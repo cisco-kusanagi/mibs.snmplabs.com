@@ -1,0 +1,1744 @@
+-- extracted from draft-danenberg-pw-cem-mib-00.txt
+-- at Sat Jul 14 06:05:23 2001
+
+   PW-CEM-MIB DEFINITIONS ::= BEGIN 
+    
+   IMPORTS 
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      experimental, Integer32, Counter32, Unsigned32, 
+      Counter64 
+         FROM SNMPv2-SMI 
+    
+   --   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP 
+   --      FROM SNMPv2-CONF 
+    
+      TEXTUAL-CONVENTION, TruthValue, RowStatus, StorageType, 
+     
+   Danenberg et al       Expires August 2001                        7 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      TimeStamp 
+         FROM SNMPv2-TC 
+    
+      InterfaceIndex, InterfaceIndexOrZero 
+         FROM IF-MIB 
+    
+      PwVcIndex  
+         FROM PW-TC-MIB 
+    
+      PerfCurrentCount, PerfIntervalCount 
+         FROM PerfHist-TC-MIB 
+     
+       pwVcIndex, pwVcInstance, pwVcOperStatus  
+         FROM PW-MIB; 
+    
+    
+   -- The CEM MIB 
+    
+   pwVcCemMIB MODULE-IDENTITY 
+      LAST-UPDATED "200107111200Z"  -- 11 July 2001 12:00:00 EST 
+      ORGANIZATION "Pseudo-Wire Emulation Edge-to-Edge (PWE3) 
+                    Working Group" 
+      CONTACT-INFO 
+          "        Dave Danenberg 
+           Postal: Litchfield Communications, Inc. 
+                   76 Westbury Park Rd 
+                   Princeton Building East 
+                   Watertown, CT 06795 
+           Tel:    +1-860-945-1573 x3180 
+           Email:  dave_danenberg@litchfieldcomm.com 
+            
+                   Thomas D. Nadeau 
+           Postal: Cisco Systems, Inc. 
+                   250 Apollo Drive 
+                   Chelmsford, MA 01824 
+           Tel:    +1-978-244-3051 
+           Email:  tnadeau@cisco.com 
+            
+                   David Zelig 
+           Postal: Corrigent Systems LTD. 
+                   126, Yigal Alon St. 
+                   Tel Aviv, ISRAEL 
+                   Phone: +972-3-6945273 
+           E-mail: davidz@corrigent.com 
+    
+                   Scott Park 
+           Postal: Litchfield Communications, Inc. 
+                   76 Westbury Park Rd 
+                   Princeton Building East 
+                   Watertown, CT 06795 
+           Tel:    +1-860-945-1573 x3185 
+           Email:  scott_park@litchfieldcomm.com 
+    
+                   Andrew G. Malis  
+     
+   Danenberg et al       Expires August 2001                        8 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+           Postal: Vivace Networks, Inc.  
+                   2730 Orchard Parkway  
+                   San Jose, CA 95134  
+           Email:  Andy.Malis@vivacenetworks.com 
+    
+    
+           The MPLS Working Group (email distribution mpls@uu.net) 
+           Or the PWE3 Working Group (pwe3@ietf.org) " 
+    
+      DESCRIPTION 
+          "This MIB contains managed object definitions for Circuit 
+           Emulation over MPLS as in: Malis, A., Vogelsang, S., and      
+           Martini, L. 'SONET/SDH Circuit Emulation Service Over MPLS  
+           (CEM) encapsulation', Internet Draft <draft-malis-sonet-  
+           ces-mpls-05.txt>, July 2001. 
+                     
+           This MIB reports to the PW-MIB. The PW-MIB contains 
+   structures 
+           and MIB associations generic to Pseudo-Wire Virtual Circuit 
+           (VC) emulation. VC-specific MIBs (such as this) contain 
+   config 
+           and stats for specific VC types." 
+    
+       
+      -- Revision history. 
+      REVISION 
+          "200107061200Z"  -- 06 July 2001 12:00:00 EST 
+      DESCRIPTION 
+          "Removed duplicate packet length object. 
+           Added minimum (DBA) packet length. 
+           Removed EXP bits object (its in PW MIB). 
+           Removed total pkt counts (its in PW MIB). 
+           Added 'UNITS' to some objects. 
+           Added DEFVAL to some objects. 
+           Removed 'playAllZeros' enum (userValue should suffice)." 
+    
+      REVISION 
+          "200107101200Z"  -- 10 July 2001 12:00:00 EST 
+      DESCRIPTION 
+          "- Added used new TC for PwVcCemConfIndex. 
+              (actually, this was added before, but not reported) 
+           - Changed pwVcCemSonetPathExtVcIndex to read-write. 
+           - Changed/added pkt counters to conform to RFC 2863. 
+           - Changed pwVcCemPerfLastDefectsAtLOPS to 
+              pwVcCemPerfLastDefectsAtUas (kept it as BITS for now). 
+           - Added pwVcCemPerfLastUasTimeStamp. 
+           - Changed pwVcCemPerfIntervalNumber to Unsigned32. 
+           - Changed pwVcCemConfIndexNext to PwVcCemConfIndex type. 
+           - Deleted all pwVcCemConfIntegrateToLOPS objects, ... 
+           - Replaced with pwVcCemConfConsecPktsInsync and 
+             pwVcCemConfConsecMissingOutSync. 
+           - Deleted pwVcCemPerfCurrentTotalIn and Out pkt counts. 
+           - Deleted pwVcCemPerfIntervalTotalIn and Out pkt counts." 
+    
+     
+   Danenberg et al       Expires August 2001                        9 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      REVISION 
+          "200107111200Z"  -- 11 July 2001 12:00:00 EST 
+      DESCRIPTION 
+          "- Added CEM up/down notifications. 
+           - Clarified APS criteria. 
+           - Clarified UAS action description. 
+           - Added description to IntervalNumber object." 
+    
+      REVISION 
+          "200107121200Z"  -- 12 July 2001 12:00:00 EST 
+      DESCRIPTION 
+          "- Cleanup based on using better MIB compiler. 
+           - Changed defects and notifications to not be 
+             tied to UAS. (Definition of CEM failures is FFS) 
+           - Added note to clarify usage of SonetIfIndex in  
+             the pwVcCem table. 
+           - Indexing of tables are updated to be correct 
+             (and compilable). 
+           - Add a few notes to clarify object descriptions." 
+    
+      ::= { experimental 8888 } --To be assigned by IANA 
+    
+    
+   -- Local Textual conventions 
+   PwVcCemConfIndex ::= TEXTUAL-CONVENTION 
+      STATUS      current 
+      DESCRIPTION 
+           "Index into the pwVcCemConfTable. 
+            Removed trap OID declarations" 
+      SYNTAX  Unsigned32 
+    
+    
+   -- Top level components of this MIB. 
+    
+   -- Traps 
+   pwVcCemNotifications OBJECT IDENTIFIER  
+                                 ::= { pwVcCemMIB 0 } 
+   pwVcCemNotifyPrefix  OBJECT IDENTIFIER 
+                                 ::= { pwVcCemNotifications 0 } 
+   -- Tables, Scalars 
+   pwVcCemObjects       OBJECT IDENTIFIER 
+                                 ::= { pwVcCemMIB 1 } 
+    
+   -- Conformance 
+   -- pwVcCemConformance   OBJECT IDENTIFIER  
+   --                               ::= { pwVcCemMIB 2 } 
+    
+   -- CEM VC table 
+    
+   pwVcCemTable OBJECT-TYPE 
+      SYNTAX        SEQUENCE OF PwVcCemEntry 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+     
+   Danenberg et al       Expires August 2001                       10 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+          "This table contains the index to the entry SONET path 
+           table for this CEM VC, the index to the CEM config table, 
+           and CEM statistics." 
+      ::= { pwVcCemObjects 1 } 
+    
+   pwVcCemEntry OBJECT-TYPE 
+      SYNTAX        PwVcCemEntry 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+          "This MIB reports to the PW-MIB. This table is indexed by 
+           the same index that was created for the associated entry 
+           in the PW VC Table (in the PW-MIB). 
+    
+             - The PwVcIndex. 
+             - The PwVcInstance. 
+    
+           An entry is created in this table by the agent for every 
+           entry in the pwVc table with a VcType of 'cem'. 
+    
+           This table provides per CEM VC performance information. 
+           HC (high capacity) counters are required for some counts 
+           due to the high speeds expected with CEM services. A SONET 
+           path of width 48 (STS-48c) can rollover non-HC counters in 
+           a few minutes. 
+            
+           CEM bridges the SONET and packet worlds. In the packet 
+           world, counts typically start from the time of service 
+           creation - and don't stop. In the SONET world, counts are 
+           kept in 15 minute intervals. The CEM-MIB supports both 
+           methods. Thestats in the VC CEM table count forever. The 
+           15 minute interval counts are in the tables following this. 
+            
+           NOTE: Outbound errors are currently not considered in the 
+           CEM-MIB. It is assumed that CEM packets are forwarded as 
+           they are generated. i.e., It is assumed that there are no 
+           congestion issues at the point of CEM adaptation." 
+    
+      INDEX  { pwVcIndex, pwVcInstance } 
+    
+         ::= { pwVcCemTable 1 } 
+    
+   PwVcCemEntry ::= SEQUENCE { 
+    
+         pwVcCemSonetPathIfIndex           InterfaceIndexOrZero, 
+         pwVcCemConfIndex                  PwVcCemConfIndex, 
+          
+         pwVcCemPerfDbaInPacketsHC         Counter64, 
+         pwVcCemPerfDbaOutPacketsHC        Counter64, 
+         pwVcCemPerfDbaInPackets           Counter32, 
+         pwVcCemPerfDbaOutPackets          Counter32, 
+    
+         pwVcCemPerfInNegPtrAdjustHC       Counter32, 
+         pwVcCemPerfInPosPtrAdjustHC       Counter32, 
+     
+   Danenberg et al       Expires August 2001                       11 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+         pwVcCemPerfInPtrAdjustSecs        Counter32, 
+         pwVcCemPerfOutNegPtrAdjustHC      Counter32, 
+         pwVcCemPerfOutPosPtrAdjustHC      Counter32, 
+         pwVcCemPerfOutPtrAdjustSecs       Counter32, 
+         pwVcCemPerfAbsPtrAdjust           Integer32, 
+    
+         pwVcCemPerfCorrectableHdrErrors   Counter32, 
+         pwVcCemPerfUncorrectableHdrErrors Counter32, 
+         pwVcCemPerfMissingPkts            Counter32, 
+         pwVcCemPerfPktsOoseq              Counter32, 
+         pwVcCemPerfPktsOoseqDropped       Counter32,  
+         pwVcCemPerfJtrBfrUnderruns        Counter32, 
+         pwVcCemPerfJtrBfrOverruns         Counter32, 
+         pwVcCemPerfPktsBadLength          Counter32, 
+    
+         pwVcCemPerfESs                    Counter32, 
+         pwVcCemPerfSESs                   Counter32, 
+         pwVcCemPerfUASs                   Counter32, 
+         pwVcCemPerfLastDefectsAtFailure   BITS, 
+         pwVcCemPerfLastFailureTimeStamp   TimeStamp, 
+         pwVcCemPerfDiscontinuityTime      TimeStamp 
+         } 
+    
+   pwVcCemSonetPathIfIndex OBJECT-TYPE 
+      SYNTAX        InterfaceIndexOrZero 
+      MAX-ACCESS    read-write 
+      STATUS        current 
+      DESCRIPTION 
+          "This is a unique index within the ifTable. It represents  
+           the interface index for the SONET path. A value of zero  
+           indicates an interface index that has yet to be configured 
+           or has since disappeared. 
+           Note: if there are multiple instances of CEM VC, then the 
+           pathIfIndex object MUST be identical in each instance." 
+      ::= { pwVcCemEntry 1 } 
+    
+   pwVcCemConfIndex OBJECT-TYPE 
+      SYNTAX        PwVcCemConfIndex 
+      MAX-ACCESS    read-write 
+      STATUS        current 
+      DESCRIPTION 
+          "Index to CEM configuration table below. It is likely that 
+           multiple CEM VCs will share 1 CEM conf table entry." 
+      ::= { pwVcCemEntry 2 } 
+    
+   pwVcCemPerfDbaInPacketsHC OBJECT-TYPE 
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets received." 
+      ::= { pwVcCemEntry 3 } 
+    
+   pwVcCemPerfDbaOutPacketsHC OBJECT-TYPE 
+     
+   Danenberg et al       Expires August 2001                       12 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets sent." 
+      ::= { pwVcCemEntry 4 } 
+    
+   pwVcCemPerfDbaInPackets OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets received." 
+      ::= { pwVcCemEntry 5 } 
+    
+   pwVcCemPerfDbaOutPackets OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets sent." 
+      ::= { pwVcCemEntry 6 } 
+    
+   -- Pointer adjustment stats 
+   pwVcCemPerfInNegPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of negative pointer adjustments sent on the 
+           SONET path based on CEM pointer adjustments received." 
+      ::= { pwVcCemEntry 7} 
+    
+   pwVcCemPerfInPosPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of postive pointer adjustments sent on the 
+           SONET path based on CEM pointer adjustments received." 
+      ::= { pwVcCemEntry 8 } 
+    
+   pwVcCemPerfInPtrAdjustSecs OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of seconds in which a pos or neg pointer 
+           adjustment was sent on the SONET path." 
+      ::= { pwVcCemEntry 9 } 
+    
+   pwVcCemPerfOutNegPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+     
+   Danenberg et al       Expires August 2001                       13 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      STATUS        current 
+      DESCRIPTION 
+          "Number of negative pointer adjustments seen on the 
+           SONET path and encoded onto sent CEM packets." 
+      ::= { pwVcCemEntry 10 } 
+    
+   pwVcCemPerfOutPosPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of positive pointer adjustments seen on the 
+           SONET path and encoded onto sent CEM packets." 
+      ::= { pwVcCemEntry 11 } 
+    
+   pwVcCemPerfOutPtrAdjustSecs OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of seconds in which a pos or neg pointer 
+           adjustment was seen on the SONET path." 
+      ::= { pwVcCemEntry 12 } 
+    
+   pwVcCemPerfAbsPtrAdjust OBJECT-TYPE 
+      SYNTAX        Integer32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Absolute Pointer adjustments is relative adjustment 
+           drifts between inbound and outbound streams. It is 
+           calculated as such : 
+              ( InPosPtrAdjust  -   InNegPtrAdjust) -  
+              (OutPosPtrAdjust  -  OutNegPtrAdjust)     " 
+      ::= { pwVcCemEntry 13 } 
+    
+   pwVcCemPerfCorrectableHdrErrors OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of correctable CEM header errors detected on 
+           inbound CEM packets." 
+      ::= { pwVcCemEntry 14 } 
+    
+   pwVcCemPerfUncorrectableHdrErrors OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of uncorrectable CEM header errors detected on 
+           inbound CEM packets." 
+      ::= { pwVcCemEntry 15 } 
+    
+     
+   Danenberg et al       Expires August 2001                       14 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+   pwVcCemPerfMissingPkts OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of missing packets (as detected via CEM header 
+           sequence number gaps)." 
+      ::= { pwVcCemEntry 16 } 
+    
+   pwVcCemPerfPktsOoseq OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets detected out of sequence (via CEM  
+           header sequence numbers), but were able to be re-sequenced. 
+           Note: some implementations may not support this feature 
+           (see pwVcCemConfPktResequence)." 
+      ::= { pwVcCemEntry 17 } 
+    
+   pwVcCemPerfPktsOoseqDropped OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets detected out of sequence (via CEM  
+           header sequence numbers), but were unable to be re- 
+           sequenced." 
+      ::= { pwVcCemEntry 18 } 
+    
+   pwVcCemPerfJtrBfrUnderruns OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of times the jitter buffer transitioned to empty." 
+      ::= { pwVcCemEntry 19 } 
+    
+   pwVcCemPerfJtrBfrOverruns OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets received while jitter buffer is full." 
+      ::= { pwVcCemEntry 20 } 
+    
+   pwVcCemPerfPktsBadLength OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets received larger or smaller than 
+           pwVcCemConfPktLength." 
+      ::= { pwVcCemEntry 21 } 
+     
+   Danenberg et al       Expires August 2001                       15 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+    
+   pwVcCemPerfESs OBJECT-TYPE 
+      SYNTAX       Counter32 
+      MAX-ACCESS   read-only 
+      STATUS       current 
+      DESCRIPTION 
+          "The counter associated with the number of Errored 
+           Seconds encountered. See future versions of 
+           draft-malis-sonet-ces-mpls for definition of ES." 
+      ::= { pwVcCemEntry 22 } 
+    
+   pwVcCemPerfSESs OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "The counter associated with the number of 
+           Severely Errored Seconds. See future versions of 
+           draft-malis-sonet-ces-mpls for definition of SES." 
+      ::= { pwVcCemEntry 23 } 
+    
+   pwVcCemPerfUASs OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "The counter associated with the number of 
+           UnAvailable Seconds. See pwVcCemConfSesToUAS. 
+             
+           NOTE: When first entering the UAS state, the number 
+           of SesToUas is added to this object, then as each 
+           additional UAS occurs, this object increments by one." 
+      ::= { pwVcCemEntry 24 } 
+    
+   pwVcCemPerfLastDefectsAtFailure OBJECT-TYPE 
+      SYNTAX BITS { 
+            uncrctHdr   ( 0), 
+            missingPkt  ( 1), 
+            ooSeqDropped( 2), 
+            jtrBfrUnder ( 3), 
+            jtrBfrOver  ( 4), 
+            pktBadLength( 5), 
+            lops        ( 6) 
+      } 
+      MAX-ACCESS    read-only                 
+      STATUS        current 
+      DESCRIPTION 
+          "The state of defects when CEM VC last entered the 
+           a 'failure' state. Since more than one defect can 
+           contributed to a CEM VC failure, all are shown here. 
+    
+           Note: currently there is no hierarchy of CEM defects. 
+    
+           Note: the algorithm used to capture these defects when 
+     
+   Danenberg et al       Expires August 2001                       16 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+           entering failure state is implementation specific. 
+    
+           Note: definition of 'CEM failure' is for further 
+           study. One possible definition: in LOPS state for 2.5 
+           seconds. A 'CEM failure' may be also be determined (via 
+           software) as a result of trend analysis (e.g., missing 
+           packet ratio over time)." 
+      ::= { pwVcCemEntry 25 } 
+    
+   pwVcCemPerfLastFailureTimeStamp OBJECT-TYPE 
+      SYNTAX      TimeStamp 
+      MAX-ACCESS  read-only 
+      STATUS      current 
+      DESCRIPTION 
+          "The value of sysUpTime on the most recent occasion at 
+           which the CEM enterd the 'failure' state." 
+      ::= { pwVcCemEntry 26 } 
+    
+   pwVcCemPerfDiscontinuityTime OBJECT-TYPE 
+      SYNTAX      TimeStamp 
+      MAX-ACCESS  read-only 
+      STATUS      current 
+      DESCRIPTION 
+          "The value of sysUpTime on the most recent occasion at 
+           which any one or more of this segment's Counter32 or 
+           Counter64 suffered a discontinuity. If no such 
+           discontinuities have occurred since the last re- 
+           initialization of the local management subsystem, then 
+           this object contains a zero value." 
+      ::= { pwVcCemEntry 27 } 
+    
+   -- End of PW CEM VC table 
+    
+    
+   -- Obtain index for PW CEM Configuration table entries 
+   pwVcCemConfIndexNext OBJECT-TYPE 
+      SYNTAX            PwVcCemConfIndex 
+      MAX-ACCESS        read-only 
+      STATUS            current 
+      DESCRIPTION 
+          "This object contains an appropriate value to be used 
+           for pwVcCemConfIndex when creating entries in the 
+           pwVcCemConfTable. The value 0 indicates that no 
+           unassigned entries are available.  To obtain the 
+           value of pwVcCemConfIndex for a new entry in the 
+           pwVcCemConfTable, the manager issues a management 
+           protocol retrieval operation to obtain the current 
+           value of pwVcCemConfIndex. After each retrieval 
+           operation, the agent should modify the value to 
+           reflect the next unassigned index.  After a manager 
+           retrieves a value the agent will determine through 
+           its local policy when this index value will be made 
+           available for reuse." 
+      ::= { pwVcCemObjects 2 } 
+     
+   Danenberg et al       Expires August 2001                       17 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+    
+   -- PW CEM VC Configuration Table 
+    
+   pwVcCemConfTable   OBJECT-TYPE 
+      SYNTAX                  SEQUENCE OF PwVcCemConfEntry 
+      MAX-ACCESS              not-accessible 
+      STATUS                  current 
+      DESCRIPTION 
+        "This table contains a set of parameters that may be 
+         referenced by 1 or more CEM VCs by pwVcCemTable." 
+      ::= { pwVcCemObjects 3 } 
+    
+   pwVcCemConfEntry   OBJECT-TYPE 
+      SYNTAX            PwVcCemConfEntry 
+      MAX-ACCESS        not-accessible 
+      STATUS            current 
+      DESCRIPTION 
+           "These parameters define the characteristics of a 
+            CEM VC. They are grouped here to ease NMS burden. 
+            Once an entry is created here it may be re-used 
+            by many VCs." 
+    
+      INDEX  { pwVcCemConfTableIndex } 
+    
+         ::= { pwVcCemConfTable 1 } 
+    
+   PwVcCemConfEntry ::= SEQUENCE { 
+         pwVcCemConfTableIndex           PwVcCemConfIndex, 
+         pwVcCemConfigError              BITS, 
+    
+         pwVcCemConfMaxPktLength         Unsigned32, 
+         pwVcCemConfMinPktLength         Unsigned32, 
+         pwVcCemConfCemOptions           Unsigned32, 
+         pwVcCemConfPktResequence        TruthValue, 
+         pwVcCemConfEnableDBA            BITS, 
+         pwVcCemConfJtrBfrDepth          Unsigned32, 
+    
+         pwVcCemConfConsecPktsInsync     Unsigned32, 
+         pwVcCemConfConsecMissingOutSync Unsigned32, 
+    
+         pwVcCemConfErrorAction          INTEGER, 
+         pwVcCemConfUserErrorAction      Unsigned32, 
+    
+         pwVcCemConfSesToUas             Unsigned32, 
+         pwVcCemConfUasAction            INTEGER, 
+         pwVcCemConfUserUasAction        Unsigned32, 
+    
+         pwVcCemConfApsCriteria          BITS, 
+    
+         pwVcCemConfRowStatus            RowStatus, 
+         pwVcCemConfStorageType          StorageType 
+         } 
+    
+   pwVcCemConfTableIndex   OBJECT-TYPE 
+     
+   Danenberg et al       Expires August 2001                       18 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      SYNTAX        PwVcCemConfIndex 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+          "Primary index to this table" 
+      ::= { pwVcCemConfEntry 1 } 
+    
+   pwVcCemConfigError OBJECT-TYPE 
+      SYNTAX BITS { 
+            dba           ( 0), 
+            resequencing  ( 1), 
+            lopsPktCount  ( 2), 
+            pktLength     ( 3), 
+            jtrBfrDepth   ( 4), 
+            cemOptions    ( 5) 
+      } 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Various configurations errors. Illegal settings within 
+           the pwVcCemConf table." 
+      ::= { pwVcCemConfEntry 2 } 
+    
+   pwVcCemConfMaxPktLength OBJECT-TYPE 
+      SYNTAX        Unsigned32 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "This is the maximum CEM packet length in number 
+           of bytes (including CEM header and payload). It is 
+           fixed and applies to inbound and outbound packets 
+           carrying user payload. Although there is no control 
+           over inbound packets, those of illegal length are 
+           discarded and accounted for (see 
+           pwVcCemPerfPktsBadLength.) 
+      
+           Note: DBA packets have their own (shorter) length 
+           and are not effected by this setting. If there were 
+           to be CEM payload compression, compressed packets 
+           would have their own (shorter) length not effected 
+           by this setting. 
+    
+           Used by signaling (LDP) to fill in the 'Virtual Circuit 
+           FEC element' and the CEM interface parameters therein." 
+      REFERENCE 
+          "See FEC element format and Interfaces Parameters format 
+           in Martini. L, et al, <draft-martini-l2circuit-trans- 
+           mpls-06>. For use of payload bytes see Malis, A., et al, 
+           <draft-malis-sonet-ces-mpls-05.txt>."       
+      ::= { pwVcCemConfEntry 3 } 
+    
+   pwVcCemConfMinPktLength OBJECT-TYPE 
+      SYNTAX        Unsigned32 
+      MAX-ACCESS    read-create 
+     
+   Danenberg et al       Expires August 2001                       19 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      STATUS        current 
+      DESCRIPTION 
+          "This is the minimum CEM packet length in number of 
+           bytes (including CEM header and payload). It applies 
+           to CEM's bandwidth-savings packets. Currently DBA is 
+           the only bandwidth-savings packet type (in the future, 
+           CEM may support compression). Minimum packet length is 
+           necessary in some systems or networks. 
+            
+           Setting Zero here indicates that there is no minimum 
+           packet restriction. If non-zero, then packets too 
+           small are be discarded and accounted for (see 
+           pwVcCemPerfPktsBadLength.) 
+    
+           Used by signaling (LDP) to fill in the 'Virtual Circuit 
+           FEC element' and the CEM interface parameters therein."  
+    
+      REFERENCE 
+          "See FEC element format and Interfaces Parameters format 
+           in Martini. L, et al, <draft-martini-l2circuit-trans- 
+           mpls-06>. For use of payload bytes see Malis, A., et al, 
+           <draft-malis-sonet-ces-mpls-05.txt>."       
+      DEFVAL { 0 } 
+      ::= { pwVcCemConfEntry 4 } 
+    
+   pwVcCemConfCemOptions OBJECT-TYPE  
+      SYNTAX        Unsigned32 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "Used by signaling (LDP) to fill in the 'Virtual Circuit FEC 
+           element' and the CEM interface parameters therein. CEM 
+   options 
+           are formatted into bit fields within a 16-bit word. Such 
+           fields will define CEM-DBA, STS-n starting time slot, etc."  
+      REFERENCE 
+          "See FEC element format and Interfaces Parameters format in 
+           Martini. L, et al, <draft-martini-l2circuit-trans-mpls-06>. 
+   Also 
+           see Malis, A., et al, <draft-malis-sonet-ces-mpls-05.txt>." 
+      ::= { pwVcCemConfEntry 5 } 
+    
+   pwVcCemConfPktResequence OBJECT-TYPE 
+      SYNTAX        TruthValue 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "If set True: as inbound packets are queued in the jitter  
+           buffer, out of order packets are re-sequenced. The  
+           maximum sequence number differential (i.e., the range in 
+           which resequencing can occur) is dependant on the depth of 
+           the jitter buffer. See pwVcCemConfJtrBfrDepth. 
+            
+           NOTE: Some implementations may not support this feature. 
+     
+   Danenberg et al       Expires August 2001                       20 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+           If set True, then error code is set in pwVcCemConfigError. 
+    
+           NOTE: Some implementations may always have this feature on. 
+           If set False, then error code is set in pwVcCemConfigError." 
+      ::= { pwVcCemConfEntry 6 } 
+    
+   pwVcCemConfEnableDBA OBJECT-TYPE 
+      SYNTAX BITS { 
+            allOnesOnAis(0), 
+            allZerosOnUnequipped(1) 
+      } 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "Any bits set here MUST enable the DBA (dynamic bandwidth 
+           allocation) feature for the specified condition. Setting 
+           allOnesOnAis will cause CEM packet payload suppression  
+           when AIS is detected on the associated SONET path.  
+           Similarly, allZerosOnUnequipped will cause payload  
+           suppression when the SONET path is un-equipped. During  
+           these conditions, CEM packets will continue to be sent,  
+           but with indicators set in the CEM header instructing the  
+           remote to play all ones or zeros onto its SONET path. 
+    
+           NOTE: some implementations may not support this feature. 
+           If set, then an error code is set in pwVcCemConfigError." 
+      DEFVAL { {allOnesOnAis} } 
+      ::= { pwVcCemConfEntry 7 } 
+    
+   pwVcCemConfJtrBfrDepth OBJECT-TYPE 
+      SYNTAX        Unsigned32 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "This setting configures the number of packet buffers  
+           reserved for this CEM VC. This object essentially sets 
+           the maximum amount of time allowed between CEM packets 
+           before the jitter buffer empties. This variable should  
+           be set based on the SONET path width (speed) and the 
+           amount of delay variation expected to be introduced by 
+           the network. Like bandwidth, jitter buffers are likely 
+           to be a limited resource to be managed." 
+      ::= { pwVcCemConfEntry 8 } 
+    
+   -- 
+   -- The following counters work together to integrate (filter) 
+   -- errors and the lack of errors on the CEM VC. An error is 
+   -- caused by a missing packet. Missing packet can be a results 
+   -- of: packet out of sequence (uncorrectable), CEM header error  
+   -- (uncorrectable), pkt length error, jitter buffer overflow, 
+   -- and jitter buffer underflow. The result is declaring whether 
+   -- or not the CEM VC is in Loss of Packet Sync (LOPS) state. 
+   -- 
+   pwVcCemConfConsecPktsInsync      OBJECT-TYPE 
+     
+   Danenberg et al       Expires August 2001                       21 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      SYNTAX        Unsigned32 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION   "Consecutive pkts with sequential sequence 
+                     numbers required to exit the LOPS state." 
+      REFERENCE 
+       "See Malis, A., et al, <draft-malis-sonet-ces-mpls-05.txt>." 
+      DEFVAL { 2 } 
+      ::= { pwVcCemConfEntry 9 } 
+    
+   pwVcCemConfConsecMissingOutSync  OBJECT-TYPE 
+      SYNTAX        Unsigned32 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION   "Consecutive missing pkts required to enter 
+                     the LOPS state." 
+      DEFVAL { 10 } 
+      ::= { pwVcCemConfEntry 10 } 
+    
+    
+   pwVcCemConfErrorAction OBJECT-TYPE 
+      SYNTAX INTEGER { 
+            playAllOnes (1), 
+            userValue   (2) 
+      } 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "These are the actions to take when inbound packets are  
+           missing due to gap in sequence numbers (uncorrectable via  
+           available re-sequencing), jitter buffer underruns, or 
+           packets with bad CEM headers. These patterns are sent  
+           (played) on the SONET path. These settings are used for  
+           immediate errors and (unless the pwVcCemConfUasAction is  
+           'errorAction') are not in effect once the CEM VC is in 
+           UAS state.  For userValue see pwVcCemConfUserErrorAction." 
+      DEFVAL { playAllOnes } 
+      ::= { pwVcCemConfEntry 11 } 
+    
+   pwVcCemConfUserErrorAction OBJECT-TYPE 
+      SYNTAX        Unsigned32 (0..255) 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION    
+          "Used when userValue selected above. This byte value is 
+           sent on every byte in every SPE."  
+      DEFVAL { 255 } -- Play all ones 
+      ::= { pwVcCemConfEntry 12 } 
+    
+   pwVcCemConfSesToUas OBJECT-TYPE 
+      SYNTAX        Unsigned32 
+      UNITS         "seconds" 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+     
+   Danenberg et al       Expires August 2001                       22 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      DESCRIPTION 
+          "Number of consecutive SESs before declaring VC in UAS 
+           state (and at which point pwVcCemPerfUASs starts counting). 
+           The SesToUas default value is 10 seconds. 
+            
+           NOTE: 10 consecutive non-SESs cause the VC to exit the 
+           UAS state.  See pwVcCemPerfSESs and pwVcCemPerfUASs." 
+      DEFVAL { 10 } 
+      ::= { pwVcCemConfEntry 13 } 
+    
+   pwVcCemConfUasAction OBJECT-TYPE 
+      SYNTAX        INTEGER { 
+            errorAction (1), 
+            playAllOnes (2), 
+            userValue   (3) 
+      } 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "These are the actions to take once the CEM VC has been 
+           declared in UAS state (as observed in pwVcCemPerfDefects) 
+           and there are missing packets (as described in the 
+           pwVcCemConfErrorAction object, above).   
+           These patterns are sent (played) on the SONET path. If 
+           'errorAction' is selected, then the pwVcCemConfErrorAction  
+           settings stay in effect even after the CEM VC is in UAS. 
+           For userValue see pwVcCemConfUserUasAction." 
+      DEFVAL { playAllOnes } 
+      ::= { pwVcCemConfEntry 14 } 
+    
+   pwVcCemConfUserUasAction OBJECT-TYPE 
+      SYNTAX        Unsigned32 (0..255) 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "Used when userValue selected above. This byte value is 
+           sent on every byte in every SPE." 
+      DEFVAL { 255 } -- Play all ones 
+      ::= { pwVcCemConfEntry 15 } 
+    
+   pwVcCemConfApsCriteria OBJECT-TYPE 
+      SYNTAX BITS { 
+            lops(0), 
+            es  (1), 
+            ses (2), 
+            uas (3) 
+      } 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "Bits set here represent defects used as inputs into APS 
+           mechanisms (see PW-MIB). NOTE: these indications are as 
+           set within pwVcCemPerfDefects. 
+           Note: for APS applications requiring fast response, the 
+     
+   Danenberg et al       Expires August 2001                       23 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+           'lops' trigger option is recommended. LOPS can be generated 
+           within milliseconds, while UAS is multiple seconds."  
+      DEFVAL { {lops} } 
+      ::= { pwVcCemConfEntry 16 } 
+    
+   pwVcCemConfRowStatus    OBJECT-TYPE 
+      SYNTAX               RowStatus 
+      MAX-ACCESS           read-create 
+      STATUS               current 
+      DESCRIPTION 
+          "For creating, modifying, and deleting this row." 
+      ::= { pwVcCemConfEntry 17 } 
+    
+   pwVcCemConfStorageType  OBJECT-TYPE 
+      SYNTAX                      StorageType 
+      MAX-ACCESS                  read-create 
+      STATUS                      current 
+      DESCRIPTION 
+          "This variable indicates the storage type for this 
+           object." 
+      ::= { pwVcCemConfEntry 18 } 
+    
+   -- End of PW CEM VC Configuration Parameter Table 
+    
+    
+   -- CEM VC Performance Current Interval Table. 
+    
+   pwVcCemPerfCurrentTable OBJECT-TYPE 
+      SYNTAX        SEQUENCE OF PwVcCemPerfCurrentEntry 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+          "This table provides per CEM VC performance information 
+           much like the pwVcCemPerfTable above. However, these 
+           counts represent the current 15 minute interval only. 
+           NOTE: Counter64 objects are used here, Counter32 is 
+           too small for OC-768 CEM VCs." 
+      ::= { pwVcCemObjects 4 } 
+    
+   pwVcCemPerfCurrentEntry OBJECT-TYPE 
+      SYNTAX        PwVcCemPerfCurrentEntry 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+          "An entry in this table is created by the agent for every  
+           pwVcCemConf entry. It is an extension to the 
+           pwVcCemConf table. After 15 minutes, the contents of 
+           this table entry are copied to a new entry in the  
+           pwVcCemPerfInterval table and the counts in this entry are  
+           reset to zero." 
+    
+      AUGMENTS { pwVcCemEntry } 
+    
+      ::= { pwVcCemPerfCurrentTable 1 } 
+     
+   Danenberg et al       Expires August 2001                       24 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+    
+   PwVcCemPerfCurrentEntry ::= SEQUENCE { 
+         pwVcCemPerfCurrentDbaInPacketsHC     Counter64, 
+         pwVcCemPerfCurrentDbaOutPacketsHC    Counter64, 
+         pwVcCemPerfCurrentDbaInPackets       Counter32, 
+         pwVcCemPerfCurrentDbaOutPackets      Counter32, 
+    
+         pwVcCemPerfCurrentInNegPtrAdjustHC   Counter32, 
+         pwVcCemPerfCurrentInPosPtrAdjustHC   Counter32, 
+         pwVcCemPerfCurrentInPtrAdjustSecs    Counter32, 
+         pwVcCemPerfCurrentOutNegPtrAdjustHC  Counter32, 
+         pwVcCemPerfCurrentOutPosPtrAdjustHC  Counter32, 
+         pwVcCemPerfCurrentOutPtrAdjustSecs   Counter32, 
+         pwVcCemPerfCurrentAbsPtrAdjust       Integer32, 
+    
+         pwVcCemPerfCurrentCrctHdrErrors      Counter32, 
+         pwVcCemPerfCurrentUncrctHdrErrors    Counter32, 
+         pwVcCemPerfCurrentMissingPkts        Counter32, 
+         pwVcCemPerfCurrentPktsOoseq          Counter32, 
+         pwVcCemPerfCurrentPktsOoseqDropped   Counter32,  
+         pwVcCemPerfCurrentJtrBfrUnderruns    Counter32, 
+         pwVcCemPerfCurrentJtrBfrOverruns     Counter32, 
+         pwVcCemPerfCurrentPktsBadLength      Counter32, 
+    
+         pwVcCemPerfCurrentESs                PerfCurrentCount, 
+         pwVcCemPerfCurrentSESs               PerfCurrentCount, 
+         pwVcCemPerfCurrentUASs               PerfCurrentCount 
+      } 
+    
+   pwVcCemPerfCurrentDbaInPacketsHC OBJECT-TYPE 
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets received." 
+      ::= { pwVcCemPerfCurrentEntry 1 } 
+    
+   pwVcCemPerfCurrentDbaOutPacketsHC OBJECT-TYPE 
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets sent." 
+      ::= { pwVcCemPerfCurrentEntry 2 } 
+    
+   pwVcCemPerfCurrentDbaInPackets OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets received." 
+      ::= { pwVcCemPerfCurrentEntry 3 } 
+    
+   pwVcCemPerfCurrentDbaOutPackets OBJECT-TYPE 
+     
+   Danenberg et al       Expires August 2001                       25 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets sent." 
+      ::= { pwVcCemPerfCurrentEntry 4 } 
+    
+   -- Pointer adjustment stats 
+   pwVcCemPerfCurrentInNegPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of negative pointer adjustments sent on the 
+           SONET path based on CEM pointer adjustments received." 
+      ::= { pwVcCemPerfCurrentEntry 5 } 
+    
+   pwVcCemPerfCurrentInPosPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of postive pointer adjustments sent on the 
+           SONET path based on CEM pointer adjustments received." 
+      ::= { pwVcCemPerfCurrentEntry 6 } 
+    
+   pwVcCemPerfCurrentInPtrAdjustSecs OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of seconds in which a pos or neg pointer 
+           adjustment was sent on the SONET path." 
+      ::= { pwVcCemPerfCurrentEntry 7 } 
+    
+   pwVcCemPerfCurrentOutNegPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of negative pointer adjustments seen on the 
+           SONET path and encoded onto sent CEM packets." 
+      ::= { pwVcCemPerfCurrentEntry 8 } 
+    
+   pwVcCemPerfCurrentOutPosPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of positive pointer adjustments seen on the 
+           SONET path and encoded onto sent CEM packets." 
+      ::= { pwVcCemPerfCurrentEntry 9 } 
+    
+   pwVcCemPerfCurrentOutPtrAdjustSecs OBJECT-TYPE 
+     
+   Danenberg et al       Expires August 2001                       26 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of seconds in which a pos or neg pointer 
+           adjustment was seen on the SONET path." 
+      ::= { pwVcCemPerfCurrentEntry 10 } 
+    
+   pwVcCemPerfCurrentAbsPtrAdjust OBJECT-TYPE 
+      SYNTAX        Integer32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Absolute Pointer adjustments is relative adjustment 
+           drifts between inbound and outbound streams. It is 
+           calculated as such : 
+              ( InPosPtrAdjust  -   InNegPtrAdjust) -  
+              (OutPosPtrAdjust  -  OutNegPtrAdjust)     " 
+      ::= { pwVcCemPerfCurrentEntry 11 } 
+    
+    
+   pwVcCemPerfCurrentCrctHdrErrors OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of correctable CEM header errors detected on 
+           inbound CEM packets." 
+      ::= { pwVcCemPerfCurrentEntry 12 } 
+    
+   pwVcCemPerfCurrentUncrctHdrErrors OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of uncorrectable CEM header errors detected on 
+           inbound CEM packets." 
+      ::= { pwVcCemPerfCurrentEntry 13 } 
+    
+   pwVcCemPerfCurrentMissingPkts OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of missing packets (as detected via CEM header 
+           sequence number gaps)." 
+      ::= { pwVcCemPerfCurrentEntry 14 } 
+    
+   pwVcCemPerfCurrentPktsOoseq OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets detected out of sequence (via CEM  
+     
+   Danenberg et al       Expires August 2001                       27 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+           header sequence numbers), but were able to be re-sequenced. 
+           Note: some implementations may not support this 
+           feature (see pwVcCemConfPktResequence)." 
+      ::= { pwVcCemPerfCurrentEntry 15 } 
+    
+   pwVcCemPerfCurrentPktsOoseqDropped OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets detected out of sequence (via CEM  
+           header sequence numbers), but were unable to be re- 
+           sequenced." 
+      ::= { pwVcCemPerfCurrentEntry 16 } 
+    
+   pwVcCemPerfCurrentJtrBfrUnderruns OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of times the jitter buffer transitioned to empty." 
+      ::= { pwVcCemPerfCurrentEntry 17 } 
+    
+   pwVcCemPerfCurrentJtrBfrOverruns OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets received while jitter buffer is full." 
+      ::= { pwVcCemPerfCurrentEntry 18 } 
+    
+   pwVcCemPerfCurrentPktsBadLength OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of non-bandwidth-saving packets received larger 
+           or smaller than pwVcCemConfMaxPktLength. Plus number of 
+           bandwidth-saving packets (like DBA) that are smaller 
+           than pwVcCemConfMinPktLength." 
+      ::= { pwVcCemPerfCurrentEntry 19 } 
+    
+   pwVcCemPerfCurrentESs OBJECT-TYPE 
+       SYNTAX       PerfCurrentCount 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "The counter associated with the number of Errored 
+            Seconds encountered." 
+       ::= { pwVcCemPerfCurrentEntry 20 } 
+    
+   pwVcCemPerfCurrentSESs OBJECT-TYPE 
+       SYNTAX        PerfCurrentCount 
+       MAX-ACCESS    read-only 
+     
+   Danenberg et al       Expires August 2001                       28 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+       STATUS        current 
+       DESCRIPTION 
+           "The counter associated with the number of 
+            Severely Errored Seconds encountered." 
+       ::= { pwVcCemPerfCurrentEntry 21 } 
+    
+   pwVcCemPerfCurrentUASs OBJECT-TYPE 
+       SYNTAX        PerfCurrentCount 
+       MAX-ACCESS    read-only 
+       STATUS        current 
+       DESCRIPTION 
+           "The counter associated with the number of 
+            Unavailable Seconds encountered." 
+       ::= { pwVcCemPerfCurrentEntry 22 } 
+    
+   -- End PW CEM VC Performance Current Interval Table 
+    
+    
+    
+   -- PW CEM VC Performance Interval Table. 
+    
+   pwVcCemPerfIntervalTable OBJECT-TYPE 
+      SYNTAX        SEQUENCE OF PwVcCemPerfIntervalEntry 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+          "This table provides per CEM VC performance information 
+           much like the pwVcCemPerfCurrentTable above. However, 
+           these counts represent historical 15 minute intervals. 
+           Typically, this table will have a maximum of 96 entries 
+           for a 24 hour period, but is not limited to this. 
+           NOTE: Counter64 objects are used here, Counter32 is 
+           too small for OC-768 CEM VCs." 
+      ::= { pwVcCemObjects 5 } 
+    
+   pwVcCemPerfIntervalEntry OBJECT-TYPE 
+      SYNTAX        PwVcCemPerfIntervalEntry 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+          "An entry in this table is created by the agent for 
+           every pwVcCemPerfCurrentEntry that is 15 minutes old. 
+           The contents of the Current entry are copied to the new 
+           entry here. The Current entry, then resets its counts 
+           to zero for the next current 15 minute interval. 
+           pwVcCemIndex is found in the pwVcCemConf table." 
+    
+      INDEX  { pwVcIndex, pwVcInstance, 
+               pwVcCemPerfIntervalNumber } 
+    
+      ::= { pwVcCemPerfIntervalTable 1 } 
+    
+   PwVcCemPerfIntervalEntry ::= SEQUENCE { 
+         pwVcCemPerfIntervalNumber             Unsigned32, 
+     
+   Danenberg et al       Expires August 2001                       29 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+         pwVcCemPerfIntervalValidData          TruthValue, 
+         pwVcCemPerfIntervalReset              INTEGER, 
+    
+         pwVcCemPerfIntervalDbaInPacketsHC     Counter64, 
+         pwVcCemPerfIntervalDbaOutPacketsHC    Counter64, 
+         pwVcCemPerfIntervalDbaInPackets       Counter32, 
+         pwVcCemPerfIntervalDbaOutPackets      Counter32, 
+    
+         pwVcCemPerfIntervalInNegPtrAdjustHC   Counter32, 
+         pwVcCemPerfIntervalInPosPtrAdjustHC   Counter32, 
+         pwVcCemPerfIntervalInPtrAdjustSecs    Counter32, 
+         pwVcCemPerfIntervalOutNegPtrAdjustHC  Counter32, 
+         pwVcCemPerfIntervalOutPosPtrAdjustHC  Counter32, 
+         pwVcCemPerfIntervalOutPtrAdjustSecs   Counter32, 
+         pwVcCemPerfIntervalAbsPtrAdjust       Integer32, 
+    
+         pwVcCemPerfIntervalCrctHdrErrors      Counter32, 
+         pwVcCemPerfIntervalUncrctHdrErrors    Counter32, 
+         pwVcCemPerfIntervalMissingPkts        Counter32, 
+         pwVcCemPerfIntervalPktsOoseq          Counter32, 
+         pwVcCemPerfIntervalPktsOoseqDropped   Counter32,  
+         pwVcCemPerfIntervalJtrBfrUnderruns    Counter32, 
+         pwVcCemPerfIntervalJtrBfrOverruns     Counter32, 
+         pwVcCemPerfIntervalPktsBadLength      Counter32, 
+    
+         pwVcCemPerfIntervalESs                PerfIntervalCount, 
+         pwVcCemPerfIntervalSESs               PerfIntervalCount, 
+         pwVcCemPerfIntervalUASs               PerfIntervalCount 
+      } 
+    
+   pwVcCemPerfIntervalNumber OBJECT-TYPE 
+      SYNTAX        Unsigned32 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+          "A number (normally between 1 and 96 to cover a 24 hour 
+           period) which identifies the interval for which the set 
+           of statistics is available. The interval identified by 1 
+           is the most recently completed 15 minute interval, and 
+           the interval identified by N is the interval immediately 
+           preceding the one identified by N-1. The minimum range of 
+           N is 1 through 4. The default range is 1 through 32. The 
+           maximum value of N is 1 through 96." 
+      ::= { pwVcCemPerfIntervalEntry 1 } 
+    
+   pwVcCemPerfIntervalValidData OBJECT-TYPE 
+      SYNTAX        TruthValue 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "This variable indicates if the data for this interval 
+           is valid." 
+      ::= { pwVcCemPerfIntervalEntry 2 } 
+    
+     
+   Danenberg et al       Expires August 2001                       30 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+   pwVcCemPerfIntervalReset OBJECT-TYPE 
+      SYNTAX        INTEGER { 
+            reset (1), 
+            normal(2) 
+      } 
+      MAX-ACCESS    read-create 
+      STATUS        current 
+      DESCRIPTION 
+          "Used in cases where the user knows that the errors 
+           within this interval should not be counted. Writing 
+           'reset' sets all error counts to zero." 
+      ::= { pwVcCemPerfIntervalEntry 3 } 
+    
+   pwVcCemPerfIntervalDbaInPacketsHC OBJECT-TYPE 
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets received." 
+      ::= { pwVcCemPerfIntervalEntry 4 } 
+    
+   pwVcCemPerfIntervalDbaOutPacketsHC OBJECT-TYPE 
+      SYNTAX        Counter64 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets sent." 
+      ::= { pwVcCemPerfIntervalEntry 5 } 
+    
+   pwVcCemPerfIntervalDbaInPackets OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets received." 
+      ::= { pwVcCemPerfIntervalEntry 6 } 
+    
+   pwVcCemPerfIntervalDbaOutPackets OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of DBA packets sent." 
+      ::= { pwVcCemPerfIntervalEntry 7 } 
+    
+   -- Pointer adjustment stats 
+   pwVcCemPerfIntervalInNegPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of negative pointer adjustments sent on the 
+           SONET path based on CEM pointer adjustments received." 
+      ::= { pwVcCemPerfIntervalEntry 8 } 
+     
+   Danenberg et al       Expires August 2001                       31 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+    
+   pwVcCemPerfIntervalInPosPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of postive pointer adjustments sent on the 
+           SONET path based on CEM pointer adjustments received." 
+      ::= { pwVcCemPerfIntervalEntry 9 } 
+    
+   pwVcCemPerfIntervalInPtrAdjustSecs OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of seconds in which a pos or neg pointer 
+           adjustment was sent on the SONET path." 
+      ::= { pwVcCemPerfIntervalEntry 10 } 
+    
+   pwVcCemPerfIntervalOutNegPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of negative pointer adjustments seen on the 
+           SONET path and encoded onto sent CEM packets." 
+      ::= { pwVcCemPerfIntervalEntry 11 } 
+    
+   pwVcCemPerfIntervalOutPosPtrAdjustHC OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of positive pointer adjustments seen on the 
+           SONET path and encoded onto sent CEM packets." 
+      ::= { pwVcCemPerfIntervalEntry 12 } 
+    
+   pwVcCemPerfIntervalOutPtrAdjustSecs OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of seconds in which a pos or neg pointer 
+           adjustment was seen on the SONET path." 
+      ::= { pwVcCemPerfIntervalEntry 13 } 
+    
+   pwVcCemPerfIntervalAbsPtrAdjust OBJECT-TYPE 
+      SYNTAX        Integer32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Absolute Pointer adjustments is relative adjustment 
+           drifts between inbound and outbound streams. It is 
+           calculated as such : 
+     
+   Danenberg et al       Expires August 2001                       32 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+              ( InPosPtrAdjust  -   InNegPtrAdjust) -  
+              (OutPosPtrAdjust  -  OutNegPtrAdjust)     " 
+      ::= { pwVcCemPerfIntervalEntry 14 } 
+    
+    
+   pwVcCemPerfIntervalCrctHdrErrors OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of correctable CEM header errors detected on 
+           inbound CEM packets." 
+      ::= { pwVcCemPerfIntervalEntry 15 } 
+    
+   pwVcCemPerfIntervalUncrctHdrErrors OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of uncorrectable CEM header errors detected on 
+           inbound CEM packets." 
+      ::= { pwVcCemPerfIntervalEntry 16 } 
+    
+   pwVcCemPerfIntervalMissingPkts OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of missing packets (as detected via CEM header 
+           sequence number gaps)." 
+      ::= { pwVcCemPerfIntervalEntry 17 } 
+    
+   pwVcCemPerfIntervalPktsOoseq OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets detected out of sequence (via CEM  
+           header sequence numbers), but were able to be re-sequenced. 
+           Note: some implementations mat not support this 
+           feature (see pwVcCemConfPktResequence)." 
+      ::= { pwVcCemPerfIntervalEntry 18 } 
+    
+   pwVcCemPerfIntervalPktsOoseqDropped OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets detected out of sequence (via CEM  
+           header sequence numbers), but were unable to be re- 
+           sequenced." 
+      ::= { pwVcCemPerfIntervalEntry 19 } 
+    
+   pwVcCemPerfIntervalJtrBfrUnderruns OBJECT-TYPE 
+     
+   Danenberg et al       Expires August 2001                       33 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of times the jitter buffer transitioned to empty." 
+      ::= { pwVcCemPerfIntervalEntry 20 } 
+    
+   pwVcCemPerfIntervalJtrBfrOverruns OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets received while jitter buffer is full." 
+      ::= { pwVcCemPerfIntervalEntry 21 } 
+    
+   pwVcCemPerfIntervalPktsBadLength OBJECT-TYPE 
+      SYNTAX        Counter32 
+      MAX-ACCESS    read-only 
+      STATUS        current 
+      DESCRIPTION 
+          "Number of packets received larger or smaller than 
+           pwVcCemConfPktLength." 
+      ::= { pwVcCemPerfIntervalEntry 22 } 
+    
+   pwVcCemPerfIntervalESs OBJECT-TYPE 
+       SYNTAX       PerfIntervalCount 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "The counter associated with the number of Errored 
+            Seconds encountered." 
+       ::= { pwVcCemPerfIntervalEntry 23 } 
+    
+   pwVcCemPerfIntervalSESs OBJECT-TYPE 
+       SYNTAX        PerfIntervalCount 
+       MAX-ACCESS    read-only 
+       STATUS        current 
+       DESCRIPTION 
+           "The counter associated with the number of 
+            Severely Errored Seconds encountered." 
+       ::= { pwVcCemPerfIntervalEntry 24 } 
+    
+   pwVcCemPerfIntervalUASs OBJECT-TYPE 
+       SYNTAX        PerfIntervalCount 
+       MAX-ACCESS    read-only 
+       STATUS        current 
+       DESCRIPTION 
+           "The counter associated with the number of 
+            Unavailable Seconds encountered." 
+       ::= { pwVcCemPerfIntervalEntry 25 } 
+    
+   -- End PW CEM VC Performance Interval Table 
+    
+    
+     
+   Danenberg et al       Expires August 2001                       34 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+   -- PW CEM SONET Path Extension Table. 
+    
+   pwVcCemSonetPathExtTable OBJECT-TYPE 
+      SYNTAX           SEQUENCE OF PwVcCemSonetPathExtEntry 
+      MAX-ACCESS       not-accessible 
+      STATUS           current 
+      DESCRIPTION 
+          "This table associates a SONET path with a CEM VC (or 
+           a set of CEM VCs) and provides the starting time-slot 
+           of the SONET path. It as assumed that the transmit  
+           and receive sides of the SONET path have the same  
+           starting time-slots. It is also assumed that STSn  
+           paths have contiguous time-slots." 
+      ::= { pwVcCemObjects 6 } 
+    
+   pwVcCemSonetPathExtEntry OBJECT-TYPE 
+      SYNTAX           PwVcCemSonetPathExtEntry 
+      MAX-ACCESS       not-accessible 
+      STATUS           current 
+      DESCRIPTION 
+           "This table is indexed by the SONET path ifIndex. An 
+            entry to this table is created by the agent when an 
+            entry (intended for CEM) is created in the  
+            sonetPathCurrentTable. Alternatively, an agent may 
+            create an entru in this table at the point where a 
+            valid ifIndex is written to pwVcCemSonetPathIfIndex 
+            in the pwVcCem table. The pwVcCemSonetPathExt table 
+            binds a SONET path to a PW CEM VC. A VC index of 0 
+            indicates that the binding has not yet been set." 
+    
+      INDEX  { pwVcCemSonetExtPathIfIndex } 
+    
+         ::= { pwVcCemSonetPathExtTable 1 } 
+    
+   PwVcCemSonetPathExtEntry ::= SEQUENCE { 
+         pwVcCemSonetExtPathIfIndex             InterfaceIndex, 
+         pwVcCemSonetPathExtVcIndex             PwVcIndex, 
+         pwVcCemSonetPathExtTimeSlot            Unsigned32, 
+         pwVcCemSonetPathExtStorageType         StorageType 
+      } 
+    
+   pwVcCemSonetExtPathIfIndex  OBJECT-TYPE 
+      SYNTAX        InterfaceIndex 
+      MAX-ACCESS    not-accessible 
+      STATUS        current 
+      DESCRIPTION 
+          "Index for a row in the sonetPathCurrentTable." 
+      REFERENCE 
+          "See 'Definitions of Managed Objects for the SONET/SDH 
+           Interface Type'. Tesink, K., RFC 2558."  
+      ::= { pwVcCemSonetPathExtEntry 1 } 
+    
+   pwVcCemSonetPathExtVcIndex  OBJECT-TYPE 
+      SYNTAX        PwVcIndex 
+     
+   Danenberg et al       Expires August 2001                       35 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+      MAX-ACCESS    read-write 
+      STATUS        current 
+      DESCRIPTION 
+          "Index for the conceptual row identifying a VC (or set 
+           of VCs) within the generic PW VC table (in PW-MIB) or 
+           the local pwVcCemTable." 
+      ::= { pwVcCemSonetPathExtEntry 2 } 
+    
+   pwVcCemSonetPathExtTimeSlot OBJECT-TYPE 
+      SYNTAX        Unsigned32 (1..192) 
+      MAX-ACCESS    read-write 
+      STATUS        current 
+      DESCRIPTION 
+          "Starting time-slot for this SONET path within the  
+           SONET line and section. For OC-48, this value could 
+           range from 1 to 48. The SONET path width must be taken 
+           into consideration here, for example, in an OC-48 an  
+           STS-3c could not start at time-slot 47." 
+      REFERENCE "RFC 2558, sonetPathCurrentWidth." 
+      ::= { pwVcCemSonetPathExtEntry 3 } 
+    
+   pwVcCemSonetPathExtStorageType OBJECT-TYPE 
+      SYNTAX        StorageType 
+      MAX-ACCESS    read-write 
+      STATUS        current 
+      DESCRIPTION 
+          "This variable indicates the storage type for this 
+           object." 
+      ::= { pwVcCemSonetPathExtEntry 4 } 
+    
+   -- End of CEM SONET Path Extension Table. 
+    
+    
+   -- Notifications - CEM VC 
+    
+   pwVcCemGlobalNotifyEnable OBJECT-TYPE 
+      SYNTAX        TruthValue 
+      MAX-ACCESS    read-write 
+      STATUS        current 
+      DESCRIPTION 
+             "If this object is true, then it enables the 
+              generation of pwVcCemUp and pwVcCemDown 
+              notifications, otherwise these notifications are 
+              not emitted. 
+              Note: enabling/disabling notifications for  
+              individual CEM VCs is for further study." 
+      DEFVAL { false } 
+      ::= { pwVcCemObjects 7 } 
+    
+   pwVcCemUp NOTIFICATION-TYPE 
+      OBJECTS   { pwVcOperStatus } 
+      STATUS      current 
+      DESCRIPTION 
+          "This notification is generated when a CEM VC has 
+     
+   Danenberg et al       Expires August 2001                       36 
+   Internet Draft            MPLS CEM MIB                    July 2001 
+    
+           exited the 'failure' state." 
+      ::= { pwVcCemNotifyPrefix 1 } 
+    
+   pwVcCemDown NOTIFICATION-TYPE 
+      OBJECTS   { pwVcCemPerfLastDefectsAtFailure } 
+      STATUS      current 
+      DESCRIPTION 
+          "This notification is generated when a CEM VC has 
+           entered the 'failure' state. See description of 
+           pwVcCemPerfLastDefectsAtFailure object." 
+      ::= { pwVcCemNotifyPrefix 2 } 
+     
+   -- End of notifications. 
+    
+END 
+
+--     
+--    "Copyright (C) The Internet Society (2001). All Rights Reserved. This 
+--    document and translations of it may be copied and furnished to 
+--    others, and derivative works that comment on or otherwise explain it 
+--    or assist in its implementation may be prepared, copied, published 
+--    and distributed, in whole or in part, without restriction of any 
+--    kind, provided that the above copyright notice and this paragraph are 
+--    included on all such copies and derivative works. However, this 
+--    document itself may not be modified in any way, such as by removing 
+--    the copyright notice or references to the Internet Society or other 
+--    Internet organizations, except as needed for the purpose of 
+--    developing Internet standards in which case the procedures for 
+--    copyrights defined in the Internet Standards process must be 
+--    followed, or as required to translate it into languages other than 
+--    English.  
+--         
+--    The limited permissions granted above are perpetual and will not be 
+--    revoked by the Internet Society or its successors or assigns.  
+--         
+--    This document and the information contained herein is provided on an 
+--    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING 
+--    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING 
+--    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION 
+--    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF 
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  
+--         
+

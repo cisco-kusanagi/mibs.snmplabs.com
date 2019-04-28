@@ -1,0 +1,1089 @@
+-- extracted from draft-desanti-fc-domain-manager-01.txt
+-- at Wed Apr  7 06:17:54 2004
+
+T11-FC-DOMAIN-MGR-MIB DEFINITIONS ::= BEGIN
+
+-- the Fibre-Channel Domain Manager MIB
+--
+-- for management of the functionality, in Fibre Channel switches,
+-- which is used to manage fabric configuration, domains, and addresses
+-- within a domain.
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, Unsigned32,
+    Counter32, Gauge32                 FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                 FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, TruthValue,
+    RowStatus                          FROM SNMPv2-TC
+    ifIndex                            FROM IF-MIB
+    DomainIdOrZero,
+    FcNameIdOrZero                     FROM FC-MGMT-MIB
+    FabricID                           FROM T11-TC-MIB;
+
+t11DomainMgrMIB MODULE-IDENTITY
+    LAST-UPDATED "200403170000Z"
+    ORGANIZATION "T11"
+    CONTACT-INFO
+            "     Editor:
+                  Phone:
+                  E-mail: xxx@yyy.com"
+    DESCRIPTION
+        "The MIB module for the domain management functionality
+        defined by the Fibre Channel standards (FC-SW-3). For the
+        purposes of this MIB, 'Domain Manager' is the software
+        functionality which executes in both the principal switch
+        and other switches."
+    REVISION    "200403170000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tbd 999 }
+
+t11DmMIBObjects      OBJECT IDENTIFIER ::= { t11DomainMgrMIB 1 }
+t11DmMIBConformance  OBJECT IDENTIFIER ::= { t11DomainMgrMIB 2 }
+t11DmConfiguration   OBJECT IDENTIFIER ::= { t11DmMIBObjects 1 }
+t11DmInfo            OBJECT IDENTIFIER ::= { t11DmMIBObjects 2 }
+t11DmNotifyControl   OBJECT IDENTIFIER ::= { t11DmMIBObjects 3 }
+t11DmNotifications   OBJECT IDENTIFIER ::= { t11DmMIBObjects 0 }
+
+-- Textual Conventions
+T11DmDomainPriority ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+           "Priority of the switch.
+           The principal switch selection is influenced by the
+           priority of the switch.
+           Some values are of importance are:
+           1   : The highest priority in principal switch
+                 selection, which is used by the administrator
+                 to establish which switch becomes the principal
+                 switch.
+           255 : Indicates that the switch is not capable of
+                 acting as a principal switch."
+    REFERENCE   "Fibre Channel - Switch Fabric - 3 (FC-SW-3),
+                 T11/Project 1508-D/Rev 6.6, section 6.1.5."
+    SYNTAX    Unsigned32 (1..255)
+
+T11DmDomainInterfaceRole ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+           "Role of the Domain Manager interface.
+           nonPrincipal (1)       - non-principal interface
+           principalUpstream (2)  - upstream  principal interface
+           principalDownsteam (3) - downstream principal interface
+           isolated (4)           - isolated interface
+           down (5)               - down interface
+           unknown (6)            - unknown interface
+           "
+    SYNTAX    INTEGER {
+                       nonPrincipal (1),
+                       principalUpstream (2),
+                       principalDownsteam (3),
+                       isolated (4),
+                       down (5),
+                       unknown (6)
+              }
+
+T11DmState ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+          "State of the Domain Manager.
+
+          starting(1)
+          unconfigured(2)
+          principalSwitchSelection(3)   - principal switch
+                                          selection in progress.
+          domainIdDistribution(4)       - domain ID distribution
+                                          in progress.
+          buildFabricPhase(5)           - BuildFabric in progress.
+          reconfigureFabricPhase(6)     - ReconfigureFabric in
+                                          progress.
+          stable(7)                     - stable.
+          stableWithNoEports(8)         - stable with no E-Ports
+                                          present.
+          stableWithDomainConfigured(9) - stable with domain
+                                          configured.
+          noDomains(10)                 - no domain
+                                          configured/assigned.
+          unknown(11)                   - unknown.  "
+    SYNTAX    INTEGER {
+                       starting(1),
+                       unconfigured(2),
+                       principalSwitchSelection(3),
+                       domainIdDistribution(4),
+                       buildFabricPhase(5),
+                       reconfigureFabricPhase(6),
+                       stable(7),
+                       stableWithNoEports(8),
+                       stableWithDomainConfigured(9),
+                       noDomains(10),
+                       unknown(11)
+              }
+
+--
+-- t11DmTable
+--
+
+t11DmTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF T11DmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table contains Domain Manager related parameters
+           which are able to be configured and monitored in a Fibre
+           Channel switch. There is one entry for each Fabric known
+           to the switch.  Entries are implicitly created/removed if
+           and when additional Fabrics are created/deleted."
+    ::= { t11DmConfiguration 1 }
+
+t11DmEntry OBJECT-TYPE
+    SYNTAX     T11DmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry provides information on the local domain manager
+           functionality for a Fabric."
+    INDEX { t11DmFabricID }
+    ::= { t11DmTable 1 }
+
+T11DmEntry ::= SEQUENCE {
+    t11DmFabricID                          FabricID,
+    t11DmConfigDomainId                    DomainIdOrZero,
+    t11DmConfigDomainIdType                INTEGER,
+    t11DmAutoReconfigure                   TruthValue,
+    t11DmContiguousAllocation              TruthValue,
+    t11DmPriority                          T11DmDomainPriority,
+    t11DmPrincipalSwitchWwn                FcNameIdOrZero,
+    t11DmLocalSwitchWwn                    FcNameIdOrZero,
+    t11DmAssignedAreaIdList                OCTET STRING,
+    t11DmGrantedFcIds                      Counter32,
+    t11DmRecoveredFcIds                    Counter32,
+    t11DmFreeFcIds                         Gauge32,
+    t11DmAssignedFcIds                     Gauge32,
+    t11DmAvailableFcIds                    Gauge32,
+    t11DmRunningPriority                   T11DmDomainPriority,
+    t11DmPrincSwRunningPriority            T11DmDomainPriority,
+    t11DmState                             T11DmState,
+    t11DmPrincipalSwitchSelections         Counter32,
+    t11DmBuildFabrics                      Counter32,
+    t11DmFabricReconfigures                Counter32,
+    t11DmDomainId                          DomainIdOrZero,
+    t11DmLocalPrincipalSwitchSelctns       Counter32,
+    t11DmSticky                            TruthValue,
+    t11DmRestart                           INTEGER
+}
+
+t11DmFabricID OBJECT-TYPE
+    SYNTAX      FabricID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A unique index value which uniquely identifies a
+            particular Fabric.
+
+            In a Fabric conformant to SW-3, only a single Fabric
+            can operate within a physical infrastructure, and thus,
+            the value of this Fabric Identifier will always be 1.
+
+            However, it is possible that future standards will define
+            how multiple Fabrics, each with its own management
+            instrumentation, could operate within a single physical
+            infrastructure.  To allow for this future possibility, this
+            index value is used to uniquely identify a particular
+            Fabric within a physcial infrastructure."
+    ::= { t11DmEntry 1 }
+
+t11DmConfigDomainId OBJECT-TYPE
+    SYNTAX      DomainIdOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The configured Domain_ID of the local switch on this
+           Fabric, or zero if no Domain_ID has been configured.
+           The meaning of this object depends on
+           t11DmConfigDomainIdType object.
+
+           If t11DmConfigDomainIdType is 'preferred', then domain ID
+           configured is called 'preferred Domain_ID'. The valid
+           values are between 0 and 239. In a situation where
+           this domain could not be assigned, any other domain ID
+           would be acceptable. The value '0' means any domain ID.
+
+           If t11DmConfigDomainIdType is 'static', then domain ID is
+           called 'static Domain_ID' and valid values are between
+           1 and 239. In a situation where this domain was
+           non-zero but could not be assigned, no other domain ID
+           would be acceptable.
+
+           If the Domain Manager is enabled on the Fabric, then an
+           RDI (Request Domain_ID) will be sent requesting this
+           Domain_ID. If a Domain_ID is not able to be granted
+           in the case of 'preferred', or if a 'static' Domain_ID is
+           configured but not able to be granted, then it is an error
+           condition.  When this error occurs, the E_Ports on that
+           Fabric will be isolated and the administrator will be
+           informed via a 't11DmDomainIdNotAssigned' notification.
+
+           If the domain manager is not enabled, then the static
+           Domain_ID is assumed to be granted, if it has been
+           configured (to a valid number).
+
+           If either of the domain IDs are not configured with a
+           non-zero value on this Fabric and if the domain manager
+           is not enabled, then
+
+           - switch will isolate all its E_Ports on the Fabric.
+           - the administrator will be informed via a notification
+             't11DmDomainIdNotAssigned'."
+    DEFVAL  { 0 }
+    ::= { t11DmEntry 2 }
+
+t11DmConfigDomainIdType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     static (1),
+                     preferred(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Type of configured Domain_ID."
+    DEFVAL  { preferred }
+    ::= { t11DmEntry 3 }
+
+t11DmAutoReconfigure OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object determines how the switch responds to
+           certain error conditions.
+
+           The condition that might cause these errors is
+           merging of two disjoint fabrics that have
+           overlapping Domain_ID list.
+
+           If value of this object is 'true', the switch will
+           send a RCF (ReConfigureFabric) to rebuild the
+           Fabric.
+
+           If 'false' the switch will isolate the E_Ports on
+           which the errors happened."
+    DEFVAL  { false }
+    ::= { t11DmEntry 4 }
+
+t11DmContiguousAllocation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Determines how the switch behaves when elected
+           as the principal switch.
+           If true, switch won't accept non-contiguous domain
+           IDs in RDIs and will try to replace all the Domain_IDs
+           in the list with contiguous Domain_IDs if a RDI for a
+           contiguous Domain_ID is not able to be fulfilled.
+           If false, then the switch acts normally in granting
+           the Domain_IDs even if they are not contiguous."
+    ::= { t11DmEntry 5 }
+
+t11DmPriority  OBJECT-TYPE
+    SYNTAX     T11DmDomainPriority
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Priority of the switch to be used in principal switch
+           selection process."
+    ::= { t11DmEntry 6 }
+
+t11DmPrincipalSwitchWwn OBJECT-TYPE
+    SYNTAX      FcNameIdOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The WWN of the Principal Switch on this Fabric,
+           or zero-length string if the identity of the principal
+           switch is unknown."
+    DEFVAL  { ''H }
+    ::= { t11DmEntry 7 }
+
+t11DmLocalSwitchWwn OBJECT-TYPE
+    SYNTAX      FcNameIdOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The WWN of the local Switch on this Fabric."
+    ::= { t11DmEntry 8 }
+
+t11DmAssignedAreaIdList    OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(0..256))
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The list of (zero or more) Area_IDs which have been
+           assigned by the local switch in this Fabric, formatted
+           as an array of octets in ascending order.
+
+           Each octet represents one Area_ID.  So, the list containing
+           area_IDs: 23, 45, 235 and 56 would be formatted as the
+           4-octet string x'172d38eb'.
+
+           A particular area's Area_ID is used as the index into the
+           t11DmAreaTable to get the statistics on that area."
+    ::= { t11DmEntry 9 }
+
+t11DmGrantedFcIds OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of FC_IDs granted (for local use, i.e.,
+            with the local switch's Domain_ID) by the Domain Manager
+            on the local switch."
+    ::= { t11DmEntry 10 }
+
+t11DmRecoveredFcIds OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of FC_IDs that have been recovered by the
+           Domain Manager on the local switch since the switch has
+           been initialized. A recovered FC_ID is one that is
+           explicitly returned after previously being granted for
+           local use."
+    ::= { t11DmEntry 11 }
+
+t11DmFreeFcIds OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of FC_IDs that are unassigned on this Fabric."
+    ::= { t11DmEntry 12 }
+
+t11DmAssignedFcIds OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of FC_IDs that are assigned on this Fabric."
+    ::= { t11DmEntry 13 }
+
+t11DmAvailableFcIds OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of FC_IDs that are currently available for
+            assignment on the Fabric."
+    ::= { t11DmEntry 14 }
+
+t11DmRunningPriority OBJECT-TYPE
+    SYNTAX     T11DmDomainPriority
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The running priority of the local switch on this Fabric."
+    ::= { t11DmEntry 15 }
+
+t11DmPrincSwRunningPriority OBJECT-TYPE
+    SYNTAX     T11DmDomainPriority
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The running priority of the principal switch on this
+           Fabric."
+    ::= { t11DmEntry 16 }
+
+t11DmState OBJECT-TYPE
+    SYNTAX     T11DmState
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The state of the Domain Manager on the local switch on
+           this Fabric."
+    ::= { t11DmEntry 17 }
+
+t11DmLocalPrincipalSwitchSelctns OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of times the local switch became the principal
+            switch on this Fabric."
+    ::= { t11DmEntry 18 }
+
+t11DmPrincipalSwitchSelections OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of principal switch selections on this Fabric."
+    ::= { t11DmEntry 19 }
+
+t11DmBuildFabrics OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of 'BuildFabrics' (BFs) that have occurred
+           on this Fabric."
+    ::= { t11DmEntry 20 }
+
+t11DmFabricReconfigures OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of 'ReconfigureFabrics' (RCFs) that have
+           occurred on this Fabric."
+    ::= { t11DmEntry 21 }
+
+t11DmDomainId OBJECT-TYPE
+    SYNTAX      DomainIdOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The Domain_ID of the local switch on this Fabric or
+            zero if no Domain_ID has been assigned."
+    ::= { t11DmEntry 22 }
+
+t11DmSticky   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "An indication of whether the local switch supports
+            the 'sticky' function on this Fabric.
+
+            If the value of this object is 'true', then the switch
+            is maintaining rows in the t11DmFcIdCacheTable for this
+            Fabric."
+    ::= { t11DmEntry 23 }
+
+t11DmRestart  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                       nonDisruptive(1),
+                       disruptive(2),
+                       noOp(3)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object tells the Domain Manager to rebuild the
+           Domain_ID tree all over again.
+
+           If this object is set to 'disruptive', then a RCF
+           (ReConfigure Fabric) is generated in the Fabric
+           in order for the fabric to recover from the errors.
+
+           If this object is set to 'nonDisruptive', then a
+           BF (Build Fabric) is generated in the Fabric.
+           No action is taken if this object is set to 'noOp'.
+           The value of the object when read is always 'noOp'."
+    REFERENCE   "Fibre Channel - Switch Fabric - 3 (FC-SW-3),
+                 T11/Project 1508-D/Rev 6.6, section 7.3."
+    ::= { t11DmEntry 24 }
+
+--
+-- t11DmIfTable - Interface configuration
+--
+
+t11DmIfTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF T11DmIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table contains interface configuration of the
+           domain manager per Fabric.
+
+           An entry in this table is automatically created when
+           an E_Port becomes non-isolated and there is an
+           entry in t11DmTable for the Fabric.
+
+           An entry is deleted automatically from this table if:
+           a) the correponding interface becomes non-existent, or
+           b) the correponding interface becomes a non-E_Port
+              and all the writable objects has default values.
+                             or
+           c) the t11DmTable entry for the corresponding Fabric
+              is deleted.
+
+           Creating entries in this table via t11DmIfRowStatus
+           provides the means to specify non-default parameter values
+           for an interface at a time when that interface is either
+           down or is a non-E_Port.
+
+           So an entry in this table exists when one or both of
+           these conditions holds:
+           - one or more configuration parameters have non-default
+             values for an interface which is either down or a
+             non-E_Port and corresponding Fabric has an entry in
+             the t11DmTable, and/or
+           - the interface is an E_Port and it is up.
+
+           This has a number of consequences:
+           - an entry exists for a non-E_Port or an E_Port which is
+             down whenever that interface has non-default parameters and
+             the corresponding Fabric has an entry in the t11DmTable;
+           - an entry is not able to be created (via t11DmIfRowStatus)
+             for an interface with default parameters; instead, the
+             agent creates/deletes an entry for an interface with
+             default parameters according to whether the E_Port is
+             up or down.
+           - an entry is not able to be created via t11DmIfRowStatus
+             unless non-default parameter values are (simultaneously)
+             configured for an interface which is a non-E_Port or a
+             down interface, and the correspoding Fabric has
+             an entry in the t11DmTable.
+           - deleting an entry via RowStatus when either the
+             interface is down and configured with non-default
+             values or the interface is up, is equivalent to
+             resetting its parameters to their default values.
+             If the interface is down and was configured with
+             default values, then the entry would be deleted."
+    ::= { t11DmConfiguration 2 }
+
+t11DmIfEntry OBJECT-TYPE
+    SYNTAX     T11DmIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing information on the interface
+            configuration on the Fabric identified by t11DmFabricID."
+    INDEX { t11DmFabricID, ifIndex}
+    ::= { t11DmIfTable 1 }
+
+T11DmIfEntry ::= SEQUENCE {
+    t11DmIfRcfReject    TruthValue,
+    t11DmIfRole         T11DmDomainInterfaceRole,
+    t11DmIfRowStatus    RowStatus
+}
+
+t11DmIfRcfReject    OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS      current
+    DESCRIPTION
+           "This object determines if the incoming ReConfigure
+           Fabric (RCF) messages on this interface on this
+           Fabric is accepted or not. If this object is 'true', then
+           the incoming RCF is rejected. If 'false', incoming RCF is
+           accepted.
+
+           Note that this object does not apply to the outgoing
+           RCFs generated by this interface."
+    DEFVAL {false}
+    ::= { t11DmIfEntry 1 }
+
+t11DmIfRole    OBJECT-TYPE
+    SYNTAX     T11DmDomainInterfaceRole
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The role of this interface."
+    ::= { t11DmIfEntry 2 }
+
+t11DmIfRowStatus    OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.
+
+           This object is not able to be used to create an entry
+           unless the corresponding interface exists. If the
+           interface does not exist, a create will fail."
+    ::= { t11DmIfEntry 3 }
+
+
+--
+-- t11DmAreaTable
+--
+
+t11DmAreaTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF T11DmAreaEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table contains area statistics on the local domain
+           manager per Fabric. Each octet in the t11DmAssignedAreaList
+           is able to be used to index into this table to find
+           information on each area."
+    REFERENCE   "Fibre Channel - Switch Fabric - 3 (FC-SW-3),
+                 T11/Project 1508-D/Rev 6.6, section 4.8."
+    ::= { t11DmInfo 1 }
+
+t11DmAreaEntry OBJECT-TYPE
+    SYNTAX     T11DmAreaEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry gives information on the Area_ID and all
+            Port_IDs that were assigned for within an area for
+            the Fabric identified by t11DmFabricID."
+    INDEX { t11DmFabricID, t11DmAreaAreaId}
+    ::= { t11DmAreaTable 1 }
+
+T11DmAreaEntry ::= SEQUENCE {
+    t11DmAreaAreaId                Unsigned32,
+    t11DmAreaAssignedPortIdList    OCTET STRING
+}
+
+t11DmAreaAreaId    OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..255)
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The Area_ID of this area."
+    ::= { t11DmAreaEntry 1 }
+
+t11DmAreaAssignedPortIdList    OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(0..256))
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+           "The list of Port_IDs which have been assigned in
+           this Area and Fabric, formatted as an array of
+           octets in ascending order. There could be zero or more
+           Port_IDs assigned on this Area and Fabric.
+
+           Each octet represents one Port_ID. So, the list containing
+           the Port_IDs 23, 45, 235 and 56 would be formatted as the
+           4-octet string x'172d38eb'."
+    ::= { t11DmAreaEntry 2 }
+
+
+--
+-- t11DmDatabaseTable
+-- .
+
+t11DmDatabaseTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF T11DmDatabaseEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table contains all information known by the
+           local switch about all the domains which have been
+           assigned in each Fabric."
+    REFERENCE   "Fibre Channel - Switch Fabric - 3 (FC-SW-3),
+                 T11/Project 1508-D/Rev 6.6, section 4.8."
+    ::= { t11DmInfo 2 }
+
+t11DmDatabaseEntry OBJECT-TYPE
+    SYNTAX     T11DmDatabaseEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry (conceptual row) in the t11DmDatabaseTable
+           containing information about one Domain_ID in the
+           Fabric identified by t11DmFabricID."
+    INDEX { t11DmFabricID , t11DmDatabaseDomainId}
+    ::= { t11DmDatabaseTable 1 }
+
+T11DmDatabaseEntry ::= SEQUENCE {
+    t11DmDatabaseDomainId              DomainIdOrZero,
+    t11DmDatabaseSwitchWwn             FcNameIdOrZero
+}
+
+t11DmDatabaseDomainId  OBJECT-TYPE
+    SYNTAX     DomainIdOrZero (1..239)
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The Domain_ID for which this row contains information.
+            The value must be non-zero."
+    ::= { t11DmDatabaseEntry 1 }
+
+t11DmDatabaseSwitchWwn  OBJECT-TYPE
+    SYNTAX      FcNameIdOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The WWN of the switch to which the corresponding
+            value of t11DmDatabaseDomainId is currently assigned
+            for the particular Fabric."
+    ::= { t11DmDatabaseEntry 2 }
+
+--
+-- Domain Manager FC_ID cache information
+--
+-- The cached information allows the Domain Manager to implement
+-- the "sticky" function whereby, after a port releases a FC_ID value,
+-- a switch makes a best-effort attempt to re-assign the same FC_ID
+-- value on the next occasion when that port requests an assignment.
+--
+
+t11DmMaxFcIdCacheSize  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The maximum number of FC_IDs that are able to be cached
+            in the t11DmFcIdCacheTable."
+    ::= { t11DmInfo 3 }
+
+--
+-- t11DmFcIdCacheTable
+--
+
+t11DmFcIdCacheTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF T11DmFcIdCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table contains all the FC_IDs that have recently
+           been released. So it lists all the FC_IDs that have
+           valid WWN to FC_ID  mappings and currently not assigned to
+           any ports. These FC_ID were assigned to ports and now, have
+           been released. This cached FC_ID contains only Area_ID
+           and Port_ID information. The FC_ID cache is kept to provide
+           best effort re-assignment of same FC_IDs. i.e, an Nx_Port
+           would get the same FC_ID when it asks for a FC_ID ID again,
+           after releasing it."
+    ::= { t11DmInfo 4 }
+
+t11DmFcIdCacheEntry OBJECT-TYPE
+    SYNTAX     T11DmFcIdCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry (conceptual row) in the t11DmFcIdCacheTable
+           containing information about one FC_ID that was
+           released from a WWN, corresponding to a range of one or
+           more ports in the Fabric identified by t11DmFabricID.
+           An entry is created when a FC_ID is released by the last
+           port in the range.  An entry is deleted either when the
+           number of rows in this table reaches t11DmMaxFcIdCacheSize
+           if it is the oldest entry (depending on the value of the
+           object 't11DmFcIdCacheReleasedTime') to make room for the a
+           new entry or when the this FC_ID is assinged to a port."
+    INDEX { t11DmFabricID, t11DmFcIdCacheWwn}
+    ::= { t11DmFcIdCacheTable 1 }
+
+T11DmFcIdCacheEntry ::= SEQUENCE {
+    t11DmFcIdCacheWwn                  FcNameIdOrZero,
+    t11DmFcIdCacheAreaIdPortId         OCTET STRING,
+    t11DmFcIdCachePortIds              Unsigned32
+}
+
+t11DmFcIdCacheWwn  OBJECT-TYPE
+    SYNTAX     FcNameIdOrZero
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The WWN of the port associated this entry."
+    ::= { t11DmFcIdCacheEntry 1 }
+
+t11DmFcIdCacheAreaIdPortId  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The Area_ID and Port_ID of FC_ID that was assigned
+           and has since been released by this port on this
+           Fabric.
+           Note that this object is only 2 bytes and only
+           contains the Area_ID and Port_ID."
+    ::= { t11DmFcIdCacheEntry 2 }
+
+t11DmFcIdCachePortIds  OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Number of port IDs assigned and/or released starting
+           from Port_ID contained in the second byte of
+           t11DmFcIdCacheAreaIdPortId for the Area_ID contained in
+           the first byte of object t11DmFcIdCacheAreaIdPortId."
+    ::= { t11DmFcIdCacheEntry 3 }
+
+
+-- Notification control objects
+
+t11DmReConfFabricChangeNotifyEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Specifies whether or not the local switch should issue a
+           t11DmFabricChangeNotify notification on sending or receiving
+           ReConfigureFabric (RCF) on a Fabric.
+
+           If the value of the object is 'true, then the
+           notification is generated. If the value is 'false',
+           notification is not generated."
+    DEFVAL { false }
+    ::= { t11DmNotifyControl 1 }
+
+
+t11DmNotifyFabricID OBJECT-TYPE
+    SYNTAX      FabricID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+           "A unique index value which identifies a particular
+            Fabric for which a particular notification is generated.
+
+            In a Fabric conformant to SW-3, only a single Fabric
+            can operate within a physical infrastructure, and thus,
+            the value of this Fabric Identifier will always be 1.
+
+            However, it is possible that future standards will define
+            how multiple Fabrics, each with its own management
+            instrumentation, could operate within a single physical
+            infrastructure.  To allow for this future possibility, this
+            value uniquely identifies the Fabric within the physical
+            infrastructure for which a notification is generated."
+    ::= { t11DmNotifyControl 2 }
+
+-- Notifications
+
+t11DmDomainIdNotAssignedNotify NOTIFICATION-TYPE
+    OBJECTS     { t11DmNotifyFabricID }
+    STATUS      current
+    DESCRIPTION
+           "This notifications indicates that a Domain_ID has not
+            been not configured nor assigned for a particular
+            Fabric, identified by t11DmNotifyFabricID.  This could
+            happen under the following conditions, and results in
+            the switch isolating E_Ports on the Fabric:
+
+            - if the Domain Manager is enabled on the local
+              switch and its request for a configured static
+              Domain_ID is rejected or no other Domain_ID is
+              assigned, then the E_Ports are isolated.
+            - if the domain manager is not enabled and if a
+              static Domain_ID is not configured on the
+              Fabric, then the switch will isolate all of its
+              E_Ports on the Fabric."
+    ::= { t11DmNotifications 1 }
+
+t11DmNewPrincipalSwitchNotify NOTIFICATION-TYPE
+    OBJECTS     { t11DmNotifyFabricID }
+    STATUS      current
+    DESCRIPTION
+           "This notification indicates that the sending switch
+           has become the new Principal Switch on the Fabric
+           identified by t11DmNotifyFabricID.
+
+           This notification is sent soon after its election as
+           the new Principal Switch, i.e., upon expiration of a
+           Principal Switch selection timer which is equal to
+           twice the Fabric Stability Timeout value (F_S_TOV)."
+    ::= { t11DmNotifications 2 }
+
+t11DmFabricChangeNotify NOTIFICATION-TYPE
+    OBJECTS     { t11DmNotifyFabricID }
+    STATUS      current
+    DESCRIPTION
+           "This notification is sent whenever a switch sends or
+           receives a Build Fabric (BF) or a ReConfigure Fabric
+           (RCF) message on the Fabric identified by
+           t11DmNotifyFabricID.
+
+            A switch might receive or issue a BuildFabric (BF)
+            message under the following conditions:
+            - A new link causes two disjoint fabrics in a
+              Fabric to merge into one fabric. The sent/received
+              message is BF if the Domain_ID lists on the disjoint
+              fabrics do not overlap.
+            - An upstream principal ISL which connects to Principal
+              switch and other switches in a Fabric fails.
+              BF is issued to see if there is an alternative path to
+              the Principal Switch, or to select a new Principal
+              Switch.
+            - A switch asks for a different set of Domain_IDs
+              than the currently assigned list, then the Principal
+              switch would issue a BF.
+
+           A switch issues a ReConfigure Fabric (RCF) message
+           under administrative control.
+
+           This notification is not sent if a
+           't11DmNewPrincipalSwitchNotify' notification is sent
+           for the same transition."
+    ::= { t11DmNotifications 3 }
+
+--
+-- Conformance
+--
+
+t11DmMIBCompliances OBJECT IDENTIFIER ::= { t11DmMIBConformance 1 }
+t11DmMIBGroups OBJECT IDENTIFIER ::= { t11DmMIBConformance 2 }
+
+t11DmMIBCompliance MODULE-COMPLIANCE
+    STATUS   current
+    DESCRIPTION
+         "The compliance statement for Fibre Channel switches which
+          implement Domain Manager functionality."
+    MODULE
+    MANDATORY-GROUPS { t11DmGroup,
+                       t11DmDatabaseGroup,
+                       t11DmAreaGroup,
+                       t11DmNotificationGroup
+                     }
+
+      OBJECT t11DmConfigDomainId
+      MIN-ACCESS read-only
+      DESCRIPTION
+             "Write access is not required."
+
+      OBJECT t11DmConfigDomainIdType
+      MIN-ACCESS read-only
+      DESCRIPTION
+             "Write access is not required."
+
+      OBJECT t11DmAutoReconfigure
+      MIN-ACCESS read-only
+      DESCRIPTION
+             "Write access is not required."
+
+      OBJECT t11DmContiguousAllocation
+      MIN-ACCESS read-only
+      DESCRIPTION
+             "Write access is not required."
+
+      OBJECT t11DmPriority
+      MIN-ACCESS read-only
+      DESCRIPTION
+             "Write access is not required."
+
+      OBJECT t11DmIfRcfReject
+      MIN-ACCESS read-only
+      DESCRIPTION
+             "Write access is not required."
+
+      OBJECT t11DmIfRowStatus
+      MIN-ACCESS read-only
+      DESCRIPTION
+             "Write access is not required."
+
+      OBJECT t11DmReConfFabricChangeNotifyEnable
+      MIN-ACCESS read-only
+      DESCRIPTION
+             "Write access is not required."
+
+      GROUP  t11DmCacheGroup,
+      DESCRIPTION
+             "This group is mandatory only for switches which
+              implement the Domain Manager 'sticky' function."
+
+      GROUP  t11DmCommandGroup
+      DESCRIPTION
+             "This group is optional."
+
+    ::= { t11DmMIBCompliances 1 }
+
+-- Units of Conformance
+
+t11DmGroup OBJECT-GROUP
+    OBJECTS  { t11DmConfigDomainId,
+               t11DmConfigDomainIdType,
+               t11DmAutoReconfigure,
+               t11DmContiguousAllocation,
+               t11DmPriority,
+               t11DmPrincipalSwitchWwn,
+               t11DmLocalSwitchWwn,
+               t11DmAssignedAreaIdList,
+               t11DmGrantedFcIds,
+               t11DmRecoveredFcIds,
+               t11DmFreeFcIds,
+               t11DmAssignedFcIds,
+               t11DmAvailableFcIds,
+               t11DmRunningPriority,
+               t11DmPrincSwRunningPriority,
+               t11DmState,
+               t11DmPrincipalSwitchSelections,
+               t11DmBuildFabrics,
+               t11DmFabricReconfigures,
+               t11DmDomainId,
+               t11DmLocalPrincipalSwitchSelctns,
+               t11DmIfRcfReject,
+               t11DmIfRole,
+               t11DmIfRowStatus,
+               t11DmReConfFabricChangeNotifyEnable,
+               t11DmNotifyFabricID,
+               t11DmSticky
+            }
+    STATUS   current
+    DESCRIPTION
+            "A collection of objects for displaying and
+              configuring Domain Manager membership."
+    ::= { t11DmMIBGroups 1 }
+
+t11DmCommandGroup OBJECT-GROUP
+    OBJECTS  { t11DmRestart }
+    STATUS   current
+    DESCRIPTION
+            "A collection of objects used for initiating an
+            operation on the Fabric."
+    ::= { t11DmMIBGroups 2 }
+
+t11DmDatabaseGroup OBJECT-GROUP
+    OBJECTS  { t11DmDatabaseSwitchWwn }
+    STATUS   current
+    DESCRIPTION
+            "A collection of objects for displaying the Domain
+            database information."
+    ::= { t11DmMIBGroups 3 }
+
+t11DmAreaGroup OBJECT-GROUP
+    OBJECTS  { t11DmAreaAssignedPortIdList }
+    STATUS   current
+    DESCRIPTION
+            "A collection of objects for displaying the Domain
+            area information."
+    ::= { t11DmMIBGroups 4 }
+
+t11DmCacheGroup OBJECT-GROUP
+    OBJECTS  { t11DmMaxFcIdCacheSize,
+               t11DmFcIdCacheAreaIdPortId,
+               t11DmFcIdCachePortIds
+             }
+    STATUS   current
+    DESCRIPTION
+            "A collection of objects for displaying the Domain
+            area information."
+    ::= { t11DmMIBGroups 5 }
+
+t11DmNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS  { t11DmDomainIdNotAssignedNotify,
+                     t11DmNewPrincipalSwitchNotify,
+                     t11DmFabricChangeNotify }
+    STATUS   current
+    DESCRIPTION
+            "A collection of notifications for status monitoring
+            and notification."
+    ::= { t11DmMIBGroups 6 }
+
+END
+
+-- 
+-- Copyright (C) The Internet Society (2001).  All Rights Reserved.
+-- 
+-- This document and translations of it may be copied and furnished to
+-- others, and derivative works that comment on or otherwise explain it or
+-- assist in its implementation may be prepared, copied, published and
+-- distributed, in whole or in part, without restriction of any kind,
+-- provided that the above copyright notice and this paragraph are included
+-- on all such copies and derivative works.  However, this document itself
+-- may not be modified in any way, such as by removing the copyright notice
+-- or references to the Internet Society or other Internet organizations,
+-- except as needed for the purpose of developing Internet standards in
+-- which case the procedures for copyrights defined in the Internet
+-- Standards process must be followed, or as required to translate it into
+-- languages other than English.
+-- 
+-- The limited permissions granted above are perpetual and will not be
+-- revoked by the Internet Society or its successors or assigns.
+-- 
+-- This document and the information contained herein is provided on an "AS
+-- IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK
+-- FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+-- LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+-- INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR
+-- FITNESS FOR A PARTICULAR PURPOSE.
+

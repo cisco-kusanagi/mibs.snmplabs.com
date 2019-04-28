@@ -1,0 +1,1520 @@
+VIVOE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            OBJECT-GROUP, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            enterprises, IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            MacAddress, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+
+        -- 1.3.6.1.4.1.35990.3.1
+        vivoeMIB MODULE-IDENTITY 
+            LAST-UPDATED "201202161324Z"
+            ORGANIZATION 
+                "Defence Equipment and Support (DE&S) Land Equipment"
+            CONTACT-INFO 
+                "Portfolio and Programme Support Team
+                Defence Equipment and Support (DE&S) Land Equipment
+                UK Ministry of Defence
+                Email: desle-defstans@mod.uk"
+            DESCRIPTION 
+                "The private MIB module definition for the management 
+                and control of devices in a digital video architecture 
+                compliant with the Vetronics Infrastructure for Video 
+                Over Ethernet (VIVOE) Defence Standard. The MIB is 
+                defined in Appendix A of Def Stan 00-82 Part 1 Issue 2."
+            REVISION "201202161324Z"
+            DESCRIPTION 
+                "Issue 2, published in Def Stan 00-82 Part 1 Issue 2. 
+                Summary of corrections and additions:
+                1.  DisplayString textual conventions modified to only 
+                    allow printable characters.
+                2.  deviceMibVersion description updated to reflect the 
+                    new version number.
+                3.  New ethernetIfIpAddressConflict object replacing 
+                    the ethernetIfMtu object.
+                4.  New deviceNatoStockNumber, deviceMode and deviceReset 
+                    objects added.
+                5.  Ranges added to the bit depth, FPS and SAP message 
+                    interval objects in the video format and channel 
+                    control tables.
+                6.  New videoFormatColorimetry object added to the 
+                    preset video format table. 
+                7.  New compression, ROI and RPT payload type objects 
+                    added to the video format table to support default 
+                    configuration start-up. 
+                8.  channelReset object allows one or more channels to be 
+                    reset independently from the rest of the device.
+                9.  channelStatus object includes single frame mode.
+                10. New channelColorimetry object added.
+                11. channelCompressionFactor changed to read-only access
+                    and loaded from videoFormatTable when setting channel.
+                12. New ROI bottom and right extent objects added with 
+                    changes to resolution and ROI objects to support 
+                    decimation and interpolation of ROIs, and scaling and 
+                    cropping of display images.
+                13. New channelDefaultVideoFormatIndex and 
+                    channelDefaultReceiveIpAddress objects added to 
+                    support default configuration start-up.
+                14. Notification objects added for device errors and 
+                    IP address conflicts.
+                15. Conformance group replace with groups to identify
+                    preset objects, channel configuration objects, 
+                    maintenance mode objects and volatile objects."
+            REVISION "201011041553Z"
+            DESCRIPTION 
+                "Initial version, published in Def Stan 00-82 Issue 1."
+            ::= { desleProducts 1 }
+
+--
+-- Textual conventions
+--
+        DisplayString16 ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "16a"
+            STATUS current
+            DESCRIPTION 
+                "This data type shall conform to the NVT ASCII character 
+                set, as defined in RFC 854, but shall be limited to only 
+                the displayable characters and shall exclude 0x00 (NUL), 
+                0x0A (CR) and 0x0D (LF). It is based on the SNMPv2-TC 
+                DisplayString type limited to 16 displayable characters."
+            SYNTAX OCTET STRING (SIZE (0..16))
+
+        DisplayString32 ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "32a"
+            STATUS current
+            DESCRIPTION 
+                "This data type shall conform to the NVT ASCII character 
+                set, as defined in RFC 854, but shall be limited to only 
+                the displayable characters and shall exclude 0x00 (NUL), 
+                0x0A (CR) and 0x0D (LF). It is based on the SNMPv2-TC 
+                DisplayString type limited to 32 displayable characters."
+            SYNTAX OCTET STRING (SIZE (0..32))
+
+        DisplayString64 ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "64a"
+            STATUS current
+            DESCRIPTION 
+                "This data type shall conform to the NVT ASCII character 
+                set, as defined in RFC 854, but shall be limited to only 
+                the displayable characters and shall exclude 0x00 (NUL), 
+                0x0A (CR) and 0x0D (LF). It is based on the SNMPv2-TC 
+                DisplayString type limited to 64 displayable characters."
+            SYNTAX OCTET STRING (SIZE (0..64))
+
+--
+-- Node definitions
+--
+        -- 1.3.6.1.4.1.35990
+        desle OBJECT IDENTIFIER ::= { enterprises 35990 }
+
+        -- 1.3.6.1.4.1.35990.3
+        desleProducts OBJECT IDENTIFIER ::= { desle 3 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1
+        deviceInfo OBJECT IDENTIFIER ::= { vivoeMIB 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.1
+        deviceDesc OBJECT-TYPE
+            SYNTAX DisplayString32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A textual description of the main function of the 
+                device, i.e. whether it is a colour camera, a sensor 
+                interface or a display interface etc."
+            ::= { deviceInfo 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.2
+        deviceManufacturer OBJECT-TYPE
+            SYNTAX DisplayString64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A textual name for the manufacturer of the device."
+            ::= { deviceInfo 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.3
+        devicePartNumber OBJECT-TYPE
+            SYNTAX DisplayString32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The manufacturer's part number for the device."
+            ::= { deviceInfo 3 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.4
+        deviceSerialNumber OBJECT-TYPE
+            SYNTAX DisplayString32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The serial number of the device."
+            ::= { deviceInfo 4 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.5
+        deviceHardwareVersion OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The hardware version of the device, if applicable."
+            ::= { deviceInfo 5 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.6
+        deviceSoftwareVersion OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The software version of the device, if applicable."
+            ::= { deviceInfo 6 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.7
+        deviceFirmwareVersion OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The firmware version of the device, if applicable."
+            ::= { deviceInfo 7 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.8
+        deviceMibVersion OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The MIB version implemented on the device. For this 
+                version of MIB the object shall be set to 'Issue 2' by 
+                the SNMP agent on the device."
+            ::= { deviceInfo 8 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.9
+        deviceType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                serviceProvider(1),
+                serviceUser(2),
+                both(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The basic functionality of the device, whether it is a 
+                service provider (a transmitter, camera etc.) or a 
+                service user (receiver, display etc). If the device can 
+                be both a service provider and user (e.g. an image 
+                processor) the object value shall be 'both'."
+            ::= { deviceInfo 9 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.10
+        deviceUserDesc OBJECT-TYPE
+            SYNTAX DisplayString64
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "A textual description assigned by the user or the system 
+                integrator to uniquely identify the device in a system, 
+                e.g. rear driving camera, image processor etc. The object 
+                can be set (when the device is in the maintenance mode) 
+                by a manager to allow the description to be changed when 
+                the device is moved or its function reconfigured. The new 
+                value shall only become active after a reset or reboot."
+            ::= { deviceInfo 10 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.11
+        ethernetIfNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of Ethernet network interfaces on the device 
+                that communicate with the VIVOE system. Up to 255 
+                interfaces may be supported."
+            ::= { deviceInfo 11 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.12
+        ethernetIfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF EthernetIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of Ethernet network interfaces on the device 
+                that communicate with the VIVOE system. The number of 
+                entries is specified by ethernetIfNumber."
+            ::= { deviceInfo 12 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.12.1
+        ethernetIfEntry OBJECT-TYPE
+            SYNTAX EthernetIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table of Ethernet network interfaces on 
+                the device. A row in this table cannot be created or 
+                deleted by SNMP operations on columns in the table. 
+                The interface in the first column in the table shall be 
+                designated the primary interface."
+            INDEX { ethernetIfIndex }
+            ::= { ethernetIfTable 1 }
+
+        EthernetIfEntry ::=
+            SEQUENCE { 
+                ethernetIfIndex
+                    Integer32,
+                ethernetIfSpeed
+                    Integer32,
+                ethernetIfMacAddress
+                    MacAddress,
+                ethernetIfIpAddress
+                    IpAddress,
+                ethernetIfSubnetMask
+                    IpAddress,
+                ethernetIfIpAddressConflict
+                    IpAddress
+             }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.12.1.1
+        ethernetIfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index for each entry in the table of Ethernet 
+                network interfaces on the device. The index value range 
+                shall be from 1 to the number of entries is specified by 
+                ethernetIfNumber."
+            ::= { ethernetIfEntry 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.12.1.2
+        ethernetIfSpeed OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "Mbps"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum speed of the Ethernet interface in Mbps 
+                (e.g. for a Gigabit Ethernet interface the value would be 
+                1000). This figure shall not necessary reflect the actual 
+                link speed that the interface is running at if auto-
+                negotiation has been undertaken. The actual speed for the 
+                link can be obtained from the switch port the interface 
+                is connected to."
+            ::= { ethernetIfEntry 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.12.1.3
+        ethernetIfMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The MAC address of the Ethernet interface represented as 
+                a string of 6 octets as defined in SNMPv2-TC (i.e. a MAC 
+                address of 01:02:03:F4:F5:F6 shall be stored as 
+                0x010203F4F5F6). A unique address shall be assigned by 
+                the device manufacturer."
+            ::= { ethernetIfEntry 3 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.12.1.4
+        ethernetIfIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This is the statically assigned IP address of the 
+                interface on the device. An SNMP manager may change the 
+                IP address (if the device is in the maintenance mode) 
+                but the new value shall only become active after a reset 
+                or reboot. Def Stan 00-82 specifies the ranges from which 
+                the IP address shall be selected. The first entry in 
+                the table shall be designated as the primary interface 
+                with subsequent entries designated as secondary 
+                interfaces in a multi-interface device. All SNMP control 
+                on the device shall be undertaken using the primary 
+                interface. There is no requirement for the addresses of 
+                secondary interfaces to be on the same subnet as the 
+                primary address as long as the subnet masks are 
+                configured correctly. If the device is a service 
+                provider the last byte of the primary IP address shall 
+                also be used as the last byte of the multicast IP 
+                address that the device transmits on, as defined in 
+                Def Stan 00-82 Part 1."
+            ::= { ethernetIfEntry 4 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.12.1.5
+        ethernetIfSubnetMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This is the subnet mask associated with the IP address of 
+                this interface. The value of the mask is an IP address with 
+                all the network bits set to 1 and all the host bits set to 0. 
+                The valid subnet masks are defined in Def Stan 00-82 Part 1. 
+                An SNMP manager may change the subnet mask (if the device is 
+                in the maintenance mode) but the new value shall only become 
+                active after a reset or reboot."
+            ::= { ethernetIfEntry 5 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.12.1.6
+        ethernetIfIpAddressConflict OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the device detected conflicting IP addresses on power 
+                up or after reset it shall store the last conflicting 
+                address in this object. The object shall be sent during 
+                the IP address conflict notification procedure and shall 
+                be reset to 0.0.0.0 (when in the maintenance mode) by a 
+                manager when the notification is acknowledged."
+            ::= { ethernetIfEntry 6 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.13
+        deviceNatoStockNumber OBJECT-TYPE
+            SYNTAX DisplayString32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The NATO stock number (NSN) of the device."
+            ::= { deviceInfo 13 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.14
+        deviceMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normal(1),
+                defaultStartUp(2),
+                maintenanceMode(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object shall be used to set the mode of the device.
+                1 - In the normal mode the device shall boot into a 'stopped' 
+                    state and . The device shall require the channelStatus 
+                    object to be set to 'start' to initiate transmission or 
+                    reception of a video stream. 
+                2 - In the default configuration start-up mode the device 
+                    shall boot into a pre-defined state e.g. a service 
+                    provider may automatically start transmitting a pre-
+                    defined video format or a service user may be set-up 
+                    to receive a pre-defined video stream.
+                3 - In the maintenance mode the objects listed in the 
+                    maintenanceModeGroup may be set to perform maintenance 
+                    and configuration tasks on the device."
+            ::= { deviceInfo 14 }
+
+        -- 1.3.6.1.4.1.35990.3.1.1.15
+        deviceReset OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normal(1),
+                reset(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object can be used to initiate a reboot or reset on 
+                the device and thus enable a currently disabled video 
+                format.
+                1 - Normal denotes that the device is in running mode.
+                2 - Setting this object to 2 initiates the reboot or 
+                    reset. When the device has rebooted this object shall 
+                    be reset to 1 by the device."
+            ::= { deviceInfo 15 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2
+        videoFormatInfo OBJECT IDENTIFIER ::= { vivoeMIB 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.1
+        videoFormatNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of distinct video formats supported by the 
+                device. Up to 255 video formats may be supported."
+            ::= { videoFormatInfo 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2
+        videoFormatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF VideoFormatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of all the distinct video formats supported by 
+                the device. The number of entries is specified by 
+                videoFormatNumber."
+            ::= { videoFormatInfo 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1
+        videoFormatEntry OBJECT-TYPE
+            SYNTAX VideoFormatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table of distinct video formats 
+                supported by the device. A row in this table cannot be 
+                created or deleted by SNMP operations on columns of 
+                the table. The objects in the row can be read to 
+                determine the video formats supported and the 
+                capabilities of the device. This information can be 
+                used to determine how to control the device using the 
+                objects in channelTable."
+            INDEX { videoFormatIndex }
+            ::= { videoFormatTable 1 }
+
+        VideoFormatEntry ::=
+            SEQUENCE { 
+                videoFormatIndex
+                    Integer32,
+                videoFormatType
+                    INTEGER,
+                videoFormatStatus
+                    INTEGER,
+                videoFormatBase
+                    DisplayString16,
+                videoFormatSampling
+                    DisplayString16,
+                videoFormatBitDepth
+                    Integer32,
+                videoFormatFps
+                    Integer32,
+                videoFormatColorimetry
+                    DisplayString16,
+                videoFormatInterlaced
+                    INTEGER,
+                videoFormatCompressionFactor
+                    INTEGER,
+                videoFormatCompressionRate
+                    Integer32,
+                videoFormatMaxHorzRes
+                    Integer32,
+                videoFormatMaxVertRes
+                    Integer32,
+                videoFormatRoiHorzRes
+                    Integer32,
+                videoFormatRoiVertRes
+                    Integer32,
+                videoFormatRoiOriginTop
+                    Integer32,
+                videoFormatRoiOriginLeft
+                    Integer32,
+                videoFormatRoiExtentBottom
+                    Integer32,
+                videoFormatRoiExtentRight
+                    Integer32,
+                videoFormatRtpPt
+                    Integer32
+             }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.1
+        videoFormatIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index for each entry in the table of distinct video 
+                formats supported by the device. The index value range 
+                shall be from 1 to the number of entries is specified 
+                by videoFormatNumber."
+            ::= { videoFormatEntry 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.2
+        videoFormatType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                videoChannel(1),
+                roi(2),
+                serviceUser(3),
+                rawData(4),
+                other(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The main function of the format. The types defined are:
+                1 - A service provider format supporting full frame video.
+                2 - A service provider format supporting a Region of 
+                    Interest (ROI).
+                3 - The format is a service user format.
+                4 - The format is a data format using the mechanisms 
+                    defined in Appendix E of Def Stan 00-82 Part 1.
+                5 - The format is an undefined, system specific type."
+            ::= { videoFormatEntry 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.3
+        videoFormatStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object denotes whether the video format described 
+                in this entry in the table is currently enabled or 
+                disabled. The status types defined are:
+                1 - Enabled denotes that the video format can be used by 
+                    a channel without the device needing to be reset or 
+                    rebooted. A channel can therefore simply be set-up to 
+                    start transmitting or receiving this video format by 
+                    a manager.
+                2 - Disabled denotes that to use this video format the 
+                    device will need to be reset or rebooted after a 
+                    manager has set a channel to use the format. The 
+                    channel video format shall be set using the 
+                    channelVideoFormatIndex object. The device shall be 
+                    reset or rebooted using either the deviceReset or 
+                    channelReset objects, as appropriate. The status and 
+                    performance of the channel cannot be guaranteed after 
+                    it has been set to this video format until a reset or 
+                    reboot has been undertaken."
+            ::= { videoFormatEntry 3 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.4
+        videoFormatBase OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The basic video format for this entry. For uncompressed 
+                video this shall be set to 'raw' and for compressed 
+                video, the compression scheme used will be designated 
+                using the relevant IANA MIME media type specifier from 
+                the RTP payload format name (e.g. jpeg2000, H264)."
+            ::= { videoFormatEntry 4 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.5
+        videoFormatSampling OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The video pixel sampling format for this entry. This 
+                shall be the same as the 'sampling' parameter from the 
+                SDP description (e.g. YCbCr-4:2:2, RGB, GRAYSCALE). If 
+                not required (e.g. the format is MPEG-4 compressed) the 
+                value shall be 'none'."
+            ::= { videoFormatEntry 5 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.6
+        videoFormatBitDepth OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of bits used to encode a pixel or series of 
+                pixels for this entry. This shall be the same as the 
+                'depth' parameter from the SDP mapping description. If 
+                not required (e.g. the format is MPEG-4 compressed) the 
+                value shall be 0."
+            ::= { videoFormatEntry 6 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.7
+        videoFormatFps OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            UNITS "Frame per Second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum number of frames per second. If the format 
+                is interlaced the number of fields per second will be twice 
+                this figure."
+            ::= { videoFormatEntry 7 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.8
+        videoFormatColorimetry OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The colorimetry specification for this entry. This shall 
+                be the same as the 'colorimetry' parameter from the SDP 
+                description (e.g. BT601-5). If not required the value 
+                shall be 'none'."
+            ::= { videoFormatEntry 8 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.9
+        videoFormatInterlaced OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                interlaced(1),
+                progressive(2),
+                none(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes whether the video format is interlaced or 
+                progressive scan. If not required the value shall be 
+                'none'. The scan types defined are:
+                1 - Interlaced.
+                2 - Progressive scan.
+                3 - None."
+            ::= { videoFormatEntry 9 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.10
+        videoFormatCompressionFactor OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                targetRate(1),
+                targetQuality(2),
+                lossless(3),
+                none(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the format employs compression, this object specifies 
+                the factor on which the video compression rate is based. 
+                The compression factors defined are:
+                1 - Target Rate: The compression factor shall be set to 
+                    achieve the target rate specified in Mbps in 
+                    videoFormatCompressionRate.
+                2 - Target Quality: The compression factor shall be set 
+                    to achieve the subjective quality factor specified in 
+                    videoFormatCompressionRate.
+                3 - Lossless compression employed.
+                4 - None."
+            ::= { videoFormatEntry 10 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.11
+        videoFormatCompressionRate OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "When the videoFormatCompressionFactor object is set to 
+                targetRate, this object shall specify the maximum target 
+                rate in Mbps. When the videoFormatCompressionFactor 
+                object is set to targetQuality, this object shall specify 
+                a subjective quality factor with 1 being the lowest quality 
+                and 16 being the highest (virtually lossless) quality. 
+                The object may be set (when in the maintenance mode) to 
+                configure a default start-up rate for the format. If the 
+                format is uncompressed the value shall be 0."
+            ::= { videoFormatEntry 11 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.12
+        videoFormatMaxHorzRes OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum horizontal resolution supported by this video 
+                format for a service provider or a ROI."
+            ::= { videoFormatEntry 12 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.13
+        videoFormatMaxVertRes OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum vertical resolution supported by this video 
+                format for a service provider or a ROI."
+            ::= { videoFormatEntry 13 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.14
+        videoFormatRoiHorzRes OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the format is a ROI this object shall specify the 
+                horizontal resolution of the ROI. If the format is not 
+                a ROI the value shall be 0. The relationship between 
+                this object and the other ROI objects shall determine 
+                whether the ROI is scalable and what scaling is 
+                required, as specified in Def Stan 00-82. The object 
+                may be set (when in the maintenance mode) to configure 
+                a default start-up ROI."
+            ::= { videoFormatEntry 14 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.15
+        videoFormatRoiVertRes OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the format is a ROI this object shall specify the 
+                vertical resolution of the ROI. If the format is not a 
+                ROI the value shall be 0. The relationship between this 
+                object and the other ROI objects shall determine whether 
+                the ROI is scalable and what scaling is required, as 
+                specified in Def Stan 00-82. The object may be set (when 
+                in the maintenance mode) to configure a default start-up 
+                ROI."
+            ::= { videoFormatEntry 15 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.16
+        videoFormatRoiOriginTop OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the format is a ROI this object shall specify the top 
+                origin of the ROI. If the format is not a ROI the value 
+                shall be 0. The relationship between this object and the 
+                other ROI objects shall determine whether the ROI is 
+                scalable and what scaling is required, as specified in 
+                Def Stan 00-82. The object may be set (when in the 
+                maintenance mode) to configure a default start-up ROI."
+            ::= { videoFormatEntry 16 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.17
+        videoFormatRoiOriginLeft OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the format is a ROI this object shall specify the left 
+                origin of the ROI. If the format is not a ROI the value 
+                shall be 0. The relationship between this object and the 
+                other ROI objects shall determine whether the ROI is 
+                scalable and what scaling is required, as specified in 
+                Def Stan 00-82. The object may be set (when in the 
+                maintenance mode) to configure a default start-up ROI."
+            ::= { videoFormatEntry 17 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.18
+        videoFormatRoiExtentBottom OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the format is a scalable ROI this object shall specify 
+                the bottom extent of the ROI. If the format is not a ROI 
+                or is a non-scalable ROI the value shall be 0. The 
+                relationship between this object and the other ROI objects 
+                shall determine what scaling is required, as specified in 
+                Def Stan 00-82. The object may be set (when in the 
+                maintenance mode) to configure a default start-up ROI."
+            ::= { videoFormatEntry 18 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.19
+        videoFormatRoiExtentRight OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the format is a scalable ROI this object shall specify 
+                the default right extent of the ROI. If the format is not 
+                a ROI or is a non-scalable ROI the value shall be 0. The 
+                relationship between this object and the other ROI objects 
+                shall determine what scaling is required, as specified in 
+                Def Stan 00-82. The object may be set (when in the 
+                maintenance mode) to configure a default start-up ROI."
+            ::= { videoFormatEntry 19 }
+
+        -- 1.3.6.1.4.1.35990.3.1.2.2.1.20
+        videoFormatRtpPt OBJECT-TYPE
+            SYNTAX Integer32 (0..127)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "For a service provider this is the RTP Payload Type 
+                number in the RTP header for this format. Payload 
+                Types from 0 to 95 are statically assigned or reserved, 
+                while 96 to 127 are dynamically assigned. The object 
+                may be set (when in the maintenance mode) to configure 
+                a default start-up Payload Type for the format."
+            ::= { videoFormatEntry 20 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3
+        channelControl OBJECT IDENTIFIER ::= { vivoeMIB 3 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.1
+        channelReset OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "In the maintenance mode this object may be used to initiate 
+                a reboot or reset on a particular channel. This will set the 
+                channel to its default state.
+                0 - Normal denotes that the device is in the normal running 
+                    mode.
+                1..254 - Setting the object to these values will initiate a 
+                    reboot or reset on the specified channel  When the device 
+                    has rebooted or reset the channel, this object shall be 
+                    reset to 0 by the device.
+                255 - Setting the object to 255 will initiate a reboot or 
+                    reset all the channels. When the device has rebooted or 
+                    reset the channels, this object shall be reset to 0 by 
+                    the device."
+            ::= { channelControl 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.2
+        channelNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..254)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of video channels supported by the device. 
+                For a service provider channels may be multiple video 
+                streams or ROIs. For service users it may be the number 
+                of digital video streams that can be simultaneously 
+                supported. Up to 254 channels may be supported."
+            ::= { channelControl 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3
+        channelTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF ChannelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of channels supported by the device. The number 
+                of entries is specified by channelNumber."
+            ::= { channelControl 3 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1
+        channelEntry OBJECT-TYPE
+            SYNTAX ChannelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table of channels supported by the 
+                device. A row in this table cannot be created or deleted 
+                by SNMP operations on columns of the table. The objects 
+                in the row can be read to obtain the current status of 
+                the channel and set to control the functionality of the 
+                channel. For service providers, part of the multicast 
+                IP address that the service provider transmits on is 
+                derived from this number, as defined in Def Stan 00-82 
+                Part 1."
+            INDEX { channelIndex }
+            ::= { channelTable 1 }
+
+        ChannelEntry ::=
+            SEQUENCE { 
+                channelIndex
+                    Integer32,
+                channelType
+                    INTEGER,
+                channelUserDesc
+                    DisplayString64,
+                channelStatus
+                    INTEGER,
+                channelVideoFormatIndex
+                    Integer32,
+                channelVideoFormat
+                    DisplayString16,
+                channelVideoSampling
+                    DisplayString16,
+                channelVideoBitDepth
+                    Integer32,
+                channelFps
+                    Integer32,
+                channelColorimetry
+                    DisplayString16,
+                channelInterlaced
+                    INTEGER,
+                channelCompressionFactor
+                    INTEGER,
+                channelCompressionRate
+                    Integer32,
+                channelHorzRes
+                    Integer32,
+                channelVertRes
+                    Integer32,
+                channelRoiOriginTop
+                    Integer32,
+                channelRoiOriginLeft
+                    Integer32,
+                channelRoiExtentBottom
+                    Integer32,
+                channelRoiExtentRight
+                    Integer32,
+                channelRtpPt
+                    Integer32,
+                channelReceiveIpAddress
+                    IpAddress,
+                channelInterPacketDelay
+                    Integer32,
+                channelSapMessageInterval
+                    Integer32,
+                channelDefaultVideoFormatIndex
+                    Integer32,
+                channelDefaultReceiveIpAddress
+                    IpAddress
+             }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.1
+        channelIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..254)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index for each entry in the table of channels 
+                supported by the device. The index value range shall be 
+                from 1 to the number of entries is specified by 
+                channelNumber."
+            ::= { channelEntry 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.2
+        channelType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                videoChannel(1),
+                roi(2),
+                serviceUser(3),
+                rawData(4),
+                other(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The main function of the channel. The types defined are:
+                1 - A service provider channel providing full frame 
+                    video.
+                2 - A service provider channel providing a ROI. The size 
+                    of the ROI is designated by channelHorzRes and 
+                    channelVertRes objects and the position by the origin 
+                    and extent objects.
+                3 - The channel is a service user channel.
+                4 - The channel is a data channel using the mechanisms 
+                    defined in Appendix E of Def Stan 00-82 Part 1.
+                5 - The channel is an undefined, system specific type."
+            ::= { channelEntry 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.3
+        channelUserDesc OBJECT-TYPE
+            SYNTAX DisplayString64
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "A textual description assigned by the user or the system 
+                integrator to uniquely identify the channel on the device 
+                in a system, e.g. front LSA camera etc. The object can be 
+                set (when the device is in the maintenance mode) by a 
+                manager to allow the description to be changed when the 
+                device is moved or its function reconfigured. The new 
+                value shall only become active after a reset or reboot. 
+                This object shall also be used to set the SDP Session Name 
+                field for SAP announcement messages for the channel, 
+                when it may be combined with the deviceUserDesc object 
+                in multi-channel devices."
+            ::= { channelEntry 3 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.4
+        channelStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                start(1),
+                stop(2),
+                singleFrame(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The current status of the channel. Setting the value of 
+                this object shall also be used to start or stop the 
+                encoding or decoding on the channel. Other objects shall 
+                be used to set parameters and settings on the channel 
+                before the channel is started or re-started. The status 
+                types defined are:
+                1 - Start encoding or decoding on the channel.
+                2 - Stop encoding or decoding on the channel. 
+                3 - When the object is set to single frame, a service 
+                    provider will immediately transmit a single frame of 
+                    video, if this functionality is implemented."
+            ::= { channelEntry 4 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.5
+        channelVideoFormatIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object cross-references the videoFormatIndex object 
+                in the videoFormatTable and may be set to select the 
+                corresponding video format for the channel. The device 
+                shall then update the objects listed in the setChannelGroup 
+                to the corresponding values for the video format. The 
+                object shall default to 0 until a video format is specified 
+                and shall always be 0 in a service user."
+            ::= { channelEntry 5 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.6
+        channelVideoFormat OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The video format currently being processed on the 
+                channel. For uncompressed video this shall be set to 
+                'raw' and for compressed video, the compression scheme 
+                used will be designated using the relevant IANA MIME 
+                media type specifier from the RTP payload format name 
+                (e.g. jpeg2000, H264). If the device is not processing 
+                video on the channel the value shall be 'none'."
+            ::= { channelEntry 6 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.7
+        channelVideoSampling OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The video pixel sampling format currently being 
+                processed on the channel. This shall be the same as the 
+                'sampling' parameter from the SDP mapping description 
+                (e.g. YCbCr-4:2:2, RGB, GRAYSCALE). If the device is not 
+                processing video on the channel or the value is not 
+                required (e.g. the format is MPEG-4 compressed) the 
+                value shall be 'none'."
+            ::= { channelEntry 7 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.8
+        channelVideoBitDepth OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of bits used to encode a pixel or series of 
+                pixels in the current video format on this channel. This 
+                shall be the same as the 'depth' parameter from the SDP 
+                mapping description. If not required (e.g. the format is 
+                MPEG-4 compressed) the value shall be 0."
+            ::= { channelEntry 8 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.9
+        channelFps OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            UNITS "Frames per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum number of frames per second for the format 
+                on this channel. If the format is interlaced the number 
+                of fields per second will be twice this figure."
+            ::= { channelEntry 9 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.10
+        channelColorimetry OBJECT-TYPE
+            SYNTAX DisplayString16
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The colorimetry specification for the format on this 
+                channel. This shall be the same as the 'colorimetry' 
+                parameter from the SDP description (e.g. BT601-5). If 
+                not required the value shall be 'none'."
+            ::= { channelEntry 10 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.11
+        channelInterlaced OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                interlaced(1),
+                progressive(2),
+                none(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes whether the video format currently be processed 
+                by the channel is interlaced or progressive scan video. 
+                If the device is not processing video on the channel the 
+                value shall be 'none'. The scan types defined are:
+                1 - Interlaced.
+                2 - Progressive scan.
+                3 - None."
+            ::= { channelEntry 11 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.12
+        channelCompressionFactor OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                targetRate(1),
+                targetQuality(2),
+                lossless(3),
+                none(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The factor on which the video compression rate is based, 
+                if applicable. The compression types defined are:
+                1 - Target Rate: The compression factor shall be set to 
+                    achieve the target rate specified in Mbps in 
+                    channelCompressionRate.
+                2 - Target Quality: The compression factor shall be set 
+                    to achieve the subjective quality factor specified in 
+                    channelCompressionRate.
+                3 - Lossless compression employed.
+                4 - None."
+            ::= { channelEntry 12 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.13
+        channelCompressionRate OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "When the channelCompressionFactor object is set to 
+                targetRate, this object shall specify the maximum target 
+                rate in Mbps. When the channelCompressionFactor object is 
+                set to targetQuality, this object shall specify a 
+                subjective quality factor with 1 being the lowest quality 
+                and 16 being the highest (virtually lossless) quality. If 
+                the device is not processing compressed video the value 
+                shall be 0. This object can be set to request a new 
+                compression rate."
+            ::= { channelEntry 13 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.14
+        channelHorzRes OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The current horizontal resolution of the channel. If the 
+                channel is a ROI, this object can be set to request a new 
+                horizontal resolution for the ROI. The relationship between 
+                this object and the other ROI objects shall determine 
+                whether the ROI is scalable and what scaling is required, 
+                as specified in Def Stan 00-82. If the channel is a service 
+                user, the relationship shall determine whether the image 
+                shall be scaled or cropped and how it is windowed on a 
+                display, as specified in Def Stan 00-82."
+            ::= { channelEntry 14 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.15
+        channelVertRes OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The current vertical resolution of the channel. If the 
+                channel is a ROI, this object can be set to request a new 
+                vertical resolution for the ROI. The relationship between 
+                this object and the other ROI objects shall determine 
+                whether the ROI is scalable and what scaling is required, 
+                as specified in Def Stan 00-82. If the channel is a service 
+                user, the relationship shall determine whether the image 
+                shall be scaled or cropped and how it is windowed on a 
+                display, as specified in Def Stan 00-82."
+            ::= { channelEntry 15 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.16
+        channelRoiOriginTop OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the channel is a ROI, this object shall specify the 
+                top origin of the ROI. The object can be set to move the 
+                ROI and the relationship between this object and the 
+                other ROI objects shall determine whether the ROI is 
+                scalable and what scaling is required, as specified in 
+                Def Stan 00-82. If the channel is a service user, the 
+                relationship shall determine whether the image shall be 
+                scaled or cropped and how it is windowed on a display, 
+                as specified in Def Stan 00-82. If the channel is a 
+                service provider the value shall be 0."
+            ::= { channelEntry 16 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.17
+        channelRoiOriginLeft OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the channel is a ROI, this object shall specify the 
+                left origin of the ROI. The object can be set to move the 
+                ROI and the relationship between this object and the 
+                other ROI objects shall determine whether the ROI is 
+                scalable and what scaling is required, as specified in 
+                Def Stan 00-82. If the channel is a service user, the 
+                relationship shall determine whether the image shall be 
+                scaled or cropped and how it is windowed on a display, 
+                as specified in Def Stan 00-82. If the channel is a 
+                service provider the value shall be 0."
+            ::= { channelEntry 17 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.18
+        channelRoiExtentBottom OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the channel is a scalable ROI, this object shall 
+                specify the bottom extent of the ROI. The object can 
+                be set to modify the ROI and the relationship between 
+                this object and the other ROI objects shall determine 
+                whether the ROI is scalable and what scaling is required, 
+                as specified in Def Stan 00-82. If the channel is a 
+                service user, the relationship shall determine whether 
+                the image shall be scaled or cropped and how it is 
+                windowed on a display, as specified in Def Stan 00-82. 
+                If the channel is a service provider or a non-scaled 
+                ROI the value shall be 0."
+            ::= { channelEntry 18 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.19
+        channelRoiExtentRight OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "pixels"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If the channel is a scalable ROI, this object shall 
+                specify the right extent of the ROI. The object can 
+                be set to modify the ROI and the relationship between 
+                this object and the other ROI objects shall determine 
+                whether the ROI is scalable and what scaling is required, 
+                as specified in Def Stan 00-82. If the channel is a 
+                service user, the relationship shall determine whether 
+                the image shall be scaled or cropped and how it is 
+                windowed on a display, as specified in Def Stan 00-82. 
+                If the channel is a service provider or a non-scaled 
+                ROI the value shall be 0."
+            ::= { channelEntry 19 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.20
+        channelRtpPt OBJECT-TYPE
+            SYNTAX Integer32 (0..127)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "For a service provider this is the RTP Payload Type ID 
+                in the RTP header associated with this channel. The 
+                Payload Type IDs from 0 to 95 are statically assigned or 
+                reserved in RFC 3551 to particular audio or video 
+                formats, while the IDs from 96 to 127 are dynamically 
+                assigned. The same ID can be used for multiple channels. 
+                For service users it shall be set to the RTP Payload Type 
+                ID for the RTP currently being received."
+            ::= { channelEntry 20 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.21
+        channelReceiveIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "For a service user channel this object is the multicast 
+                IP address to receive RTP encoded video or data on and 
+                can be changed to select a new RTP stream. A service user 
+                channel shall not start processing the stream (or join 
+                the relevant multicast group) until it is re-started 
+                using the channelStatus object unless it is in the 
+                default start-up mode. If a service user channel is not 
+                currently receiving a stream or the channel is a service 
+                provider channel or ROI the value shall be null or 
+                0.0.0.0."
+            ::= { channelEntry 21 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.22
+        channelInterPacketDelay OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "microseconds"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object may be used to set the delay in microseconds 
+                between RTP packets on this channel. The time is measured 
+                from the end of the previous packet to the beginning of 
+                the next packet in the stream. The value of this object 
+                can be set (when in the maintenance mode) to request a new 
+                delay time to implement simple flow control on the network. 
+                If a service provider does not have a programmable inter-
+                packet delay then it shall ignore this object and set it 
+                to the default value of 0. Not applicable for service users."
+            ::= { channelEntry 22 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.23
+        channelSapMessageInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..1000)
+            UNITS "milliseconds"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The interval (in milliseconds) between transmitted 
+                SAP/SDP messages. The value of this object can be set 
+                (when in the maintenance mode) to request a new interval. 
+                The default value shall be 1000 (1 second). If a service 
+                provider does not have a programmable interval then it 
+                shall ignore this object. Not applicable for service 
+                users."
+            ::= { channelEntry 23 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.24
+        channelDefaultVideoFormatIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object cross-references the videoFormatIndex object 
+                in the videoFormatTable and may be set (when in the 
+                maintenance mode) to define the default video format that 
+                a service provider shall transmit if the deviceMode 
+                object is set to defaultStartUp. At start-up the device 
+                shall update all the objects listed in the setChannelGroup 
+                to the corresponding values in the default video format. 
+                If no default mode is specified or the device is a service 
+                user the value shall be 0."
+            ::= { channelEntry 24 }
+
+        -- 1.3.6.1.4.1.35990.3.1.3.3.1.25
+        channelDefaultReceiveIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "For a service user channel this object is the default 
+                multicast IP address that that a service user shall 
+                receive RTP encoded video or data on at start-up if the 
+                deviceMode object is set to defaultStartUp. A service 
+                user channel shall join the relevant multicast group and 
+                start processing the stream regardless of the state of 
+                the channelStatus object. If no default is set or channel 
+                is a service provider channel the value shall be null or 
+                0.0.0.0. The object may be set (when in the maintenance 
+                mode) to define the default receive address."
+            ::= { channelEntry 25 }
+
+        -- 1.3.6.1.4.1.35990.3.1.4
+        vivoeNotifications OBJECT IDENTIFIER ::= { vivoeMIB 4 }
+
+        -- 1.3.6.1.4.1.35990.3.1.4.1
+        deviceError NOTIFICATION-TYPE
+            OBJECTS { deviceUserDesc, deviceMode }
+            STATUS current
+            DESCRIPTION 
+                "This trap is sent when an unspecified error has been 
+                detected on the device. The message shall be sent using 
+                the broadcast IP address specified in Def Stan 00-82 
+                Part 1."
+            ::= { vivoeNotifications 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.4.2
+        ipAddressConflict NOTIFICATION-TYPE
+            OBJECTS { ethernetIfIpAddress, ethernetIfIpAddressConflict }
+            STATUS current
+            DESCRIPTION 
+                "This notification message is sent when an IP address 
+                conflict has been detected by the device. The 
+                notification includes the last IP address a conflict 
+                was detected on. The message shall be sent using 
+                the broadcast IP address specified in Def Stan 00-82 
+                Part 1."
+            ::= { vivoeNotifications 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.5
+        vivoeGroups OBJECT IDENTIFIER ::= { vivoeMIB 5 }
+
+        -- 1.3.6.1.4.1.35990.3.1.5.1
+        presetGroup OBJECT-GROUP
+            OBJECTS { deviceDesc, deviceManufacturer, devicePartNumber, 
+                deviceSerialNumber, deviceHardwareVersion, 
+                deviceSoftwareVersion, deviceFirmwareVersion, 
+                deviceMibVersion, deviceType, ethernetIfNumber, 
+                ethernetIfSpeed, ethernetIfMacAddress, deviceNatoStockNumber, 
+                videoFormatNumber, videoFormatType, videoFormatStatus, 
+                videoFormatBase, videoFormatSampling, videoFormatBitDepth, 
+                videoFormatFps, videoFormatColorimetry, 
+                videoFormatInterlaced, videoFormatCompressionFactor, 
+                videoFormatMaxHorzRes, videoFormatMaxVertRes, 
+                channelNumber }
+            STATUS current
+            DESCRIPTION 
+                "The objects whose values shall be preset by the 
+                manufacturer of the device and cannot be subsequently 
+                changed via the MIB."
+            ::= { vivoeGroups 1 }
+
+        -- 1.3.6.1.4.1.35990.3.1.5.2
+        setChannelGroup OBJECT-GROUP
+            OBJECTS { channelType, channelVideoFormat, channelVideoSampling, 
+                channelVideoBitDepth, channelFps, channelColorimetry, 
+                channelInterlaced, channelCompressionFactor, 
+                channelCompressionRate, channelHorzRes, channelVertRes, 
+                channelRoiOriginTop, channelRoiOriginLeft, 
+                channelRoiExtentBottom, channelRoiExtentRight, 
+                channelRtpPt }
+            STATUS current
+            DESCRIPTION 
+                "The list of objects that a service provider shall update 
+                when setting a channel to a particular video format. In 
+                the normal mode the format shall be selected by the 
+                channelVideoFormatIndex object and by the 
+                channelDefaultVideoFormatIndex object in the default 
+                configuration start-up mode."
+            ::= { vivoeGroups 2 }
+
+        -- 1.3.6.1.4.1.35990.3.1.5.3
+        maintenanceModeGroup OBJECT-GROUP
+            OBJECTS { deviceUserDesc, ethernetIfIpAddress, 
+                ethernetIfSubnetMask, ethernetIfIpAddressConflict, 
+                deviceReset, videoFormatCompressionRate, 
+                videoFormatRoiHorzRes, videoFormatRoiVertRes, 
+                videoFormatRoiOriginTop, videoFormatRoiOriginLeft, 
+                videoFormatRoiExtentBottom, videoFormatRoiExtentRight, 
+                videoFormatRtpPt, channelReset, channelUserDesc, 
+                channelInterPacketDelay, channelSapMessageInterval, 
+                channelDefaultVideoFormatIndex, 
+                channelDefaultReceiveIpAddress }
+            STATUS current
+            DESCRIPTION 
+                "The objects whose values shall only be settable when the 
+                device is in the maintenance mode (the deviceMode object 
+                is set to maintenanceMode. If the device is not in this 
+                mode the agent shall return a resourceUnavailable error 
+                if a set operation is performed on these objects. Any 
+                values set during the maintenance mode period shall only 
+                become active after a reset, reboot or power cycle."
+            ::= { vivoeGroups 3 }
+
+        -- 1.3.6.1.4.1.35990.3.1.5.4
+        volatileGroup OBJECT-GROUP
+            OBJECTS { deviceMode, deviceReset, channelReset, channelType, 
+                channelStatus, channelVideoFormatIndex, channelVideoFormat, 
+                channelVideoSampling, channelVideoBitDepth, channelFps, 
+                channelColorimetry, channelInterlaced, 
+                channelCompressionFactor, channelCompressionRate, 
+                channelHorzRes, channelVertRes, channelRoiOriginTop, 
+                channelRoiOriginLeft, channelRoiExtentBottom, 
+                channelRoiExtentRight, channelRtpPt, 
+                channelReceiveIpAddress }
+            STATUS current
+            DESCRIPTION 
+                "The objects whose values shall be stored in volatile 
+                memory and shall not maintained during a reset, reboot 
+                or power cycle. The values for all other objects shall 
+                be maintained during a reset, reboot or power cycle."
+            ::= { vivoeGroups 4 }
+
+        -- 1.3.6.1.4.1.35990.3.1.5.5
+        notificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { deviceError, ipAddressConflict }
+            STATUS current
+            DESCRIPTION 
+                "The group of objects specifying the notifications (Traps) 
+                that can be sent by the device."
+            ::= { vivoeGroups 5 }
+    END

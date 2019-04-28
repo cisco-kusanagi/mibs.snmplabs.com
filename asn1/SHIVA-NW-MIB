@@ -1,0 +1,667 @@
+--
+-- 	Copyright 1992, 1993, 1995, 1996, 1998 Shiva Corporation
+--
+
+--
+--	Shiva Temporary NetWare MIB, until we implement official one.
+--
+
+SHIVA-NW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	Counter, TimeTicks
+  		FROM RFC1155-SMI
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	tNetWare
+		FROM SHIVA-MIB;
+
+-- textual conventions
+
+	IpxNetNumber ::=	-- 4 octets of net number
+				-- in network byte order,
+				-- 1 octet of node number
+		OCTET STRING (SIZE (4))
+		-- used to encode IPX network numbers.
+
+	IpxNodeNumber ::=	-- 4 octets of net number
+				-- in network byte order,
+				-- 1 octet of node number
+		OCTET STRING (SIZE (6))
+		-- used to encode IPX node numbers.
+
+	NetWareName ::=		-- NetWare service name
+		OCTET STRING (SIZE (1..47))
+		-- used to encode NetWare service names.
+
+    nwIpx	OBJECT IDENTIFIER ::= { tNetWare 1 }
+    nwRip	OBJECT IDENTIFIER ::= { tNetWare 2 }
+    nwSap	OBJECT IDENTIFIER ::= { tNetWare 3 }
+    nwSpx	OBJECT IDENTIFIER ::= { tNetWare 4 }
+    nwIf	OBJECT IDENTIFIER ::= { tNetWare 5 }
+    nwMgmt	OBJECT IDENTIFIER ::= { tNetWare 6 }
+
+--
+-- IPX (Internet Packet eXchange) Group
+--
+
+    ipxInReceives OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of IPX datagrams received on all
+		interfaces"
+	::= { nwIpx 1 }
+
+    ipxForwDatagrams OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of received IPX datagrams which were not
+		addressed directly to the router."
+	::= { nwIpx 2 }
+
+    ipxInHdrErrors OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of received IPX datagrams which were
+		dropped because of some error in the header, such as a
+		protocol length which was inconsistent with the
+		data-link length."
+	::= { nwIpx 3 }
+
+    ipxInDiscards OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of received IPX datagrams which
+		were dropped because of a resource error."
+	::= { nwIpx 4 }
+
+    ipxInDelivers OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of received IPX datagrams delivered to
+		protocol agents within the router."
+	::= { nwIpx 5 }
+
+    ipxInUnknownProtos OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of packets which were addressed to the
+		node, but for which no protocol handler could be
+		found."
+	::= { nwIpx 6 }
+
+    ipxOutRequests OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of IPX datagrams sent on behalf of agents
+		in the router."
+	::= { nwIpx 7 }
+
+    ipxOutDiscards OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of packets, whether originating locally or
+		remotely, which were not transmitted because of a
+		resource error."
+	::= { nwIpx 8 }
+
+    ipxOutNoRoutes OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of packets, whether originating locally or
+		remotely, which were not transmitted because there was
+		no known route to the destination network."
+	::= { nwIpx 9 }
+
+    ipxNBForwards OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of NetBIOS wide-area broadcast packets
+		forwarded by the router."
+	::= { nwIpx 10 }
+
+    ipxTooManyHops OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of packets which were dropped because the
+		hop count was greater than or equal to 16."
+	::= { nwIpx 11 }
+
+    ipxRouteTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF IpxRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"This entity's IPX Routing table."
+	::= { nwIpx 12 }
+
+    ipxRouteEntry OBJECT-TYPE
+	SYNTAX	IpxRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A route to a particular destination."
+	INDEX { ipxRouteDest }		-- XXX INTEGER?
+	::= { ipxRouteTable 1 }
+
+    IpxRouteEntry ::= SEQUENCE {
+	ipxRouteDest		IpxNetNumber,
+	ipxRouteNwIfIndex	INTEGER,
+	ipxRouteHops		INTEGER,
+	ipxRouteTime		TimeTicks,
+	ipxRouteNextHop		IpxNodeNumber,
+	ipxRouteType		INTEGER,
+	ipxRouteProto		INTEGER,
+	ipxRouteAge		INTEGER,
+	ipxRouteUses		Counter
+    }
+
+    ipxRouteDest OBJECT-TYPE
+	SYNTAX	IpxNetNumber
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The destination IPX network number of this route."
+	::= { ipxRouteEntry 1 }
+
+    ipxRouteNwIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The nwifIndex of the next hop NetWare interface."
+	::= { ipxRouteEntry 2 }
+
+    ipxRouteHops OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of intervening routers between the agent
+		and the destination network. Directly attached routes
+		have a hop count of zero."
+	::= { ipxRouteEntry 3 }
+
+    ipxRouteTime OBJECT-TYPE
+	SYNTAX	TimeTicks
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The approximate round-trip transit time, in
+		hundredths of a second, of a 576-byte IPX packet
+		destined for this network."
+	::= { ipxRouteEntry 4 }
+
+    ipxRouteNextHop OBJECT-TYPE
+	SYNTAX	IpxNodeNumber
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IPX node address of the next hop of this
+		route.  If the next hop is a directly
+		connected net, the value is the agent's node
+		address on that net."
+		
+	::= { ipxRouteEntry 5 }
+
+    ipxRouteType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		invalid(2),
+		direct(3),
+		indirect(4)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of the route. Indicates whether the route is
+		on a directly attached interface or reached through
+		another router."
+	::= { ipxRouteEntry 6 }
+
+    ipxRouteProto OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		rip(2)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The routing mechanism by which the route was
+		learned."
+	::= { ipxRouteEntry 7 }
+
+    ipxRouteAge OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The age of the route in seconds.  Set to zero if the
+		route is a direct route."
+	::= { ipxRouteEntry 8 }
+
+    ipxRouteUses OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of packets that the entity has sent to
+		this network, whether generated internally or
+		forwarded on behalf of another node."
+	::= { ipxRouteEntry 9 }
+
+    ipxNumRoutes OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number or routes in this entity's IPX Routing table."
+	::= { nwIpx 13 }
+
+--
+-- RIP (Routing Information Protocol) Group.
+--
+
+    ripInMsgs OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of RIP packets received."
+	::= { nwRip 1 }
+
+    ripOutMsgs OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of RIP packets transmitted."
+	::= { nwRip 2 }
+
+--
+-- SAP (Service Advertising Protocol) Group.
+--
+
+    sapInMsgs	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of SAP packets received."
+	::= { nwSap 1 }
+
+    sapOutMsgs	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of SAP packets transmitted."
+	::= { nwSap 2 }
+
+    sapTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SapEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"This entity's Service Advertising Protocol table."
+	::= { nwSap 3 }
+
+    sapEntry OBJECT-TYPE
+	SYNTAX	SapEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the SAP table."
+	INDEX { sapIndex }
+	::= { sapTable 1 }
+
+    SapEntry ::= SEQUENCE {
+	sapIndex	INTEGER,
+	sapType		INTEGER,
+	sapNet		IpxNetNumber,
+	sapNode		IpxNodeNumber,
+	sapSocket	INTEGER,
+	sapName		NetWareName,
+	sapAge		INTEGER,
+	sapHops		INTEGER,
+	sapNwIfIndex	INTEGER
+    }
+
+    sapIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	not-accessible	-- illegal under SMIv1, but that's the way it's always been
+	STATUS	mandatory
+	DESCRIPTION
+		"A unique number indicating this entry's ordinal
+		position in the SAP table."
+	::= { sapEntry 1 }
+
+    sapType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		novellFileServer(4),
+		novellNacs(35),		-- 0x23
+		novellAdvPrintServer(71), -- 0x47
+		novellRemCons(263),	-- 0x107
+		shivaNetModem(459),	-- 0x1cb
+		shivaLanRoverE(460),	-- 0x1cc
+		shivaLanRoverT(461)	-- 0x1cd
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The device type of the server represented by
+		this entry.  This can be any 16-bit integer
+		from 1 to 65534."
+	::= { sapEntry 2 }
+
+    sapNet	OBJECT-TYPE
+	SYNTAX	IpxNetNumber
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IPX network number of the server."
+	::= { sapEntry 3 }
+
+    sapNode	OBJECT-TYPE
+	SYNTAX	IpxNodeNumber
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IPX node number of the server."
+	::= { sapEntry 4 }
+
+    sapSocket	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IPX socket number of the server."
+	::= { sapEntry 5 }
+
+    sapName	OBJECT-TYPE
+	SYNTAX	NetWareName
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the server."
+	::= { sapEntry 6 }
+
+    sapAge	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The age of this entry in seconds."
+	::= { sapEntry 7 }
+
+    sapHops	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of networks between this one and
+		the server."
+	::= { sapEntry 8 }
+
+    sapNwIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The NetWare interface on which information
+		about this server arrived."
+	::= { sapEntry 9 }
+
+    sapNumEntries OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of entries in this entity's SAP table."
+	::= { nwSap 4 }
+
+--
+-- NetWare Interface Group.
+--
+
+    nwifNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The highest nwifIndex in use."
+	::= { nwIf 1 }
+
+    nwifTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF NwifEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A list of NetWare interfaces for this entity."
+	::= { nwIf 2 }
+
+    nwifEntry	OBJECT-TYPE
+	SYNTAX	NwifEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The description of one of the NetWare
+		interfaces on this entity."
+		INDEX { nwifIndex }
+	::= { nwifTable 1 }
+
+    NwifEntry ::= SEQUENCE {
+	nwifIndex	INTEGER,
+	nwifDescr	DisplayString,
+	nwifType	INTEGER,
+	nwifNetwork	IpxNetNumber,
+	nwifNode	IpxNodeNumber,
+	nwifStatus	INTEGER,
+	nwifIfIndex	INTEGER,
+	nwifHome	INTEGER,
+	nwifNBForward	INTEGER
+    }
+
+    nwifIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A unique value for each NetWare Interface.  Its value
+		is between 1 and the total number of NetWare
+		Interfaces. The value for each interface must remain
+		constant at least from the re-initialization of the
+		entity's network management system to the next
+		re-initialization."
+	::= { nwifEntry 1 }
+
+    nwifDescr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A text string containing information about the
+		interface.  This string is intended for presentation
+		to a human; it must not contain anything but printable
+		ASCII characters."
+	::= { nwifEntry 2 }
+
+    nwifType	OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),       -- none of the following
+		ieee8023(2),	-- IPX checksum after 802 length
+		ethernet2(3),
+		snap(4),
+		ieee8022(5),
+		dialin(6),	-- virtual dialin network
+		ppp(7),
+		rfc1234(8),
+		lantolan(9)
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of interface and encapsulation."
+	::= { nwifEntry 3 }
+
+    nwifNetwork OBJECT-TYPE
+	SYNTAX	IpxNetNumber
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"IPX network number associated with this interface."
+	::= { nwifEntry 4 }
+
+    nwifNode	OBJECT-TYPE
+	SYNTAX	IpxNodeNumber
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"IPX node number associated with this interface."
+	::= { nwifEntry 5 }
+
+    nwifStatus	OBJECT-TYPE
+	SYNTAX	INTEGER {
+		disabled(1),
+		unlocked(2),	-- configured but not "locked"
+		locked(3),	-- configured and "locked",
+		unconfigured(4), -- enabled but no net number yet
+		learned(5),	-- learned from a network entity
+		guessed(6)	-- locally generated
+	}
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Status of this interface."
+	::= { nwifEntry 6 }
+
+    nwifIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The physical or data-link interface associated with 
+		this NetWare interface.  The interface identified by a 
+		particular value of this index is the same interface as
+		identified by the same value of ifIndex."
+	::= { nwifEntry 7 }
+
+    nwifHome	OBJECT-TYPE
+	SYNTAX	INTEGER { home(1), notHome(2) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"An indication of whether or not the entity is homed
+		on this interface, that is to say, an interface on
+		which the entity could perform registrations for
+		services that it chooses to advertise."
+	::= { nwifEntry 8 }
+
+    nwifNBForward OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates whether Novell NetBIOS Wide Area Broadcast
+		packets are forwarded out this interface."
+	::= { nwifEntry 9 }
+
+--
+-- NetWare Management information group
+--
+
+-- Information on the primary network management service registration
+
+    nwmgmtType	OBJECT-TYPE
+	SYNTAX	INTEGER {
+		shivaNetModem(459),			-- 0x01cb
+		shivaLanRoverE(460),			-- 0x01cc
+		shivaLanRoverT(461),			-- 0x01cd
+		shivaUniversal(462),			-- 0x01ce
+		ibm8325model002(1386),			-- 0x056a
+		ibm8325model001(1387),			-- 0x056b
+		shivaLanRoverEPLUS(1388),		-- 0x056c
+		shivaLanRoverTPLUS(1389),		-- 0x056d
+		ibm8235model012(1873),			-- 0x0751
+		ibm8235model011(1874),			-- 0x0752
+		shivaLanRoverE115(1947),		-- 0x079b
+		shivaLanRoverT115(1948),		-- 0x079c
+		ibm8235model022(1949),			-- 0x079d
+		ibm8325model021(1950),			-- 0x079e
+		shivaLanRoverAccessSwitchE(2084),	-- 0x0824
+		nortelRapport8E(2178),			-- 0x0882
+		nortelRapport8T(2179),			-- 0x0883
+		nortelRapportDialupSwitch112E(2216),	-- 0x08a8
+		ibm8325modelI40E(2229),			-- 0x08b5
+		ibm8235modelI40T(2242)			-- 0x08c2
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The device type of the primary network
+		management service advertisement.  If the value
+		is shivaUniversal, the server type is coded in
+		nwmgmtName."
+	::= { nwMgmt 1 }
+
+    nwmgmtNet	OBJECT-TYPE
+	SYNTAX	IpxNetNumber
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IPX network number of the primary network
+		management service advertisement."
+	::= { nwMgmt 2 }
+
+    nwmgmtNode	OBJECT-TYPE
+	SYNTAX	IpxNodeNumber
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IPX node number of the primary network
+		management service advertisement."
+	::= { nwMgmt 3 }
+
+    nwmgmtSocket OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IPX socket number of the primary network
+		management service advertisement."
+	::= { nwMgmt 5 }
+
+    nwmgmtName	OBJECT-TYPE
+	SYNTAX	NetWareName
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the the primary network
+		management service advertisement."
+	::= { nwMgmt 6 }
+
+END

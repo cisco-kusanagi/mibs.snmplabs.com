@@ -1,0 +1,681 @@
+-- extracted from draft-nadeau-mpls-packet-classifier-mib-01.txt
+-- at Sat Jul 22 07:08:04 2000
+
+MPLS-PACKET-CLASSIFIER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   Integer32, Unsigned32, Counter32, experimental
+      FROM SNMPv2-SMI
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF
+   TEXTUAL-CONVENTION, TruthValue, RowStatus,
+   StorageType, DisplayString
+      FROM SNMPv2-TC
+   InterfaceIndexOrZero
+      FROM IF-MIB
+   MplsTunnelIndex
+      FROM MPLS-TE-MIB
+   InetAddressIPv4, InetAddressIPv6, InetAddressType
+      FROM INET-ADDRESS-MIB;
+
+mplsPacketClassifierMIB MODULE-IDENTITY
+   LAST-UPDATED "200007141200Z"  -- 14 July 2000 12:00:00 EST
+   ORGANIZATION "Multiprotocol Label Switching (MPLS) Working Group"
+   CONTACT-INFO
+       "        Thomas D. Nadeau
+        Postal: Cisco Systems, Inc.
+                250 Apollo Drive
+                Chelmsford, MA 01824
+        Tel:    +1-978-244-3051
+        Email:  tnadeau@cisco.com
+       
+                Cheenu Srinivasan
+        Postal: Tachion Networks, Inc.
+                Monmouth Park Corporate Center I
+                Building C, 185 Monmouth Park Highway
+                West Long Branch, NJ 07764
+        Tel:    +1-732-542-7750 x1234
+        Email:  cheenu@tachion.com
+       
+                Arun Viswanathan
+        Postal: Force10 Networks, Inc.
+                1440 McCarthy Blvd
+                Milpitas, CA 95035
+        Tel:    +1-408-571-3516
+        Email:  arun@force10networks.com"
+
+   DESCRIPTION
+       "This MIB module contains managed object definitions for
+        specifying packet classification for MPLS."
+       
+   -- Revision history.
+       
+   REVISION
+       "200007141200Z"  -- 14 July 2000 12:00:00 EST
+   DESCRIPTION
+       "Initial draft version."
+   REVISION
+       "200003032030Z"  -- 03 March 2000 20:30:00 EST
+   DESCRIPTION
+       "Initial draft version."
+       
+   ::= { experimental oid } -- to be assigned
+
+-- Textual Conventions.
+
+MplsPortAddr ::= TEXTUAL-CONVENTION
+   STATUS              current
+   DESCRIPTION
+       "A TCP or UDP port number. Along with an IP address
+        identifies a stream of IP traffic uniquely."
+   SYNTAX              INTEGER (0..65535)
+
+MplsPacketClassifierIndex ::= TEXTUAL-CONVENTION
+   STATUS              current
+   DESCRIPTION
+       "Index for a packet classifier."
+   SYNTAX              Integer32(1..2147483647)
+
+MplsPacketClassifierIndexOrZero ::= TEXTUAL-CONVENTION
+   STATUS              current
+   DESCRIPTION
+       "Index for a packet classifier or zero."
+   SYNTAX              Integer32(0..2147483647)
+
+-- Top level components of the MIB.
+
+-- tables, scalars
+mplsPacketClassifierObjects OBJECT IDENTIFIER
+   ::= { mplsPacketClassifierMIB 1 }
+       
+-- traps
+mplsPacketClassifierNotifications OBJECT IDENTIFIER
+   ::= { mplsPacketClassifierMIB 2 }
+-- notification prefix
+mplsPacketClassifierNotifPrefix OBJECT IDENTIFIER
+   ::= { mplsPacketClassifierNotifications 0 }
+
+-- conformance
+mplsPacketClassifierConformance OBJECT IDENTIFIER
+   ::= { mplsPacketClassifierMIB 3 }
+
+-- Packet classifier table.
+
+mplsPacketClassifierIndexNext OBJECT-TYPE
+   SYNTAX              MplsPacketClassifierIndexOrZero
+   MAX-ACCESS          read-only
+   STATUS              current
+   DESCRIPTION
+       "This  object contains the next appropriate value to  be
+        used   for   mplsPacketClassifierIndex  when   creating
+        entries  in  the  mplsPacketClassifierTable.   If   the
+        number  of unassigned entries is exhausted, this object
+        MUST   return   a   value  of   0.    To   obtain   the
+        mplsPacketClassifierIndex value for a  new  entry,  the
+        manager   must   first  issue  a  management   protocol
+        retrieval operation to obtain the current value of this
+        object.   The agent should modify the value to  reflect
+        the   next   unassigned  index  after  each   retrieval
+        operation.  After a manager retrieves a value the agent
+        will determine through its local policy when this index
+        value will be made available for reuse."
+   ::= { mplsPacketClassifierObjects 1 }
+
+mplsPacketClassifierTable  OBJECT-TYPE
+   SYNTAX          SEQUENCE OF MplsPacketClassifierEntry
+   MAX-ACCESS      not-accessible
+   STATUS          current
+   DESCRIPTION
+       "This table contains the currently defined packet
+        classifiers."
+   ::=  { mplsPacketClassifierObjects  2 }
+
+mplsPacketClassifierEntry  OBJECT-TYPE
+   SYNTAX          MplsPacketClassifierEntry
+   MAX-ACCESS      not-accessible
+   STATUS          current
+   DESCRIPTION
+       "Each entry represents one packet classifier which
+        defines a rule to compare against incoming packets and
+        an action to be taken on matching packets."
+   INDEX { mplsPacketClassifierIndex }
+   ::=  { mplsPacketClassifierTable 1 }
+
+MplsPacketClassifierEntry  ::=  SEQUENCE {
+      mplsPacketClassifierIndex
+   MplsPacketClassifierIndex,
+      mplsPacketClassifierRowStatus           RowStatus,
+      mplsPacketClassifierDescr               DisplayString,
+      mplsPacketClassifierApplied             TruthValue,
+      mplsPacketClassifierMask                BITS,
+      mplsPacketClassifierAddrType            InetAddressType,
+      mplsPacketClassifierSourceIpv4AddrMin   InetAddressIPv4,
+      mplsPacketClassifierSourceIpv6AddrMin   InetAddressIPv6,
+      mplsPacketClassifierSourceIpv4AddrMax   InetAddressIPv4,
+      mplsPacketClassifierSourceIpv6AddrMax   InetAddressIPv6,
+      mplsPacketClassifierDestIpv4AddrMin     InetAddressIPv4,
+      mplsPacketClassifierDestIpv6AddrMin     InetAddressIPv6,
+      mplsPacketClassifierDestIpv4AddrMax     InetAddressIPv4,
+      mplsPacketClassifierDestIpv6AddrMax     InetAddressIPv6,
+      mplsPacketClassifierSourcePortMin       MplsPortAddr,
+      mplsPacketClassifierSourcePortMax       MplsPortAddr,
+      mplsPacketClassifierDestPortMin         MplsPortAddr,
+      mplsPacketClassifierDestPortMax         MplsPortAddr,
+      mplsPacketClassifierProtocol            INTEGER,
+      mplsPacketClassifierActionType          INTEGER,
+      mplsPacketClassifierActionPointer       RowPointer,
+      mplsPacketClassifierStorageType         StorageType
+   }
+
+mplsPacketClassifierIndex   OBJECT-TYPE
+   SYNTAX              MplsPacketClassifierIndex
+   MAX-ACCESS          not-accessible
+   STATUS              current
+   DESCRIPTION
+       "Unique index for the this packet classifier entry."
+   ::= { mplsPacketClassifierEntry 1 }
+
+mplsPacketClassifierRowStatus OBJECT-TYPE
+   SYNTAX              RowStatus
+   MAX-ACCESS          read-create
+   STATUS              current
+   DESCRIPTION
+       "For controlling the creation and deletion of this row."
+   ::= { mplsPacketClassifierEntry 2 }
+
+mplsPacketClassifierDescr   OBJECT-TYPE
+   SYNTAX              DisplayString
+   MAX-ACCESS          read-create
+   STATUS              current
+   DESCRIPTION
+       "Description of this packet classifier."
+   ::= { mplsPacketClassifierEntry 3 }
+
+mplsPacketClassifierApplied OBJECT-TYPE
+   SYNTAX              TruthValue
+   MAX-ACCESS          read-only
+   STATUS              current
+   DESCRIPTION
+       "Indicates whether this packet classifier has been
+        applied on any interface or not."
+   ::= { mplsPacketClassifierEntry 4 }
+
+mplsPacketClassifierMask OBJECT-TYPE
+   SYNTAX             BITS {
+                       sourceAddr(0),
+                       destAddr(1),
+                       sourcePort(2),
+                       destPort(3),
+                       protocol(4)
+                      }
+   MAX-ACCESS          read-create
+   STATUS              current
+   DESCRIPTION
+       "This bit map indicates which of the fields described
+        next, namely source address range, destination address
+        range, source port range, destination port range, and
+        protocol is active for this . If a particular bit is
+        inactive (i.e., set to zero) then the corresponding
+        field in the packet is ignored for comparison
+        purposes."
+   ::= { mplsPacketClassifierEntry 5 }
+
+mplsPacketClassifierAddrType OBJECT-TYPE
+   SYNTAX             InetAddressType
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Type  of  IP  packet  that this classifier  will  match
+        against. If this object has the value ipv4(1) then  the
+        objects  in this entry of type InetAddressIpv6 MUST  be
+        ignored by management applications. If this object  has
+        the  value  ipv6(1) then the objects in this  entry  of
+        type  InetAddressIpv4  MUST be  ignored  by  management
+        applications."
+   DEFVAL { ipv4 }
+   ::= { mplsPacketClassifierEntry 6 }
+
+mplsPacketClassifierSourceIpv4AddrMin OBJECT-TYPE
+   SYNTAX             InetAddressIPv4
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Lower end of source address range - IPv4 version."
+   ::= { mplsPacketClassifierEntry 7 }
+
+mplsPacketClassifierSourceIpv6AddrMin OBJECT-TYPE
+   SYNTAX             InetAddressIPv6
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       " Lower end of source address range - IPv6 version."
+   ::= { mplsPacketClassifierEntry 8 }
+
+mplsPacketClassifierSourceIpv4AddrMax OBJECT-TYPE
+   SYNTAX             InetAddressIPv4
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Upper end of source address range - IPv4 version."
+   ::= { mplsPacketClassifierEntry 9 }
+
+mplsPacketClassifierSourceIpv6AddrMax OBJECT-TYPE
+   SYNTAX             InetAddressIPv6
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Upper end of source address range - IPv4 version."
+   ::= { mplsPacketClassifierEntry 10 }
+
+mplsPacketClassifierDestIpv4AddrMin OBJECT-TYPE
+   SYNTAX             InetAddressIPv4
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Lower end of destination address range - IPv4 version."
+   ::= { mplsPacketClassifierEntry 11 }
+
+   mplsPacketClassifierDestIpv6AddrMin OBJECT-TYPE
+   SYNTAX             InetAddressIPv6
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Lower end of destination address range - IPv6 version."
+   ::= { mplsPacketClassifierEntry 12 }
+
+mplsPacketClassifierDestIpv4AddrMax OBJECT-TYPE
+   SYNTAX             InetAddressIPv4
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Upper end of destination address range - IPv4 version "
+   ::= { mplsPacketClassifierEntry 13 }
+
+mplsPacketClassifierDestIpv6AddrMax OBJECT-TYPE
+   SYNTAX             InetAddressIPv6
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Upper end of destination address range - IPv6 version "
+   ::= { mplsPacketClassifierEntry 14 }
+
+mplsPacketClassifierSourcePortMin OBJECT-TYPE
+   SYNTAX             MplsPortAddr
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Lower end of source port range."
+   ::= { mplsPacketClassifierEntry 15 }
+
+mplsPacketClassifierSourcePortMax OBJECT-TYPE
+   SYNTAX             MplsPortAddr
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Higher end of source port range "
+   ::= { mplsPacketClassifierEntry 16 }
+
+mplsPacketClassifierDestPortMin OBJECT-TYPE
+   SYNTAX             MplsPortAddr
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Lower end of the destination port range."
+   ::= { mplsPacketClassifierEntry 17 }
+
+mplsPacketClassifierDestPortMax OBJECT-TYPE
+   SYNTAX             MplsPortAddr
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Higher end of the destination port range."
+   ::= { mplsPacketClassifierEntry 18 }
+
+mplsPacketClassifierProtocol OBJECT-TYPE
+   SYNTAX             INTEGER (0..65535)
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "Protocol."
+   ::= { mplsPacketClassifierEntry 19 }
+
+mplsPacketClassifierActionType OBJECT-TYPE
+   SYNTAX             INTEGER {
+                   drop(1),          -- discard this packet
+                   redirectLsp(2),   -- redirect into specified LSP
+                   redirectTunnel(3) -- redirect into specified tunnel
+                      }
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "The type of action to be taken on packets matching this
+        filter."
+   ::= { mplsPacketClassifierEntry 20 }
+
+mplsPacketClassifierActionPointer OBJECT-TYPE
+   SYNTAX             RowPointer
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "If mplsPacketClassifierActionType is redirectLsp(2),
+        then this object indicates the instance of mplsXCEntry
+        for the LSP to redirect matching packets to. If
+        mplsPacketClassifierActionType is redirectTunnel(3),
+        then this object indicates the instance of
+        mplsTunnelEntry for the MPLS tunnel to redirect
+        matching packets to. For other values of
+        mplsPacketClassifierActionType this object MUST be
+        ignored by management applications. Agents SHOULD
+        return 0 as the value of this object."
+   ::= { mplsPacketClassifierEntry 21 }
+
+mplsPacketClassifierStorageType OBJECT-TYPE
+   SYNTAX             StorageType
+   MAX-ACCESS         read-create
+   STATUS             current
+   DESCRIPTION
+       "The storage type for this entry."
+   ::= { mplsPacketClassifierEntry 22 }
+
+-- End of mplsPacketClassifierTable.
+
+
+-- Packet classifier mapping table.
+
+mplsPacketClassifierMapTable OBJECT-TYPE
+   SYNTAX              SEQUENCE OF MplsPacketClassifierMapEntry
+   MAX-ACCESS          not-accessible
+   STATUS              current
+   DESCRIPTION
+       "This table contains objects for mapping previously
+        defined packet classifiers to interfaces."
+   ::=  { mplsPacketClassifierObjects 3 }
+
+mplsPacketClassifierMapEntry OBJECT-TYPE
+   SYNTAX              MplsPacketClassifierMapEntry
+   MAX-ACCESS          not-accessible
+   STATUS              current
+   DESCRIPTION
+       "Each entry indicates the application of a particular
+        packet classifier on an interface. The order of
+        application of packet classifiers on an interface is
+        the order in which they will be compared against
+        incoming packets for a match. Each entry of this table
+        is indexed by the interface index that the classifier
+        is applied to, with the value 0 representing all
+        interfaces, the index of the previous packet classifier
+        applied on the interface and the index of the current
+        packet classifier. This linked-list structure allows
+        classifiers to be inserted at arbitrary positions in
+        the list. Agents MUST NOT allow the same classifiers to
+        be applied multiple times to the same interface."
+   INDEX  {
+             mplsPacketClassifierMapIfIndex,
+             mplsPacketClassifierMapPrevIndex,
+             mplsPacketClassifierMapCurrIndex
+          }
+   ::=  { mplsPacketClassifierMapTable 1 }
+
+MplsPacketClassifierMapEntry  ::=  SEQUENCE {
+      mplsPacketClassifierMapIfIndex   InterfaceIndexOrZero,
+      mplsPacketClassifierMapPrevIndex MplsPacketClassifierIndexOrZero,
+      mplsPacketClassifierMapCurrIndex MplsPacketClassifierIndex,
+      mplsPacketClassifierMapRowStatus RowStatus,
+      mplsPacketClassifierMapStorageType
+                                       StorageType
+   }
+
+mplsPacketClassifierMapIfIndex OBJECT-TYPE
+   SYNTAX              InterfaceIndexOrZero
+   MAX-ACCESS          read-create
+   STATUS              current
+   DESCRIPTION
+       "Interface index that this classifier is being applied
+        to. Zero represents all interfaces."
+   ::= { mplsPacketClassifierMapEntry 1 }
+   
+mplsPacketClassifierMapPrevIndex OBJECT-TYPE
+   SYNTAX              MplsPacketClassifierIndexOrZero
+   MAX-ACCESS          read-create
+   STATUS              current
+   DESCRIPTION
+       "Index of the previous classifier that was applied to
+        this interface. Zero indicates that this should be the
+        first classifier in the list."
+   ::=  { mplsPacketClassifierMapEntry 2 }
+
+mplsPacketClassifierMapCurrIndex OBJECT-TYPE
+   SYNTAX              MplsPacketClassifierIndex
+   MAX-ACCESS          read-create
+   STATUS              current
+   DESCRIPTION
+       "Index of the current classifier that is being applied
+        to this interface."
+   ::=  { mplsPacketClassifierMapEntry 3 }
+
+mplsPacketClassifierMapRowStatus OBJECT-TYPE
+   SYNTAX              RowStatus
+   MAX-ACCESS          read-create
+   STATUS              current
+   DESCRIPTION
+       "For controlling the creation and deletion of this row."
+   ::=  { mplsPacketClassifierMapEntry 4 }
+
+mplsPacketClassifierMapStorageType OBJECT-TYPE
+   SYNTAX              StorageType
+   MAX-ACCESS          read-create
+   STATUS              current
+   DESCRIPTION
+       "The storage type for this entry."
+::= { mplsPacketClassifierMapEntry 5 }
+
+-- End of packetClassifierMapTable
+
+-- Packet classifier performance table
+
+mplsPacketClassifierPerfTable OBJECT-TYPE
+   SYNTAX              SEQUENCE OF MplsPacketClassifierPerfEntry
+   MAX-ACCESS          not-accessible
+   STATUS              current
+   DESCRIPTION
+       "This table contains performance statistics on packet
+        classifiers on a per-interface basis."
+   ::= { mplsPacketClassifierObjects 4 }
+
+mplsPacketClassifierPerfEntry OBJECT-TYPE
+   SYNTAX              MplsPacketClassifierPerfEntry
+   MAX-ACCESS          not-accessible
+   STATUS              current
+   DESCRIPTION
+       "Each entry contains performance information for the
+        specified interface and packet classifier
+        activated/mapped to this interface."
+
+   INDEX  { mplsPacketClassifierMapIfIndex,
+mplsPacketClassifierMapCurrIndex }
+   ::=  { mplsPacketClassifierPerfTable 1 }
+
+MplsPacketClassifierPerfEntry  ::=  SEQUENCE {
+      mplsPacketClassifierMatchedPackets          Counter32,
+      mplsPacketClassifierMatchedOctets           Counter32,
+      mplsPacketClassifierMatchedHCPackets        Counter64,
+      mplsPacketClassifierMatchedHCOctets         Counter64
+   }
+
+mplsPacketClassifierMatchedPackets OBJECT-TYPE
+   SYNTAX              Counter32
+   MAX-ACCESS          read-only
+   STATUS              current
+   DESCRIPTION
+       "Number of packets that matched the specified packet
+        classifier if it is applied/mapped to the specified
+        interface."
+   ::= { mplsPacketClassifierPerfEntry 1 }
+
+mplsPacketClassifierMatchedOctets OBJECT-TYPE
+   SYNTAX              Counter32
+   MAX-ACCESS          read-only
+   STATUS              current
+   DESCRIPTION
+       "Number of octets that matched the specified packet
+        classifier if it is applied/mapped to the specified
+        interface."
+   ::= { mplsPacketClassifierPerfEntry 2 }
+
+mplsPacketClassifierMatchedHCPackets OBJECT-TYPE
+   SYNTAX              Counter64
+   MAX-ACCESS          read-only
+   STATUS              current
+   DESCRIPTION
+       "High-capacity counter for the number of packets that
+        matched the specified packet classifier if it is
+        applied/mapped to the specified interface."
+   ::= { mplsPacketClassifierPerfEntry 3 }
+
+mplsPacketClassifierMatchedHCOctets OBJECT-TYPE
+   SYNTAX              Counter64
+   MAX-ACCESS          read-only
+   STATUS              current
+   DESCRIPTION
+       "High-capacity counter for the number of octets that
+        matched the specified packet classifier if it is
+        applied/mapped to the specified interface."
+   ::= { mplsPacketClassifierPerfEntry 4 }
+
+-- End of mplsPacketClassifierPerfTable
+
+-- Module compliance.
+
+mplsPacketClassifierGroups
+   OBJECT IDENTIFIER ::= { mplsPacketClassifierConformance 1 }
+
+mplsPacketClassifierCompliances
+   OBJECT IDENTIFIER ::= { mplsPacketClassifierConformance 2 }
+
+mplsPacketClassifierModuleCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+       "Compliance statement for agents that support  the  MPLS
+        Packet Classifier MIB."
+
+MODULE -- this module
+
+   -- The mandatory groups have to be implemented
+   -- by all LSRs.  However, they may all be supported
+   -- as read-only objects in the case where manual
+   -- configuration is unsupported.
+
+   MANDATORY-GROUPS {
+      mplsPacketClassifierRuleGroup,
+      mplsPacketClassifierMapGroup
+   }
+
+   GROUP mplsPacketClassifierHCPerfGroup
+   DESCRIPTION
+       "This  group  is  mandatory for those perf  entries  for
+        which  the  object  mplsPacketClassifierMatchedHCOctets
+        and  mplsPacketClassifierMatchedHCPackets  wrap  around
+        too quickly."
+
+   ::= { mplsPacketClassifierCompliances 1 }
+
+-- Units of conformance.
+mplsPacketClassifierRuleGroup OBJECT-GROUP
+   OBJECTS {
+      mplsPacketClassifierIndexNext,
+      mplsPacketClassifierRowStatus,
+      mplsPacketClassifierDescr,
+      mplsPacketClassifierApplied,
+      mplsPacketClassifierMask,
+      mplsPacketClassifierAddrType,
+      mplsPacketClassifierSourceIpv4AddrMin,
+      mplsPacketClassifierSourceIpv6AddrMin,
+      mplsPacketClassifierSourceIpv4AddrMax,
+      mplsPacketClassifierSourceIpv6AddrMax,
+      mplsPacketClassifierDestIpv4AddrMin,
+      mplsPacketClassifierDestIpv6AddrMin,
+      mplsPacketClassifierDestIpv4AddrMax,
+      mplsPacketClassifierDestIpv6AddrMax,
+      mplsPacketClassifierSourcePortMin,
+      mplsPacketClassifierSourcePortMax,
+      mplsPacketClassifierDestPortMin,
+      mplsPacketClassifierDestPortMax,
+      mplsPacketClassifierProtocol,
+      mplsPacketClassifierActionType,
+      mplsPacketClassifierActionPointer,
+      mplsPacketClassifierStorageType
+   }
+   STATUS current
+   DESCRIPTION
+       "Collection   of  objects  needed  for  MPLS  classifier
+        configuration and monitoring."
+   ::= { mplsPacketClassifierGroups 1 }
+
+mplsPacketClassifierMapGroup OBJECT-GROUP
+   OBJECTS {
+      mplsPacketClassifierMapIfIndex,
+      mplsPacketClassifierMapPrevIndex,
+      mplsPacketClassifierMapCurrIndex,
+      mplsPacketClassifierMapRowStatus,
+      mplsPacketClassifierMapStorageType
+   }
+   STATUS current
+   DESCRIPTION
+       "Collection   of  objects  needed  for  MPLS  classifier
+        configuration and monitoring."
+   ::= { mplsPacketClassifierGroups 2 }
+
+mplsPacketClassifierPerfGroup OBJECT-GROUP
+   OBJECTS {
+      mplsPacketClassifierMatchedPackets,
+      mplsPacketClassifierMatchedOctets
+   }
+   STATUS current
+   DESCRIPTION
+       "Collection of objects needed for MPLS packet classifier
+        performance monitoring."
+   ::= { mplsPacketClassifierGroups 3 }
+
+mplsPacketClassifierHCPerfGroup OBJECT-GROUP
+   OBJECTS {
+      mplsPacketClassifierMatchedHCPackets,
+      mplsPacketClassifierMatchedHCOctets
+   }
+   STATUS current
+   DESCRIPTION
+       "Collection of objects needed for MPLS packet classifier
+        performance   monitoring   when   using   high-capacity
+        counters."
+   ::= { mplsPacketClassifierGroups 4 }
+
+-- End of MPLS-PACKET-CLASSIFIER-MIB
+
+END
+
+--    
+--    Copyright (C) The Internet Society (2000). All Rights Reserved.
+--    
+--    This document and translations of it may be copied and furnished to
+--    others, and derivative works that comment on or otherwise explain it
+--    or assist in its implementation may be prepared, copied, published
+--    and distributed, in whole or in part, without restriction of any
+--    kind, provided that the above copyright notice and this paragraph are
+--    included on all such copies and derivative works.  However, this
+--    document itself may not be modified in any way, such as by removing
+--    the copyright notice or references to the Internet Society or other
+--    Internet organizations, except as needed for the purpose of
+--    developing Internet standards in which case the procedures for
+--    copyrights defined in the Internet Standards process must be
+--    followed, or as required to translate it into languages other than
+--    English.
+--    
+--    The limited permissions granted above are perpetual and will not be
+--    revoked by the Internet Society or its successors or assigns. This
+--    document and the information contained herein is provided on an "AS
+--    IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK
+--    FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
+--    NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN
+--    WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+

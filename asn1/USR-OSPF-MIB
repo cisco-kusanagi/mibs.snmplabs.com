@@ -1,0 +1,2825 @@
+USR-OSPF-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+                MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress
+				FROM SNMPv2-SMI
+		 common, UsrConfigStatus
+				FROM USR-DEFINITIONS-MIB
+		TEXTUAL-CONVENTION, RowStatus, DisplayString
+				FROM SNMPv2-TC;
+usrOspf MODULE-IDENTITY
+        LAST-UPDATED "200102151935Z" -- February 15, 19:35, 2001
+        ORGANIZATION "CommWorks Corporation, a 3Com company"
+        CONTACT-INFO "Customer Support"
+        DESCRIPTION
+       "The MIB module to describe the enterprise specific
+        objects for the OSPF Protocol"
+    ::= { common 63 }
+TOSType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Type of Service is defined as a mapping to the IP Type of
+       Service Flags as defined in the IP Forwarding Table MIB
+       +-----+-----+-----+-----+-----+-----+-----+-----+
+       |                 |                       |     |
+       |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |
+       |                 |                       |     |
+       +-----+-----+-----+-----+-----+-----+-----+-----+
+                IP TOS                IP TOS
+           Field     Policy      Field     Policy
+           Contents    Code      Contents    Code
+           0 0 0 0  ==>   0      0 0 0 1  ==>   2
+           0 0 1 0  ==>   4      0 0 1 1  ==>   6
+           0 1 0 0  ==>   8      0 1 0 1  ==>  10
+           0 1 1 0  ==>  12      0 1 1 1  ==>  14
+           1 0 0 0  ==>  16      1 0 0 1  ==>  18
+           1 0 1 0  ==>  20      1 0 1 1  ==>  22
+           1 1 0 0  ==>  24      1 1 0 1  ==>  26
+           1 1 1 0  ==>  28      1 1 1 1  ==>  30
+       The remaining values are left for future definition."
+    SYNTAX      Integer32 (0..30)
+-- Begin IP policy object definitions here...
+--
+--      The OSPF Export Policy Table
+--
+--
+--  Rip gateway and interface have been removed from the
+--  the ospf export policy table. To add them back in
+--  modify the table using the commented out
+--  items at the bottom of this file.
+--
+    usrOspfExportPolicyTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF UsrOspfExportPolicyEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+	            "A set of export policies for OSPF."
+      ::= { usrOspf 1 }
+    usrOspfExportPolicyEntry OBJECT-TYPE
+        SYNTAX  UsrOspfExportPolicyEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           ""
+       REFERENCE
+          ""
+      INDEX { 
+	usrOspfExportPolicyNet,
+	usrOspfExportPolicyMask,
+	usrOspfExportPolicyRouteSource
+	}
+      ::= { usrOspfExportPolicyTable 1 }
+UsrOspfExportPolicyEntry ::= SEQUENCE {
+      usrOspfExportPolicyNet			IpAddress,
+      usrOspfExportPolicyMask			IpAddress,
+      usrOspfExportPolicyRouteSource		INTEGER,
+      usrOspfExportPolicyAction			INTEGER,
+      usrOspfExportPolicyMetric			Integer32 (0..16777215),
+      usrOspfExportPolicyMetricType		INTEGER,
+      usrOspfExportPolicyTag			Integer32 (0..2147483647),
+      usrOspfExportPolicyStatus                 RowStatus
+}
+usrOspfExportPolicyNet OBJECT-TYPE
+        SYNTAX		IpAddress
+        MAX-ACCESS   	read-only
+        STATUS   	current
+        DESCRIPTION
+           "Specifies the network address which will match this policy."
+::= { usrOspfExportPolicyEntry 1 }
+usrOspfExportPolicyMask OBJECT-TYPE
+        SYNTAX		IpAddress
+        MAX-ACCESS   	read-only
+        STATUS   	current
+        DESCRIPTION
+           "The network mask to be applied to the network address to
+            specify a specific address or range of addresses for this policy."
+::= { usrOspfExportPolicyEntry 2 }
+usrOspfExportPolicyRouteSource OBJECT-TYPE
+        SYNTAX		INTEGER {  
+				any(0),
+                        	local(1),
+                              	static(2),
+                 	      	rip(8)
+			}
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+           "Identifies the source of the routing information: local,
+            static, or RIP."
+	DEFVAL		{ 0 }
+::= { usrOspfExportPolicyEntry 3 }
+--	As part of NSSA development two new CLI commands are added
+--	to delete all OSPF send and receive policies, where the 
+--	source will be 'any' and the policy will be 'zero' in 
+--	order to distinguish between all policy deletion and one policy.
+usrOspfExportPolicyAction OBJECT-TYPE
+	SYNTAX		INTEGER {
+                        	advertise(1),
+                              	doNotAdvertise(2)
+			}
+        MAX-ACCESS   	read-create
+        STATUS   	current
+        DESCRIPTION
+           "The action to take with this export policy. If the action
+            is propagate, the route or routes described by the entry are included
+            in the local OSPF updates if they exist in the routing table. If the
+            action is ignore, the route or routes described are not advertised in
+            the local OSPF updates."
+	DEFVAL		{ 1 }
+       --CONFIGURABLE
+::= { usrOspfExportPolicyEntry 4 }
+usrOspfExportPolicyMetric OBJECT-TYPE
+        SYNTAX   	Integer32 (0..16777215) 
+        MAX-ACCESS   	read-create
+        STATUS   	current
+        DESCRIPTION
+           "The metric to be used when advertising the route(s)
+            described by this policy. A metric value of 0 will cause the 
+            metric that is inserted into the AS External Links advertisement 
+            to be taken from the associated route entry in the routing table.
+            For all other valid metric values, the value is directly inserted
+            into the AS External Links advertisement."
+	DEFVAL		{ 0 }
+       --CONFIGURABLE
+::= { usrOspfExportPolicyEntry 5 }
+usrOspfExportPolicyMetricType OBJECT-TYPE
+        SYNTAX   	INTEGER {
+                        	comparableCost(1), -- external type I
+                              	nonComparable(2)  -- external type II
+			}
+        MAX-ACCESS   	read-create
+        STATUS   	current
+        DESCRIPTION
+           "This variable describes the external type of metric that the
+            export policy will advertise an external route as. Essentially
+            this variable determines if the E Bit in an AS External Links
+            Advertisement is set or not. A selection of external type II
+            will cause the E bit to be set to 1. An external route tagged
+            as an external type II indicates that the external cost to
+            the route is all that should be associated with it's cost metric.
+            A route tagged as external type I indicates that the
+            internal cost to the Autonomous System Border Router as well
+            as the external cost of the route should be associated with
+            the route's cost metric."
+	DEFVAL		{ 1 }
+       --CONFIGURABLE
+::= { usrOspfExportPolicyEntry 6 }
+usrOspfExportPolicyTag OBJECT-TYPE
+        SYNTAX   	Integer32 (0..2147483647)
+        MAX-ACCESS   	read-create
+        STATUS   	current
+        DESCRIPTION
+           "The routing tag to be used when exporting the route(s)
+described by this policy entry."
+	DEFVAL		{ 0 }
+       --CONFIGURABLE
+::= { usrOspfExportPolicyEntry 7}
+usrOspfExportPolicyStatus OBJECT-TYPE
+        SYNTAX   	RowStatus
+        MAX-ACCESS   	read-create
+        STATUS   	current
+        DESCRIPTION
+           "The administrative status of the export policy entry."
+       --CONFIGURABLE
+::= { usrOspfExportPolicyEntry 8}
+--
+--      The OSPF Import Policy Table
+--
+usrOspfImportPolicyTable OBJECT-TYPE
+        SYNTAX   	SEQUENCE OF UsrOspfImportPolicyEntry
+        MAX-ACCESS   	not-accessible
+        STATUS   	current
+        DESCRIPTION
+	"A set of OSPF import policies."
+::= { usrOspf 2 }
+usrOspfImportPolicyEntry OBJECT-TYPE
+        SYNTAX   	UsrOspfImportPolicyEntry
+        MAX-ACCESS   	not-accessible
+        STATUS   	current
+        DESCRIPTION
+           "An entry for an OSPF Import Policy"
+      INDEX {usrOspfImportPolicyNet }
+::= { usrOspfImportPolicyTable 1 }
+UsrOspfImportPolicyEntry ::= SEQUENCE {
+	usrOspfImportPolicyNet		                IpAddress,
+	usrOspfImportPolicyMask		                IpAddress,
+	usrOspfImportPolicyAction	                INTEGER,
+	usrOspfImportPolicyRoutingPreference	        INTEGER,
+        usrOspfImportPolicyStatus                       RowStatus
+}
+usrOspfImportPolicyNet OBJECT-TYPE
+        SYNTAX		IpAddress
+        MAX-ACCESS   	read-only
+        STATUS   	current
+        DESCRIPTION
+           "The network address of the destination or set of
+destinations for which this import policy is being defined."
+::= { usrOspfImportPolicyEntry 1 }
+usrOspfImportPolicyMask OBJECT-TYPE
+        SYNTAX   	IpAddress
+        MAX-ACCESS   	read-only
+        STATUS   	current
+        DESCRIPTION
+           "The network mask for the destination or set of
+            destinations for which this import policy is being defined."
+::= { usrOspfImportPolicyEntry 2 }
+usrOspfImportPolicyAction OBJECT-TYPE
+        SYNTAX   	INTEGER {
+                        	accept(1),
+	                 	ignore(2)
+			}
+        MAX-ACCESS   	read-create
+        STATUS   	current
+        DESCRIPTION
+           "The action to take with this import policy. If the action
+            is accept, the route or routes described by the entry are included 
+            in the routing table when received in peer OSPF updates. If the action 
+            is ignore, the route or routes described are filtered from received 
+            OSPF updates."
+       --CONFIGURABLE
+::= { usrOspfImportPolicyEntry 3 }
+usrOspfImportPolicyRoutingPreference OBJECT-TYPE
+        SYNTAX 	INTEGER  {
+	            routingPreference0 (1),   -- same routing preference as OSPF 
+                                              --    internal routes
+                    routingPreference1 (2),   -- same routing preference as OSPF 
+                                              --    external type 1 routes
+                    routingPreference2 (3),   -- same routing preference as OSPF
+                                              --    external type 2 routes
+                    routingPreference3 (4)    -- route will never be used for
+                                              --    forwarding
+                  }
+        MAX-ACCESS   	read-create
+        STATUS   	current
+        DESCRIPTION
+           "The routing preference to associate with this route. A routing preference
+            of routingPreference0 is more preferred than a preference equal to
+            routingPreference1. A routing preference of routingPreference1 is more 
+            preferred than a preference equal to routingPreference2. A routing
+            preference of routingPreference3 will cause a route to never be used
+	    in forwarding. It will be present in the routing table but will never
+            make it into the forwarding table."
+       --CONFIGURABLE
+::= { usrOspfImportPolicyEntry 4 }
+usrOspfImportPolicyStatus OBJECT-TYPE
+        SYNTAX   	RowStatus
+        MAX-ACCESS   	read-create
+        STATUS   	current
+        DESCRIPTION
+           "The administrative status of the import policy entry."
+       --CONFIGURABLE
+::= { usrOspfImportPolicyEntry 5}
+--      The OSPF Area Table
+    usrOspfAreaTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF UsrOspfAreaEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "NOT IMPLEMENTED!
+           Information describing the configured  parame-
+           ters  and cumulative statistics of the router's
+           attached areas."
+       REFERENCE
+          "OSPF Version 2, Section 6  The Area Data Struc-
+          ture"
+       ::= { usrOspf 3 }
+    usrOspfAreaEntry OBJECT-TYPE
+        SYNTAX  UsrOspfAreaEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the configured  parame-
+           ters  and  cumulative  statistics of one of the
+           router's attached areas."
+      INDEX { 
+	usrOspfAreaId
+	}
+      ::= { usrOspfAreaTable 1 }
+UsrOspfAreaEntry ::= SEQUENCE {
+      usrOspfAreaId		IpAddress,
+      usrOspfAreaType	        INTEGER
+}
+    usrOspfAreaId OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A 32-bit integer uniquely identifying an area.
+           Area ID 0.0.0.0 is used for the OSPF backbone."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+      ::= { usrOspfAreaEntry 1 }
+    usrOspfAreaType OBJECT-TYPE
+        SYNTAX   INTEGER    {
+                    transit (1),
+                    stub (2)
+                  }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The area's support for determining if the Type is Stub or Transit."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+      DEFVAL { transit }
+      ::= { usrOspfAreaEntry 2 }
+usrOspfVersion OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS      read-only
+	STATUS      current
+	DESCRIPTION
+		"The current software version of the OSPF Process."
+::= { usrOspf 4 }
+usrOspfConfigFileName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS      read-only
+	STATUS      current
+	DESCRIPTION		
+		"The name of a ConfigFile to read/write  permanent database records."
+::= { usrOspf 5 }
+usrOspfCFMStatusFlag  OBJECT-TYPE
+	SYNTAX	  UsrConfigStatus
+	MAX-ACCESS      read-write
+	STATUS      current
+	DESCRIPTION
+		"Setting the value of this object to `save' causes the values
+		 of the OSPF Group to be written out to the current config
+		 file. While the new data is being written, the config process
+		 will set the value of this flag to `saving''. Any
+		 attempts to set the value while it is  not `normal'
+		 (i.e. the file is currently being written to the
+		 ConfigFile) will result in a badValue error being
+		 returned. Setting the value to `normal' will result in no
+		 action."
+::= { usrOspf 6 }
+--      The OSPF Default Area ID
+usrOspfDefaultAreaId OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+           "A 32-bit integer uniquely identifying an area.
+           Area ID 0.0.0.0 is used for the OSPF backbone.  This area ID is used 
+           to create the default area when the ospf base is created"
+    DEFVAL   { '00000000'H }    -- 0.0.0.0
+    --CONFIGURABLE
+::= { usrOspf 7 }
+--      The OSPF Host Table
+    usrOspfHostTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF UsrOspfHostEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The list of Hosts, and their metrics, that the
+            router will advertise as host routes."
+       REFERENCE
+          "OSPF Version 2, Section C.6  The Host route parameters"
+::= { usrOspf 8 }
+    usrOspfHostEntry OBJECT-TYPE
+        SYNTAX  UsrOspfHostEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A metric to be advertised, for a given type of service,
+            when a given host is reachable."
+      INDEX { 
+	usrOspfHostIpAddress, usrOspfHostIpTOS
+	}
+      ::= { usrOspfHostTable 1 }
+UsrOspfHostEntry ::= SEQUENCE {
+      usrOspfHostIpAddress	IpAddress,
+      usrOspfHostIpTOS	        TOSType,
+      usrOspfHostIpMask	        IpAddress
+}
+    usrOspfHostIpAddress OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The IP Address of the Host."
+       REFERENCE
+          "OSPF Version 2, Appendix C.6 Host route parameters"
+      ::= { usrOspfHostEntry 1 }
+    usrOspfHostIpTOS OBJECT-TYPE
+        SYNTAX       TOSType
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The Type of Service of the route being config-
+           ured."
+        REFERENCE
+          "OSPF Version 2, Appendix C.6 Host route parame-
+          ters"
+	::= { usrOspfHostEntry 2 }
+    usrOspfHostIpMask OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The IP Mask of the Host."
+       REFERENCE
+          "The IP Mask of the Host entry - enterprise specific 
+           object"
+      ::= { usrOspfHostEntry 3 }
+--      The OSPF Cryptographic Key Table
+    usrOspfCryptoKeyTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF UsrOspfCryptoKeyEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The list of OSPF Cryptographic Authentication Keys 
+            per OSPF Interface that will be used to generating/
+            verifying Cryptographic authentication."
+       REFERENCE
+          "OSPF Version 2, Appendix D. Authentication"
+      ::= { usrOspf 9 }
+    usrOspfCryptoKeyEntry OBJECT-TYPE
+        SYNTAX   UsrOspfCryptoKeyEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The information regarding a single OSPF Cryptographic
+            Authentication Key."
+       INDEX { usrOspfIfIpAddress, usrOspfAddressLessIf, usrOspfCryptoKeyId }
+       ::= { usrOspfCryptoKeyTable 1 }
+UsrOspfCryptoKeyEntry ::=
+    SEQUENCE {
+        usrOspfIfIpAddress
+            IpAddress,
+        usrOspfAddressLessIf
+            Integer32,
+        usrOspfCryptoKeyId
+            Integer32 (0..'FF'h),
+        usrOspfCryptoKey
+            OCTET STRING,
+        usrOspfCryptoKeyStatus
+            RowStatus,
+        usrOspfCryptoAlgo
+            Integer32,
+        usrOspfCryptoKeyStartAccept
+            Integer32,
+        usrOspfCryptoKeyStartGenerate
+            Integer32,
+        usrOspfCryptoKeyStopGenerate
+            Integer32,
+        usrOspfCryptoKeyStopAccept
+            Integer32
+              }
+    usrOspfIfIpAddress OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The IP address of this OSPF interface."
+       ::= { usrOspfCryptoKeyEntry 1 }
+    usrOspfAddressLessIf OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "For the purpose of easing  the  instancing  of
+           addressed   and  addressless  interfaces;  This
+           variable takes the value 0 on  interfaces  with
+           IP  Addresses,  and  the corresponding value of
+           ifIndex for interfaces having no IP Address."
+       ::= { usrOspfCryptoKeyEntry 2 }
+    usrOspfCryptoKeyId OBJECT-TYPE
+        SYNTAX   Integer32 (0..'FF'h)
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The Key ID of this cryptographic key.    This 
+            field identifies the algorithm and secret key 
+            used to create the message digest appended to 
+            the OSPF packet. Key Identifiers are unique
+            per-interface (or equivalently, per-subnet)."
+       ::= { usrOspfCryptoKeyEntry 3 }
+    usrOspfCryptoKey OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..256))
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "The Cryptographic Authentication Key.  If the 
+            Authentication Type is Cryptographic,  and the 
+            key length is shorter than 16 octets, the agent
+            will left adjust and zero fill to 16 octets.
+            When read, usrOspfCryptoKey always returns an 
+            Octet String of length zero."
+       --CONFIGURABLE
+      ::= { usrOspfCryptoKeyEntry 4 }
+    usrOspfCryptoKeyStatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "This variable displays the status of  the  en-
+           try.  Setting it to 'invalid' has the effect of
+           rendering it inoperative.  The internal  effect
+           (row removal) is implementation dependent."
+       --CONFIGURABLE
+      ::= { usrOspfCryptoKeyEntry 5 }
+    usrOspfCryptoAlgo OBJECT-TYPE
+        SYNTAX   Integer32
+                    -- md5 (0)
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "This field identifies the algorithm used to create
+           message digest."
+      DEFVAL { 0 }
+       --CONFIGURABLE
+      ::= { usrOspfCryptoKeyEntry 6 }
+    usrOspfCryptoKeyStartAccept OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "The time that the router will start accepting 
+           packets that have been created with the given key.
+           The time is expressed as a number of seconds since
+           the Epoch, 00:00:00 GMT, on January 1, 1995"
+       --CONFIGURABLE
+      ::= { usrOspfCryptoKeyEntry 7 }
+    usrOspfCryptoKeyStartGenerate OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "The time that the router will start using the 
+           key for packet generation.
+           The time is expressed as a number of seconds since
+           the Epoch, 00:00:00 GMT, on January 1, 1995"
+       --CONFIGURABLE
+      ::= { usrOspfCryptoKeyEntry 8 }
+    usrOspfCryptoKeyStopGenerate OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "The time that the router will stop using the 
+           key for packet generation.
+           The time is expressed as a number of seconds since
+           the Epoch, 00:00:00 GMT, on January 1, 1995.
+           The value 0HFFFFFFFF stands for infinity."
+       --CONFIGURABLE
+      ::= { usrOspfCryptoKeyEntry 9 }
+    usrOspfCryptoKeyStopAccept OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "The time that the router will stop accepting 
+           packets that have been created with the given key.
+           The time is expressed as a number of seconds since
+           the Epoch, 00:00:00 GMT, on January 1, 1995
+           The value 0HFFFFFFFF stands for infinity."
+       --CONFIGURABLE
+      ::= { usrOspfCryptoKeyEntry 10 }
+--      OSPF Default Area
+usrOspfDefaultAreaStatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "This variable is used to delete the ospf default
+            area."
+::= { usrOspf 10 }
+END     -- End of USR-OSPF-MIB DEFINITIONS
+-- Commented out items for ospf send policy table. To restore
+-- the ospf send policy rip gateway and rip interface cut and
+-- and paste these items back into the table. Within the table
+-- they followed the export policy action. Adjust usrOspfExportPolicyEntry
+-- numbers accordingly for ospf send metric, metric type, and tag
+-- after reinserting rip gateway and interface.
+--
+--      INDEX { 
+--	usrOspfExportPolicyRouteSource, 
+--	usrOspfExportPolicyNet,
+--	usrOspfExportPolicyMask,
+--	usrOspfExportPolicyFromRIPGateway,
+--	usrOspfExportPolicyReceivedOnRIPInterface 
+--	}
+--
+-- UsrOspfExportPolicyEntry ::= SEQUENCE {
+--      usrOspfExportPolicyRouteSource		INTEGER,
+--      usrOspfExportPolicyNet			IpAddress,
+--      usrOspfExportPolicyMask			IpAddress,
+--      usrOspfExportPolicyAction		INTEGER,
+--      usrOspfExportPolicyFromRIPGateway		IpAddress,
+--      usrOspfExportPolicyReceivedOnRIPInterface	IpAddress,
+--      usrOspfExportPolicyMetric			Integer32,
+--      usrOspfExportPolicyMetricType		INTEGER,
+--      usrOspfExportPolicyTag			Integer32,
+--      usrOspfExportPolicyStatus               RowStatus
+-- }
+--
+-- usrOspfExportPolicyFromRIPGateway OBJECT-TYPE
+--        SYNTAX   	IpAddress
+--        MAX-ACCESS   	read-only
+--        STATUS   	current
+--        DESCRIPTION
+--           "This attribute applies when the route to be exported is a
+-- RIP route. If this attribute is defined, then only RIP updates
+-- received from the specified RIP gateway are eligible for export. Any
+-- RIP gateway can be specified using 0.0.0.0 as the address."
+-- ::= { usrOspfExportPolicyEntry 5 }
+--
+-- usrOspfExportPolicyReceivedOnRIPInterface OBJECT-TYPE
+--        SYNTAX   	IpAddress
+--        MAX-ACCESS   	read-only
+--        STATUS   	current
+--        DESCRIPTION
+--           "This attribute applies when the route described by this
+-- policy is a RIP route. If this attribute is defined, then only RIP
+-- updates received on the specified interface are eligible for
+-- export. Use 0.0.0.0 to indicate that this policy applies to RIP
+-- updates received on any interface."
+-- ::= { usrOspfExportPolicyEntry 6 }
+--
+-- ************************************************************************
+--
+--    usr_fr_ext.mib - The Frame Relay enterprise specific MIB module
+--                     This MIB module when used in conjunction with
+--                     rfc2115.mib obsoletes previously used usr_fr.mib 
+--
+--
+-- Author:         <Cezary Wierucki>
+--
+USR-FR-EXT-MIB DEFINITIONS ::= BEGIN
+     IMPORTS
+             UsrDisplayString, UsrConfigStatus, common          FROM USR-DEFINITIONS-MIB
+             MODULE-IDENTITY, NOTIFICATION-TYPE,
+             Integer32, Counter32, OBJECT-TYPE                  FROM SNMPv2-SMI
+             DisplayString, RowStatus, TimeStamp, TruthValue    FROM SNMPv2-TC;
+     --  Frame Relay DTE MIB Extensions
+     --
+     --      the range of ifIndex
+     --
+     Index ::= Integer32       -- 1..ifNumber
+     --
+     --      the range of a Data Link Connection Identifier
+     --
+     DLCI ::= INTEGER(16..1023)        -- 0..DLCINumber
+     --
+     --  The Frame Relay Base Group.
+     --
+    usrFRExt MODULE-IDENTITY
+         LAST-UPDATED "200205141520Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The CommWorks Frame Relay DTE MIB Extensions"
+--       REVISION "200205141520Z"
+--       DESCRIPTION "Add structured trap comments"
+         ::= { common 64 }
+     usrfrExtBaseCfgFileName OBJECT-TYPE
+         SYNTAX      UsrDisplayString
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                 "The name of a Frame Relay ConfigFile to read/write
+                 permanent database records. If the value of this
+                 object is an empty string, then the FR process
+                 uses the default name '@file://FrFile.cfg'."
+         ::= { usrFRExt 1 }
+     usrfrExtBaseCFMSaveStatus OBJECT-TYPE
+         SYNTAX  UsrConfigStatus
+         MAX-ACCESS  read-write
+         STATUS  current
+         DESCRIPTION
+                 "Setting the value of this object to 'save'
+                 causes the values of the FR Base Group
+                 entries to be written out to the current FR
+                 configuration file. While the new configuration file 
+                 is being written, the FR process will set the value
+                 of this flag set to 'saving'. Any attempts to set
+                 the value while it is not 'normal' (i.e. the file
+                 is currently being written to the config file)
+                 will result in a badValue error being returned.
+                 Setting the value to 'normal' will result in no
+                 action."
+         ::= { usrFRExt 2 }
+     --
+     --  Frame Relay Conformance Options
+     --
+     usrfrExtBaseConformanceOption OBJECT-TYPE
+         SYNTAX INTEGER {
+                 sprint  (1),
+                 idacom  (2)
+         }
+         MAX-ACCESS  read-write
+         STATUS  current
+         DESCRIPTION
+                 "This variable indicates the Conformance Option
+                 of the Frame Relay Datalink."
+         DEFVAL { 2 }
+         --CONFIGURABLE
+         ::= { usrFRExt 3 }
+     --
+     --  Data Link Connection Management Interface Extensions
+     --
+     --  The variables that configure the DLC Management Interface.
+     --
+     usrfrExtDlcmiTable OBJECT-TYPE
+         SYNTAX   SEQUENCE OF UsrFrExtDlcmiEntry
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "The Parameters for the Data Link Connection Management
+            Interface for the frame relay service on this
+            interface."
+         REFERENCE
+            "Draft American National Standard T1.617-1991, Annex D"
+         ::= { usrFRExt 4 }
+         usrfrExtDlcmiEntry OBJECT-TYPE
+             SYNTAX   UsrFrExtDlcmiEntry
+             MAX-ACCESS   not-accessible
+             STATUS   current
+             DESCRIPTION
+                "The Parameters for a particular Data Link Connection
+                 Management Interface."
+            INDEX { usrfrExtDlcmiIfIndex }
+            ::= { usrfrExtDlcmiTable 1 }
+         UsrFrExtDlcmiEntry ::=
+             SEQUENCE {
+                 usrfrExtDlcmiIfIndex
+                     Index,
+                 usrfrExtDlcmiOperStatus
+                     INTEGER,
+                 usrfrExtDlcmiMaximumTransferUnit
+                     INTEGER,
+                 usrfrExtDlcmiAccessRate
+                     INTEGER,
+                 usrfrExtDlcmiNewPVCLearning
+                     INTEGER,
+                 usrfrExtDlcmiTrace
+                     INTEGER
+         }
+         usrfrExtDlcmiIfIndex OBJECT-TYPE
+             SYNTAX  Index
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The ifIndex value of the  corresponding  ifEntry."
+             ::= { usrfrExtDlcmiEntry 1 }
+         usrfrExtDlcmiOperStatus OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 ready         (1),
+                 waitForDriver (2),
+                 recovery      (3),
+                 down          (4),
+                 disabled      (5)
+             }
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "This variable indicates the operational status of 
+                 the Frame Relay link. The Status is determined by a 
+                 success or failure of the LMI message exchange with
+                 the Frame Relay switch, the WAN Interface state and 
+                 Administrator Link State."
+             ::= { usrfrExtDlcmiEntry 2 }
+         usrfrExtDlcmiMaximumTransferUnit OBJECT-TYPE
+             SYNTAX  INTEGER (260..2048)
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "This is the largest number of bytes the Frame Relay
+                 DLL Layer will attempt to transmit through its 
+                 physical interface in a single frame."
+             DEFVAL { 1600 }
+             --CONFIGURABLE
+             ::= { usrfrExtDlcmiEntry 3 }
+         usrfrExtDlcmiAccessRate OBJECT-TYPE
+             SYNTAX  INTEGER (0..8192000)
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "This is the speed of access channel, a Frame Relay
+                 DLL Layer will use for data transfer. This value is
+                 expressed in bits per second.
+                 If value 0 is selected, then the Access Rate value used
+                 by Frame Relay to its calculations will be taken from
+                 physical WAN driver."
+             REFERENCE
+                 "CCITT Recommendation I.370, Section 1.2 access rate"
+             DEFVAL { 1544000 }
+             --CONFIGURABLE
+             ::= { usrfrExtDlcmiEntry 4 }
+         usrfrExtDlcmiNewPVCLearning OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 on  (1),
+                 off (2)
+             }
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "This indicates if the Frame Relay interface 
+                 can dynamically create a new PVC based on
+                 information received in LMI Full Status message."
+             DEFVAL { 2 }
+             --CONFIGURABLE
+             ::= { usrfrExtDlcmiEntry 5 }
+         usrfrExtDlcmiTrace OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 on  (1),
+                 off (2)
+             }
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "This indicates if the LMI Protocol frames trace 
+                 information will be displayed on the console."
+             DEFVAL { 2 }
+             --CONFIGURABLE
+             ::= { usrfrExtDlcmiEntry 6 }
+     -- A Frame Relay service is a multiplexing service.  Data
+     -- Link Connection Identifiers enumerate virtual circuits
+     -- (permanent or switched) which are layered onto the underlying
+     -- interface, represented by ifEntry.  Therefore, each of the entries
+     -- in the Standard MIB's Interface Table with an IfType of
+     -- Frame Relay represents a Q.922 interface.  Zero or more
+     -- virtual circuits are layered onto this interface and provide
+     -- interconnection with various remote destinations.
+     -- Each such virtual circuit is represented by an entry in the
+     -- circuit table.
+     --   Circuit Table Extensions  
+     -- The table describing the use of the PVCs attached to
+     -- each Frame Relay Interface.
+     usrfrExtCircuitTable OBJECT-TYPE
+         SYNTAX   SEQUENCE OF UsrFrExtCircuitEntry
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "A table containing information about 
+            specific virtual circuits."
+         ::= { usrFRExt 5 }
+         usrfrExtCircuitEntry OBJECT-TYPE
+             SYNTAX   UsrFrExtCircuitEntry
+             MAX-ACCESS   not-accessible
+             STATUS   current
+             DESCRIPTION
+                "The information regarding a single  Data  Link
+                Connection Identifier."
+             INDEX { usrfrExtCircuitIfIndex, usrfrExtCircuitDlci }
+             ::= { usrfrExtCircuitTable 1 }
+         UsrFrExtCircuitEntry ::=
+             SEQUENCE {
+                 usrfrExtCircuitIfIndex
+                     Index,
+                 usrfrExtCircuitDlci
+                     DLCI,
+                 usrfrExtCircuitOperStatus
+                     INTEGER,
+                 usrfrExtCircuitCIR
+                     INTEGER,
+                 usrfrExtCircuitBcMax
+                     INTEGER,
+                 usrfrExtCircuitBcMin
+                     INTEGER,
+                 usrfrExtCircuitCurrentBc
+                     INTEGER,
+                 usrfrExtCircuitTc
+                     INTEGER,
+                 usrfrExtCircuitBECNMonitoring
+                     INTEGER,
+                 usrfrExtCircuitCMP
+                     INTEGER,
+                 usrfrExtCircuitTxFramesCongested             
+                     Counter32,             
+                 usrfrExtCircuitTxOctetsCongested
+                     Counter32,             
+                 usrfrExtCircuitTxFramesDiscarded
+                     Counter32,             
+                 usrfrExtCircuitTxOctetsDiscarded
+                     Counter32,             
+                 usrfrExtCircuitTxFramesFromForwarder
+                     Counter32,             
+                 usrfrExtCircuitTxOctetsFromForwarder    
+                     Counter32,             
+                 usrfrExtCircuitRxFramesCongested    
+                     Counter32,             
+                 usrfrExtCircuitRxOctetsCongested    
+                     Counter32,             
+                 usrfrExtCircuitRxOctetsDiscarded    
+                     Counter32,             
+                 usrfrExtCircuitRxFramesByForwarder    
+                     Counter32,             
+                 usrfrExtCircuitRxOctetsByForwarder    
+                     Counter32,             
+                 usrfrExtCircuitTxIPProtocolFrames    
+                     Counter32,             
+                 usrfrExtCircuitRxIPProtocolFrames    
+                     Counter32,             
+                 usrfrExtCircuitTxIPXProtocolFrames    
+                     Counter32,             
+                 usrfrExtCircuitRxIPXProtocolFrames    
+                     Counter32,             
+                 usrfrExtCircuitTxATProtocolFrames    
+                     Counter32,             
+                 usrfrExtCircuitRxATProtocolFrames    
+                     Counter32,             
+                 usrfrExtCircuitTxBridgedFrames    
+                     Counter32,             
+                 usrfrExtCircuitRxBridgedFrames    
+                     Counter32,
+                 usrfrExtCircuitPVCName
+                     DisplayString,
+                 usrfrExtCircuitTrace
+                     INTEGER,
+                 usrfrExtCircuitBECNRatio
+                     INTEGER,
+                 usrfrExtCircuitTxL2TPProtocolFrames
+                     Counter32,
+                 usrfrExtCircuitRxL2TPProtocolFrames
+                     Counter32,
+	         usrfrExtCircuitPTMPGroupState
+		     TruthValue,
+	         usrfrExtCircuitPTMPGroupName
+	             DisplayString	
+         }
+         usrfrExtCircuitIfIndex OBJECT-TYPE
+             SYNTAX  Index
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The ifIndex value of the ifEntry this  virtual
+                 circuit is layered onto."
+             ::= { usrfrExtCircuitEntry 1 }
+         usrfrExtCircuitDlci OBJECT-TYPE
+             SYNTAX  DLCI
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The Data Link Connection Identifier  for  this
+                 virtual circuit."
+             REFERENCE
+                 "Draft American National  Standard  T1.618-1991,
+                 Section 3.3.6"
+             ::= { usrfrExtCircuitEntry 2 }
+         usrfrExtCircuitOperStatus OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 up       (1),  -- ready to pass packets
+                 down     (2),
+                 disabled (3)
+             }
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The current operational state of the FR PVC.  The
+                 disabled(3) state indicates that no operational packets
+                 can be passed through this PVC.  It reflects the fact that 
+                 CircuitAdminStatus is disabled. The up(1) describes
+                 a state when packets can be sent and received on the PVC.
+                 The down(2) indicates that PVC is not able to operate. 
+                 The up(1) and down(2) states are set up based
+                 on LMI PVCS IE."
+             ::= { usrfrExtCircuitEntry 3 }
+         usrfrExtCircuitCIR OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 on  (1),
+                 off (2)
+             }
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "Committed Information Rate (CIR) describes how congestion
+                 control is handled.  Off indicates that no attempt
+                 at transmit control is made.
+                 On indicates that Frame Relay is monitoring amount of
+                 data transmitted through the physical interface and
+                 restricts this according to CIR rules."
+             DEFVAL { 1 }
+             --CONFIGURABLE
+             ::= { usrfrExtCircuitEntry 4 }
+         usrfrExtCircuitBcMax OBJECT-TYPE
+             SYNTAX  INTEGER (0..8192000)
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "The Committed Burst Size is the maximum amount of data
+                 (in bits) that the user may offer to the network, under
+                 normal conditions, during a time interval Tc.
+                 The BcMax value defines the upper boundary of current
+                 Bc value."
+             REFERENCE 
+                 "CCITT Recommendation I.370, Section 1.2 Bc"
+             DEFVAL { 256000 }
+             --CONFIGURABLE
+             ::= { usrfrExtCircuitEntry 5 }
+         usrfrExtCircuitBcMin OBJECT-TYPE
+             SYNTAX  INTEGER (0..8192000)
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "The Committed Burst Size is the maximum amount of data
+                 (in bits) that the user may offer to the network, under
+                 normal conditions, during a time interval Tc.
+                 The BcMin value defines the lower boundary of current
+                 Bc value."
+             REFERENCE 
+                 "CCITT Recommendation I.370, Section 1.2 Bc"
+             DEFVAL { 128000 }
+             --CONFIGURABLE
+             ::= { usrfrExtCircuitEntry 6 }
+         usrfrExtCircuitCurrentBc OBJECT-TYPE
+             SYNTAX  INTEGER (0..8192000)
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The Committed Burst Size is the maximum amount of data
+                 (in bits) that the user may offer to the network, under
+                 normal conditions, during a time interval Tc.
+                 The CurrentBc value represents currently used Bc value."
+             REFERENCE 
+                 "CCITT Recommendation I.370, Section 1.2 Bc"
+             ::= { usrfrExtCircuitEntry 7 }
+         usrfrExtCircuitTc OBJECT-TYPE
+             SYNTAX  INTEGER (0..2147483647)
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The Committed Rate Measurement Interval is
+                 a time interval during which the user is allowed
+                 to send only the committed amount of date (Bc) and
+                 the excess amount of data (Be). This value is
+                 calculated and is expressed in milliseconds."
+             REFERENCE 
+                 "CCITT Recommendation I.370, Section 1.2 Tc"
+             ::= { usrfrExtCircuitEntry 8 }
+         usrfrExtCircuitBECNMonitoring OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 on  (1),
+                 off (2)
+             }
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "BECN Monitoring describes if BECN congestion notification
+                 control is handled.  Off indicates that no attempt
+                 at congestion notification control is made. 
+                 On indicates that the BECN bit of the Q.922 header is
+                 monitored. When the BECN bit indicates that the Frame
+                 Relay switch is experiencing congestion over this DLCI,
+                 the transmission rate will be slowed, to value calculated
+                 based on usrfrCircuitBcMin. When the bit indicates 
+                 alleviation of congestion, the transmission rate will 
+                 be incrementally increased back to a value calculated 
+                 based on usrfrCircuitBcMax."
+             DEFVAL { 2 }
+             --CONFIGURABLE
+             ::= { usrfrExtCircuitEntry 9 }
+         usrfrExtCircuitCMP OBJECT-TYPE
+             SYNTAX  INTEGER (1..100)
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "The Congestion Monitoring Period - is a period
+                 expressed in seconds, during which Frame Relay
+                 monitors number of received BECN events."    
+             DEFVAL { 10 }
+             --CONFIGURABLE
+             ::= { usrfrExtCircuitEntry 10 }
+         --
+         -- Circuit Statistics
+         --
+         usrfrExtCircuitTxFramesCongested OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of frames congested by a physical driver
+                  during transmit action taken by this PVC since 
+                  it was created."
+             ::= { usrfrExtCircuitEntry 11 }
+         usrfrExtCircuitTxOctetsCongested OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of bytes congested by a physical driver
+                  during transmit action taken by this PVC since 
+                  it was created."
+             ::= { usrfrExtCircuitEntry 12 }
+         usrfrExtCircuitTxFramesDiscarded OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of frames discarded during transmit 
+                  action by this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 13 }
+         usrfrExtCircuitTxOctetsDiscarded OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of bytes discarded during transmit
+                  action by this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 14 }
+         usrfrExtCircuitTxFramesFromForwarder OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of frames handed down from forwarder to
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 15 }
+         usrfrExtCircuitTxOctetsFromForwarder OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of bytes handed down from forwarder to
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 16 }
+         usrfrExtCircuitRxFramesCongested OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of frames congested by a forwarder
+                  during receive action taken by this PVC since 
+                  it was created."
+             ::= { usrfrExtCircuitEntry 17 }
+         usrfrExtCircuitRxOctetsCongested OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of bytes congested by a forwarder
+                  during receive action taken by this PVC since 
+                  it was created."
+             ::= { usrfrExtCircuitEntry 18 }
+         usrfrExtCircuitRxOctetsDiscarded OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of bytes discarded during receive
+                  action by this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 19 }
+         usrfrExtCircuitRxFramesByForwarder OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of frames passed to forwarder by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 20 }
+         usrfrExtCircuitRxOctetsByForwarder OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of bytes passed to forwarder by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 21 }
+         usrfrExtCircuitTxIPProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of IP protocol frames sent by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 22 }
+         usrfrExtCircuitRxIPProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of IP protocol frames received by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 23 }
+         usrfrExtCircuitTxIPXProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of IPX protocol frames sent by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 24 }
+         usrfrExtCircuitRxIPXProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of IPX protocol frames received by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 25 }
+         usrfrExtCircuitTxATProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of AppleTalk protocol frames sent by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 26 }
+         usrfrExtCircuitRxATProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of AppleTalk protocol frames received by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 27 }
+         usrfrExtCircuitTxBridgedFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of Bridged frames sent by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 28 }
+         usrfrExtCircuitRxBridgedFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of Bridged frames received by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 29 }
+         usrfrExtCircuitPVCName OBJECT-TYPE
+             SYNTAX  DisplayString (SIZE (1..32))
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "The name of this PVC. This table allows
+                 the Pilgrim CLI process to translate PVC
+                 name into IfIndex/DLCI pair."
+             --CONFIGURABLE
+             ::= { usrfrExtCircuitEntry 30 }
+         usrfrExtCircuitTrace OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 on  (1),
+                 off (2)
+             }
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "This indicates if the Frame Relay data frames trace 
+                 information will be displayed on the console for this
+                 PVC."
+             DEFVAL { 2 }
+             --CONFIGURABLE
+             ::= { usrfrExtCircuitEntry 31 }
+         usrfrExtCircuitBECNRatio OBJECT-TYPE
+             SYNTAX  INTEGER (1..99)
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "BECN/(BECN + NO_BECN) percentage ratio used by 
+                 BECN Monitoring mechanism to make a BC adjustment
+                 decision for this PVC. It is expressed in percents."
+             DEFVAL { 50 }
+             --CONFIGURABLE
+             ::= { usrfrExtCircuitEntry 32 }
+         usrfrExtCircuitTxL2TPProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of L2TP Protocol frames sent by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 33 }
+         usrfrExtCircuitRxL2TPProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of L2TP Protocol frames received by
+                  this PVC since it was created."
+             ::= { usrfrExtCircuitEntry 34 }
+		 usrfrExtCircuitPTMPGroupState	OBJECT-TYPE
+			 SYNTAX  TruthValue
+			 MAX-ACCESS	read-only
+			 STATUS	 current
+			 DESCRIPTION
+				"Determines whether this PVC is attached to a PTMP
+				 Group or not"
+			 ::= { usrfrExtCircuitEntry 35 }
+		 usrfrExtCircuitPTMPGroupName	OBJECT-TYPE
+			 SYNTAX	DisplayString
+			 MAX-ACCESS	read-only
+			 STATUS	current
+			 DESCRIPTION
+				"Name of the Point-to-Multipoint group this PVC is
+				 assiciated with"
+			 ::= { usrfrExtCircuitEntry 36 }
+     --        
+     --  Frame Relay DLL Error Table Extensions
+     --
+     -- The table describing errors encountered on each Frame
+     -- Relay Interface.
+     usrfrExtErrTable OBJECT-TYPE
+         SYNTAX   SEQUENCE OF UsrFrExtErrEntry
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "A table containing information about Errors on the 
+            Frame Relay interface."
+         ::= { usrFRExt 6 }
+         usrfrExtErrEntry OBJECT-TYPE
+             SYNTAX   UsrFrExtErrEntry
+             MAX-ACCESS   not-accessible
+             STATUS   current
+             DESCRIPTION
+                "The error information for a single Frame Relay
+                interface."
+            INDEX { usrfrExtErrIfIndex }
+            ::= { usrfrExtErrTable 1 }
+         UsrFrExtErrEntry ::=
+             SEQUENCE {
+                 usrfrExtErrIfIndex
+                     Index,
+                 usrfrExtErrUnknownError
+                     Counter32,
+                 usrfrExtErrReceivedShortFrames
+                     Counter32,
+                 usrfrExtErrReceivedLongFrames
+                     Counter32,
+                 usrfrExtErrIllegalDlcis
+                     Counter32,
+                 usrfrExtErrUnknownDlcis
+                     Counter32,
+                 usrfrExtErrDlmciProtocolErrs
+                     Counter32,
+                 usrfrExtStatDLLRxFrames
+                     Counter32,
+                 usrfrExtStatDLLRxOctets
+                     Counter32,
+                 usrfrExtStatDLLTxFrames    
+                     Counter32,
+                 usrfrExtStatDLLTxOctets    
+                     Counter32,
+                 usrfrExtStatLMIRxFrames    
+                     Counter32,
+                 usrfrExtStatLMITxFrames    
+                     Counter32,
+                 usrfrExtStatLMIRxStatusEnquiry    
+                     Counter32,
+                 usrfrExtStatLMITxStatusEnquiry    
+                     Counter32,
+                 usrfrExtStatLMIRxStatus    
+                     Counter32,
+                 usrfrExtStatLMITxStatus    
+                     Counter32,
+                 usrfrExtStatLMIRxStatusUpdate    
+                     Counter32,
+                 usrfrExtErrLMINoNetworkResponse    
+                     Counter32,
+                 usrfrExtErrLMIInvQ922    
+                     Counter32,
+                 usrfrExtErrLMIInvControlField    
+                     Counter32,
+                 usrfrExtErrLMIInvProtocolDiscr    
+                     Counter32,
+                 usrfrExtErrLMIInvCallReference    
+                     Counter32,
+                 usrfrExtErrLMIInvMessageType    
+                     Counter32,
+                 usrfrExtErrLMIInvLockingShift    
+                     Counter32,
+                 usrfrExtErrLMIInvReportType    
+                     Counter32,
+                 usrfrExtErrLMIInvLIV    
+                     Counter32,
+                 usrfrExtErrLMIInvSeqNum    
+                     Counter32,
+                 usrfrExtErrLMIInvPVCStatus    
+                     Counter32,
+                 usrfrExtErrLMIUnsolicitedMessage    
+                     Counter32,
+                 usrfrExtErrLMIUnrecognizedIE    
+                     Counter32,
+                 usrfrExtErrLMIIncompleteMessage    
+                     Counter32,
+                 usrfrExtErrLMIOutOfOrderIE    
+                     Counter32,
+                 usrfrExtErrLMIInvSpareBits    
+                     Counter32,
+                 usrfrExtErrLMIInvExtensionBit    
+                     Counter32,
+                 usrfrExtErrLMIInvNADBits    
+                     Counter32,
+                 usrfrExtStatLMIRxAsyncStatus    
+                     Counter32
+         }
+         usrfrExtErrIfIndex OBJECT-TYPE
+             SYNTAX   Index
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "The ifIndex Value of the ifEntry this  virtual
+                circuit is layered onto."
+            ::= { usrfrExtErrEntry 1 }
+         usrfrExtErrUnknownError OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "An error which is not specified by another counter."
+           ::= { usrfrExtErrEntry 2 }
+         usrfrExtErrReceivedShortFrames OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of frames discarded because they were
+                too short."
+           ::= { usrfrExtErrEntry 3 }
+         usrfrExtErrReceivedLongFrames OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of frames discarded because they were
+                too long."
+           ::= { usrfrExtErrEntry 4 }
+         usrfrExtErrIllegalDlcis OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of frames discarded because they contained
+                illegal DLCIs."
+           ::= { usrfrExtErrEntry 5 }
+         usrfrExtErrUnknownDlcis OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of frames discarded because they contained
+                unknown DLCIs."
+           ::= { usrfrExtErrEntry 6 }
+         usrfrExtErrDlmciProtocolErrs OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay protocol errors."
+           ::= { usrfrExtErrEntry 7 }
+         usrfrExtStatDLLRxFrames OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay frames received on this DLL."
+           ::= { usrfrExtErrEntry 8 }
+         usrfrExtStatDLLRxOctets OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of bytes received on this DLL."
+           ::= { usrfrExtErrEntry 9 }
+         usrfrExtStatDLLTxFrames OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay frames transmitted on this DLL."
+           ::= { usrfrExtErrEntry 10 }
+         usrfrExtStatDLLTxOctets OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of octets transmitted on this DLL."
+           ::= { usrfrExtErrEntry 11 }
+         usrfrExtStatLMIRxFrames OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay LMI frames received on this DLL."
+           ::= { usrfrExtErrEntry 12 }
+         usrfrExtStatLMITxFrames OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay LMI frames transmitted on this DLL."
+           ::= { usrfrExtErrEntry 13 }
+         usrfrExtStatLMIRxStatusEnquiry OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay LMI Status Enquiry frames 
+                 receiveded on this DLL."
+           ::= { usrfrExtErrEntry 14 }
+         usrfrExtStatLMITxStatusEnquiry OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay LMI Status Enquiry frames 
+                 transmitted on this DLL."
+           ::= { usrfrExtErrEntry 15 }
+         usrfrExtStatLMIRxStatus OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay LMI Status frames 
+                 received on this DLL."
+           ::= { usrfrExtErrEntry 16 }
+         usrfrExtStatLMITxStatus OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay LMI Status frames 
+                 transmitted on this DLL."
+           ::= { usrfrExtErrEntry 17 }
+         usrfrExtStatLMIRxStatusUpdate OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of Frame Relay LMI Status Update frames 
+                 received on this DLL."
+           ::= { usrfrExtErrEntry 18 }
+         usrfrExtErrLMINoNetworkResponse OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of lacks of Network responses to LMI 
+                 Status Enquiry frames sent on this DLL."
+           ::= { usrfrExtErrEntry 19 }
+         usrfrExtErrLMIInvQ922 OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Q922 header
+                 received on this DLL."
+           ::= { usrfrExtErrEntry 20 }
+         usrfrExtErrLMIInvControlField OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Control Field
+                 received on this DLL."
+           ::= { usrfrExtErrEntry 21 }
+         usrfrExtErrLMIInvProtocolDiscr OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Protocol 
+                 Discriominator field received on this DLL."
+           ::= { usrfrExtErrEntry 22 }
+         usrfrExtErrLMIInvCallReference OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Call Reference
+                 field received on this DLL."
+           ::= { usrfrExtErrEntry 23 }
+         usrfrExtErrLMIInvMessageType OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Message Type
+                 field received on this DLL."
+           ::= { usrfrExtErrEntry 24 }
+         usrfrExtErrLMIInvLockingShift OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Locking Shift
+                 IE received on this DLL."
+           ::= { usrfrExtErrEntry 25 }
+         usrfrExtErrLMIInvReportType OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Report Type
+                 IE received on this DLL."
+           ::= { usrfrExtErrEntry 26 }
+         usrfrExtErrLMIInvLIV OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Link Integrity
+                 Verification IE received on this DLL."
+           ::= { usrfrExtErrEntry 27 }
+         usrfrExtErrLMIInvSeqNum OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Sequence Number
+                 field received on this DLL."
+           ::= { usrfrExtErrEntry 28 }
+         usrfrExtErrLMIInvPVCStatus OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid PVC Status
+                 IE received on this DLL."
+           ::= { usrfrExtErrEntry 29 }
+         usrfrExtErrLMIUnsolicitedMessage OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of unsolicited LMI frames received on 
+                 this DLL."
+           ::= { usrfrExtErrEntry 30 }
+         usrfrExtErrLMIUnrecognizedIE OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with unrecognized
+                 IE received on this DLL."
+           ::= { usrfrExtErrEntry 31 }
+         usrfrExtErrLMIIncompleteMessage OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with incomplete current
+                 IE received on this DLL."
+           ::= { usrfrExtErrEntry 32 }
+         usrfrExtErrLMIOutOfOrderIE OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with out_of_order IE 
+                 received on this DLL."
+           ::= { usrfrExtErrEntry 33 }
+         usrfrExtErrLMIInvSpareBits OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Spare Bits
+                 values in IE received on this DLL."
+           ::= { usrfrExtErrEntry 34 }
+         usrfrExtErrLMIInvExtensionBit OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid Extension Bit
+                 value in IE received on this DLL."
+           ::= { usrfrExtErrEntry 35 }
+         usrfrExtErrLMIInvNADBits OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI frames with invalid New, Active or
+                 Delete bits in PVCS IE received on this DLL."
+           ::= { usrfrExtErrEntry 36 }
+         usrfrExtStatLMIRxAsyncStatus OBJECT-TYPE
+             SYNTAX   Counter32
+             MAX-ACCESS   read-only
+             STATUS   current
+             DESCRIPTION
+                "Number of LMI Async Status frames received on this DLL."
+           ::= { usrfrExtErrEntry 37 }    
+     -- 
+     --  Frame Relay Trap Extensions
+     --  
+     usrfrExtTraps OBJECT IDENTIFIER ::= { usrFRExt 7}
+     usrfrExtDLCMIStatusChange NOTIFICATION-TYPE
+         OBJECTS  { usrfrExtDlcmiOperStatus }
+         STATUS   current
+         DESCRIPTION
+         " This trap indicates that the indicated Data Link Layer
+         has changed state. It has either been created or invalidated,
+         or has toggled between the active and inactive states. " 
+         --#TYPE "Warning"
+         --#SUMMARY "Data Link Layer has changed state (%d)"
+         --#ARGUMENTS { 0 }
+         --#SEVERITY MAJOR
+         --#STATE    OPERATIONAL
+         --#PROBABLECAUSE "State Change"
+         ::= { usrfrExtTraps 1 }
+	--
+	--  Frame Relay PTMP PVC Group Definition
+	-- The Point-to-Multipoint PVC Group is a logical
+      -- interface between Layer 3 protocol forwarders
+      -- and a Group of PTP PVCs participating in this
+      -- Group.
+      --
+usrfrExtPTMPGroupTable OBJECT-TYPE
+         SYNTAX   SEQUENCE OF UsrFrExtPTMPGroupEntry
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "A table containing information about 
+            PTMP PVC Group specific"
+         ::= { usrFRExt 8 }
+         usrfrExtPTMPGroupEntry OBJECT-TYPE
+             SYNTAX   UsrFrExtPTMPGroupEntry
+             MAX-ACCESS   not-accessible
+             STATUS   current
+             DESCRIPTION
+                "The information regarding a single PTMP PVC
+                Group entry."
+             INDEX { usrfrExtPTMPGroupName }
+             ::= { usrfrExtPTMPGroupTable 1 }
+         UsrFrExtPTMPGroupEntry ::=
+             SEQUENCE {
+                 usrfrExtPTMPGroupName
+                     DisplayString,
+                 usrfrExtPTMPGroupIndex
+                     Index,
+                 usrfrExtPTMPGroupOperStatus
+                     INTEGER,
+                 usrfrExtPTMPNumberOfPVCs
+                     Counter32,
+                 usrfrExtPTMPTxUcastFrames
+                     Counter32,
+                 usrfrExtPTMPTxUcastOctets
+                     Counter32,
+                 usrfrExtPTMPTxMcastFrames
+                     Counter32,
+                 usrfrExtPTMPTxMcastOctets
+                     Counter32,
+                 usrfrExtPTMPTxDiscardedFrames
+                     Counter32,
+                 usrfrExtPTMPTxDiscardedOctets
+                     Counter32,
+                 usrfrExtPTMPRxFrames
+                     Counter32,
+                 usrfrExtPTMPRxOctets 
+                     Counter32,
+                 usrfrExtPTMPRxCongestedFrames
+                     Counter32,
+                 usrfrExtPTMPRxCongestedOctets
+                     Counter32,
+                 usrfrExtPTMPRxDiscardedFrames
+                     Counter32,
+                 usrfrExtPTMPRxDiscardedOctets
+                     Counter32,
+                 usrfrExtPTMPTxIPProtocolFrames
+                     Counter32,    
+                 usrfrExtPTMPRxIPProtocolFrames
+                     Counter32,    
+                 usrfrExtPTMPTxIPXProtocolFrames
+                     Counter32,
+                 usrfrExtPTMPRxIPXProtocolFrames
+                     Counter32,
+                 usrfrExtPTMPTxATProtocolFrames
+                     Counter32,    
+                 usrfrExtPTMPRxATProtocolFrames
+                     Counter32,    
+                 usrfrExtPTMPTxBridgedFrames
+                     Counter32,    
+                 usrfrExtPTMPRxBridgedFrames
+                     Counter32,    
+                 usrfrExtPTMPTxL2TPProtocolFrames
+                     Counter32,    
+                 usrfrExtPTMPRxL2TPProtocolFrames
+                     Counter32,
+                 usrfrExtPTMPCreationTime
+                     TimeStamp,
+                 usrfrExtPTMPLastTimeChange
+                     TimeStamp,
+                 usrfrExtPTMPRowStatus
+                     RowStatus,
+                 usrfrExtPTMPTrace
+                     INTEGER
+         }
+         usrfrExtPTMPGroupName OBJECT-TYPE
+             SYNTAX  DisplayString (SIZE (1..32))
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "The name of the PTMP PVC Group. It is a unique
+                 name used as a index to PTMP PVC Group Table."
+             ::= { usrfrExtPTMPGroupEntry 1 }
+         usrfrExtPTMPGroupIndex OBJECT-TYPE
+             SYNTAX  Index
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Logical Index used by a PVC as a reference to 
+                a PTMP PVC Group. This index is a unique number."
+             --CONFIGURABLE
+             ::= { usrfrExtPTMPGroupEntry 2 }   
+         usrfrExtPTMPGroupOperStatus OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 up       (1),  -- ready to pass packets
+                 down     (2),
+                 disabled (3)
+             }
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The current operational state of the PTMP PVC Group. The
+                 disabled(3) state indicates that no data packets
+                 can be passed through this PTMP PVC Group. It reflects the fact that 
+                 RowStatus is set to notInService. The up(1) describes
+                 a state when packets can be sent and received on the PTMP PVC Group.
+                 The down(2) indicates that PTMP PVC Group is not able to operate. 
+                 The up(1) and down(2) states are set up based
+                 on status of all PVC participating in this Group. "
+             ::= { usrfrExtPTMPGroupEntry 3 }
+         usrfrExtPTMPNumberOfPVCs OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of PVCs associated with this PTMP PVC
+                Group."
+             ::= { usrfrExtPTMPGroupEntry 4 }   
+         usrfrExtPTMPTxUcastFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of unicast frames sent by a forwarder 
+                to this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 5 }
+         usrfrExtPTMPTxUcastOctets OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of octets in unicast frames sent by a forwarder
+                to this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 6 }   
+         usrfrExtPTMPTxMcastFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of multicast frames sent by a forwarder 
+                to this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 7 }   
+         usrfrExtPTMPTxMcastOctets OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of octets in multicast frames sent by a forwarder
+                to this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 8 }
+         usrfrExtPTMPTxDiscardedFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of frames discarded, which were sent by forwarder 
+                to this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 9 }
+         usrfrExtPTMPTxDiscardedOctets OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of octets in a discarded frames sent by a 
+                forwarder to this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 10 }
+         usrfrExtPTMPRxFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of frames received from all associated PVCS
+                by this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 11 }
+         usrfrExtPTMPRxOctets OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of octets received from all associated PVCS
+                by this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 12 }
+         usrfrExtPTMPRxCongestedFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of frames received from all associated PVCS,
+                which were congested by the forwarder on attempt of
+                passing them by PTMP PVC Group, since the group was enabled."
+             ::= { usrfrExtPTMPGroupEntry 13 }
+         usrfrExtPTMPRxCongestedOctets OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of octets in frames received from all associated PVCS,
+                which were congested by the forwarder on attempt of
+                passing them by PTMP PVC Group, since the group was enabled."
+             ::= { usrfrExtPTMPGroupEntry 14 }
+         usrfrExtPTMPRxDiscardedFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of received frames from all associated PVCs which 
+                were discarded by this PTMP PVC Group, since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 15 }
+         usrfrExtPTMPRxDiscardedOctets OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                "Number of octets in a received frames from all associated
+                PVCs which were discarded by  this PTMP PVC Group, since it 
+                was enabled."
+             ::= { usrfrExtPTMPGroupEntry 16 }
+         usrfrExtPTMPTxIPProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of IP protocol frames sent by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 17 }
+         usrfrExtPTMPRxIPProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of IP protocol frames received by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 18 }
+         usrfrExtPTMPTxIPXProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of IPX protocol frames sent by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 19 }
+         usrfrExtPTMPRxIPXProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of IPX protocol frames received by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 20 }
+         usrfrExtPTMPTxATProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of AppleTalk protocol frames sent by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 21 }
+         usrfrExtPTMPRxATProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of AppleTalk protocol frames received by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 22 }
+         usrfrExtPTMPTxBridgedFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of Bridged frames sent by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 23 }
+         usrfrExtPTMPRxBridgedFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of Bridged frames received by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 24 }
+         usrfrExtPTMPTxL2TPProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of L2TP Protocol frames sent by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 25 }
+         usrfrExtPTMPRxL2TPProtocolFrames OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "Number of L2TP Protocol frames received by
+                  this PTMP PVC Group since it was enabled."
+             ::= { usrfrExtPTMPGroupEntry 26 }
+         usrfrExtPTMPCreationTime OBJECT-TYPE
+             SYNTAX  TimeStamp
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The value of sysUpTime when this PTMP PVC Group was created."
+             ::= { usrfrExtPTMPGroupEntry 27 }
+         usrfrExtPTMPLastTimeChange OBJECT-TYPE
+             SYNTAX  TimeStamp
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION
+                 "The value of sysUpTime when last there was a change
+                  in this PTMP PVC Group state."
+             ::= { usrfrExtPTMPGroupEntry 28 }
+         usrfrExtPTMPRowStatus OBJECT-TYPE
+             SYNTAX  RowStatus
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                "This object is used to create a new row or destroy or modify an
+                existing row in a manner described in the definition of the
+                RowStatus textual convention."
+             --CONFIGURABLE
+             ::= { usrfrExtPTMPGroupEntry 29 }
+         usrfrExtPTMPTrace OBJECT-TYPE
+             SYNTAX  INTEGER {
+                 on  (1),
+                 off (2)
+             }
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "This indicates if the Frame Relay data frames trace 
+                 information will be displayed on the console for this
+                 PTMP PVC Group."
+             DEFVAL { 2 }
+             --CONFIGURABLE
+             ::= { usrfrExtPTMPGroupEntry 30 }
+     usrfrExtPTMPGroupStatusChange NOTIFICATION-TYPE
+         OBJECTS  { usrfrExtPTMPGroupOperStatus }
+         STATUS   current
+         DESCRIPTION
+         " This trap indicates that the indicated PTMP PVC Group
+         has changed its state. It has either been created or invalidated,
+         or has toggled between the active and inactive states. " 
+         --#TYPE "Warning"
+         --#SUMMARY "PTMP PVC Group has changed state (%d)"
+         --#ARGUMENTS { 0 }
+         --#SEVERITY MAJOR
+         --#STATE    OPERATIONAL
+         --#PROBABLECAUSE "State Change"
+         ::= { usrfrExtTraps 2 }
+     END        -- End of USR-FR-EXT-MIB DEFINITIONS
+-- **********************************************************************
+--	usr_dhcp.mib
+--
+--
+-- Author:         Fritz Reeve
+--
+Usr-Dhcp-MIB DEFINITIONS ::= BEGIN
+        IMPORTS
+          OBJECT-TYPE, MODULE-IDENTITY,
+          Counter32, Integer32, IpAddress
+                FROM SNMPv2-SMI
+          RowStatus, DisplayString
+                FROM SNMPv2-TC
+          common, UsrConfigStatus
+                  FROM USR-DEFINITIONS-MIB;
+    usrDhcp MODULE-IDENTITY
+         LAST-UPDATED "200205051900Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects
+                   for the Dynamic Host Configuration Protocol."
+--       REVISION "200205051900Z"
+--       DESCRIPTION "Converted to SNMPv2"
+         ::= { common 59 }
+   -- textual conventions
+          -- All representations of MAC addresses in this MIB Module
+          -- use, as a textual convention (i.e. this convention does
+          -- not affect their encoding), the data type:
+          MacAddress ::= OCTET STRING (SIZE (6))    -- a 6 octet address
+                                                    -- in the
+                                                    -- "canonical"
+                                                    -- order
+          -- defined by IEEE 802.1a, i.e., as if it were transmitted
+          -- least significant bit first, even though 802.5 (in
+          -- contrast to other n802.x protocols) requires MAC
+          -- addresses to be transmitted most significant bit first.
+   -- Begin managed object definitions here...
+     usrDhcpConfigFileName OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION             
+            "The name of a ConfigFile to read/write permanent database
+             records.  If the value of this object is an empty string, 
+             then the Filter Manager process uses the default name 
+             `@file://filter.cfg'. "
+     ::= { usrDhcp 1 }
+     usrDhcpCFMStatusFlag  OBJECT-TYPE
+         SYNTAX      UsrConfigStatus
+         MAX-ACCESS      read-write
+         STATUS          current
+         DESCRIPTION
+            "Setting the value of this object to `save' causes the values
+             of the SNMP Group to be written out to the     current config
+             file, which is stored in the usrFilterConfigFileName object.
+             While the new ConfigFile is being written, the SNMP process
+             will set the value of this flag to `saving''. Any
+             attempts to set the value while it is not `normal'
+             (i.e. the file is     currently being written to the
+             ConfigFile) will result in a badValue error being
+             returned. Setting the value to `normal' will result in no
+             action."
+     ::= { usrDhcp 2 }
+     usrDhcpAgent OBJECT-TYPE
+         SYNTAX  INTEGER {
+             disable(0),
+             enable(1)
+         }
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+             "this variable enables/disables the DHCP Relay Agent"
+         --CONFIGURABLE
+     ::= { usrDhcp 3 }
+     usrDhcpServer1    OBJECT-TYPE
+         SYNTAX  IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+             "when usrDhcpAgent is enabled, this variable contains the DHCP
+              Server IP Address."
+          --CONFIGURABLE
+     ::= { usrDhcp 4 }
+     usrDhcpServer2    OBJECT-TYPE
+         SYNTAX  IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+             "when usrDhcpAgent is enabled, this variable contains the DHCP
+              Server IP Address."
+          --CONFIGURABLE
+     ::= { usrDhcp 5 }
+     usrDhcpClientMessages OBJECT-TYPE
+         SYNTAX  Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                 "The total number of messages received on the LAN
+                 interface from the Client."
+     ::= { usrDhcp 6 }
+     usrDhcpServerMessages OBJECT-TYPE
+         SYNTAX  Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                 "The total number of messages received on the WAN 
+                 interfaces from the Servers."
+     ::= { usrDhcp 7 }
+     usrDhcpClientErrors   OBJECT-TYPE
+         SYNTAX  Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                 "The total number of messages received on the LAN 
+                 interfaces from the Client which were discarded 
+                 due to validation errors."
+     ::= { usrDhcp 8 }
+     usrDhcpServerErrors   OBJECT-TYPE
+         SYNTAX  Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                 "The total number of messages received on the WAN 
+                 interfaces from the Servers which were discarded 
+                 due to validation errors."
+     ::= { usrDhcp 9 }
+     usrDhcpCmGiAddr   OBJECT-TYPE
+         SYNTAX  DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+            "The network name for the Cable Modems in the Cable Modem Termination
+			System"
+          --CONFIGURABLE
+     ::= { usrDhcp 10 }
+     usrDhcpCpeGiAddr   OBJECT-TYPE
+         SYNTAX  DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+            "The network name for the Customer Premises Equipment in the 
+			Cable Modem Termination System"
+          --CONFIGURABLE
+     ::= { usrDhcp 11 }
+     usrDhcpMode  OBJECT-TYPE
+         SYNTAX  INTEGER {
+             enabled(1),
+             disabled(2)
+         }
+         MAX-ACCESS read-write
+         STATUS deprecated
+         DESCRIPTION
+             "this variable selects the DHCP mode. When set to Server, the 
+              router will be a local DHCP server and assign configured addresses 
+              and parameters to the clients on the LAN.  When set to Relay, 
+              the router will send the Client DHCP/BOOTP requests to the 
+              configured remote Server(s).  "
+         DEFVAL { 2 } 
+         --CONFIGURABLE
+     ::= { usrDhcp 12 }
+    usrDhcpProTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF UsrDhcpProEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION "Table of Client configuration profiles"
+	::= {usrDhcp 13 }
+    usrDhcpProEntry OBJECT-TYPE
+	SYNTAX UsrDhcpProEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION "Client configuration profile"
+	INDEX {usrDhcpProIndex}
+	::= {usrDhcpProTable 1}
+    UsrDhcpProEntry ::=
+	SEQUENCE {
+           usrDhcpProIndex 	Integer32,
+           usrDhcpProLease 	Integer32,
+           usrDhcpProRtr   	IpAddress,
+           usrDhcpProDNS1  	IpAddress,
+           usrDhcpProDNS2  	IpAddress,
+           usrDhcpProWINS1 	IpAddress,
+           usrDhcpProWINS2 	IpAddress,
+           usrDhcpProHost	DisplayString,
+           usrDhcpProDomain	DisplayString,
+	   usrDhcpProStatus	RowStatus
+  	   }
+    usrDhcpProIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION "Profile index"
+	::= {usrDhcpProEntry 1}
+    usrDhcpProLease OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "Address lease lifetime. Default of -1 indicates infinite lease"
+	--CONFIGURABLE
+	::= {usrDhcpProEntry 2}
+    usrDhcpProRtr OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "IP Address of default router for client"
+	--CONFIGURABLE
+	::= {usrDhcpProEntry 3}
+    usrDhcpProDNS1 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "IP address of DNS server for client"
+	--CONFIGURABLE
+	::= {usrDhcpProEntry 4}
+    usrDhcpProDNS2 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "IP address of secondary DNS server"
+	--CONFIGURABLE
+	::= {usrDhcpProEntry 5}
+    usrDhcpProWINS1 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "IP address of primary WINS server"
+	--CONFIGURABLE
+	::= {usrDhcpProEntry 6}
+    usrDhcpProWINS2 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "IP address of secondary WINS Server"
+	--CONFIGURABLE
+	::= {usrDhcpProEntry 7}
+    usrDhcpProHost OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "Base host name. Each host name allocated will a a numeric suffix added"
+	--CONFIGURABLE
+	::= {usrDhcpProEntry 8}
+    usrDhcpProDomain OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "Domain name"
+	--CONFIGURABLE
+	::= {usrDhcpProEntry 9}
+    usrDhcpProStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Status of the Profile Table row"
+	::= {usrDhcpProEntry 10}
+    ---
+    ---  Automatic Address allocation table
+    ---
+    usrDhcpAutoTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF UsrDhcpAutoEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION "Table of IP address allocation entries"
+	::= {usrDhcp 14 }
+    usrDhcpAutoEntry OBJECT-TYPE
+	SYNTAX UsrDhcpAutoEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION "Automatic IP address allocation entry"
+	INDEX {usrDhcpAutoIndex}
+	::={ usrDhcpAutoTable 1}
+    UsrDhcpAutoEntry ::=
+	SEQUENCE {
+		usrDhcpAutoIndex	Integer32,
+		usrDhcpAutoSeed		IpAddress,
+		usrDhcpAutoMask		IpAddress,
+		usrDhcpAutoRange	IpAddress,
+		usrDhcpAutoPro		Integer32,
+		usrDhcpAutoStatus	RowStatus
+	  }
+    usrDhcpAutoIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION "Auto range index"
+	::={ usrDhcpAutoEntry 1}
+    usrDhcpAutoSeed OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "Initial seed address. Default 10.0.0.1"
+	--CONFIGURABLE
+	::= {usrDhcpAutoEntry 2}
+    usrDhcpAutoMask OBJECT-TYPE	
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "Subnet mask. Default 255.0.0.0"
+	--CONFIGURABLE
+	::= {usrDhcpAutoEntry 3}
+    usrDhcpAutoRange OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "Highest IP address. Default of 255.255.255.255 indicates up to limit of seed mask"
+	--CONFIGURABLE
+	::= {usrDhcpAutoEntry 4}
+    usrDhcpAutoPro OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION "Index of client configuration profile"
+	::= {usrDhcpAutoEntry 5}
+    usrDhcpAutoStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Status of the range table row"
+	::= {usrDhcpAutoEntry 6}
+    ---
+    ---   Lease Status table
+    ---   Displays details of allocated IP addresses and clients
+    ---   to which they have been allocated
+    ---
+    usrDhcpLeaseTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF UsrDhcpLeaseEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION "A table of automatically allocated IP addresses"
+	::= {usrDhcp 15 }
+    usrDhcpLeaseEntry OBJECT-TYPE
+	SYNTAX UsrDhcpLeaseEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION "A description of an automatically-allocated address"
+	INDEX { usrDhcpLeaseIpAddr }
+	::= {usrDhcpLeaseTable 1}
+    UsrDhcpLeaseEntry ::=
+	SEQUENCE {
+           usrDhcpLeaseIpAddr  	IpAddress,
+           usrDhcpLeaseIfIndex 	Integer32,
+           usrDhcpLeaseHwAddr  	MacAddress,
+           usrDhcpLeaseCID     	OCTET STRING,
+           usrDhcpLeaseValue	Integer32,
+           usrDhcpLeaseLife	Integer32,
+	   usrDhcpLeaseType	INTEGER,
+	   usrDhcpLeaseStatus	RowStatus
+         }
+    usrDhcpLeaseIpAddr OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION "Automatically allocated IP address"
+	::= {usrDhcpLeaseEntry 1}
+    usrDhcpLeaseIfIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Interface over which IP address was allocated"
+	::= {usrDhcpLeaseEntry 2}
+    usrDhcpLeaseHwAddr OBJECT-TYPE
+	SYNTAX MacAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Hardware address of client to which IP address was allocated"
+	::= {usrDhcpLeaseEntry 3}
+    usrDhcpLeaseCID OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Identifier of client to which IP address was allocated"
+	::= {usrDhcpLeaseEntry 4}
+    usrDhcpLeaseValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Lifetime of lease. -1 if permanently allocated"
+	::= {usrDhcpLeaseEntry 5}
+    usrDhcpLeaseLife OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Remaining lifetime of lease. -1 if permanently allocated"
+	::= {usrDhcpLeaseEntry 6}
+    usrDhcpLeaseType OBJECT-TYPE
+	SYNTAX INTEGER {dynamic(1),manual(2)}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Type of lease"
+	::= {usrDhcpLeaseEntry 7}
+    usrDhcpLeaseStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION "Status of the Lease Table row"
+	::= {usrDhcpLeaseEntry 8}
+---
+--- Server counters
+---
+   usrDhcpLeaseReqRx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 16 }
+   usrDhcpRenewalReqRx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 17 }
+   usrDhcpAcceptReqRx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 18 }
+   usrDhcpDeclineRx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 19 }
+   usrDhcpReleaseRx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 20}
+   usrDhcpInvalidRx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 21}
+   usrDhcpOfferTx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 22}
+    usrDhcpConfirmTx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 23}
+   usrDhcpDenialTx OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 24}
+   usrDhcpReqAddrOutOfRange OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 25}
+   usrDhcpReqAddrInUse OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 26}
+   usrDhcpNoFreeAddr OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 27}
+   usrDhcpReqLeaseTooLong OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION ""
+	::= {usrDhcp 28}
+   usrDhcpProxyEnabled  OBJECT-TYPE
+         SYNTAX  INTEGER {
+             enabled(1),
+             disabled(2)
+         } 
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+             "this variable sets the DHCP proxy to enabled/disabled "
+         --CONFIGURABLE
+     ::= { usrDhcp 29 }
+   usrDhcpProxyDiscIfLeaseExp  OBJECT-TYPE
+         SYNTAX  INTEGER {
+             yes(1),
+             no(2)
+         } 
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+             "this sets the behavior if IP address lease expires "
+         --CONFIGURABLE
+     ::= { usrDhcp 30 }
+    ---
+    ---   ProxyClient Lease Status table
+    ---   Displays details of allocated IP addresses and clients
+    ---   to which they have been allocated
+    ---
+    usrDhcpProxyLeaseTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF UsrDhcpProxyLeaseEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION "A table of automatically allocated IP addresses"
+	::= {usrDhcp 31}
+    usrDhcpProxyLeaseEntry OBJECT-TYPE
+	SYNTAX UsrDhcpProxyLeaseEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION "A description of an automatically-allocated address"
+	INDEX { usrDhcpProxyLeaseIndex }
+	::= {usrDhcpProxyLeaseTable 1}
+    UsrDhcpProxyLeaseEntry ::=
+	SEQUENCE {
+           usrDhcpProxyLeaseIndex   	Integer32,
+           usrDhcpProxyLeaseCID     	DisplayString,
+           usrDhcpProxyLeaseIpAddr  	IpAddress,
+           usrDhcpProxyLeaseIfIndex 	Integer32,
+           usrDhcpProxyLeaseHwAddr  	MacAddress,
+           usrDhcpProxyLeaseValue	    Integer32,
+           usrDhcpProxyLeaseLife	    Integer32,
+           usrDhcpProxyLeaseStatus      RowStatus
+         }
+    usrDhcpProxyLeaseIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "Index to the table which makes each entry unique"
+    ::= {usrDhcpProxyLeaseEntry 1}
+    usrDhcpProxyLeaseCID OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "Identifier of client to which IP address was allocated"
+	::= {usrDhcpProxyLeaseEntry 2}
+    usrDhcpProxyLeaseIpAddr OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "Automatically allocated IP address"
+	::= {usrDhcpProxyLeaseEntry 3}
+    usrDhcpProxyLeaseIfIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "Interface over which IP address was allocated"
+	::= {usrDhcpProxyLeaseEntry 4}
+    usrDhcpProxyLeaseHwAddr OBJECT-TYPE
+	SYNTAX MacAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "Hardware address of client to which IP address was allocated"
+	::= {usrDhcpProxyLeaseEntry 5}
+    usrDhcpProxyLeaseValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "Lifetime of lease. -1 if permanently allocated"
+	::= {usrDhcpProxyLeaseEntry 6}
+    usrDhcpProxyLeaseLife OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "Remaining lifetime of lease. -1 if permanently allocated"
+	::= {usrDhcpProxyLeaseEntry 7}
+    usrDhcpProxyLeaseStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Status of the Lease Table row"
+    ::= {usrDhcpProxyLeaseEntry 8}
+---
+---  Proxy Client counters
+---
+     usrDhcpProxyDiscoveries OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+	 STATUS     current
+	 DESCRIPTION ""
+	 ::= {usrDhcp 32 }
+     usrDhcpProxyOffers OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+	 STATUS     current
+	 DESCRIPTION ""
+	 ::= {usrDhcp 33 }
+     usrDhcpProxyAddressesAcquired OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+	 STATUS     current
+	 DESCRIPTION ""
+	 ::= {usrDhcp 34 }
+     usrDhcpProxyAddressesReleased OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+	 STATUS     current
+	 DESCRIPTION ""
+	 ::= {usrDhcp 35 }
+     usrDhcpProxyClientsActive OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+	 STATUS     current
+	 DESCRIPTION ""
+	 ::= {usrDhcp 36 }
+     usrDhcpProxyT1renewals OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+	 STATUS     current
+	 DESCRIPTION ""
+	 ::= {usrDhcp 37 }
+     usrDhcpProxyT2renewals  OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+	 STATUS     current
+	 DESCRIPTION ""
+	 ::= {usrDhcp 38 }
+     usrDhcpProxyMaxRetry  OBJECT-TYPE
+     SYNTAX Integer32 (2..5)
+     MAX-ACCESS read-write
+	 STATUS     current
+	 DESCRIPTION "PRoxy Client retry count value"
+	 DEFVAL { 2 }
+	 --CONFIGURABLE
+	 ::= {usrDhcp 39 }
+    usrDhcpServerResetCounters	OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	    current
+    DESCRIPTION
+    	"An user action to reset all the server counter contains to value zero"
+    --CONFIGURABLE
+    ::= { usrDhcp 40 }
+    usrDhcpProxyClientResetCounters	OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	    current
+    DESCRIPTION
+    	"An user action to reset all the ProxyClient counter contains to value zero"
+    --CONFIGURABLE
+    ::= { usrDhcp 41 }
+    usrDhcpServerResetSettings	OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	    current
+    DESCRIPTION
+    	"An user action to reset all the server Addresses to value zero"
+    --CONFIGURABLE
+    ::= { usrDhcp 42 }
+END         -- End DHCP MIB definitions
+USR-RSHD-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        IpAddress, Counter32 , OBJECT-TYPE, MODULE-IDENTITY
+			FROM  SNMPv2-SMI
+        common, UsrUserName
+            FROM USR-DEFINITIONS-MIB;
+    usrRsh MODULE-IDENTITY
+         LAST-UPDATED "200202212020Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects for rshd"
+--      REVISION   "20020022102020Z"
+--      DESCRIPTION
+--              "Converted to SNMPv2"
+         ::= { common 74 }
+	usrRshHostsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF USRRshHostsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table of ip address and user name for connection authentication."
+    ::= { usrRsh 1 }
+    usrRshHostsTableEntry    OBJECT-TYPE
+    SYNTAX  USRRshHostsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An entry of an ip address and user name for connection authentication."
+    INDEX   { usrRshHostsTableIpAddress, usrRshHostsTableUserName}
+    ::= { usrRshHostsTable 1 }
+    USRRshHostsTableEntry ::= SEQUENCE {
+         usrRshHostsTableUserName        UsrUserName,
+         usrRshHostsTableIpAddress    IpAddress,
+         usrRshHostsTableStatus      INTEGER
+         }
+    usrRshHostsTableUserName OBJECT-TYPE
+    SYNTAX  UsrUserName
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The users name"
+    ::= { usrRshHostsTableEntry 1 }
+    usrRshHostsTableIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The ip address of the remote hosts"
+    ::= { usrRshHostsTableEntry 2 }
+    usrRshHostsTableStatus   OBJECT-TYPE
+    SYNTAX  INTEGER {
+        delete(1),
+        add(2)
+        }
+	MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If set to 2 user name and the ip address is added to this pool. If
+                 set to delet(1) this table is  deleted"
+        --CONFIGURABLE
+    ::= { usrRshHostsTableEntry 3 }
+	usrRshTotalConnections OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of connections made"
+        ::= { usrRsh 2 }
+	 usrRshTotalRSHConnections OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+              "The total number of rsh requests"
+        ::= { usrRsh 3 }
+	 usrRshTotalRcpConnections OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+              "The total number of rcp requests"
+        ::= { usrRsh 4 }
+	 usrRshTotalAuthFailed OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+              "The total number of auth failed"
+        ::= { usrRsh 5 }
+	 usrRshTotalNASDropped OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+              "The total number of NAS dropped connections"
+        ::= { usrRsh 6 }
+END

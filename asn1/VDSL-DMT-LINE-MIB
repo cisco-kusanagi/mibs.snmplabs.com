@@ -1,0 +1,421 @@
+-- extracted from draft-baillie-adslmib-vdsldmt-00.txt
+-- at Mon Feb 26 17:04:17 2001
+
+VDSL-DMT-LINE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+MODULE-IDENTITY, 
+OBJECT-TYPE                   FROM SNMPv2-SMI
+TEXTUAL-CONVENTION,
+TruthValue                    FROM SNMPv2-TC
+adslLineConfProfileName,
+adslMIB                       FROM ADSL-LINE-MIB;
+
+vdslDMTMib MODULE-IDENTITY
+    LAST-UPDATED "200102150000Z"    -- February 15, 2001
+    ORGANIZATION "ADSLMIB Working Group"
+    CONTACT-INFO
+    "
+        Scott Baillie
+        NEC Australia Pty. Ltd.
+        649-655 Springvale Road
+        Mulgrave 3170, Victoria, Australia
+        Tel: +61 3 9262 1111
+        Fax: +61 3 9264 3892
+        E-mail: scottb@nstc.nec.com.au
+
+        Umberto Bonollo
+        NEC Australia Pty. Ltd.
+        649-655 Springvale Road
+        Mulgrave 3170, Victoria, Australia
+        Tel: +61 3 9262 1111
+        Fax: +61 3 9264 3892
+        E-mail: umberto@nstc.nec.com.au
+    
+        Bob Ray
+        Verilink Corporation
+        950 Explorer Blvd. 
+        Huntsville, AL 35758 USA
+        Tel: +1 256-327-2380
+        Fax: +1 256-327-2880
+        E-mail: bray@verilink.com
+        "
+
+    DESCRIPTION
+        "This MIB module defines a collection of objects for
+        managing VDSL DMT Lines.  These objects extend the ADSL-LINE-MIB
+        (RFC2662)."
+
+    ::= { adslMIB 4 }  
+
+vdslDMTMibObjects OBJECT IDENTIFIER ::= { vdslDMTMib 1 }
+
+-- Textual Conventions used in this MIB
+--
+VdslDmtConfProfileSSF ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is used to specify the number of Symbols per Super
+        Frame. The super frame consists of a number of symbols, the
+        symbols are grouped as upstream symbols, downstream symbols
+        and quiescent symbols. The number of symbols in a super frame
+        is fixed but the number of upstream and downstream symbols
+        can be varied, hence the upstream and downstream bandwidth
+        can be varied."
+    SYNTAX INTEGER (0..255)
+
+VdslDmtConfProfileSpectrum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type specifies the bin on which to start/stop
+        transmission/reception on."
+    SYNTAX INTEGER (4..255)
+
+VdslDmtConfProfileRFIEnable ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is used to enable/disable the Radio Frequency
+        Interference (RFI) canceller.  The RFI Canceler is a system
+        that allows the VDSL modems to avoid transmitting on certain
+        frequency bands.  The position and range of each frequency
+        band can be specified. The frequency bands are positioned
+        such that they lie over a known source of RFI."
+    SYNTAX TruthValue
+
+VdslDmtConfProfileRFIBand ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is used to specify the start/stop frequency of the
+        RFI bands."
+    SYNTAX INTEGER (4..255)
+
+VdslDmtConfProfilePowerCutback ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "For 256 tones, 6-bit values specify the desired receive
+        Power Spectral Density (PSD).  The units of the values are 'dB
+        down from maximum power,' and each value is valid for 8
+        tones.  For example, if the third value in the 32-value table
+        is 22, then the desired receive PSD for tones 16-23 is 22 dB
+        below the maximum transmit PSD."
+    SYNTAX OCTET STRING (SIZE(32))
+
+VdslDmtConfProfilePowerBoost ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is used to specify a boost value for the transmit
+        Power Spectral Density (PSD)."
+    SYNTAX INTEGER {
+      noPsdBoost(0),  -- No boost to transmit Power Spectral 
+                      -- Density (PSD).
+      psdBoost3dB(1), -- Restricts transmission in both Directions 
+                      -- to within the lower 128 subchannels but at 
+                      -- 3 dB higher transmit PSD.
+      psdBoost6dB(2), -- Restricts transmission in both Directions to 
+                      -- within the lower 64 subchannels but at 6 dB 
+                      -- higher transmit PSD.
+      psdBoost1dB(3)  -- Restricts transmission in both Directions to 
+                      -- within the lower 192 subchannels but at 1 dB 
+                      -- higher transmit PSD.
+    }
+
+VdslDmtConfProfileEnergyRedist ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is used to enable/disable energy redistribution.
+        Use of energy redistribution allows energy that would have
+        been allocated to subchannels that are not used to be
+        redistributed to subchannels supporting data transmission."
+    SYNTAX TruthValue
+
+-- Profile Group
+--
+
+vdslDMTConfProfileTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF VdslDMTConfProfileEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+        "This table contains configuration parameters that
+         apply to VDSL modems."
+    ::= { vdslDMTMibObjects 1 }
+
+vdslDMTConfProfileEntry OBJECT-TYPE
+    SYNTAX	VdslDMTConfProfileEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+        "An entry for the vdslDMTConfProfileTable"
+    INDEX { IMPLIED adslLineConfProfileName }
+    ::= { vdslDMTConfProfileTable 1 }
+
+VdslDMTConfProfileEntry ::= SEQUENCE 
+    {
+    vdslDmtConfProfileSSFTotal      VdslDmtConfProfileSSF,
+    vdslDmtConfProfileSSFDownStream VdslDmtConfProfileSSF,
+    vdslDmtConfProfileLowSpectrum   VdslDmtConfProfileSpectrum,
+    vdslDmtConfProfileHighSpectrum  VdslDmtConfProfileSpectrum,
+    vdslDmtConfProfileRFIEnable     VdslDmtConfProfileRFIEnable,
+    vdslDmtConfProfileRFIBand1Low   VdslDmtConfProfileRFIBand,
+    vdslDmtConfProfileRFIBand1High  VdslDmtConfProfileRFIBand,
+    vdslDmtConfProfileRFIBand2Low   VdslDmtConfProfileRFIBand,
+    vdslDmtConfProfileRFIBand2High  VdslDmtConfProfileRFIBand,
+    vdslDmtConfProfileRFIBand3Low   VdslDmtConfProfileRFIBand,
+    vdslDmtConfProfileRFIBand3High  VdslDmtConfProfileRFIBand,
+    vdslDmtConfProfileRFIBand4Low   VdslDmtConfProfileRFIBand,
+    vdslDmtConfProfileRFIBand4High  VdslDmtConfProfileRFIBand,
+    vdslDmtConfProfilePowerCutback  VdslDmtConfProfilePowerCutback,
+    vdslDmtConfProfilePowerBoost    VdslDmtConfProfilePowerBoost,
+    vdslDmtConfProfileEnergyRedist  VdslDmtConfProfileEnergyRedist
+    }
+
+vdslDmtConfProfileSSFTotal OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileSSF
+    UNITS       "Number of Symbols"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "Total number of symbols per superframe. Note that currently
+        the total must be set to 20. The sum of
+        up-stream-symbols+down-stream-symbols+quiescent-symbols must
+        be equal to total-symbols. Note that currently
+        quiescent-symbols=2. Note that currently down-stream-symbols
+        can be in the range 7..16"
+    ::= { vdslDmtConfProfileEntry 1 }
+
+vdslDmtConfProfileSSFDownStream OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileSSF
+    UNITS       "Number of Symbols"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "Number of down stream symbols per superframe.  The sum of
+        up-stream-symbols+down-stream-symbols+quiescent-symbols must
+        be equal to total-symbols.  Note that currently
+        quiescent-symbols = 2.  Note that currently
+        down-stream-symbols can be in the range 7..16"
+    ::= { vdslDmtConfProfileEntry 2 }
+
+vdslDmtConfProfileLowSpectrum OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileSpectrum
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "The lower edge of the down stream and up stream transmit
+        spectrum is controlled by this setting. This setting is the
+        first bin on which to transmit/receive."
+    ::= { vdslDmtConfProfileEntry 3 }
+
+vdslDmtConfProfileHighSpectrum OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileSpectrum
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "The highest edge of the down stream and up stream transmit
+        spectrum is controlled by this setting. This setting is the
+        last bin on which to transmit/receive"
+    ::= { vdslDmtConfProfileEntry 4 }
+
+vdslDmtConfProfileRFIEnable OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIEnable
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "Enable/disable the RFI canceller.  Enabling the RFI
+        canceller mitigates egress into the bands specified by
+        RFIBands and prevents the modems from transmitting on
+        subchannels within those bands."
+    ::= { vdslDmtConfProfileEntry 5 }
+
+vdslDmtConfProfileRFIBand1Low OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIBand
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This setting specifies the start frequency of RFI band 1."
+    ::= { vdslDmtConfProfileEntry 6 }
+
+vdslDmtConfProfileRFIBand1High OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIBand
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This setting specifies the stop frequency of RFI band 1."
+    ::= { vdslDmtConfProfileEntry 7 }
+
+vdslDmtConfProfileRFIBand2Low OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIBand
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This setting specifies the start frequency of RFI band 2."
+    ::= { vdslDmtConfProfileEntry 8 }
+
+vdslDmtConfProfileRFIBand2High OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIBand
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This setting specifies the stop frequency of RFI band 2."
+    ::= { vdslDmtConfProfileEntry 9 }
+
+vdslDmtConfProfileRFIBand3Low OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIBand
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This setting specifies the start frequency of RFI band 3."
+    ::= { vdslDmtConfProfileEntry 10 }
+
+vdslDmtConfProfileRFIBand3High OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIBand
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This setting specifies the stop frequency of RFI band 3."
+    ::= { vdslDmtConfProfileEntry 11 }
+
+vdslDmtConfProfileRFIBand4Low OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIBand
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This setting specifies the start frequency of RFI band 4."
+    ::= { vdslDmtConfProfileEntry 12 }
+
+vdslDmtConfProfileRFIBand4High OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileRFIBand
+    UNITS       "Bin number"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This setting specifies the stop frequency of RFI band 4."
+    ::= { vdslDmtConfProfileEntry 13 }
+
+vdslDmtConfProfilePowerCutback OBJECT-TYPE
+    SYNTAX       VdslDmtConfProfilePowerCutback
+    UNITS       "dB down from maximum power"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This array is used to set the desired receive Power Spectral
+        Density (PSD) at a value below the maximum transmit PSD."
+    ::= { vdslDmtConfProfileEntry 14 }
+
+vdslDmtConfProfilePowerBoost OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfilePowerBoost
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This variable is used to specify a boost value for the
+        transmit Power Spectral Density (PSD)."
+    ::= { vdslDmtConfProfileEntry 15 }
+
+vdslDmtConfProfileEnergyRedist OBJECT-TYPE
+    SYNTAX      VdslDmtConfProfileEnergyRedist
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+        "This variable enables/disable energy redistribution.
+         Use of energy redistribution allows energy that would have
+         been allocated to subchannels that are not used to be
+         redistributed to subchannels supporting data transmission."
+    ::= { vdslDmtConfProfileEntry 16 }
+
+-- conformance information
+--
+
+vdslConformance OBJECT IDENTIFIER ::= { vdslDMTMib 2 }
+vdslGroups      OBJECT IDENTIFIER ::= { vdslConformance 1 }
+vdslCompliances OBJECT IDENTIFIER ::= { vdslConformance 2 }
+
+-- agent compliance statements
+
+vdslLineMibCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The section outlines compliance requirements for this MIB."
+    MODULE
+    MANDATORY-GROUPS
+    {
+    vdslDMTConfProfileGroup
+    }
+::= { vdslCompliances 1 }
+
+-- units of conformance
+--
+
+vdslDMTConfProfileGroup OBJECT-GROUP
+    OBJECTS
+    {
+    vdslDmtConfProfileSSFTotal,
+    vdslDmtConfProfileSSFDownStream,
+    vdslDmtConfProfileLowSpectrum,
+    vdslDmtConfProfileHighSpectrum,
+    vdslDmtConfProfileRFIEnable,
+    vdslDmtConfProfileRFIBand1Low,
+    vdslDmtConfProfileRFIBand1High,
+    vdslDmtConfProfileRFIBand2Low,
+    vdslDmtConfProfileRFIBand2High,
+    vdslDmtConfProfileRFIBand3Low,
+    vdslDmtConfProfileRFIBand3High,
+    vdslDmtConfProfileRFIBand4Low,
+    vdslDmtConfProfileRFIBand4High,
+    vdslDmtConfProfilePowerCutback,
+    vdslDmtConfProfilePowerBoost,
+    vdslDmtConfProfileEnergyRedist
+    }
+    STATUS      current
+    DESCRIPTION
+        "This group supports objects for configuring VDSL DMT lines."
+    ::= { vdslGroups 1 }
+
+END
+
+-- 
+-- Copyright (C) The Internet Society (1999).  All Rights Reserved.
+-- 
+-- This document and translations of it may be copied and furnished to
+-- others, and derivative works that comment on or otherwise explain it
+-- or assist in its implementation may be prepared, copied, published
+-- and distributed, in whole or in part, without restriction of any
+-- kind, provided that the above copyright notice and this paragraph are
+-- included on all such copies and derivative works.  However, this
+-- document itself may not be modified in any way, such as by removing
+-- the copyright notice or references to the Internet Society or other
+-- Internet organizations, except as needed for the purpose of
+-- developing Internet standards in which case the procedures for
+-- copyrights defined in the Internet Standards process must be
+-- followed, or as required to translate it into languages other than
+-- English.
+-- 
+-- The limited permissions granted above are perpetual and will not be
+-- revoked by the Internet Society or its successors or assigns.
+-- 
+-- This document and the information contained herein is provided on an
+-- "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+-- TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+-- BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+-- HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF 
+-- MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- 
+-- 
+-- 
+-- 
+-- 
+-- 
+-- 
+-- 
+-- 
+-- 
+-- 
+-- Expires August 15, 2001                                        Page [16]
+

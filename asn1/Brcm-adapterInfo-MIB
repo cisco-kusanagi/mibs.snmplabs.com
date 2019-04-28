@@ -1,0 +1,396 @@
+Brcm-adapterInfo-MIB DEFINITIONS ::= BEGIN
+
+          -- Broadcom(R) NetXtreme Network Adapter Extended Information MIB
+          -- 
+          -- This MIB defines the Broadcom NetXtreme Adapter Extended Information Set.
+          -- These objects are part of the enterprise MIB for Broadcom server and 
+          -- work station network adapters.
+          --
+
+          IMPORTS
+                  enterprises, OBJECT-TYPE, Counter
+                          FROM RFC1155-SMI
+                  DisplayString, PhysAddress
+                          FROM RFC1213-MIB;
+                  
+    broadcom         	OBJECT IDENTIFIER ::= { enterprises 4413 }
+    enet             	OBJECT IDENTIFIER ::= { broadcom 1 }
+    basp             	OBJECT IDENTIFIER ::= { enet 2 }
+    ifControllers       OBJECT IDENTIFIER ::= { enet 3 }
+    baspConfig       	OBJECT IDENTIFIER ::= { basp 1 }
+    baspStat         	OBJECT IDENTIFIER ::= { basp 2 }
+    baspTrap         	OBJECT IDENTIFIER ::= { basp 3 }
+    
+    InetAddressType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value that represents a type of Internet address.
+
+         unknown(0)  An unknown address type.  This value MUST
+                     be used if the value of the corresponding
+                     InetAddress object is a zero-length string.
+                     It may also be used to indicate an IP address
+                     that is not in one of the formats defined
+                     below.
+
+         ipv4(1)     An IPv4 address as defined by the
+                     InetAddressIPv4 textual convention.
+
+         ipv6(2)     An IPv6 address as defined by the
+                     InetAddressIPv6 textual convention.
+
+         ipv4z(3)    A non-global IPv4 address including a zone
+                     index as defined by the InetAddressIPv4z
+                     textual convention.
+
+         ipv6z(4)    A non-global IPv6 address including a zone
+                     index as defined by the InetAddressIPv6z
+                     textual convention.
+
+         dns(16)     A DNS domain name as defined by the
+                     InetAddressDNS textual convention.
+
+         Each definition of a concrete InetAddressType value must be
+         accompanied by a definition of a textual convention for use
+         with that InetAddressType.
+
+         To support future extensions, the InetAddressType textual
+         convention SHOULD NOT be sub-typed in object type definitions.
+         It MAY be sub-typed in compliance statements in order to
+         require only a subset of these address types for a compliant
+         implementation.
+
+         Implementations must ensure that InetAddressType objects
+         and any dependent objects (e.g., InetAddress objects) are
+         consistent.  An inconsistentValue error must be generated
+         if an attempt to change an InetAddressType object would,
+         for example, lead to an undefined InetAddress value.  In
+
+         particular, InetAddressType/InetAddress pairs must be
+         changed together if the address type changes (e.g., from
+         ipv6(2) to ipv4(1))."
+    SYNTAX       INTEGER {
+                     unknown(0),
+                     ipv4(1),
+                     ipv6(2),
+                     ipv4z(3),
+                     ipv6z(4),
+                     dns(16)
+                 }
+
+InetAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Denotes a generic Internet address.
+
+         An InetAddress value is always interpreted within the context
+         of an InetAddressType value.  Every usage of the InetAddress
+         textual convention is required to specify the InetAddressType
+         object that provides the context.  It is suggested that the
+         InetAddressType object be logically registered before the
+         object(s) that use the InetAddress textual convention, if
+         they appear in the same logical row.
+
+         The value of an InetAddress object must always be
+         consistent with the value of the associated InetAddressType
+         object.  Attempts to set an InetAddress object to a value
+         inconsistent with the associated InetAddressType
+         must fail with an inconsistentValue error.
+
+         When this textual convention is used as the syntax of an
+         index object, there may be issues with the limit of 128
+         sub-identifiers specified in SMIv2, STD 58.  In this case,
+         the object definition MUST include a 'SIZE' clause to
+         limit the number of potential instance sub-identifiers;
+         otherwise the applicable constraints MUST be stated in
+         the appropriate conceptual row DESCRIPTION clauses, or
+         in the surrounding documentation if there is no single
+         DESCRIPTION clause that is appropriate."
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+InetAddressIPv4 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d"
+    STATUS       current
+    DESCRIPTION
+        "Represents an IPv4 network address:
+
+           Octets   Contents         Encoding
+            1-4     IPv4 address     network-byte order
+
+         The corresponding InetAddressType value is ipv4(1).
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions, as it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType, as a pair."
+    SYNTAX       OCTET STRING (SIZE (4))
+
+InetAddressIPv6 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
+    STATUS       current
+    DESCRIPTION
+        "Represents an IPv6 network address:
+
+           Octets   Contents         Encoding
+            1-16    IPv6 address     network-byte order
+
+         The corresponding InetAddressType value is ipv6(2).
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions, as it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType, as a pair."
+    SYNTAX       OCTET STRING (SIZE (16))
+---------------------
+-- adaptergroup Group
+---------------------
+          ifNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of Broadcom network interfaces (regardless
+                      of their current state) present on this system."
+              ::= { ifControllers 1 }
+              
+          ifTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF AdapterEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of Broadcom network interface entries.  
+                      The number of entries is given by the ifNumber."
+              ::= { ifControllers 2 }
+
+          ifEntry OBJECT-TYPE
+              SYNTAX  AdapterEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An entry containing statistics objects of a Broadcom
+                       network interface in this system."
+              INDEX   { ifIndex }
+              ::= { ifTable 1 }
+              
+		 AdapterEntry ::=
+              SEQUENCE {
+			      ifIndex
+					  INTEGER,
+                  ifName
+                      DisplayString,
+				  ifDescr
+				      DisplayString,
+                  ifNetworkAddress
+                      IpAddress,
+				  ifSubnetMask
+				      IpAddress,
+				  ifPhysAddress
+                      PhysAddress,
+				  ifPermPhysAddress
+                      PhysAddress,
+				  ifLinkStatus
+					  INTEGER,
+                  ifState
+                      INTEGER,
+                  ifLineSpeed
+                      INTEGER,
+                  ifDuplexMode
+                      INTEGER,
+				  ifMemBaseLow
+					  DisplayString,
+				  ifMemBaseHigh
+				  	  DisplayString,	
+				  ifInterrupt
+                      INTEGER,
+				  ifBusNumber
+					  INTEGER,
+				  ifDeviceNumber
+				      INTEGER,
+				  ifFunctionNumber
+				      INTEGER,
+				  ifIpv6NetworkAddress
+				      InetAddressIPv6
+			  }
+              
+          ifIndex  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "An unique value for each Broadcom interface.
+                      The value for each interface must remain constant at
+                      least from one re-initialization of the entity's
+                      network management system to the next re-
+                      initialization."
+              ::= { ifEntry 1 }
+
+          ifName  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      " A textual string containing name of the adapter or team"
+              ::= { ifEntry 2 }
+              
+          ifDescr  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      " A textual string containing the adapter or team description"
+              ::= { ifEntry 3 }
+              
+          ifNetworkAddress  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "IP address of the adapter."
+              ::= { ifEntry 4 }
+
+          ifSubnetMask  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "IP subnet Mask of the adapter."
+              ::= { ifEntry 5 }
+
+          ifPhysAddress  OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "MAC address of the adapter."
+              ::= { ifEntry 6 }
+
+          ifPermPhysAddress  OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Permanent MAC address of the adapter."
+              ::= { ifEntry 7 }
+
+          ifLinkStatus OBJECT-TYPE
+              SYNTAX  INTEGER
+              {
+                   link-up(1),
+                   link-fail(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	Adapter link status, this information only
+                      applicable to the Broadcom adapter"
+          	  ::= { ifEntry 8 }
+
+          ifState  OBJECT-TYPE
+              SYNTAX INTEGER 
+              {
+                   normal-mode(1),
+                   diagnotic-mode(2),
+                   adapter-removed(3),
+                   lowpower-mode(4)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The operating mode of the driver, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifEntry  9 }
+
+    	   ifLineSpeed  OBJECT-TYPE
+              SYNTAX  INTEGER
+			  {
+					unknown(1),
+					speed-10-Mbps (2),
+					speed-100-Mbps (3),
+					speed-1000-Mbps (4),
+					speed-2500-Mbps (5),
+					speed-10-Gbps (6)
+			  } 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	The operating speed of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifEntry  10 }
+
+           ifDuplexMode OBJECT-TYPE
+              SYNTAX  INTEGER
+              {
+                   unknown(1),
+                   half-duplex(2),
+                   full-duplex(3)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	Adapter duplex mode, this information only
+                      applicable to the Broadcom adapter"
+           	  ::= { ifEntry 11 }
+
+           ifMemBaseLow OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	memory low range of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifEntry 12 }
+
+           ifMemBaseHigh OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	memory high range of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifEntry 13 }
+
+    	   ifInterrupt  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	IRQ value for the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifEntry 14 }
+
+           ifBusNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	PCI Bus Number where the Adapter is situated, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifEntry 15 }
+
+           ifDeviceNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	PCI Device Number of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifEntry 16 }
+
+           ifFunctionNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	PCI Function Number of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifEntry 17 }
+
+          ifIpv6NetworkAddress  OBJECT-TYPE
+              SYNTAX  InetAddressIPv6
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "IPv6 address of the adapter."
+              ::= { ifEntry 18 }
+
+END	

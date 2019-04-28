@@ -1,0 +1,400 @@
+USR-SNMP-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY,
+		IpAddress, Integer32
+                  FROM SNMPv2-SMI
+        DisplayString
+                  FROM SNMPv2-TC
+        UsrLongString, common, UsrConfigStatus, UsrDisplayString
+                  FROM USR-DEFINITIONS-MIB;
+    usrSnmp MODULE-IDENTITY
+         LAST-UPDATED "200205051300Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects
+                   for the SNMP process."
+--       REVISION "200205051300Z"
+--       DESCRIPTION "Convert to SNMPv2"
+         ::= { common 5 }
+   -- textual conventions
+   -- 
+   -- textual conventions are like pre-processor macro in 'C'
+   --        (i.e. #define statements)
+   -- Use them to define your own 'datatypes'
+   -- memory size, expressed in units of 1024bytes
+	-- A sample Table definition.
+	usrSnmpConfigFileName OBJECT-TYPE
+		SYNTAX          UsrDisplayString
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION		
+		  "The name of a ConfigFile to read/write permanent database records.
+		   If the value of this object is an empty string, then the
+		   SNMP process uses the default name `@file://SnmpProcess.cfg'. "
+	::= { usrSnmp 1 }
+	usrSnmpCFMStatusFlag  OBJECT-TYPE
+	 	SYNTAX	  UsrConfigStatus
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		  "Setting the value of this object to `save' causes the values
+		   of the SNMP Group to be written out to the current config
+		   file, which is stored in the usrSnmpConfigFileName object.
+		   While the new ConfigFile is being written, the SNMP process
+		   will set the value of this flag to `saving''. Any
+		   attempts to set the value while it is not `normal'
+		   (i.e. the file is currently being written to the
+		   ConfigFile) while result in a badValue error being
+		   returned. Setting the value to `normal' will result in no
+		   action."
+	::= { usrSnmp 2 }
+	usrSnmpCommTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UsrSnmpCommEntry
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "The SNMP Community Table"
+	::= { usrSnmp 3 }
+	usrSnmpCommEntry OBJECT-TYPE
+         	SYNTAX  UsrSnmpCommEntry
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            ""
+         INDEX   { usrSnmpCommName }
+	::= { usrSnmpCommTable 1 }
+	UsrSnmpCommEntry ::=
+         	SEQUENCE {
+         	usrSnmpCommName
+            DisplayString,
+         	usrSnmpCommIpAddr
+            IpAddress,
+         	usrSnmpCommAccess
+            INTEGER,
+         	usrSnmpCommStatus
+            INTEGER,
+         	usrSnmpCommLastError
+            UsrLongString,
+         	usrSnmpCommLastErrorTicks
+                Integer32,
+          usrSnmpCommPoolName
+            UsrDisplayString,
+	  usrSnmpCommPoolValid
+            INTEGER,
+          usrSnmpCommValidateAddress
+            INTEGER
+         }
+	usrSnmpCommName OBJECT-TYPE
+         	SYNTAX  DisplayString (SIZE (0..255))
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "The name of the SNMP Community."
+	::= { usrSnmpCommEntry 1 }
+	usrSnmpCommIpAddr OBJECT-TYPE
+         	SYNTAX  IpAddress
+         	MAX-ACCESS  read-write
+         	STATUS      current
+         	DESCRIPTION
+            "The IP Address of the remote community"
+		--CONFIGURABLE
+	::= { usrSnmpCommEntry 2 }
+	usrSnmpCommAccess OBJECT-TYPE
+	 	SYNTAX   INTEGER {
+			readOnly(1),
+			readWrite(2),
+			administrator(4)
+			}
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "The allowed access for this community.
+		   A value of readOnly(1) allows read-only access to user-level
+		   objects.
+		   A value of readWrite(2) allows read access to user-level
+		   objects and write access to writable user-level objects.
+		   A value of administrator(3) allows read access to all
+		   objects and write access to all writable objects."
+		--CONFIGURABLE
+         ::= { usrSnmpCommEntry 3 }
+	usrSnmpCommStatus OBJECT-TYPE
+	 	SYNTAX   INTEGER {
+			normal(1),
+			delete(2)
+			}
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "The status of the entry for this community"
+         ::= { usrSnmpCommEntry 4 }
+	usrSnmpCommLastError OBJECT-TYPE
+         	SYNTAX  UsrLongString (SIZE (0..511))
+         	MAX-ACCESS  read-only
+         	STATUS      current
+         	DESCRIPTION
+            "If there is an error on a request, this variable may
+		   contain a message indicating the error."
+	::= { usrSnmpCommEntry 5 }
+	usrSnmpCommLastErrorTicks OBJECT-TYPE
+	 	SYNTAX   Integer32
+         	MAX-ACCESS   read-only
+         	STATUS       current
+         	DESCRIPTION
+            "If the LastError variable is set, this is set to the
+		   tick count of that error."
+         ::= { usrSnmpCommEntry 6 }
+	usrSnmpCommPoolName OBJECT-TYPE
+	 	SYNTAX   UsrDisplayString (SIZE (0..32))
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "The name of the SNMP community address pool to use
+             for this community."
+         --CONFIGURABLE
+         ::= { usrSnmpCommEntry 7 }
+	usrSnmpCommPoolValid OBJECT-TYPE
+	 	SYNTAX   INTEGER {
+			valid(1),
+			invalid(2)
+			}
+         	MAX-ACCESS   read-only
+         	STATUS       current
+         	DESCRIPTION
+            "A value of valid(1) means that the community pool
+             assigned to this community exists. A value of
+             invalid(2) means that the community pool assigned
+             to this community does not exist."
+         ::= { usrSnmpCommEntry 8 }
+	usrSnmpCommValidateAddress OBJECT-TYPE
+	 	SYNTAX   INTEGER {
+			useAddress(1),
+			usePool(2)
+			}
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "If this object is set to use_address(1), the value
+             of usrSnmpCommIpAddr will be used to validate that the
+             management station is allowed access. If this object
+             is set to use_pool(2), the IP address of the
+             management station will be validate using the list
+             of IP addresses configured for the usrSnmpCommPoolName."
+         DEFVAL { useAddress }
+         --CONFIGURABLE
+         ::= { usrSnmpCommEntry 9 }
+	usrSnmpTrapCommTable OBJECT-TYPE
+         	SYNTAX  SEQUENCE OF UsrSnmpTrapCommEntry
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "The SNMP Trap Community Table"
+	::= { usrSnmp 4 }
+	usrSnmpTrapCommEntry OBJECT-TYPE
+         	SYNTAX  UsrSnmpTrapCommEntry
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            ""
+         INDEX   { usrSnmpTrapCommName }
+	::= { usrSnmpTrapCommTable 1 }
+	UsrSnmpTrapCommEntry ::=
+         	SEQUENCE {
+         	usrSnmpTrapCommName
+            UsrDisplayString,
+         	usrSnmpTrapCommIpAddr
+            IpAddress,
+         	usrSnmpTrapCommStatus
+            INTEGER,
+                usrSnmpTrapCommPoolName
+            UsrDisplayString,
+	        usrSnmpTrapCommPoolValid
+            INTEGER,
+                usrSnmpTrapCommValidateAddress
+            INTEGER
+         }
+	usrSnmpTrapCommName OBJECT-TYPE
+         	SYNTAX      UsrDisplayString (SIZE (0..255))
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "The name of the SNMP Trap Community."
+	::= { usrSnmpTrapCommEntry 1 }
+	usrSnmpTrapCommIpAddr OBJECT-TYPE
+         	SYNTAX  IpAddress
+         	MAX-ACCESS  read-write
+         	STATUS      current
+         	DESCRIPTION
+            "The IP Address of the remote community"
+		--CONFIGURABLE
+	::= { usrSnmpTrapCommEntry 2 }
+	usrSnmpTrapCommStatus OBJECT-TYPE
+		SYNTAX   INTEGER {
+			normal(1),
+			delete(2)
+			}
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "The status of the entry for this community"
+         ::= { usrSnmpTrapCommEntry 3 }
+	usrSnmpTrapCommPoolName OBJECT-TYPE
+	 	SYNTAX           UsrDisplayString (SIZE (0..32))
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "The name of the SNMP community address pool to use
+             for this community."
+         --CONFIGURABLE
+         ::= { usrSnmpTrapCommEntry 4 }
+	usrSnmpTrapCommPoolValid OBJECT-TYPE
+	 	SYNTAX   INTEGER {
+			valid(1),
+			invalid(2)
+			}
+         	MAX-ACCESS   read-only
+         	STATUS       current
+         	DESCRIPTION
+            "A value of valid(1) means that the community pool
+             assigned to this community exists. A value of
+             invalid(2) means that the community pool assigned
+             to this community does not exist."
+         ::= { usrSnmpTrapCommEntry 5 }
+	usrSnmpTrapCommValidateAddress OBJECT-TYPE
+	 	SYNTAX   INTEGER {
+			useAddress(1),
+			usePool(2)
+			}
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "If this object is set to use_address(1), the value
+             of usrSnmpTrapCommIpAddr will be used to validate that the
+             management station is allowed access. If this object
+             is set to use_pool(2), the IP address of the
+             management station will be validate using the list
+             of IP addresses configured for the usrSnmpCommPoolName."
+         DEFVAL { useAddress }
+         --CONFIGURABLE
+         ::= { usrSnmpTrapCommEntry 6 }
+	usrSnmpCommAddrPoolTable OBJECT-TYPE
+         	SYNTAX  SEQUENCE OF UsrSnmpCommAddrPoolEntry
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "The SNMP Community Address Pool Table"
+	::= { usrSnmp 5 }
+	usrSnmpCommAddrPoolEntry OBJECT-TYPE
+         	SYNTAX  UsrSnmpCommAddrPoolEntry
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            ""
+         INDEX   { usrSnmpCommAddrPoolName,
+                   usrSnmpCommAddrPoolIpAddr }
+	::= { usrSnmpCommAddrPoolTable 1 }
+	UsrSnmpCommAddrPoolEntry ::=
+         	SEQUENCE {
+         	usrSnmpCommAddrPoolName
+            UsrDisplayString,
+         	usrSnmpCommAddrPoolIpAddr
+            IpAddress,
+         	usrSnmpCommAddrPoolStatus
+            INTEGER,
+	        usrSnmpCommAddrPoolGroupCount
+            Integer32
+         }
+	usrSnmpCommAddrPoolName OBJECT-TYPE
+         	SYNTAX      UsrDisplayString (SIZE (0..32))
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "The name of the SNMP Community Address Pool."
+	::= { usrSnmpCommAddrPoolEntry 1 }
+	usrSnmpCommAddrPoolIpAddr OBJECT-TYPE
+         	SYNTAX  IpAddress
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "An IP Address in the SNMP community address pool."
+	::= { usrSnmpCommAddrPoolEntry 2 }
+	usrSnmpCommAddrPoolStatus OBJECT-TYPE
+		SYNTAX   INTEGER {
+			normal(1),
+			delete(2)
+			}
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "The status of the entry in this SNMP community
+             address pool."
+         --CONFIGURABLE
+         ::= { usrSnmpCommAddrPoolEntry 3 }
+	usrSnmpCommAddrPoolGroupCount OBJECT-TYPE
+		SYNTAX   Integer32
+         	MAX-ACCESS   read-only
+         	STATUS       current
+         	DESCRIPTION
+            "The number of addresses per community."
+         ::= { usrSnmpCommAddrPoolEntry 4 }
+	usrSnmpTrapCommAddrPoolTable OBJECT-TYPE
+         	SYNTAX  SEQUENCE OF UsrSnmpTrapCommAddrPoolEntry
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "The SNMP Community Address Pool Table"
+	::= { usrSnmp 6 }
+	usrSnmpTrapCommAddrPoolEntry OBJECT-TYPE
+         	SYNTAX  UsrSnmpTrapCommAddrPoolEntry
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            ""
+         INDEX   { usrSnmpTrapCommAddrPoolName,
+                   usrSnmpTrapCommAddrPoolIpAddr }
+	::= { usrSnmpTrapCommAddrPoolTable 1 }
+	UsrSnmpTrapCommAddrPoolEntry ::=
+         	SEQUENCE {
+         	usrSnmpTrapCommAddrPoolName
+            UsrDisplayString,
+         	usrSnmpTrapCommAddrPoolIpAddr
+            IpAddress,
+         	usrSnmpTrapCommAddrPoolStatus
+            INTEGER,
+	        usrSnmpTrapCommAddrPoolGroupCount
+            Integer32
+         }
+	usrSnmpTrapCommAddrPoolName OBJECT-TYPE
+         	SYNTAX      UsrDisplayString (SIZE (0..32))
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "The name of the SNMP Community Address Pool."
+	::= { usrSnmpTrapCommAddrPoolEntry 1 }
+	usrSnmpTrapCommAddrPoolIpAddr OBJECT-TYPE
+         	SYNTAX  IpAddress
+         	MAX-ACCESS  not-accessible
+         	STATUS      current
+         	DESCRIPTION
+            "An IP Address in the SNMP community address pool."
+	::= { usrSnmpTrapCommAddrPoolEntry 2 }
+	usrSnmpTrapCommAddrPoolStatus OBJECT-TYPE
+		SYNTAX   INTEGER {
+			normal(1),
+			delete(2)
+			}
+         	MAX-ACCESS   read-write
+         	STATUS       current
+         	DESCRIPTION
+            "The status of the entry in this SNMP community
+             address pool."
+         --CONFIGURABLE
+         ::= { usrSnmpTrapCommAddrPoolEntry 3 }
+	usrSnmpTrapCommAddrPoolGroupCount OBJECT-TYPE
+    		SYNTAX       Integer32
+         	MAX-ACCESS   read-only
+         	STATUS       current
+         	DESCRIPTION
+            "The number of addresses per community."
+         ::= { usrSnmpTrapCommAddrPoolEntry 4 }
+END  -- End of USR-SNMP-MIB DEFINITIONS

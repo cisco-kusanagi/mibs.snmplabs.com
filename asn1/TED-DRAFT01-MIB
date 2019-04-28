@@ -1,0 +1,861 @@
+-- extracted from draft-ietf-ccamp-gmpls-ted-mib-00.txt
+-- at Tue Nov 14 06:07:30 2006
+
+   TED-DRAFT01-MIB DEFINITIONS ::= BEGIN  
+    
+   IMPORTS 
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, transmission, 
+   IpAddress 
+        FROM SNMPv2-SMI                            --[RFC2578] 
+      MODULE-COMPLIANCE, OBJECT-GROUP 
+        FROM SNMPv2-CONF                           --[RFC2580] 
+   RowPointer    
+   FROM SNMPv2-TC                                  --[RFC2579] 
+      ospfAreaId, ospfLsdbLsid, ospfLsdbRouterId  
+        FROM OSPF-MIB;                             --[OSPFMIB UPDATE] 
+      IsisISLevel, IsisLinkStatePDUID, IsisSystemID  
+        FROM ISIS-MIB;                             --[ISISMIB] 
+    
+   teMIB MODULE-IDENTITY 
+      LAST-UPDATED "200510240000Z"  -- 04 July 2005 00:00:00 GMT 
+      ORGANIZATION "IETF CCAMP Working Group." 
+      CONTACT-INFO 
+         "          Tomohiro Otani 
+                     otani@kddilabs.jp 
+    
+                     Masanori Miyazawa 
+                     ma-miyazawa@kddilabs.jp 
+    
+                     Thomas D. Nadeau 
+                     tnadeau@cisco.com 
+    
+                     Kenji Kumaki 
+                     ke-kumaki@kddi.com 
+    
+                     Comments and discussion to ccamp@ietf.org" 
+      DESCRIPTION 
+           "This MIB contains managed object definitions for  
+            TED in support of MPLS/GMPLS Traffic 
+            Engienering (TE) Database." 
+    
+           "Copyright (C) The IETF Trust <2006>.  This version of  
+        this MIB module is part of RFC XXXX; see the RFC itself for  
+        full legal notices." 
+    
+     -- Revision history. 
+      REVISION 
+         "200506041200Z"  -- 04 July 2005 12:00:00 GMT 
+      DESCRIPTION 
+        "Initial version. Published as RFC xxxx." -- RFC-editor pls fill 
+                                                  --in xxx 
+      ::= { transmission 9988 } -- assigned by IANA, see section 7.1 for  
+                                -- details 
+    
+   -- Textual Conventions. 
+    
+   -- Top level components of this MIB. 
+    
+     
+T. Otani et al.                                                       5 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+   teNotifications OBJECT IDENTIFIER ::= { teMIB 0 } 
+   teObjects       OBJECT IDENTIFIER ::= { teMIB 1 } 
+   teScalars       OBJECT IDENTIFIER ::= { teObjects 1 } 
+   teTables        OBJECT IDENTIFIER ::= { teObjects 2 } 
+   teConformance   OBJECT IDENTIFIER ::= { teMIB 2 } 
+    
+   -- MIB Definitions 
+    
+   -- 
+   -- Scalar Objects 
+   -- 
+    
+    
+   -- 
+   --  TE DB Table 
+   -- 
+    
+   teTEDTable OBJECT-TYPE  
+   SYNTAX       SEQUENCE OF TeTEDEntry  
+   MAX-ACCESS   not-accessible  
+   STATUS       current  
+   DESCRIPTION  
+        "This table indicates multiple TED information which has been 
+   supported by [OSPF-TE]." 
+   ::= { teTables 1 }  
+    
+   teTEDEntry OBJECT-TYPE  
+      SYNTAX       TeTEDEntry  
+      MAX-ACCESS   not-accessible  
+      STATUS       current  
+      DESCRIPTION  
+      "This entry contains TED information commonly utilized in both 
+   MPLS and GMPLS"  
+      INDEX { ospfAreaId, ospfLsdbLsid, ospflsdbRouterId }  
+   ::= { teTEDTable 1 }  
+    
+   TeTEDEntry ::= SEQUENCE { 
+      teLinkInformationSource     INTEGER, 
+      teAreaLevelID               OCTET STRING, 
+      teLSPDUID                   OCTET STRING, 
+      teRouterSystemID            OCTET STRING, 
+      teLinkType                  INTEGER, 
+      teLinkIdAddr                IpAddress, 
+      teMetric                    Integer32, 
+      teMaxBandwidth              OCTET STRING, 
+      teMaxReservableBandwidth    OCTET STRING, 
+      teUnreservedBandwidthPri0   OCTET STRING, 
+      teUnreservedBandwidthPri1   OCTET STRING, 
+      teUnreservedBandwidthPri2   OCTET STRING, 
+      teUnreservedBandwidthPri3   OCTET STRING, 
+      teUnreservedBandwidthPri4   OCTET STRING, 
+      teUnreservedBandwidthPri5   OCTET STRING, 
+      teUnreservedBandwidthPri6   OCTET STRING, 
+      teUnreservedBandwidthPri7   OCTET STRING, 
+     
+T. Otani et al.                                                       6 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+      teAdministrativeGroup       Integer32, 
+      teLocalId                   Integer32, 
+      teRemoteId                  Integer32, 
+      teLinkProtectionType        BITS, 
+      teLinkInformationData       RowPointer, 
+   }  
+    
+    
+ 
+   teLinkInformationSource OBJECT-TYPE 
+         SYNTAX  INTEGER { 
+                 unknown(0), 
+                 locallyConfigured(1), 
+                 ospf(2), 
+                 isis(3), 
+                 other(4) 
+         } 
+         MAX-ACCESS read-only 
+         STATUS  current 
+         DESCRIPTION 
+             "This object indicates the source of the information about 
+   the TE link" 
+     ::= { teTEDEntry 1 } 
+    
+   teAreaLevelId OBJECT-TYPE 
+         SYNTAX Usigned32 {ospfAreaId, IsisISLevel} 
+         MAX-ACCESS read-only 
+         STATUS  current 
+         DESCRIPTION 
+           "This is corresponding to area ID in OSPF and level ID in 
+   ISIS" 
+     ::= { teTEDEntry 2 } 
+    
+   teOSPDUId OBJECT-TYPE 
+         SYNTAX Usigned32 {ospfLsdbLsid, IsisLinkStatePDUID} 
+         MAX-ACCESS read-only 
+         STATUS  current 
+         DESCRIPTION 
+           "This is corresponding to link state ID in OSPF and link 
+   state PDU ID in ISIS" 
+     ::= { teTEDEntry 3 } 
+    
+   teRouterSystem OBJECT-TYPE 
+         SYNTAX Usigned32 {ospfLsdbRouterId, IsisSystemID} 
+         MAX-ACCESS read-only 
+         STATUS  current 
+         DESCRIPTION 
+           "This is corresponding to the router ID in OSPF and the 
+   system ID in ISIS" 
+     ::= { teTEDEntry 4 } 
+    
+   teLinkType OBJECT-TYPE  
+       SYNTAX    INTEGER {  
+                           pointToPoint (1),  
+     
+T. Otani et al.                                                       7 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+                           multiAccess (2) 
+                        } 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the type of the link such as point-to-point 
+   or multi-access"  
+   ::= { teTEDEntry 5 }  
+    
+   teLinkIdAddr OBJECT-TYPE  
+       SYNTAX       IpAddress  
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+               "This indicates the Router ID of the neighbor in the case 
+   of point-to-point links.  This also indicates the interface address 
+   of the designated router in the case of multi-access links."  
+   ::= { teTEDEntry 6 }  
+    
+   teMetric OBJECT-TYPE  
+       SYNTAX       Integer32  
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the traffic engineering metric value of the 
+   TE link."  
+   ::= { teTEDEntry 7 }  
+    
+   teMaxBandwidth OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE( 4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the maximum bandwidth that 
+      can be used on this link in this direction"  
+   ::= { teTEDEntry 8 }  
+    
+   teMaxReservableBandwidth OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the maximum bandwidth that may be reserved on 
+   this link in this direction"  
+   ::= { teTEDEntry 9 }  
+    
+   teUnreservedBandwidthPri0 OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+     
+T. Otani et al.                                                       8 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+           "This indicates the amount of bandwidth not yet reserved at 
+   the priority 0"  
+   ::= { teTEDEntry 10 }  
+    
+   teUnreservedBandwidthPri1 OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the amount of bandwidth not yet reserved at 
+   the priority 1"  
+   ::= { teTEDEntry 11 } 
+    
+   teUnreservedBandwidthPri2 OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the amount of bandwidth not yet reserved at 
+   the priority 2"  
+   ::= { teTEDEntry 12 } 
+    
+   teUnreservedBandwidthPri3 OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION 
+           "This indicates the amount of bandwidth not yet reserved at 
+   the priority 3"  
+   ::= { teTEDEntry 13 } 
+    
+   teUnreservedBandwidthPri4 OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the amount of bandwidth not yet reserved at 
+   the priority 4"  
+   ::= { teTEDEntry 14 } 
+    
+   teUnreservedBandwidthPri5 OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the amount of bandwidth not yet reserved at 
+   the priority 5"  
+   ::= { teTEDEntry 15 } 
+    
+     
+T. Otani et al.                                                       9 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+   teUnreservedBandwidthPri6 OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the amount of bandwidth not yet reserved at 
+   the priority 6"  
+   ::= { teTEDEntry 16 } 
+    
+   teUnreservedBandwidthPri7 OBJECT-TYPE  
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the amount of bandwidth not yet reserved at 
+   the priority 7"  
+   ::= { teTEDEntry 17 } 
+    
+   teAdministrativeGroup OBJECT-TYPE  
+       SYNTAX       Integer32 
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the Administrative Group which the link 
+   belong to.  Since the value is a bit mask, the link can belong to 
+   multiple groups.  This is also called Resource Class/Color."  
+   ::= { teTEDEntry 18 } 
+    
+   teLocalId OBJECT-TYPE  
+       SYNTAX       Integer32  
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the Link local identifier of an unnumbered 
+   link." 
+   ::= { teTEDEntry 19 } 
+    
+   teRemoteId OBJECT-TYPE  
+       SYNTAX       Integer32  
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           " This indicates the Link remote identifier of an unnumbered 
+   link."  
+   ::= { teTEDEntry 20 } 
+    
+   teLinkProtectionType OBJECT-TYPE 
+       SYNTAX  BITS { 
+               extraTraffic(0), 
+               unprotected(1), 
+               shared (2), 
+               dedicatedOneToOne (3), 
+     
+T. Otani et al.                                                      10 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+               dedicatedOnePlusOne(4), 
+               enhanced(5) 
+       } 
+       MAX-ACCESS read-only 
+       STATUS  current 
+       DESCRIPTION 
+           "This object indicates the protection type of the TE link" 
+   ::= { teTEDEntry 21 } 
+ 
+   teLinkInformationData OBJECT-TYPE 
+       SYNTAX  RowPointer 
+       MAX-ACCESS read-only 
+       STATUS  current 
+       DESCRIPTION 
+           "This object cross-references the source of the information 
+   about this TE link and should be interpretted in the context of 
+   teLinkInformationSource. 
+           If teLinkInformationSource has the value unknown(0) this 
+   object SHOULD contain a value of zeroDotZero. 
+           If teLinkInformationSource has the value 
+   locallyConfigured(1), this object MAY contain the identifier of the 
+   corresponding row entry in the teLinkTable of TE-LINK-STD-MIB, MAY 
+   contain the identifier of the corresponding row in a local 
+   proprietary TE link MIB module, or otherwise SHOULD contain the value 
+   of zeroDotZero. 
+           If teLinkInformationSource has the value ospf(2), this 
+   object MAY contain the identifier of the corresponding row entry in 
+   the ospfLocalLsdbTable of [OSPF-MIB], or otherwise SHOULD contain the 
+   value of zeroDotZero. 
+           If teLinkInformationSource has the value isis(3) this object 
+   MAY contain the identifier of the corresponding row entry in the 
+   isisAreaAddr of [ISIS-MIB], or otherwise SHOULD contain the value of 
+   zeroDotZero. 
+           If teLinkInformationSource has the value other(4) this 
+   object MAY contain the identifier of the corresponding row entry a 
+   local proprietary MIB module, or otherwise SHOULD contain the value 
+   of zeroDotZero." 
+   ::= { teTEDEntry 22 } 
+ 
+   -- 
+   --  TED Local Interface IP Address Table 
+   -- 
+    
+   teLocalIntAddrTable OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF TeLocalIntAddrEntry  
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This table contains the IP address information of a local TE 
+   link."  
+   ::= { teTables 2 }       
+    
+   teLocalIntAddrEntry OBJECT-TYPE  
+       SYNTAX       TeLocalIntAddrEntry  
+     
+T. Otani et al.                                                      11 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This entry contains the IP address information of the local 
+   TE link."  
+       INDEX { ospfAreaId, ospfLsdbLsid, ospfLsdbRouterId, 
+   teLocalIntAddrIndex }  
+   ::= { teLocalIntAddrTable 1 }  
+    
+   TeLocalIntAddrEntry ::= SEQUENCE { 
+           teLocalIntAddrIndex Unsigned32, 
+           teLocalIntAddr      IpAddress, 
+       }  
+    
+   teLocalIntAddrIndex OBJECT-TYPE  
+       SYNTAX       Unsigned32 
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+       "This indicates the index to identify multiple local TE links"  
+   ::= { teLocalIntAddrEntry 1 } 
+    
+   teLocalIntAddr OBJECT-TYPE  
+       SYNTAX       IpAddress  
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+       "This object indicates the address of the local TE link."  
+   ::= { teLocalIntAddrEntry 2 } 
+    
+    
+   -- 
+   --  TED Remote Interface IP Address Table 
+   -- 
+    
+   teRemoteIntAddrTable OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF TeRemoteIntAddrEntry  
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This table contains the IP address information of a remote 
+   TE link."  
+   ::= { teTables 3 }       
+    
+   teRemoteIntAddrEntry OBJECT-TYPE  
+       SYNTAX       TeRemoteIntAddrEntry  
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This entry contains the IP address information of the remote 
+   TE link."  
+   INDEX { ospfAreaId, ospfLsdbLsid, ospflsdbRouterId, 
+   teRemoteIntAddrIndex }  
+       ::= { teRemoteIntAddrTable 1 }  
+     
+T. Otani et al.                                                      12 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+    
+   TeRemoteIntAddrEntry ::= SEQUENCE {  
+       teRemoteIntAddrIndex Unsigned32, 
+       teRemoteIntAddr      IpAddress, 
+   }  
+    
+   teRemoteIntAddrIndex OBJECT-TYPE  
+       SYNTAX       Unsigned32 
+       MAX-ACCESS   not-accessible 
+       STATUS       current  
+       DESCRIPTION  
+           "This indicates the index to identify multiple remote TE 
+   links."  
+   ::= { teRemoteIntAddrEntry 1 } 
+    
+   teRemoteIntAddr OBJECT-TYPE  
+       SYNTAX       IpAddress 
+       MAX-ACCESS   read-only 
+       STATUS       current  
+       DESCRIPTION  
+           "This object indicates the address of the remote TE link."  
+   ::= { teRemoteIntAddrEntry 2 } 
+    
+    
+   -- 
+   --  TED Switch Capable Table 
+   -- 
+    
+   teSwCapTable OBJECT-TYPE  
+       SYNTAX       SEQUENCE OF TeSwCapEntry  
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This table contains the GMPLS TED switching capability 
+   information." 
+   ::= { teTables 4 }  
+    
+   teSwCapEntry OBJECT-TYPE  
+       SYNTAX       TeSwCapEntry  
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This entry relates each TE link with its GMPLS TE switching 
+   capability information. IF the MIB deals with only OSPF-TE 
+   information, the value of each object related with GMPLS TE 
+   extensions should be null." 
+       INDEX { ospfAreaId, ospfLsdbLsid, ospfLsdbRouterId, 
+   teSwCapIndex }  
+   ::= { teSwCapTable 1 }  
+      
+   TeSwCapEntry ::= SEQUENCE { 
+       teSwCapIndex            Unsigned32, 
+       teSwitchingType         INTEGER, 
+       teEncoding              INTEGER, 
+     
+T. Otani et al.                                                      13 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+       teMaxLspBandwidthPri0   OCTET STRING, 
+       teMaxLspBandwidthPri1   OCTET STRING, 
+       teMaxLspBandwidthPri2   OCTET STRING, 
+       teMaxLspBandwidthPri3   OCTET STRING, 
+       teMaxLspBandwidthPri4   OCTET STRING, 
+       teMaxLspBandwidthPri5   OCTET STRING, 
+       teMaxLspBandwidthPri6   OCTET STRING, 
+       teMaxLspBandwidthPri7   OCTET STRING, 
+       teMinLspBandwidth       OCTET STRING, 
+       teIntMtu                Integer32, 
+       teIndication            INTEGER 
+   }  
+    
+   teSwCapIndex OBJECT-TYPE  
+       SYNTAX       Unsigned32 
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This index is utilized to identify multiple switching 
+   functions on a local or remote TE link."  
+   ::= { teSwCapEntry 1 } 
+    
+   teSwitchingType OBJECT-TYPE 
+      SYNTAX  INTEGER { 
+                 unknown (0), 
+                 psc1    (1), 
+                 psc2    (2), 
+                 psc3    (3), 
+                 psc4    (4), 
+                 l2sc   (51), 
+                 tdm   (100), 
+                 lsc   (150), 
+                 fsc   (200) 
+           } 
+           MAX-ACCESS read-only 
+           STATUS  current 
+           DESCRIPTION 
+               "This object indicates the GMPLS switching capability 
+   assigned to the TE link." 
+           ::= { teSwCapEntry 2 } 
+    
+   teEncoding OBJECT-TYPE 
+           SYNTAX  INTEGER { 
+                 packet         (1), 
+                 ethernet       (2), 
+                 ansiEtsiPdh    (3), 
+                 sdhSonet       (5), 
+                 digitalWrapper (7), 
+                 lambda         (8), 
+                 fiber          (9), 
+                 fiberChannel  (11) 
+               } 
+       MAX-ACCESS read-only 
+       STATUS  current 
+     
+T. Otani et al.                                                      14 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+       DESCRIPTION 
+           "This object indicates the GMPLS encoding type assigned to 
+   the TE link." 
+   ::= { teSwCapEntry 3 } 
+    
+   teMaxLspBandwidthPri0 OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the maximum bandwidth of the TE link 
+   at the priority 0 for GMPLS LSP creation." 
+   ::= { teSwCapEntry 4 } 
+    
+   teMaxLspBandwidthPri1 OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the maximum bandwidth of the TE link 
+   at the priority 1 for GMPLS LSP creation." 
+   ::= { teSwCapEntry 5 } 
+    
+   teMaxLspBandwidthPri2  OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the maximum bandwidth of the TE link 
+   at the priority 2 for GMPLS LSP creation." 
+   ::= { teSwCapEntry 6 } 
+    
+   teMaxLspBandwidthPri3 OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the maximum bandwidth of the TE link 
+   at the priority 3 for GMPLS LSP creation." 
+   ::= { teSwCapEntry 7 } 
+    
+   teMaxLspBandwidthPri4 OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the maximum bandwidth of the TE link 
+   at the priority 4 for GMPLS LSP creation." 
+   ::= { teSwCapEntry 8 } 
+     
+T. Otani et al.                                                      15 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+    
+   teMaxLspBandwidthPri5  OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+    
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the maximum bandwidth of the TE link 
+   at the priority 5 for GMPLS LSP creation." 
+   ::= { teSwCapEntry 9 } 
+        
+   teMaxLspBandwidthPri6 OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the maximum bandwidth of the TE link 
+   at the priority 6 for GMPLS LSP creation." 
+   ::= { teSwCapEntry 10 } 
+    
+   teMaxLspBandwidthPri7 OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the maximum bandwidth of the TE link 
+   at the priority 7 for GMPLS LSP creation." 
+   ::= { teSwCapEntry 11 } 
+    
+   teMinLspBandwidth OBJECT-TYPE 
+       SYNTAX       OCTET STRING (SIZE (4)) 
+       UNITS        "Byte per seconds" 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the minimum bandwidth of the TE link 
+   for GMPLS LSP creation if the switching capability field is TDM, PSC-
+   1, PSC-2, PSC-3, or PSC-4." 
+   ::= { teSwCapEntry 12 } 
+    
+   teIntMtu OBJECT-TYPE 
+       SYNTAX       Integer32 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates the MTU of the local or remote TE 
+   link" 
+   ::= { teSwCapEntry 13 } 
+    
+   teIndication OBJECT-TYPE 
+       SYNTAX       INTEGER { 
+     
+T. Otani et al.                                                      16 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+                      standard (0), 
+                      arbitrary (1) 
+                      } 
+       MAX-ACCESS   read-only 
+       STATUS       current 
+       DESCRIPTION 
+           "This object indicates whether the interface supports 
+   Standard or Arbitrary SONET/SDH." 
+   ::= { teSwCapEntry 14 } 
+    
+   -- 
+   --  TED SRLG Table 
+   -- 
+    
+   teSrlgTable OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF TeSrlgEntry  
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This table contains the SRLG information of the TE link."  
+   ::= { teTables 5 }       
+    
+   teSrlgEntry OBJECT-TYPE  
+       SYNTAX       TeSrlgEntry  
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This entry relates each TE link with its SRLG information."  
+       INDEX { ospfAreaId, ospfLsdbLsid, ospfLsdbRouterId, teSrlgIndex }  
+   ::= { teSrlgTable 1 }  
+    
+   TeSrlgEntry ::= SEQUENCE { 
+       teSrlgIndex Unsigned32 
+       teSrlg      Integer32 
+       }  
+    
+   teSrlgIndex OBJECT-TYPE  
+       SYNTAX       Unsigned32 
+       MAX-ACCESS   not-accessible  
+       STATUS       current  
+       DESCRIPTION  
+           "This index is utilized to identify multiple SRLG values on a 
+   local or remote TE link."  
+   ::= { teSrlgTableEntry 1 } 
+    
+   teSrlg OBJECT-TYPE  
+       SYNTAX       Integer32  
+       MAX-ACCESS   read-only  
+       STATUS       current  
+       DESCRIPTION  
+           "This object indicate the SRLG value assigned to a local or 
+   remote TE link"  
+   ::= { teSrlgEntry 2 } 
+    
+     
+T. Otani et al.                                                      17 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+   -- Conformance Statement 
+   teGroups 
+         OBJECT IDENTIFIER ::= { teConformance 1 } 
+    
+   teCompliances 
+         OBJECT IDENTIFIER ::= { teConformance 2 } 
+    
+   -- Module Compliance 
+    
+   teModuleFullCompliance MODULE-COMPLIANCE 
+         STATUS current 
+         DESCRIPTION 
+            "Compliance statement for agents provides full support  
+             for the TED MIB" 
+         MODULE -- this module 
+            MANDATORY-GROUPS    { teMainGroup 
+                                } 
+    
+      ::= { teCompliances 1 } 
+    
+   -- 
+   -- ReadOnly Compliance 
+   -- 
+    
+   teModuleReadOnlyCompliance MODULE-COMPLIANCE 
+         STATUS current 
+         DESCRIPTION  
+           "Compliance requirement for implementations only provide 
+           read-only support for TED. Such devices can then be monitored 
+           but cannot be configured using this MIB module. 
+           " 
+         MODULE -- this module 
+            MANDATORY-GROUPS    { teMainGroup 
+                                } 
+    
+      ::= { teCompliances 2 } 
+    
+    
+      -- Units of conformance. 
+      teMainGroup OBJECT-GROUP 
+         OBJECTS {  
+               teLinkInformationSource     , 
+               teLinkType                  , 
+               teLinkIdAddr                , 
+               teMetric                    , 
+               teMaxBandwidth              , 
+               teMaxReservableBandwidth    , 
+               teUnreservedBandwidthPri0   , 
+               teUnreservedBandwidthPri1   , 
+               teUnreservedBandwidthPri2   , 
+               teUnreservedBandwidthPri3   , 
+               teUnreservedBandwidthPri4   , 
+               teUnreservedBandwidthPri5   , 
+               teUnreservedBandwidthPri6   , 
+     
+T. Otani et al.                                                      18 
+Internet Drafts draft-ietf-ccamp-gmpls-ted-mib-00.txt     November 2006 
+ 
+               teUnreservedBandwidthPri7   , 
+               teAdministrativeGroup       , 
+               teLocalId                   , 
+               teRemoteId                  , 
+               teLinkProtectionType        , 
+               teLinkInformationData       , 
+               teLocalIntAddr              , 
+               teRemoteIntAddr             , 
+               teSwitchingType             , 
+               teEncoding                  , 
+               teMaxLspBandwidthPri0       , 
+               teMaxLspBandwidthPri1       , 
+               teMaxLspBandwidthPri2       , 
+               teMaxLspBandwidthPri3       , 
+               teMaxLspBandwidthPri4       , 
+               teMaxLspBandwidthPri5       , 
+               teMaxLspBandwidthPri6       , 
+               teMaxLspBandwidthPri7       , 
+               teMinLspBandwidth           , 
+               teIntMtu                    , 
+               teIndication                , 
+               teSrlg 
+              } 
+         STATUS  current 
+         DESCRIPTION 
+                "Collection of objects for TED management" 
+       ::= { teGroups 1 } 
+    
+   END 
+
+--     
+--    "Copyright (C) The IETF Trust (2006). This document is subject to the 
+--    rights, licenses and restrictions contained in BCP 78, and except as 
+--    set forth therein, the authors retain all their rights." 
+--     
+--    "This document and the information contained herein are provided on 
+--    an "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE 
+--    REPRESENTS OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE 
+--    IETF TRUST AND THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL 
+--    WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY 
+--    WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY 
+--    RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A 
+--    PARTICULAR PURPOSE." 
+--      
+-- T. Otani et al.                                                      22 
+

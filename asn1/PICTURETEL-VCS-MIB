@@ -1,0 +1,2583 @@
+PICTURETEL-VCS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE, Counter32, Gauge32, enterprises
+FROM SNMPv2-SMI
+
+TruthValue, TimeStamp, TimeInterval, DisplayString,  RowStatus, TEXTUAL-CONVENTION
+FROM SNMPv2-TC;
+
+pictureTel                OBJECT IDENTIFIER ::= { enterprises 274 }
+
+products                  OBJECT IDENTIFIER ::= { pictureTel 5 }
+
+pictureTelVCSModule MODULE-IDENTITY
+
+	LAST-UPDATED    "0101030000Z"
+	ORGANIZATION    "PictureTel Corporation"
+	CONTACT-INFO
+		"Postal:
+			PictureTel Corporation
+			100 Minuteman Drive
+			Andover, MA 01810-1031
+			USA"
+	DESCRIPTION
+	"The PictureTel VCS Administration MIB specifies a conceptual group of observable
+	 events and objects.  These events and objects comprise the management information 
+	 necessary to effectively administrate a PictureTel videoconferencing system.
+
+	Copyright 2001 PictureTel Corporation.  All rights reserved.  Reproduction of this 
+	document is authorized on the condition that the foregoing copyright notice is included.
+
+	This SNMP MIB module (Specification) embodies PictureTel Corporation's proprietary 
+	intellectual property. PictureTel Corporation retains all title and ownership in the 
+	Specification, including any revisions.
+
+	PictureTel Corporation grants all interested parties a non-exclusive license to use 
+	and distribute an unmodified copy of this Specification in connection with management 
+	of PictureTel Corporation products, and without fee, provided this copyright notice 
+	and license appear on all copies.
+
+	This Specification is supplied 'AS IS,' and PictureTel Corporation makes no warranty, 
+	either express or implied, as to the use, operation, condition, or performance of the 
+	Specification."
+
+	REVISION        "0101030000Z"
+	DESCRIPTION
+		"Rev 0.0.11
+		3 Jan 2001 12:00  
+		Release version"
+::= { products 5 }
+
+--
+-- Textual Conventions used in this module
+--
+
+CallBandwidthType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"Enumerated type representing current call bandwidth"
+	SYNTAX	INTEGER {
+		unknown(0),
+		cb1x64K(1),
+		cb2x64K(2),
+		cb1x128K(3),
+		cb1x192K(4),
+		cb1x256K(5),
+		cb1x320K(6),
+		cb1x384K(7),
+		cb1x512K(8),
+		cb1x768K(9),
+		cb1x1152K(10),
+		cb1x1472K(11),
+		cb1x1536K(12),
+		cb1x1920K(13)
+		}
+
+
+VideoAlgorithmType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"Enumerated type representing current video algorithms"
+	SYNTAX	INTEGER {
+		unknown(0),
+		h261(1),
+		h263(2),
+		h263p(3),
+		max(4)
+	 	}
+
+AudioAlgorithmType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"Enumerated type representing current audio algorithms"
+	SYNTAX	INTEGER {
+		minOrOffUnframed(0),
+		offFramed(1),
+		g711Unknown(2),
+		g711alaw48(3),
+		g711ulaw48(4),
+		g711alaw56(5),
+		g711ulaw56(6),
+		g711alaw64(7),   -- same as AUDIO_ALGORITHM_G711_A_LAW_UNFRAMED
+		g711ulaw64(8),   -- same as AUDIO_ALGORITHM_G711_U_LAW_UNFRAMED
+		g722at48kbps(9),
+		g722at56kbps(10),
+		g722at64kbps(11),
+		g7221at16kbps(12),  -- // reserved 
+		g7221at24kbps(13),
+		g7221at32kbps(14),
+		g7235pt3kbps(15),
+		g7236pt3kbps(16),
+		g728(17),
+		pt724(18),
+		siren7at16kbps(19),
+		siren7at24kbps(20),
+		siren7at32kbps(21),
+		siren14at24kbps(22),
+		siren14at32kbps(23),
+		siren14at48kbps(24),
+		maxOrBestCapsAudio(25)
+		}
+
+DataProtocolType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"Enumerated type representing current data protocols"
+	SYNTAX	INTEGER {
+		off(0),
+		h224lsd(1),
+		h224mlp(2),
+		h224lsdAndT120(3),
+		h224mlpAndT120(4),
+		t120(5)
+		}
+
+VideoResolutionType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"Enumerated type representing current video resolutions"
+	SYNTAX	INTEGER {
+		unknown(0),
+		sqcif(1),         -- 0x00000001,    //  128x96
+		qcif(2),          -- 0x00000002,    //  176x144
+		cif(4),           -- 0x00000004,    //  352x288
+		cif4(8),          -- 0x00000008,    //  704x576
+		cif16(16),        -- 0x00000010,    // 1408x1152
+		vga(32),          -- 0x00000020,    //  640x480
+		vgaDiv4(64),      -- 0x00000040,    //  320x240
+		svga(128),        -- 0x00000080,    //  800x600
+		svgaDiv4(256),    -- 0x00000100,    //  400x300
+		xvga(512),        -- 0x00000200,    // 1024x768
+		xvgaDiv4(1024),   -- 0x00000400,    //  512x384
+		xvgaDiv16(2048),  -- 0x00000800,    //  256x192
+		ntsc(4096),       -- 0x00001000,    //  704x480
+		ntscDiv4(8192),   -- 0x00002000,    //  352x240
+		max(32767)        -- 0x7FFF        since this is an INTEGER (not LONG)
+--		max(2147467264),     0x7FFFC000    we will use max INT instead
+		}
+
+
+MediaChannelStatusType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"Enumerated type representing current media channel status"
+	SYNTAX	INTEGER {
+		minOrClosed(0),
+		openIP(1),
+		maxOrOpenATM(2)
+		}
+
+
+--
+-- pictureTelVCSModule Placeholders
+--
+
+
+-- Monitoring Area
+ptMonitoring       OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "OID for pictureTelVCSModule monitoring branch"
+	::= { pictureTelVCSModule 1 }
+
+-- H320 MIB placeholder
+ptH320             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "OID - Subtree for root of H.320 module(s)"
+	::= { pictureTelVCSModule 2 }
+
+-- H323 MIB placeholder
+ptH323             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "OID - Subtree for root of H.323 module(s)"
+	::= { pictureTelVCSModule 3 }
+
+-- Configuration MIB placeholder
+ptConfiguration    OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "OID - Subtree for root of configuration module(s)"
+	::= { pictureTelVCSModule 4 }
+
+-- ISDNVoiceOnly MIB placeholder
+ptISDNVoiceOnly OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "OID - Subtree for root of ISDN voice-only module(s)"
+	::= { pictureTelVCSModule 5 }
+
+-- System Statistics MIB placeholder
+ptSystemStatistics OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "OID - Subtree for root of the system statistics module(s)"
+	::= { pictureTelVCSModule 6 }
+
+-- Control MIB placeholder
+ptControl OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "OID - Subtree for root of control module(s)"
+	::= { pictureTelVCSModule 7 }
+
+
+
+--  ptMonitoring Branch consists of: 
+--  ptMonitoring\ptMonSystem area
+--  ptMonitoring\ptTraps     area
+
+ptMonSystem                OBJECT-IDENTITY
+	STATUS                  current
+	DESCRIPTION              "OID for ptMonitoring/System area"
+	::= { ptMonitoring 1 }
+
+
+ptTraps                    OBJECT-IDENTITY
+	STATUS                  current
+	DESCRIPTION              "OID for ptMonitoring/Traps area"
+	::= { ptMonitoring 2 }
+
+
+-- ptMonitoring\ptMonSys
+
+ptMonSysName               OBJECT-TYPE
+	SYNTAX                  DisplayString
+	MAX-ACCESS              read-only
+	STATUS                  current
+	DESCRIPTION             "An administratively assigned name for the videoconferencing
+				system. If the name is unknown, the value contained in this
+				object is the zero-length string. This value is the same as the
+				system name defined in the system software."
+	REFERENCE               "This object contains a value identical to that of the MIB-II
+				sysName object."
+	::= { ptMonSystem 1 }
+
+
+ptMonSysDescription        OBJECT-TYPE
+	SYNTAX                  DisplayString
+	MAX-ACCESS              read-only
+	STATUS                  current
+	DESCRIPTION     
+				"A textual description of the videoconferencing system.  The
+				value is a string containing the vendor name, the product name,
+				and the product version.  Here is an example:  `PictureTel 
+				Venue 2000 version 1.3'."
+	REFERENCE       
+				"This object contains a value identical to that of the MIB-II 
+				sysDescr object."
+	::= { ptMonSystem 2 }
+
+
+ptMonSysOID        OBJECT-TYPE
+	SYNTAX          OBJECT IDENTIFIER
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+			"The product identifier for the PictureTel system.  The 
+			value of this managed object is an Object Value Assignment 
+			(OVA), residing within the registration subtree of the
+			vendor's enterprise name space.  This object is useful in 
+			verifying the model and version of the vendor's service."
+	REFERENCE
+			"This object contains a value identical to that of the MIB-II 
+			sysObjectID object."
+	::= { ptMonSystem 3 }
+
+
+
+ptMonSysUpTime     OBJECT-TYPE
+	SYNTAX          TimeStamp
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+			"The elapsed time since the PictureTel SNMP agent was started."
+	REFERENCE
+			"This object contains a value identical to that contained in 
+			the MIB-II sysUpTime object."
+	::= { ptMonSystem 4 }
+
+
+ptMonSysContact     OBJECT-TYPE
+	SYNTAX          DisplayString
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+			"The textual identification of the on-site support staff 
+			responsible for the videoconferencing system installation.  If 
+			no contact information is known, the value contained in this 
+			object is the zero-length string."
+	REFERENCE
+			"This object contains a value identical to that contained in 
+			the MIB-II sysContact object."
+	::= { ptMonSystem 5 }
+
+ptMonSysLocation    OBJECT-TYPE
+	SYNTAX          DisplayString
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+			"The physical location of the videoconferencing system (e.g., 
+			`Main conference room - 3rd floor').  If the location is
+			unknown, the value contained in this object is the zero-length                                                                                  string."
+	REFERENCE
+			"This object contains a value identical to that of the MIB-II 
+			sysLocation object."
+	::= { ptMonSystem 6 }
+
+
+
+
+-- ptMonitoring\Traps
+
+ptNotificationPrefix OBJECT IDENTIFIER
+	::= { ptTraps 0 }
+
+pictureTelTrapSystemRebooting NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that system is about to reboot"
+	::= { ptNotificationPrefix 1 }
+
+pictureTelTrapSystemShutdown NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that system is entering shutdown"
+	::= { ptNotificationPrefix 2 }
+
+pictureTelTrapAgentStarted NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that SNMP agent started"
+	::= { ptNotificationPrefix 3 }
+
+pictureTelTrapAgentShutdown NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that the SNMP agent is shuting down"
+	::= { ptNotificationPrefix 4 }
+
+pictureTelTrapH320IncomingCall NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification of H.320 incoming call."
+	::= { ptNotificationPrefix 5 }
+
+pictureTelTrapH323IncomingCall NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification of H.323 incoming call"
+	::= { ptNotificationPrefix 6 }
+
+pictureTelTrapISDNVoiceOnlyIncomingCall NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification of ISDN voice-only incoming call"
+	::= { ptNotificationPrefix 7 }
+
+pictureTelTrapH320CallConnected NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that H.320 call connected"
+	::= { ptNotificationPrefix 8 }
+
+pictureTelTrapH323CallConnected NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that H.323 call connected"
+	::= { ptNotificationPrefix 9 }
+
+pictureTelTrapISDNVoiceOnlyCallConnected NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that ISDN voice-only call connected"
+	::= { ptNotificationPrefix 10 }
+
+pictureTelTrapDialing NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that system is dialing a call"
+	::= { ptNotificationPrefix 11 }
+
+pictureTelTrapRinging NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that dialed call progressed to ringing state"
+	::= { ptNotificationPrefix 12 }
+
+pictureTelTrapConnecting NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that dialed call is connecting"
+	::= { ptNotificationPrefix 13 }
+
+pictureTelTrapConnected NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that dialed call successfully connected"
+	::= { ptNotificationPrefix 14 }
+
+pictureTelTrapMultiPointConferenceStarted NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that system dialed into the bridge"
+	::= { ptNotificationPrefix 15 }
+
+pictureTelTrapMultiPointConferenceEnded NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that system dropped out from a multipoint (bridge) call"
+	::= { ptNotificationPrefix 16 }
+
+pictureTelTrapH320CallDisconnected NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that H.320 call disconnected"
+	::= { ptNotificationPrefix 17 }
+
+pictureTelTrapH323CallDisconnected NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that H.323 call disconnected"
+	::= { ptNotificationPrefix 18 }
+
+pictureTelTrapISDNVoiceOnlyCallDisConnected NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that ISDN voice-only call disconnected"
+	::= { ptNotificationPrefix 19 }
+
+pictureTelTrapISDNNotReady NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that ISDN is unplugged or inaccessible"
+	::= { ptNotificationPrefix 20 }
+
+pictureTelTrapConnectFailed NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that attempt to make a call (connect) failed"
+	::= { ptNotificationPrefix 21 }
+
+pictureTelTrapAutoSPIDFailure NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that Auto SPID failed"
+	::= { ptNotificationPrefix 22 }
+
+pictureTelTrapDocumentServerUnreachable NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that system is not able to contact Document Server"
+	::= { ptNotificationPrefix 23 }
+
+pictureTelTrapGatekeeperUnreachable NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that system is not able to register with the gatekeeper"
+	::= { ptNotificationPrefix 24}
+
+pictureTelTrapDirectoryServerUnreachable NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that system is not able to contact Directory Server"
+	::= { ptNotificationPrefix 25 }
+
+pictureTelTrapCameraUnplugged NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that camera was unplugged"
+	::= { ptNotificationPrefix 26 }
+
+pictureTelTrapVideoMuted NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that near-end video is muted"
+	::= { ptNotificationPrefix 27 }
+
+pictureTelTrapVGASettingProblem NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that there is a VGA setting problem"
+	::= { ptNotificationPrefix 28 }
+
+pictureTelTrapMICUnplugged NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that near-end microphone was unplugged"
+	::= { ptNotificationPrefix 29 }
+
+pictureTelTrapAudioMuted NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that near-end audio is muted"
+	::= { ptNotificationPrefix 30 }
+
+pictureTelTrapBatteriesLow NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that IR keypad batteries are running low"
+	::= { ptNotificationPrefix 31 }
+
+pictureTelTrapLAMBLow NOTIFICATION-TYPE
+	OBJECTS { ptMonSysName }
+	STATUS  current
+	DESCRIPTION
+		"Notification that LAMB batteries are running low"
+	::= { ptNotificationPrefix 32 }
+
+END     
+PICTURETEL-VCS-H323-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Gauge32, Integer32, enterprises
+FROM SNMPv2-SMI
+	TruthValue, DisplayString
+FROM SNMPv2-TC
+	CallBandwidthType, VideoAlgorithmType, AudioAlgorithmType, DataProtocolType, VideoResolutionType, MediaChannelStatusType, ptH323
+FROM PICTURETEL-VCS-MIB;
+
+pictureTelVCSH323Module MODULE-IDENTITY
+	LAST-UPDATED "0101030000Z"
+	ORGANIZATION "PictureTel Corporation"
+	CONTACT-INFO
+		"
+		Postal:	PictureTel Corporation
+				100 Minuteman Drive
+				Andover, MA 01810-1031
+				USA"
+	DESCRIPTION
+		"Final version of the PictureTel H.323 MIB"
+	REVISION	"0101030000Z"
+	DESCRIPTION
+		"Rev 0.0.11
+		3 Jan 2001 12:00  
+		Latest version of MIB module PICTURETEL-VCS-H323-MIB"
+
+::= { ptH323 1 }
+
+
+--
+-- H323 placeholders
+--
+
+
+ptH323Statistics           OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 statistics"
+	::= { pictureTelVCSH323Module 1 }
+
+
+ptH323CallStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 call statistics"
+	::= { ptH323Statistics 1 }
+
+
+ptH323ChannelStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.245 logical channel statistics"
+	::= { ptH323Statistics 2 }
+
+
+ptH323VideoStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 video statistics"
+	::= { ptH323Statistics 3 }
+
+
+ptH323AudioStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 audio statistics"
+	::= { ptH323Statistics 4 }
+
+
+ptH323MUXStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 MUX call statistics"
+	::= { ptH323Statistics 5 }
+
+ptH323VideoNumberOfEncoders   OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Number of video encoders/decoders"
+	::= { ptH323Statistics 6 }
+
+
+
+
+--
+-- H.323 Call Statistics
+--
+
+ptH323CallBandwidth  OBJECT-TYPE
+	SYNTAX CallBandwidthType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Current call bandwidth"
+	::= { ptH323CallStat 1 }
+
+
+ptH323CallRestricted  OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Call in restricted mode"
+	::= { ptH323CallStat 2 }
+
+
+
+
+--
+-- H.245 Logical Channel Statistic
+--
+
+
+ptH323ChannelStatTable         OBJECT-TYPE
+	SYNTAX SEQUENCE OF PtH323ChannelStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION     "H.245 logical channel statistics table"
+	::= { ptH323ChannelStat 1 }
+
+
+ptH323ChannelStatEntry         OBJECT-TYPE
+	SYNTAX PtH323ChannelStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION     "Logical row describing an entry in the
+	                 H.245 logical channel statistics table"
+	INDEX	{ ptH323ChannelStatIndex }
+	::= { ptH323ChannelStatTable 1 }
+
+
+PtH323ChannelStatEntry ::= SEQUENCE {
+	ptH323ChannelStatIndex                   Integer32,
+	ptH323ChannelVideoTransmitToFarEnd       MediaChannelStatusType,
+	ptH323ChannelVideoReceiveFromFarEnd      MediaChannelStatusType
+	}
+
+
+ptH323ChannelStatIndex  OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION     "Index of the H245 logical video channel 
+	                 statistics in the table."
+	::= { ptH323ChannelStatEntry 1 }
+
+
+ptH323ChannelVideoTransmitToFarEnd  OBJECT-TYPE
+	SYNTAX MediaChannelStatusType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Status of the video channel that is used 
+	                  to transmit data to the far end"
+	::= { ptH323ChannelStatEntry 2 }
+
+
+ptH323ChannelVideoReceiveFromFarEnd  OBJECT-TYPE
+	SYNTAX MediaChannelStatusType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Status of the video channel that is used 
+	                  to receive data from the far end"
+	::= { ptH323ChannelStatEntry 3 }
+
+
+ptH323ChannelAudioTransmitToFarEnd  OBJECT-TYPE
+	SYNTAX MediaChannelStatusType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Status of the audio channel that is used 
+	                  to transmit data to the far end"
+	::= { ptH323ChannelStat 2 }
+
+
+ptH323ChannelAudioReceiveFromFarEnd  OBJECT-TYPE
+	SYNTAX MediaChannelStatusType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Status of the audio channel that is used 
+	                  to receive data from the far end"
+	::= { ptH323ChannelStat 3 }
+
+
+ptH323ChannelTransmitT120Data  OBJECT-TYPE
+	SYNTAX MediaChannelStatusType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Status of the T.120 transmit data channel"
+	::= { ptH323ChannelStat 4 }
+
+
+ptH323ChannelReceiveT120Data  OBJECT-TYPE
+	SYNTAX MediaChannelStatusType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Status of the T.120 receive data channel"
+	::= { ptH323ChannelStat 5 }
+
+
+
+--
+-- Video Statistics
+--
+
+
+ptH323VideoStatTable         OBJECT-TYPE
+	SYNTAX SEQUENCE OF PtH323VideoStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION     "H.323 video statistics table"
+	::= { ptH323VideoStat 1 }
+
+
+ptH323VideoStatEntry         OBJECT-TYPE
+	SYNTAX PtH323VideoStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION      "Logical row describing an entry in
+	                  the H.323 video statistics table"
+	INDEX	{ ptH323VideoStatIndex }
+	::= { ptH323VideoStatTable 1 }
+
+
+PtH323VideoStatEntry ::= SEQUENCE {
+	ptH323VideoStatIndex                   Integer32,
+	ptH323VideoTransmitAlgorithm           VideoAlgorithmType,
+	ptH323VideoTransmitAnnex               DisplayString,
+	ptH323VideoReceiveAlgorithm            VideoAlgorithmType,
+	ptH323VideoReceiveAnnex                DisplayString,
+	ptH323VideoTransmitTargetFrameRate     Gauge32,
+	ptH323VideoTransmitActualFrameRate     Gauge32,
+	ptH323VideoReceiveActualFrameRate      Gauge32,
+	ptH323VideoTransmitPictureFormat       VideoResolutionType,
+	ptH323VideoReceivePictureFormat        VideoResolutionType,
+	ptH323VideoTransmitTargetBitRate       Gauge32,
+	ptH323VideoReceiveTargetBitRate        Gauge32,
+	ptH323VideoTransmitActualBitRate       Gauge32,
+	ptH323VideoReceiveActualBitRate        Gauge32,
+	ptH323VideoTransmittedKeyFrames        Gauge32,
+	ptH323VideoReceivedKeyFrames           Gauge32,
+	ptH323VideoReceivedBitstreamErrors     Gauge32,
+	ptH323VideoEncoderNoiseReductionFilter TruthValue,
+	ptH323VideoDecoderPostFilters          TruthValue,
+	ptH323VideoReceivedChecksumErrors      Gauge32,
+	ptH323VideoTransmittedFrames           Gauge32,
+	ptH323VideoReceivedFrames              Gauge32
+	}
+
+
+ptH323VideoStatIndex  OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Index of the H.323 video statistics in the table"
+	::= { ptH323VideoStatEntry 1 }
+
+
+ptH323VideoTransmitAlgorithm   OBJECT-TYPE
+	SYNTAX VideoAlgorithmType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current transmit video algorithm 
+	                  (for active state only)"
+	::= { ptH323VideoStatEntry 2 }
+
+
+ptH323VideoTransmitAnnex   OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current transmit video annex 
+	                  (for active state only)
+	                  BOOL AnnexFAdvancedPrediction        : 1 bit
+	                  BOOL AnnexJDeblockingFilter          : 1 bit
+	                  BOOL AnnexNReferencePictureSelection : 1 bit
+	                  BOOL AppendixIErrorTracking          : 1 bit
+	                  int  AdditionalPictureMemory         : 3 bits
+	                  BOOL CustomPicture640x480            : 1 bit
+	                  BOOL CustomPicture704x480            : 1 bit
+	                  BOOL CustomPicture800x600            : 1 bit
+	                  BOOL CustomPicture1024x768           : 1 bit"
+	::= { ptH323VideoStatEntry 3 }
+
+
+ptH323VideoReceiveAlgorithm   OBJECT-TYPE
+	SYNTAX VideoAlgorithmType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current receive video algorithm 
+	                  (for active state only)"
+	::= { ptH323VideoStatEntry 4}
+
+
+ptH323VideoReceiveAnnex   OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current receive video annex 
+	                  (for active state only)
+	                  BOOL AnnexFAdvancedPrediction        : 1 bit
+	                  BOOL AnnexJDeblockingFilter          : 1 bit
+	                  BOOL AnnexNReferencePictureSelection : 1 bit
+	                  BOOL AppendixIErrorTracking          : 1 bit
+	                  int  AdditionalPictureMemory         : 3 bits
+	                  BOOL CustomPicture640x480            : 1 bit
+	                  BOOL CustomPicture704x480            : 1 bit
+	                  BOOL CustomPicture800x600            : 1 bit
+	                  BOOL CustomPicture1024x768           : 1 bit"
+	::= { ptH323VideoStatEntry 5 }
+
+
+ptH323VideoTransmitTargetFrameRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Target transmit frame rate (for active 
+	                  state only) - frames/sec"
+	::= { ptH323VideoStatEntry 6 }
+
+
+ptH323VideoTransmitActualFrameRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current average transmit frame rate 
+	                  (for active state only) - frames/sec"
+	::= { ptH323VideoStatEntry 7 }
+
+
+ptH323VideoReceiveActualFrameRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current average receive frame rate 
+	                  (for active state only) - frames/sec"
+	::= { ptH323VideoStatEntry 8 }
+
+
+ptH323VideoTransmitPictureFormat   OBJECT-TYPE
+	SYNTAX VideoResolutionType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current video picture format transmitted 
+	                  (for active state only)"
+	::= { ptH323VideoStatEntry 9 }
+
+
+ptH323VideoReceivePictureFormat   OBJECT-TYPE
+	SYNTAX VideoResolutionType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current video picture format received 
+	                  (for active state only)"
+	::= { ptH323VideoStatEntry 10 }
+
+
+ptH323VideoTransmitTargetBitRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of bits per second allocated for video Tx"
+	::= { ptH323VideoStatEntry 11 }
+
+
+ptH323VideoReceiveTargetBitRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of bits per second allocated for video Rx"
+	::= { ptH323VideoStatEntry 12 }
+
+
+ptH323VideoTransmitActualBitRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Actual number of bits per second for video Tx
+	                  (Active state only)"
+	::= { ptH323VideoStatEntry 13 }
+
+
+ptH323VideoReceiveActualBitRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Actual number of bits per second for video Rx
+	                  (Active state only)"
+	::= { ptH323VideoStatEntry 14 }
+
+
+ptH323VideoTransmittedKeyFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of the key (intra) frames sent"
+	::= { ptH323VideoStatEntry 15 }
+
+
+ptH323VideoReceivedKeyFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of the key (intra) frames received"
+	::= { ptH323VideoStatEntry 16 }
+
+
+ptH323VideoReceivedBitstreamErrors   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of the bitstream errors received"
+	::= { ptH323VideoStatEntry 17}
+
+
+ptH323VideoEncoderNoiseReductionFilter   OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "State of noise reduction filter
+	                  (true/false)"
+	::= { ptH323VideoStatEntry 18}
+
+
+ptH323VideoDecoderPostFilters   OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "State of decoder post filters
+	                  (true/false)"
+	::= { ptH323VideoStatEntry 19}
+
+
+ptH323VideoReceivedChecksumErrors   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of checksum errors received"
+	::= { ptH323VideoStatEntry 20}
+
+
+ptH323VideoTransmittedFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of transmitted frames"
+	::= { ptH323VideoStatEntry 21}
+
+
+ptH323VideoReceivedFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of received frames"
+	::= { ptH323VideoStatEntry 22}
+
+
+--
+-- H323 Audio Statistics
+--
+
+ptH323AudioTransmitAlgorithm         OBJECT-TYPE
+	SYNTAX AudioAlgorithmType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current transmit audio algorithm"
+	::= { ptH323AudioStat 1 }
+
+
+ptH323AudioReceiveAlgorithm          OBJECT-TYPE
+	SYNTAX AudioAlgorithmType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current receive audio algorithm"
+	::= { ptH323AudioStat 2 }
+
+
+ptH323AudioTransmitActualBitRate     OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Actual transmit bit rate (bits/sec)"
+	::= { ptH323AudioStat 3 }
+
+
+ptH323AudioReceiveActualBitRate      OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Actual receive bit rate (bits/sec)"
+	::= { ptH323AudioStat 4 }
+
+
+ptH323AudioSilentPacketsToMUX      OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Number of silent audio packets sent to MUX"
+	::= { ptH323AudioStat 5 }
+
+
+ptH323AudioDecoderDiscardedFrames      OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of discarded decoder frames "
+	::= { ptH323AudioStat 6 }
+
+
+ptH323AudioDecoderInsertedSilenceFrames    OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Number of inserted silence frames"
+	::= { ptH323AudioStat 7 }
+
+
+
+
+
+--
+-- MUX Statistic
+--
+
+
+ptH323MUXCurrentJitterDelay             OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Current jitter delay (msec)"
+	::= { ptH323MUXStat 1 }
+
+
+ptH323MUXAudioStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 MUX audio channel statistics"
+	::= { ptH323MUXStat 2 }
+
+
+ptH323MUXVideoStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 MUX video channel statistics"
+	::= { ptH323MUXStat 3 }
+
+
+ptH323MUXH245Stat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 MUX H.245 channel statistics"
+	::= { ptH323MUXStat 4 }
+
+
+--
+-- MUX Audio channel Statistic
+--
+
+
+ptH323MUXAudioPacketsSent           OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Total number of packets sent by MUX
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 1 }
+
+
+ptH323MUXAudioBytesSent             OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Total number of bytes sent by MUX
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 2 }
+
+
+ptH323MUXAudioPacketsReceived       OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Total number of packets received by MUX
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 3 }
+
+
+ptH323MUXAudioBytesReceived         OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Total number of bytes received by MUX
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 4 }
+
+
+ptH323MUXAudioPacketsLost           OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Total number of packets lost in 
+	                  network - never received by MUX - 
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 5 }
+
+
+ptH323MUXAudioPacketsOutOfOrder     OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Total number of packets received by MUX 
+	                  that are out of order, but within jitter
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 6 }
+
+
+ptH323MUXAudioPacketsLate           OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Total number of packets received by MUX 
+	                  that are outside of the jitter window
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 7 }
+
+
+ptH323MUXAudioPacketsDiscarded      OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Total number of packets discarded due 
+	                  to a bad RTP header for the audio channel"
+	::= { ptH323MUXAudioStat 8 }
+
+
+ptH323MUXAudioPacketJitter          OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     "Average audio packet jitter (msec)"
+	::= { ptH323MUXAudioStat 9 }
+
+
+ptH323MUXAudioMinRoundTripLatency   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Minimum round-trip latency
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 10 }
+
+
+ptH323MUXAudioMaxRoundTripLatency   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Maximum round-trip latency
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 11 }
+
+
+ptH323MUXAudioAvgRoundTripLatency   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Average round-trip latency
+	                  for the audio channel"
+	::= { ptH323MUXAudioStat 12 }
+
+
+--
+-- MUX Video channel Statistic
+--
+
+
+ptH323MUXVideoStatTable         OBJECT-TYPE
+	SYNTAX SEQUENCE OF PtH323MUXVideoStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION      "H.323 MUX video channel statistics table"
+	::= { ptH323MUXVideoStat 1 }
+
+
+ptH323MUXVideoStatEntry         OBJECT-TYPE
+	SYNTAX PtH323MUXVideoStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION      "Logical row describing an entry in the
+	                  H.323 MUX video channel statistics table"
+	INDEX	{ ptH323MUXVideoStatIndex }
+	::= { ptH323MUXVideoStatTable 1 }
+
+
+PtH323MUXVideoStatEntry ::= SEQUENCE {
+	ptH323MUXVideoStatIndex              Integer32,
+	ptH323MUXVideoPacketsSent            Gauge32,
+	ptH323MUXVideoBytesSent              Gauge32,
+	ptH323MUXVideoPacketsReceived        Gauge32,
+	ptH323MUXVideoBytesReceived          Gauge32,
+	ptH323MUXVideoPacketsLost            Gauge32,
+	ptH323MUXVideoPacketsOutOfOrder      Gauge32,
+	ptH323MUXVideoPacketsLate            Gauge32,
+	ptH323MUXVideoPacketsDiscarded       Gauge32,
+	ptH323MUXVideoPacketJitter           Gauge32,
+	ptH323MUXVideoMinRoundTripLatency    Gauge32,
+	ptH323MUXVideoMaxRoundTripLatency    Gauge32,
+	ptH323MUXVideoAvgRoundTripLatency    Gauge32
+	}
+
+
+
+ptH323MUXVideoStatIndex   OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "The index of the H.323 MUX video channel
+	                  statistics in the table"
+	::= { ptH323MUXVideoStatEntry 1 }
+
+
+ptH323MUXVideoPacketsSent           OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets sent by MUX
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 2 }
+
+
+ptH323MUXVideoBytesSent             OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of bytes sent by MUX
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 3 }
+
+
+ptH323MUXVideoPacketsReceived        OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets received by MUX
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 4 }
+
+
+ptH323MUXVideoBytesReceived          OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of bytes received by MUX
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 5 }
+
+
+ptH323MUXVideoPacketsLost           OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets lost in network
+	                  (never received by MUX) for the video channel"
+	::= { ptH323MUXVideoStatEntry 6 }
+
+
+ptH323MUXVideoPacketsOutOfOrder     OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets received by MUX 
+	                  that are out of order, but within jitter
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 7 }
+
+
+ptH323MUXVideoPacketsLate           OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets received by MUX 
+	                  that are outside of the jitter window
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 8 }
+
+
+ptH323MUXVideoPacketsDiscarded      OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets discarded due 
+	                  to a bad RTP header for the video channel"
+	::= { ptH323MUXVideoStatEntry 9 }
+
+
+ptH323MUXVideoPacketJitter          OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Average video packet jitter (msec)"
+	::= { ptH323MUXVideoStatEntry 10 }
+
+
+ptH323MUXVideoMinRoundTripLatency   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Minimum round-trip latency
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 11 }
+
+
+ptH323MUXVideoMaxRoundTripLatency   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Maximum round-trip latency
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 12 }
+
+
+ptH323MUXVideoAvgRoundTripLatency   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Average round-trip latency
+	                  for the video channel"
+	::= { ptH323MUXVideoStatEntry 13 }
+
+
+--
+-- MUX H.245 control channel Statistic
+--
+
+
+ptH323MUXH245PacketsSent            OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets sent by MUX"
+	::= { ptH323MUXH245Stat  1 }
+
+
+ptH323MUXH245BytesSent             OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of bytes sent by MUX"
+	::= { ptH323MUXH245Stat 2 }
+
+
+ptH323MUXH245PacketsReceived        OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets received by MUX"
+	::= { ptH323MUXH245Stat 3 }
+
+
+ptH323MUXH245BytesReceived          OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of bytes received by MUX"
+	::= { ptH323MUXH245Stat 4 }
+
+
+ptH323MUXH245PacketsDiscarded      OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Total number of packets discarded due 
+	                  to a bad RTP header"
+	::= { ptH323MUXH245Stat 5 }
+
+
+
+
+
+END
+PICTURETEL-VCS-H320-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Gauge32, Integer32, enterprises
+FROM SNMPv2-SMI
+	TruthValue, DisplayString
+FROM SNMPv2-TC
+	CallBandwidthType, VideoAlgorithmType, AudioAlgorithmType, DataProtocolType, VideoResolutionType, ptH320
+FROM PICTURETEL-VCS-MIB;
+
+pictureTelVCSH320Module MODULE-IDENTITY
+	LAST-UPDATED "0101030000Z"
+	ORGANIZATION "PictureTel Corporation"
+	CONTACT-INFO
+		"
+		Postal:	PictureTel Corporation
+				100 Minuteman Drive
+				Andover, MA 01810-1031
+				USA"
+	DESCRIPTION
+		"Final version of the PictureTel H.320 MIB"
+	REVISION	"0101030000Z"
+	DESCRIPTION
+		"Rev 0.0.13
+		3 Jan 2001 12:00  
+		Latest version of MIB module PICTURETEL-VCS-H320-MIB"
+
+ ::= { ptH320 1 }
+
+
+--
+-- H.320 placeholders
+--
+
+ptH320Statistics           OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.320 statistics"
+	::= { pictureTelVCSH320Module 1 }
+
+
+ptH320CallStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.320 call statistics"
+	::= { ptH320Statistics 1 }
+
+
+ptH320VideoStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.320 video statistics"
+	::= { ptH320Statistics 2 }
+
+
+ptH320AudioStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.320 audio statistics"
+	::= { ptH320Statistics 3 }
+
+
+ptH320DataStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.320 data statistics"
+	::= { ptH320Statistics 4 }
+
+--
+-- Call Statistics
+--
+
+ptH320CallBandwidth  OBJECT-TYPE
+	SYNTAX CallBandwidthType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current call bandwidth"
+	::= { ptH320CallStat 1 }
+
+
+ptH320CallRestricted  OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Call in restricted mode"
+	::= { ptH320CallStat 2 }
+
+
+ptH320CallNumberOfChannels  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of network channels aggregated by H.221
+	                  (a bonded call has only one channel from the
+	                  H.221 perspective)"
+	::= { ptH320CallStat 3 }
+
+
+ptH320CallStatTable         OBJECT-TYPE
+	SYNTAX SEQUENCE OF PtH320CallStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION     "H.221 network channel statistics table"
+	::= { ptH320CallStat 4 }
+
+
+ptH320CallStatEntry         OBJECT-TYPE
+	SYNTAX PtH320CallStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION     "Logical row describing an entry in the H.221 
+	                 network channel statistics table"
+	INDEX	{ ptH320CallStatIndex }
+	::= { ptH320CallStatTable 1 }
+
+
+PtH320CallStatEntry ::= SEQUENCE {
+	ptH320CallStatIndex                         Gauge32,
+	ptH320CallH221FramesAligned                 TruthValue,
+	ptH320CallH221FramesLost                    Gauge32,
+	ptH320CallH221SMFTransmitted                Gauge32, 
+	ptH320CallH221SMFReceived                   Gauge32,
+	ptH320CallH221ReceivedEBitSet               Gauge32,
+	ptH320CallH221ReceivedCRCError              Gauge32,
+	ptH320CallH221ReceivedBASECCError           Gauge32,
+	ptH320CallH221ReceivedBASProtocolViolation  Gauge32
+	}
+
+ptH320CallStatIndex  OBJECT-TYPE
+	SYNTAX	Gauge32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION    "Index of the H.221 network channel in the table"
+	::= { ptH320CallStatEntry 1 }
+
+
+ptH320CallH221FramesAligned  OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "If the value of this object is true(1),
+	                  then the multi-frames are aligned"
+	::= { ptH320CallStatEntry 2 }
+
+
+ptH320CallH221FramesLost  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of times when framing was lost"
+	::= { ptH320CallStatEntry 3 }
+
+
+ptH320CallH221SMFTransmitted   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of SMFs (submultiframes) transmitted"
+	::= { ptH320CallStatEntry 4 }
+
+
+ptH320CallH221SMFReceived   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of SMFs (submultiframes) received"
+	::= { ptH320CallStatEntry 5 }
+
+
+ptH320CallH221ReceivedEBitSet   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of SMFs (submultiframes) received
+	                  with E bit set"
+	::= { ptH320CallStatEntry 6 }
+
+
+ptH320CallH221ReceivedCRCError   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of SMFs (submultiframes) received
+	                  with CRC error"
+	::= { ptH320CallStatEntry 7 }
+
+
+ptH320CallH221ReceivedBASECCError  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of SMFs (submultiframes) received
+	                  with BAS ECC error"
+	::= { ptH320CallStatEntry 8 }
+
+
+ptH320CallH221ReceivedBASProtocolViolation  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of SMFs (submultiframes) received with
+	                  BAS that have a valid ECC, but are inappropriate 
+	                  for current state (e.g., mode received during the 
+	                  capability exchange)"
+	::= { ptH320CallStatEntry 9 }
+
+
+
+
+--
+-- Video Statistics
+--
+
+ptH320VideoNumberOfEncoders   OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of video encoders/decoders"
+	::= { ptH320VideoStat 1 }
+
+
+ptH320VideoStatTable         OBJECT-TYPE
+	SYNTAX SEQUENCE OF PtH320VideoStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION      "H.320 video statistics table"
+	::= { ptH320VideoStat 2 }
+
+
+ptH320VideoStatEntry         OBJECT-TYPE
+	SYNTAX PtH320VideoStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION      "Logical row describing an entry in the H.320 
+	                  video statistics table"
+	INDEX	{ ptH320VideoStatIndex }
+	::= { ptH320VideoStatTable 1 }
+
+
+PtH320VideoStatEntry ::= SEQUENCE {
+	ptH320VideoStatIndex                   Gauge32,
+	ptH320VideoTransmitAlgorithm           VideoAlgorithmType,
+	ptH320VideoTransmitAnnex               DisplayString,
+	ptH320VideoReceiveAlgorithm            VideoAlgorithmType,
+	ptH320VideoReceiveAnnex                DisplayString,
+	ptH320VideoTransmitTargetFrameRate     Gauge32,
+	ptH320VideoTransmitActualFrameRate     Gauge32,
+	ptH320VideoReceiveActualFrameRate      Gauge32,
+	ptH320VideoTransmitPictureFormat       VideoResolutionType,
+	ptH320VideoReceivePictureFormat        VideoResolutionType,
+	ptH320VideoTransmitTargetBitRate       Gauge32,
+	ptH320VideoReceiveTargetBitRate        Gauge32,
+	ptH320VideoTransmitActualBitRate       Gauge32,
+	ptH320VideoReceiveActualBitRate        Gauge32,
+	ptH320VideoTransmittedKeyFrames        Gauge32,
+	ptH320VideoReceivedKeyFrames           Gauge32,
+	ptH320VideoTransmittedFECFrames        Gauge32,
+	ptH320VideoReceivedFECFrames           Gauge32,
+	ptH320VideoReceivedCorrectableFrames   Gauge32,
+	ptH320VideoReceivedUncorrectableFrames Gauge32,
+	ptH320VideoFramingLost                 Gauge32,
+	ptH320VideoReceivedBitstreamErrors     Gauge32,
+	ptH320VideoEncoderNoiseReductionFilter TruthValue,
+	ptH320VideoDecoderPostFilters          TruthValue,
+	ptH320VideoReceivedChecksumErrors      Gauge32,
+	ptH320VideoTransmittedFrames           Gauge32,
+	ptH320VideoReceivedFrames              Gauge32
+	}
+
+
+ptH320VideoStatIndex  OBJECT-TYPE
+	SYNTAX	Gauge32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION    "Index of H.320 video statistics in the table.
+		            Indicates number of video encoders/decoders"
+	::= { ptH320VideoStatEntry 1 }
+
+
+ptH320VideoTransmitAlgorithm   OBJECT-TYPE
+	SYNTAX VideoAlgorithmType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current transmit video algorithm 
+	                  (for active state only)"
+	::= { ptH320VideoStatEntry 2 }
+
+
+ptH320VideoTransmitAnnex   OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current transmit video annex 
+	                  (for active state only)
+	                  BOOL AnnexFAdvancedPrediction         : 1 bit
+	                  BOOL AnnexJDeblockingFilter           : 1 bit
+	                  BOOL AnnexNReferencePictureSelection  : 1 bit
+	                  BOOL AnnexPReferencePictureResampling : 1 bit
+	                  BOOL AppendixIErrorTracking           : 1 bit
+	                  BOOL CustomPicture640x480             : 1 bit
+	                  BOOL CustomPicture704x480             : 1 bit
+	                  BOOL CustomPicture800x600             : 1 bit
+	                  BOOL CustomPicture1024x768            : 1 bit"
+	::= { ptH320VideoStatEntry 3 }
+
+
+ptH320VideoReceiveAlgorithm   OBJECT-TYPE
+	SYNTAX VideoAlgorithmType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current receive video algorithm 
+	                  (for active state only)"
+	::= { ptH320VideoStatEntry 4}
+
+
+ptH320VideoReceiveAnnex   OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current receive video annex 
+	                  (for active state only)
+	                  BOOL AnnexFAdvancedPrediction         : 1 bit
+	                  BOOL AnnexJDeblockingFilter           : 1 bit
+	                  BOOL AnnexNReferencePictureSelection  : 1 bit
+	                  BOOL AnnexPReferencePictureResampling : 1 bit
+	                  BOOL AppendixIErrorTracking           : 1 bit
+	                  BOOL CustomPicture640x480             : 1 bit
+	                  BOOL CustomPicture704x480             : 1 bit
+	                  BOOL CustomPicture800x600             : 1 bit
+	                  BOOL CustomPicture1024x768            : 1 bit"
+	::= { ptH320VideoStatEntry 5 }
+
+
+ptH320VideoTransmitTargetFrameRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Target transmit frame rate (for active 
+	                  state only) - frames/sec"
+	::= { ptH320VideoStatEntry 6 }
+
+
+ptH320VideoTransmitActualFrameRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current average transmit frame rate 
+	                  (for active state only) - frames/sec"
+	::= { ptH320VideoStatEntry 7 }
+
+
+ptH320VideoReceiveActualFrameRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current average receive frame rate 
+	                  (for active state only) - frames/sec"
+	::= { ptH320VideoStatEntry 8 }
+
+
+ptH320VideoTransmitPictureFormat   OBJECT-TYPE
+	SYNTAX VideoResolutionType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current video picture format transmitted 
+	                  (for active state only)"
+	::= { ptH320VideoStatEntry 9 }
+
+
+ptH320VideoReceivePictureFormat   OBJECT-TYPE
+	SYNTAX VideoResolutionType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current video picture format received 
+	                  (for active state only)"
+	::= { ptH320VideoStatEntry 10 }
+
+
+ptH320VideoTransmitTargetBitRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of bits per second allocated for video Tx"
+	::= { ptH320VideoStatEntry 11 }
+
+
+ptH320VideoReceiveTargetBitRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of bits per second allocated for video Rx"
+	::= { ptH320VideoStatEntry 12 }
+
+ptH320VideoTransmitActualBitRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of actual bits per second transmitted"
+	::= { ptH320VideoStatEntry 13 }
+
+
+ptH320VideoReceiveActualBitRate   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of actual bits per second received"
+	::= { ptH320VideoStatEntry 14 }
+
+
+ptH320VideoTransmittedKeyFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of key (intra) frames sent"
+	::= { ptH320VideoStatEntry 15 }
+
+
+ptH320VideoReceivedKeyFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of key (intra) frames received"
+	::= { ptH320VideoStatEntry 16 }
+
+
+ptH320VideoTransmittedFECFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of FEC frames transmitted"
+	::= { ptH320VideoStatEntry 17 }
+
+
+ptH320VideoReceivedFECFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of FEC frames received"
+	::= { ptH320VideoStatEntry 18 }
+
+
+ptH320VideoReceivedCorrectableFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of FEC frames received with
+	                  correctable errors"
+	::= { ptH320VideoStatEntry 19 }
+
+
+ptH320VideoReceivedUncorrectableFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of FEC frames received with
+	                  uncorrectable errors"
+	::= { ptH320VideoStatEntry 20}
+
+
+ptH320VideoFramingLost   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of times when video framing was lost"
+	::= { ptH320VideoStatEntry 21}
+
+
+ptH320VideoReceivedBitstreamErrors   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of bitstream errors received"
+	::= { ptH320VideoStatEntry 22}
+
+
+ptH320VideoEncoderNoiseReductionFilter   OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "State of the noise reduction filter
+	                  (true/false)"
+	::= { ptH320VideoStatEntry 23}
+
+
+ptH320VideoDecoderPostFilters   OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "State of the decoder post filters
+	                  (true/false)"
+	::= { ptH320VideoStatEntry 24}
+
+
+ptH320VideoReceivedChecksumErrors   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of checksum errors received"
+	::= { ptH320VideoStatEntry 25}
+
+
+ptH320VideoTransmittedFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of transmitted frames"
+	::= { ptH320VideoStatEntry 26}
+
+
+ptH320VideoReceivedFrames   OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of received frames"
+	::= { ptH320VideoStatEntry 27}
+
+
+
+--
+-- Audio Statistics
+--
+
+ptH320AudioTransmitAlgorithm         OBJECT-TYPE
+	SYNTAX AudioAlgorithmType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current transmit audio algorithm 
+	                  (for all states except Idle Final)"
+	::= { ptH320AudioStat 1 }
+
+
+ptH320AudioReceiveAlgorithm         OBJECT-TYPE
+	SYNTAX AudioAlgorithmType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current receive audio algorithm 
+	                  (for all states except Idle Final)"
+	::= { ptH320AudioStat 2 }
+
+
+
+--
+-- Data Statistics
+--
+
+ptH320DataTransmitProtocol       OBJECT-TYPE
+	SYNTAX DataProtocolType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current transmit data protocol"
+	::= { ptH320DataStat 1 }
+
+
+ptH320DataReceiveProtocol        OBJECT-TYPE
+	SYNTAX DataProtocolType
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Current receive data protocol"
+	::= { ptH320DataStat 2 }
+
+
+ptH320DataTransmitLSDRate        OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Transmit LSD rate of data channels allocated 
+	                  in MUX (bits/sec)"
+	::= { ptH320DataStat 3 }
+
+
+ptH320DataReceiveLSDRate         OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Receive LSD rate of data channels allocated 
+	                  in MUX (bits/sec)"
+	::= { ptH320DataStat 4 }
+
+
+ptH320DataTransmitMLPRate        OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Transmit MLP rate of data channels allocated 
+	                  in MUX (bits/sec)"
+	::= { ptH320DataStat 5 }
+
+
+ptH320DataReceiveMLPRate         OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Receive MLP rate of data channels allocated 
+	                  in MUX (bits/sec)"
+	::= { ptH320DataStat 6 }
+
+
+ptH320DataReceiveLSDFramesWithCRCError  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of LSD frames with CRC error received"
+	::= { ptH320DataStat 7 }
+
+
+ptH320DataReceiveLSDFramingError  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of LSD frames with framing error received"
+	::= { ptH320DataStat 8 }
+
+
+ptH320DataTransmitLSDBytes  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of LSD bytes transmitted"
+	::= { ptH320DataStat 9 }
+
+
+ptH320DataReceiveLSDBytes  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of LSD bytes received"
+	::= { ptH320DataStat 10 }
+
+ptH320DataTransmitMLPBytes  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of MLP bytes transmitted"
+	::= { ptH320DataStat 11 }
+
+
+ptH320DataReceiveMLPBytes  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of MLP bytes received"
+	::= { ptH320DataStat 12 }
+
+ptH320DataTransmitLSDFrames  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of LSD frames transmitted"
+	::= { ptH320DataStat 13 }
+
+
+ptH320DataReceiveLSDFrames  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of LSD frames received"
+	::= { ptH320DataStat 14 }
+
+ptH320DataTransmitMLPFrames  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of MLP frames transmitted"
+	::= { ptH320DataStat 15 }
+
+
+ptH320DataReceiveMLPFrames  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of MLP frames received"
+	::= { ptH320DataStat 16 }
+
+
+ptH320DataReceiveMLPCRCErrors  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of LSD frames with CRC errors received"
+	::= { ptH320DataStat 17 }
+
+
+ptH320DataReceiveMLPFramingErrors  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of MLP frames with framing errors received"
+	::= { ptH320DataStat 18 }
+
+
+ptH320DataH224PacketsReceived  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of H.224 packets received"
+	::= { ptH320DataStat 19 }
+
+
+ptH320DataH224PacketsTransmitted  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of H.224 packets transmitted"
+	::= { ptH320DataStat 20 }
+
+
+ptH320DataTransmitT120Packets  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of T.120 packets transmitted"
+	::= { ptH320DataStat 21 }
+
+
+ptH320DataReceiveT120Packets  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION      "Number of T.120 packets received"
+	::= { ptH320DataStat 22 }
+
+END
+PICTURETEL-VCS-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY
+FROM SNMPv2-SMI
+	TruthValue, TimeStamp, DisplayString
+FROM SNMPv2-TC
+	ptConfiguration
+FROM PICTURETEL-VCS-MIB;
+
+pictureTelVCSConfigurationModule MODULE-IDENTITY
+	LAST-UPDATED "0101030000Z"
+	ORGANIZATION "PictureTel Corporation"
+	CONTACT-INFO
+		"
+		Postal:	PictureTel Corporation
+				100 Minuteman Drive
+				Andover, MA 01810-1031
+				USA"
+	DESCRIPTION
+		"Final version of the PictureTel Configuration MIB"
+	REVISION	"0101030000Z"
+	DESCRIPTION
+		"Rev 0.0.05
+		3 Jan 2001 12:00  
+		Latest version of MIB module PICTURETEL-VCS-CONFIG-MIB"
+
+ ::= { ptConfiguration 1 }
+
+
+--
+-- Configuration placeholders
+--
+
+ptBasicConfig           OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for basic system configuration"
+	::= { pictureTelVCSConfigurationModule 1 }
+
+
+ptAdvancedConfig             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for advanced system configuration"
+	::= { pictureTelVCSConfigurationModule 2 }
+
+
+--
+--  Basic System configuration
+--
+
+ptConfSysName OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"An administratively assigned name for the videoconferencing 
+		system. If the name is unknown, the value contained in this 
+		object is the zero-length string.  This value is the same as 
+		the system name defined in the system software."
+	REFERENCE
+		"This object contains a value identical to that of the MIB-II 
+		sysName object"
+	::= { ptBasicConfig 1 }
+
+ptConfSysDescription OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"A textual description of the entity.  This value
+		should include the full name and version
+		identification of the system's hardware type,
+		software operating-system, and networking
+		software.  It is mandatory that this only contain
+		printable ASCII characters."
+	::= { ptBasicConfig 2 }
+
+ptConfSysContact OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The textual identification of the on-site support staff
+		responsible for the videoconferencing system installation.  If
+		no contact information is known, the value contained in this
+		object is the zero-length string."
+	REFERENCE
+		"This object contains a value identical to that of the MIB-II 
+		sysContact object"
+	::= { ptBasicConfig 3 }
+
+ptConfSysOID OBJECT-TYPE
+	SYNTAX	OBJECT IDENTIFIER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The product identifier for the videoconferencing system.  The 
+		value of this managed object is an Object Value Assignment 
+		(OVA), residing within the registration subtree of the
+		vendor's enterprise name space.  This object is useful in 
+		verifying the model and version of the vendor's service."
+	REFERENCE
+		"This object contains a value identical to that of the MIB-II 
+		sysObjectID object"
+	::= { ptBasicConfig 4 }
+
+ptConfSysUpTime OBJECT-TYPE
+	SYNTAX  TimeStamp
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The time (in hundredths of a second) since the network
+		 management portion of the system was last re-initialized"
+	::= { ptBasicConfig 5 }
+
+ptConfSysLocation OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The physical location of the videoconferencing system (e.g., 
+		`Main conference room - 3rd floor').  If the location is unknown,
+		the value contained in this object is the zero-length string."
+	REFERENCE
+		"This object contains a value identical to that of the MIB-II 
+		sysLocation object"
+	::= { ptBasicConfig 6 }
+
+
+ptConfSysNotificationMode OBJECT-TYPE
+	SYNTAX	TruthValue
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"If the value of this object is true(1), then the notifications 
+		are enabled"
+	::= { ptBasicConfig 7 }
+
+
+END
+PICTURETEL-VCS-SYSSTAT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Gauge32
+FROM SNMPv2-SMI
+	TimeStamp, DisplayString, TEXTUAL-CONVENTION
+FROM SNMPv2-TC
+	ptSystemStatistics
+FROM PICTURETEL-VCS-MIB;
+
+pictureTelVCSSystemStatisticsModule MODULE-IDENTITY
+	LAST-UPDATED "0101030000Z"
+	ORGANIZATION "PictureTel Corporation"
+	CONTACT-INFO
+		"
+		Postal:	PictureTel Corporation
+				100 Minuteman Drive
+				Andover, MA 01810-1031
+				USA"
+	DESCRIPTION
+		"Final version"
+	REVISION	"0101030000Z"
+	DESCRIPTION
+		"Rev 0.0.08
+		3 Jan 2001 12:00  
+		Latest version of MIB module PICTURETEL-VCS-SYSSTAT-MIB"
+
+ ::= { ptSystemStatistics 1 }
+
+
+
+--
+-- Textual Convention used in this module
+--
+
+CallStateType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"Enumerated type representing the current state of the call"
+	SYNTAX INTEGER {
+		idleinitial(0),
+		address(1),
+		dialing(2),
+		ringing(3),
+		connecting(4),
+		active(5),
+		reconnecting(6),
+		incoming(7),
+		disconnecting(8),
+		gateway(9),
+		idlefinal(10)
+		}
+
+
+--
+-- System Statistics placeholders
+--
+
+ptSysCommonStat             OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for common statistics"
+	::= { pictureTelVCSSystemStatisticsModule 1 }
+
+
+ptSysH320CallStat           OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.320 video statistics"
+	::= { pictureTelVCSSystemStatisticsModule 2 }
+
+
+ptSysH323CallStat           OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for H.323 audio statistics"
+	::= { pictureTelVCSSystemStatisticsModule 3 }
+
+
+ptSysVoiceOnlyCallStat      OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for voice-only statistics"
+	::= { pictureTelVCSSystemStatisticsModule 4 }
+
+
+ptSystemVersions      OBJECT-IDENTITY
+	STATUS          current
+	DESCRIPTION     "Subtree for system versions"
+	::= { pictureTelVCSSystemStatisticsModule 5 }
+
+
+
+--
+-- Common System Statistics
+--
+
+ptTotalCameraCommands  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Number of commands sent to the local camera"
+	::= { ptSysCommonStat 1 }
+
+ptTotalIRKeyCommands  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Number of commands sent from the IR Keyboard"
+	::= { ptSysCommonStat 2 }
+
+
+ ptTimeSinceSAPIStartup  OBJECT-TYPE
+	SYNTAX TimeStamp
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Total time since SAPI was started"
+	::= { ptSysCommonStat 3 }
+
+
+ ptTimeInCallsSinceSAPIStartup  OBJECT-TYPE
+	SYNTAX TimeStamp
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Time system was in the call since SAPI was started"
+	::= { ptSysCommonStat 4 }
+
+
+ptTimeInCallsSinceSysCreation  OBJECT-TYPE
+	SYNTAX TimeStamp
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Time system was in the call since system creation"
+	::= { ptSysCommonStat 5 }
+
+
+ptTimeInVoiceOnlyCallsSinceSAPIStartup  OBJECT-TYPE
+	SYNTAX TimeStamp
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Time system was in the voice-only call since 
+	                  SAPI startup"
+	::= { ptSysCommonStat 6 }
+
+
+ptTimeInVoiceOnlyCallsSinceSysCreation  OBJECT-TYPE
+	SYNTAX TimeStamp
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Time system was in the voice-only call since 
+	                  system creation"
+	::= { ptSysCommonStat 7 }
+
+
+--
+-- H.320 Call System Statistics
+--
+
+ptTotalH320CallsPlaced  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Total number of H.320 calls placed"
+	::= { ptSysH320CallStat 1 }
+
+
+ ptTotalH320CallsReceived  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Total number of H.320 calls received"
+	::= { ptSysH320CallStat 2 }
+
+
+
+ptH320CallState  OBJECT-TYPE
+	SYNTAX CallStateType
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Current or most recent H.320 call state"
+	::= { ptSysH320CallStat 3 }
+
+
+
+ptH320CallDuration  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Current or most recent H.320 call duration (sec)"
+	::= { ptSysH320CallStat 4 }
+
+
+--
+-- H.323 Call System Statistics
+--
+
+ptTotalH323CallsPlaced  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Total number of H.323 calls placed"
+	::= { ptSysH323CallStat 1 }
+
+
+ptTotalH323CallsReceived  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Total number of H.323 calls received"
+	::= { ptSysH323CallStat 2 }
+
+
+ptH323CallState  OBJECT-TYPE
+	SYNTAX CallStateType
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Current or most recent H.323 call state"
+	::= { ptSysH323CallStat 3 }
+
+
+ptH323CallDuration  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Current or most recent H.323 call duration (sec)"
+	::= { ptSysH323CallStat 4 }
+
+
+--
+-- Voice Only Call System Statistics
+--
+
+ptTotalVoiceOnlyCallsPlaced  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Total number of voice-only calls placed"
+	::= { ptSysVoiceOnlyCallStat 1 }
+
+
+ptTotalVoiceOnlyCallsReceived  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS	read-only
+	STATUS          current
+	DESCRIPTION     " Total number of voice-only calls received"
+	::= { ptSysVoiceOnlyCallStat 2 }
+
+
+ptVoiceOnlyCallState  OBJECT-TYPE
+	SYNTAX CallStateType
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Current or most recent voice-only call state"
+	::= { ptSysVoiceOnlyCallStat 3 }
+
+
+ptVoiceOnlyCallDuration  OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     " Current or most recent voice-only call duration (sec)"
+	::= { ptSysVoiceOnlyCallStat 4 }
+
+
+--
+-- System Versions
+--
+
+ptVCSVersion  OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     "Current VCS version"
+	::= { ptSystemVersions 1 }
+
+
+ptPlatformVersions      OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     "Current version of the aggregate of all 
+	                 non-PictureTel software (OS, Video Drivers,
+	                 Productivity software,...)"
+	::= { ptSystemVersions 2 }
+
+
+ptVCSRemoteManagementVersion  OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     "Current version of Remote Management"
+	::= { ptSystemVersions 3 }
+
+
+ptH323CoreVersion  OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS          current
+	DESCRIPTION     "Current version of H.323 Core"
+	::= { ptSystemVersions 4 }
+
+
+
+END
+
+

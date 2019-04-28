@@ -1,0 +1,908 @@
+-- extracted from draft-niraj-tmt-mib-01.txt
+-- at Thu Nov  7 06:11:16 2002
+
+   TABLE-MODIF-TRACKING-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+           MODULE-IDENTITY,
+           NOTIFICATION-TYPE,
+           OBJECT-TYPE,
+           Counter32
+       FROM SNMPv2-SMI
+           TEXTUAL-CONVENTION,
+           TruthValue,
+           VariablePointer,
+           TimeStamp,
+           RowStatus
+       FROM SNMPv2-TC
+           MODULE-COMPLIANCE,
+           NOTIFICATION-GROUP,
+           OBJECT-GROUP
+       FROM SNMPv2-CONF
+           SnmpAdminString
+       FROM SNMP-FRAMEWORK-MIB
+           InetAddressType,
+           InetAddress
+       FROM INET-ADDRESS-MIB
+           Unsigned32
+       FROM CISCO-TC
+           ciscoMgmt
+       FROM CISCO-SMI;
+
+
+   tableModifTrackingMIB MODULE-IDENTITY
+       LAST-UPDATED "200211040000Z"
+       ORGANIZATION "Cisco Systems, Inc."
+       CONTACT-INFO "
+           Niraj Gopal
+           Cisco Systems, Inc.
+           170 W Tasman Drive
+           San Jose, CA 95134
+           USA
+
+           Phone:  +1 408-527-3347
+           E-mail: niraj@cisco.com"
+       DESCRIPTION
+           "The MIB module to track and store the modifications
+           in data of NMS specified MIB tables implemented in an
+           SNMP command responder (traditionally called an SNMP
+           agent).
+
+           This MIB allows an NMS to register for change monitoring
+           in the tables it is interested in.  This MIB then tracks
+           modifications in those registered tables, allowing the
+           NMS to poll one table to determine if others need to be
+           polled.
+
+           This MIB keeps track of all modifications, including
+           adding a new row, deletion of a row, and modification
+           of an object in a row.  It can also be configured to
+           send change notifications to an NMS."
+       REVISION "200211040000Z"
+       DESCRIPTION
+           "Initial version of this MIB module."
+       ::= { mib-2 xxx }
+
+   tmtMIBObjects OBJECT IDENTIFIER ::= {
+           tableModifTrackingMIB 1 }
+
+   -- Subgroups
+
+   tmtRegistration OBJECT IDENTIFIER
+               ::= { tmtMIBObjects 1 } tmtControl OBJECT IDENTIFIER
+               ::= { tmtMIBObjects 2 } tmtHist OBJECT IDENTIFIER
+               ::= { tmtMIBObjects 3 }
+
+   -- Textual Conventions
+
+   ModificationType ::= TEXTUAL-CONVENTION
+       STATUS          current
+       DESCRIPTION
+           "The MIB table data modification types that can be found
+           and recorded.  This is a bit map, with each bit representing
+           a different modification type as described below:
+
+           Bit 0 - rowCreation     - Indicating creation of a row in
+                                     a MIB table.
+           Bit 1 - rowDeletion     - Representing deletion of a row
+                                     in a MIB table.
+           Bit 2 - rowModification - Indicating modification to an
+                                     object in a row in a MIB table.
+
+           Setting all defined bits to 1 will enable the NMS to track
+           all the modification types."
+       SYNTAX  BITS {
+           rowCreation(0),
+           rowDeletion(1),
+           rowModification(2)
+           }
+
+   -- MIB tables registration table
+
+   tmtRegistrationTable OBJECT-TYPE
+       SYNTAX          SEQUENCE OF tmtRegistrationEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A table to register the MIB tables for monitoring
+           various modification types e.g addition of new rows,
+           deletion of rows and modification in objects of existing
+           rows.  The changes in the registered MIB tables'
+           data will be recorded in tmtHistTableModifTable
+           and tmtHistRowModifTable tables. Only the tables that
+           are present in ctmtSupportedTable can be registered.
+
+           If an NMS is interested in row modifications in only a
+           few objects in a particular table, it can do that by
+           specifying those objects in tmtRegExcludeObjTable."
+       ::= { tmtRegistration 1 }
+
+   tmtRegistrationEntry OBJECT-TYPE
+       SYNTAX          TmtRegistrationEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "Information for tracking changes in data of MIB table
+           specified in this entry.
+
+           Deleting an entry in tmtRegistrationTable deletes
+           all corresponding entries in tmtHistTableModifTable
+           and tmtHistRowModifTable tables.
+
+           Entries in this table may not be changed while the
+           corresponding value of tmtRegistrationTrackModifs
+           is 'trackingModifications'."
+
+       INDEX   { tmtRegistrationOwner, tmtRegistrationIndex }
+       ::= { tmtRegistrationTable 1 }
+
+   TmtRegistrationEntry ::=
+       SEQUENCE {
+           tmtRegistrationOwner            SnmpAdminString,
+           tmtRegistrationIndex            Unsigned32,
+           tmtRegistrationModifTypeTracked ModificationType,
+           tmtRegistrationTableID          OBJECT IDENTIFIER,
+           tmtRegistrationContextName      SnmpAdminString,
+           tmtRegistrationCtxtNameWildcard TruthValue,
+           tmtRegistrationMaxRowModifHist  Unsigned32,
+           tmtRegistrationTrackModifs      INTEGER,
+           tmtRegistrationEntryStatus      RowStatus
+       }
+
+   tmtRegistrationOwner OBJECT-TYPE
+       SYNTAX          SnmpAdminString (SIZE(0..32))
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "The owner of this entry.  The exact semantics of this
+           string are subject to the security policy defined by the
+           security administrator.  The value of this variable could
+           be name of the NMS user."
+       ::= { tmtRegistrationEntry 1 }
+
+   tmtRegistrationIndex OBJECT-TYPE
+       SYNTAX          Unsigned32 (1..4294967295)
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "An arbitrary number that uniquely identifies the entries
+           in this table.  To create an entry a management application
+           should pick a random number."
+       ::= { tmtRegistrationEntry 2 }
+
+   tmtRegistrationModifTypeTracked OBJECT-TYPE
+       SYNTAX          ModificationType
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+           "Indicates the type of MIB table data modifications
+           that will be recorded.  Any other type of MIB table
+           data modifications will be ignored e.g. if the NMS
+           has asked to process rowCreation(1) type of modification
+           only, then rowDeletion(2) and rowModification(3) will
+           be ignored.  By default all types of MIB table data
+           modifications are recorded."
+       DEFVAL { { rowCreation, rowDeletion, rowModification } }
+       ::= { tmtRegistrationEntry 3 }
+
+   tmtRegistrationTableID OBJECT-TYPE
+       SYNTAX          OBJECT IDENTIFIER
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+           "The object identifier of the MIB table of interest.
+           The changes in its data will be recorded in
+           tmtHistTableModifTable and tmtHistRowModifTable
+           tables.
+
+           This must be the OID of the table-defining SEQUENCE OF
+           registration point.
+
+           A given tmtRegistrationOwner can register a particular MIB
+           table only once."
+       ::= { tmtRegistrationEntry 4 }
+
+   tmtRegistrationContextName OBJECT-TYPE
+       SYNTAX          SnmpAdminString
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+           "The management context from which to obtain changes in
+           tmtRegistrationTableID.
+
+           This may be wildcarded by leaving characters off the
+           end.  For example use 'Repeater' to wildcard to
+           'Repeater1', 'Repeater2', 'Repeater-999.87b', and so
+           on.  To indicate such wildcarding is intended,
+           tmtRegistrationCtxtNameWildcard must be 'true'.
+
+           Each instance that fills the wildcard is independent of any
+           additional instances, that is, wildcarded objects operate
+           as if there were a separate table entry for each instance
+           that fills the wildcard without having to actually predict
+           all possible instances ahead of time.
+
+           Operation of this feature assumes that the local system has
+           a list of available contexts against which to apply the
+           wildcard.  If the objects are being read from the local
+           system, this is clearly the system's own list of contexts.
+           For a remote system a local version of such a list is not
+           defined by any current standard and may not be available,
+           so this function MAY not be supported."
+       DEFVAL { ''H }
+       ::= { tmtRegistrationEntry 5 }
+
+   tmtRegistrationCtxtNameWildcard OBJECT-TYPE
+       SYNTAX          TruthValue
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+           "Control for whether tmtRegistrationContextName is to
+           be treated as fully-specified or wildcarded, with 'true'
+           indicating wildcard."
+       DEFVAL { false }
+       ::= { tmtRegistrationEntry 6 }
+
+   tmtRegistrationMaxRowModifHist OBJECT-TYPE
+       SYNTAX          Unsigned32 (0..500)
+       UNITS           "entries"
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+           "The upper limit on the number of entries that the
+           tmtHistRowModifTable may contain for modifications in the
+           MIB table represented by this entry.
+
+           A value of 0 will prevent any history from being retained.
+           When the number of entries in tmtHistRowModifTable for a
+           MIB table represented by this entry exceeds this value,
+           the oldest entry will be deleted and a new one will be
+           created."
+       DEFVAL { 1 }
+       ::= { tmtRegistrationEntry 7 }
+
+   tmtRegistrationTrackModifs OBJECT-TYPE
+       SYNTAX          INTEGER {
+           notActive(1),
+           ready(2),
+           start(3),
+           stop(4),
+           trackingModifications(5)
+           }
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+           "The control to start/stop tracking modifications.
+
+           The value is 'notActive' as long as
+           tmtRegistrationEntryStatus is not active.  When
+           tmtRegistrationEntryStatus becomes active this object
+           goes to 'ready'.
+
+           This object can be set to 'start' only when its value is
+           'ready'.  Once it is set to 'start', the MIB begins
+           monitoring modifications for the MIB table represented by
+           this entry and this object goes to 'trackingModifications'.
+
+           This object can be set to 'stop' only when its value is
+           'trackingModifications'.  Once it is set to 'stop', the MIB
+           stops monitoring modifications for the MIB table represented
+           by this entry and this object goes to 'ready'."
+       ::= { tmtRegistrationEntry 8 }
+
+   tmtRegistrationEntryStatus OBJECT-TYPE
+       SYNTAX          RowStatus
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+       "The control that allows creation, modification, and deletion
+       of entries.  For detailed rules see the DESCRIPTION for
+       tmtRegistrationEntry."
+       ::= { tmtRegistrationEntry 9 }
+
+
+   tmtRegExcludeObjTable OBJECT-TYPE
+       SYNTAX          SEQUENCE OF tmtRegExcludeObjEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A table to specify the objects in a registered MIB table,
+           identified in tmtRegistrationTable, that this MIB WILL NOT
+           monitor for modifications.  E.g. if an NMS wants to watch
+           changes in all objects in a MIB table except for a few
+           objects, the NMS can specify those objects in this table
+           indicating this MIB should NOT record changes in these
+           objects.
+
+           The implementation of this MIB may automatically put fast
+           changing MIB objects e.g. Counters in this table so as to
+           avoid a storm of modification records due to fast changing
+           values of these objects. In this case, those entries will
+           be read-only to the NMS."
+       ::= { tmtRegistration 2 }
+
+   tmtRegExcludeObjEntry OBJECT-TYPE
+       SYNTAX          TmtRegExcludeObjEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "Indicates the MIB object the changes in which WILL
+           NOT be recorded by this MIB.
+
+           If for a registered MIB, identified in tmtRegistrationTable,
+           there are no entries in this table, this MIB will record
+           changes in all the objects in that table.
+
+           Entries in this table may not be changed, created or
+           deleted while the corresponding value of
+           tmtRegistrationTrackModifs is 'trackingModifications'."
+       INDEX   { tmtRegistrationOwner, tmtRegistrationIndex,
+                 tmtRegExcludeObjOID }
+       ::= { tmtRegExcludeObjTable 1 }
+
+   TmtRegExcludeObjEntry ::=
+       SEQUENCE {
+           tmtRegExcludeObjOID          OBJECT IDENTIFIER,
+           tmtRegExcludeObjEntryStatus  RowStatus
+       }
+
+   tmtRegExcludeObjOID OBJECT-TYPE
+       SYNTAX          OBJECT IDENTIFIER
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "The object identifier of the MIB object, the changes in
+           which, WILL NOT be recorded by this MIB. Please note that
+           this is an implicit wildcard i.e. by specifying a MIB
+           object here, the changes in all its instances will NOT be
+           recorded by this MIB."
+       ::= { tmtRegExcludeObjEntry 1 }
+
+   tmtRegExcludeObjEntryStatus OBJECT-TYPE
+       SYNTAX          RowStatus
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+           "The control that allows creation, modification, and deletion
+           of entries.  For detailed rules see the DESCRIPTION for
+           tmtRegExcludeObjEntry."
+       ::= { tmtRegExcludeObjEntry 2 }
+
+
+   tmtSupportedMIBTable OBJECT-TYPE
+       SYNTAX          SEQUENCE OF tmtSupportedMIBEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A table to specify the list of MIBs, the modifications
+           in which could be tracked by this MIB. This MIB table
+           is read-only and it is always initialized by the SNMP
+           command responder.
+
+           If a MIB does not exist in this table, no table in that
+           MIB can be registered in the tmtRegistrationTable."
+       ::= { tmtRegistration 3 }
+
+   tmtSupportedMIBEntry OBJECT-TYPE
+       SYNTAX          TmtSupportedMIBEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "Indicates the MIB table the changes in which can be
+           tracked by this MIB."
+       INDEX   { tmtSupportedMIBOID }
+       ::= { tmtSupportedMIBTable 1 }
+
+   TmtSupportedMIBEntry ::=
+       SEQUENCE {
+           tmtSupportedMIBOID          OBJECT IDENTIFIER
+       }
+
+   tmtSupportedMIBOID OBJECT-TYPE
+       SYNTAX          OBJECT IDENTIFIER
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "The object identifier of the supported MIB.  This
+           must be the OID of the MIB-Module-defining
+           MODULE-IDENTITY registration point."
+       ::= { tmtSupportedMIBEntry 1 }
+
+   -- Notification control table
+
+   tmtControlNotificationsTable OBJECT-TYPE
+       SYNTAX          SEQUENCE OF tmtControlNotificationsEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A table to control the notifications sent by this MIB."
+       ::= { tmtControl 1 }
+
+   tmtControlNotificationsEntry OBJECT-TYPE
+       SYNTAX          TmtControlNotificationsEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "Notifications control information for a
+   tmtRegistrationOwner.
+
+           A new entry is automatically created in this table as soon
+           as the first entry is created for a tmtRegistrationOwner
+           in tmtRegistrationTable.
+
+           Deleting all entries in tmtRegistrationTable for a particular
+           tmtRegistrationOwner deletes this entry as well."
+       INDEX   { tmtRegistrationOwner }
+       ::= { tmtControlNotificationsTable 1 }
+
+   TmtControlNotificationsEntry ::=
+       SEQUENCE {
+           tmtControlNotificationsEnabled        TruthValue,
+           tmtControlNotificationsSent           Counter32
+
+       }
+
+   tmtControlNotificationsEnabled OBJECT-TYPE
+       SYNTAX          TruthValue
+       MAX-ACCESS      read-write
+       STATUS          current
+       DESCRIPTION
+           "Indicates whether tmtTableRowModified notifications
+           will or will not be sent when data in a MIB table registered
+           by the tmtRegistrationOwner is modified in the SNMP command
+           responder on the device.  Disabling notifications does
+           not prevent table modified messages from being added to
+           tmtHistTableModifTable and tmtHistRowModifTable tables."
+       DEFVAL { false }
+       ::= { tmtControlNotificationsEntry 1 }
+
+   tmtControlNotificationsSent OBJECT-TYPE
+       SYNTAX          Counter32
+       UNITS           "notifications"
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "The number of tmtTableRowModified notifications for
+           changes in the MIB tables registered by tmtRegistrationOwner
+           that have been sent.  This number may include notifications
+           that were prevented from being transmitted due to reasons
+           such as resource limitations and/or non-connectivity.  If
+           one is receiving notifications, one can periodically poll
+           this object to determine if any notifications were missed.
+           If so, a poll of tmtHistTableModifTable and
+           tmtHistRowModifTable might be
+           appropriate."
+       ::= { tmtControlNotificationsEntry 2 }
+
+
+   -- MIB tables modifications history table
+
+   tmtHistTableModifTable OBJECT-TYPE
+       SYNTAX          SEQUENCE OF tmtHistTableModifEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A table listing the MIB tables from the registered
+           MIB tables in tmtRegistrationTable that had their
+           data modified.
+
+           There will only be one entry per registered MIB table
+           that had a modification in its data.  If a registered MIB
+           table had many modifications, tmtHistTableLastModified
+           of the entry corresponding to that registered table will be
+           updated to the time when the last change occurred.
+
+           This table allows the NMS to find out, in one operation:
+
+           - If data in a given MIB table for an owner has changed.
+           - If so, when did the last change occur.
+           - And, the count of changes that occurred in the table.
+             (Each SNMP Set request, CLI command or an internal process
+             state change that causes modification in MIB table data is
+             counted as one change. Although they may affect multiple
+             rows in a MIB table.)
+
+           Using this info the NMS can choose to:
+
+           - Do nothing if the last change time is older than
+             the time it polled this table last.
+           - Check if the count of changes in the MIB table data
+             is greater than this value at the previous poll plus
+             any modifications done by this NMS.
+
+             If this is false, it indicates there have been no
+             modifications done by other managers. So, the NMS
+             does not have to do anything.
+           - Look into the tmtHistRowModifTable to find the rows
+             that have changed since the last poll and only download
+             the newly modified rows.
+           - Or Download the entire table.
+       ::= { tmtHist 1 }
+
+   tmtHistTableModifEntry OBJECT-TYPE
+       SYNTAX          TmtHistTableModifEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "An entry for a MIB table registered by an owner that
+           had its data modified."
+       INDEX   { tmtRegistrationOwner, tmtRegistrationIndex }
+       ::= { tmtHistTableModifTable 1 }
+
+   TmtHistTableModifEntry ::=
+       SEQUENCE {
+           tmtHistTableModifCount          Counter32,
+           tmtHistTableModifRowMsgsFlushed Counter32,
+           tmtHistTableModifLastModified   TimeStamp
+       }
+
+   tmtHistTableModifCount OBJECT-TYPE
+       SYNTAX          Counter32
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "It represents the number of modifications in the data
+           of the MIB table represented by tmtRegistrationIndex and
+           tmtRegistrationOwner.  A single SNMP Set request, CLI command
+           or an internal process state change that caused change in
+           the MIB data is considered ONE modification.  Although
+           they may affect multiple rows in a MIB table.
+
+           This object can be utilized to determine if the NMS will
+           need to poll the tmtHistRowModifTable to find out if
+           anything has changed.  E.g., if the value of this object
+           is 15 at the previous poll by the NMS.  The NMS then
+           modified the data in the registered MIB table twice.  At
+           the next poll, if the value of this object is greater
+           than 17, then the NMS will know that someone else has
+           also modified the data of this MIB table and it should
+           walk the tmtHistRowModifTable to find out rows that have
+           been modified."
+       ::= { tmtHistTableModifEntry 1 }
+
+   tmtHistTableModifRowMsgsFlushed OBJECT-TYPE
+           SYNTAX          Counter32
+           UNITS           "messages"
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+           "The number of entries that have been removed from the
+           tmtHistRowModifTable for a MIB table represented by
+           tmtRegistrationIndex and tmtRegistrationOwner in order
+           to make room for new entries.
+
+           This object can be utilized to determine whether your
+           polling frequency on tmtHistRowModifTable is fast enough
+           and/or the maximum number of entries allowed in the
+           tmtHistRowModifTable for a MIB table represented by
+           tmtRegistrationIndex and tmtRegistrationOwner is large
+           enough such that you are not missing modification messages."
+       ::= { tmtHistTableModifEntry 2 }
+
+   tmtHistTableModifLastModified OBJECT-TYPE
+       SYNTAX          TimeStamp
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "The time (in thousandth's of a second since the network
+           management portion of the system was last re-initialized)
+           when the last data modification for a MIB table, registered
+           by a particular owner, occurred."
+       ::= { tmtHistTableModifEntry 3 }
+
+
+   -- Row modifications history table
+
+   tmtHistRowModifTable OBJECT-TYPE
+       SYNTAX          SEQUENCE OF tmtHistRowModifEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A table listing the rows that have been modified in a
+           registered MIB table for a particular owner.  The maximum
+           number of entries in this table is controlled by the
+           tmtRegistrationMaxRowModifHist object in the
+           tmtRegistrationTable."
+       ::= { tmtHist 2 }
+
+   tmtHistRowModifEntry OBJECT-TYPE
+       SYNTAX          TmtHistRowModifEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A modification in a row of a registered MIB table.
+
+           If a single SNMP Set request, CLI command or an internal
+           process state change caused modifications in multiple
+           objects of a single row, only one entry will be created
+           here.  But if multiple SNMP Set requests, CLI commands or
+           internal process state changes modify different objects
+           in one row, multiple entries will be created."
+       INDEX   { tmtRegistrationOwner, tmtRegistrationIndex,
+                 tmtHistRowModifIndex }
+       ::= { tmtHistRowModifTable 1 }
+
+   TmtHistRowModifEntry ::=
+       SEQUENCE {
+           tmtHistRowModifIndex          Unsigned32,
+           tmtHistRowModifTimestamp      TimeStamp,
+           tmtHistRowModifType           ModificationType,
+           tmtHistRowModifInstance       OBJECT IDENTIFIER,
+           tmtHistRowModifSource         INTEGER,
+           tmtHistRowModifSrcAddressType InetAddressType,
+           tmtHistRowModifSourceAddress  InetAddress,
+           tmtHistRowModifTerminalUser   SnmpAdminString
+
+       }
+
+   tmtHistRowModifIndex OBJECT-TYPE
+       SYNTAX          Unsigned32 (1..4294967295)
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION             "A monotonically increasing integer for
+   the sole purpose
+           of indexing history entries.  When it reaches the maximum
+           value the agent the value back to 1."
+       ::= { tmtHistRowModifEntry 1 }
+
+   tmtHistRowModifTimestamp OBJECT-TYPE
+       SYNTAX          TimeStamp
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "The The value of sysUpTime when the modification in the
+           row data of a registered MIB table occurred."
+       ::= { tmtHistRowModifEntry 2 }
+
+   tmtHistRowModifType OBJECT-TYPE
+       SYNTAX          ModificationType
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "The type of modification that has occurred in the
+           row data."
+       ::= { tmtHistRowModifEntry 3 }
+
+   tmtHistRowModifInstance OBJECT-TYPE
+       SYNTAX          OBJECT IDENTIFIER
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "This object represents the instance of the row that
+           has been modified.
+
+           For example: if a row with '171.69.0.0' instance
+           in ipRouteTable is added/deleted/modified, this
+           variable will be set to '171.69.0.0'."
+       ::= { tmtHistRowModifEntry 4 }
+
+   tmtHistRowModifSource OBJECT-TYPE
+       SYNTAX          INTEGER {
+           other(1),
+           commandLine(2),
+           snmp(3),
+           internal(4),
+           http(5),
+           xml(6)
+           }
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "The source of the command that directly or indirectly
+           caused the modification in the data of the row of a
+           registered MIB table.
+
+           other(1)       - None of the types specified below."
+
+           commandLine(2) - The ubiquitous Command Line Interface.
+
+           snmp(3)        - The Simple Network Management Protocol
+                            interface.
+
+           internal(4)    - The MIB data is changed because of changes
+                            in the process state e.g., new entries in
+                            ipRouteTable are created due to new routes
+                            learned by the routing process.
+
+           http(5)        - The Hyper Text Transfer Protocol
+                            interface.
+
+           xml(6)        - The eXtensible Markup Language interface."
+
+       ::= { tmtHistRowModifEntry 5 }
+
+   tmtHistRowModifSrcAddressType OBJECT-TYPE
+       SYNTAX          InetAddressType
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "If tmtHistRowModifSource is 'snmp(3)', 'http(5)' or 'xml(6)'
+           this object represents the type of address stored in
+           tmtHistRowModifSourceAddress."
+       ::= { tmtHistRowModifEntry 6 }
+
+   tmtHistRowModifSourceAddress OBJECT-TYPE
+       SYNTAX          InetAddress
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "If tmtHistRowModifSource is 'snmp(3)', 'http(5)' or 'xml(6),
+           the internet address of the NMS that did the modification in
+           the data of the row of a registered MIB table.  If
+           tmtHistRowModifSource is set to 'commandLine(2)', this object
+           represents the internet address of the VTY terminal. The
+   length
+           is zero if not available or not applicable."
+       ::= { tmtHistRowModifEntry 7 }
+
+   tmtHistRowModifTerminalUser OBJECT-TYPE
+       SYNTAX          SnmpAdminString (SIZE(0..64))
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "If tmtHistRowModifSource is 'commandLine(2)', 'snmp(3)' with
+           version 3, 'http(5)' or 'xml(6)' this objects records the
+   name of
+           the user.  The length is zero if not available or not
+   applicable."
+       ::= { tmtHistRowModifEntry 8 }
+
+
+   -- notifications
+
+   tmtMIBNotificationsPrefix OBJECT IDENTIFIER
+               ::= { tableModifTrackingMIB 2 } tmtMIBNotifications
+   OBJECT IDENTIFIER
+               ::= { tmtMIBNotificationsPrefix 0 }
+
+   tmtTableRowModified NOTIFICATION-TYPE
+       OBJECTS {
+           tmtRegistrationTableID,
+           tmtRegistrationContextName,
+           tmtRegistrationCtxtNameWildcard,
+           tmtHistRowModifTimestamp,
+           tmtHistRowModifType,
+           tmtHistRowModifInstance,
+           tmtHistRowModifSource,
+           tmtHistRowModifSrcAddressType,
+           tmtHistRowModifSourceAddress,
+           tmtHistRowModifTerminalUser
+       }
+       STATUS          current
+       DESCRIPTION
+           "This notification is sent when the data in a
+           registered MIB table implemented in the SNMP
+           command responder on the device is modified.
+           This notification can be enabled/disabled by
+           the value set in the tmtControlNotificationsEnabled
+           object."
+       ::= { tmtMIBNotifications 1 }
+
+   -- conformance information
+
+   tmtMIBConformance OBJECT IDENTIFIER
+           ::= { tableModifTrackingMIB 3 } tmtMIBCompliances OBJECT
+   IDENTIFIER
+           ::= { tmtMIBConformance 1 } tmtMIBGroups   OBJECT IDENTIFIER
+           ::= { tmtMIBConformance 2 }
+
+
+   -- compliance statements
+
+   tmtMIBCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+           "The compliance statement for entities which implement
+           the Cisco Table Modification Tracking MIB."
+       MODULE  -- this module
+           MANDATORY-GROUPS {
+               tmtRegistrationGroup,
+               tmtHistoryGroup
+           }
+
+           GROUP tmtControlGroup
+           DESCRIPTION
+               "This group is required only for entities that
+               support configuration of the notification targets
+               and enabling/disabling of notifications generation."
+
+           GROUP tmtNotificationsGroup
+           DESCRIPTION
+               "This group is required only for entities that
+               support generation of tmtTableRowModified
+               notifications."
+       ::= { tmtMIBCompliances 1 }
+
+   -- units of conformance
+
+   tmtRegistrationGroup OBJECT-GROUP
+       OBJECTS {
+           -- MIB table registration objects
+           tmtRegistrationModifTypeTracked,
+           tmtRegistrationTableID,
+           tmtRegistrationContextName,
+           tmtRegistrationCtxtNameWildcard,
+           tmtRegistrationMaxRowModifHist,
+           tmtRegistrationTrackModifs,
+           tmtRegistrationEntryStatus,
+           -- Supported MIB objects
+           tmtSupportedMIBOID,
+           -- MIB objects registration objects
+           tmtRegExcludeObjEntryStatus
+       }
+       STATUS          current
+       DESCRIPTION
+           "A collection of objects providing the table
+           and MIB objects registration capability."
+       ::= { tmtMIBGroups 1 }
+
+   tmtControlGroup OBJECT-GROUP
+       OBJECTS {
+           tmtControlNotificationsEnabled,
+           tmtControlNotificationsSent
+       }
+       STATUS          current
+       DESCRIPTION
+           "A collection of objects providing the control
+           (enable/disable) of Table Modification Tracking
+           MIB notifications."
+       ::= { tmtMIBGroups 2 }
+
+   tmtHistoryGroup OBJECT-GROUP
+       OBJECTS {
+           -- Table modification history objects
+           tmtHistTableModifCount,
+           tmtHistTableModifRowMsgsFlushed,
+           tmtHistTableModifLastModified,
+           -- Row modification history objects
+           tmtHistRowModifTimestamp,
+           tmtHistRowModifType,
+           tmtHistRowModifInstance,
+           tmtHistRowModifSource,
+           tmtHistRowModifSrcAddressType,
+           tmtHistRowModifSourceAddress,
+           tmtHistRowModifTerminalUser
+       }
+       STATUS          current
+       DESCRIPTION
+           "A collection of objects keeping the history
+           of changes in the data of a MIB table."
+       ::= { tmtMIBGroups 3 }
+
+   tmtNotificationsGroup NOTIFICATION-GROUP
+       NOTIFICATIONS { tmtTableRowModified }
+       STATUS          current
+       DESCRIPTION
+           "The notification generated by the Table
+           Modification Tracking MIB."
+       ::= { tmtMIBGroups 4 }
+
+   END
+
+-- 
+--    Copyright (C) The Internet Society (2002).  All Rights Reserved.
+-- 
+--    This document and translations of it may be copied and furnished to
+--    others, and derivative works that comment on or otherwise explain it
+--    or assist in its implementation may be prepared, copied, published
+--    and distributed, in whole or in part, without restriction of any
+--    kind, provided that the above copyright notice and this paragraph are
+--    included on all such copies and derivative works.  However, this
+--    document itself may not be modified in any way, such as by removing
+--    the copyright notice or references to the Internet Society or other
+--    Internet organizations, except as needed for the purpose of
+--    developing Internet standards in which case the procedures for
+--    copyrights defined in the Internet Standards process must be
+--    followed, or as required to translate it into languages other than
+--    English.
+-- 
+--    The limited permissions granted above are perpetual and will not be
+--    revoked by the Internet Society or its successors or assigns.
+-- 
+--    This document and the information contained herein is provided on an
+--    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+--    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+--    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+--    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+

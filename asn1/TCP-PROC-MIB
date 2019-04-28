@@ -1,0 +1,547 @@
+-- extracted from draft-persson-v6ops-mib-issue-01.txt
+-- at Thu Nov  9 06:07:30 2006
+
+TCP-PROC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
+    Gauge32, Counter32, Counter64, IpAddress, mib-2, TimeTicks
+                                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+    InetAddress, InetAddressType,
+    InetPortNumber                     FROM INET-ADDRESS-MIB
+    tcpConnectionEntry, tcpListenerEntry
+                                                   FROM TCP-MIB;
+
+tcpProcMIB MODULE-IDENTITY
+    LAST-UPDATED      "200610010000Z"
+    ORGANIZATION        "IETF IPv6 Working Group"
+    CONTACT-INFO
+        "Alain Durand
+        Comcast Cable
+        1500 Market st
+        Philadelphia
+        PA 19102 USA
+        Email: alain_durand@cable.comcast.com
+
+        Anders Persson
+        SUN Microsystems inc.
+        17 Network Circle
+        Menlo Park
+        CA 94025 USA
+        Email: anders.persson@sun.com
+
+        Paul Schauer
+        Comcast Cable
+        183 Inverness Dr West
+        Englewood
+        CO 80112 USA
+        Email: paul_schauer@cable.comcast.com
+
+        David Thaler
+        Microsoft
+        One Microsoft Way
+        Redmond
+        WA 98052 USA
+        Email: dthaler@microsoft.com"
+
+    DESCRIPTION
+           "Test branch for proposed TCP connection process information
+            tables"
+
+    REVISION    "200610010000Z"
+    DESCRIPTION
+        "Initial version"
+
+    ::= { mib-2 990 }
+
+tcpProc      OBJECT IDENTIFIER ::= { mib-2 992 }
+
+--
+-- The proposed new TCP Connection Information table
+--
+
+tcpConnectionInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TcpConnectionInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A table containing additional information about existing TCP
+            connections. This table augments the existing
+            tcpConnectionTable by providing information for the process
+            that created the connection on the listed address/port,
+            not just the process currently associated with the
+            connection. This aids identifying processes sharing
+            connections on the same port."
+
+    ::= { tcpProc 1 }
+
+tcpConnectionInfoEntry OBJECT-TYPE
+    SYNTAX     TcpConnectionInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A conceptual row of the tcpConnectionInfoTable containing
+            information about a particular current TCP connection.
+            The addition of the tcpConnectionInfoCreatorPID and
+            tcpConnectionInfoProcessCreateTime data provides an operator
+            an explicit way to relate network connections with
+            running processes."
+    AUGMENTS { tcpConnectionEntry }
+
+    ::= { tcpConnectionInfoTable 1 }
+
+TcpConnectionInfoEntry ::= SEQUENCE {
+        tcpConnectionInfoCreatorPID         Unsigned32,
+        tcpConnectionInfoProcessCreateTime  TimeTicks
+    }
+
+tcpConnectionInfoCreatorPID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The system's process ID for the process that created
+            this connection, even if this process no longer exists
+            or is no longer associated with this connection."
+
+    ::= { tcpConnectionInfoEntry 1 }
+
+tcpConnectionInfoProcessCreateTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "This field provides the time the process created the
+            connection on this port."
+
+    ::= { tcpConnectionInfoEntry 2 }
+
+--
+-- The proposed new TCP Connection Process table
+--
+
+tcpConnectionProcTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TcpConnectionProcEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A table containing additional information about existing TCP
+            connections. This table delivers functionality
+            beyond the existing tcpConnectionTable
+            by providing an entry for each process that is associated
+            with the connection for operating systems that support this
+            functionality. An entry in the tcpConnectionTable implies
+            the existance of one or more entries in this table for the
+            connection, and vice-versa."
+    ::= { tcpProc 2 }
+
+tcpConnectionProcEntry OBJECT-TYPE
+    SYNTAX     TcpConnectionProcEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A conceptual row of the tcpConnectionProcTable containing
+            information about a particular current TCP connection.
+            Each row of this table is transient in that it ceases to
+            exist when (or soon after) the parent connection that
+            created the connection exits."
+    INDEX   { tcpConnectionProcLocalAddressType,
+              tcpConnectionProcLocalAddress,
+              tcpConnectionProcLocalPort,
+              tcpConnectionProcRemAddressType,
+              tcpConnectionProcRemAddress,
+              tcpConnectionProcRemPort,
+              tcpConnectionProcPID }
+    ::= { tcpConnectionProcTable 1 }
+
+TcpConnectionProcEntry ::= SEQUENCE {
+        tcpConnectionProcLocalAddressType   InetAddressType,
+        tcpConnectionProcLocalAddress       InetAddress,
+        tcpConnectionProcLocalPort          InetPortNumber,
+        tcpConnectionProcRemAddressType     InetAddressType,
+        tcpConnectionProcRemAddress         InetAddress,
+        tcpConnectionProcRemPort            InetPortNumber,
+        tcpConnectionProcPID                Unsigned32
+    }
+
+tcpConnectionProcLocalAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The address type of tcpConnectionProcLocalAddress."
+    ::= { tcpConnectionProcEntry 1 }
+
+tcpConnectionProcLocalAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The local IP address for this TCP connection.  The type
+            of this address is determined by the value of
+            tcpConnectionProcLocalAddressType.
+            As this object is used in the index for the
+            tcpConnectionProcTable, implementors should be
+            careful not to create entries that would result in OIDs
+            with more than 128 subidentifiers; otherwise the information
+            cannot be accessed by using SNMPv1, SNMPv2c, or SNMPv3."
+    ::= { tcpConnectionProcEntry 2 }
+
+tcpConnectionProcLocalPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The local port number for this TCP connection."
+    ::= { tcpConnectionProcEntry 3 }
+
+tcpConnectionProcRemAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The address type of tcpConnectionProcRemAddress."
+    ::= { tcpConnectionProcEntry 4 }
+
+tcpConnectionProcRemAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The remote IP address for this TCP connection.  The type
+            of this address is determined by the value of
+            tcpConnectionInfoRemAddressType.
+
+            As this object is used in the index for the
+            tcpConnectionProcTable, implementors should be
+            careful not to create entries that would result in OIDs
+            with more than 128 subidentifiers; otherwise the information
+            cannot be accessed by using SNMPv1, SNMPv2c, or SNMPv3."
+    ::= { tcpConnectionProcEntry 5 }
+
+tcpConnectionProcRemPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The remote port number for this TCP connection."
+    ::= { tcpConnectionProcEntry 6 }
+
+
+tcpConnectionProcPID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The system's process ID for the process sharing
+            this connection. This process corresponds to a row
+            in HOST-RESOURCES-MIB::hrSWRunIndex and
+            SYSAPPL-MIB::sysApplElmRunIndex for operating systems
+            that support this functionality and the corresponding MIBs."
+
+    ::= { tcpConnectionProcEntry 8 }
+
+-- The TCP Listener Information table
+
+tcpListenerInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TcpListenerInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A table containing additional information about existing TCP
+            listeners. This table augments the existing tcpListenerTable
+            by providing information for the process that created the
+            listener on the listed address/port, not just the
+            process currently associated with the listener. This
+            aids identifying multiple processes listening on the
+            same port."
+    ::= { tcpProc 3 }
+
+tcpListenerInfoEntry OBJECT-TYPE
+    SYNTAX     TcpListenerInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A conceptual row of the tcpListenerProcTable containing
+            information about a particular TCP listener."
+    AUGMENTS { tcpListenerEntry }
+
+    ::= { tcpListenerInfoTable 1 }
+
+TcpListenerInfoEntry ::= SEQUENCE {
+        tcpListenerInfoCreatorPID             Unsigned32,
+        tcpListenerInfoProcessCreateTime      TimeTicks
+    }
+
+tcpListenerInfoCreatorPID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The system's process ID for the process that created
+            this listener, even if this process no longer exists
+            or is no longer associated with this connection."
+    ::= { tcpListenerInfoEntry 1 }
+
+tcpListenerInfoProcessCreateTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "This field provides the time the process started
+            listening on this port."
+    ::= { tcpListenerInfoEntry 2 }
+
+-- The TCP Listener Process table
+
+tcpListenerProcTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TcpListenerProcEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A table containing additional information about existing
+            TCP listeners. This table delivers functionality beyond
+            the existing tcpListenerTable by providing an entry
+            for each process that is associated with the listener
+            for operating systems that support this functionality.
+            An entry in the tcpListenerTable implies the existance of
+            one or more entries in this table for the listener, and
+            vice-versa.  A listening application can be represented
+            in three possible ways:
+
+            1. An application that is willing to accept both IPv4 and
+               IPv6 datagrams is represented by
+               a tcpListenerProcLocalAddressType of unknown (0) and
+               a tcpListenerProcLocalAddress of ''h (a zero-length
+               octet-string).
+
+            2. An application that is willing to accept only IPv4 or
+               IPv6 datagrams is represented by a
+               tcpListenerProcLocalAddressType of the appropriate
+               address type and a tcpListenerProcLocalAddress of
+               '0.0.0.0' or '::' respectively.
+
+            3. An application that is listening for data destined
+               only to a specific IP address, but from any remote
+               system, is represented by a
+               tcpListenerProcLocalAddressType of an appropriate
+               address type, with tcpListenerProcLocalAddress
+               as the specific local address.
+
+            NOTE: The address type in this table represents the
+            address type used for the communication, irrespective
+            of the higher-layer abstraction.  For example, an
+            application using IPv6 'sockets' to communicate via
+            IPv4 between ::ffff:10.0.0.1 and ::ffff:10.0.0.2 would
+            use InetAddressType ipv4(1))."
+    ::= { tcpProc 4 }
+
+tcpListenerProcEntry OBJECT-TYPE
+    SYNTAX     TcpListenerProcEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A conceptual row of the tcpListenerProcTable containing
+            information about a particular TCP listener."
+    INDEX   { tcpListenerProcLocalAddressType,
+              tcpListenerProcLocalAddress,
+              tcpListenerProcLocalPort,
+              tcpListenerProcPID }
+    ::= { tcpListenerProcTable 1 }
+
+TcpListenerProcEntry ::= SEQUENCE {
+        tcpListenerProcLocalAddressType       InetAddressType,
+        tcpListenerProcLocalAddress           InetAddress,
+        tcpListenerProcLocalPort              InetPortNumber,
+        tcpListenerProcPID                    Unsigned32
+    }
+
+tcpListenerProcLocalAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The address type of tcpListenerProcLocalAddress.  The value
+            should be unknown (0) if connection initiations to all
+            local IP addresses are accepted."
+    ::= { tcpListenerProcEntry 1 }
+
+tcpListenerProcLocalAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The local IP address for this TCP connection.
+            The value of this object can be represented in three
+            possible ways, depending on the characteristics of the
+            listening application:
+
+            1. For an application willing to accept both IPv4 and
+               IPv6 datagrams, the value of this object must be
+               ''h (a zero-length octet-string), with the value
+               of the corresponding tcpListenerProcLocalAddressType
+               object being unknown (0).
+
+            2. For an application willing to accept only IPv4 or
+               IPv6 datagrams, the value of this object must be
+               '0.0.0.0' or '::' respectively, with
+               tcpListenerProcLocalAddressType representing the
+               appropriate address type.
+
+            3. For an application which is listening for data
+               destined only to a specific IP address, the value
+               of this object is the specific local address, with
+               tcpListenerProcLocalAddressType representing the
+               appropriate address type.
+
+            As this object is used in the index for the
+            tcpListenerProcTable, implementors should be
+            careful not to create entries that would result in OIDs
+            with more than 128 subidentifiers; otherwise the information
+            cannot be accessed, using SNMPv1, SNMPv2c, or SNMPv3."
+    ::= { tcpListenerProcEntry 2 }
+
+tcpListenerProcLocalPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The local port number for this TCP connection."
+    ::= { tcpListenerProcEntry 3 }
+
+tcpListenerProcPID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The system's process ID for the process associated with
+            this listener."
+    ::= { tcpListenerProcEntry 4 }
+
+-- compliance statements
+tcpProcMIBConformance OBJECT IDENTIFIER ::= { tcpProcMIB 1 }
+
+tcpProcMIBCompliances OBJECT IDENTIFIER ::= { tcpProcMIBConformance 1 }
+tcpProcMIBGroup       OBJECT IDENTIFIER ::= { tcpProcMIBConformance 2 }
+
+tcpProcMIBConnectionCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+            "The compliance statement for systems that implement the
+             TCP process MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { tcpProcInfoGroup }
+    GROUP  tcpProcProcessGroup
+    DESCRIPTION
+           "This group should be implemented for operating systems that
+            support multiple processes sharing a single connection. It
+            is left as optional to accommodate operating systems that do
+            not provide sufficient information to express this data."
+
+    ::= { tcpProcMIBCompliances 1 }
+
+tcpProcMIBListenerCompliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+           "The compliance statement for systems that implement the
+            TCP process MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { tcpProcListenerInfoGroup }
+    GROUP  tcpProcListenerProcessGroup
+    DESCRIPTION
+           "This group should be implemented for operating systems that
+            support multiple processes sharing a single listener. It is
+            left as optional to accommodate operating systems that do
+            not provide sufficient information to express this data."
+
+    ::= { tcpProcMIBCompliances 2 }
+
+-- units of conformance
+
+tcpProcInfoGroup OBJECT-GROUP
+    OBJECTS     { tcpConnectionInfoCreatorPID,
+                  tcpConnectionInfoProcessCreateTime }
+    STATUS      current
+    DESCRIPTION
+           "The tcpProcInfoGroup providing basic information about
+            processes associated with a specific connection"
+
+    ::= { tcpProcMIBGroups 1 }
+
+tcpProcProcessGroup OBJECT-GROUP
+    OBJECTS     { tcpConnectionProcPID }
+    STATUS      current
+    DESCRIPTION
+           "The tcpProcProcessGroup providing specific process
+            information about processes associated with a specific
+            connection."
+    ::= { tcpProcMIBGroups 2 }
+
+tcpProcListenerInfoGroup OBJECT-GROUP
+    OBJECTS { tcpListenerInfoCreatorPID,
+              tcpListenerInfoProcessCreateTime }
+    STATUS      current
+    DESCRIPTION
+           "The tcpProcListenerInfoGroup providing basic information
+            about processes associated with a specific listener."
+
+    ::= { tcpProcMIBGroups 3 }
+
+tcpProcListenerProcessGroup OBJECT-GROUP
+    OBJECTS { tcpListenerProcPID }
+    STATUS      current
+    DESCRIPTION
+            "The tcpProcListenerProcessGroup providing specific process
+             information about processes associated with a specific
+             listener."
+
+    ::= { tcpProcMIBGroups 4 }
+END
+
+-- 
+--    Copyright (C) The Internet Society (2006).
+-- 
+--    This document is subject to the rights, licenses and restrictions
+--    contained in BCP 78, and except as set forth therein, the authors
+--    retain all their rights.
+-- 
+--    This document and the information contained herein are provided on an
+--    "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+--    OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+--    ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+--    INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+--    INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+--    WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- 
+-- 
+-- Intellectual Property
+-- 
+--    The IETF takes no position regarding the validity or scope of any
+--    Intellectual Property Rights or other rights that might be claimed to
+--    pertain to the implementation or use of the technology described in
+--    this document or the extent to which any license under such rights
+--    might or might not be available; nor does it represent that it has
+--    made any independent effort to identify any such rights.  Information
+--    on the procedures with respect to rights in RFC documents can be
+--    found in BCP 78 and BCP 79.
+-- 
+--    Copies of IPR disclosures made to the IETF Secretariat and any
+--    assurances of licenses to be made available, or the result of an
+--    attempt made to obtain a general license or permission for the use of
+--    such proprietary rights by implementers or users of this
+--    specification can be obtained from the IETF on-line IPR repository at
+--    http://www.ietf.org/ipr.
+-- 
+--    The IETF invites any interested party to bring to its attention any
+--    copyrights, patents or patent applications, or other proprietary
+--    rights that may cover technology that may be required to implement
+--    this standard.  Please address the information to the IETF at
+--    ietf-ipr@ietf.org.
+-- 
+-- 
+-- Acknowledgment
+-- 
+--    Funding for the RFC Editor function is provided by the IETF
+--    Administrative Support Activity (IASA).
+

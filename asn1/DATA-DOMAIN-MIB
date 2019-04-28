@@ -1,0 +1,2155 @@
+-- **********************************************************************
+--
+-- Copyright 2004, 2005 Data Domain, Inc.
+-- All Rights Reserved.
+--
+-- Management Information Base for Data Domain Products
+-- 
+-- Data Domain enterprise number is 19746
+--
+-- The ASN.1 prefix to, and including the Data Domain, Inc.  Enterprise is
+--      1.3.6.1.4.1.19746
+--
+-- **********************************************************************
+
+DATA-DOMAIN-MIB DEFINITIONS ::=	BEGIN
+
+    IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+	    FROM SNMPv2-SMI
+	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+	    FROM SNMPv2-CONF
+	Counter32, Counter64
+	    FROM SNMPv2-SMI
+        enterprises
+	    FROM RFC1155-SMI
+        DisplayString
+	    FROM RFC1213-MIB;
+
+    dataDomainMib MODULE-IDENTITY
+	LAST-UPDATED "200501270000Z"  -- 27 January, 2005
+	ORGANIZATION "Data Domain, Inc"
+	CONTACT-INFO
+	    "Phone: +1-650-565-7300 
+	     Fax:   +1-650-424-1057"
+	DESCRIPTION
+	    "This MIB is used for managing the suite of Data Domain Products."
+	::= { enterprises 19746 }
+
+    dataDomainMibConformance	OBJECT IDENTIFIER ::= { dataDomainMib 0 }
+
+    dataDomainMibObjects	OBJECT IDENTIFIER ::= { dataDomainMib 1 }
+
+    environmentals		OBJECT IDENTIFIER ::= { dataDomainMibObjects 1 }
+
+    nvram			OBJECT IDENTIFIER ::= { dataDomainMibObjects 2 }
+
+    fileSystem			OBJECT IDENTIFIER ::= { dataDomainMibObjects 3 }
+
+    alerts			OBJECT IDENTIFIER ::= { dataDomainMibObjects 4 }
+
+    statistics			OBJECT IDENTIFIER ::= { dataDomainMibObjects 5 }
+
+    diskStorage			OBJECT IDENTIFIER ::= { dataDomainMibObjects 6 }
+
+    raid			OBJECT IDENTIFIER ::= { dataDomainMibObjects 7 }
+
+    replication			OBJECT IDENTIFIER ::= { dataDomainMibObjects 8 }
+
+    dataDomainMibNotifications	OBJECT IDENTIFIER ::= { dataDomainMib 2 }
+
+    products  			OBJECT IDENTIFIER ::= { dataDomainMib 3 }
+    
+    restorer            	OBJECT IDENTIFIER ::= { products 1 }
+
+    dd200			OBJECT IDENTIFIER ::= { restorer 1 }
+
+    dd200Proto  	OBJECT IDENTIFIER ::= { restorer 2 }
+
+    dd410			OBJECT IDENTIFIER ::= { restorer 3 }
+
+    dd430			OBJECT IDENTIFIER ::= { restorer 4 }
+
+    dd460			OBJECT IDENTIFIER ::= { restorer 5 }
+
+    dd400g			OBJECT IDENTIFIER ::= { restorer 6 }
+
+    dd460g          OBJECT IDENTIFIER ::= { restorer 7 }
+
+    dd560           OBJECT IDENTIFIER ::= { restorer 8 }
+
+    dd560g          OBJECT IDENTIFIER ::= { restorer 9 }
+
+    dd580           OBJECT IDENTIFIER ::= { restorer 10 }
+
+    dd580g          OBJECT IDENTIFIER ::= { restorer 11 }
+
+    dd565           OBJECT IDENTIFIER ::= { restorer 12 }
+
+    dd530           OBJECT IDENTIFIER ::= { restorer 13 }
+
+    dd510           OBJECT IDENTIFIER ::= { restorer 14 }
+
+    dd120           OBJECT IDENTIFIER ::= { restorer 15 }
+
+    dd590           OBJECT IDENTIFIER ::= { restorer 16 }
+
+    dd590g          OBJECT IDENTIFIER ::= { restorer 17 }
+
+    ddModelUnsupported          OBJECT IDENTIFIER ::= { restorer 9999 }
+
+    -- Generic Type definitions.
+
+    EnclosureID		::= INTEGER
+					-- unique Enclosure ID, used as index in several tables 
+
+    Temperature			::= INTEGER
+					-- Temperature value in Celsius
+
+    Minutes			::= INTEGER
+					-- Minutes
+
+    Percentage			::= INTEGER(0..100)
+					--Percentage
+
+    KBytesPerSecond		::= Counter32
+					-- Number of KBytes transferred per second 
+
+    OpsPerSecond		::= Counter32
+					-- Number of Operations performed per second
+
+    ErrorCount			::= Counter32
+					--Number of Errors Encountered
+
+    -- Specific Type definitions.
+
+    PowerModuleIndex		::= INTEGER
+					-- Number of Power Module present in the DDR 
+
+    PowerModuleStatus		::= INTEGER { 
+					ok		(1),
+					unknown		(2),
+					fail		(3)
+				    } -- Current Power Module Status
+
+    TempSensorIndex		::= INTEGER
+					-- Number of Temperature Sensor present in the DDR 
+
+    TempSensorDescription	::= DisplayString (SIZE (0..64))	
+					-- Temperature Sensor Description
+
+    TempSensorStatus		::= INTEGER { 
+					absent		(0),
+					ok			(1),
+					notfound	(2)
+				    } -- Current Temperature Sensor Status
+
+    FanIndex			::= INTEGER
+					-- Fan Number of fan that is present in DDR 
+
+    FanDescription		::= DisplayString (SIZE (0..64))	
+					-- Fan Description
+
+    FanLevel			::= INTEGER { 
+					unknown	(0), 
+					low		(1),
+					normal		(2),
+					high		(3)
+				    } -- Current Fan level
+
+    FanStatus			::= INTEGER { 
+					notfound	(0), 
+					ok		(1),
+					fail		(2)
+				    } -- Current Fan Status
+
+    NvramMemorySize		::= INTEGER
+					-- Memory Size of NVRAM in megabytes.
+
+    NvramWindowSize		::= INTEGER
+					-- Window Size of NVRAM in megabytes.
+
+    NvramBytesTransferred	::= INTEGER
+					-- Number of bytes read/written from/to NVRAM
+
+    NvramBatteryIndex		::= INTEGER
+					-- Number of NVRAM Battery present in the DDR 
+
+    NvramBatteryStatus		::= INTEGER { 
+					ok		(1),
+					disabled	(2), 
+					discharged	(3),
+					unknown		(4),
+					softdisabled (5)
+				    } -- Current NVRAM Battery Status
+
+    DiskIndex			::= INTEGER
+					-- Disk Number of disk that is present in the DDR 
+
+    DiskModel			::= DisplayString (SIZE (0..64))	
+					-- Manufacture & Model Number of disk 
+
+    DiskFirmwareVersion		::= DisplayString (SIZE (0..64))	
+					-- Firmware version of disk 
+
+    DiskSerialNumber		::= DisplayString (SIZE (0..64))	
+					-- Serial Number of disk 
+
+    DiskCapacity		::= DisplayString (SIZE (0..20))	
+					-- Capacity of disk 
+							
+    DiskState			::= INTEGER { 
+					ok		(1),
+					unknown		(2),
+					absent		(3), 
+					failed		(4)
+				    } -- Current Disk State
+    DiskSectorsPerSecond	::= Counter32
+					-- Number of disk sectors being transferred per second
+
+    FileSystemStatus		::= INTEGER {
+					enabled		(1),
+					disabled	(2),
+					running		(3),
+					unknown		(4) 
+				    } -- Current File System Status
+
+    FileSystemResourceIndex	::= INTEGER
+					-- Resource Number of file system resource
+
+    FileSystemResourceName      ::= DisplayString (SIZE (0..64))
+					--File System resource name
+
+    FileSystemSpaceUnit		::= Counter32
+					-- Units of space in the file System represented in Gigabytes		
+
+    AlertIndex			::= INTEGER
+					-- Alert Row Index 
+
+    AlertTimestamp		::= DisplayString (SIZE (0..64))
+					-- Alert Timestamp
+
+    AlertDescription		::= DisplayString (SIZE (0..255))
+					-- Alert Description
+    
+    SystemStatsIndex		::= INTEGER
+					-- Statistics Row Index 
+
+    RaidDiskState		::= INTEGER {
+					inuse		(1),
+					notinuse	(2),
+					spare		(3),
+					absent		(4),
+					failed		(5),
+					unknown		(6)
+				    } -- Raid Disk State
+
+    RaidDiskStatus		::= INTEGER {
+					ok		(1),
+					reconstructing	(2),
+					resynching	(3),
+					unknown		(4)
+				    } -- Raid Disk Status
+
+    RaidDiskGroup		::= DisplayString (SIZE (0..64))	
+					-- Name of Raid Disk Group 
+
+    ReplicationState		::= INTEGER {
+					enabled		(1),
+					disabled	(2),
+					disabledNeedsResync	(3) 
+				    } -- Current Replication status
+
+    ReplicationStatus		::= INTEGER {
+					connected		(1),
+					disconnected	(2), 
+					migrating		(3), 
+					suspended		(4), 
+					neverConnected	(5)
+				    } -- Current Replication connection status
+
+    ReplicationConnectTime		::= INTEGER
+					-- timestamp when connection was established, or 0 if ReplicationStatus is not 1
+
+    ReplicationPath		::= DisplayString (SIZE (0..254))	
+					-- source or destination path for replication 
+
+    ReplicationLag			::= INTEGER
+					-- current replication lag in seconds, or -1 if unknown
+
+    ReplicationTraffic		::= INTEGER
+					-- measurement of bytes being replicated 
+
+    ReplicationThrottle		::= INTEGER
+					-- measurement of replication throttle in bps 
+
+	ReplicationSyncedTime	::= INTEGER
+					-- timestamp when replication source and destination were in sync, or 0 if unknown
+					
+	ReplicationContext	::= INTEGER
+					-- 0 for collection replication contexts, > 0 for directory replication contexts
+					
+-- **********************************************************************
+--
+-- DataDomainMibCompliance 
+-- =======================
+--
+-- dataDomainMib			(1.3.6.1.4.1.19746)
+--   dataDomainMibConformance		(1.3.6.1.4.1.19746.0)
+--	dataDomainMibComplicances	(1.3.6.1.4.1.19746.0.1)
+--	    dataDoamainMibCompliance	(1.3.6.1.4.1.19746.0.1.1)
+--
+-- **********************************************************************
+
+    dataDomainMibCompliances	OBJECT IDENTIFIER ::= { dataDomainMibConformance 1 }
+
+    dataDomainMibCompliance MODULE-COMPLIANCE
+	STATUS  current
+	DESCRIPTION
+	    "The compliance statement for SNMP entities which
+	    implement this MIB module."
+	MODULE  -- this module
+	    MANDATORY-GROUPS { environmentalsGroup, nvramGroup, fileSystemGroup, alertsGroup, statisticsGroup, raidGroup,
+			       replGroup, basicNotificationsGroup }
+
+	    GROUP   internalDiskStorageGroup
+	    DESCRIPTION
+		"This group is mandatory for SNMP entities which
+		support internal disk storage"
+
+	    GROUP   internalDiskStorageNotificationsGroup   
+	    DESCRIPTION
+		"This group is mandatory for SNMP entities which
+		support internal disk storage"
+
+	    GROUP   externalUnmanagedDiskStorageGroup
+	    DESCRIPTION
+		"This group is mandatory for SNMP entities which
+		support external unmanaged disk storage"
+
+    ::= { dataDomainMibCompliances 1 }
+
+-- **********************************************************************
+--
+-- DataDomainMibCompliance 
+-- =======================
+--
+-- dataDomainMib			(1.3.6.1.4.1.19746)
+--   dataDomainMibConformance		(1.3.6.1.4.1.19746.0)
+--	dataDoamainMibGroups		(1.3.6.1.4.1.19746.0.2)
+--
+-- **********************************************************************
+
+    dataDomainMibGroups		OBJECT IDENTIFIER ::= { dataDomainMibConformance 2 }
+
+    environmentalsGroup OBJECT-GROUP
+	OBJECTS {
+		powerEnclosureID,
+		powerModuleIndex,
+	    powerModuleStatus,
+	    tempEnclosureID,
+	    tempSensorIndex,
+	    tempSensorDescription,
+	    tempSensorCurrentValue,
+	    tempSensorStatus,
+	    fanEnclosureID,
+	    fanIndex,
+	    fanDescription,
+	    fanLevel,
+	    fanStatus
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing environmental monitoring information."
+	::= { dataDomainMibGroups 1 }
+
+    nvramGroup OBJECT-GROUP
+	OBJECTS {
+	    nvramMemorySize,
+	    nvramWindowSize,
+	    nvramPCIErrorCount,
+	    nvramMemoryErrorCount,
+	    nvramBatteryIndex,
+	    nvramBatteryStatus,
+	    nvramBatteryCharge 
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing nvram monitoring information."
+	::= { dataDomainMibGroups 2 }
+
+    fileSystemGroup OBJECT-GROUP
+	OBJECTS {
+	    fileSystemStatus,
+	    fileSystemVirtualSpace,
+	    fileSystemResourceIndex,
+	    fileSystemResourceName,
+	    fileSystemSpaceSize,
+	    fileSystemSpaceUsed,
+	    fileSystemSpaceAvail,
+	    fileSystemPercentUsed
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing file system monitoring information."
+	::= { dataDomainMibGroups 3 }
+
+    alertsGroup OBJECT-GROUP
+	OBJECTS {
+	    currentAlertIndex,
+	    currentAlertTimestamp,
+	    currentAlertDescription
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing alert monitoring information."
+	::= { dataDomainMibGroups 4 }
+
+    statisticsGroup OBJECT-GROUP
+	OBJECTS {
+	    systemStatsIndex,
+	    cpu0PercentageBusy,
+	    cpu1PercentageBusy,
+	    nfsOpsPerSecond,
+	    nfsIdlePercentage,
+	    nfsProcPercentage,
+	    nfsSendPercentage,
+	    nfsReceivePercentage,
+	    cifsOpsPerSecond,
+	    diskReadKBytesPerSecond,
+	    diskWriteKBytesPerSecond,
+	    diskBusyPercentage,
+	    nvramReadKBytesPerSecond,
+	    nvramWriteKBytesPerSecond,
+	    replInKBytesPerSecond,
+	    replOutKBytesPerSecond
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing statistics information."
+	::= { dataDomainMibGroups 5 }
+
+    raidGroup OBJECT-GROUP
+	OBJECTS {
+	    raidDiskEnclosureID,
+	    raidDiskIndex,
+	    raidDiskState,
+	    raidDiskGroup, 
+	    raidDiskStatus,
+	    raidDiskReconPercentage,	 
+	    raidDiskReconMinutes,
+	    raidDiskResynchPercentage,
+	    raidDiskResynchMinutes
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing raid monitoring information."
+	::= { dataDomainMibGroups 6 }
+
+    internalDiskStorageGroup OBJECT-GROUP
+	OBJECTS {
+	    diskPropEnclosureID,
+	    diskPropIndex,
+	    diskModel,
+	    diskFirmwareVersion,
+	    diskSerialNumber,
+	    diskCapacity,
+	    diskPropState,
+	    diskPerfEnclosureID,
+	    diskPerfIndex,
+	    diskSectorsRead,
+	    diskSectorsWritten,
+	    diskTotalKBytes,
+	    diskBusy,
+	    diskPerfState,
+	    diskErrEnclosureID,
+	    diskErrIndex,
+	    diskTemperature,
+	    diskTimeoutCount,
+	    diskReadFailCount,
+	    diskWriteFailCount,
+	    diskMiscFailCount,
+	    diskOffTrackErrCount,
+	    diskSoftEccCount,
+	    diskCrcErrCount,
+	    diskProbationalCount,
+	    diskReallocCount,
+	    diskErrState
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing internal disk monitoring information."
+	::= { dataDomainMibGroups 7 }
+
+    externalUnmanagedDiskStorageGroup OBJECT-GROUP
+	OBJECTS {
+	    diskPropEnclosureID,
+	    diskPropIndex,
+	    diskModel,
+	    diskFirmwareVersion,
+	    diskSerialNumber,
+	    diskCapacity,
+	    diskPropState,
+	    diskPerfIndex,
+	    diskSectorsRead,
+	    diskSectorsWritten,
+	    diskTotalKBytes,
+	    diskBusy,
+	    diskPerfState
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing internal disk monitoring information."
+	::= { dataDomainMibGroups 8 }
+
+    basicNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+	    powerSupplyFailedAlarm,
+	    systemOverheatWarningAlarm,
+	    systemOverheatAlertAlarm,
+	    systemOverheatShutdowntAlarm,
+	    fanModuleFailedAlarm,
+	    nvramFailingAlarm,
+	    fileSystemFailedAlarm,
+	    fileSpaceMaintenanceAlarm,
+	    fileSpaceWarningAlarm,
+	    fileSpaceSevereAlarm,
+	    fileSpaceCriticalAlarm,
+	    raidReconSevereAlarm,
+	    raidReconCriticalAlarm,
+	    raidReconCriticalShutdownAlarm
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing basic notifications."
+	::= { dataDomainMibGroups 9 }
+
+    internalDiskStorageNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+	    diskFailingAlarm,
+	    diskFailedAlarm,
+	    diskOverheatWarningAlarm,
+	    diskOverheatAlertAlarm,
+	    diskOverheatShutdowntAlarm
+	}
+	STATUS  current
+	DESCRIPTION
+            "A collection of objects providing internal disk storage notifications."
+	::= { dataDomainMibGroups 10 }
+
+	replGroup OBJECT-GROUP
+	OBJECTS {
+		replContext,
+		replState,
+		replStatus,
+		replFileSysStatus,
+		replConnTime,
+		replSource, 
+		replDestination,
+		replLag,
+		replPreCompBytesSent,
+		replPostCompBytesSent,
+		replPreCompBytesRemaining,
+		replPostCompBytesReceived,
+		replThrottle
+	}
+	STATUS	current
+	DESCRIPTION
+		"a collection of objects providing replication pair config and monitoring information."
+	::= { dataDomainMibGroups 11 }
+	
+-- **********************************************************************
+--
+-- Environmentals 
+-- ==============
+--
+-- dataDomainMib		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects	(1.3.6.1.4.1.19746.1)
+--	environmentals		(1.3.6.1.4.1.19746.1.1)
+--
+-- **********************************************************************
+
+-- **********************************************************************
+--
+-- Power 
+-- ============
+--
+-- dataDomainMib		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects	(1.3.6.1.4.1.19746.1)
+--	environmentals		(1.3.6.1.4.1.19746.1.1)
+--	    power			(1.3.6.1.4.1.19746.1.1.1)
+--
+-- **********************************************************************
+
+    power	    OBJECT IDENTIFIER ::= { environmentals 1 }
+
+-- **********************************************************************
+--
+-- powerModules 
+-- ==================
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	environmentals			(1.3.6.1.4.1.19746.1.1)
+--	    power				(1.3.6.1.4.1.19746.1.1.1)
+--	       powerModules		(1.3.6.1.4.1.19746.1.1.1.1)
+--
+-- **********************************************************************
+
+    powerModules	    OBJECT IDENTIFIER ::= { power 1 }
+
+    powerModuleTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PowerModuleEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of PowerModuleEntry."
+        ::= { powerModules 1 }
+
+    powerModuleEntry OBJECT-TYPE
+        SYNTAX  PowerModuleEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "powerModuleTable Row Description" 
+        INDEX { powerEnclosureID, powerModuleIndex }
+        ::= { powerModuleTable 1 }
+
+    PowerModuleEntry ::= SEQUENCE {
+    powerEnclosureID		EnclosureID,
+    powerModuleIndex		PowerModuleIndex,
+	powerModuleStatus		PowerModuleStatus
+    }
+
+    powerEnclosureID OBJECT-TYPE
+        SYNTAX  EnclosureID
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Power Module Enclosure ID"
+        ::= { powerModuleEntry 1 }
+
+    powerModuleIndex OBJECT-TYPE
+        SYNTAX  PowerModuleIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Power Module index"
+        ::= { powerModuleEntry 2 }
+
+    powerModuleStatus OBJECT-TYPE
+        SYNTAX  PowerModuleStatus
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "current enclosure Power Module status"
+        ::= { powerModuleEntry 3 }
+
+
+-- **********************************************************************
+--
+-- Temperatures 
+-- ============
+--
+-- dataDomainMib		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects	(1.3.6.1.4.1.19746.1)
+--	environmentals		(1.3.6.1.4.1.19746.1.1)
+--	    temperatures	(1.3.6.1.4.1.19746.1.1.2)
+--
+-- **********************************************************************
+
+    temperatures	    OBJECT IDENTIFIER ::= { environmentals 2 }
+
+-- **********************************************************************
+--
+-- TemperatureSensors 
+-- ==================
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	environmentals			(1.3.6.1.4.1.19746.1.1)
+--	    temperatures		(1.3.6.1.4.1.19746.1.1.2)
+--	       temperatureSensors	(1.3.6.1.4.1.19746.1.1.2.1)
+--
+-- **********************************************************************
+
+    temperatureSensors	    OBJECT IDENTIFIER ::= { temperatures 1 }
+
+    temperatureSensorTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TemperatureSensorEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of TemperatureSensorEntry."
+        ::= { temperatureSensors 1 }
+
+    temperatureSensorEntry OBJECT-TYPE
+        SYNTAX  TemperatureSensorEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "temperatureSensorTable Row Description" 
+        INDEX { tempEnclosureID, tempSensorIndex }
+        ::= { temperatureSensorTable 1 }
+
+    TemperatureSensorEntry ::= SEQUENCE {
+    tempEnclosureID		EnclosureID,
+	tempSensorIndex		TempSensorIndex,
+	tempSensorDescription	TempSensorDescription,
+	tempSensorCurrentValue	Temperature,
+	tempSensorStatus		TempSensorStatus
+    }
+
+    tempEnclosureID OBJECT-TYPE
+        SYNTAX  EnclosureID
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Temperature Sensor Enclosure ID"
+        ::= { temperatureSensorEntry 1 }
+
+    tempSensorIndex OBJECT-TYPE
+        SYNTAX  TempSensorIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Temperature Sensor Number"
+        ::= { temperatureSensorEntry 2 }
+
+    tempSensorDescription OBJECT-TYPE
+        SYNTAX  TempSensorDescription
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Temperature Sensor Description"
+        ::= { temperatureSensorEntry 3 }
+
+    tempSensorCurrentValue OBJECT-TYPE
+        SYNTAX  Temperature 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Current Temperature Value of the sensor"
+        ::= { temperatureSensorEntry 4 }
+
+    tempSensorStatus OBJECT-TYPE
+        SYNTAX  TempSensorStatus 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Current status of the sensor"
+        ::= { temperatureSensorEntry 5 }
+
+-- **********************************************************************
+--
+-- Fans 
+-- ====
+--
+-- dataDomainMib		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects	(1.3.6.1.4.1.19746.1)
+--	environmentals		(1.3.6.1.4.1.19746.1.1)
+--	    fans		(1.3.6.1.4.1.19746.1.1.3)
+--
+-- **********************************************************************
+
+    fans		    OBJECT IDENTIFIER ::= { environmentals 3 }
+
+-- **********************************************************************
+--
+-- FanProperties
+-- =============
+--
+-- dataDomainMib        	(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects	(1.3.6.1.4.1.19746.1)
+--	environmentals		(1.3.6.1.4.1.19746.1.1)
+--	    fans		(1.3.6.1.4.1.19746.1.1.3)
+--		fanProperties	(1.3.6.1.4.1.19746.1.1.3.1)
+--
+-- **********************************************************************
+
+    fanProperties	    OBJECT IDENTIFIER ::= { fans 1 }
+
+    fanPropertiesTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FanPropertiesEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of FanPropertiesEntry."
+        ::= { fanProperties 1 }
+
+    fanPropertiesEntry OBJECT-TYPE
+        SYNTAX  FanPropertiesEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "fanPropertiesTable Row Description" 
+        INDEX { fanEnclosureID, fanIndex }
+        ::= { fanPropertiesTable 1 }
+
+    FanPropertiesEntry ::= SEQUENCE {
+	fanEnclosureID	EnclosureID,
+	fanIndex	FanIndex,
+	fanDescription  FanDescription,
+	fanLevel	FanLevel,
+	fanStatus	FanStatus
+    }
+
+    fanEnclosureID OBJECT-TYPE
+        SYNTAX  EnclosureID
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Enclosure ID of fan"
+        ::= { fanPropertiesEntry 1 }
+
+    fanIndex OBJECT-TYPE
+        SYNTAX  FanIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Fan Number"
+        ::= { fanPropertiesEntry 2 }
+
+    fanDescription OBJECT-TYPE
+        SYNTAX  FanDescription
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Vendor supplied description of the fan"
+        ::= { fanPropertiesEntry 3 }
+
+    fanLevel OBJECT-TYPE
+        SYNTAX  FanLevel 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "current run level of fan"
+        ::= { fanPropertiesEntry 4 }
+
+    fanStatus OBJECT-TYPE
+        SYNTAX  FanStatus 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Current status of the fan"
+        ::= { fanPropertiesEntry 5 }
+
+-- **********************************************************************
+--
+-- NvramProperties
+-- ===============
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	nvram				(1.3.6.1.4.1.19746.1.2)
+--	    nvramProperties		(1.3.6.1.4.1.19746.1.2.1)
+--
+-- **********************************************************************
+
+    nvramProperties	    OBJECT IDENTIFIER ::= { nvram 1 }
+
+    nvramMemorySize OBJECT-TYPE
+        SYNTAX  NvramMemorySize 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Size of NVRAM Memory in megabytes"
+        ::= { nvramProperties 1 }
+
+    nvramWindowSize OBJECT-TYPE
+        SYNTAX  NvramWindowSize 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Window size of NVRAM in megabytes"
+        ::= { nvramProperties 2 }
+
+-- **********************************************************************
+--
+-- NvramStats
+-- ==========
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	nvram				(1.3.6.1.4.1.19746.1.2)
+--	    nvramStats			(1.3.6.1.4.1.19746.1.2.2)
+--
+-- **********************************************************************
+
+    nvramStats		    OBJECT IDENTIFIER ::= { nvram 2 }
+
+    nvramPCIErrorCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of PCI Errors Encountered on NVRAM Card"
+        ::= { nvramStats 1 }
+
+    nvramMemoryErrorCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Memory Errors  Encountered on NVRAM Card"
+        ::= { nvramStats 2 }
+
+-- **********************************************************************
+--
+-- NvramBatteries
+-- ==============
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	nvram				(1.3.6.1.4.1.19746.1.2)
+--	    nvramBatteries		(1.3.6.1.4.1.19746.1.2.3)
+--
+-- **********************************************************************
+
+    nvramBatteries	    OBJECT IDENTIFIER ::= { nvram 3 }
+
+    nvramBatteryTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NvramBatteryEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of NvramBatteryEntry."
+        ::= { nvramBatteries 1 }
+
+    nvramBatteryEntry OBJECT-TYPE
+        SYNTAX  NvramBatteryEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "nvramBatteryTable Row Description" 
+        INDEX { nvramBatteryIndex }
+        ::= { nvramBatteryTable 1 }
+
+    NvramBatteryEntry ::= SEQUENCE {
+	nvramBatteryIndex   NvramBatteryIndex,
+	nvramBatteryStatus  NvramBatteryStatus,
+	nvramBatteryCharge  Percentage 
+    }
+
+    nvramBatteryIndex OBJECT-TYPE
+        SYNTAX  NvramBatteryIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "NVRAM Battery Number"
+        ::= { nvramBatteryEntry 1 }
+
+    nvramBatteryStatus OBJECT-TYPE
+        SYNTAX  NvramBatteryStatus
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "NVRAM Battery Status"
+        ::= { nvramBatteryEntry 2 }
+
+    nvramBatteryCharge OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "NVRAM Battery change percentage"
+        ::= { nvramBatteryEntry 3 }
+
+-- **********************************************************************
+--
+-- FileSystemProperties 
+-- ====================
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	fileSystem			(1.3.6.1.4.1.19746.1.3)
+--	    fileSystemProperties	(1.3.6.1.4.1.19746.1.3.1)
+--
+-- **********************************************************************
+
+    fileSystemProperties    OBJECT IDENTIFIER ::= { fileSystem 1 }
+
+    fileSystemStatus OBJECT-TYPE
+        SYNTAX  FileSystemStatus 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Status of the file system"
+        ::= { fileSystemProperties 1 }
+
+    fileSystemVirtualSpace OBJECT-TYPE
+        SYNTAX  FileSystemSpaceUnit 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Amount of Uncompressed data that has been backed up by the system"
+        ::= { fileSystemProperties 2 }
+
+-- **********************************************************************
+--
+-- FileSystemSpace 
+-- ===============
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	fileSystem			(1.3.6.1.4.1.19746.1.3)
+--	    fileSystemSpace		(1.3.6.1.4.1.19746.1.3.2)
+--
+-- **********************************************************************
+
+    fileSystemSpace	    OBJECT IDENTIFIER ::= { fileSystem 2 }
+
+    fileSystemSpaceTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FileSystemSpaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of FileSystemSpaceEntry."
+        ::= { fileSystemSpace 1 }
+
+    fileSystemSpaceEntry OBJECT-TYPE
+        SYNTAX  FileSystemSpaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+	    "fileSystemSpaceTable Row Description" 
+        INDEX { fileSystemResourceIndex }
+        ::= { fileSystemSpaceTable 1 }
+
+    FileSystemSpaceEntry ::= SEQUENCE {
+	fileSystemResourceIndex	FileSystemResourceIndex,
+	fileSystemResourceName	FileSystemResourceName,
+	fileSystemSpaceSize	FileSystemSpaceUnit,
+	fileSystemSpaceUsed	FileSystemSpaceUnit,
+	fileSystemSpaceAvail	FileSystemSpaceUnit,
+	fileSystemPercentUsed	Percentage
+    }
+
+    fileSystemResourceIndex OBJECT-TYPE
+        SYNTAX  FileSystemResourceIndex 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "File system resource index"
+        ::= { fileSystemSpaceEntry 1 }
+
+    fileSystemResourceName OBJECT-TYPE
+        SYNTAX  FileSystemResourceName 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "File system resource name"
+        ::= { fileSystemSpaceEntry 2 }
+
+    fileSystemSpaceSize OBJECT-TYPE
+        SYNTAX  FileSystemSpaceUnit 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Size of the file system resource in gigabytes"
+        ::= { fileSystemSpaceEntry 3 }
+
+    fileSystemSpaceUsed OBJECT-TYPE
+        SYNTAX  FileSystemSpaceUnit 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Amount of used space within the file system resource in gigabytes"
+        ::= { fileSystemSpaceEntry 4 }
+
+    fileSystemSpaceAvail OBJECT-TYPE
+        SYNTAX  FileSystemSpaceUnit 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Amount of available space within the file system resource in gigabytes"
+        ::= { fileSystemSpaceEntry 5 }
+
+    fileSystemPercentUsed OBJECT-TYPE
+        SYNTAX  Percentage
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of used space within the file system resource"
+        ::= { fileSystemSpaceEntry 6 }
+
+-- **********************************************************************
+--
+-- CurrentAlerts 
+-- =============
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	alerts				(1.3.6.1.4.1.19746.1.4)
+--	    currentAlerts		(1.3.6.1.4.1.19746.1.4.1)
+--
+-- **********************************************************************
+
+    currentAlerts	    OBJECT IDENTIFIER ::= { alerts 1 }
+
+    currentAlertTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CurrentAlertEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of CurrentAlertEntry."
+        ::= { currentAlerts 1 }
+
+    currentAlertEntry OBJECT-TYPE
+        SYNTAX  CurrentAlertEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+	    "currentAlertTable Row Description" 
+        INDEX { currentAlertIndex }
+        ::= { currentAlertTable 1 }
+
+    CurrentAlertEntry ::= SEQUENCE {
+	currentAlertIndex	AlertIndex,
+	currentAlertTimestamp	AlertTimestamp,
+	currentAlertDescription	AlertDescription
+    }
+
+    currentAlertIndex OBJECT-TYPE
+        SYNTAX  AlertIndex 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Current Alert Row index"
+        ::= { currentAlertEntry 1 }
+
+    currentAlertTimestamp OBJECT-TYPE
+        SYNTAX  AlertTimestamp 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Timestamp of current alert"
+        ::= { currentAlertEntry 2 }
+
+    currentAlertDescription OBJECT-TYPE
+        SYNTAX  AlertDescription 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Alert Description"
+        ::= { currentAlertEntry 3 }
+
+-- **********************************************************************
+--
+-- SystemStats 
+-- ===========
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	statistics			(1.3.6.1.4.1.19746.1.5)
+--	    systemStats			(1.3.6.1.4.1.19746.1.5.1)
+--
+-- **********************************************************************
+
+    systemStats		    OBJECT IDENTIFIER ::= { statistics 1 }
+
+    systemStatsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SystemStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of SystemStatsEntry."
+        ::= { systemStats 1 }
+
+    systemStatsEntry OBJECT-TYPE
+        SYNTAX  SystemStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+	    "systemStatsTable Row Description" 
+        INDEX { systemStatsIndex }
+        ::= { systemStatsTable 1 }
+
+    SystemStatsEntry ::= SEQUENCE {
+	systemStatsIndex	    SystemStatsIndex,
+	cpu0PercentageBusy	    Percentage,
+	cpu1PercentageBusy	    Percentage,
+	nfsOpsPerSecond		    OpsPerSecond,
+	nfsIdlePercentage	    Percentage,
+	nfsProcPercentage	    Percentage,
+	nfsSendPercentage	    Percentage,
+	nfsReceivePercentage	    Percentage,
+	cifsOpsPerSecond	    OpsPerSecond,
+	diskReadKBytesPerSecond	    KBytesPerSecond,
+	diskWriteKBytesPerSecond    KBytesPerSecond,
+	diskBusyPercentage	    Percentage,
+	nvramReadKBytesPerSecond    KBytesPerSecond,
+	nvramWriteKBytesPerSecond   KBytesPerSecond,
+	replInKBytesPerSecond	    KBytesPerSecond,
+	replOutKBytesPerSecond	    KBytesPerSecond 
+    }
+
+    systemStatsIndex OBJECT-TYPE
+        SYNTAX  SystemStatsIndex 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "System Stats Row index"
+        ::= { systemStatsEntry 1 }
+
+    cpu0PercentageBusy OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "CPU 0 Percentage Busy"
+        ::= { systemStatsEntry 2 }
+
+    cpu1PercentageBusy OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "CPU 1 Percentage Busy"
+        ::= { systemStatsEntry 3 }
+
+    nfsOpsPerSecond OBJECT-TYPE
+        SYNTAX  OpsPerSecond 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of NFS Operations performed per second"
+        ::= { systemStatsEntry 4 }
+
+    nfsIdlePercentage OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of time NFS was Idle"
+        ::= { systemStatsEntry 5 }
+
+    nfsProcPercentage OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of time NFS was processing"
+        ::= { systemStatsEntry 6 }
+
+    nfsSendPercentage OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of time NFS was sending requests"
+        ::= { systemStatsEntry 7 }
+
+    nfsReceivePercentage OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of time NFS was receiving requests"
+        ::= { systemStatsEntry 8 }
+
+    cifsOpsPerSecond OBJECT-TYPE
+        SYNTAX  OpsPerSecond 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of CIFS Operations performed per second"
+        ::= { systemStatsEntry 9 }
+
+    diskReadKBytesPerSecond OBJECT-TYPE
+        SYNTAX  KBytesPerSecond 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of KBytes per second read from disk"
+        ::= { systemStatsEntry 10 }
+
+    diskWriteKBytesPerSecond OBJECT-TYPE
+        SYNTAX  KBytesPerSecond 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of KBytes per second read from disk"
+        ::= { systemStatsEntry 11 }
+
+    diskBusyPercentage OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of Time Disks were busy"
+        ::= { systemStatsEntry 12 }
+
+    nvramReadKBytesPerSecond OBJECT-TYPE
+        SYNTAX  KBytesPerSecond 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of KBytes read per second from NVRAM"
+        ::= { systemStatsEntry 13 }
+
+    nvramWriteKBytesPerSecond OBJECT-TYPE
+        SYNTAX  KBytesPerSecond 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of KBytes read per second from NVRAM"
+        ::= { systemStatsEntry 14 }
+
+    replInKBytesPerSecond OBJECT-TYPE
+        SYNTAX  KBytesPerSecond 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of KBytes per second received for Replication"
+        ::= { systemStatsEntry 15 }
+
+    replOutKBytesPerSecond OBJECT-TYPE
+        SYNTAX  KBytesPerSecond 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of KBytes per second sent for Replication"
+        ::= { systemStatsEntry 16 }
+
+-- **********************************************************************
+--
+-- DiskProperties
+-- ==============
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	diskStorage			(1.3.6.1.4.1.19746.1.6)
+--	    diskProperties		(1.3.6.1.4.1.19746.1.6.1)
+--
+-- **********************************************************************
+
+    diskProperties	    OBJECT IDENTIFIER ::= { diskStorage 1 }
+
+    diskPropertiesTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DiskPropertiesEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of DiskPropertiesEntry."
+        ::= { diskProperties 1 }
+
+    diskPropertiesEntry OBJECT-TYPE
+        SYNTAX  DiskPropertiesEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "diskPropertiesTable Row Description" 
+        INDEX { diskPropEnclosureID, diskPropIndex }
+        ::= { diskPropertiesTable 1 }
+
+    DiskPropertiesEntry ::= SEQUENCE {
+    diskPropEnclosureID		EnclosureID,
+	diskPropIndex	    DiskIndex,
+	diskModel	    DiskModel,
+	diskFirmwareVersion DiskFirmwareVersion,
+	diskSerialNumber    DiskSerialNumber,
+	diskCapacity	    DiskCapacity,
+	diskPropState	    DiskState
+    }
+
+    diskPropEnclosureID OBJECT-TYPE
+        SYNTAX  EnclosureID
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Enclosure ID of disk"
+        ::= { diskPropertiesEntry 1 }
+
+    diskPropIndex OBJECT-TYPE
+        SYNTAX  DiskIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Disk Number"
+        ::= { diskPropertiesEntry 2 }
+
+    diskModel OBJECT-TYPE
+        SYNTAX	DiskModel 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION 
+	    "Manufacture and model of the disk"
+        ::= { diskPropertiesEntry 3 }
+
+    diskFirmwareVersion OBJECT-TYPE
+        SYNTAX	DiskFirmwareVersion
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION 
+	    "Firmware version of the disk"
+        ::= { diskPropertiesEntry 4 }
+
+    diskSerialNumber OBJECT-TYPE
+        SYNTAX	DiskSerialNumber
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION 
+	    "Serial Number of the disk"
+        ::= { diskPropertiesEntry 5 }
+
+    diskCapacity OBJECT-TYPE
+        SYNTAX	DiskCapacity
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION 
+	    "Capacity of the disk"
+        ::= { diskPropertiesEntry 6 }
+
+    diskPropState OBJECT-TYPE
+        SYNTAX	DiskState
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION 
+	    "Current State of the disk"
+        ::= { diskPropertiesEntry 7 }
+
+-- **********************************************************************
+--
+-- DiskPerformance
+-- ===============
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	diskStorage			(1.3.6.1.4.1.19746.1.6)
+--	    diskPerformance		(1.3.6.1.4.1.19746.1.6.2)
+--
+-- **********************************************************************
+
+    diskPerformance	    OBJECT IDENTIFIER ::= { diskStorage 2 }
+
+    diskPerformanceTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DiskPerformanceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of DiskPerformanceEntry."
+        ::= { diskPerformance 1 }
+
+    diskPerformanceEntry OBJECT-TYPE
+        SYNTAX  DiskPerformanceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+	    "diskPerformanceTable Row Description" 
+        INDEX { diskPerfEnclosureID, diskPerfIndex }
+        ::= { diskPerformanceTable 1 }
+
+    DiskPerformanceEntry ::= SEQUENCE {
+    diskPerfEnclosureID		EnclosureID,
+	diskPerfIndex	    DiskIndex,
+	diskSectorsRead	    DiskSectorsPerSecond,
+	diskSectorsWritten  DiskSectorsPerSecond,
+	diskTotalKBytes	    KBytesPerSecond,
+	diskBusy	    Percentage,
+        diskPerfState	    DiskState
+    }
+
+    diskPerfEnclosureID OBJECT-TYPE
+        SYNTAX  EnclosureID
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Enclosure ID of disk"
+        ::= { diskPerformanceEntry 1 }
+
+    diskPerfIndex OBJECT-TYPE
+        SYNTAX  DiskIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Disk Number"
+        ::= { diskPerformanceEntry 2 }
+
+    diskSectorsRead OBJECT-TYPE
+        SYNTAX  DiskSectorsPerSecond
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of disk sectors read per second"
+        ::= { diskPerformanceEntry 3 }
+
+    diskSectorsWritten OBJECT-TYPE
+        SYNTAX  DiskSectorsPerSecond
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of disk sectors written per second"
+        ::= { diskPerformanceEntry 4 }
+
+    diskTotalKBytes OBJECT-TYPE
+        SYNTAX  KBytesPerSecond
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Total Number of Kilo-bytes read/written per second"
+        ::= { diskPerformanceEntry 5 }
+
+    diskBusy OBJECT-TYPE
+        SYNTAX  Percentage
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of time disk is busy"
+        ::= { diskPerformanceEntry 6 }
+
+    diskPerfState OBJECT-TYPE
+        SYNTAX  DiskState
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Current State of the disk"
+        ::= { diskPerformanceEntry 7 }
+
+-- **********************************************************************
+--
+-- DiskReliability
+-- ===============
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	diskStorage			(1.3.6.1.4.1.19746.1.6)
+--	    diskReliability		(1.3.6.1.4.1.19746.1.6.3)
+--
+-- **********************************************************************
+
+    diskReliability	    OBJECT IDENTIFIER ::= { diskStorage 3 }
+
+    diskReliabilityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DiskReliabilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of DiskReliabilityEntry."
+        ::= { diskReliability 1 }
+
+    diskReliabilityEntry OBJECT-TYPE
+        SYNTAX  DiskReliabilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+	    "diskReliabilityTable Row Description" 
+        INDEX { diskErrEnclosureID, diskErrIndex }
+        ::= { diskReliabilityTable 1 }
+
+    DiskReliabilityEntry ::= SEQUENCE {
+    diskErrEnclosureID	EnclosureID,
+	diskErrIndex		DiskIndex,
+	diskTemperature		Temperature,
+	diskTimeoutCount	ErrorCount,
+	diskReadFailCount	ErrorCount,
+	diskWriteFailCount	ErrorCount,
+	diskMiscFailCount	ErrorCount,
+	diskOffTrackErrCount	ErrorCount,
+	diskSoftEccCount	ErrorCount,
+	diskCrcErrCount		ErrorCount,
+	diskProbationalCount	ErrorCount,
+	diskReallocCount	ErrorCount,
+	diskErrState		DiskState 
+    }
+
+    diskErrEnclosureID OBJECT-TYPE
+        SYNTAX  EnclosureID
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Enclosure ID of disk"
+        ::= { diskReliabilityEntry 1 }
+
+    diskErrIndex OBJECT-TYPE
+        SYNTAX  DiskIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Disk Number"
+        ::= { diskReliabilityEntry 2 }
+
+    diskTemperature OBJECT-TYPE
+        SYNTAX  Temperature 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Current Disk Temperature in Celsius"
+        ::= { diskReliabilityEntry 3 }
+
+    diskTimeoutCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of command timeouts"
+        ::= { diskReliabilityEntry 4 }
+
+    diskReadFailCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of read failures"
+        ::= { diskReliabilityEntry 5 }
+
+    diskWriteFailCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of write failures"
+        ::= { diskReliabilityEntry 6 }
+
+    diskMiscFailCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of miscellaneous failures"
+        ::= { diskReliabilityEntry 7 }
+
+    diskOffTrackErrCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of offtrack errors"
+        ::= { diskReliabilityEntry 8 }
+
+    diskSoftEccCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of soft ecc errors"
+        ::= { diskReliabilityEntry 9 }
+
+    diskCrcErrCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of crc errors"
+        ::= { diskReliabilityEntry 10 }
+
+    diskProbationalCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of probational errors"
+        ::= { diskReliabilityEntry 11 }
+
+    diskReallocCount OBJECT-TYPE
+        SYNTAX  ErrorCount 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of reallocation errors"
+        ::= { diskReliabilityEntry 12 }
+
+    diskErrState OBJECT-TYPE
+        SYNTAX  DiskState
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Current State of the disk"
+        ::= { diskReliabilityEntry 13 }
+
+-- **********************************************************************
+--
+-- RaidInfo 
+-- ========
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	raid				(1.3.6.1.4.1.19746.1.7)
+--	    raidinfo			(1.3.6.1.4.1.19746.1.7.1)
+--
+-- **********************************************************************
+
+    raidInfo		    OBJECT IDENTIFIER ::= { raid 1 }
+
+    raidInfoTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RaidInfoEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of RaidInfoEntry."
+        ::= { raidInfo 1 }
+
+    raidInfoEntry OBJECT-TYPE
+        SYNTAX  RaidInfoEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+	    "raidInfoTable Row Description" 
+        INDEX { raidDiskEnclosureID, raidDiskIndex }
+        ::= { raidInfoTable 1 }
+
+    RaidInfoEntry ::= SEQUENCE {
+	raidDiskEnclosureID     EnclosureID,
+	raidDiskIndex		    DiskIndex,
+	raidDiskState		    RaidDiskState,
+	raidDiskGroup		    RaidDiskGroup, 
+	raidDiskStatus		    RaidDiskStatus,
+	raidDiskReconPercentage	    Percentage,
+	raidDiskReconMinutes	    Minutes,
+	raidDiskResynchPercentage   Percentage,
+	raidDiskResynchMinutes	    Minutes
+    }
+
+    raidDiskEnclosureID OBJECT-TYPE
+        SYNTAX  EnclosureID
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Enclosure id of raid disk"
+        ::= { raidInfoEntry 1 }
+
+    raidDiskIndex OBJECT-TYPE
+        SYNTAX  DiskIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Disk Number of raid disk"
+        ::= { raidInfoEntry 2 }
+
+    raidDiskState OBJECT-TYPE
+        SYNTAX  RaidDiskState
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "State of raid disk"
+        ::= { raidInfoEntry 3 }
+
+    raidDiskGroup OBJECT-TYPE
+        SYNTAX  RaidDiskGroup
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Disk Group of raid disk"
+        ::= { raidInfoEntry 4 }
+
+    raidDiskStatus OBJECT-TYPE
+        SYNTAX  RaidDiskStatus
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Status of raid disk"
+        ::= { raidInfoEntry 5 }
+
+    raidDiskReconPercentage OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Reconstruction Percentage complete if raidDiskStatus = reconstructing"
+        ::= { raidInfoEntry 6 }
+
+    raidDiskReconMinutes OBJECT-TYPE
+        SYNTAX  Minutes 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of minutes reconstruction has taken if raidDiskStatus = reconstructing"
+        ::= { raidInfoEntry 7 }
+
+    raidDiskResynchPercentage OBJECT-TYPE
+        SYNTAX  Percentage 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Resynch Percentage complete if raidDiskStatus = resynching"
+        ::= { raidInfoEntry 8 }
+
+    raidDiskResynchMinutes OBJECT-TYPE
+        SYNTAX  Minutes 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of minutes resynching has taken if raidDiskStatus = resynching"
+        ::= { raidInfoEntry 9 }
+
+-- **********************************************************************
+--
+-- ReplicationInfo 
+-- ========
+--
+-- dataDomainMib        		(1.3.6.1.4.1.19746)
+--   dataDomainMibObjects		(1.3.6.1.4.1.19746.1)
+--	replication				(1.3.6.1.4.1.19746.1.8)
+--	    replicationInfo			(1.3.6.1.4.1.19746.1.8.1)
+--
+-- Physical replication is represented with a replContext of 0
+-- and has it's bytes sent and received put in replPostCompBytesSent
+-- and replPostCompBytesReceived respectively
+-- **********************************************************************
+
+    replicationInfo		    OBJECT IDENTIFIER ::= { replication 1 }
+
+    replicationInfoTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ReplicationInfoEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table containing entries of ReplicationInfoEntry."
+        ::= { replicationInfo 1 }
+
+    replicationInfoEntry OBJECT-TYPE
+        SYNTAX  ReplicationInfoEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+	    "replicationInfoTable Row Description" 
+        INDEX { replContext }
+        ::= { replicationInfoTable 1 }
+
+    ReplicationInfoEntry ::= SEQUENCE {
+	replContext		     		ReplicationContext,
+	replState			  	  	ReplicationState,
+	replStatus			  		ReplicationStatus,
+	replFileSysStatus			FileSystemStatus,
+	replConnTime		    	ReplicationConnectTime,
+	replSource			    	ReplicationPath, 
+	replDestination 			ReplicationPath,
+	replLag		   				ReplicationLag,
+	replPreCompBytesSent	    ReplicationTraffic,
+	replPostCompBytesSent       ReplicationTraffic,
+	replPreCompBytesRemaining   ReplicationTraffic,
+	replPostCompBytesReceived   ReplicationTraffic,
+	replThrottle				ReplicationThrottle,
+	replSyncedAsOfTime			ReplicationSyncedTime
+    }
+
+    replContext OBJECT-TYPE
+        SYNTAX  ReplicationContext
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "context ID of replication source/dest pair"
+        ::= { replicationInfoEntry 1 }
+
+    replState OBJECT-TYPE
+        SYNTAX  ReplicationState
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "state of replication source/dest pair"
+        ::= { replicationInfoEntry 2 }
+
+    replStatus OBJECT-TYPE
+        SYNTAX  ReplicationStatus
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "status of replication source/dest pair connection"
+        ::= { replicationInfoEntry 3 }
+
+    replFileSysStatus OBJECT-TYPE
+        SYNTAX  FileSystemStatus
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "status of filesystem"
+        ::= { replicationInfoEntry 4 }
+
+    replConnTime OBJECT-TYPE
+        SYNTAX  ReplicationConnectTime
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "time of connection established between source and dest,
+             or time since disconnect if status is 'disconnected'"
+        ::= { replicationInfoEntry 5 }
+
+    replSource OBJECT-TYPE
+        SYNTAX  ReplicationPath
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "network path to replication source directory"
+        ::= { replicationInfoEntry 6 }
+
+    replDestination OBJECT-TYPE
+        SYNTAX  ReplicationPath
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "network path to replication destination directory"
+        ::= { replicationInfoEntry 7 }
+
+    replLag OBJECT-TYPE
+        SYNTAX  ReplicationLag
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "time lag between source and destination"
+        ::= { replicationInfoEntry 8 }
+
+    replPreCompBytesSent OBJECT-TYPE
+        SYNTAX  ReplicationTraffic
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "pre compression bytes sent"
+        ::= { replicationInfoEntry 9 }
+
+    replPostCompBytesSent OBJECT-TYPE
+        SYNTAX  ReplicationTraffic
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "post compression bytes sent"
+        ::= { replicationInfoEntry 10 }
+
+    replPreCompBytesRemaining OBJECT-TYPE
+        SYNTAX  ReplicationTraffic
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "pre compression bytes remaining"
+        ::= { replicationInfoEntry 11 }
+
+    replPostCompBytesReceived OBJECT-TYPE
+        SYNTAX  ReplicationTraffic
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "post compression bytes received"
+        ::= { replicationInfoEntry 12 }
+
+    replThrottle OBJECT-TYPE
+        SYNTAX  ReplicationThrottle
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "replication throttle in bps -- -1 is disabled, 0 unlimited"
+        ::= { replicationInfoEntry 13 }
+
+    replSyncedAsOfTime OBJECT-TYPE
+        SYNTAX  ReplicationSyncedTime
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "time when the source and destination were in sync,
+             or 0 if the time is unknown"
+        ::= { replicationInfoEntry 14 }
+
+-- **********************************************************************
+--
+-- Common Notifications 
+-- ====================
+--
+-- dataDomainMib        	(1.3.6.1.4.1.19746)
+--  dataDomainMibNotifications	(1.3.6.1.4.1.19746.2)
+--
+-- **********************************************************************
+
+  powerSupplyFailedAlarm NOTIFICATION-TYPE
+	STATUS	current
+        DESCRIPTION
+            "Meaning: Power Supply failed
+             What to do: replace the power supply"
+        ::= { dataDomainMibNotifications 1 } 
+
+  systemOverheatWarningAlarm NOTIFICATION-TYPE
+        OBJECTS { tempSensorIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: the temperature reading of one of the thermometers in the Chassis  has exceeded 
+	     the 'warning' temperature level.  If it continues to rise, it may eventually trigger a 
+	     shutdown of the DDR.  The index value of the alarm indicates the thermometer index that
+	     may be looked up in the environmentals table 'temperatures' for more information about
+	     the actual thermometer reading the high value.
+	     What to do: check the Fan status, temperatures of the environment in which the DDR is,
+	     and other factors which may increase the temperature."
+	::= { dataDomainMibNotifications 2 }
+
+  systemOverheatAlertAlarm NOTIFICATION-TYPE
+        OBJECTS { tempSensorIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: the temperature reading of one of the thermometers in the Chassis is more than
+	     halfway between the 'warning' and 'shutdown' temperature levels.  If it continues to rise, 
+	     it may eventually trigger a shutdown of the DDR.  The index value of the alarm indicates 
+	     the thermometer index that may be looked up in the environmentals table 'temperatures' 
+	     for more information about the actual thermometer reading the high value.
+	     What to do: check the Fan status, temperatures of the environment in which the DDR is,
+	     and other factors which may increase the system temperature."
+	::= { dataDomainMibNotifications 3 }
+
+  systemOverheatShutdowntAlarm NOTIFICATION-TYPE
+        OBJECTS { tempSensorIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: the temperature reading of one of the thermometers in the Chassis has reached
+	     or exceeded the 'shutdown' temperature level. The DDR will be shutdown to prevent damage
+	     to the system.  The index value of the alarm indicates the thermometer index that may be
+	     looked up in the environmentals table 'temperatures' for more information about the actual 
+	     thermometer reading the high value.
+	     What to do: Once the system has been brought back up, after checking for high environment
+	     temperatures or other factors which may increase the system temperature, check other 
+	     environmental values, such as Fan Status, Disk Temperatures, etc..."
+	::= { dataDomainMibNotifications 4 }
+
+  fanModuleFailedAlarm NOTIFICATION-TYPE
+        OBJECTS { fanIndex } 
+	STATUS	current
+        DESCRIPTION
+            "Meaning: a Fan Module in the enclosure has failed.  The index of the fan is given
+             as the index of the alarm.  This same index can be looked up in the environmentals
+             table 'fanProperies' for more information about which fan has failed.
+             What to do: replace the fan"
+        ::= { dataDomainMibNotifications 5 } 
+
+  nvramFailingAlarm NOTIFICATION-TYPE
+	STATUS	current
+        DESCRIPTION
+            "Meaning: The system has detected that the NVRAM is potentially failing.  There has
+            been an excessive amount of PCI or Memory errors. The nvram tables 'nvramProperties'
+            and 'nvramStats' may provide for information on why the NVRAM is failing.
+            What to do: check the status of the NVRAM after reboot, and replace if the
+            errors continue."
+        ::= { dataDomainMibNotifications 6 } 
+
+  fileSystemFailedAlarm NOTIFICATION-TYPE
+	STATUS	current
+        DESCRIPTION
+            "Meaning: The File System process on the DDR has had a serious problem and has had
+             to restart.
+             What to do: check the system logs for conditions that may be triggering the failure.
+             Other alarms may also indicate why the File System is having problems."
+        ::= { dataDomainMibNotifications 7 } 
+
+  fileSpaceMaintenanceAlarm NOTIFICATION-TYPE
+        OBJECTS { fileSystemResourceIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: DDVAR File System Resource Space is running low for system maintenance activities.  The
+	     system may not have enough space for the routine system activities to run without error.
+	     What to do: Delete unneeded files, such as old log files, support bundles, core files,
+	     upgrade rpm files stored in the /ddvar file system.  Consider upgrading the hardware or adding
+	     shelves to high-end units.  Reducing the retention times for backup data can also help. When 
+	     files are deleted from outside of the /ddvar space, filesys clean will have to be done before 
+	     the space is recovered."
+	::= { dataDomainMibNotifications 8 }
+
+  fileSpaceWarningAlarm NOTIFICATION-TYPE
+        OBJECTS { fileSystemResourceIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: A File System Resource space is 90% utilized.  The index value of the alarm indicates 
+	     the file system index that may be looked up in the fileSystem table 'fileSystemSpace' 
+	     for more information about the actual FS that is getting full. 
+	     What to do: Delete unneeded files, such as old log files, support bundles, core files,
+	     upgrade rpm files stored in the /ddvar file system.  Consider upgrading the hardware or adding
+	     shelves to high-end units.  Reducing the retention times for backup data can also help. When 
+	     files are deleted from outside of the /ddvar space, filesys clean will have to be done before 
+	     the space is recovered."
+	::= { dataDomainMibNotifications 9 }
+
+  fileSpaceSevereAlarm NOTIFICATION-TYPE
+        OBJECTS { fileSystemResourceIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: A File System Resource space is 95% utilized.  The index value of the alarm indicates 
+	     the file system index that may be looked up in the fileSystem table 'fileSystemSpace' 
+	     for more information about the actual FS that is getting full. 
+	     What to do: Delete unneeded files, such as old log files, support bundles, core files,
+	     upgrade rpm files stored in the /ddvar file system.  Consider upgrading the hardware or adding
+	     shelves to high-end units.  Reducing the retention times for backup data can also help. When 
+	     files are deleted from outside of the /ddvar space, filesys clean will have to be done before 
+	     the space is recovered."
+	::= { dataDomainMibNotifications 10 }
+
+  fileSpaceCriticalAlarm NOTIFICATION-TYPE
+        OBJECTS { fileSystemResourceIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: A File System Resource space is 100% utilized.  The index value of the alarm indicates 
+	     the file system index that may be looked up in the fileSystem table 'fileSystemSpace' 
+	     for more information about the actual FS that is full. 
+	     What to do: Delete unneeded files, such as old log files, support bundles, core files,
+	     upgrade rpm files stored in the /ddvar file system.  Consider upgrading the hardware or adding
+	     shelves to high-end units.  Reducing the retention times for backup data can also help. When 
+	     files are deleted from outside of the /ddvar space, filesys clean will have to be done before 
+	     the space is recovered."
+	::= { dataDomainMibNotifications 11 }
+
+  diskFailingAlarm NOTIFICATION-TYPE
+        OBJECTS { diskPropIndex } 
+	STATUS	current
+        DESCRIPTION
+            "Meaning: some problem has been detected about the indicated disk.  The index value 
+             of the alarm indicates the disk index that may be looked up in the disk tables 
+             'diskProperties', 'diskPerformance', and 'diskReliability' for more information 
+             about the actual disk that is failing.
+             What to do: monitor the status of the disk, and consider replacing if the problem
+             continues."
+        ::= { dataDomainMibNotifications 12 } 
+
+  diskFailedAlarm NOTIFICATION-TYPE
+        OBJECTS { diskPropIndex } 
+	STATUS	current
+        DESCRIPTION
+            "Meaning: some problem has been detected about the indicated disk.  The index value 
+             of the alarm indicates the disk index that may be looked up in the disk tables 
+             'diskProperties', 'diskPerformance', and 'diskReliability' for more information 
+             about the actual disk that has failed.
+             What to do: replace the disk."
+        ::= { dataDomainMibNotifications 13 } 
+
+  diskOverheatWarningAlarm NOTIFICATION-TYPE
+        OBJECTS { diskErrIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: the temperature reading of the indicated disk has exceeded the 'warning' 
+	     temperature level.  If it continues to rise, it may eventually trigger a 
+	     shutdown of the DDR.  The index value of the alarm indicates the disk index that
+	     may be looked up in the disk tables 'diskProperties', 'diskPerformance', and 
+	     'diskReliability' for more information about the actual disk reading the high value.
+	     What to do: check the disk status, temperatures of the environment in which the DDR is,
+	     and other factors which may increase the temperature."
+	::= { dataDomainMibNotifications 14 }
+
+  diskOverheatAlertAlarm NOTIFICATION-TYPE
+        OBJECTS { diskErrIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: the temperature reading of the indicated disk is more than halfway between
+	     the 'warning' and 'shutdown' temperature levels. If it continues to rise, it will 
+	     trigger a shutdown of the DDR.  The index value of the alarm indicates the disk index that
+	     may be looked up in the disk tables 'diskProperties', 'diskPerformance', and 
+	     'diskReliability' for more information about the actual disk reading the high value.
+	     What to do: check the disk status, temperatures of the environment in which the DDR is,
+	     and other factors which may increase the temperature.  If the temperature continues stays
+	     at this level or rises, and no other disks are reading this trouble, consider 'failing'
+	     the disk, and get a replacement."
+	::= { dataDomainMibNotifications 15 }
+
+  diskOverheatShutdowntAlarm NOTIFICATION-TYPE
+        OBJECTS { diskErrIndex } 
+	STATUS current
+	DESCRIPTION
+	    "Meaning: the temperature reading of the indicated disk has surpassed the 'shutdown' 
+	     temperature level. The DDR will be shutdown.  The index value of the alarm indicates 
+	     the disk index that may be looked up in the disk tables 'diskProperties', 'diskPerformance', 
+	     and 'diskReliability' for more information about the actual disk reading the high value.
+	     What to do: Boot the DDR and monitor the status and temperatures.  If the same disk has
+	     continued problems, consider 'failing' it and get a replacement disk."
+	::= { dataDomainMibNotifications 16 }
+
+  raidReconSevereAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	    "Meaning: Raid group reconstruction is currently active and has not completed after 71
+	     hours.  Reconstruction occurs when the raid group falls into 'degraded' mode.  This can
+	     happen due to a disk failing at run-time or boot-up.
+	     What to do: while it is still possible that the reconstruction could succeed, the disk
+	     should be replaced to ensure data safety."
+	::= { dataDomainMibNotifications 17 }
+
+  raidReconCriticalAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	    "Meaning: Raid group reconstruction is currently active and has not completed after 72
+	     hours.  Reconstruction occurs when the raid group falls into 'degraded' mode.  This can
+	     happen due to a disk failing at run-time or boot-up.
+	     What to do: the disk should be replaced to ensure data safety."
+	::= { dataDomainMibNotifications 18 }
+
+  raidReconCriticalShutdownAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	    "Meaning: Raid group reconstruction is currently active and has not completed after more
+	     than 72 hours.  Reconstruction occurs when the raid group falls into 'degraded' mode.  
+	     This can happen due to a disk failing at run-time or boot-up.
+	     What to do: the disk must be replaced."
+	::= { dataDomainMibNotifications 19 }
+
+END

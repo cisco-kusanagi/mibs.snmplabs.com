@@ -1,0 +1,988 @@
+--
+-- 	Copyright 1995, 1996, 1997 Shiva Corporation
+--
+
+--
+--	Shiva systems call control MIB
+--
+
+SHIVA-CALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	DisplayString
+		FROM RFC1213-MIB
+	Counter
+		FROM RFC1155-SMI
+	call
+		FROM SHIVA-MIB;
+
+    callPhoneGroupTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF CallPhoneGroupEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of the PhoneGroups configured in the box."
+	::= { call 1 }
+
+    callPhoneGroupEntry OBJECT-TYPE
+	SYNTAX	CallPhoneGroupEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A Phone Group in Call Control."
+	INDEX { callPhoneGroupNumber }
+	::= { callPhoneGroupTable 1 }
+
+    CallPhoneGroupEntry ::= SEQUENCE {
+	callPhoneGroupNumber	INTEGER,
+	callPhoneGroupName	DisplayString,
+	callPhoneGroupState	INTEGER,
+	callDataLinks		INTEGER,
+	callTypeSource		INTEGER,
+	callTypeForce		INTEGER,
+	callIncomingCalls	Counter,
+	callOutgoingCalls	Counter,
+	callModemName		DisplayString,
+	callAnswerInit		DisplayString,
+	callInitString		DisplayString,
+	callInitSpeed		INTEGER,
+	callInitFlowControl	INTEGER,
+	callInPools		DisplayString,
+	callOutPools		DisplayString
+    }
+
+    callPhoneGroupNumber OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The configured number of this PhoneGroup.  For
+		instance, if this is PhoneGroup7, the value is 7."
+	::= { callPhoneGroupEntry 1 }
+
+    callPhoneGroupName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The configured name of this PhoneGroup."
+	::= { callPhoneGroupEntry 2 }
+
+    callPhoneGroupState OBJECT-TYPE
+	SYNTAX	INTEGER {
+		off(1),
+		on(2),
+		initFail(3),
+		dmcDown(4)	-- down because associated DMC is down
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The state of this PhoneGroup."
+	::= { callPhoneGroupEntry 3 }
+
+    callDataLinks OBJECT-TYPE
+	SYNTAX	INTEGER (0..63)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+                "This variable indicates the set of data-links
+		that will be available to calls on this PhoneGroup.
+
+    The callPhoneGroup DataLinks is a bit map represented as a sum,
+    therefore, it can represent multiple data-links simultaneously.
+
+    The various bit positions are:
+	  1	callHDLC		HDLC, for PPP
+	  2	callARAV1		ARA 1.0
+	  4	callARAV2		ARA 2.0
+	  8	callShell		Command shell
+	 16	callAALAP		AALAP, for NetModem 1.x
+					AppleTalk
+	 32	callSLIP		SLIP listener (SLIP normally
+					via Shell)
+	 128	callL2FPPP		PPP encapsulated within L2F
+	 256	callL2FSLIP		SLIP encapsulated within L2F"
+	::= { callPhoneGroupEntry 4 }
+    
+    callTypeSource OBJECT-TYPE
+	SYNTAX	INTEGER {
+		switch(1),
+		forced(2)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The source of the call type for calls to this
+		PhoneGroup, for calls via PRI interfaces.  If the
+		value is switch, it will be from information elements
+		provided by the telephone network.  If the value is
+		forced, the call type will be forced to the type
+		specified in callTypeForce."
+	::= { callPhoneGroupEntry 5 }
+
+    callTypeForce OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		modemV34(2),
+		digitalSync(3)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"If callTypeSource is forced, this is what calls
+		over a PRI in this PhoneGroup will be interpreted as,
+		ignoring anything in the PRI information elements.
+		The modemV34 value means that the call will be treated
+		as an analog call, and routed to an ITU-T V.34 modem.
+		The digitalSync value means that the call will be
+		treated as a digital call, containing synchronous
+		digital data, eg. Synchronous PPP.
+
+		For channelized T1 lines, all calls are routed to an
+		ITU-T V.34 modem."
+	::= { callPhoneGroupEntry 6 }
+
+    callIncomingCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of incoming calls that were answered by
+		this PhoneGroup."
+	::= { callPhoneGroupEntry 7 }
+
+    callOutgoingCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of outgoing calls that were originated by
+		this PhoneGroup."
+	::= { callPhoneGroupEntry 8 }
+
+    callModemName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the type of modem (configuration) selected
+		for use with calls to and from this PhoneGroup."
+	::= { callPhoneGroupEntry 9 }
+
+    callAnswerInit OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The initialization string sent to a modem when it
+		will be answering a phone call to this PhoneGroup."
+	::= { callPhoneGroupEntry 10 }
+
+    callInitString OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The initialization string sent to a modem when it
+		will be originating a phone call from this PhoneGroup."
+	::= { callPhoneGroupEntry 11 }
+
+    callInitSpeed OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The rate in bits per second at which communications
+		with the modem will be initiated, for calls to and
+		from this PhoneGroup."
+	::= { callPhoneGroupEntry 12 }
+
+    callInitFlowControl OBJECT-TYPE
+	SYNTAX	INTEGER {
+		none(1),	-- no flow control
+		hardware(2),	-- hardware using RTS/CTS handshakes
+		software(3)	-- software with XON/XOFF characters
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of flow control to use with the modem for
+		calls to and from this PhoneGroup."
+	::= { callPhoneGroupEntry 13 }
+
+    callInPools OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The names of the incoming call pools that this
+		PhoneGroup is a part of.  The names are in a list,
+		seperated by commas."
+	::= { callPhoneGroupEntry 14 }
+
+    callOutPools OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The names of the outgoing call pools that this
+		PhoneGroup is a part of.  The names are in a list,
+		seperated by commas."
+	::= { callPhoneGroupEntry 15 }
+
+    callPhoneNumberTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF CallPhoneNumberEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of the telephone numbers associated with
+		each of the PhoneGroups in the box.  Each phone number
+		is associated with one, and only one, PhoneGroup."
+	::= { call 2 }
+
+    callPhoneNumberEntry OBJECT-TYPE
+	SYNTAX	CallPhoneNumberEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A Phone Number in a PhoneGroup."
+	INDEX { callPhoneNumberGroupNumber, callPhoneNumberIndex }
+	::= { callPhoneNumberTable 1 }
+
+    CallPhoneNumberEntry ::= SEQUENCE {
+	callPhoneNumberGroupNumber   INTEGER,
+	callPhoneNumberIndex	     INTEGER,
+	callPhoneNumber		     DisplayString,
+	callPhoneNumberState	     INTEGER,
+	callPhoneNumberCalls	     Counter
+    }
+
+    callPhoneNumberGroupNumber OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The configured number of this PhoneGroup.  For
+		instance, if this is PhoneGroup7, the value is 7."
+	::= { callPhoneNumberEntry 1 }
+
+    callPhoneNumberIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of this telephone number associated with
+		this PhoneGroup." 
+	::= { callPhoneNumberEntry 2 }
+
+    callPhoneNumber OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A phone number that is a member of this PhoneGroup."
+	::= { callPhoneNumberEntry 3 }
+
+    callPhoneNumberState OBJECT-TYPE
+	SYNTAX	INTEGER {
+		active(1),
+		idle(2)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The state of this telephone number."
+	::= { callPhoneNumberEntry 4 }
+
+    callPhoneNumberCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of incoming and outgoing calls that have
+		occured on this phone number."
+	::= { callPhoneNumberEntry 5 }
+
+
+    callInterfaceTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF CallInterfaceEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of the interfaces that are usable
+		by each PhoneGroup.  The presence of an entry
+		in this table indicates that this interface
+		is associated with this PhoneGroup.  Note that a
+		particular interface may be associated with many 
+		PhoneGroups."
+	::= { call 3 }
+
+    callInterfaceEntry OBJECT-TYPE
+	SYNTAX	CallInterfaceEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An interface in a PhoneGroup."
+	INDEX { callInterfacePhoneGroup, callInterfaceIfIndex }
+	::= { callInterfaceTable 1 }
+
+    CallInterfaceEntry ::= SEQUENCE {
+	callInterfacePhoneGroup		INTEGER,
+	callInterfaceIfIndex		INTEGER
+    }
+
+    callInterfacePhoneGroup OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The configured number of this PhoneGroup.  For
+		instance, if this is PhoneGroup7, the value is 7."
+	::= { callInterfaceEntry 1 }
+
+    callInterfaceIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of an interface (timeslot WANInterfaceN:N)
+		which is a member of this PhoneGroup."
+	::= { callInterfaceEntry 2 }
+
+
+    callActiveTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF CallActiveEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of the active calls on the box, giving
+		ISDN characteristics."
+	::= { call 4 }
+
+    callActiveEntry OBJECT-TYPE
+	SYNTAX	CallActiveEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An active call."
+	INDEX { callActiveIfIndex }
+	::= { callActiveTable 1 }
+
+    CallActiveEntry ::= SEQUENCE {
+	callActiveIfIndex		INTEGER,
+	callUnitNumber			INTEGER,
+	callSequenceNumber		INTEGER,
+	callActivePhoneGroup		INTEGER,
+	callType			INTEGER,
+	callLineSpeed			INTEGER,
+	callLineStatus			INTEGER,
+	callRateAdaptation		INTEGER,
+	callSourceNumber		DisplayString,
+	callSourceNumberType		INTEGER,
+	callSourceNumberPlan		INTEGER,
+	callSourceNumberPresentation	INTEGER,
+	callSourceNumberScreening	INTEGER,
+	callDestNumber			DisplayString,
+	callDestNumberType		INTEGER,
+	callDestNumberPlan		INTEGER,
+	callDataType			INTEGER,
+	callDirection			INTEGER
+    }
+
+    callActiveIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of the interface which this call
+		is considered to be on.  This may be a timeslot,
+		or may be the modem channel that the call has
+		been assigned to.  SNMP statistics for the call are
+		being kept on this interface."
+	::= { callActiveEntry 1 }
+
+    callUnitNumber OBJECT-TYPE
+	SYNTAX	INTEGER (1..256)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of the interface on which this call
+		is on.  This is the N number in the
+		CallInterfaceN:#M name of the interface assigned
+		for the duration of the call, as used in the event
+		log.  This is also the index used in sessLineTable
+		in the SHIVA-SESS-MIB."
+	::= { callActiveEntry 2 }
+
+    callSequenceNumber OBJECT-TYPE
+	SYNTAX	INTEGER (65..32767)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The call sequence number for this call.  This is the M
+		number of the CallInterfaceN:#M name of the interface
+		assigned for the duration of the call, as used in the event
+		log."
+	::= { callActiveEntry 3 }
+
+    callActivePhoneGroup OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The PhoneGroup that this call is on."
+	::= { callActiveEntry 4 }
+
+    callType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		modemV34(2),
+		digitalSync(3),
+		digitalL2F(4)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of call, with respect to data transfer."
+	::= { callActiveEntry 5 }
+
+    callLineSpeed OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Speed in bits/second that the modem (if any) on this call is
+		operating at."
+	::= { callActiveEntry 6 }
+
+    callLineStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		disabled(1),
+		initializing(2),
+		idle(3),
+		packet(4),	-- in use for packet-oriented networking
+		character(5)	-- in use for character-oriented I/O
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Serial line status for the logical line associated
+		with this call.  Setting callLineStatus to initializing(2)
+		forces the logical line to be reinitialized."
+	::= { callActiveEntry 7 }
+
+    -- callRateAdaptation is presently always none, this is a deficiency.
+
+    callRateAdaptation OBJECT-TYPE
+	SYNTAX	INTEGER {
+		none(1),	-- no rate adaptation
+		v110(2),	-- ITU-T V.110 rate adaptation
+		v120(3),	-- ITU-T V.120 rate adaptation
+		v110-v42(4),	-- deprecated, never used
+		piafs(5)	-- piafs rate adaptation
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of rate adaptation used for this call,
+		if it is operating directly over ISDN."
+	::= { callActiveEntry 8 }
+    
+    callSourceNumber OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The source (calling party) phone number of this call."
+	::= { callActiveEntry 9 }
+
+    callSourceNumberType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		international(2),	-- starting with country code
+		national(3),		-- starting with area code
+		subscriber(4),
+		abbreviated(5)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of telephone number, per ITU-T Q.931."
+	::= { callActiveEntry 10 }
+
+    callSourceNumberPlan OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		isdn(2),		-- ISDN numbering plan, per E.164
+		telephony(3),		-- national telephony
+					-- numbering plan
+		private(4)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The numbering plan, per ITU-T Q.931."
+	::= { callActiveEntry 11 }
+
+    callSourceNumberPresentation OBJECT-TYPE
+	SYNTAX	INTEGER {
+		allowed(1),
+		restricted(2),
+		notAvailable(3)		-- due to interworking
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The presentation indicator, per ITU-T Q.931."
+	::= { callActiveEntry 12 }
+
+    callSourceNumberScreening OBJECT-TYPE
+	SYNTAX	INTEGER {
+		notScreened(1),
+		verPassed(2),
+		verFailed(3),
+		networkProvided(4)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The screening indicator, per ITU-T Q.931."
+	::= { callActiveEntry 13 }
+
+    callDestNumber OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The destination (called party) phone number of this
+		call."
+	::= { callActiveEntry 14 }
+
+    callDestNumberType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		international(2),	-- starting with country code
+		national(3),		-- starting with area code
+		subscriber(4),
+		abbreviated(5)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of telephone number, per ITU-T Q.931."
+	::= { callActiveEntry 15 }
+
+    callDestNumberPlan OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		isdn(2),		-- ISDN numbering plan, per E.164
+		telephony(3),		-- national telephony
+					-- numbering plan
+		private(4)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The numbering plan, per ITU-T Q.931."
+	::= { callActiveEntry 16 }
+
+    callDataType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		voice(1),	-- voice, possibly too bad for modem
+		modem(2),	-- 3.1 KHz audio (high quality voice)
+		dig56(3),	-- eight bit unavailable
+		dig64(4),	-- pure 8 bit path
+		dig64restricted(5), -- 8 bit, but no zero bytes
+		vpdnppp(6),     -- PPP encapsulated within L2F, L2TP, etc.
+		other(7)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of the call, as reported or requested to
+		ISDN signalling."
+	::= { callActiveEntry 17 }
+
+    callDirection OBJECT-TYPE
+	SYNTAX	INTEGER { in(1), out(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The direction of the call."
+	::= { callActiveEntry 18 }
+
+    callInitDone OBJECT-TYPE
+	SYNTAX INTEGER { true(1), false(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This is false while the call-control system is
+		initializing, and true forever afterwards.  Until
+		it is true, the tables in this MIB will not exist,
+		and the ifTable will not have the complete set
+		of physical interfaces instantiated.  (The ifTable
+		will continue to grow as dynamic PPP interfaces
+		are instantiated.)"
+	::= { call 5 }
+
+
+    -- While the callWanInterfaceTable has been in the MIB since
+    -- ShivOS 4.5, it wasn't actually implemented until ShivOS 5.4.
+
+    callWanInterfaceTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF CallWanInterfaceEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table listing the WAN Interfaces and their configuration,
+		primarily relating to common-channel signaling characteristics.
+		(ISDN characteristics can be found in the appropriate
+		IETF MIB.)"
+	::= { call 6 }
+
+    callWanInterfaceEntry OBJECT-TYPE
+	SYNTAX	CallWanInterfaceEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A wan interface in a PhoneGroup."
+	INDEX { callWanInterfaceIfIndex }
+	::= { callWanInterfaceTable 1 }
+
+    CallWanInterfaceEntry ::= SEQUENCE {
+	callWanInterfaceIfIndex		INTEGER,
+	callWanInterfaceDialType	INTEGER,
+	callWanInterfaceSignallingType	INTEGER,
+	callWanInterfaceSectionNumber	INTEGER,
+	callWanInterfaceTotalIncomingCalls		Counter,
+	callWanInterfaceTotalOutgoingCalls		Counter,
+	callWanInterfaceTotalDigitalCalls		Counter,
+	callWanInterfaceTotalDigitizedAnalogCalls	Counter,
+	callWanInterfaceTotalAnalogCalls		Counter,
+	callWanInterfaceTotalRadV110Calls		Counter,
+	callWanInterfaceTotalRadV120Calls		Counter,
+	callWanInterfaceTotalLeasedLineCalls		Counter,
+	callWanInterfaceTotalPiafsCalls			Counter
+    }
+
+    callWanInterfaceIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of this WANInterface.  Not related
+		to the section number in the configuration."
+	::= { callWanInterfaceEntry 1 }
+
+    callWanInterfaceDialType OBJECT-TYPE
+	-- We've taken the minor liberty of changing ISDN to isdn
+	-- at ShivOS 5.5 for syntactic correctness.
+	SYNTAX	INTEGER {
+		   isdn(1),	-- ISDN dial
+		   pulse(2),	-- pulse dial
+		   tone(3),	-- tone dial: DTMF, multfrequency (R1),
+				-- or 2-out-of-6 (R2)
+		   none(4)	-- no dialing
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The wan interface's dial type."
+	::= { callWanInterfaceEntry 2 }
+
+    callWanInterfaceSignallingType OBJECT-TYPE
+	-- The order of the enumeration is less than graceful
+	-- due to adding new signalling types while maintaining
+	-- backwards compatability.
+	SYNTAX	INTEGER {
+		   -- AT&T D4 channel bank, E&M lead signalling	
+		   robbedBitWinkStart(1),		-- Wink Start
+		   robbedBitImmediateStart(2),  	-- Immediate Start
+
+		   -- AT&T D4 channel bank, Foreign Exchange Subscriber, 4ESS
+		   robbedBit4ESSLoopStartWink(3), 	-- Loop Start wink
+		   robbedBit4ESSLoopStartNoWink(4),	-- Loop Start no wink
+		   robbedBit4ESSGroundStartWink(5),	-- Ground Start wink
+		   robbedBit4ESSGroundStartNoWink(6),	-- Ground Start no wink
+
+		   -- AT&T D4 channel bank, Foreign Exchange Subscriber, 5ESS
+		   robbedBit5ESSLoopStart(7),
+		   robbedBit5ESSGroundStart(8),
+
+		   -- AT&T D4 channel bank, Foreign Exchange Office
+		   robbedBitFXOLoopStart(9),		-- Loop Start
+		   robbedBitFXOGroundStart(10),		-- Ground Start
+
+		   -- types for ISDN (see IETF ISDN MIB for details)
+   		   pri(11),				-- Primary Rate Int.
+		   bri(12),				-- Basic Rate Int.
+
+		   -- no signalling
+		   none(13),
+
+		   -- AT&T D4 channel bank, E&M lead signalling	
+		   robbedBitDelayDial(14),		-- Delay Dial
+
+		   -- D4 channel bank, ITU-T Signalling System R1 
+		   -- (Q.300 series)
+		   robbedBitR1(15),			-- Generic
+		   robbedBitR1Taiwan(16),		-- Taiwan
+
+		   -- E1 G.704 Time Slot 16 channel associated signalling, 
+		   -- with ITU-T Signalling System R2 (Q.400 series)
+	           signallingSystemR2(17),		-- Generic
+	           signallingSystemR2China(18),		-- China
+	           signallingSystemR2Mexico(19),	-- Mexico
+	           signallingSystemR2NewZealand(20),	-- New Zealand
+	           signallingSystemR2Venezuela(21),	-- Venezuela
+	           signallingSystemR2Philippines(22),	-- Philippines
+	           signallingSystemR2Brazil(23),	-- Brazil
+	           signallingSystemR2Thailand(24),	-- Thailand
+	           signallingSystemR2IndonesiaEricsson(25), 
+							-- Indonesia, Ericsson
+	           signallingSystemR2IndonesiaEM(26),	-- Indonesia, E&M
+	           signallingSystemR2India(27),		-- India
+	           signallingSystemR2ArgentinaQ421(28),	-- Argentina, Q.421
+	           signallingSystemR2ArgentinaEM(29),	-- Argentina, E&M
+	           signallingSystemR2ChileQ421(30),	-- Chile, Q.421
+	           signallingSystemR2ChileEM(31),	-- Chile, E&M
+
+		   -- E1 G.704 Time Slot 16 channel associated signalling, 
+		   -- with ITU-T Signalling System R1 (Q.300 series)
+	           signallingSystemR1Turkey(32)		-- Turkey
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The wan interface's configured signalling type."
+	::= { callWanInterfaceEntry 3 }
+
+    callWanInterfaceSectionNumber OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The section number of this WAN Interface in the configuration.
+		For example, if this WAN Interface is configured in section
+		[WANInterface3], then 3 is the value of this variable."
+	::= { callWanInterfaceEntry 4 }
+
+    callWanInterfaceTotalIncomingCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of incoming calls received on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 5 }
+
+    callWanInterfaceTotalOutgoingCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of outgoing calls originating on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 6 }
+
+    callWanInterfaceTotalDigitalCalls OBJECT-TYPE
+	SYNTAX 	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of digital calls received on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 7 }
+
+    callWanInterfaceTotalDigitizedAnalogCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of digitized analog calls received on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 8 }
+
+    callWanInterfaceTotalAnalogCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS 	mandatory	
+	DESCRIPTION
+		"The total number of analog calls received on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 9 }
+
+    callWanInterfaceTotalRadV110Calls OBJECT-TYPE
+	SYNTAX 	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of V.110 calls received on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 10 }
+
+    callWanInterfaceTotalRadV120Calls OBJECT-TYPE
+	SYNTAX 	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of V.120 calls received on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 11 }
+
+    callWanInterfaceTotalLeasedLineCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS 	mandatory
+	DESCRIPTION
+		"The total number of leased line calls received on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 12 }
+
+    callWanInterfaceTotalPiafsCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of PIAFS calls received on this WAN interface since the device was last rebooted."
+	::= { callWanInterfaceEntry 13 }
+
+
+    -- Objects callTotalCalls through callLeasedLineCalls have been
+    -- deprecated, as they have the wrong SYNTAX.  They are not Counters,
+    -- they are INTEGERS, as they increase and decrease.  Sorry for
+    -- the inconvenience.  They are replaced by callCurrentCalls through
+    -- callCurrentLeasedLineCalls below.
+
+    callTotalCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"Current incoming and outgoing calls of all types"
+	::= { call 7 }
+
+    callAnalogCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"Current incoming and outgoing analog calls on the RS-232 
+		ports"
+	::= { call 8 }
+
+    callDigitalCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"Current incoming and outgoing digital calls over ISDN"
+	::= { call 9 }
+
+    callRadV110Calls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"Current incoming and outgoing rate adaptation V.110 calls"
+	::= { call 10 }
+
+    callRadV120Calls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"Current incoming and outgoing rate adaptation V.120 calls"
+	::= { call 11 }
+
+    callDigitizedAnalogCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"Current incoming and outgoing digitized analog (modem)
+		 calls over ISDN"
+	::= { call 12 }
+
+    callLeasedLineCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"Current incoming and outgoing leased line calls"
+	::= { call 13 }
+
+    -- The Objects callCurrentCalls through callCurrentLeasedLineCalls 
+    -- replace the deprecated Objects callTotalCalls through
+    -- callLeasedLineCalls above.  They have the correct syntax.
+
+    callCurrentCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The current number of calls connected to the system,
+		incoming and outgoing, for all call types."
+	::= { call 14 }
+
+    callCurrentAnalogCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current incoming and outgoing analog calls on RS-232 ports.
+		This does NOT include analog calls over digital telephony
+		interfaces, those are in callCurrentDigitizedAnalogCalls."
+	::= { call 15 }
+
+    callCurrentDigitalCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current incoming and outgoing synchronous digital (ISDN)
+		calls.  Does not include rate-adapted calls."
+	::= { call 16 }
+
+    callCurrentRadV110Calls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current incoming and outgoing calls using ITU-T V.110
+		rate adaptation."
+	::= { call 17 }
+
+    callCurrentRadV120Calls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current incoming and outgoing calls using ITU-T V.120
+		rate adaptation."
+	::= { call 18 }
+
+    callCurrentDigitizedAnalogCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current incoming and outgoing calls using analog modem
+		signalling (ITU-T V.34, etc.) over PCM modulation on
+		ISDN or channel-associated-signalling digital telephony
+		trunk interfaces."
+	::= { call 19 }
+
+    callCurrentLeasedLineCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current incoming and outgoing leased line calls"
+	::= { call 20 }
+
+    callCurrentPiafsCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current incoming and outgoing calls using PIAFS
+		rate adaptation."
+	::= { call 21 }
+
+END

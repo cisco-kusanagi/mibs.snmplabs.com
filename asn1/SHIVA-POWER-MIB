@@ -1,0 +1,102 @@
+-- shiva-power.asn
+--
+-- 	Copyright 1999 Shiva Corporation
+--
+
+SHIVA-POWER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	Counter
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB definitions
+	TRAP-TYPE
+		FROM RFC-1215		-- TRAPs
+	power
+		FROM SHIVA-MIB;
+
+-- MIB for status of power supplies on LRAS DPS
+
+   psStatus	OBJECT IDENTIFIER ::= { power 1 }
+
+	psCount OBJECT-TYPE
+	    SYNTAX  Counter
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Number of power supplies in the system"
+	    ::= { psStatus 1 }
+
+	psTrapsEnabled OBJECT-TYPE
+	    SYNTAX  INTEGER { enabled(1), disabled(2) }
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Indicates whether the SNMP agent process is permitted to
+		generate power-supply status change traps."
+	    ::= { psStatus 2 }
+
+-- power supply table
+
+	psTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF PsEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"A table of power supplies present in the system."
+	    ::= { psStatus 3 }
+
+	psEntry OBJECT-TYPE
+	    SYNTAX  PsEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Power Supply information."
+	    INDEX { psIndex }
+	    ::= { psTable 1 }
+
+	PsEntry ::= SEQUENCE {
+	    psIndex		INTEGER,
+	    psPowerStatus	INTEGER,
+	    psFanStatus		INTEGER
+	}
+
+	psIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Power Supply index."
+	    ::= { psEntry 1 }
+
+	psPowerStatus OBJECT-TYPE
+	    SYNTAX  INTEGER { enabled(1), disabled(2) }
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Status of the power supply itself."
+	    ::= { psEntry 2 }
+
+	psFanStatus OBJECT-TYPE
+	    SYNTAX  INTEGER { enabled(1), disabled(2) }
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Status of the fan for this power supply."
+	    ::= { psEntry 3 }
+
+   psTraps OBJECT IDENTIFIER ::= { power 2 }
+
+   psStatusChanged TRAP-TYPE
+	ENTERPRISE
+	    psTraps
+	VARIABLES {
+	    psPowerStatus,
+	    psFanStatus
+	}
+	DESCRIPTION
+		"This trap is generated whenever a change in the status of a
+		power supply or its fan is detected."
+	::= 1
+
+END

@@ -1,0 +1,693 @@
+-- extracted from draft-cetin-mpls-diffserv-te-mib-00.txt
+-- at Tue Nov 26 06:11:58 2002
+
+MPLS-DS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       Unsigned32,
+       OBJECT-TYPE,
+       NOTIFICATION-TYPE,
+       MODULE-IDENTITY
+                               FROM SNMPv2-SMI
+
+       TEXTUAL-CONVENTION,
+       RowStatus,
+       DisplayString
+                               FROM SNMPv2-TC
+
+       InterfaceIndexOrZero
+                               FROM IF-MIB
+
+       Dscp
+                               FROM DIFFSERV-DSCP-TC;
+
+mplsDsMIB MODULE-IDENTITY
+   LAST-UPDATED "200211011200Z"  -- 01 November 2002 12:00:00 GMT
+   ORGANIZATION "Multiprotocol Label Switching (MPLS) Working Group"
+   CONTACT-INFO
+       "
+                Riza Cetin
+        Postal: Alcatel
+                Francis Wellesplein 1
+                B-2018 Antwerp, Belgium
+        Tel:    +32-3-2404735
+        Email:  riza.cetin@alcatel.be      
+       "
+  
+DESCRIPTION
+       "This MIB module contains managed object definitions for
+        MPLS DiffServ support as defined in: F. Le Faucheur, L. Wu,
+        B. Davie, S. Davari, P. Vaananen, R. Krishnan, P. Cheval,
+        J. Heinanen, Multi-Protocol Label Switching (MPLS) Support
+        of Differentiated Services RFC 3270, May 2002."
+
+-- Revision history.
+      
+   REVISION
+       "200211011200Z"  -- 01 November 2002 12:00:00 GMT
+   DESCRIPTION
+       "Initial draft version."
+    ::= { mplsMIB x }   -- to be assigned.
+
+-- Textual conventions used in this MIB.
+
+MplsDsClassIndex                 ::=TEXTUAL-CONVENTION
+     STATUS                      current
+     DESCRIPTION
+        "DiffServ class of service index."
+     SYNTAX                      INTEGER(0..65535)
+
+MplsTeClassType                  ::=TEXTUAL-CONVENTION
+     STATUS                      current
+     DESCRIPTION
+        "Traffic Engineering Class Type."
+     SYNTAX                      INTEGER(0..7)
+
+MplsDsDropPreference             ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT                "d"
+     STATUS   current
+     DESCRIPTION
+        "Drop preference."
+     SYNTAX                      INTEGER { low    (1),
+                                           medium (2),
+                                           high   (3) }
+
+MplsLspType                     ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT               "d"
+     STATUS                     current
+     DESCRIPTION
+        "Defines the type of the LSP (E-LSP or L-LSP)."
+     SYNTAX                    INTEGER { eLsp (1),
+                                         lLsp (2) }
+
+MplsExp                         ::= TEXTUAL-CONVENTION
+     STATUS                     current
+     DESCRIPTION
+        "Exp bits."
+     SYNTAX                     INTEGER (0..7)
+
+-- Top-Level Components of this MIB.
+
+-- Objects
+   mplsDsObjects        OBJECT IDENTIFIER ::= {mplsDsMIB 1}
+
+-- Per Hop Behavior (PHB) Table
+
+mplsDsPhbTable                   OBJECT-TYPE
+     SYNTAX                      SEQUENCE OF MplsDsPhbEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This table defines PHBs. A PHB consists of DiffServ class of
+         service and drop preference, and gets a unique PHB-Id." 
+     ::= {mplsDsObjects 1}
+
+mplsDsPhbEntry                   OBJECT-TYPE
+     SYNTAX                      MplsDsPhbEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "An entry for a particular PHB."
+     INDEX {mplsDsPhbDsClassIndex,
+            mplsDsPhbDropPreference
+           }
+     ::= {mplsDsPhbTable 1}
+
+MplsDsPhbEntry                   ::= SEQUENCE
+     {
+     mplsDsPhbDsClassIndex       MplsDsClassIndex,
+     mplsDsPhbDropPreference     MplsDsDropPreference,
+     mplsDsPhbId                 Unsigned32,
+     mplsDsPhbDescr              DisplayString,
+     mplsDsPhbRowStatus          RowStatus
+     }
+
+mplsDsPhbDsClassIndex            OBJECT-TYPE
+     SYNTAX                      MplsDsClassIndex
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "DiffServ class of service index of this PHB."
+     ::= {mplsDsPhbEntry 1}
+
+mplsDsPhbDropPreference          OBJECT-TYPE
+     SYNTAX                      MplsDsDropPreference
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "Drop preference of this PHB."
+     ::= {mplsDsPhbEntry 2}
+
+mplsDsPhbId                      OBJECT-TYPE
+     SYNTAX                      Unsigned32
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "Per Hop Behavior identification.
+         It follows the unsigned 16 bit binary encoding as specified
+         in RFC 3140."
+     ::= {mplsDsPhbEntry 3}
+
+
+mplsDsPhbDescr                   OBJECT-TYPE
+     SYNTAX                      DisplayString
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "Textual description of this PHB."
+     ::= {mplsDsPhbEntry 4}
+
+mplsDsPhbRowStatus               OBJECT-TYPE
+     SYNTAX                      RowStatus
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "This object is used to create, modify, and/or
+         delete a row in this table."
+     ::= {mplsDsPhbEntry 5}
+
+-- PHB Scheduling Class (PSC) Table  
+
+mplsDsPscTable                   OBJECT-TYPE
+     SYNTAX                      SEQUENCE OF MplsDsPscEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This table defines PHB Scheduling Classes." 
+     ::= {mplsDsObjects 2}
+
+mplsDsPscEntry                   OBJECT-TYPE
+     SYNTAX                      MplsDsPscEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This entry describes a PHB Scheduling Class."
+     INDEX {mplsDsPscDsClassIndex}
+     ::= {mplsDsPscTable 1}
+
+MplsDsPscEntry                   ::=SEQUENCE
+     {
+     mplsDsPscDsClassIndex       MplsDsClassIndex,
+     mplsDsPscId                 Unsigned32,
+     mplsDsPscDescr              DisplayString,
+     mplsDsPscTeClassType        MplsTeClassType,
+     mplsDsPscRowStatus          RowStatus
+     }
+
+mplsDsPscDsClassIndex            OBJECT-TYPE
+     SYNTAX                      MplsDsClassIndex
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "DiffServ class of service index."
+     ::= {mplsDsPscEntry 1}
+
+mplsDsPscId                      OBJECT-TYPE
+     SYNTAX                      Unsigned32
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "The PHB Scheduling Class that is used inside the DS Domain
+         while establishing an l-lsp.
+         It follows the unsigned 16 bit binary encoding as specified
+         in RFC 3140."
+     ::= {mplsDsPscEntry 2}
+
+mplsDsPscDescr                   OBJECT-TYPE
+     SYNTAX                      DisplayString
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "Textual description of this PSC."
+     ::= {mplsDsPscEntry 3}
+
+mplsDsPscTeClassType             OBJECT-TYPE
+     SYNTAX                      MplsTeClassType
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "Traffic engineering class type."
+     ::= {mplsDsPscEntry 4}
+
+mplsDsPscRowStatus               OBJECT-TYPE
+     SYNTAX                      RowStatus
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+         "This object is used to create, modify, and/or
+         delete a row in this table."
+     ::= {mplsDsPscEntry 5}
+
+-- DSCP to PBH Mapping Table 
+
+mplsDsDscpToPhbMapTable          OBJECT-TYPE
+     SYNTAX                      SEQUENCE OF MplsDsDscpToPhbMapEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This table is used to configure DSCP to PHB mapping
+         profiles, each profile is identified by profile index."
+     ::= {mplsDsObjects 3}
+
+mplsDsDscpToPhbMapEntry          OBJECT-TYPE
+     SYNTAX                      MplsDsDscpToPhbMapEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This entry describes DSCP to PHB mapping."
+     INDEX {mplsDsDscpToPhbMapProfileIndex,
+            mplsDsDscpToPhbMapDscp
+           }
+     ::= {mplsDsDscpToPhbMapTable 1}
+
+MplsDsDscpToPhbMapEntry                  ::= SEQUENCE
+     {
+     mplsDsDscpToPhbMapProfileIndex      Unsigned32,
+     mplsDsDscpToPhbMapDscp              Dscp,
+     mplsDsDscpToPhbMapDsClassIndex      MplsDsClassIndex,
+     mplsDsDscpToPhbMapDropPreference    mplsDsDropPreference,
+     mplsDsDscpToPhbMapRowStatus         RowStatus
+     }
+
+mplsDsDscpToPhbMapProfileIndex   OBJECT-TYPE
+     SYNTAX                      Unsigned32
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "The DSCP to PHB mapping profile index."
+     ::= {mplsDsDscpToPhbMapEntry 1}
+
+mplsDsDscpToPhbMapDscp           OBJECT-TYPE
+     SYNTAX                      Dscp
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This is the Differentiated Services Code Point
+         (DSCP)."
+     ::= {mplsDsDscpToPhbMapEntry 2}
+
+mplsDsDscpToPhbMapDsClassIndex   OBJECT-TYPE
+     SYNTAX                      MplsDsClassIndex
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+       "DiffServ class of service index of this DSCP."
+     DEFVAL                      {0}
+     ::= {mplsDsDscpToPhbMapEntry 3}
+
+mplsDsDscpToPhbMapDropPreference OBJECT-TYPE
+     SYNTAX                      mplsDsDropPreference
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "Drop preference of this DSCP."
+     DEFVAL                      {high}
+     ::= {mplsDsDscpToPhbMapEntry 4}
+
+mplsDsDscpToPhbMapRowStatus      OBJECT-TYPE
+     SYNTAX                      RowStatus
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "This object is used to create, modify, and/or
+         delete a row in this table."
+     ::= {mplsDsDscpToPhbMapEntry 5}
+
+-- EXP to PHB Mapping Table
+
+mplsDsExpToPhbMapTable           OBJECT-TYPE
+     SYNTAX                      SEQUENCE OF MplsDsExpToPhbMapEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This table is used to configure EXP to PHB mapping
+         profiles, each profile is identified by profile index.
+
+         This table contains both pre-configured mappings and 
+         mappings signaled via RSVP-TE signaling protocol."
+     ::= {mplsDsObjects 4}
+
+mplsDsExpToPhbMapEntry           OBJECT-TYPE
+     SYNTAX                      MplsDsExpToPhbMapEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This entry describes EXP to PHB mapping.
+
+         An entry can be created by a network administrator
+         or by an SNMP agent as instructed by RSVP-TE
+         signalling protocol."
+
+     INDEX {mplsDsExpToPhbMapProfileIndex,
+            mplsDsExpToPhbMapExp
+           }
+     ::= {mplsDsExpToPhbMapTable 1}
+
+MplsDsExpToPhbMapEntry                ::= SEQUENCE
+     {
+     mplsDsExpToPhbMapProfileIndex    Unsigned32,
+     mplsDsExpToPhbMapExp             MplsExp,
+     mplsDsExpToPhbMapDsClassIndex    MplsDsClassIndex,
+     mplsDsExpToPhbMapDropPreference  MplsDsDropPreference,
+     mplsDsExpToPhbMapRowStatus       RowStatus,
+     mplsDsExpToPhbMapStorageType     StorageType
+     }
+
+mplsDsExpToPhbMapProfileIndex    OBJECT-TYPE
+     SYNTAX                      Unsigned32
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "The EXP to PHB mapping profile index."
+     ::= {mplsDsExpToPhbMapEntry 1}
+
+mplsDsExpToPhbMapExp             OBJECT-TYPE
+     SYNTAX                      MplsExp
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "Exp Bits value is used to indicate a certain PHB for
+         MPLS traffic."
+     ::= {mplsDsExpToPhbMapEntry 2}
+
+mplsDsExpToPhbMapDsClassIndex    OBJECT-TYPE
+     SYNTAX                      MplsDsClassIndex
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+       "DiffServ class of service index of this EXP."
+     DEFVAL                      {0}
+     ::= {mplsDsExpToPhbMapEntry 3}
+
+mplsDsExpToPhbMapDropPreference  OBJECT-TYPE
+     SYNTAX                      MplsDsDropPreference
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "Drop preference of this EXP."
+     DEFVAL                      {high}
+     ::= {mplsDsExpToPhbMapEntry 4}
+
+mplsDsExpToPhbMapRowStatus       OBJECT-TYPE
+     SYNTAX                      RowStatus
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "This object is used to create, modify, and/or
+         delete a row in this table."
+     ::= {mplsDsExpToPhbMapEntry 5}
+
+mplsDsExpToPhbMapStorageType     OBJECT-TYPE
+     SYNTAX                      StorageType
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "This variable indicates the storage type." 
+     ::= {mplsDsExpToPhbMapEntry 6}
+
+-- PHB to EXP Mapping Table  
+
+mplsDsPhbToExpMapTable           OBJECT-TYPE
+     SYNTAX                      SEQUENCE OF MplsDsPhbToExpMapEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This table is used to assign EXP values to the PHBs.
+        
+         At the ingress LSRs, EXP bits value is determined from the
+         PHB of the incoming IP packets by using PHB-EXP mapping before
+         packets are tunneled into the LSP.
+
+         PHB-EXP mapping is configured Per PHB (Per Hop Behavior). 
+         A PHB is represented by DsClassIndex and DropPreference objects."
+     ::= {mplsDsObjects 5}
+
+mplsDsPhbToExpMapEntry           OBJECT-TYPE
+     SYNTAX                      MplsDsPhbToExpMapEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This entry describes PHB to EXP mapping."
+     INDEX {mplsDsPhbToExpMapProfileIndex,
+            mplsDsPhbToExpMapDsClassIndex,
+            mplsDsPhbToExpMapDropPreference
+           }
+     ::= {mplsDsPhbToExpMapTable 1}
+
+MplsDsPhbToExpMapEntry               ::=  SEQUENCE
+     {
+     mplsDsPhbToExpMapProfileIndex   Unsigned32,
+     mplsDsPhbToExpMapDsClassIndex   MplsDsClassIndex,    
+     mplsDsPhbToExpMapDropPreference MplsDsDropPreference,
+     mplsDsPhbToExpMapExp            MplsExp,
+     mplsDsPhbToExpMapRowStatus      RowStatus 
+     }
+
+mplsDsPhbToExpMapProfileIndex    OBJECT-TYPE
+     SYNTAX                      Unsigned32
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "The PHB to EXP Mapping profile index."
+     ::= {mplsDsPhbToExpMapEntry 1}
+
+mplsDsPhbToExpMapDsClassIndex    OBJECT-TYPE
+     SYNTAX                      MplsDsClassIndex
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "DiffServ class of service index of the incoming PHB."
+     ::= {mplsDsPhbToExpMapEntry 2}
+
+mplsDsPhbToExpMapDropPreference  OBJECT-TYPE
+     SYNTAX                      MplsDsDropPreference
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+        "This object indicates the drop preference of
+         the incoming PHB."
+     ::= {mplsDsPhbToExpMapEntry 3}
+
+mplsDsPhbToExpMapExp             OBJECT-TYPE
+     SYNTAX                      MplsExp
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "This object indicates the EXP bits to be used for the
+         outgoing MPLS packets."
+     DEFVAL                    {0}
+     ::={mplsDsPhbToExpMapEntry 4}
+
+mplsDsPhbToExpMapRowStatus       OBJECT-TYPE
+     SYNTAX                      RowStatus
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "This object is used to create, modify, and/or
+        delete a row in this table."
+     ::= {mplsDsPhbToExpMapEntry 5}
+
+-- Interface Mapping Table   
+
+mplsDsIfMapTable                OBJECT-TYPE
+     SYNTAX                     SEQUENCE OF MplsDsIfMapEntry
+     MAX-ACCESS                 not-accessible
+     STATUS                     current
+     DESCRIPTION
+        "This table is used to configure/map DSCP --> PHB, 
+         EXP --> PHB and PHB --> EXP mapping profiles onto
+         interfaces."
+     ::= {mplsDsObjects 6}
+
+mplsDsIfMapEntry                OBJECT-TYPE
+     SYNTAX                     MplsDsIfMapEntry
+     MAX-ACCESS                 not-accessible
+     STATUS                     current
+     DESCRIPTION
+        "This entry contains the DSCP --> PHB, EXP --> PHB and
+         PHB --> EXP profiles that are mapped onto interfaces."
+     INDEX {mplsDsIfMapIndex}
+     ::= {mplsDsIfMapTable 1}
+
+MplsDsIfMapEntry                       ::=  SEQUENCE
+     {
+     mplsDsIfMapIndex                   InterfaceIndexOrZero,
+     mplsDsIfMapDscpToPhbMapProfIndex   Unsigned32,
+     mplsDsIfMapExpToPhbMapProfIndex    Unsigned32,
+     mplsDsIfMapPhbToExpMapProfIndex    Unsigned32
+     }
+
+mplsDsIfMapIndex                  OBJECT-TYPE
+     SYNTAX                       InterfaceIndexOrZero
+     MAX-ACCESS                   not-accessible
+     STATUS                       current
+     DESCRIPTION
+        "Interface index. Profiles configured on interfaceIndex 0
+         are applied globally onto all interfaces where no profile
+         is explicitly configured."
+     ::= {mplsDsIfMapEntry 1}
+
+mplsDsIfMapDscpToPhbMapProfIndex  OBJECT-TYPE
+     SYNTAX                       Unsigned32
+     MAX-ACCESS                   read-create
+     STATUS                       current
+     DESCRIPTION
+        "The DSCP to PHB mapping profile index.
+         This profile is applied at the ingress direction.
+
+         The index value 0 means 'no interface specific profile',
+         in this case profile configured with interface index 0
+         is applied."
+     DEFVAL                      {0}
+     ::= {mplsDsIfMapEntry 2}
+
+mplsDsIfMapExpToPhbMapProfIndex  OBJECT-TYPE
+     SYNTAX                      Unsigned32
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "The EXP to PHB mapping profile index.
+         This profile is applied at the ingress direction.
+
+         The index value 0 means 'no interface specific profile',
+         in this case profile configured with interface index 0
+         is applied."
+     DEFVAL                      {0}
+     ::= {mplsDsIfMapEntry 3}
+
+mplsDsIfMapPhbToExpMapProfIndex OBJECT-TYPE
+     SYNTAX                     Unsigned32
+     MAX-ACCESS                 read-create
+     STATUS                     current
+     DESCRIPTION
+        "The PHB to EXP Mapping profile index.
+         This profile is applied at the egress direction.
+
+         The index value 0 means 'no interface specific profile',
+         in this case profile configured with interface index 0
+         is applied."
+     DEFVAL                      {0}
+     ::= {mplsDsPrPortMapEntry 4}
+
+-- MPLS DiffServ Tunnel Table   
+
+mplsDsTunnelTable               OBJECT-TYPE
+     SYNTAX                     SEQUENCE OF MplsDsTunnelEntry
+     MAX-ACCESS                 not-accessible
+     STATUS                     current
+     DESCRIPTION
+        "This table extends the mplsTunnelTable defined in the 
+         MPLS-TE MIB with the diffServ objects."
+     ::= {mplsDsObjects 7}
+
+mplsDsTunnelEntry               OBJECT-TYPE
+     SYNTAX                     MplsDsTunnelEntry
+     MAX-ACCESS                 not-accessible
+     STATUS                     current
+     DESCRIPTION
+        "This entry contains the diffSer parameters of the tunnel."
+     AUGMENTS { mplsTunnelEntry }
+     ::= {mplsDsTunnelTable 1}
+
+MplsDsTunnelEntry                     ::=  SEQUENCE
+     {
+     mplsDsTunnelLspType               MplsLspType,
+     mplsDsTunnelExpToPhbMapProfIndex  Unsigned32,
+     mplsDsTunnelPhbToExpMapProfIndex  Unsigned32,
+     mplsDsTunnelDsClassIndex          MplsDsClassIndex,
+     mplsDsTunnelTeClassType           MplsTeClassType,
+     mplsDsTunnelRowStatus             RowStatus
+     }
+
+mplsDsTunnelLspType              OBJECT-TYPE
+     SYNTAX                      MplsLspType
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "Type of the DiffServ LSP (L-LSP or E-LSP)."
+     ::= {mplsDsTunnelEntry 1}
+
+mplsDsTunnelExpToPhbMapProfIndex OBJECT-TYPE
+     SYNTAX                      Unsigned32
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "The EXP to PHB Mapping profile index.
+         This is used for E-LSPs to signal EXP --> PHB
+         mapping via RSVP-TE.
+
+         The value 0 means that EXP --> PHB mapping is not
+         signaled and downstream LSRs should use the
+         mappping configured on the incoming interfaces."
+     DEFVAL                    {0}
+     ::= {mplsDsPrPortMapEntry 2}
+
+mplsDsTunnelPhbToExpMapProfIndex OBJECT-TYPE
+     SYNTAX                      Unsigned32
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "The PHB to EXP Mapping profile index.
+         This is used to determine EXP bits at the ingress
+         LSRs while IP is being tunneled into MPLS.
+
+         The value 0 means that the mapping configured on the
+         interface where the tunnel leaves the ingress LSR
+         should be used."
+     DEFVAL                    {0}
+     ::= {mplsDsPrPortMapEntry 3}
+
+mplsDsTunnelDsClassIndex        OBJECT-TYPE
+     SYNTAX                     MplsDsClassIndex
+     MAX-ACCESS                 read-create
+     STATUS                     current
+     DESCRIPTION
+        "DiffServ class of service index of L-LSPs.
+         This object is used to determine PSC for L-LSPs."
+     ::= {mplsDsTunnelEntry 4}
+
+mplsDsTunnelTeClassType         OBJECT-TYPE
+     SYNTAX                     MplsTeClassType
+     MAX-ACCESS                 read-create
+     STATUS                     current
+     DESCRIPTION
+        "Traffic Engineering Class Type of this LSP."
+     ::= {mplsDsTunnelEntry 5}
+
+mplsDsTunnelRowStatus            OBJECT-TYPE
+     SYNTAX                      RowStatus
+     MAX-ACCESS                  read-create
+     STATUS                      current
+     DESCRIPTION
+        "This object is used to create, modify, and/or
+        delete a row in this table."
+     ::= {mplsDsTunnelEntry 6}
+
+END
+
+--   
+--    Copyright (C) The Internet Society (2001). All Rights Reserved.
+--   
+--    This document and translations of it may be copied and furnished to
+--    others, and derivative works that comment on or otherwise explain it
+--    or assist in its implementation may be prepared, copied, published
+--    and distributed, in whole or in part, without restriction of any
+--    kind, provided that the above copyright notice and this paragraph are
+--    included on all such copies and derivative works.  However, this
+--    document itself may not be modified in any way, such as by removing
+--    the copyright notice or references to the Internet Society or other
+--    Internet organizations, except as needed for the purpose of
+--    developing Internet standards in which case the procedures for
+--    copyrights defined in the Internet Standards process must be
+--    followed, or as required to translate it into languages other than
+--    English.
+--    The limited permissions granted above are perpetual and will not be
+--    revoked by the Internet Society or its successors or assigns. This
+--    document and the information contained herein is provided on an "AS
+--    IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK
+--    FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
+--    NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN
+--    WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- 
+

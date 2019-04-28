@@ -1,0 +1,3744 @@
+-- extracted from draft-ietf-atommib-opticalmib-01.txt
+-- at Tue Jul 24 06:05:36 2001
+
+OTN-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Integer32,
+      transmission
+          FROM SNMPv2-SMI
+    TruthValue
+          FROM SNMPv2-TC
+    SnmpAdminString
+          FROM SNMP-FRAMEWORK-MIB 	
+    MODULE-COMPLIANCE, OBJECT-GROUP
+          FROM SNMPv2-CONF
+    ifIndex
+          FROM IF-MIB
+    PerfCurrentCount, PerfIntervalCount
+          FROM PerfHist-TC-MIB; 	
+
+--  This is the MIB module for the OTN Interface objects.
+
+
+optIfMibModule MODULE-IDENTITY
+    LAST-UPDATED "200107190000Z"
+    ORGANIZATION " "
+    CONTACT-INFO
+      "Mark A. Stewart
+       1801 Varsity Drive
+       Raleigh, NC  27606 USA
+       Tel: +1 919 838 5572
+       E-mail: markstewart@lucent.com."
+    DESCRIPTION
+       "The draft MIB module to describe OTN interfaces objects."
+    REVISION  "200107190000Z"	
+    DESCRIPTION
+       "The initial version."
+    ::={ transmission yy}
+
+-- textual conventions
+
+IntervalNumber ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "Uniquely identifies a 15 minute interval.  The interval
+     identified by 1 is the most recently completed interval, and
+     the interval identified by n is the interval immediately
+     preceding the one identified by n-1."
+  SYNTAX  Integer32 (1..96)
+
+-- object groups
+
+optIfObjects OBJECT IDENTIFIER ::= { optIfMibModule 1 }
+optIfConfs OBJECT IDENTIFIER ::= { optIfMibModule 2 }
+
+optIfPerfMon OBJECT IDENTIFIER ::= { optIfObjects 1 }
+optIfOTSn OBJECT IDENTIFIER ::= { optIfObjects 2 }
+optIfOMSn OBJECT IDENTIFIER ::= { optIfObjects 3 }
+optIfOCh OBJECT IDENTIFIER ::= { optIfObjects 4 }
+
+optIfOTUk OBJECT IDENTIFIER ::= { optIfOCh 1 }
+optIfODUkT OBJECT IDENTIFIER ::= { optIfOCh 2 }
+optIfODUkP OBJECT IDENTIFIER ::= { optIfOCh 3 }
+
+optIfGroups OBJECT IDENTIFIER ::= { optIfConfs 1 }
+optIfCompl OBJECT IDENTIFIER ::= { optIfConfs 2 }
+
+-- the optIfPerfMon group
+-- This group defines performance monitoring objects for all
+-- layers.
+
+optIfPerfMonCurrentTimeElapsed OBJECT-TYPE
+  SYNTAX  Gauge32 (0..900)
+  UNITS  "seconds"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Number of seconds elapsed in the current 15 minute
+     performance monitoring interval."
+  ::= { optIfPerfMon 1 }
+
+optIfPerfMonCurDayTimeElapsed OBJECT-TYPE
+  SYNTAX  Gauge32 (0..86400)
+  UNITS  "seconds"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Number of seconds elapsed in the current calendar day
+     performance monitoring period."
+  ::= { optIfPerfMon 2 }
+
+-- PM interval table
+
+optIfPerfMonIntervalTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfPerfMonIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of 15 minute performance monitoring interval
+     information."
+  ::= { optIfPerfMon 3 }
+
+optIfPerfMonIntervalEntry OBJECT-TYPE
+  SYNTAX  OptIfPerfMonIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains 15 minute performance
+     monitoring interval information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfPerfMonIntervalTable 1 }
+
+OptIfPerfMonIntervalEntry ::=
+  SEQUENCE {
+    optIfPerfMonIntervalNumIntervals         Unsigned32,
+    optIfPerfMonIntervalNumInvalidIntervals  Unsigned32
+    }
+
+optIfPerfMonIntervalNumIntervals OBJECT-TYPE
+  SYNTAX  Unsigned32 (0..96)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The number of 15 minute intervals for which performance
+     monitoring data is available.  The number is the same for all
+     the associated sub layers of the interface.
+
+     An optical interface must be capable of supporting at least
+     n intervals, where n is defined as follows:
+         The minimum value of n is 4.
+         The default of n is 32.
+         The maximum value of n is 96.
+
+     The value of this object will be n unless performance
+     monitoring was (re-)started for the interface within the last
+     (n*15) minutes, in which case the value will be the number of
+     complete 15 minute intervals since measurement was
+     (re-)started."
+  ::= { optIfPerfMonIntervalEntry 1 }
+
+optIfPerfMonIntervalNumInvalidIntervals OBJECT-TYPE
+  SYNTAX  Unsigned32 (0..96)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The number of intervals in the range from 0 to
+     optIfPerfMonIntervalNumIntervals for which no performance
+     monitoring data is available and/or the data is invalid."
+  ::= { optIfPerfMonIntervalEntry 2 }
+
+-- the optIfOTSn group
+-- This group handles the configuration and performance
+-- monitoring objects for OTS layers.
+
+-- OTSn config table
+
+optIfOTSnConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTSn configuration information."
+  ::= { optIfOTSn 1 }
+
+optIfOTSnConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn configuration
+     information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfOTSnConfigTable 1 }
+
+OptIfOTSnConfigEntry ::=
+  SEQUENCE {
+    optIfOTSnTraceIdentifierTransmitted  SnmpAdminString,
+    optIfOTSnDAPIExpected                SnmpAdminString,
+    optIfOTSnSAPIExpected                SnmpAdminString,
+    optIfOTSnTraceIdentifierAccepted     SnmpAdminString,
+    optIfOTSnAcTIStatus                  INTEGER,
+    optIfOTSnTIMDetMode                  INTEGER,
+    optIfOTSnTIMActEnabled               TruthValue,
+    optIfOTSnCurrentStatus               INTEGER
+    }
+
+optIfOTSnTraceIdentifierTransmitted OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..64))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The trace identifier transmitted."
+  ::= { optIfOTSnConfigEntry 1 }
+
+optIfOTSnDAPIExpected OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..16))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The DAPI expected by the receiver."
+  ::= { optIfOTSnConfigEntry 2 }
+
+optIfOTSnSAPIExpected OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..16))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The SAPI expected by the receiver."
+  ::= { optIfOTSnConfigEntry 3 }
+
+optIfOTSnTraceIdentifierAccepted OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE (0..64))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual trace identifier received."
+  ::= { optIfOTSnConfigEntry 4 }
+
+optIfOTSnAcTIStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    stable(1),
+    unstable(2)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The status of the accepted Trail Trace Identifier by the receiver."
+  ::= { optIfOTSnConfigEntry 5 }
+
+optIfOTSnTIMDetMode OBJECT-TYPE
+  SYNTAX  INTEGER {
+    off(1),
+    dapi(2),
+    sapi(3),
+    both(4)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the mode of the Trace Identifier Mismatch (TIM)
+     Detection function."
+  ::= { optIfOTSnConfigEntry 6 }
+
+optIfOTSnTIMActEnabled OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the Trace Identifier Mismatch (TIM)
+     Consequent Action function is enabled."
+  ::= { optIfOTSnConfigEntry 7 }
+
+optIfOTSnCurrentStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    noDefect(1),
+    bdiP(2),
+    bdiO(3),
+    bdi(4)
+    tim(5),
+    losP(6),
+    losO(7),
+    los(8)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Indicates the failure condition of the entity, if any."
+  ::= { optIfOTSnConfigEntry 8 }
+
+-- OTSn sink current table
+-- Contains data for the current 15 minute performance monitoring
+-- interval.
+
+optIfOTSnSinkCurrentTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnSinkCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTSn sink performance monitoring information for
+     the current 15 minute interval."
+  ::= { optIfOTSn 2 }
+
+optIfOTSnSinkCurrentEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnSinkCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn sink performance
+     monitoring information of an interface for the current
+     15 minute interval."
+  INDEX  { ifIndex }
+  ::= { optIfOTSnSinkCurrentTable 1 }
+
+OptIfOTSnSinkCurrentEntry ::=
+  SEQUENCE {
+    optIfOTSnSinkCurrentSuspectedFlag             TruthValue,
+    optIfOTSnSinkCurrentInputPower                Integer32,
+    optIfOTSnSinkCurrentLowInputPower             Integer32,
+    optIfOTSnSinkCurrentHighInputPower            Integer32,
+    optIfOTSnSinkCurrentLowerInputPowerThreshold  Integer32,
+    optIfOTSnSinkCurrentUpperInputPowerThreshold  Integer32
+    }
+
+optIfOTSnSinkCurrentSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOTSnSinkCurrentEntry 1 }
+
+optIfOTSnSinkCurrentInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The optical power monitored at the input."
+  ::= { optIfOTSnSinkCurrentEntry 2 }
+
+optIfOTSnSinkCurrentLowInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the input during the
+     current interval."
+  ::= { optIfOTSnSinkCurrentEntry 3 }
+
+optIfOTSnSinkCurrentHighInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the input during the
+     current interval."
+  ::= { optIfOTSnSinkCurrentEntry 4 }
+
+optIfOTSnSinkCurrentLowerInputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on input power.  If
+     optIfOTSnSinkCurrentInputPower drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOTSnSinkCurrentEntry 5 }
+
+optIfOTSnSinkCurrentUpperInputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on input power.  If
+     optIfOTSnSinkCurrentInputPower reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOTSnSinkCurrentEntry 6 }
+
+-- OTSn sink interval table
+-- Contains data for previous 15 minute performance monitoring
+-- intervals.
+
+optIfOTSnSinkIntervalTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnSinkIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of historical OTSn sink performance monitoring
+     information."
+  ::= { optIfOTSn 3 }
+
+optIfOTSnSinkIntervalEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnSinkIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn sink performance
+     monitoring information of an interface during a particular
+     historical interval."
+  INDEX  { ifIndex, optIfOTSnSinkIntervalNumber }
+  ::= { optIfOTSnSinkIntervalTable 1 }
+
+OptIfOTSnSinkIntervalEntry ::=
+  SEQUENCE {
+    optIfOTSnSinkIntervalNumber          IntervalNumber,
+    optIfOTSnSinkIntervalSuspectedFlag   TruthValue,
+    optIfOTSnSinkIntervalLastInputPower  Integer32,
+    optIfOTSnSinkIntervalLowInputPower   Integer32,
+    optIfOTSnSinkIntervalHighInputPower  Integer32
+    }
+
+optIfOTSnSinkIntervalNumber OBJECT-TYPE
+  SYNTAX  IntervalNumber
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Uniquely identifies the interval."
+  ::= { optIfOTSnSinkIntervalEntry 1 }
+
+optIfOTSnSinkIntervalSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOTSnSinkIntervalEntry 2 }
+
+optIfOTSnSinkIntervalLastInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the input during the
+     interval."
+  ::= { optIfOTSnSinkIntervalEntry 3 }
+
+optIfOTSnSinkIntervalLowInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the input during the
+     interval."
+  ::= { optIfOTSnSinkIntervalEntry 4 }
+
+optIfOTSnSinkIntervalHighInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the input during the
+     interval."
+  ::= { optIfOTSnSinkIntervalEntry 5 }
+
+-- OTSn sink current day table
+-- Contains data for the current calendar day performance
+-- monitoring interval.
+
+optIfOTSnSinkCurDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnSinkCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTSn sink performance monitoring information for
+     the current calendar day."
+  ::= { optIfOTSn 4 }
+
+optIfOTSnSinkCurDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnSinkCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn sink performance
+     monitoring information of an interface for the current
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOTSnSinkCurDayTable 1 }
+
+OptIfOTSnSinkCurDayEntry ::=
+  SEQUENCE {
+    optIfOTSnSinkCurDaySuspectedFlag   TruthValue,
+    optIfOTSnSinkCurDayLowInputPower   Integer32,
+    optIfOTSnSinkCurDayHighInputPower  Integer32
+    }
+
+optIfOTSnSinkCurDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOTSnSinkCurDayEntry 1 }
+
+optIfOTSnSinkCurDayLowInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the input during the
+     current calendar day."
+  ::= { optIfOTSnSinkCurDayEntry 2 }
+
+optIfOTSnSinkCurDayHighInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the input during the
+     current calendar day."
+  ::= { optIfOTSnSinkCurDayEntry 3 }
+
+-- OTSn sink previous day table
+-- Contains data for the previous calendar day performance
+-- monitoring interval.
+
+optIfOTSnSinkPrevDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnSinkPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTSn sink performance monitoring information for
+     the previous calendar day."
+  ::= { optIfOTSn 5 }
+
+optIfOTSnSinkPrevDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnSinkPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn sink performance
+     monitoring information of an interface for the previous
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOTSnSinkPrevDayTable 1 }
+
+OptIfOTSnSinkPrevDayEntry ::=
+  SEQUENCE {
+    optIfOTSnSinkPrevDaySuspectedFlag   TruthValue,
+    optIfOTSnSinkPrevDayLastInputPower  Integer32,
+    optIfOTSnSinkPrevDayLowInputPower   Integer32,
+    optIfOTSnSinkPrevDayHighInputPower  Integer32
+    }
+
+optIfOTSnSinkPrevDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOTSnSinkPrevDayEntry 1 }
+
+optIfOTSnSinkPrevDayLastInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the input during the
+     previous calendar day."
+  ::= { optIfOTSnSinkPrevDayEntry 2 }
+
+optIfOTSnSinkPrevDayLowInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the input during the
+     previous calendar day."
+  ::= { optIfOTSnSinkPrevDayEntry 3 }
+
+optIfOTSnSinkPrevDayHighInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the input during the
+     previous calendar day."
+  ::= { optIfOTSnSinkPrevDayEntry 4 }
+
+-- OTSn source current table
+-- Contains data for the current 15 minute performance monitoring
+-- interval.
+
+optIfOTSnSrcCurrentTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnSrcCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTSn source performance monitoring information for
+     the current 15 minute interval."
+  ::= { optIfOTSn 6 }
+
+optIfOTSnSrcCurrentEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnSrcCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn source performance
+     monitoring information of an interface for the current
+     15 minute interval."
+  INDEX  { ifIndex }
+  ::= { optIfOTSnSrcCurrentTable 1 }
+
+OptIfOTSnSrcCurrentEntry ::=
+  SEQUENCE {
+    optIfOTSnSrcCurrentSuspectedFlag              TruthValue,
+    optIfOTSnSrcCurrentOutputPower                Integer32,
+    optIfOTSnSrcCurrentLowOutputPower             Integer32,
+    optIfOTSnSrcCurrentHighOutputPower            Integer32,
+    optIfOTSnSrcCurrentLowerOutputPowerThreshold  Integer32,
+    optIfOTSnSrcCurrentUpperOutputPowerThreshold  Integer32,
+    optIfOTSnSrcCurrentLaserTemp                  Integer32,
+    optIfOTSnSrcCurrentLowLaserTemp               Integer32,
+    optIfOTSnSrcCurrentHighLaserTemp              Integer32,
+    optIfOTSnSrcCurrentLowerLaserTempThreshold    Integer32,
+    optIfOTSnSrcCurrentUpperLaserTempThreshold    Integer32
+    }
+
+optIfOTSnSrcCurrentSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOTSnSrcCurrentEntry 1 }
+
+optIfOTSnSrcCurrentOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The optical power monitored at the output."
+  ::= { optIfOTSnSrcCurrentEntry 2 }
+
+optIfOTSnSrcCurrentLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     current interval."
+  ::= { optIfOTSnSrcCurrentEntry 3 }
+
+optIfOTSnSrcCurrentHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     current interval."
+  ::= { optIfOTSnSrcCurrentEntry 4 }
+
+optIfOTSnSrcCurrentLowerOutputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on output power.  If
+     optIfOTSnSrcCurrentOutputPower drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOTSnSrcCurrentEntry 5 }
+
+optIfOTSnSrcCurrentUpperOutputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on output power.  If
+     optIfOTSnSrcCurrentOutputPower reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOTSnSrcCurrentEntry 6 }
+
+optIfOTSnSrcCurrentLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The operating temperature of the laser."
+  ::= { optIfOTSnSrcCurrentEntry 7 }
+
+optIfOTSnSrcCurrentLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     current interval."
+  ::= { optIfOTSnSrcCurrentEntry 8 }
+
+optIfOTSnSrcCurrentHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     current interval."
+  ::= { optIfOTSnSrcCurrentEntry 9 }
+
+optIfOTSnSrcCurrentLowerLaserTempThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on laser temperature.  If
+     optIfOTSnSrcCurrentLaserTemp drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOTSnSrcCurrentEntry 10 }
+
+optIfOTSnSrcCurrentUpperLaserTempThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on laser temperature.  If
+     optIfOTSnSrcCurrentLaserTemp reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOTSnSrcCurrentEntry 11 }
+
+-- OTSn source interval table
+-- Contains data for previous 15 minute performance monitoring
+-- intervals.
+
+optIfOTSnSrcIntervalTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnSrcIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of historical OTSn source performance monitoring
+     information."
+  ::= { optIfOTSn 7 }
+
+optIfOTSnSrcIntervalEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnSrcIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn source performance
+     monitoring information of an interface during a particular
+     historical interval."
+  INDEX  { ifIndex, optIfOTSnSrcIntervalNumber }
+  ::= { optIfOTSnSrcIntervalTable 1 }
+
+OptIfOTSnSrcIntervalEntry ::=
+  SEQUENCE {
+    optIfOTSnSrcIntervalNumber           IntervalNumber,
+    optIfOTSnSrcIntervalSuspectedFlag    TruthValue,
+    optIfOTSnSrcIntervalLastOutputPower  Integer32,
+    optIfOTSnSrcIntervalLowOutputPower   Integer32,
+    optIfOTSnSrcIntervalHighOutputPower  Integer32,
+    optIfOTSnSrcIntervalLastLaserTemp    Integer32,
+    optIfOTSnSrcIntervalLowLaserTemp     Integer32,
+    optIfOTSnSrcIntervalHighLaserTemp    Integer32
+    }
+
+optIfOTSnSrcIntervalNumber OBJECT-TYPE
+  SYNTAX  IntervalNumber
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Uniquely identifies the interval."
+  ::= { optIfOTSnSrcIntervalEntry 1 }
+
+optIfOTSnSrcIntervalSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOTSnSrcIntervalEntry 2 }
+
+optIfOTSnSrcIntervalLastOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the output during the
+     interval."
+  ::= { optIfOTSnSrcIntervalEntry 3 }
+
+optIfOTSnSrcIntervalLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     interval."
+  ::= { optIfOTSnSrcIntervalEntry 4 }
+
+optIfOTSnSrcIntervalHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     interval."
+  ::= { optIfOTSnSrcIntervalEntry 5 }
+
+optIfOTSnSrcIntervalLastLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last operating temperature of the laser during the
+     interval."
+  ::= { optIfOTSnSrcIntervalEntry 6 }
+
+optIfOTSnSrcIntervalLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     interval."
+  ::= { optIfOTSnSrcIntervalEntry 7 }
+
+optIfOTSnSrcIntervalHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     interval."
+  ::= { optIfOTSnSrcIntervalEntry 8 }
+
+-- OTSn source current day table
+-- Contains data for the current calendar day performance
+-- monitoring interval.
+
+optIfOTSnSrcCurDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnSrcCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTSn source performance monitoring information for
+     the current calendar day."
+  ::= { optIfOTSn 8 }
+
+optIfOTSnSrcCurDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnSrcCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn source performance
+     monitoring information of an interface for the current
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOTSnSrcCurDayTable 1 }
+
+OptIfOTSnSrcCurDayEntry ::=
+  SEQUENCE {
+    optIfOTSnSrcCurDaySuspectedFlag    TruthValue,
+    optIfOTSnSrcCurDayLowOutputPower   Integer32,
+    optIfOTSnSrcCurDayHighOutputPower  Integer32,
+    optIfOTSnSrcCurDayLowLaserTemp     Integer32,
+    optIfOTSnSrcCurDayHighLaserTemp    Integer32
+    }
+
+optIfOTSnSrcCurDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOTSnSrcCurDayEntry 1 }
+
+optIfOTSnSrcCurDayLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     current calendar day."
+  ::= { optIfOTSnSrcCurDayEntry 2 }
+
+optIfOTSnSrcCurDayHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     current calendar day."
+  ::= { optIfOTSnSrcCurDayEntry 3 }
+
+optIfOTSnSrcCurDayLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     current calendar day."
+  ::= { optIfOTSnSrcCurDayEntry 4 }
+
+optIfOTSnSrcCurDayHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     current calendar day."
+  ::= { optIfOTSnSrcCurDayEntry 5 }
+
+-- OTSn source previous day table
+-- Contains data for the previous calendar day performance
+-- monitoring interval.
+
+optIfOTSnSrcPrevDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTSnSrcPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTSn source performance monitoring information for
+     the previous calendar day."
+  ::= { optIfOTSn 9 }
+
+optIfOTSnSrcPrevDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOTSnSrcPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTSn source performance
+     monitoring information of an interface for the previous
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOTSnSrcPrevDayTable 1 }
+
+OptIfOTSnSrcPrevDayEntry ::=
+  SEQUENCE {
+    optIfOTSnSrcPrevDaySuspectedFlag    TruthValue,
+    optIfOTSnSrcPrevDayLastOutputPower  Integer32,
+    optIfOTSnSrcPrevDayLowOutputPower   Integer32,
+    optIfOTSnSrcPrevDayHighOutputPower  Integer32,
+    optIfOTSnSrcPrevDayLastLaserTemp    Integer32,
+    optIfOTSnSrcPrevDayLowLaserTemp     Integer32,
+    optIfOTSnSrcPrevDayHighLaserTemp    Integer32
+    }
+
+optIfOTSnSrcPrevDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOTSnSrcPrevDayEntry 1 }
+
+optIfOTSnSrcPrevDayLastOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOTSnSrcPrevDayEntry 2 }
+
+optIfOTSnSrcPrevDayLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOTSnSrcPrevDayEntry 3 }
+
+optIfOTSnSrcPrevDayHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOTSnSrcPrevDayEntry 4 }
+
+optIfOTSnSrcPrevDayLastLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOTSnSrcPrevDayEntry 5 }
+
+optIfOTSnSrcPrevDayLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOTSnSrcPrevDayEntry 6 }
+
+optIfOTSnSrcPrevDayHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOTSnSrcPrevDayEntry 7 }
+
+-- the optIfOMSn group
+-- This group handles the configuration and performance monitoring
+-- information for OMS layers.
+
+-- OMSn config table
+
+optIfOMSnConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OMSn configuration information."
+  ::= { optIfOMSn 1 }
+
+optIfOMSnConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn configuration
+     information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfOMSnConfigTable 1 }
+
+OptIfOMSnConfigEntry ::=
+  SEQUENCE {
+    optIfOMSnOrder          Unsigned32,
+    optIfOMSnCurrentStatus  INTEGER
+    }
+
+optIfOMSnOrder OBJECT-TYPE
+  SYNTAX  Unsigned32 (1..900)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The number of multiplexed optical channels."
+  ::= { optIfOMSnConfigEntry 1 }
+
+optIfOMSnCurrentStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    noDefect(1),
+    ssfP(2),
+    ssfO(3),
+    ssf(4),
+    bdiP(5),
+    bdiO(6),
+    bdi(7),
+    losP(8)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Indicates the failure condition of the entity, if any."
+  ::= { optIfOMSnConfigEntry 2 }
+
+-- OMSn sink current table
+-- Contains data for the current 15 minute performance monitoring
+-- interval. Laser temperature attributes are provided when a
+-- pre-amplifier is used.
+
+optIfOMSnSinkCurrentTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnSinkCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OMSn sink performance monitoring information for
+     the current 15 minute interval."
+  ::= { optIfOMSn 2 }
+
+optIfOMSnSinkCurrentEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnSinkCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn sink performance
+     monitoring information of an interface for the current
+     15 minute interval."
+  INDEX  { ifIndex }
+  ::= { optIfOMSnSinkCurrentTable 1 }
+
+OptIfOMSnSinkCurrentEntry ::=
+  SEQUENCE {
+    optIfOMSnSinkCurrentSuspectedFlag             TruthValue,
+    optIfOMSnSinkCurrentAggregatedInputPower      Integer32,
+    optIfOMSnSinkCurrentLowAggregatedInputPower   Integer32,
+    optIfOMSnSinkCurrentHighAggregatedInputPower  Integer32,
+    optIfOMSnSinkCurrentLowerInputPowerThreshold  Integer32,
+    optIfOMSnSinkCurrentUpperInputPowerThreshold  Integer32,
+    optIfOMSnSinkCurrentLaserTemp                 Integer32,
+    optIfOMSnSinkCurrentLowLaserTemp              Integer32,
+    optIfOMSnSinkCurrentHighLaserTemp             Integer32,
+    optIfOMSnSinkCurrentLowerLaserTempThreshold   Integer32,
+    optIfOMSnSinkCurrentUpperLaserTempThreshold   Integer32
+    }
+
+optIfOMSnSinkCurrentSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOMSnSinkCurrentEntry 1 }
+
+optIfOMSnSinkCurrentAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The aggregated optical power of all the DWDM input
+     channels."
+  ::= { optIfOMSnSinkCurrentEntry 2 }
+
+optIfOMSnSinkCurrentLowAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest aggregated optical power of all the DWDM input
+     channels during the current interval."
+  ::= { optIfOMSnSinkCurrentEntry 3 }
+
+optIfOMSnSinkCurrentHighAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest aggregated optical power of all the DWDM input
+     channels during the current interval."
+  ::= { optIfOMSnSinkCurrentEntry 4 }
+
+optIfOMSnSinkCurrentLowerInputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on aggregated input power.  If
+     optIfOMSnSinkCurrentAggregatedInputPower drops to this value
+     or below, a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOMSnSinkCurrentEntry 5 }
+
+optIfOMSnSinkCurrentUpperInputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on aggregated input power.  If
+     optIfOMSnSinkCurrentAggregatedInputPower reaches or exceeds
+     this value, a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOMSnSinkCurrentEntry 6 }
+
+optIfOMSnSinkCurrentLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The operating temperature of the laser."
+  ::= { optIfOMSnSinkCurrentEntry 7 }
+
+optIfOMSnSinkCurrentLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     current interval."
+  ::= { optIfOMSnSinkCurrentEntry 8 }
+
+optIfOMSnSinkCurrentHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     current interval."
+  ::= { optIfOMSnSinkCurrentEntry 9 }
+
+optIfOMSnSinkCurrentLowerLaserTempThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on laser temperature.  If
+     optIfOMSnSinkCurrentLaserTemp drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOMSnSinkCurrentEntry 10 }
+
+optIfOMSnSinkCurrentUpperLaserTempThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on aggregated input power.  If
+     optIfOMSnSinkCurrentLaserTemp reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOMSnSinkCurrentEntry 11 }
+
+-- OMSn sink interval table
+-- Contains data for previous 15 minute performance monitoring
+-- intervals. Laser Temperature attributes are provided when
+-- a pre-amplifier is used.
+
+optIfOMSnSinkIntervalTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnSinkIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of historical OMSn sink performance monitoring
+     information."
+  ::= { optIfOMSn 3 }
+
+optIfOMSnSinkIntervalEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnSinkIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn sink performance
+     monitoring information of an interface during a particular
+     historical interval."
+  INDEX  { ifIndex, optIfOMSnSinkIntervalNumber }
+  ::= { optIfOMSnSinkIntervalTable 1 }
+
+OptIfOMSnSinkIntervalEntry ::=
+  SEQUENCE {
+    optIfOMSnSinkIntervalNumber                    IntervalNumber,
+    optIfOMSnSinkIntervalSuspectedFlag             TruthValue,
+    optIfOMSnSinkIntervalLastAggregatedInputPower  Integer32,
+    optIfOMSnSinkIntervalLowAggregatedInputPower   Integer32,
+    optIfOMSnSinkIntervalHighAggregatedInputPower  Integer32,
+    optIfOMSnSinkIntervalLastLaserTemp             Integer32,
+    optIfOMSnSinkIntervalLowLaserTemp              Integer32,
+    optIfOMSnSinkIntervalHighLaserTemp             Integer32
+    }
+
+optIfOMSnSinkIntervalNumber OBJECT-TYPE
+  SYNTAX  IntervalNumber
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Uniquely identifies the interval."
+  ::= { optIfOMSnSinkIntervalEntry 1 }
+
+optIfOMSnSinkIntervalSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOMSnSinkIntervalEntry 2 }
+
+optIfOMSnSinkIntervalLastAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last aggregated optical power of all the DWDM input
+     channels during the interval."
+  ::= { optIfOMSnSinkIntervalEntry 3 }
+
+optIfOMSnSinkIntervalLowAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest aggregated optical power of all the DWDM input
+     channels during the interval."
+  ::= { optIfOMSnSinkIntervalEntry 4 }
+
+optIfOMSnSinkIntervalHighAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest aggregated optical power of all the DWDM input
+     channels during the interval."
+  ::= { optIfOMSnSinkIntervalEntry 5 }
+
+optIfOMSnSinkIntervalLastLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last operating temperature of the laser during the
+     interval."
+  ::= { optIfOMSnSinkIntervalEntry 6 }
+
+optIfOMSnSinkIntervalLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     interval."
+  ::= { optIfOMSnSinkIntervalEntry 7 }
+
+optIfOMSnSinkIntervalHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     interval."
+  ::= { optIfOMSnSinkIntervalEntry 8 }
+
+-- OMSn sink current day table
+-- Contains data for the current calendar day performance
+-- monitoring interval. Laser Temperature attributes are
+-- provided when a pre-amplifier is used.
+
+optIfOMSnSinkCurDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnSinkCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OMSn sink performance monitoring information for
+     the current calendar day."
+  ::= { optIfOMSn 4 }
+
+optIfOMSnSinkCurDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnSinkCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn sink performance
+     monitoring information of an interface for the current
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOMSnSinkCurDayTable 1 }
+
+OptIfOMSnSinkCurDayEntry ::=
+  SEQUENCE {
+    optIfOMSnSinkCurDaySuspectedFlag             TruthValue,
+    optIfOMSnSinkCurDayLowAggregatedInputPower   Integer32,
+    optIfOMSnSinkCurDayHighAggregatedInputPower  Integer32,
+    optIfOMSnSinkCurDayLowLaserTemp              Integer32,
+    optIfOMSnSinkCurDayHighLaserTemp             Integer32
+    }
+
+optIfOMSnSinkCurDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOMSnSinkCurDayEntry 1 }
+
+optIfOMSnSinkCurDayLowAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest aggregated optical power of all the DWDM input
+     channels during the current calendar day."
+  ::= { optIfOMSnSinkCurDayEntry 2 }
+
+optIfOMSnSinkCurDayHighAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest aggregated optical power of all the DWDM input
+     channels during the current calendar day."
+  ::= { optIfOMSnSinkCurDayEntry 3 }
+
+optIfOMSnSinkCurDayLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     current calendar day."
+  ::= { optIfOMSnSinkCurDayEntry 4 }
+
+optIfOMSnSinkCurDayHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     current calendar day."
+  ::= { optIfOMSnSinkCurDayEntry 5 }
+
+-- OMSn sink previous day table
+-- Contains data for the previous calendar day performance
+-- monitoring interval. Laser Temperature attributes are
+-- provided when a pre-amplifier is used.
+
+optIfOMSnSinkPrevDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnSinkPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OMSn sink performance monitoring information for
+     the previous calendar day."
+  ::= { optIfOMSn 5 }
+
+optIfOMSnSinkPrevDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnSinkPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn sink performance
+     monitoring information of an interface for the previous
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOMSnSinkPrevDayTable 1 }
+
+OptIfOMSnSinkPrevDayEntry ::=
+  SEQUENCE {
+    optIfOMSnSinkPrevDaySuspectedFlag             TruthValue,
+    optIfOMSnSinkPrevDayLastAggregatedInputPower  Integer32,
+    optIfOMSnSinkPrevDayLowAggregatedInputPower   Integer32,
+    optIfOMSnSinkPrevDayHighAggregatedInputPower  Integer32,
+    optIfOMSnSinkPrevDayLastLaserTemp             Integer32,
+    optIfOMSnSinkPrevDayLowLaserTemp              Integer32,
+    optIfOMSnSinkPrevDayHighLaserTemp             Integer32
+    }
+
+optIfOMSnSinkPrevDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOMSnSinkPrevDayEntry 1 }
+
+optIfOMSnSinkPrevDayLastAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last aggregated optical power of all the DWDM input
+     channels during the previous calendar day."
+  ::= { optIfOMSnSinkPrevDayEntry 2 }
+
+optIfOMSnSinkPrevDayLowAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest aggregated optical power of all the DWDM input
+     channels during the previous calendar day."
+  ::= { optIfOMSnSinkPrevDayEntry 3 }
+
+optIfOMSnSinkPrevDayHighAggregatedInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest aggregated optical power of all the DWDM input
+     channels during the previous calendar day."
+  ::= { optIfOMSnSinkPrevDayEntry 4 }
+
+optIfOMSnSinkPrevDayLastLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOMSnSinkPrevDayEntry 5 }
+
+optIfOMSnSinkPrevDayLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOMSnSinkPrevDayEntry 6 }
+
+optIfOMSnSinkPrevDayHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOMSnSinkPrevDayEntry 7 }
+
+-- OMSn source current table
+-- Contains data for the current 15 minute performance monitoring
+-- interval. Laser Temperature attributes are provided when a
+-- post-amplifier is used.
+
+optIfOMSnSrcCurrentTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnSrcCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OMSn source performance monitoring information for
+     the current 15 minute interval."
+  ::= { optIfOMSn 6 }
+
+optIfOMSnSrcCurrentEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnSrcCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn source performance
+     monitoring information of an interface for the current
+     15 minute interval."
+  INDEX  { ifIndex }
+  ::= { optIfOMSnSrcCurrentTable 1 }
+
+OptIfOMSnSrcCurrentEntry ::=
+  SEQUENCE {
+    optIfOMSnSrcCurrentSuspectedFlag              TruthValue,
+    optIfOMSnSrcCurrentOutputPower                Integer32,
+    optIfOMSnSrcCurrentLowOutputPower             Integer32,
+    optIfOMSnSrcCurrentHighOutputPower            Integer32,
+    optIfOMSnSrcCurrentLowerOutputPowerThreshold  Integer32,
+    optIfOMSnSrcCurrentUpperOutputPowerThreshold  Integer32,
+    optIfOMSnSrcCurrentLaserTemp                  Integer32,
+    optIfOMSnSrcCurrentLowLaserTemp               Integer32,
+    optIfOMSnSrcCurrentHighLaserTemp              Integer32,
+    optIfOMSnSrcCurrentLowerLaserTempThreshold    Integer32,
+    optIfOMSnSrcCurrentUpperLaserTempThreshold    Integer32
+    }
+
+optIfOMSnSrcCurrentSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOMSnSrcCurrentEntry 1 }
+
+optIfOMSnSrcCurrentOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The optical power monitored at the output."
+  ::= { optIfOMSnSrcCurrentEntry 2 }
+
+optIfOMSnSrcCurrentLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     current interval."
+  ::= { optIfOMSnSrcCurrentEntry 3 }
+
+optIfOMSnSrcCurrentHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     current interval."
+  ::= { optIfOMSnSrcCurrentEntry 4 }
+
+optIfOMSnSrcCurrentLowerOutputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on output power.  If
+     optIfOMSnSrcCurrentOutputPower drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOMSnSrcCurrentEntry 5 }
+
+optIfOMSnSrcCurrentUpperOutputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on output power.  If
+     optIfOMSnSrcCurrentOutputPower reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOMSnSrcCurrentEntry 6 }
+
+optIfOMSnSrcCurrentLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The operating temperature of the laser."
+  ::= { optIfOMSnSrcCurrentEntry 7 }
+
+optIfOMSnSrcCurrentLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     current interval."
+  ::= { optIfOMSnSrcCurrentEntry 8 }
+
+optIfOMSnSrcCurrentHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     current interval."
+  ::= { optIfOMSnSrcCurrentEntry 9 }
+
+optIfOMSnSrcCurrentLowerLaserTempThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on laser temperature.  If
+     optIfOMSnSrcCurrentLaserTemp drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOMSnSrcCurrentEntry 10 }
+
+optIfOMSnSrcCurrentUpperLaserTempThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on laser temperature.  If
+     optIfOMSnSrcCurrentLaserTemp reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOMSnSrcCurrentEntry 11 }
+
+-- OMSn source interval table
+-- Contains data for previous 15 minute performance monitoring
+-- intervals. Laser Temperature attributes are provided when
+-- a post-amplifier is used.
+
+optIfOMSnSrcIntervalTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnSrcIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of historical OMSn source performance monitoring
+     information."
+  ::= { optIfOMSn 7 }
+
+optIfOMSnSrcIntervalEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnSrcIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn source performance
+     monitoring information of an interface during a particular
+     historical interval."
+  INDEX  { ifIndex, optIfOMSnSrcIntervalNumber }
+  ::= { optIfOMSnSrcIntervalTable 1 }
+
+OptIfOMSnSrcIntervalEntry ::=
+  SEQUENCE {
+    optIfOMSnSrcIntervalNumber           IntervalNumber,
+    optIfOMSnSrcIntervalSuspectedFlag    TruthValue,
+    optIfOMSnSrcIntervalLastOutputPower  Integer32,
+    optIfOMSnSrcIntervalLowOutputPower   Integer32,
+    optIfOMSnSrcIntervalHighOutputPower  Integer32,
+    optIfOMSnSrcIntervalLastLaserTemp    Integer32,
+    optIfOMSnSrcIntervalLowLaserTemp     Integer32,
+    optIfOMSnSrcIntervalHighLaserTemp    Integer32
+    }
+
+optIfOMSnSrcIntervalNumber OBJECT-TYPE
+  SYNTAX  IntervalNumber
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Uniquely identifies the interval."
+  ::= { optIfOMSnSrcIntervalEntry 1 }
+
+optIfOMSnSrcIntervalSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOMSnSrcIntervalEntry 2 }
+
+optIfOMSnSrcIntervalLastOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the output during the
+     interval."
+  ::= { optIfOMSnSrcIntervalEntry 3 }
+
+optIfOMSnSrcIntervalLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     interval."
+  ::= { optIfOMSnSrcIntervalEntry 4 }
+
+optIfOMSnSrcIntervalHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     interval."
+  ::= { optIfOMSnSrcIntervalEntry 5 }
+
+optIfOMSnSrcIntervalLastLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last operating temperature of the laser during the
+     interval."
+  ::= { optIfOMSnSrcIntervalEntry 6 }
+
+optIfOMSnSrcIntervalLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     interval."
+  ::= { optIfOMSnSrcIntervalEntry 7 }
+
+optIfOMSnSrcIntervalHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     interval."
+  ::= { optIfOMSnSrcIntervalEntry 8 }
+
+-- OMSn source current day table
+-- Contains data for the current calendar day performance
+-- monitoring interval. Laser Temperature attributes are
+-- provided when a post-amplifier is used.
+
+optIfOMSnSrcCurDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnSrcCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OMSn source performance monitoring information for
+     the current calendar day."
+  ::= { optIfOMSn 8 }
+
+optIfOMSnSrcCurDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnSrcCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn source performance
+     monitoring information of an interface for the current
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOMSnSrcCurDayTable 1 }
+
+OptIfOMSnSrcCurDayEntry ::=
+  SEQUENCE {
+    optIfOMSnSrcCurDaySuspectedFlag    TruthValue,
+    optIfOMSnSrcCurDayLowOutputPower   Integer32,
+    optIfOMSnSrcCurDayHighOutputPower  Integer32,
+    optIfOMSnSrcCurDayLowLaserTemp     Integer32,
+    optIfOMSnSrcCurDayHighLaserTemp    Integer32
+    }
+
+optIfOMSnSrcCurDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOMSnSrcCurDayEntry 1 }
+
+optIfOMSnSrcCurDayLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     current calendar day."
+  ::= { optIfOMSnSrcCurDayEntry 2 }
+
+optIfOMSnSrcCurDayHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     current calendar day."
+  ::= { optIfOMSnSrcCurDayEntry 3 }
+
+optIfOMSnSrcCurDayLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     current calendar day."
+  ::= { optIfOMSnSrcCurDayEntry 4 }
+
+optIfOMSnSrcCurDayHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     current calendar day."
+  ::= { optIfOMSnSrcCurDayEntry 5 }
+
+-- OMSn source previous day table
+-- Contains data for the previous calendar day performance
+-- monitoring interval. Laser Temperature attributes are
+-- provided when a post-amplifier is used.
+
+optIfOMSnSrcPrevDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOMSnSrcPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OMSn source performance monitoring information for
+     the previous calendar day."
+  ::= { optIfOMSn 9 }
+
+optIfOMSnSrcPrevDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOMSnSrcPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OMSn source performance
+     monitoring information of an interface for the previous
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOMSnSrcPrevDayTable 1 }
+
+OptIfOMSnSrcPrevDayEntry ::=
+  SEQUENCE {
+    optIfOMSnSrcPrevDaySuspectedFlag    TruthValue,
+    optIfOMSnSrcPrevDayLastOutputPower  Integer32,
+    optIfOMSnSrcPrevDayLowOutputPower   Integer32,
+    optIfOMSnSrcPrevDayHighOutputPower  Integer32,
+    optIfOMSnSrcPrevDayLastLaserTemp    Integer32,
+    optIfOMSnSrcPrevDayLowLaserTemp     Integer32,
+    optIfOMSnSrcPrevDayHighLaserTemp    Integer32
+    }
+
+optIfOMSnSrcPrevDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOMSnSrcPrevDayEntry 1 }
+
+optIfOMSnSrcPrevDayLastOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOMSnSrcPrevDayEntry 2 }
+
+optIfOMSnSrcPrevDayLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOMSnSrcPrevDayEntry 3 }
+
+optIfOMSnSrcPrevDayHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOMSnSrcPrevDayEntry 4 }
+
+optIfOMSnSrcPrevDayLastLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOMSnSrcPrevDayEntry 5 }
+
+optIfOMSnSrcPrevDayLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOMSnSrcPrevDayEntry 6 }
+
+optIfOMSnSrcPrevDayHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOMSnSrcPrevDayEntry 7 }
+
+-- the optIfOCh group
+-- This group handles the configuration and
+-- performance monitoring information for OCh layers.
+
+-- OCh config table
+
+optIfOChConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OCh configuration information."
+  ::= { optIfOCh 4 }
+
+optIfOChConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfOChConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh configuration
+     information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfOChConfigTable 1 }
+
+OptIfOChConfigEntry ::=
+  SEQUENCE {
+    optIfOChSinkAdaptActive    TruthValue,
+    optIfOChSourceAdaptActive  TruthValue,
+    optIfOChSinkFECEnabled     TruthValue,
+    optIfOChCurrentStatus      INTEGER
+    }
+
+optIfOChSinkAdaptActive OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the sink adaptation function is activated or not."
+  ::= { optIfOTSnConfigEntry 1 }
+
+optIfOChSourceAdaptActive OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the source adaptation function is activated or 
+     not."
+  ::= { optIfOTSnConfigEntry 2 }
+
+optIfOChSinkFECEnabled OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "If Forward Error Correction (FEC) is supported, this object 
+     indicates whether FEC at the OCh sink adaptation function is 
+     enabled or not."
+  ::= { optIfOTSnConfigEntry 3 }
+
+optIfOChCurrentStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    noDefect(1),
+    ais(2),
+    lof(3),
+    lom(4),
+    los(5),
+    losP(6),
+    oci(7),
+    ssfP(8),
+    ssfO(9),
+    ssf(10)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Indicates the failure condition of the entity, if any."
+  ::= { optIfOChConfigEntry 4 }
+
+-- OCh sink current table
+-- Contains data for the current 15 minute performance monitoring
+-- interval.
+
+optIfOChSinkCurrentTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChSinkCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OCh sink performance monitoring information for
+     the current 15 minute interval."
+  ::= { optIfOCh 5 }
+
+optIfOChSinkCurrentEntry OBJECT-TYPE
+  SYNTAX  OptIfOChSinkCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh sink performance
+     monitoring information for an interface for the current
+     15 minute interval."
+  INDEX  { ifIndex }
+  ::= { optIfOChSinkCurrentTable 1 }
+
+OptIfOChSinkCurrentEntry ::=
+  SEQUENCE {
+    optIfOChSinkCurrentSuspectedFlag             TruthValue,
+    optIfOChSinkCurrentInputPower                Integer32,
+    optIfOChSinkCurrentLowInputPower             Integer32,
+    optIfOChSinkCurrentHighInputPower            Integer32,
+    optIfOChSinkCurrentLowerInputPowerThreshold  Integer32,
+    optIfOChSinkCurrentUpperInputPowerThreshold  Integer32
+    }
+
+optIfOChSinkCurrentSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOChSinkCurrentEntry 1 }
+
+optIfOChSinkCurrentInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The optical power monitored at the input."
+  ::= { optIfOChSinkCurrentEntry 2 }
+
+optIfOChSinkCurrentLowInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the input during the
+     current interval."
+  ::= { optIfOChSinkCurrentEntry 3 }
+
+optIfOChSinkCurrentHighInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the input during the
+     current interval."
+  ::= { optIfOChSinkCurrentEntry 4 }
+
+optIfOChSinkCurrentLowerInputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on input power.  If
+     optIfOChSinkCurrentInputPower drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOChSinkCurrentEntry 5 }
+
+optIfOChSinkCurrentUpperInputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on input power.  If
+     optIfOChSinkCurrentInputPower reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOChSinkCurrentEntry 6 }
+
+-- OCh sink interval table
+-- Contains data for previous 15 minute performance monitoring
+-- intervals.
+
+optIfOChSinkIntervalTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChSinkIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of historical OCh sink performance monitoring
+     information."
+  ::= { optIfOCh 6 }
+
+optIfOChSinkIntervalEntry OBJECT-TYPE
+  SYNTAX  OptIfOChSinkIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh sink performance
+     monitoring information of an interface during a particular
+     historical interval."
+  INDEX  { ifIndex, optIfOChSinkIntervalNumber }
+  ::= { optIfOChSinkIntervalTable 1 }
+
+OptIfOChSinkIntervalEntry ::=
+  SEQUENCE {
+    optIfOChSinkIntervalNumber          IntervalNumber,
+    optIfOChSinkIntervalSuspectedFlag   TruthValue,
+    optIfOChSinkIntervalLastInputPower  Integer32,
+    optIfOChSinkIntervalLowInputPower   Integer32,
+    optIfOChSinkIntervalHighInputPower  Integer32
+    }
+
+optIfOChSinkIntervalNumber OBJECT-TYPE
+  SYNTAX  IntervalNumber
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Uniquely identifies the interval."
+  ::= { optIfOChSinkIntervalEntry 1 }
+
+optIfOChSinkIntervalSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOChSinkIntervalEntry 2 }
+
+optIfOChSinkIntervalLastInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the input during the
+     interval."
+  ::= { optIfOChSinkIntervalEntry 3 }
+
+optIfOChSinkIntervalLowInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the input during the
+     interval."
+  ::= { optIfOChSinkIntervalEntry 4 }
+
+optIfOChSinkIntervalHighInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the input during the
+     interval."
+  ::= { optIfOChSinkIntervalEntry 5 }
+
+-- OCh sink current day table
+-- Contains data for the current calendar day performance
+-- monitoring interval.
+
+optIfOChSinkCurDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChSinkCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OCh sink performance monitoring information for
+     the current calendar day."
+  ::= { optIfOCh 7 }
+
+optIfOChSinkCurDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOChSinkCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh sink performance
+     monitoring information of an interface for the current
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOChSinkCurDayTable 1 }
+
+OptIfOChSinkCurDayEntry ::=
+  SEQUENCE {
+    optIfOChSinkCurDaySuspectedFlag   TruthValue,
+    optIfOChSinkCurDayLowInputPower   Integer32,
+    optIfOChSinkCurDayHighInputPower  Integer32
+    }
+
+optIfOChSinkCurDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOChSinkCurDayEntry 1 }
+
+optIfOChSinkCurDayLowInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the input during the
+     current calendar day."
+  ::= { optIfOChSinkCurDayEntry 2 }
+
+optIfOChSinkCurDayHighInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the input during the
+     current calendar day."
+  ::= { optIfOChSinkCurDayEntry 3 }
+
+-- OCh sink previous day table
+-- Contains data for the previous calendar day performance
+-- monitoring interval.
+
+optIfOChSinkPrevDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChSinkPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OCh sink performance monitoring information for
+     the previous calendar day."
+  ::= { optIfOCh 8 }
+
+optIfOChSinkPrevDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOChSinkPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh sink performance
+     monitoring information of an interface for the previous
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOChSinkPrevDayTable 1 }
+
+OptIfOChSinkPrevDayEntry ::=
+  SEQUENCE {
+    optIfOChSinkPrevDaySuspectedFlag   TruthValue,
+    optIfOChSinkPrevDayLastInputPower  Integer32,
+    optIfOChSinkPrevDayLowInputPower   Integer32,
+    optIfOChSinkPrevDayHighInputPower  Integer32
+    }
+
+optIfOChSinkPrevDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOChSinkPrevDayEntry 1 }
+
+optIfOChSinkPrevDayLastInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the input during the
+     previous calendar day."
+  ::= { optIfOChSinkPrevDayEntry 2 }
+
+optIfOChSinkPrevDayLowInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the input during the
+     previous calendar day."
+  ::= { optIfOChSinkPrevDayEntry 3 }
+
+optIfOChSinkPrevDayHighInputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the input during the
+     previous calendar day."
+  ::= { optIfOChSinkPrevDayEntry 4 }
+
+-- OCh source current table
+-- Contains data for the current 15 minute performance monitoring
+-- interval.
+
+optIfOChSrcCurrentTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChSrcCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OCh source performance monitoring information for
+     the current 15 minute interval."
+  ::= { optIfOCh 9 }
+
+optIfOChSrcCurrentEntry OBJECT-TYPE
+  SYNTAX  OptIfOChSrcCurrentEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh source performance
+     monitoring information of an interface for the current
+     15 minute interval."
+  INDEX  { ifIndex }
+  ::= { optIfOChSrcCurrentTable 1 }
+
+OptIfOChSrcCurrentEntry ::=
+  SEQUENCE {
+    optIfOChSrcCurrentSuspectedFlag              TruthValue,
+    optIfOChSrcCurrentOutputPower                Integer32,
+    optIfOChSrcCurrentLowOutputPower             Integer32,
+    optIfOChSrcCurrentHighOutputPower            Integer32,
+    optIfOChSrcCurrentLowerOutputPowerThreshold  Integer32,
+    optIfOChSrcCurrentUpperOutputPowerThreshold  Integer32,
+    optIfOChSrcCurrentLaserTemp                  Integer32,
+    optIfOChSrcCurrentLowLaserTemp               Integer32,
+    optIfOChSrcCurrentHighLaserTemp              Integer32,
+    optIfOChSrcCurrentLowerLaserTempThreshold    Integer32,
+    optIfOChSrcCurrentUpperLaserTempThreshold    Integer32
+    }
+
+optIfOChSrcCurrentSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOChSrcCurrentEntry 1 }
+
+optIfOChSrcCurrentOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The optical power monitored at the output."
+  ::= { optIfOChSrcCurrentEntry 2 }
+
+optIfOChSrcCurrentLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     current interval."
+  ::= { optIfOChSrcCurrentEntry 3 }
+
+optIfOChSrcCurrentHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     current interval."
+  ::= { optIfOChSrcCurrentEntry 4 }
+
+optIfOChSrcCurrentLowerOutputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on output power.  If
+     optIfOChSrcCurrentOutputPower drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOChSrcCurrentEntry 5 }
+
+optIfOChSrcCurrentUpperOutputPowerThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on output power.  If
+     optIfOChSrcCurrentOutputPower reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOChSrcCurrentEntry 6 }
+
+optIfOChSrcCurrentLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The operating temperature of the laser."
+  ::= { optIfOChSrcCurrentEntry 7 }
+
+optIfOChSrcCurrentLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     current interval."
+  ::= { optIfOChSrcCurrentEntry 8 }
+
+optIfOChSrcCurrentHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     current interval."
+  ::= { optIfOChSrcCurrentEntry 9 }
+
+optIfOChSrcCurrentLowerLaserTempThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The lower limit threshold on laser temperature.  If
+     optIfOChSrcCurrentLaserTemp drops to this value or below,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOChSrcCurrentEntry 10 }
+
+optIfOChSrcCurrentUpperLaserTempThreshold OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The upper limit threshold on laser temperature.  If
+     optIfOChSrcCurrentLaserTemp reaches or exceeds this value,
+     a Threshold Crossing Alert (TCA) should be sent."
+  ::= { optIfOChSrcCurrentEntry 11 }
+
+-- OCh source interval table
+-- Contains data for previous 15 minute performance monitoring
+-- intervals.
+
+optIfOChSrcIntervalTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChSrcIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of historical OCh source performance monitoring
+     information."
+  ::= { optIfOCh 10 }
+
+optIfOChSrcIntervalEntry OBJECT-TYPE
+  SYNTAX  OptIfOChSrcIntervalEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh source performance
+     monitoring information of an interface during a particular
+     historical interval."
+  INDEX  { ifIndex, optIfOChSrcIntervalNumber }
+  ::= { optIfOChSrcIntervalTable 1 }
+
+OptIfOChSrcIntervalEntry ::=
+  SEQUENCE {
+    optIfOChSrcIntervalNumber           IntervalNumber,
+    optIfOChSrcIntervalSuspectedFlag    TruthValue,
+    optIfOChSrcIntervalLastOutputPower  Integer32,
+    optIfOChSrcIntervalLowOutputPower   Integer32,
+    optIfOChSrcIntervalHighOutputPower  Integer32,
+    optIfOChSrcIntervalLastLaserTemp    Integer32,
+    optIfOChSrcIntervalLowLaserTemp     Integer32,
+    optIfOChSrcIntervalHighLaserTemp    Integer32
+    }
+
+optIfOChSrcIntervalNumber OBJECT-TYPE
+  SYNTAX  IntervalNumber
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Uniquely identifies the interval."
+  ::= { optIfOChSrcIntervalEntry 1 }
+
+optIfOChSrcIntervalSuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOChSrcIntervalEntry 2 }
+
+optIfOChSrcIntervalLastOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the output during the
+     interval."
+  ::= { optIfOChSrcIntervalEntry 3 }
+
+optIfOChSrcIntervalLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     interval."
+  ::= { optIfOChSrcIntervalEntry 4 }
+
+optIfOChSrcIntervalHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     interval."
+  ::= { optIfOChSrcIntervalEntry 5 }
+
+optIfOChSrcIntervalLastLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last operating temperature of the laser during the
+     interval."
+  ::= { optIfOChSrcIntervalEntry 6 }
+
+optIfOChSrcIntervalLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     interval."
+  ::= { optIfOChSrcIntervalEntry 7 }
+
+optIfOChSrcIntervalHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     interval."
+  ::= { optIfOChSrcIntervalEntry 8 }
+
+-- OCh source current day table
+-- Contains data for the current calendar day performance
+-- monitoring interval.
+
+optIfOChSrcCurDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChSrcCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OCh source performance monitoring information for
+     the current calendar day."
+  ::= { optIfOCh 11 }
+
+optIfOChSrcCurDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOChSrcCurDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh source performance
+     monitoring information of an interface for the current
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOChSrcCurDayTable 1 }
+
+OptIfOChSrcCurDayEntry ::=
+  SEQUENCE {
+    optIfOChSrcCurDaySuspectedFlag    TruthValue,
+    optIfOChSrcCurDayLowOutputPower   Integer32,
+    optIfOChSrcCurDayHighOutputPower  Integer32,
+    optIfOChSrcCurDayLowLaserTemp     Integer32,
+    optIfOChSrcCurDayHighLaserTemp    Integer32
+    }
+
+optIfOChSrcCurDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOChSrcCurDayEntry 1 }
+
+optIfOChSrcCurDayLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     current calendar day."
+  ::= { optIfOChSrcCurDayEntry 2 }
+
+optIfOChSrcCurDayHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     current calendar day."
+  ::= { optIfOChSrcCurDayEntry 3 }
+
+optIfOChSrcCurDayLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     current calendar day."
+  ::= { optIfOChSrcCurDayEntry 4 }
+
+optIfOChSrcCurDayHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     current calendar day."
+  ::= { optIfOChSrcCurDayEntry 5 }
+
+-- OCh source previous day table
+-- Contains data for the previous calendar day performance
+-- monitoring interval.
+
+optIfOChSrcPrevDayTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOChSrcPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OCh source performance monitoring information for
+     the previous calendar day."
+  ::= { optIfOCh 12 }
+
+optIfOChSrcPrevDayEntry OBJECT-TYPE
+  SYNTAX  OptIfOChSrcPrevDayEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OCh source performance
+     monitoring information of an interface for the previous
+     calendar day."
+  INDEX  { ifIndex }
+  ::= { optIfOChSrcPrevDayTable 1 }
+
+OptIfOChSrcPrevDayEntry ::=
+  SEQUENCE {
+    optIfOChSrcPrevDaySuspectedFlag    TruthValue,
+    optIfOChSrcPrevDayLastOutputPower  Integer32,
+    optIfOChSrcPrevDayLowOutputPower   Integer32,
+    optIfOChSrcPrevDayHighOutputPower  Integer32,
+    optIfOChSrcPrevDayLastLaserTemp    Integer32,
+    optIfOChSrcPrevDayLowLaserTemp     Integer32,
+    optIfOChSrcPrevDayHighLaserTemp    Integer32
+    }
+
+optIfOChSrcPrevDaySuspectedFlag OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If true, the data in this entry may be unreliable."
+  ::= { optIfOChSrcPrevDayEntry 1 }
+
+optIfOChSrcPrevDayLastOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOChSrcPrevDayEntry 2 }
+
+optIfOChSrcPrevDayLowOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOChSrcPrevDayEntry 3 }
+
+optIfOChSrcPrevDayHighOutputPower OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "0.1 dbm"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest optical power monitored at the output during the
+     previous calendar day."
+  ::= { optIfOChSrcPrevDayEntry 4 }
+
+optIfOChSrcPrevDayLastLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The last operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOChSrcPrevDayEntry 5 }
+
+optIfOChSrcPrevDayLowLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The lowest operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOChSrcPrevDayEntry 6 }
+
+optIfOChSrcPrevDayHighLaserTemp OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS  "degrees Celsius"
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The highest operating temperature of the laser during the
+     previous calendar day."
+  ::= { optIfOChSrcPrevDayEntry 7 }
+
+-- the optIfOTUk group
+-- This group handles the configuration 
+-- information for OTUk layers.
+
+-- OTUk config table
+
+optIfOTUkConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTUkConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTUk configuration information."
+  ::= { optIfOTUk 1 }
+
+optIfOTUkConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfOTUkConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTUk configuration
+     information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfOTUkConfigTable 1 }
+
+OptIfOTUkConfigEntry ::=
+  SEQUENCE {
+    optIfOTUkTraceIdentifierTransmitted  SnmpAdminString,
+    optIfOTUkDAPIExpected                SnmpAdminString,
+    optIfOTUkSAPIExpected                SnmpAdminString,
+    optIfOTUkTraceIdentifierAccepted     SnmpAdminString,
+    optIfOTUkAcTIStatus                  INTEGER,
+    optIfOTUkTIMDetMode                  INTEGER,
+    optIfOTUkTIMActEnabled               TruthValue,
+    optIfOTUkDEGThr                      INTEGER,
+    optIfOTUkDEGM                        INTEGER,
+    optIfOTUkCurrentStatus               INTEGER
+    }
+
+optIfOTUkTraceIdentifierTransmitted OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..64))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The trace identifier transmitted."
+  ::= { optIfOTUkConfigEntry 1 }
+
+optIfOTUkDAPIExpected OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..16))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The DAPI expected by the receiver."
+  ::= { optIfOTUkConfigEntry 2 }
+
+optIfOTUkSAPIExpected OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..16))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The SAPI expected by the receiver."
+  ::= { optIfOTUkConfigEntry 3 }
+
+optIfOTUkTraceIdentifierAccepted OBJECT-TYPE
+  SYNTAX  SnmpAdminString(SIZE (0..64))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual trace identifier accepted."
+  ::= { optIfOTUkConfigEntry 4 }
+
+optIfOTUkAcTIStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    stable(1),
+    unstable(2)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The status of the accepted Trail Trace Identifier by the receiver."
+  ::= { optIfOTUkConfigEntry 5 }
+
+optIfOTUkTIMDetMode OBJECT-TYPE
+  SYNTAX  INTEGER {
+    off(1),
+    dapi(2),
+    sapi(3),
+    both(4)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the mode of the Trace Identifier Mismatch (TIM)
+     Detection function."
+  ::= { optIfOTUkConfigEntry 6 }
+
+optIfOTUkTIMActEnabled OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the Trace Identifier Mismatch (TIM) 
+     Consequent Action function is enabled"
+  ::= { optIfOTUkConfigEntry 7 }
+
+optIfOTUkDEGThr OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS   "percentage"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the threshold level for declaring a performance 
+     monitoring (PM) Second to be bad. A PM Second is declared bad if 
+     the percentage of detected errored blocks in that second is 
+     greater than or equal to DEGTHR."
+  ::= { optIfOTUkConfigEntry 8 }
+
+optIfOTUkDEGM OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the threshold level for declaring a Degraded Signal defect
+     (dDEG). A dDEG shall be declared if DEGM consecutive bad PM Seconds
+     are detected."
+  ::= { optIfOTUkConfigEntry 9 }
+
+optIfOTUkCurrentStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    noDefect(1),
+    tim(2),
+    deg(3),
+    bdi(4),
+    ssf(5)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Indicates the failure condition of the entity, if any."
+  ::= { optIfOTUkConfigEntry 10 }
+
+-- the optIfODUkT group
+-- This group handles the configuration information 
+-- for the ODUkT layers.
+
+-- ODUkT Sink config table
+
+optIfODUkTSinkConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfODUkTSinkConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of ODUkT TCM Sink configuration information."
+  ::= { optIfODUkT 1 }
+
+optIfODUkTSinkConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfODUkTSinkConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains ODUkT Sink configuration
+     information of an interface."
+  INDEX  { ifIndex, optIfODUkTTcmId }
+  ::= { optIfODUkTSinkConfigTable 1 }
+
+OptIfODUkTSinkConfigEntry ::=
+  SEQUENCE {
+    optIfODUkTTcmId                       Unsigned32,
+    optIfODUkTDAPIExpected                SnmpAdminString,
+    optIfODUkTSAPIExpected                SnmpAdminString,
+    optIfODUkTTraceIdentifierAccepted     SnmpAdminString,
+    optIfODUkTAcTIStatus                  INTEGER,
+    optIfODUkTTIMDetMode                  INTEGER,
+    optIfODUkTTIMActEnabled               TruthValue,
+    optIfODUkTDEGThr                      INTEGER,
+    optIfODUkTDEGM                        INTEGER,
+    optIfODUkTSinkMode                    INTEGER,
+    optIfODUkTSinkLockSignalAdminState    INTEGER,
+    optIfODUkTCurrentStatus               INTEGER
+    }
+
+optIfODUkTTcmId OBJECT-TYPE
+  SYNTAX  Unsigned32 (1..6)
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Value of the TCM level"
+  ::= { optIfODUkTSinkConfigEntry 1 }
+
+optIfODUkTDAPIExpected OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..16))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The DAPI expected by the receiver."
+  ::= { optIfODUkTSinkConfigEntry 2 }
+
+optIfODUkTSAPIExpected OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..16))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The SAPI expected by the receiver."
+  ::= { optIfODUkTSinkConfigEntry 3 }
+
+optIfODUkTTraceIdentifierAccepted OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE (0..64))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual trace identifier accepted."
+  ::= { optIfODUkTSinkConfigEntry 4 }
+
+optIfODUkTAcTIStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    stable(1),
+    unstable(2)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The status of the accepted Trail Trace Identifier by the receiver."
+  ::= { optIfODUkTSinkConfigEntry 5 }
+
+optIfODUkTTIMDetMode OBJECT-TYPE
+  SYNTAX  INTEGER {
+    off(1),
+    dapi(2),
+    sapi(3),
+    both(4)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the mode of the Trace Identifier Mismatch (TIM)
+     Detection function."
+  ::= { optIfODUkTSinkConfigEntry 6 }
+
+optIfODUkTTIMActEnabled OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the Trace Identifier Mismatch (TIM)
+     Consequent Action function is enabled."
+  ::= { optIfODUkTConfigEntry 7 }
+
+optIfODUkTDEGThr OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS   "percentage"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the threshold level for declaring a performance 
+     monitoring (PM) Second to be bad. A PM Second is declared bad if 
+     the percentage of detected errored blocks in that second is 
+     greater than or equal to DEGTHR."
+  ::= { optIfODUkTSinkConfigEntry 8 }                     
+
+optIfODUkTDEGM OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the threshold level for declaring a Degraded Signal 
+     defect (dDEG). A dDEG shall be declared if DEGM consecutive bad PM 
+     Seconds are detected."
+  ::= { optIfODUkTSinkConfigEntry 9 }
+
+optIfODUkTSinkMode OBJECT-TYPE
+  SYNTAX  INTEGER  {
+    transparent (1),
+    operational (2)
+    }               	
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Controls the detection of the TCM sub-fields at the Sink:
+     If the value is TRANSPARENT, the TCM sub-fields were not inserted.
+     If the value is OPERATIONAL, then:
+        - Trail Trace Identifier is inserted in the TTI byte position
+        - Backward Defect Indication is inserted in the BDI bit position
+        - Bit Interleaved Parity (BIP-8) is inserted in the BIP8 byte 
+          position
+        - Bits 6, 7 and 8 of byte BI shall be fixed to 000 (reserved)"
+  ::= { optIfODUkTSinkConfigEntry 10 } 
+
+optIfODUkTSinkLockSignalAdminState OBJECT-TYPE
+  SYNTAX  INTEGER {
+    locked(1),
+    normal(2)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Provides the capability to provision the LOCK signal, which
+     is one of the ODUk maintenance signals, at the ODUKT sink.  When
+     a Tandem Connection endpoint is set to admin state locked,
+     it inserts the ODUk-LCK signal in the sink direction."
+  ::= { optIfODUkTSinkConfigEntry 11 }                                             
+
+optIfODUkTCurrentStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    noDefect(1),
+    oci(2),
+    lck(3),
+    tim(4),
+    deg(5),
+    bdi(6),
+    ssf(7)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Indicates the failure condition of the entity, if any."
+  ::= { optIfODUkTSinkConfigEntry 12 }
+
+-- ODUkT Source config table
+
+optIfODUkTSourceConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfODUkTSourceConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of ODUkT TCM Source configuration information."
+  ::= { optIfODUkT 2 }
+
+optIfODUkTSourceConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfODUkTSourceConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains ODUkT Source configuration
+     information of an interface."
+  INDEX  { ifIndex, optIfODUkTTcmId }
+  ::= { optIfODUkTSourceConfigTable 1 }
+
+OptIfODUkTSourceConfigEntry ::=
+  SEQUENCE {
+    optIfODUkTTcmId                       Unsigned32,
+    optIfODUkTTraceIdentifierTransmitted  SnmpAdminString,
+    optIfODUkTSourceMode                  INTEGER,
+    optIfODUkTSourceLockSignalAdminState  INTEGER
+    }
+
+optIfODUkTTcmId OBJECT-TYPE
+  SYNTAX  Unsigned32 (1..6)
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Value of the TCM level"
+  ::= { optIfODUkTSourceConfigEntry 1 }
+
+
+optIfODUkTTraceIdentifierTransmitted OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..64))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The trace identifier transmitted."
+  ::= { optIfODUkTSourceConfigEntry 2 }
+
+optIfODUkTSourceMode OBJECT-TYPE
+  SYNTAX  INTEGER  {
+    transparent (1),
+    operational (2)
+    }               	
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Controls the detection of the TCM sub-fields at the Source:
+     If the value is TRANSPARENT, all information shall be passed 
+        through transparently, with the exception of the TCM ACT.
+     If the value is OPERATIONAL, then:
+        - Trail Trace Identifier is inserted in the TTI byte position
+        - Backward Defect Indication is inserted in the BDI bit position
+        - Bit Interleaved Parity (BIP-8) is inserted in the BIP8 byte 
+          position
+        - Bits 6, 7 and 8 of byte BI shall be fixed to 000 (reserved)"
+  ::= { optIfODUkTSourceConfigEntry 3 }                  
+
+optIfODUkTSourceLockSignalAdminState OBJECT-TYPE
+  SYNTAX  INTEGER {
+    locked(1),
+    normal(2)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Provides the capability to provision the LOCK signal, which
+     is one of the ODUk maintenance signals, at the source.
+     When a Tandem Connection endpoint is set to admin state
+     locked, it inserts the ODUk-LCK signal in the source
+     direction."
+  ::= { optIfODUkTSourceConfigEntry 4 }
+
+-- the optIfODUkP group
+-- This group handles the configuration information 
+-- for the ODUkP layers.
+
+-- ODUkP config table
+
+optIfODUkPConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfODUkPConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of ODUkP configuration information."
+  ::= { optIfODUkP 1 }
+
+optIfODUkPConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfODUkPConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains ODUkP configuration
+     information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfODUkPConfigTable 1 }
+
+OptIfODUkPConfigEntry ::=
+  SEQUENCE {
+    optIfODUkPTraceIdentifierTransmitted  SnmpAdminString,
+    optIfODUkPDAPIExpected                SnmpAdminString,
+    optIfODUkPSAPIExpected                SnmpAdminString,
+    optIfODUkPTraceIdentifierAccepted     SnmpAdminString,
+    optIfODUkPAcTIStatus                  INTEGER,
+    optIfODUkPTIMDetMode                  INTEGER,
+    optIfODUkPTIMActEnabled               TruthValue,
+    optIfODUkPDEGThr                      INTEGER,
+    optIfODUkPDEGM                        INTEGER,
+    optIfODUkPCurrentStatus               INTEGER,
+    optIfODUkPPayloadTypeTransmitted      Unsigned32,
+    optIfODUkPPayloadTypeExpected         Unsigned32,
+    optIfODUkPPayloadTypeAccepted         Unsigned32,
+    optIfODUkPActiveAdaptFuncSource       INTEGER,
+    optIfODUkPActiveAdaptFuncSink         INTEGER
+    }
+
+optIfODUkPTraceIdentifierTransmitted OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..64))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The trace identifier transmitted."
+  ::= { optIfODUkPConfigEntry 1 }
+
+optIfODUkPDAPIExpected OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..16))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The DAPI expected by the receiver."
+  ::= { optIfODUkPConfigEntry 2 }
+
+optIfODUkPSAPIExpected OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(0..16))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The SAPI expected by the receiver."
+  ::= { optIfODUkPConfigEntry 3 }
+
+optIfODUkPTraceIdentifierAccepted OBJECT-TYPE
+  SYNTAX  SnmpAdminString(SIZE (0..64))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual trace identifier accepted."
+  ::= { optIfODUkPConfigEntry 4 }
+
+optIfODUkPAcTIStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    stable(1),
+    unstable(2)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The status of the accepted Trail Trace Identifier by the receiver."
+  ::= { optIfODUkPConfigEntry 5 }
+
+optIfODUkPTIMDetMode OBJECT-TYPE
+  SYNTAX  INTEGER {
+    off(1),
+    dapi(2),
+    sapi(3),
+    both(4)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the mode of the Trace Identifier Mismatch (TIM)
+     Detection function."
+  ::= { optIfODUkPConfigEntry 6 }
+
+optIfODUkPTIMActEnabled OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the Trace Identifier Mismatch (TIM)
+     Consequent Action function is enabled."
+  ::= { optIfODUkPConfigEntry 7 }
+
+optIfODUkPDEGThr OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS   "percentage"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the threshold level for declaring a performance 
+     monitoring (PM) Second to be bad. A PM Second is declared bad if 
+     the percentage of detected errored blocks in that second is 
+     greater than or equal to DEGTHR."
+  ::= { optIfODUkPConfigEntry 8 }                     
+
+optIfODUkPDEGM OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the threshold level for declaring a Degraded Signal 
+     defect (dDEG). A dDEG shall be declared if DEGM consecutive bad PM 
+     Seconds are detected."
+  ::= { optIfODUkPConfigEntry 9 }
+
+optIfODUkPCurrentStatus OBJECT-TYPE
+  SYNTAX  INTEGER {
+    noDefect(1),
+    lck(2),
+    tim(3),
+    oci(4),
+    deg(5),
+    bdi(6),
+    ssf(7),
+    plm(8)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Indicates the failure condition of the entity, if any."
+  ::= { optIfODUkPConfigEntry 10 }
+
+optIfODUkPPayloadTypeTransmitted OBJECT-TYPE
+  SYNTAX  Unsigned32 (0..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The payload type signal transmitted."
+  ::= { optIfODUkPConfigEntry 11 }
+
+optIfODUkPPayloadTypeExpected OBJECT-TYPE
+  SYNTAX  Unsigned32 (0..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The payload type signal expected by the receiver."
+  ::= { optIfODUkPConfigEntry 12 }
+
+optIfODUkPPayloadTypeAccepted OBJECT-TYPE
+  SYNTAX  Unsigned32 (0..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual payload type signal accepted."
+  ::= { optIfODUkPConfigEntry 13}
+
+optIfODUkPActiveAdaptFuncSource OBJECT-TYPE
+  SYNTAX  INTEGER {
+    cBRa2G5(1),
+    cBRa10G(2),
+    cBRa40G(3),
+    cBRb2G5(4),
+    cBRb10G(5),
+    cBRb40G(6),
+    aTMvp(7),
+    gFP(8),
+    nULL(9),
+    pRBS(10),
+    rSn(11),
+    gcc(12),
+    aps(13)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "When an ODUkP termination point supports multiple
+     adaptation functions, this object indicates the active
+     adaptation function at the interface port."
+  ::= { optIfODUkPConfigEntry 14 }
+
+optIfODUkPActiveAdaptFuncSink OBJECT-TYPE
+  SYNTAX  INTEGER {
+    cBR2G5(1),
+    cBR10G(2),
+    cBR40G(3),
+    aTMvp(4),
+    gFP(5),
+    nULL(6),
+    pRBS(7),
+    rSn(8),
+    gcc(9),
+    aps(10)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "When an ODUkP termination point supports multiple
+     adaptation functions, this object indicates the active
+     adaptation function at the interface port."
+  ::= { optIfODUkPConfigEntry 15 }
+
+-- groups
+
+optIfPerfMonGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfPerfMonCurrentTimeElapsed,
+    optIfPerfMonCurDayTimeElapsed,
+    optIfPerfMonIntervalNumIntervals,
+    optIfPerfMonIntervalNumInvalidIntervals
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of performance monitoring interval objects."
+  ::= { optIfGroups 1 }
+
+optIfOTSnConfigGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOTSnTraceIdentifierTransmitted,
+    optIfOTSnDAPIExpected,
+    optIfOTSnSAPIExpected,
+    optIfOTSnTraceIdentifierAccepted,
+    optIfOTSnAcTIStatus,
+    optIfOTSnTIMDetModeled,
+    optIfOTSnTIMActEnabled,
+    optIfOTSnCurrentStatus
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of OTSn configuration objects."
+  ::= { optIfGroups 2 }
+
+optIfOTSnPMGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOTSnSinkCurrentSuspectedFlag,
+    optIfOTSnSinkCurrentInputPower,
+    optIfOTSnSinkCurrentLowInputPower,
+    optIfOTSnSinkCurrentHighInputPower,
+    optIfOTSnSinkCurrentLowerInputPowerThreshold,
+    optIfOTSnSinkCurrentUpperInputPowerThreshold,
+    optIfOTSnSinkIntervalNumber,
+    optIfOTSnSinkIntervalSuspectedFlag,
+    optIfOTSnSinkIntervalLastInputPower,
+    optIfOTSnSinkIntervalLowInputPower,
+    optIfOTSnSinkIntervalHighInputPower,
+    optIfOTSnSinkCurDaySuspectedFlag,
+    optIfOTSnSinkCurDayLowInputPower,
+    optIfOTSnSinkCurDayHighInputPower,
+    optIfOTSnSinkPrevDaySuspectedFlag,
+    optIfOTSnSinkPrevDayLastInputPower,
+    optIfOTSnSinkPrevDayLowInputPower,
+    optIfOTSnSinkPrevDayHighInputPower,
+    optIfOTSnSrcCurrentSuspectedFlag,
+    optIfOTSnSrcCurrentOutputPower,
+    optIfOTSnSrcCurrentLowOutputPower,
+    optIfOTSnSrcCurrentHighOutputPower,
+    optIfOTSnSrcCurrentLowerOutputPowerThreshold,
+    optIfOTSnSrcCurrentUpperOutputPowerThreshold,
+    optIfOTSnSrcCurrentLaserTemp,
+    optIfOTSnSrcCurrentLowLaserTemp,
+    optIfOTSnSrcCurrentHighLaserTemp,
+    optIfOTSnSrcCurrentLowerLaserTempThreshold,
+    optIfOTSnSrcCurrentUpperLaserTempThreshold,
+    optIfOTSnSrcIntervalNumber,
+    optIfOTSnSrcIntervalSuspectedFlag,
+    optIfOTSnSrcIntervalLastOutputPower,
+    optIfOTSnSrcIntervalLowOutputPower,
+    optIfOTSnSrcIntervalHighOutputPower,
+    optIfOTSnSrcIntervalLastLaserTemp,
+    optIfOTSnSrcIntervalLowLaserTemp,
+    optIfOTSnSrcIntervalHighLaserTemp,
+    optIfOTSnSrcCurDaySuspectedFlag,
+    optIfOTSnSrcCurDayLowOutputPower,
+    optIfOTSnSrcCurDayHighOutputPower,
+    optIfOTSnSrcCurDayLowLaserTemp,
+    optIfOTSnSrcCurDayHighLaserTemp,
+    optIfOTSnSrcPrevDaySuspectedFlag,
+    optIfOTSnSrcPrevDayLastOutputPower,
+    optIfOTSnSrcPrevDayLowOutputPower,
+    optIfOTSnSrcPrevDayHighOutputPower,
+    optIfOTSnSrcPrevDayLastLaserTemp,
+    optIfOTSnSrcPrevDayLowLaserTemp,
+    optIfOTSnSrcPrevDayHighLaserTemp
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of OTSn performance monitoring objects."
+  ::= { optIfGroups 3 }
+
+optIfOMSnConfigGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOMSnOrder,
+    optIfOMSnCurrentStatus
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of OMSn configuration objects."
+  ::= { optIfGroups 4 }
+
+optIfOMSnPMGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOMSnSinkCurrentSuspectedFlag,
+    optIfOMSnSinkCurrentAggregatedInputPower,
+    optIfOMSnSinkCurrentLowAggregatedInputPower,
+    optIfOMSnSinkCurrentHighAggregatedInputPower,
+    optIfOMSnSinkCurrentLowerInputPowerThreshold,
+    optIfOMSnSinkCurrentUpperInputPowerThreshold,
+    optIfOMSnSinkCurrentLaserTemp,
+    optIfOMSnSinkCurrentLowLaserTemp,
+    optIfOMSnSinkCurrentHighLaserTemp,
+    optIfOMSnSinkCurrentLowerLaserTempThreshold,
+    optIfOMSnSinkCurrentUpperLaserTempThreshold,
+    optIfOMSnSinkIntervalNumber,
+    optIfOMSnSinkIntervalSuspectedFlag,
+    optIfOMSnSinkIntervalLastAggregatedInputPower,
+    optIfOMSnSinkIntervalLowAggregatedInputPower,
+    optIfOMSnSinkIntervalHighAggregatedInputPower,
+    optIfOMSnSinkIntervalLastLaserTemp,
+    optIfOMSnSinkIntervalLowLaserTemp,
+    optIfOMSnSinkIntervalHighLaserTemp,
+    optIfOMSnSinkCurDaySuspectedFlag,
+    optIfOMSnSinkCurDayLowAggregatedInputPower,
+    optIfOMSnSinkCurDayHighAggregatedInputPower,
+    optIfOMSnSinkCurDayLowLaserTemp,
+    optIfOMSnSinkCurDayHighLaserTemp,
+    optIfOMSnSinkPrevDaySuspectedFlag,
+    optIfOMSnSinkPrevDayLastAggregatedInputPower,
+    optIfOMSnSinkPrevDayLowAggregatedInputPower,
+    optIfOMSnSinkPrevDayHighAggregatedInputPower,
+    optIfOMSnSinkPrevDayLastLaserTemp,
+    optIfOMSnSinkPrevDayLowLaserTemp,
+    optIfOMSnSinkPrevDayHighLaserTemp,
+    optIfOMSnSrcCurrentSuspectedFlag,
+    optIfOMSnSrcCurrentOutputPower,
+    optIfOMSnSrcCurrentLowOutputPower,
+    optIfOMSnSrcCurrentHighOutputPower,
+    optIfOMSnSrcCurrentLowerOutputPowerThreshold,
+    optIfOMSnSrcCurrentUpperOutputPowerThreshold,
+    optIfOMSnSrcCurrentLaserTemp,
+    optIfOMSnSrcCurrentLowLaserTemp,
+    optIfOMSnSrcCurrentHighLaserTemp,
+    optIfOMSnSrcCurrentLowerLaserTempThreshold,
+    optIfOMSnSrcCurrentUpperLaserTempThreshold,
+    optIfOMSnSrcIntervalNumber,
+    optIfOMSnSrcIntervalSuspectedFlag,
+    optIfOMSnSrcIntervalLastOutputPower,
+    optIfOMSnSrcIntervalLowOutputPower,
+    optIfOMSnSrcIntervalHighOutputPower,
+    optIfOMSnSrcIntervalLastLaserTemp,
+    optIfOMSnSrcIntervalLowLaserTemp,
+    optIfOMSnSrcIntervalHighLaserTemp,
+    optIfOMSnSrcCurDaySuspectedFlag,
+    optIfOMSnSrcCurDayLowOutputPower,
+    optIfOMSnSrcCurDayHighOutputPower,
+    optIfOMSnSrcCurDayLowLaserTemp,
+    optIfOMSnSrcCurDayHighLaserTemp,
+    optIfOMSnSrcPrevDaySuspectedFlag,
+    optIfOMSnSrcPrevDayLastOutputPower,
+    optIfOMSnSrcPrevDayLowOutputPower,
+    optIfOMSnSrcPrevDayHighOutputPower,
+    optIfOMSnSrcPrevDayLastLaserTemp,
+    optIfOMSnSrcPrevDayLowLaserTemp,
+    optIfOMSnSrcPrevDayHighLaserTemp
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of OMSn performance monitoring objects."
+  ::= { optIfGroups 5 }
+
+optIfOChConfigGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOChSinkAdaptActive,
+    optIfOChSourceAdaptActive,
+    optIfOChSinkFECEnabled,
+    optIfOChCurrentStatus
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of OCh configuration objects."
+  ::= { optIfGroups 6 }
+
+optIfOChPMGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOChSinkCurrentSuspectedFlag,
+    optIfOChSinkCurrentInputPower,
+    optIfOChSinkCurrentLowInputPower,
+    optIfOChSinkCurrentHighInputPower,
+    optIfOChSinkCurrentLowerInputPowerThreshold,
+    optIfOChSinkCurrentUpperInputPowerThreshold,
+    optIfOChSinkIntervalNumber,
+    optIfOChSinkIntervalSuspectedFlag,
+    optIfOChSinkIntervalLastInputPower,
+    optIfOChSinkIntervalLowInputPower,
+    optIfOChSinkIntervalHighInputPower,
+    optIfOChSinkCurDaySuspectedFlag,
+    optIfOChSinkCurDayLowInputPower,
+    optIfOChSinkCurDayHighInputPower,
+    optIfOChSinkPrevDaySuspectedFlag,
+    optIfOChSinkPrevDayLastInputPower,
+    optIfOChSinkPrevDayLowInputPower,
+    optIfOChSinkPrevDayHighInputPower,
+    optIfOChSrcCurrentSuspectedFlag,
+    optIfOChSrcCurrentOutputPower,
+    optIfOChSrcCurrentLowOutputPower,
+    optIfOChSrcCurrentHighOutputPower,
+    optIfOChSrcCurrentLowerOutputPowerThreshold,
+    optIfOChSrcCurrentUpperOutputPowerThreshold,
+    optIfOChSrcCurrentLaserTemp,
+    optIfOChSrcCurrentLowLaserTemp,
+    optIfOChSrcCurrentHighLaserTemp,
+    optIfOChSrcCurrentLowerLaserTempThreshold,
+    optIfOChSrcCurrentUpperLaserTempThreshold,
+    optIfOChSrcIntervalNumber,
+    optIfOChSrcIntervalSuspectedFlag,
+    optIfOChSrcIntervalLastOutputPower,
+    optIfOChSrcIntervalLowOutputPower,
+    optIfOChSrcIntervalHighOutputPower,
+    optIfOChSrcIntervalLastLaserTemp,
+    optIfOChSrcIntervalLowLaserTemp,
+    optIfOChSrcIntervalHighLaserTemp,
+    optIfOChSrcCurDaySuspectedFlag,
+    optIfOChSrcCurDayLowOutputPower,
+    optIfOChSrcCurDayHighOutputPower,
+    optIfOChSrcCurDayLowLaserTemp,
+    optIfOChSrcCurDayHighLaserTemp,
+    optIfOChSrcPrevDaySuspectedFlag,
+    optIfOChSrcPrevDayLastOutputPower,
+    optIfOChSrcPrevDayLowOutputPower,
+    optIfOChSrcPrevDayHighOutputPower,
+    optIfOChSrcPrevDayLastLaserTemp,
+    optIfOChSrcPrevDayLowLaserTemp,
+    optIfOChSrcPrevDayHighLaserTemp
+     }
+  STATUS  current
+  DESCRIPTION
+    "A collection of OCh performance monitoring objects."
+  ::= { optIfGroups 7 }
+
+optIfOTUkConfigGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOTUkTraceIdentifierTransmitted,
+    optIfOTUkDAPIExpected, 
+    optIfOTUkSAPIExpected, 
+    optIfOTUkTraceIdentifierAccepted, 
+    optIfOTUkAcTIStatus, 
+    optIfOTUkTIMDetMode, 
+    optIfOTUkTIMActEnabled, 
+    optIfOTUkDEGThr,
+    optIfOTUkDEGM, 
+    optIfOTUkCurrentStatus
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of OTUk configuration objects."
+  ::= { optIfGroups 8 }
+
+optIfODUkTGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfODUkTTcmI,
+    optIfODUkTTraceIdentifierTransmitted,
+    optIfODUkTDAPIExpected, 
+    optIfODUkTSAPIExpected, 
+    optIfODUkTTraceIdentifierAccepted, 
+    optIfODUkTAcTIStatus, 
+    optIfODUkTTIMDetMode, 
+    optIfODUkTTIMActEnabled, 
+    optIfODUkTDEGThr, 
+    optIfODUkTDEGM, 
+    optIfODUkTSinkMode, 
+    optIfODUkTSourceMode, 
+    optIfODUkTSinkLockSignalAdminState, 
+    optIfODUkTSourceLockSignalAdminState,
+    optIfODUkTCurrentStatus
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of ODUkT configuration objects."
+  ::= { optIfGroups 9 }
+
+optIfODUkPGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfODUkPTraceIdentifierTransmitted,
+    optIfODUkPDAPIExpected,
+    optIfODUkPSAPIExpected,
+    optIfODUkPTraceIdentifierAccepted,
+    optIfODUkPAcTIStatus,
+    optIfODUkPTIMDetMode,
+    optIfODUkPTIMActEnabled,
+    optIfODUkPDEGThr,
+    optIfODUkPDEGM,
+    optIfODUkPCurrentStatus,
+    optIfODUkPPayloadTypeTransmitted,
+    optIfODUkPPayloadTypeExpected,
+    optIfODUkPPayloadTypeAccepted,
+    optIfODUkPActiveAdaptFuncSource,
+    optIfODUkPActiveAdaptFuncSink
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of ODUkP configuration objects."
+  ::= { optIfGroups 10 }
+
+-- compliance specifications
+
+optIfMinCompl MODULE-COMPLIANCE
+  STATUS  current
+  DESCRIPTION
+    "The minimal implementation requirements for this MIB module."
+  MODULE
+    MANDATORY-GROUPS  {
+      optIfPerfMonGroup,
+      optIfOTSnConfigGroup,
+      optIfOTSnPMGroup,
+      optIfOChConfigGroup,
+      optIfOChPMGroup
+      }
+  ::= { optIfCompl 1 }
+
+optIfFullCompl MODULE-COMPLIANCE
+  STATUS  current
+  DESCRIPTION
+    "The full implementation requirements for this MIB module."
+  MODULE  -- This module
+    MANDATORY-GROUPS  {
+      optIfPerfMonGroup,
+      optIfOTSnConfigGroup,
+      optIfOTSnPMGroup,
+      optIfOMSnConfigGroup,
+      optIfOMSnPMGroup,
+      optIfOChConfigGroup,
+      optIfOChPMGroup,
+      optIfOTUkConfigGroup,
+      optIfODUkTGroup,
+      optIfODUkPGroup
+      }
+  ::= { optIfCompl 2 }
+
+END

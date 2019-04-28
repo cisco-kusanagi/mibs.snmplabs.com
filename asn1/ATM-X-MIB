@@ -1,0 +1,1833 @@
+ATM-X-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, Counter32, Gauge32, Integer32, TimeTicks, IpAddress FROM SNMPv2-SMI
+	radAtm, alarmSeverity, alarmState FROM RAD-MIB
+	ifAlias FROM IF-MIB
+	TEXTUAL-CONVENTION, RowStatus FROM SNMPv2-TC
+	;
+--
+atmGen  OBJECT IDENTIFIER  ::=  {radAtm 2}
+atmPerfHistory  OBJECT IDENTIFIER  ::=  {atmGen 1}
+atmIfPerformance  OBJECT IDENTIFIER  ::=  {atmPerfHistory 1}
+     -- AAL5 Virtual Channel Connection Performance Statistics
+     -- Table
+     -- This table contains the AAL5 extension
+     -- performance statistics of a VCC at the
+     -- interface associated with an AAL5 entity in an ATM
+     -- host or ATM switch.
+     aal5VccXTable        OBJECT-TYPE
+          SYNTAX         SEQUENCE OF Aal5VccXEntry
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION
+           "This table is an extension to AAL5 VCC Table."
+          ::= { atmIfPerformance 4 }
+     aal5VccXEntry        OBJECT-TYPE
+          SYNTAX         Aal5VccXEntry
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION
+           "This list contains the additional AAL5 VCC
+            performance parameters and is indexed
+            by ifIndex values of AAL5 interfaces
+            and the associated VPI/VCI values."
+          AUGMENTS { aal5VccEntry }
+          ::= { aal5VccXTable 1 }
+     Aal5VccXEntry    ::= SEQUENCE  {
+          aal5VccInFrames     Counter32,
+          aal5VccOutFrames    Counter32,
+		  aal5VccUnknownProtocolFrames	 Counter32
+               }
+     aal5VccInFrames  OBJECT-TYPE
+          SYNTAX         Counter32
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION
+           "The number of frames received via this interface."
+          ::= { aal5VccXEntry 1 }
+     aal5VccOutFrames OBJECT-TYPE
+          SYNTAX         Counter32
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION
+           "The total number of frames transmitted out of the
+           interface."
+          ::= { aal5VccXEntry 2 }
+    aal5VccUnknownProtocolFrames OBJECT-TYPE
+          SYNTAX         Counter32
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION
+           "The number of frames that were discarded due to unsupported
+            protocol encapsulation on this VCC."
+          ::= { aal5VccXEntry 3 }
+     aal5VccCurrentTable        OBJECT-TYPE
+          SYNTAX         SEQUENCE OF Aal5VccCurrentEntry
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION
+           "The AAL5 Current table."
+          ::= { atmIfPerformance 5 }
+     aal5VccCurrentEntry        OBJECT-TYPE
+          SYNTAX         Aal5VccCurrentEntry
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION
+           "An entry in the AAL5 Current table."
+          INDEX { ifIndex, aal5VccVpi, aal5VccVci }
+           ::= { aal5VccCurrentTable 1 }
+     Aal5VccCurrentEntry    
+     ::= SEQUENCE  {
+          aal5VccCurrentInFrames     
+             Gauge32,
+          aal5VccCurrentOutFrames    
+             Gauge32,
+		  aal5VccCurrentUnknownProtocolFrames	 
+		     Gauge32,
+		  aal5VccCurrentCrcErrors	 
+		     Gauge32,
+		  aal5VccCurrentLengthError	 
+		     Gauge32,
+		  aal5VccCurrentInputCongestionDropped
+			 Gauge32,
+		  aal5VccCurrentOutputCongestionDropped
+			 Gauge32
+               }
+aal5VccCurrentInFrames OBJECT-TYPE
+      SYNTAX      Gauge32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+	  "The counter associated with the number of received frames, 
+	  encountered by the AAL5 interface in the current 15 minute 
+	  interval."
+    ::= { aal5VccCurrentEntry 1 }
+aal5VccCurrentOutFrames OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of transmitted frames, 
+	  encountered by the AAL5 interface in the current 15 minute 
+	  interval."
+      ::= { aal5VccCurrentEntry 2 }
+aal5VccCurrentUnknownProtocolFrames OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of frames that were 
+	  discarded due to unsupported protocol encapsulation, 
+	  encountered by the AAL5 interface in the current 15 minute 
+	  interval."
+      ::= { aal5VccCurrentEntry 3 }
+aal5VccCurrentCrcErrors OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of AAL5 CPCS PDUs 
+	  received with	CRC-32 errors, encountered by the AAL5 
+	  interface in the current 15 minute interval."
+      ::= { aal5VccCurrentEntry 4 }
+aal5VccCurrentLengthError OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of received frames 
+	  with length error, encountered by the AAL5 interface in the 
+	  current 15 minute interval."
+      ::= { aal5VccCurrentEntry 5 }
+aal5VccCurrentInputCongestionDropped OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of 
+	   dropped frames due to congestion, encountered by 
+	   the AAL5 interface on the Receive direction 
+	   in the current 15 minute interval."
+      ::= { aal5VccCurrentEntry 6 }
+aal5VccCurrentOutputCongestionDropped OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of 
+	   dropped frames due to congestion, encountered by 
+	   the AAL5 interface on the Transmit direction 
+	   in the current 15 minute interval."
+      ::= { aal5VccCurrentEntry 7 }
+-- Interval Table 
+     aal5VccIntervalTable        OBJECT-TYPE
+          SYNTAX         SEQUENCE OF Aal5VccIntervalEntry
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION
+           "The AAL5 Interval table."
+          ::= { atmIfPerformance 6 }
+     aal5VccIntervalEntry        OBJECT-TYPE
+          SYNTAX         Aal5VccIntervalEntry
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION
+           "An entry in the AAL5 Interval table."
+          INDEX { ifIndex, aal5VccVpi, aal5VccVci, aal5VccIntervalNumber }
+           ::= { aal5VccIntervalTable 1 }
+     Aal5VccIntervalEntry    
+     ::= SEQUENCE  {
+          aal5VccIntervalNumber     
+             Integer32,
+          aal5VccIntervalInFrames     
+             Gauge32,
+          aal5VccIntervalOutFrames    
+             Gauge32,
+		  aal5VccIntervalUnknownProtocolFrames	 
+		     Gauge32,
+		  aal5VccIntervalCrcErrors	 
+		     Gauge32,
+		  aal5VccIntervalLengthError	 
+		     Gauge32,
+		  aal5VccIntervalInputCongestionDropped
+			 Gauge32,
+		  aal5VccIntervalOutputCongestionDropped
+			 Gauge32
+               }
+aal5VccIntervalNumber OBJECT-TYPE
+    SYNTAX  Integer32 (1..96)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A number between 1 and 96, where 1 is the most
+         recently completed 15 minute interval and 96 is
+         the least recently completed 15 minutes interval
+         (assuming that all 96 intervals exist)."
+    ::= { aal5VccIntervalEntry 1 }
+aal5VccIntervalInFrames OBJECT-TYPE
+      SYNTAX      Gauge32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+	  "The counter associated with the number of received frames, 
+	  encountered by the AAL5 interface in one of the previous 
+	  96, individual 15 minute, intervals."
+    ::= { aal5VccIntervalEntry 2 }
+aal5VccIntervalOutFrames OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of transmitted frames, 
+	  encountered by the AAL5 interface in in one of the previous 
+	  96, individual 15 minute, intervals."
+      ::= { aal5VccIntervalEntry 3 }
+aal5VccIntervalUnknownProtocolFrames OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of frames that were 
+	  discarded due to unsupported protocol encapsulation, 
+	  encountered by the AAL5 interface in one of the previous 
+	  96, individual 15 minute, intervals."
+      ::= { aal5VccIntervalEntry 4 }
+aal5VccIntervalCrcErrors OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of AAL5 CPCS PDUs 
+	  received with	CRC-32 errors, encountered by the AAL5 
+	  interface in one of the previous 96, individual 15 minute, 
+	  intervals."
+      ::= { aal5VccIntervalEntry 5 }
+aal5VccIntervalLengthError OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of received frames 
+	  with length error, encountered by the AAL5 interface in one 
+	  of the previous 96, individual 15 minute, intervals."
+      ::= { aal5VccIntervalEntry 6 }
+aal5VccIntervalInputCongestionDropped OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of dropped frames 
+	  due to a congestion, encountered by the AAL5 interface on 
+	  the Receive direction in one of the previous 96, individual 
+	  15 minute, intervals"
+      ::= { aal5VccIntervalEntry 7 }
+aal5VccIntervalOutputCongestionDropped OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of dropped frames 
+	  due to a congestion, encountered by the AAL5 interface on 
+	  the Transmit direction in one of the previous 96, individual 
+	  15 minute, intervals"
+      ::= { aal5VccIntervalEntry 8 }
+-- END
+-- 
+-- file :v:\doc\rdv\mib\ver485\atm\atmCes.txt
+-- 
+-- 
+-- File: v:\doc\rdv\mib\ver485\atm\atmCes.txt
+-- Date:      17/01/02
+-- By:        Ilana Schvetz
+-- Last Update: 17-Jan-02 By Ilana Schvetz
+-- 
+-- AAL1 statistics. An addition to ATMF-CES (ces.mib) 
+--
+atmCes OBJECT IDENTIFIER  ::=  {radAtm 9}
+atmCesPerformance      OBJECT IDENTIFIER ::= {atmCes 1 }
+atmCesAal1CurrentTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmCesAal1CurrentEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+         "The AAL1 Current table."
+      ::= { atmCesPerformance 1 }
+atmCesAal1CurrentEntry OBJECT-TYPE
+      SYNTAX  AtmCesAal1CurrentEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "An entry in the AAL1 Current table."
+      INDEX   { atmCesAal1CurrentIfIndex }
+      ::= { atmCesAal1CurrentTable 1 }
+AtmCesAal1CurrentEntry ::=
+      SEQUENCE {
+      atmCesAal1CurrentIfIndex
+           Integer32,
+      atmCesAal1CurrentSeqErrors
+      	   Gauge32,
+      atmCesAal1CurrentHdrErrors
+           Gauge32,
+      atmCesAal1CurrentPointerReframes
+           Gauge32,
+      atmCesAal1CurrentBufUnderflows
+           Gauge32,
+      atmCesAal1CurrentBufOverflows
+           Gauge32
+      }
+atmCesAal1CurrentIfIndex OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The index of the AAL1 interface. 
+        It may be ifIndex."
+    ::= { atmCesAal1CurrentEntry 1 }
+atmCesAal1CurrentSeqErrors OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of Discarded 
+        cells due to wrong sequence number, encountered 
+        by an AAL1 interface in the current 15 minute interval."
+      ::= { atmCesAal1CurrentEntry 2 }
+atmCesAal1CurrentHdrErrors OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of Discarded 
+        cells due to bad AAL1 header error (including correctable 
+        and uncorrectable CRC, and bad parity), encountered 
+        by an AAL1 interface in the current 15 minute interval."
+      ::= { atmCesAal1CurrentEntry 3 }
+atmCesAal1CurrentPointerReframes OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of events in 
+	  which a SDT pointer isn't where it is expected to be, 
+	  and must be reacquired, encountered by an AAL1 interface 
+	  in the current 15 minute interval."
+      ::= { atmCesAal1CurrentEntry 4 }
+atmCesAal1CurrentBufUnderflows OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of buffer 
+	  underflow events, encountered by an AAL1 interface 
+	  in the current 15 minute interval."
+      ::= { atmCesAal1CurrentEntry 5 }
+atmCesAal1CurrentBufOverflows OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of buffer 
+	  overflow events, encountered by an AAL1 interface 
+	  in the current 15 minute interval."
+      ::= { atmCesAal1CurrentEntry 6 }
+--Interval Table
+atmCesAal1IntervalTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmCesAal1IntervalEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+         "The AAL1 Interval table."
+      ::= { atmCesPerformance 2 }
+atmCesAal1IntervalEntry OBJECT-TYPE
+      SYNTAX  AtmCesAal1IntervalEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "An entry in the AAL1 Interval table."
+              INDEX   { atmCesAal1IntervalIfIndex, atmCesAal1IntervalNumber }
+              ::= { atmCesAal1IntervalTable 1 }
+AtmCesAal1IntervalEntry ::=
+      SEQUENCE {
+      atmCesAal1IntervalIfIndex
+           Integer32,
+      atmCesAal1IntervalNumber
+           Integer32,
+      atmCesAal1IntervalSeqErrors
+      	   Gauge32,
+      atmCesAal1IntervalHdrErrors
+           Gauge32,
+      atmCesAal1IntervalPointerReframes
+           Gauge32,
+      atmCesAal1IntervalBufUnderflows
+           Gauge32,
+      atmCesAal1IntervalBufOverflows
+           Gauge32
+      }
+atmCesAal1IntervalIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the AAL1 interface. 
+        It may be ifIndex."
+    ::= { atmCesAal1IntervalEntry 1 }
+atmCesAal1IntervalNumber OBJECT-TYPE
+    SYNTAX  Integer32 (1..96)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A number between 1 and 96, where 1 is the most
+         recently completed 15 minute interval and 96 is
+         the least recently completed 15 minutes interval
+         (assuming that all 96 intervals exist)."
+    ::= { atmCesAal1IntervalEntry 2 }
+atmCesAal1IntervalSeqErrors OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of Discarded 
+        cells due to wrong sequence number, encountered 
+        by an AAL1 interface in one of the previous 96, 
+        individual 15 minute, intervals."
+      ::= { atmCesAal1IntervalEntry 3 }
+atmCesAal1IntervalHdrErrors OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of Discarded 
+        cells due to bad AAL1 header error (including correctable 
+        and uncorrectable CRC, plus bad parity), encountered 
+        by an AAL1 interface in one of the previous 96, 
+        individual 15 minute, intervals."
+      ::= { atmCesAal1IntervalEntry 4 }
+atmCesAal1IntervalPointerReframes OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of events in 
+	  which a SDT pointer isn't where it is expected to be, 
+	  and must be reacquired, encountered by an AAL1 interface 
+	  in one of the previous 96, individual 15 minute, 
+	  intervals."
+      ::= { atmCesAal1IntervalEntry 5 }
+atmCesAal1IntervalBufUnderflows OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of buffer 
+	  underflow events, encountered by an AAL1 interface 
+	  in one of the previous 96, individual 15 minute, 
+	  intervals."
+      ::= { atmCesAal1IntervalEntry 6 }
+atmCesAal1IntervalBufOverflows OBJECT-TYPE
+      SYNTAX  Gauge32  
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The counter associated with the number of buffer 
+	  overflow events, encountered by an AAL1 interface 
+	  in one of the previous 96, individual 15 minute, 
+	  intervals."
+      ::= { atmCesAal1IntervalEntry 7 }
+-- Extension for CES Configuration Table
+atmCesConfiguration      OBJECT IDENTIFIER ::= {atmCes 2 }
+ atmCesXConfTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AtmCesXConfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    "This table is an extension of atmfCESConfTable table."
+	::= { atmCesConfiguration 1 }
+ atmCesXConfEntry OBJECT-TYPE
+	SYNTAX AtmCesXConfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    "Conceptual row in atmfCESConfTable.
+     A new row is created in this table upon each new CES VCC creation."
+ AUGMENTS { atmfCESConfEntry }
+	::= { atmCesXConfTable 1 }
+ AtmCesXConfEntry ::= SEQUENCE {
+	atmCesXConfCBRMode       INTEGER
+ }
+ atmCesXConfCBRMode     OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      normal (2),
+                      spaced (3)
+                      }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "This parameter defines if to use Spaced or Normal CBR.  
+         Normal - TD will be allocated from the policing range (described 
+                  in ACE2002 NMS SRS). The PCR is expanded with a constant 
+                  value of 30 cell/sec.
+         Spaced - TD will be allocated from the spacing range (described 
+                  in ACE2002 NMS SRS). The PCR and CDVT will be expanded 
+                  as described for Normal, and the CES traffic including
+                  the OAM will be spaced out at the TD's PCR.
+                  This mode is used to prevent CDVT violation due to OAM 
+                  cell insertion with the CES traffic."
+    ::= { atmCesXConfEntry 1 }
+-- 
+-- file :v:\doc\rdv\mib\ver475\radadsl.txt
+-- 
+--Version:   1.0
+--Date:     27.03.2001              
+--By:       Yig'al Hachmon
+--File:     ADSL.txt
+--
+--Last Update: Yig'al Hachmon 8-July-2001
+--ADSL configuration
+--wanGen   OBJECT IDENTIFIER ::= {radWan 1}
+--diverseIfWanGen OBJECT IDENTIFIER ::= {wanGen 6} (see mpmx.txt)
+adslIf OBJECT IDENTIFIER ::= {diverseIfWanGen 10} 
+adslConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AdslConfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+     "A list of ADSL Configuration entries "
+    ::= { adslIf 1 }
+adslConfEntry OBJECT-TYPE
+    SYNTAX  AdslConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+     "An entry in adslConfTable"
+    INDEX   { adslConfCnfgIdx,ifIndex }
+    ::= { adslConfTable 1 }
+AdslConfEntry ::=
+   SEQUENCE {
+    adslConfCnfgIdx				    Integer32,
+    adslConfFramingType	            INTEGER,
+    adslConfPilotToneRequest		INTEGER,
+    adslConfTrellisCoding 			INTEGER,
+    adslConfTransmissionMode 		INTEGER,
+    adslConfStandardCompliance 	    INTEGER,
+    adslConfMaxBitPerBin 			Integer32,
+    adslConfTxStartFreqBin 	        Integer32,
+    adslConfTxEndFreqBin   	        Integer32,
+    adslConfRxStartFreqBin 	        Integer32,
+    adslConfRxEndFreqBin   	        Integer32,
+    adslConfTxPowerAttenuation      Integer32
+             }
+adslConfCnfgIdx      OBJECT-TYPE
+     SYNTAX  Integer32 (1..255)
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+      "This object indicates the Idx of the Config being accessed.
+       Idx of 255 relates to the Temporary (Scratch) Config.
+       For products that support several configurations, 
+       Set can be performed only to the Temporary Config (=255). "
+     ::= { adslConfEntry 1}
+adslConfFramingType	 OBJECT-TYPE
+    SYNTAX INTEGER {
+    notApplicable    (1),
+    type2            (2), -- 64Kbits/S overhead
+    type3            (3), -- 32Kbits/S overhead
+	type0            (4), 
+	type1            (5)
+	                }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "ADSL Frame type "
+    ::= { adslConfEntry 2 }
+adslConfPilotToneRequest	OBJECT-TYPE
+    SYNTAX INTEGER {
+    notApplicable    (1),
+    disable          (2),  -- PTR is disabled 
+    enable           (3)   -- PTR is enabled
+	                }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter controls Pilot Tone Request (PTR)."
+    ::= { adslConfEntry 3}
+adslConfTrellisCoding  OBJECT-TYPE
+    SYNTAX INTEGER {
+    notApplicable    (1),
+    disable          (2),  --  Trellis Coding disabled
+    enable           (3) --  Trellis Coding enabled
+	                }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter enables/disables Trellis error detection code. 
+      using error detection code may introduce delays."
+    ::= { adslConfEntry 4 }
+adslConfTransmissionMode  OBJECT-TYPE
+    SYNTAX INTEGER {
+    notApplicable    (1),
+    echoCancellation (2),  -- EC 
+    frequencyDivision(3)   -- FDM
+                    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter controls transmision mode: 
+      Echo Cancellation is required when both ATU-C an ATU-R use
+      the same frequency.
+      Frequency Division (different frequency ranges for ATU-C 
+      and ATU-R) may limit data rate."
+    ::= { adslConfEntry 5}
+adslConfStandardCompliance	OBJECT-TYPE
+    SYNTAX INTEGER {
+    notApplicable    (1),
+    t1Hypen413       (2), -- T1-413 
+    gDotDmt          (3), -- G.DMT (Discrete Multi Tones)
+    multiMode        (4), -- Multimode 
+    alcatel1Dot4     (5), -- Alcatel 1.4
+    alcatel          (6), -- Alcatel
+    adi              (7)  -- ADI
+                    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter indicates standard compliance
+      G.Lite enables extended ADSL range, ease of installation,
+      but requires lower rate."
+    ::= { adslConfEntry 6}
+adslConfMaxBitPerBin 	OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter indicates maximum number of bits per ADSL Bin.
+      Each Bin has bandwidth of 4khz.
+      Range of values for this parameter is 0..15 "
+	::= { adslConfEntry 7}
+adslConfTxStartFreqBin	  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter controls Transmit Start Bin number.
+      For ADSL Annex A - range of values  is  6 to 31.
+      For ADSL Annex B - range of values  is 33 to 63.
+      Frequency (in khz unit) is calculated by multiplying this 
+      parameter value by bin bandwidth (4Khz) "
+    ::= { adslConfEntry 8}
+adslConfTxEndFreqBin	  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter controls Transmit End Bin number.
+      For ADSL Annex A - range of values  is  6 to 31.
+      For ADSL Annex B - range of values  is 33 to 63.
+	  requency (in khz unit) is calculated by multiplying this 
+      value by bin bandwidth (4Khz) "
+    ::= { adslConfEntry 9}
+adslConfRxStartFreqBin		OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter controls Receive Start Bin number.
+      Range of values for this parameter depends on ADSL Annex supported,
+      and transmisson mode (adslTransmissionMode) selected:
+	  ADSL Annex A and Echo Cancellation (EC)   :  6 to 255
+	  ADSL Annex A and Frequency Division (FDM) : 32 to 255 	  
+	  ADSL Annex B and Echo Cancellation (EC) 	: 33 to 255
+      ADSL Annex B and Frequency Division (FDM) : 64 to 255
+      Frequency (in khz unit) is calculated by multiplying this 
+      value by bin bandwidth (4Khz) "
+    ::= { adslConfEntry 10}
+adslConfRxEndFreqBin	  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter controls Receive End Bin number.
+      Range of values for this parameter depends on ADSL Annex supported,
+      and transmisson mode (adslTransmissionMode) selected:
+	  ADSL Annex A and Echo Cancellation (EC)   :  6 to 255
+	  ADSL Annex A and Frequency Division (FDM) : 32 to 255 	  
+	  ADSL Annex B and Echo Cancellation (EC) 	: 33 to 255
+      ADSL Annex B and Frequency Division (FDM) : 64 to 255
+      Frequency (in khz unit) is calculated by multiplying this 
+      value by bin bandwidth (4Khz) "
+    ::= { adslConfEntry 11}
+adslConfTxPowerAttenuation	  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This parameter controls Transmit Gain in dB units
+      Range is 0 to 12dB. Resolution is 1 dB"
+    ::= { adslConfEntry 12}
+adslStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AdslStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+     "A list of Adsl Status entries "
+    ::= { adslIf 2 }
+adslStatusEntry OBJECT-TYPE
+   SYNTAX  AdslStatusEntry
+   MAX-ACCESS  not-accessible
+   STATUS  current
+   DESCRIPTION
+       "An entry in adslStatusTable"
+   INDEX   { ifIndex }
+   ::= { adslStatusTable 1 }
+AdslStatusEntry ::=
+   SEQUENCE {
+			 adslStatusBitRxRate Gauge32
+             }
+adslStatusBitRxRate	   OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "bps"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+     "This parameter indicates actual Receive (Downstream)
+     rate on this channel 
+     Range of values for this parameter is 0 -8,064,000 bps"
+    ::= { adslStatusEntry 1}
+-- 
+-- file :v:\doc\rdv\mib\ver475\radsdsl.txt
+-- 
+--Version:   1.0
+--Date:     27.03.2001              
+--By:       Yig'al Hachmon
+--File:     SDSL.txt
+--
+--Last Update: Yig'al Hachmon 12-Apr-2001
+--SDSL configuration
+--wanGen    OBJECT IDENTIFIER ::= {radWan 1}
+--diverseIfWanGen OBJECT IDENTIFIER ::= {wanGen 6} (see mpmx.txt)
+sdslIf OBJECT IDENTIFIER ::= {diverseIfWanGen 11} 
+sdslConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdslConfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "A list of SDSL Configuration entries "
+    ::= { sdslIf 1 }
+sdslConfEntry OBJECT-TYPE
+    SYNTAX  SdslConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An entry in sdslConfTable        "
+    INDEX   {sdslConfCnfgIdx,ifIndex }
+    ::= { sdslConfTable 1 }
+SdslConfEntry ::=
+   SEQUENCE {
+sdslConfCnfgIdx                Integer32,
+sdslConfRateAquisition		   INTEGER,
+sdslConfBaudRate			   INTEGER,
+sdslConfMode				   INTEGER
+            }
+sdslConfCnfgIdx      OBJECT-TYPE
+     SYNTAX  Integer32 (1..255)
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "This object indicates the Idx of the Config being accessed.
+      Idx of 255 relates to the Temporary (Scratch) Config.
+      For products that support several configurations, Set can be performed
+      only to the Temporary Config (=255). "
+     ::= { sdslConfEntry 1}
+sdslConfRateAquisition	OBJECT-TYPE
+    SYNTAX INTEGER {
+    notApplicable   (1),  
+    autoNegotiate   (2),
+    fixed           (3) 
+	               }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SDSL Rate Aquisition mode
+         Default value = fixed." 
+    ::= { sdslConfEntry 2 }
+sdslConfBaudRate	   OBJECT-TYPE
+    SYNTAX INTEGER {
+    notApplicable  (1),
+    r144kbps       (2), 
+    r748kbps       (3),
+    r1168kbps      (4),
+	r1550kbps      (5),
+	r2320kbps      (6)
+	               }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SDSL baud rate. Not applicable if rate aquisition is AutoNegotiation.
+         Default value = r144kbps"
+    ::= { sdslConfEntry 3 }
+sdslConfMode	   OBJECT-TYPE
+    SYNTAX INTEGER {
+    coe   (1), -- HTU-C
+    cpe   (2)  -- HTU-R
+	               }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SDSL  mode - COE (HTU-C) or CPE (HTU-R) 
+         Default value = COE" 
+    ::= { sdslConfEntry 4 }
+-- 
+-- file :v:\doc\rdv\mib\ver510\radshdsl.txt
+-- 
+--Version:   1.0
+--Date:     9 Sep 02              
+--By:       Yig'al Hachmon
+--File:     radshdsl.txt
+--
+--Last Update: 23-Aug-2004 by Shlomo Shoham
+--SHDSL configuration
+--wanGen    OBJECT IDENTIFIER ::= {radWan 1}
+--diverseIfWanGen OBJECT IDENTIFIER ::= {wanGen 6} (see mpmx.txt)
+shdslIf OBJECT IDENTIFIER ::= {diverseIfWanGen 12} 
+radHdsl2ShdslEvents  OBJECT IDENTIFIER ::= {shdslIf 0}
+-- Segment Endpoint Current Status/Performance Group
+shdslEndpointCurrTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ShdslEndpointCurrEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "This table is an extension of hdsl2ShdslEndpointCurrTable of rfc3276
+         It contains current status and performance information
+         for segment endpoints in HDSL2/SHDSL Lines.  As with other 
+         tables in this MIB indexed by ifIndex, entries in this table 
+         MUST be maintained in a persistent manner."
+      ::= { shdslIf 1 }
+shdslEndpointCurrEntry OBJECT-TYPE
+      SYNTAX      ShdslEndpointCurrEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "An entry in the shdslEndpointCurrTable.  Each entry 
+        contains status and performance information relating to a 
+        single segment endpoint.  It is indexed by the ifIndex of the
+        HDSL2/SHDSL line, the UnitId of the associated unit, the side
+        of the unit, and the wire-pair of the associated modem."
+      AUGMENTS {hdsl2ShdslEndpointCurrEntry}
+      ::= { shdslEndpointCurrTable 1 }
+   ShdslEndpointCurrEntry ::=
+      SEQUENCE
+      {	
+	   hdsl2ShdslEndpointCurrRcvGain			  Integer32, 
+       hdsl2ShdslEndpointCurrTransPower			  Integer32,	
+       hdsl2ShdslEndpointCurrPowerBO			  Integer32,	
+       hdsl2ShdslEndpointCurrLineStatus			  INTEGER,   
+       hdsl2ShdslEndpointCurrOpState   			  BITS,	   
+       hdsl2ShdslEndpointAccumulatedTimeElapsed	  TimeTicks,
+	   hdsl2ShdslEndpointCurrPsd			  	  INTEGER
+	   }
+ hdsl2ShdslEndpointCurrRcvGain OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current receive gain in hundredth of dB."
+     ::= { shdslEndpointCurrEntry 1 }
+hdsl2ShdslEndpointCurrTransPower  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current transmit power in tenth of dBm."
+    ::= { shdslEndpointCurrEntry 2 }
+hdsl2ShdslEndpointCurrPowerBO   OBJECT-TYPE	-- added by RAD
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current transceiver actual power packoff from 0dB to 6dB."
+     ::= { shdslEndpointCurrEntry 3 }
+hdsl2ShdslEndpointCurrLineStatus OBJECT-TYPE	-- added by RAD
+    SYNTAX      INTEGER
+	           {
+	            noSync (2),
+                sync  (3)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current line synchronization status."
+     ::= { shdslEndpointCurrEntry 4 }
+hdsl2ShdslEndpointCurrOpState OBJECT-TYPE	-- added by RAD
+    SYNTAX      BITS
+	            {
+                 idleMode(0),
+                 dataMode(1),
+                 bootUpload(2),
+                 bootUploadDone(3), 
+                 startupHandshakeInProgress(4),
+                 startupTrainingInProgress(5),  
+                 framerSyncInProgress(6),
+                 localAnalogLoopbackInProgress(7),
+                 remoteCoreLoopbackInProgress(8), 
+                 localDigitalLoopbackInProgress(9),
+                 spectrumTestInProgress(10)
+				 }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state."  
+    ::= { shdslEndpointCurrEntry 5 }
+hdsl2ShdslEndpointAccumulatedTimeElapsed   OBJECT-TYPE -- added by RAD
+    SYNTAX       TimeTicks
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The time (in hundredths of a second) since the 
+         accumulated counters were last re-initialized:   
+         Accumulated counters are hdsl2ShdslEndpointES,           
+         hdsl2ShdslEndpointSES, hdsl2ShdslEndpointCRCanomalies 
+		 hdsl2ShdslEndpointLOSWS, and hdsl2ShdslEndpointUAS."  
+    ::= { shdslEndpointCurrEntry 6 }
+hdsl2ShdslEndpointCurrPsd OBJECT-TYPE
+   SYNTAX      INTEGER
+               {
+               asymmetric(2),
+			   symmetric(3)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "This object indicates use of symmetric/asymmetric PSD (Power
+      Spectral Density) Mask for the associated SHDSL Line."  
+      ::= { shdslEndpointCurrEntry 7 }
+shdslEndpointMaintTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ShdslEndpointMaintEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "This table supports maintenance operations (eg. loopbacks)
+         to be performed on HDSL2/SHDSL segment endpoints.  This table
+         contains live data from equipment.  As such, it is NOT 
+         persistent."
+      ::= { shdslIf 2 }
+shdslEndpointMaintEntry OBJECT-TYPE
+      SYNTAX      ShdslEndpointMaintEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "An entry in the hdsl2ShdslEndpointMaintTable.  Each entry
+         corresponds to a single segment endpoint, and is indexed by the
+         ifIndex of the HDSL2/SHDSL line, the UnitId of the associated
+         unit and the side of the unit."
+      INDEX { ifIndex, hdsl2ShdslInvIndex, hdsl2ShdslEndpointSide }
+      ::= { shdslEndpointMaintTable 1 }
+ShdslEndpointMaintEntry ::=
+      SEQUENCE
+      {
+      shdslMaintPowerBackOff        INTEGER
+      }
+shdslMaintPowerBackOff OBJECT-TYPE
+      SYNTAX      INTEGER
+                  {
+                  default(1),
+                  enhanced(2),
+			      disabled (3) 
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+        "This object configures the receiver at the associated
+         segment endpoint to operate in default or enhanced power
+         backoff mode.
+         powerbackoff may also be disabled"
+      ::= { shdslEndpointMaintEntry 1 }
+  -- Span Configuration Profile Group
+shdslSpanConfProfileTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ShdslSpanConfProfileEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "This table supports definitions of span configuration
+         profiles for SHDSL lines.  HDSL2 does not support these 
+         configuration options.  This table MUST be maintained
+         in a persistent manner."
+      ::= { shdslIf 3 }
+shdslSpanConfProfileEntry OBJECT-TYPE
+      SYNTAX      ShdslSpanConfProfileEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "Each entry corresponds to a single span configuration
+         profile.  Each profile contains a set of span configuration
+         parameters.  The configuration parameters in a profile are
+         applied to those lines referencing that profile (see the 
+         hdsl2ShdslSpanConfProfile object).  Profiles may be 
+         created/deleted using the row creation/deletion mechanism 
+         via hdsl2ShdslSpanConfProfileRowStatus.  If an active
+         entry is referenced in hdsl2ShdslSpanConfProfile, the 
+         entry MUST remain active until all references are removed."
+      AUGMENTS {hdsl2ShdslSpanConfProfileEntry}
+      ::= { shdslSpanConfProfileTable 1 }
+ShdslSpanConfProfileEntry ::=
+      SEQUENCE
+      {
+	  hdsl2ShdslSpanConfEocCompatible	   INTEGER, 
+	  hdsl2ShdslSpanConfAsymmetricPSDRate  INTEGER
+      }
+hdsl2ShdslSpanConfEocCompatible	OBJECT-TYPE  -- Added by RAD
+    SYNTAX      INTEGER
+                {
+                proprietary (2),
+                standard    (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicate if device  supports only 
+          standard EOC messages or also proprietary messages."
+    ::= { shdslSpanConfProfileEntry 1 }
+hdsl2ShdslSpanConfAsymmetricPSDRate  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                notApplicable   (1),
+                asymmetricR1    (2),
+				asymmetricR2    (3)    
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates line rate when 
+         rfc3276.hdsl2ShdslSpanConfPSD value is asymmetric(2).
+		 Seleceted rate depends on transmission mode - 
+		 specified in Annex A or B of G.991.2.
+         For Annex A; 
+           R1 selects the 776 or 784 kbit/s 
+ 		   R2 selects the 1544 or 1552 kbit/s  
+		 For Annex B ;
+           R1 selects the 2312 kbit/s 
+           R2 selects the 2056 kbit/s "
+    ::= { shdslSpanConfProfileEntry 2 }
+hdsl2ShdslIfConf OBJECT IDENTIFIER ::= { shdslIf 4 }
+--Interface configuration with Configuration index
+hdsl2ShdslIfConfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hdsl2ShdslIfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table enables configuration of HDSL2/SHDSL interfaces
+     per configuration index.
+     Write operation for products supporting Active+Temp configurations,
+     is possible only on the Temp configuration(255)."
+    ::= { hdsl2ShdslIfConf 1 }
+hdsl2ShdslIfConfEntry OBJECT-TYPE
+    SYNTAX      Hdsl2ShdslIfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the hdsl2ShdslIfConfTable. "
+    INDEX { hdsl2ShdslIfConfIdx, ifIndex, hdsl2ShdslSideIdx}
+    ::= { hdsl2ShdslIfConfTable 1 }
+Hdsl2ShdslIfConfEntry ::=
+    SEQUENCE
+    {
+    hdsl2ShdslIfConfIdx             Integer32,
+    hdsl2ShdslSideIdx               INTEGER,
+    hdsl2ShdslMaxBw                 INTEGER,
+	hdsl2ShdslPwrBackoff            INTEGER,
+	hdsl2ShdslTxMode                INTEGER,
+	hdsl2ShdslAttenuationThreshold  Integer32,
+	hdsl2ShdslSnrMarginThreshold    Integer32,
+	hdsl2ShdslTs0OverDsl            INTEGER,
+	hdsl2ShdslMode                  INTEGER,
+	hdsl2ShdslTsCompactionMode      INTEGER
+    }
+hdsl2ShdslIfConfIdx OBJECT-TYPE
+    SYNTAX  Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the Idx of the Config being accessed.
+     Idx of 255 relates to the Temporary (Scratch) Config.
+     Write operation for products supporting Active+Temp configurations, 
+     is allowed to Temporary configuration only. "
+    ::= {hdsl2ShdslIfConfEntry 1}
+hdsl2ShdslSideIdx OBJECT-TYPE
+      SYNTAX  INTEGER {
+	    nearEnd(2),
+        farEnd (3)
+        }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+      "This object indicates the Side of the managed object: Near-End
+       or Far-End."
+      ::= {hdsl2ShdslIfConfEntry 2}
+hdsl2ShdslMaxBw     OBJECT-TYPE
+      SYNTAX  INTEGER {
+      notApplicable (1),
+      r192          (2), 
+      r256          (3), 
+      r320          (4),
+	  r384          (5),
+	  r448          (6),
+      r512          (7), 
+      r576          (8),
+	  r640          (9),
+	  r704          (10),
+      r768          (11), 
+      r832          (12),
+	  r896          (13),
+	  r960          (14),
+      r1024         (15), 
+      r1088         (16),
+	  r1152         (17),
+	  r1216         (18),
+	  r1280         (19),
+	  r1344         (20),
+	  r1408         (21),
+	  r1472         (22),
+	  r1536         (23),
+	  r1600         (24),
+	  r1664         (25),
+	  r1728         (26),
+	  r1792         (27),
+	  r1856         (28),
+	  r1920         (29),
+	  r1984         (30),
+	  r2048         (31)
+        }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "Maximum BW (Bandwidth) of the Shdsl Line, in Kbps units.
+       Respective Max No. of TSs =  Max. Rate/64
+       This object can be Set only for a Central (xtuC) unit."
+      ::= {hdsl2ShdslIfConfEntry 3}
+hdsl2ShdslPwrBackoff OBJECT-TYPE
+      SYNTAX  INTEGER {
+	    notApplicable(1),
+        enhanced(2),  -- enabled
+ 		disabled (3)  -- added by RAD
+        }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+      "This object configures the receiver at the associated
+       segment endpoint to enable/disable power	backoff mode.
+       This object is similar to hdsl2ShdslMaintPowerBackOff, but per
+       configuration. Therefore, the order of the enum values is the same. "
+      ::= {hdsl2ShdslIfConfEntry 4}
+hdsl2ShdslTxMode OBJECT-TYPE
+    SYNTAX  INTEGER
+      {
+      notApplicable(1),
+      annexA       (2),
+      annexB       (3)
+      }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "This object configures the Transmission Mode for the SHDSL Line.
+     This object can be Set only for a Central (xtuC) unit."
+    ::= { hdsl2ShdslIfConfEntry 5}
+hdsl2ShdslAttenuationThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "This object configures the Attentuation alarm threshold.
+     0=Off
+     Valid values: 0..127 ."
+    ::= { hdsl2ShdslIfConfEntry 6}
+hdsl2ShdslSnrMarginThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "This object configures the SNR margin alarm threshold.
+     0=Off
+     Valid values: 0..15 ."
+    ::= { hdsl2ShdslIfConfEntry 7}
+hdsl2ShdslTs0OverDsl OBJECT-TYPE
+    SYNTAX  INTEGER
+      {
+      notApplicable(1),
+      looped       (2),
+      transparent  (3)
+      }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "This object configures the way TS0 will be treated over the SHDSL Line.
+	 looped - looped inside
+	 transparent - sent transparently over the DSL Line.
+     This object can be Set only for a Central (xtuC) unit."
+    ::= { hdsl2ShdslIfConfEntry 8}
+hdsl2ShdslMode OBJECT-TYPE
+    SYNTAX  INTEGER
+      {
+      notApplicable(1),
+      stuC         (2),
+      stuR         (3)
+      }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "This object is relevant only for the Near-End device.
+     stuC - Central 
+     stuR - Remote ."
+    ::= { hdsl2ShdslIfConfEntry 9}
+hdsl2ShdslTsCompactionMode OBJECT-TYPE
+    SYNTAX  INTEGER
+      {
+      noCompaction (1),
+      noMapping    (2),
+      withMapping  (3),
+	  lowTsMapping (4),
+	  spareMapping (5)
+      }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "This object configures how TSs will be compacted over the SHDSL Line.
+	 In both mapping cases (2),(3), only the TSs connected on the E1 line will be 
+	 transferred over the SHDSL Line
+	 noCompaction - the whole E1 BW is reserved on the SHDSL Line, 
+	             even if only part  of the TSs are actually connected.
+	 noMapping - there is no mapping between the E1 TSs and the SHDSL frame TSs.
+	             Therefore, E1 connected TSs are ordered in ascending order (e.g
+				 E1 TSs 2, 16, 20 will occupy places 1, 2, 3 in SHDSL Line).
+				 In this case, if user wants to add connection for 
+				 a TS that is lower	than the existing ones on SHDSL, 
+				 the TSs that are higher will have to  move. 
+				 That causes breaks in service for the moved TSs. 
+				 (e.g if E1 TS8 is added in the above case, 
+				 TSs 16 and 20 will move, so that by the
+				 end of this process, the E1 TSs 2, 8, 16, 20 will
+				  be ordered in  SHDSL frame as 1, 2, 3, 4).
+	 withMapping - there is a mapping between the E1 TSs and the SHDSL frame TSs.
+	             Therefore, if some TSs were connected and then user wants to add
+	             additional E1 TSs, there is no need to move the existing TSs of the 
+	             SHDSL frame. The additional TSs will be added AFTER the existing ones, 
+	             or in gaps created by E1 TSs removed by user. The main thing is that
+				 the existing TSs will NOT be moved and so, their service will not be 
+				 damaged by the addition or removal of E1 TS connections.
+	 lowTsMapping - the first 2 TSs are used for Signaling (TS16) and Dedicated TS
+	             if relevant. The payload starts afterwards, unmapped (according to 
+	             E1 connected TSs order). This will ensure that Signaling and 
+	             Dedicated TS will continue to function also when new TSs are 
+	             connected.	User will still get service breaks when TSs are moved.
+	 spareMapping - applicable only for MP-2100/2104 cards. It should be selected only 
+	             when working vs. a MP-2100.2104. It resembles the noMapping option,
+	             but it contains Spare TSs for unconnected TSs. These Spare TSs 
+	             will prevent service breaks upon added connections, because these
+	             will be selected from the Spare existing TSs."
+    ::= { hdsl2ShdslIfConfEntry 10}
+-- SHSDL Notifications
+--SHDSL EOC LOOPBACK TOWARDS NETWORK
+radHdsl2ShdslLoopBackTrap NOTIFICATION-TYPE
+   OBJECTS   { alarmSeverity,alarmState,ifAlias  }
+   STATUS    current
+   DESCRIPTION
+   "This notification indicates that a remote loopback 
+    has been activated on the Embedded Operations Channel (EOC) of the SHDSL
+    link."
+   ::= { radHdsl2ShdslEvents 1 }-- 
+-- file :v:\doc\rdv\mib\ver510\services.txt
+-- 
+--Version:   5.10
+--First Version Date:   7 May 2002              
+--By:        Yig'al Hachmon
+--File:      services.txt
+--Last Update: 21-October-2002 by Smadar Tauber 
+ services OBJECT IDENTIFIER ::= { radGen 3} 
+--Weighted Fair Queueing (WFQ) Table
+wfq OBJECT IDENTIFIER ::= { services 1}
+wfqTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WfqEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This table allows user to define several
+     WFQ tables per output port.
+     WFQ supports flows with different bandwidth requirements 
+     by giving each queue a weight that assigns it 
+     a different percentage of output port bandwidth.
+     When Weighted Fair Queuing is used, 
+     it is possible to precisely attribute bandwidth 
+     partitioning among the queues. 
+     When there is congestion, each class (queue) 
+     is not allowed to use more bandwidth than the amount 
+     allocated to it."
+    ::= { wfq 1 }
+wfqEntry OBJECT-TYPE
+    SYNTAX  WfqEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry in the Weighted Fair Queueing table."
+    INDEX {wfqCnfgIdx, wfqPrtIdx,wfqTblIdx, wfqQueueIdx }
+    ::= { wfqTable 1 }
+WfqEntry ::=
+    SEQUENCE {
+              wfqCnfgIdx     Integer32,
+              wfqPrtIdx      Integer32,
+              wfqTblIdx      Integer32,
+              wfqQueueIdx    Integer32,
+              wfqRowStatus   RowStatus,
+              wfqWeightValue Integer32 
+              }
+wfqCnfgIdx OBJECT-TYPE
+    SYNTAX  Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the Idx of the Agent Cnfg the following 
+     objects refer.
+     255=Temporary Cnfg (when relevant, 
+     Set is done only to this configuration).
+     For Agents that support only one configuration, 
+     this object will be  constant=1. "
+    ::= { wfqEntry 1 }
+wfqPrtIdx OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates a unique port or interface number,
+     for which Weighted Fair Queueing table is applicable .
+	 For numbering, see product's spec.
+     For some products, the numbering can equal ifIndex.
+     Value of 255 (not applicable) refer to system level queue"    
+    ::= { wfqEntry 2 }
+wfqTblIdx OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates which  Weighted Fair Queueing (WFQ)
+     Table is being used. There can be several tables.
+     For FCD-155 User will select which one will be used 
+     for a virtual concatenation group.Valid values are 1,2"    
+    ::= { wfqEntry 3 }
+wfqQueueIdx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates a queue index.
+     For FCD-155, valid queues are 1..3.
+     The 4th queue is not in MIB. 
+     Its weight will be RO, Calculated according to 
+     the sum of the 3 first queues."
+    ::= { wfqEntry 4 }
+wfqRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+    "This object enables Creation/Deletion of 
+    rows in the WFQ table.
+    For FCD-155, rows are not created nor destroyed by user."
+    ::= { wfqEntry 5 }
+wfqWeightValue OBJECT-TYPE
+    SYNTAX  Integer32  (0..100)
+	UNITS      "%"
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+    "This object indicates a relative weight value.
+     User should make sure that the sum of 
+     values for all queues will not exceed 100%
+     (sum should  be BELOW 100% in order 
+      to leave some BW percentage for last queue)  "
+    ::= { wfqEntry 6 }
+-- Differential Services Code Point Mapping
+Dscp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+     "A Differentiated Services Code-Point that may be used for
+       marking a traffic stream."
+    REFERENCE
+        "RFC 2474, RFC 2780"
+    SYNTAX   Integer32 (0..63)
+dscpMapping      OBJECT IDENTIFIER ::= {services 2}
+dscpMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DscpMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Mapping of DSCP value to a regenerated priority level."
+    ::= { dscpMapping 1 }
+dscpMappingEntry  OBJECT-TYPE
+    SYNTAX      DscpMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry in dscpMappingTable."
+    INDEX   { dscpMappingCnfgIdx,dscpMappingDscpIdx }
+    ::= { dscpMappingTable 1 }
+DscpMappingEntry ::=
+    SEQUENCE {
+        dscpMappingCnfgIdx       Integer32,
+        dscpMappingDscpIdx            Dscp,
+        dscpMappingRegenPriority      Integer32
+    }
+dscpMappingCnfgIdx OBJECT-TYPE
+    SYNTAX  Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the Idx of the Agent Cnfg the following 
+     objects refer to.
+     255=Temporary Cnfg (when relevant, Set is done only 
+     to this configuration).
+     For Agents that support only one configuration, 
+     this object will be  constant=1. 
+     This object can be used to carry additional indexing 
+     (e.g port index) when needed."
+    ::= { dscpMappingEntry 1 }
+dscpMappingDscpIdx OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    " DSCP value of the incoming IP packet"
+    ::= { dscpMappingEntry 2 }
+dscpMappingRegenPriority OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The Regenerated Priority level the
+     incoming DSCP value is mapped to.
+     For FCD-155, valid values are 0,1,2,3"
+    ::= { dscpMappingEntry 3 }
+-- IfTeQos - Traffic Engineering Quality of Service Interface
+ifTeQos		 OBJECT IDENTIFIER ::= { services 3 }
+ifTeQosTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfTeQosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The TE QOS Interface Table."
+    ::= {  ifTeQos 1 }
+ifTeQosEntry  OBJECT-TYPE
+    SYNTAX      IfTeQosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry in the TE QOS Interface table."
+    INDEX   { ifTeQosIdx1, ifTeQosIdx2, ifTeQosIdx3 }
+    ::= { ifTeQosTable 1 }
+IfTeQosEntry ::=
+	SEQUENCE { 
+        ifTeQosIdx1			Integer32,
+		ifTeQosIdx2			Integer32,
+		ifTeQosIdx3			Integer32,
+		ifTeQosParam		OCTET STRING
+    	}
+ifTeQosIdx1 OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the 1st Index of the table."
+    ::= { ifTeQosEntry 1 }
+ifTeQosIdx2 OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the 2nd Index of the table."
+    ::= { ifTeQosEntry 2 }
+ifTeQosIdx3 OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the 3rd Index of the table."
+    ::= { ifTeQosEntry 3 }
+ifTeQosParam OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "This object is used for QOS attributes 
+     of the entry's entities."
+    ::= { ifTeQosEntry 4 }
+-- 
+-- file :v:\doc\rdv\mib\ver495\atm\atmRou~1.txt
+-- 
+--Version:   4.95
+--
+--First Version Date:   12-Aug-2002              
+--By:        Shay Harari
+--File:      atmRouter.txt
+--
+--Last update: 20-Oct-2002
+--By: Ilana Schvetz 
+radAtmRouter  OBJECT IDENTIFIER  ::= { radAtm 10 }
+-- Extension of the ATM Logical IP Subnet Interface Mapping Table
+-- ( ipoaLisIfMappingTable from RFC 2320 )
+atmIpoaLisIfMappingXTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AtmIpoaLisIfMappingXEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    "This table is an extension of a table 
+     from RFC 2320: ipoaLisIfMappingTable - 
+     The ATM Logical IP Subnet Interface Mapping Table."
+	::= { radAtmRouter 1 }
+atmIpoaLisIfMappingXEntry OBJECT-TYPE
+	SYNTAX AtmIpoaLisIfMappingXEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    "Conceptual row in ipoaLisIfMappingTable."
+	AUGMENTS { ipoaLisIfMappingEntry }
+	::= { atmIpoaLisIfMappingXTable 1 }
+AtmIpoaLisIfMappingXEntry ::= SEQUENCE {
+	atmIpoaLisIfMappingType
+		INTEGER,
+	atmIpoaLisIfMappingIPAddress
+		IpAddress	 
+ }
+atmIpoaLisIfMappingType OBJECT-TYPE
+	SYNTAX  INTEGER {
+       notApplicable(1),
+	   static(2),
+	   inAtmArp(3)
+     }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+	"This object indicates the Mapping Type."
+	::= { atmIpoaLisIfMappingXEntry 1 }
+atmIpoaLisIfMappingIPAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+	MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+	"This parameter is applicable for 
+	atmIpoaLisIfMappingTypeIP=static(2). 
+	This parameter is the IP Address assigned 
+	by the user when applicable."
+	::= { atmIpoaLisIfMappingXEntry 2 }
+radAtmRtrInAtmArpInterval OBJECT-TYPE   
+	SYNTAX  Integer32 
+	MAX-ACCESS  read-write    
+	STATUS  current
+	DESCRIPTION
+	"The time interval (in seconds) between sending of
+	 two InATMARP requests."
+	::= { radAtmRouter 2 }
+radAtmRtrInAtmArpAgingTime OBJECT-TYPE   
+	SYNTAX  Integer32 
+	MAX-ACCESS  read-write    
+	STATUS  current
+	DESCRIPTION
+	"The time (in seconds) that passes until an 
+	 entry is deleted, unless this entry
+	 was previously updated by a new inATMARP 
+	 request or response.
+	 This variable value should be greater than 
+	 the value of radAtmRtrInAtmArpInterval,
+	 so that the entry won't be deleted before
+	 an InATMARP request was sent."
+	::= { radAtmRouter 3 }
+-- 
+-- file :v:\doc\rdv\mib\ver510\voiceIf.txt
+-- 
+--Version: 
+--Date: 25/02/2003
+--By: Yig'al Hachmon
+--V:\doc\rdv\mib\ver495\voiceIf.txt
+--Last changed by Liora Gafni, 17 Aug 2004
+--diverseIfWanGen	OBJECT IDENTIFIER ::= {wanGen 6 }
+voiceIf		 OBJECT IDENTIFIER ::= {diverseIfWanGen 13}
+-- Voice Interface Ringing Cadence Configuration table  
+voiceIfCadenceCnfgTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF VoiceIfCadenceCnfgEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+       "Voice port ringing cadence configuration table.
+        Each ringing cycle, indexed by voiceIfCadenceIdx,
+        consists of a number of ring ON-Period/ring OFF-Period 
+        pairs. Pairs are indexed sequentially, according to 
+        voiceIfCadencePeriodIdx: 1,2,...number of pairs"
+      ::= { voiceIf 1 }
+voiceIfCadenceCnfgEntry OBJECT-TYPE
+       SYNTAX VoiceIfCadenceCnfgEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+          "Ringing cadence configuration per voice port."
+       INDEX  {voiceIfCadenceCnfgIdx, 
+               voiceIfCadencePortIdx,	
+       		   voiceIfCadenceIdx,
+       		   voiceIfCadencePeriodIdx}
+       ::= {voiceIfCadenceCnfgTable 1}
+VoiceIfCadenceCnfgEntry ::=
+         SEQUENCE {
+         voiceIfCadenceCnfgIdx	          Integer32,
+         voiceIfCadencePortIdx	          Integer32,
+         voiceIfCadenceIdx	              Integer32,
+         voiceIfCadencePeriodIdx		  Integer32,
+         voiceIfCadenceRowStatus		  RowStatus,
+         voiceIfCadenceRingOnPeriod       Integer32,
+         voiceIfCadenceRingOffPeriod      Integer32
+        	}
+voiceIfCadenceCnfgIdx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the Idx of the 
+     Agent Cnfg the following objects refer to.
+     255=Temporary Cnfg (when relevant, 
+	 Set is done only to this configuration).
+     For Agents that support only one configuration, 
+     this object will be  constant=1. "
+    ::= {voiceIfCadenceCnfgEntry 1}
+voiceIfCadencePortIdx	 OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Voice Port Index. May equal to the value of ifIndex."
+    ::= {voiceIfCadenceCnfgEntry 2}
+voiceIfCadenceIdx	       OBJECT-TYPE  
+    SYNTAX  Integer32 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Cadence (ringing type) index."
+    ::= {voiceIfCadenceCnfgEntry 3}
+voiceIfCadencePeriodIdx	       OBJECT-TYPE  
+    SYNTAX  Integer32 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Periods index (pair number) in a ringing cycle Cadence.
+    This index must be sequential, start from 1. Its maximum 
+    value is the number of pairs of certain ringing type.
+    For Vmux-110, one or two period pairs may be defined."
+    ::= { voiceIfCadenceCnfgEntry 4}
+voiceIfCadenceRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+    "This attribute allows to create/delete
+     ringing cadence entry in this table.
+     For Vmux-110, only a single cadance can be defined.
+     Delete action of a period entry can be performed only 
+     if it is the last existing period of the cadance."
+    ::= {voiceIfCadenceCnfgEntry 5 }
+voiceIfCadenceRingOnPeriod	 OBJECT-TYPE	
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+	"Duration (in tenth of seconds) of Ringing (ON) 
+	 period."
+    ::= { voiceIfCadenceCnfgEntry 6}
+voiceIfCadenceRingOffPeriod  OBJECT-TYPE	
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+	"Duration (in tenth of seconds) of Silence (OFF) 
+     period."
+    ::= { voiceIfCadenceCnfgEntry 7}
+-- Voice Interface Configuration & Status table  
+voiceIfCnfgTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF VoiceIfCnfgEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+           "Voice port configuration table."
+       ::= { voiceIf 2 }
+voiceIfCnfgEntry OBJECT-TYPE
+       SYNTAX VoiceIfCnfgEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+          "Configuration per voice port."
+       INDEX   {voiceIfCnfgIdx,voiceIfPortIdx}
+       ::= { voiceIfCnfgTable 1 }
+VoiceIfCnfgEntry ::=
+         SEQUENCE {
+         voiceIfCnfgIdx         Integer32,
+         voiceIfPortIdx         Integer32,
+		 voiceIfRingingTimeout  Integer32,
+		 voiceIfFlashTimeout    Integer32,
+		 voiceIfRxGain		    Integer32,
+		 voiceIfTxGain		    Integer32,
+		 voiceIfSignalingABCD   OCTET STRING,
+		 voiceIfState           INTEGER,
+		 voiceIfCallState		INTEGER
+		 }
+voiceIfCnfgIdx  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the Idx of the 
+     Agent Cnfg the following objects refer to.
+     255=Temporary Cnfg (when relevant, 
+	 Set is done only to this configuration).
+     For Agents that support only one configuration, 
+     this object will be  constant=1. "
+    ::= { voiceIfCnfgEntry 1}
+voiceIfPortIdx  OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Index of voice port ."
+    ::= {voiceIfCnfgEntry 2}
+voiceIfRingingTimeout  OBJECT-TYPE  
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Ringing timeout in seconds."
+    ::= {voiceIfCnfgEntry 3}
+voiceIfFlashTimeout OBJECT-TYPE  
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "A time period in milliseconds. Flash (Register Recall)
+     is detected if On-Hook time is shorter than this timeout."
+    ::= {voiceIfCnfgEntry 4}
+voiceIfRxGain OBJECT-TYPE  
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Receive gain in dB."
+    ::= {voiceIfCnfgEntry 5}
+voiceIfTxGain OBJECT-TYPE  
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Transmission gain in dB."
+    ::= {voiceIfCnfgEntry 6}
+voiceIfSignalingABCD OBJECT-TYPE  
+    SYNTAX  OCTET STRING 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Octet String. 
+     Nibble No. 1 represents ON  Hook (same for Rx and Tx).
+     Nibble No. 2 represents OFF Hook (same for Rx and Tx).
+     Nibble No. 3 represents Reverse Polarity.
+     Nibble No. 4 represents Ring pattern 1.
+	 Nibble No. 5 represents Ring pattern 2.
+	 Nibble No. 6 is not used.
+	 The bits will be as following:
+       Bit 1 = Bit A - ON  Hook	 (LSB)
+	   Bit 2 = Bit B - ON  Hook
+	   Bit 3 = Bit C - ON  Hook
+	   Bit 4 = Bit D - ON  Hook
+	   Bit 5 = Bit A - OFF Hook
+	   Bit 6 = Bit B - OFF Hook
+	   Bit 7 = Bit C - OFF Hook
+	   Bit 8 = Bit D - OFF Hook	 
+	   Bit  9 = Bit A - Reverse Polarity
+       Bit 10 = Bit B - Reverse Polarity
+       Bit 11 = Bit C - Reverse Polarity
+       Bit 12 = Bit D - Reverse Polarity  
+       Bit 13 = Bit A - Ring 1
+       Bit 14 = Bit B - Ring 1
+       Bit 15 = Bit C - Ring 1
+       Bit 16 = Bit D - Ring 1   
+ 	   Bit 17 = Bit A - Ring 2
+       Bit 18 = Bit B - Ring 2
+       Bit 19 = Bit C - Ring 2
+       Bit 20 = Bit D - Ring 2   
+       Bits 21...24 = 0 (not used).  (Bit 24 is MSB).
+	   For Vmux-110:
+	   Ring 1 and Ring 2 are used. The default is 3 octets.
+	   (MSB) 0000  1011  1011  1001  1011  1010 (LSB)"  
+    ::= {voiceIfCnfgEntry 7}
+voiceIfState          OBJECT-TYPE   
+      SYNTAX  INTEGER {
+		 notApplicable (1),
+		 onHook        (2),	--ON Hook State = idle
+		 offHook       (3) -- OFF HOOK state
+		}
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "Attribute indicating voice port state."   
+     ::= { voiceIfCnfgEntry 8}
+voiceIfCallState    OBJECT-TYPE   
+      SYNTAX  INTEGER {
+		 noCall        (1),
+		 oos           (2),	-- out of service
+		 dialing       (3), 
+         waitForAlert  (4),
+         waitForConnect(5),
+         ringing       (6),
+         active        (7),
+         waitForReject (8),
+         waitForInfo   (9)
+		}
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "Attribute indicating the status of the call on this port.
+       In Vmux devices this attribute is used for FXS ports."   
+     ::= { voiceIfCnfgEntry 9}
+END

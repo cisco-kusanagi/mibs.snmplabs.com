@@ -1,0 +1,291 @@
+Wellfleet-Voice-E1-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+
+      Counter 
+        FROM RFC1155-SMI
+      OBJECT-TYPE
+        FROM RFC-1212
+      wfVoiceE1Group
+        FROM Wellfleet-COMMON-MIB
+      TRAP-TYPE        
+        FROM RFC-1215;
+
+    wfVoiceE1Table OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfVoiceE1Entry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Voice E1 line record"
+        ::= { wfVoiceE1Group 1  }   
+
+    wfVoiceE1Entry OBJECT-TYPE
+        SYNTAX	WfVoiceE1Entry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the E1 table"
+        INDEX	{ wfVoiceE1Slot,
+    		  wfVoiceE1Connector }
+        ::= { wfVoiceE1Table 1 }
+
+        WfVoiceE1Entry ::= SEQUENCE {
+        wfVoiceE1Delete 		INTEGER,
+    	wfVoiceE1Disable 		INTEGER,
+        wfVoiceE1State          	INTEGER,
+    	wfVoiceE1Slot 			INTEGER,
+    	wfVoiceE1Connector 		INTEGER,
+        wfVoiceE1FrameType              INTEGER,
+        wfVoiceE1LineCode               INTEGER,
+        wfVoiceE1LineBuildoutType       INTEGER,
+        wfVoiceE1ReceiveClock   	INTEGER,
+        wfVoiceE1TransmitClock   	INTEGER
+        }
+
+    wfVoiceE1Delete OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    created(1),
+    		    deleted(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "create/delete parameter, dflt = created"
+        DEFVAL	{ created }
+        ::= { wfVoiceE1Entry 1 }
+
+    wfVoiceE1Disable OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    enabled(1),
+    		    disabled(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "enable/disable parameter, dflt = enabled"
+        DEFVAL	{ enabled }
+        ::= { wfVoiceE1Entry 2 }
+
+    wfVoiceE1State OBJECT-TYPE
+        SYNTAX	INTEGER {
+		    init(1),
+    		    sync(2),
+    		    redAlarm(3),
+    		    yellowAlarm(4),
+		    pulseDensityViolation(5)
+    		}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "physical line status, updated by E1 line driver"
+        DEFVAL	{ init }
+        ::= { wfVoiceE1Entry 3 }
+
+    wfVoiceE1Slot OBJECT-TYPE
+        SYNTAX	INTEGER(1..14)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "instance ID Slot, filled in by driver.
+	         For the FBR this is a game slot."
+        ::= { wfVoiceE1Entry 4 }
+
+    wfVoiceE1Connector OBJECT-TYPE
+        SYNTAX	INTEGER 
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "instance ID Connector, filled in by driver.  For the
+                 FBR, this attribute is an encoded value and is equal 
+                 to 'pci slot' * 1000 + 'module'*100 + 'connector'."
+        ::= { wfVoiceE1Entry 5 }
+
+    wfVoiceE1FrameType OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    crc4(1),
+    		    nocrc4(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Frame Type - differentiates between two tarrifed framing formats
+                CRC4Enabled or NoCRC4."
+        DEFVAL	{ crc4 }
+        ::= { wfVoiceE1Entry 6 }
+
+
+    wfVoiceE1LineCode OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    hdb3(1),
+    		    ami(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                " HDB3(High Density Bipolar Coding) or Alternate Mark Inversion"
+        DEFVAL	{ hdb3 }
+        ::= { wfVoiceE1Entry 7 }
+
+    wfVoiceE1LineBuildoutType  OBJECT-TYPE
+        SYNTAX  INTEGER(75..120) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " E1 short haul pulses are allowed to be transmitted into
+                  120 ohm twisted pair or 75 ohm coaxial cable. E1 short 
+                  haul pulses are allowed to be transmitted into 120 ohm
+                  twisted pair."
+        DEFVAL  { 120 }
+        ::= { wfVoiceE1Entry 8 }
+
+    wfVoiceE1ReceiveClock OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    primary(1),
+    		    secondary(2),
+    		    ignore(3)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Clock Mode - Specifiess the usage of the E1 receive clock.
+                 Primary: Apply the receive clock of this E1 line as the system 
+		 	  clock source if it is available.
+		 Secondary: When Primary clock source is not available, use 
+			    secondary as the system clock source.
+		 Ignore: Never use this for system clock source. "
+        DEFVAL	{ ignore }
+        ::= { wfVoiceE1Entry 9 }
+
+    wfVoiceE1TransmitClock OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    internal(1),
+    		    external(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Clock Mode - Specifies the source of the E1 transmit clock.
+                 Internal: Apply the system clock source as the transmit 
+		 	   clock source.
+		 External: Loopback, use the receive clock of this E1 line
+                           as the transmit clock source. "
+        DEFVAL	{ internal }
+        ::= { wfVoiceE1Entry 10 }
+
+
+    wfVoiceE1StatusTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfVoiceE1StatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table containing Voice over IP E1 channel status  records"
+        ::= { wfVoiceE1Group 2 }
+
+
+    wfVoiceE1StatusEntry OBJECT-TYPE
+        SYNTAX	WfVoiceE1StatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the voice channel status table"
+        INDEX	{ wfVoiceE1Slot, wfVoiceE1Connector }
+
+        ::= { wfVoiceE1StatusTable 1 }
+
+     WfVoiceE1StatusEntry ::= SEQUENCE {
+          wfVoiceE1BipolarVios 			Counter,
+          wfVoiceE1FrameBitErrs 		Counter,
+          wfVoiceE1LossOfFrameErrs 		Counter,
+          wfVoiceE1LineCodeErrs 		Counter,
+          wfVoiceE1CRCErrs 			Counter,
+          wfVoiceE1AISAlarms   			Counter,
+          wfVoiceE1LossOfSignal 		Counter,
+          wfVoiceE1RedAlarms	 		Counter
+
+	}
+
+
+   wfVoiceE1BipolarVios OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceE1StatusEntry 1 }
+
+
+   wfVoiceE1FrameBitErrs OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceE1StatusEntry 2 }
+
+   wfVoiceE1LossOfFrameErrs OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceE1StatusEntry 3 }
+
+   wfVoiceE1LineCodeErrs OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceE1StatusEntry 4 }
+
+   wfVoiceE1CRCErrs OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceE1StatusEntry 5 }
+
+   wfVoiceE1AISAlarms OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceE1StatusEntry 6 }
+
+   wfVoiceE1LossOfSignal OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceE1StatusEntry 7 }
+
+   wfVoiceE1RedAlarms OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceE1StatusEntry 8 }
+
+
+
+
+
+
+    wfVoIPE1Error TRAP-TYPE
+        ENTERPRISE wfVoiceE1Group
+        VARIABLES {wfVoiceE1Slot, wfVoiceE1Connector, wfVoiceE1State}
+        DESCRIPTION
+            "The SNMP trap that is generated when a E1 interface detects
+	     an error."
+        ::= 1
+
+
+
+
+    END  -- Wellfleet-Voice-E1-MIB
+

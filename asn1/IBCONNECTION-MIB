@@ -1,0 +1,484 @@
+-- extracted from draft-strahm-ibconn-mib-00.txt
+-- at Tue Oct 23 06:06:31 2001
+
+   IBCONNECTION-MIB DEFINITIONS ::= BEGIN 
+   IMPORTS  -- Do we use all of these ??? 
+          Counter32,  
+          Counter64,  
+          Integer32, 
+          Gauge32, 
+          MODULE-IDENTITY, 
+          OBJECT-TYPE 
+                FROM SNMPv2-SMI 
+          TEXTUAL-CONVENTION, 
+          TruthValue 
+                FROM SNMPv2-TC 
+          OBJECT-GROUP,  
+          MODULE-COMPLIANCE              
+                FROM SNMPv2-CONF 
+          InterfaceIndex 
+                FROM IF-MIB 
+          IbIfMIB 
+                FROM IB-IF-MIB; 
+    
+   ibConnMIB MODULE-IDENTITY 
+       LAST-UPDATED "200110200000Z"  -- 20 Oct 2001 
+       ORGANIZATION 
+         "IETF IP over IB Working Group" 
+       Email:   "ipoverib@ietf.org" 
+       CONTACT-INFO 
+               "Bill Strahm 
+       Postal: Sanera Systems Inc. 
+               1925 NW Amberglen Parkway 
+               Suite 155 
+               Beaverton, OR   97006 
+               United States 
+       Tel:    +1 503 601 0263 
+       Email:  bill@sanera.net" 
+    
+       DESCRIPTION 
+          "The managed objects for an Infiniband Channel Adapter.  This 
+          MIB provides for management of the Infiniband transports in 
+          three tables: 
+          1) Unreliable Datagram 
+          2) Reliable Datagram 
+          3) Connected Services" 
+        
+       REVISION    "200110200000Z" -û 20 Oct 2001 
+       DESCRIPTION "Initial version of this MIB." 
+        
+   ::={ibIFMIB xxx} û- To be determined by the IPoIB WG  
+    
+     
+   Strahm         Internet Draft- Expires April 2002                 6 
+                      Infiniband Connection MIB              Oct 2001 
+    
+    
+   -- 
+   -- Textual Conventions 
+   -- 
+    
+   IBCommunicationID ::= TEXTUAL-CONVENTION 
+       STATUS    current 
+       DESCRIPTION 
+          "The Communication ID for a given connection.  Each end of a 
+          connection is responsible for picking a unique value for this 
+          field." 
+       SYNTAX    Integer32 
+    
+   IBQuePairNumber ::= TEXTUAL-CONVENTION 
+       STATUS    current 
+       DESCRIPTION 
+          "The Queue Pair Number of an IB communication endpoint.  
+          Queue Pairs are 24 bit numbers.  To allow this value to be an 
+          index, one is added to the value that is sent on the wire" 
+       SYNTAX    INTEGER (1..16777216) 
+    
+   IBEtoEContext ::= TEXTUAL-CONVENTION 
+       STATUS    current 
+       DESCRIPTION 
+          "The End û End Context Number of an IB communiction endpoint.  
+          The EECN is a 24 bit number.  To allow this value to be an 
+          index, one is added to the value that is sent on the wire" 
+       SYNTAX    INTEGER (1..16777216) 
+    
+   -- 
+   -- Objects 
+   -- 
+   ibConnMIBObjects OBJECT IDENTIFIER ::= { ibCAMIB 1 } 
+   ibCAConformance  OBJECT IDENTIFIER ::= { ibCAMIB 2 } 
+    
+   -- 
+   -- Unreliable Datagram 
+   -- 
+   ibConnUD OBJECT IDENTIFIER ::= { ibConnMibObjects 1 } 
+    
+   ibConnUDInDatagrams  OBJECT-TYPE 
+   SYNTAX              Counter64 
+   MAX-ACCESS          read-only 
+   STATUS              current 
+   DESCRIPTION 
+      "Total number of Unreliable Datagrams delivered." 
+   ::= { ibConnUD 1 } 
+    
+     
+   Strahm         Internet Draft- Expires April 2002                 7 
+                      Infiniband Connection MIB              Oct 2001 
+    
+    
+   ibConnUDNoQP         OBJECT-TYPE 
+   SYNTAX              Counter32 
+   MAX-ACCESS          read-only 
+   STATUS              current 
+   DESCRIPTION 
+      "Total number of received Unreliable Datagrams discarded because 
+      the QP wasnÆt allocated." 
+   ::= { ibConnUD 2 } 
+    
+   ibConnUDInErrors     OBJECT-TYPE 
+   SYNTAX               Counter32 
+   MAX-ACCESS           read-only 
+   STATUS               current 
+   DESCRIPTION 
+      "Number of received Unreliable Datagrams that could not be 
+      delivered for reasons other than the lack of an allocated QP." 
+   ::= { ibConnUD 3 } 
+    
+   ibConnUDOutDatagrams OBJECT-TYPE 
+   SYNTAX               Counter64 
+   MAX-ACCESS           read-only 
+   STATUS               current 
+   DESCRIPTION 
+      "Total number of Unreliable Datagrams sent from this entity." 
+   ::= { ibConnUD 4 } 
+    
+   ibConnUDTable OBJECT-TYPE  
+   SYNTAX        SEQUENCE OF IbConnUDEntry  
+   MAX-ACCESS    not-accessible  
+   STATUS        current  
+   DESCRIPTION 
+      "A table containing information about all of the Unreliable 
+      Datagram Connections in the device." 
+   ::= { ibConnUD 5 } 
+       
+   ibConnUDEntry OBJECT-TYPE  
+   SYNTAX        IbConnUDEntry 
+   MAX-ACCESS    not-accessible  
+   STATUS        current  
+   DESCRIPTION  
+      "A conceptual row of the containing information about a 
+      Unreliable connection entry."  
+   INDEX { ibConnUDGID, 
+           ibConnUDLID,  
+           ibConnUDLocalQPN}   
+   ::= { ibConnUDTable 1 }  
+        
+   IbConnUDEntry ::= SEQUENCE {  
+           ibConnUDGID       GidTC, 
+           ibConnUDLID      LidTC, 
+           ibConnUDLocalQPN  IBQuePairNumber 
+           } 
+    
+     
+   Strahm         Internet Draft- Expires April 2002                 8 
+                      Infiniband Connection MIB              Oct 2001 
+    
+    
+   ibConnUDGID         OBJECT-TYPE 
+   SYNTAX              GidTC 
+   MAX-ACCESS          read-only 
+   STATUS              current 
+   DESCRIPTION 
+      "GID of listener." 
+   ::= { ibConnUDEntry 1 } 
+    
+    
+   ibConnUDLID         OBJECT-TYPE 
+   SYNTAX              LidTC 
+   MAX-ACCESS          read-only 
+   STATUS              current 
+   DESCRIPTION 
+      "LID of listener." 
+   ::= { ibConnUDEntry 2 } 
+    
+   ibConnUDLocalQPN    OBJECT-TYPE 
+   SYNTAX              IBQuePairNumber 
+   MAX-ACCESS          read-only 
+   STATUS               current 
+   DESCRIPTION 
+      "Local Que Pair Number of listener." 
+   ::= { ibConnUDEntry 3 } 
+    
+   -- 
+   -- Reliable Datagram 
+   -- 
+    
+   ibConnRD OBJECT IDENTIFIER ::= { ibConnMibObjects 2 } 
+    
+   ibConnRDInDatagrams  OBJECT-TYPE 
+   SYNTAX              Counter64 
+   MAX-ACCESS          read-only 
+   STATUS              current 
+   DESCRIPTION 
+      "Total number of Reliable Datagrams delivered." 
+   ::= { ibConnRD 1 } 
+    
+   ibConnRDNoQP         OBJECT-TYPE 
+   SYNTAX              Counter32 
+   MAX-ACCESS          read-only 
+   STATUS              current 
+   DESCRIPTION 
+      "Total number of received Reliable Datagrams discarded because 
+      the QP wasnÆt allocated." 
+   ::= { ibConnRD 2 } 
+    
+     
+   Strahm         Internet Draft- Expires April 2002                 9 
+                      Infiniband Connection MIB              Oct 2001 
+    
+    
+   ibConnRDInErrors     OBJECT-TYPE 
+   SYNTAX               Counter32 
+   MAX-ACCESS           read-only 
+   STATUS               current 
+   DESCRIPTION 
+      "Number of received Reliable Datagrams that could not be 
+      delivered for reasons other than the lack of an allocated QP." 
+   ::= { ibConnRD 3 } 
+    
+   ibConnRDOutDatagrams OBJECT-TYPE 
+   SYNTAX               Counter64 
+   MAX-ACCESS           read-only 
+   STATUS               current 
+   DESCRIPTION 
+      "Total number of Reliable Datagrams sent from this entity." 
+   ::= { ibConnRD 4 } 
+    
+    
+   ibConnRDTable OBJECT-TYPE  
+   SYNTAX      SEQUENCE OF IbConnRDEntry  
+   MAX-ACCESS  not-accessible  
+   STATUS      current  
+   DESCRIPTION 
+      "A table containing information about all of the Reliable 
+      Datagram connections in the device." 
+   ::= { ibConnRD 5 } 
+       
+   ibConnRDEntry       OBJECT-TYPE  
+   SYNTAX               IbConnRDEntry 
+   MAX-ACCESS           not-accessible  
+   STATUS               current  
+   DESCRIPTION  
+      "A conceptual row of the containing information about a Reliable 
+      Datagram entry."  
+   INDEX { ibConnRDLGID, ibConnRDLLID,  
+           ibConnRDLEEC, ibConnRDRGID,  
+           ibConnRDRLID, ibConnRDREEC }   
+   ::= { ibConnRDTable 1 }  
+        
+   IbConnRDEntry ::= SEQUENCE {  
+           ibConnRDLGID      GidTC, 
+           ibConnRDLLID      LidTC, 
+          ibConnRDLEEC      IBEtoEContext, 
+          ibConnRDRGID      GidTC, 
+          ibConnRDRLID      LidTC, 
+           ibConnRDREEC      IBEtoEContext 
+           } 
+    
+     
+   Strahm         Internet Draft- Expires April 2002                10 
+                      Infiniband Connection MIB              Oct 2001 
+    
+    
+   ibConnRDLGID OBJECT-TYPE 
+   SYNTAX      GidTC 
+   MAX-ACCESS   read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "GID of the local end of the connection." 
+   ::= { ibConnRDEntry 1 } 
+    
+   ibConnRDLLID OBJECT-TYPE 
+   SYNTAX      LidTC 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "LID of the local end of the connection." 
+   ::= { ibConnRDEntry 2 } 
+    
+   ibConnRDLEEC OBJECT-TYPE 
+   SYNTAX      IBEtoEContext 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+     "End to End Context of the local end of the connection." 
+   ::= { ibConnRDEntry 3 } 
+    
+   ibConnRDRGID OBJECT-TYPE 
+   SYNTAX      GidTC 
+   MAX-ACCESS   read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "GID of the remote end of the connection." 
+   ::= { ibConnRDEntry 4 } 
+    
+   ibConnRDRLID OBJECT-TYPE 
+   SYNTAX      LidTC 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "LID of the remote end of the connection." 
+   ::= { ibConnRDEntry 5 } 
+    
+   ibConnRDREEC OBJECT-TYPE 
+   SYNTAX      IBEtoEContext 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+     "End to End Context of the remote end of the connection." 
+   ::= { ibConnRDEntry 6 } 
+    
+     
+   Strahm         Internet Draft- Expires April 2002                11 
+                      Infiniband Connection MIB              Oct 2001 
+    
+    
+   -- 
+   -- Connected 
+   -- 
+    
+   ibConnConnected OBJECT IDENTIFIER ::= { ibConnMibObjects 3 } 
+    
+   ibConnCInSegs OBJECT-TYPE 
+   SYNTAX      Counter64 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The total number of segments received, including those 
+       received in error.  This count includes segments received on 
+       currently established connections." 
+   ::= { ibConnConnected 1 } 
+    
+   ibConnCOutSegs OBJECT-TYPE 
+   SYNTAX      Counter64 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The total number of segments sent, including those on 
+      current connections but excluding those containing only 
+      retransmitted octets." 
+   ::= { ibConnConnected 2 } 
+    
+    
+   ibConnCTable OBJECT-TYPE  
+   SYNTAX      SEQUENCE OF IbConnCEntry  
+   MAX-ACCESS  not-accessible  
+   STATUS      current  
+   DESCRIPTION 
+      "A table containing information about all of the Connections in 
+      the device.  This table contains connections that are both 
+      reliable and unreliable." 
+   ::= { ibConnConnected 3 } 
+       
+   ibConnCEntry OBJECT-TYPE  
+   SYNTAX      IbConnCEntry 
+   MAX-ACCESS  not-accessible  
+   STATUS      current  
+   DESCRIPTION  
+      "A conceptual row of the containing information about a 
+      Connection entry."  
+   INDEX { ibConnCLGID, ibConnCLLID, ibConnCLQPN, 
+           ibConnCRGID, ibConnCRLID, ibConnCRQPN }   
+   ::= { ibConnCTable 1 }  
+        
+     
+   Strahm         Internet Draft- Expires April 2002                12 
+                      Infiniband Connection MIB              Oct 2001 
+    
+    
+   IbConnCEntry ::= SEQUENCE {  
+           ibConnCLGID       GidTC, 
+           ibConnCLLID      LidTC, 
+          ibConnCLQPN       IBQuePairNumber, 
+          ibConnCRGID       GidTC, 
+          ibConnCRLID       LidTC, 
+           ibConnCRQPN       IBQuePairNumber, 
+          ibConnCState      INTEGER, 
+           ibConnCReliable   TruthValue 
+           } 
+    
+   ibConnCLGID OBJECT-TYPE 
+   SYNTAX      GidTC 
+   MAX-ACCESS   read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "GID of the local end of the connection." 
+   ::= { ibConnCEntry 1 } 
+    
+   ibConnCLLID OBJECT-TYPE 
+   SYNTAX      LidTC 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "LID of the local end of the connection." 
+   ::= { ibConnCEntry 2 } 
+    
+   ibConnCLQPN OBJECT-TYPE 
+   SYNTAX      IBQuePairNumber 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+     "Que Pair Number of the local end of the connection." 
+   ::= { ibConnCEntry 3 } 
+    
+   ibConnCRGID OBJECT-TYPE 
+   SYNTAX      GidTC 
+   MAX-ACCESS   read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "GID of the remote end of the connection." 
+   ::= { ibConnCEntry 4 } 
+    
+   ibConnCRLID OBJECT-TYPE 
+   SYNTAX      LidTC 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "LID of the remote end of the connection." 
+   ::= { ibConnCEntry 5 } 
+    
+     
+   Strahm         Internet Draft- Expires April 2002                13 
+                      Infiniband Connection MIB              Oct 2001 
+    
+    
+   ibConnCRQPN OBJECT-TYPE 
+   SYNTAX      IBEtoEContext 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+     "Que Pair Number of the remote end of the connection." 
+   ::= { ibConnCEntry 6 } 
+    
+   ibConnCState OBJECT-TYPE 
+   SYNTAX       INTEGER { 
+                    listen (1), 
+                    reqSent (2), 
+                    reqRcvd (3) 
+                    repRcvd (4), 
+                    Established (5), 
+                    dreqSent (6), 
+                    dreqRcvd (7), 
+                    timeWait (8), 
+                    rtuTimeout (9), 
+                    peerCompare (10), 
+                    timeout (11), 
+                    repWait (12), 
+                    mraREPSent (13), 
+                    drepTimeout (14) 
+                    } 
+                  
+   MAX-ACCESS   read-only 
+   STATUS       current 
+   DESCRIPTION 
+      "State of the connection.  Derived from 12.9.5 and 12.9.6." 
+   ::= { ibConnCEntry 7 } 
+    
+   ibConnCReliable     OBJECT-TYPE 
+   SYNTAX              TruthValue 
+   MAX-ACCESS          read-only 
+   STATUS              current 
+   DESCRIPTION 
+      "Reliability of the connection." 
+   ::= { ibConnCEntry 8 } 
+    
+   -- 
+   -- Module Groups 
+   -- 
+   ibCAGroups OBJECT IDENTIFIER ::= { ibCAConformance 1} 
+   ibCAUnreliableDatagram OBJECT IDENTIFIER ::= { ibCAGroups 1 } 
+   ibCAReliableDatagram OBJECT IDENTIFIER ::= { ibCAGroups 2 } 
+   ibCAUnreliableConnected OBJECT IDENTIFIER ::= { ibCAGroups 3 } 
+   ibCAReliableConnected OBJECT IDENTIFIER ::= { ibCAGroups 4 } 
+    
+   END 

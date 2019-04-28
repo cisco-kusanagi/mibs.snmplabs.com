@@ -1,0 +1,725 @@
+PDN-CONTROL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	RowStatus
+  		FROM SNMPv2-TC
+	DisplayString,ifIndex
+		FROM RFC1213-MIB
+	Counter,IpAddress, TimeTicks
+		FROM RFC1155-SMI
+	TRAP-TYPE
+		FROM RFC-1215
+	OBJECT-TYPE
+		FROM RFC-1212
+    pdn-control
+		FROM PDN-HEADER-MIB;
+
+-- ====================================================================
+--
+--  Device Control, Version 4.0, 12/2/97
+--
+--  Last Updated: 12/23/97 by R. Steinberger (ras@eng.paradyne.com)
+--                (Added devControlRMON and devControlLatency groups,
+--                 Added global comments,
+--                 Added Enum values to devControlTestStatus,
+--                 Modified comments on devControlTestCommand)
+--                12/31/97 - 1/6/97 by R. Steinberger (ras@eng.paradyne.com)
+--                (Completely removed devControlSLA
+--                 Changed Enum values for devControlRMON.)
+--                03/01/2000 by J. Colom (jaime@paradyne.com)
+--                (added new ftp control group)
+--                03/02/2000 by Rajesh Gowda (rgowda@nj.paradyne.com)
+--                (added devSNSwitchFirmwareTable for old service nodes)
+--
+-- ====================================================================
+--
+-- Device Reset Object
+--
+-- Used to reset (warm boot) the device.
+--
+devHWControlReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        noOp(1),
+        reset(2)
+            }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Writing the value reset(2) to this object initiates a
+         Hardware power-on reset of the device.  
+         The value read from this object is noOp(1)."
+    ::= { pdn-control 1 }
+
+-- ====================================================================
+--
+-- Test Table
+--
+-- This table controls device level tests.
+--
+devControlTestTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DevControlTestEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of Device tests that may be run."
+    ::= { pdn-control 2 }
+
+devControlTestEntry OBJECT-TYPE
+    SYNTAX  DevControlTestEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The device Test Table."
+    INDEX  { devControlTest }
+    ::= { devControlTestTable 1 }
+
+DevControlTestEntry ::=
+    SEQUENCE {
+    devControlTest
+        INTEGER,
+    devControlTestStatus
+        INTEGER,
+    devControlTestCmd
+        INTEGER
+    }
+
+devControlTest OBJECT-TYPE
+    SYNTAX INTEGER {
+        lampTest (1)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An index into the test table that indicates which test 
+         the row involves."
+::= { devControlTestEntry 1 }
+
+devControlTestStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        active(1),
+        inactive(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The test status on the device. This object indicates whether
+         the indexed test is currently active(1) or inactive(2)."
+::= { devControlTestEntry 2 }
+
+devControlTestCmd OBJECT-TYPE
+    SYNTAX INTEGER {
+        start  (1),
+        stop   (2)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Used to start or stop the indexed test.
+         When read, the value returned will be the next logical command."
+::= { devControlTestEntry 3 }
+
+-- ====================================================================
+--
+-- Download Control Table
+--
+-- This table is used to control and provide information concerning
+-- downloaded executable images. 
+--
+devControlDownLoadTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DevControlDownLoadEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of the current Download Releases and their associated status.
+	 Each Download Release will be indexed by a number from 1 to N.
+	 The user will be able to view the Download Release String and 
+	 Operational Status of the release (valid or invalid) and 
+	 activate a valid Download Release by changing the 
+	 Administration Status to active."
+    ::= { pdn-control 3 }
+
+devControlDownLoadEntry OBJECT-TYPE
+    SYNTAX  DevControlDownLoadEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The Device DownLoad Release entry."
+    INDEX  { devControlDownLoadIndex }
+    ::= { devControlDownLoadTable 1 }
+
+DevControlDownLoadEntry ::=
+    SEQUENCE {
+    devControlDownLoadIndex
+	INTEGER,
+    devControlDownLoadRelease
+        DisplayString,
+    devControlDownLoadOperStatus
+        INTEGER,
+    devControlDownLoadAdminStatus
+        INTEGER
+    }
+
+devControlDownLoadIndex OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to index the download table (range 1 to N)."
+::= { devControlDownLoadEntry 1 }
+
+devControlDownLoadRelease OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+  	"This object indicates the Software Release for 
+	 this Download. If the Software Download is Operational Status
+	 is invalid, the Software Revision Number will be blank."
+::= { devControlDownLoadEntry 2 }
+
+devControlDownLoadOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	valid(1),
+	invalid(2)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object indicates whether or not the indexed 
+	 download entry contains a valid(1) or invalid(2) download."
+::= { devControlDownLoadEntry 3 }
+
+devControlDownLoadAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	active(1),
+	inactive(2)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object indicates whether or not the indexed 
+	 download entry is active(1) or inactive(2). 
+	 Writing active(1) will activate that software release
+	 and cause the unit to reset (response may timeout).
+	 Writing active(1) to a download entry whose 
+	 devControlDownloadOperStatus is invalid will return BAD VALUE.
+	 Writing inactive(2) will always return BAD VALUE."
+::= { devControlDownLoadEntry 4 }
+
+-- ====================================================================
+--
+-- The RMON Group
+--
+-- This group is a collection of items that control the RMON process.
+--
+devControlRMON    OBJECT IDENTIFIER ::= { pdn-control 4}
+
+devControlRMONAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The desired state of the RMON process.  If set to enabled(1), the 
+         RMON process will perform the collection tasks it is set up to do.  
+         If it is disabled(2), RMON will not perform collection."
+    ::= { devControlRMON 1 }
+
+-- ====================================================================
+--
+--  Objects that switch banks in the Service Nodes(ASN).
+--  devSNSwitchFirmwareTable is deprecated by devFirmwareControl
+--  group in sle_devControl.mib (Atlantis 4.0 onwards)
+
+devSNSwitchFirmwareTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DevSNSwitchFirmwareEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of objects needed to switch bank
+         and reset the Service Node (ASN)."
+    ::= { pdn-control 5 }
+
+devSNSwitchFirmwareEntry OBJECT-TYPE
+    SYNTAX  DevSNSwitchFirmwareEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The Service Node Switch Firmware table."
+    INDEX  { devSNSwitchFirmwareIndex }
+    ::= { devSNSwitchFirmwareTable 1 }
+
+DevSNSwitchFirmwareEntry ::=
+    SEQUENCE {
+    devSNSwitchFirmwareIndex
+        INTEGER,
+    devSNSwitchFirmwareBank
+        INTEGER
+    }
+
+devSNSwitchFirmwareIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An index into the Service Node switch firmware table that
+         indicates which interface the row involves. This index
+         corresponds to the entityPhysicalIndex of the entity MIB "
+::= { devSNSwitchFirmwareEntry 1 }
+
+devSNSwitchFirmwareBank OBJECT-TYPE
+    SYNTAX  INTEGER {
+        noOp(1),
+        switch(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "Writing the value switch(2) to this object will
+          switch the banks to change the firmware being
+          used on the service node. The firmware from the stand
+          by (not active) bank will be used as the currently running
+          firmware.  The value read from this object is noOp(1)."
+::= { devSNSwitchFirmwareEntry 2 }
+
+-- ====================================================================
+--
+-- The FTP Group
+--
+-- This group is a collection of items that control the FTP process
+--
+devControlFTP    OBJECT IDENTIFIER ::= { pdn-control 6}
+
+devControlFTPRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "FTP max transfer rate in (Kbps)"
+    ::= { devControlFTP 1 }
+
+
+-- =======================================================
+--
+--  The Paradyne File Transfer Group  (J.Strain)
+-- =======================================================
+devFileXferMIBObjects OBJECT IDENTIFIER ::= { pdn-control 7}
+devFileXferMIBTraps OBJECT IDENTIFIER ::= { pdn-control 8 }
+
+devFileXferConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DevFileXferConfigEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "The Paradyne  FileXfer Client Config Table."
+    ::= { devFileXferMIBObjects 1 }
+
+devFileXferConfigEntry OBJECT-TYPE
+    SYNTAX  DevFileXferConfigEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+
+       " Use of the File Tranfer MIB could be used with other MIBS in
+              the following manner:
+                  a) Use another MIB/means to verify available space /make room
+                     for a file to be transfered to this device
+                  b) Use this MIB to download the file
+                  c) Use another MIB/means to select the file you want to make 
+                     active
+                                        if your selecting firmware for example.
+                  d) Use another MIB/means to reset the device.
+
+        A management station wishing to initiate a file transfer needs to
+                         create an entry in this table. To do so, you must
+       first identify the ifIndex of the device you intend to
+       do the transfer with.  You should
+       then create the associated instance of the row status
+       It must also, either in the same
+       or in successive PDUs, create an instance of
+       devFileXferFileName, DevFileXferFileType, 
+.      devFileXferServerIpAddress,
+       devFileXferOperation.
+
+       It should also modify the default values for the other
+       configuration objects if the defaults are not appropriate.
+
+       Once the appropriate instance of all the configuration
+       objects have been created, either by an explicit SNMP
+       set request or by default, the row status should be set
+       to active to initiate the request. Note that this entire
+       procedure may be initiated via a single set request which
+       specifies a row status of createAndGo as well as specifies
+       valid values for the non-defaulted configuration objects.
+
+       Once the DevFileXferConfigEntry request has been created (i.e. the
+       devFileXferRowStatus has been made active), the entry
+       cannot be modified - the only operation possible
+       after this is to delete the row.
+
+       Once the request completes, the management station should
+       retrieve the values of the status objects of interest, and
+       should then delete the entry.  In order to prevent old
+       entries from clogging the table, entries could be aged out,
+       but an entry will never be deleted within 5 minutes of
+       completing.  "
+    INDEX   { ifIndex }
+    ::= { devFileXferConfigTable  1 }
+
+DevFileXferConfigEntry ::=
+    SEQUENCE {
+
+    devFileXferFileName
+        DisplayString,
+
+    devFileXferCopyProtocol
+        INTEGER,
+
+    devFileXferFileType
+        INTEGER,
+
+    devFileXferServerIpAddress
+        IpAddress,
+
+    devFileXferUserName
+        DisplayString,
+
+    devFileXferUserPassword
+        DisplayString,
+
+    devFileXferOperation
+        INTEGER,
+
+    devFileXferPktsSent
+        Counter,
+
+    devFileXferPktsRecv
+        Counter,
+
+    devFileXferOctetsSent
+        Counter,
+
+    devFileXferOctetsRecv
+        Counter,
+
+    devFileXferOwnerString
+        OCTET STRING,
+
+    devFileXferStatus
+        INTEGER,
+
+    devFileXferErrorStatus
+        INTEGER,
+
+    devFileXferSendEvent
+        INTEGER,
+
+    devFileXferRowStatus
+        RowStatus,
+		
+    devFileXferXferTime
+		TimeTicks	
+    }
+
+devFileXferFileName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the name of the filetransfer file."
+    ::= { devFileXferConfigEntry  1 }
+
+devFileXferCopyProtocol OBJECT-TYPE
+    SYNTAX   INTEGER {
+                         tftp(1),
+                         ftp(2)
+                                                }
+    ACCESS  read-write
+    STATUS  mandatory
+        DESCRIPTION
+          "The transfer protocol that should be used to copy the file
+           across the network. If the file transfer is to occur locally on the 
+           SNMP agent, the method of transfer is left upto the implementation, 
+           and is not restricted to the protocols below."
+
+--    DEFVAL  { tftp }
+    ::= { devFileXferConfigEntry  2 }
+
+devFileXferFileType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                                firmware(1),
+                                config(2)
+                                }
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Specifies the type of file your want to transfer."
+    ::= { devFileXferConfigEntry  3 }
+
+devFileXferServerIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the file transfer server's IP address. "
+    ::= { devFileXferConfigEntry  4 }
+
+devFileXferUserName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the username if a username is needed
+        to login to the server."
+    ::= { devFileXferConfigEntry  5 }
+
+devFileXferUserPassword OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the password if a password is needed
+            to login to the server. This object will return null on a read 
+            operation."
+    ::= { devFileXferConfigEntry  6 }
+
+devFileXferOperation OBJECT-TYPE
+    SYNTAX  INTEGER {
+                                get(1),
+                                put(2)
+                                        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the operation the file transfer wants to 
+perform."
+    ::= { devFileXferConfigEntry  7 }
+
+devFileXferPktsSent OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the the number of packets sent to the
+        server at the time of interrogation."
+    ::= { devFileXferConfigEntry  8 }
+
+devFileXferPktsRecv OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the the number of packets received from the
+        server at the time of interrogation."
+    ::= { devFileXferConfigEntry  9 }
+
+devFileXferOctetsSent OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the the number of octets sent to the
+        server at the time of interrogation."
+    ::= { devFileXferConfigEntry  10 }
+
+devFileXferOctetsRecv OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the the number of octets received from the
+        server at the time of interrogation."
+    ::= { devFileXferConfigEntry  11 }
+
+devFileXferOwnerString OBJECT-TYPE
+    SYNTAX   OCTET STRING (SIZE(0..255))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The entity which currently has the 'ownership'
+        required to invoke the operation on this index."
+    ::= { devFileXferConfigEntry  12 }
+
+devFileXferStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                 none(1),
+                 success(2),
+                 failure(3),
+                 inprogress(4)
+               }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the status of the file transfer."
+    ::= { devFileXferConfigEntry  13 }
+
+devFileXferErrorStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object contains the reason code of the failure determined in 
+devFileXferStatus.
+        The reason code are specific to the file transfer protocol.
+
+        Please refer to the file transfer protocols respective RFC for 
+clarification
+        of the error code value meanings.
+
+        TFTP Error Codes from rfc 1350
+        FTP Error Codes from rfc 959"
+
+    ::= { devFileXferConfigEntry  14 }
+
+devFileXferSendEvent OBJECT-TYPE
+    SYNTAX INTEGER {
+    active(1),
+    inactive(2)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object indicates whether or not to send the 
+         devFileXferEvent event trap ."
+    ::= { devFileXferConfigEntry  15 }
+
+devFileXferRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object is used to create
+     a new row or delete an
+     existing row in this table."
+    ::= { devFileXferConfigEntry  16 }
+
+devFileXferXferTime OBJECT-TYPE
+    SYNTAX  TimeTicks 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object indicates the elapsed time 
+		(in hundredths of a second) of the file transfer."
+    ::= { devFileXferConfigEntry 17 }
+
+
+-- ====================================================================
+--
+-- Firmware Control Table
+--
+-- This table is used to control and provide information concerning
+-- firmware/executable images.
+--
+-- ====================================================================
+devFirmwareControlMIBObjects OBJECT IDENTIFIER ::= { pdn-control 9 }
+
+devFirmwareControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DevFirmwareControlEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of the current Firmware Releases and their associated
+         status.  Each Firmware Release will be indexed by a number
+         from 1 to N.  The user will be able to view the Firmware
+         Release String and Operational Status of the release (valid
+                 or invalid) and activate a valid Firmware Release by changing
+                 the Administration Status to active."
+    ::= { devFirmwareControlMIBObjects 1 }
+
+devFirmwareControlEntry OBJECT-TYPE
+    SYNTAX  DevFirmwareControlEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The Device Firmware Release entry."
+    INDEX  { devFirmwareControlIndex }
+    ::= { devFirmwareControlTable 1 }
+
+DevFirmwareControlEntry ::=
+    SEQUENCE {
+    devFirmwareControlIndex
+    INTEGER,
+    devFirmwareControlRelease
+        DisplayString,
+    devFirmwareControlOperStatus
+        INTEGER,
+    devFirmwareControlAdminStatus
+        INTEGER
+    }
+
+devFirmwareControlIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to index the Firmware table (range 1 to N)."
+::= { devFirmwareControlEntry 1 }
+
+devFirmwareControlRelease OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "This object indicates the Software Release for
+     this Firmware. If the Software Firmware is Operational Status
+     is invalid, the Software Revision Number will be blank."
+::= { devFirmwareControlEntry 2 }
+
+devFirmwareControlOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+    valid(1),
+    invalid(2),
+    unknown(3)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+     "This object indicates whether or not the indexed
+     Firmware entry contains a valid(1) or invalid(2) Firmware."
+::= { devFirmwareControlEntry 3 }
+
+devFirmwareControlAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+    active(1),
+    inactive(2)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object indicates whether or not the indexed
+     Firmware entry is active(1) or inactive(2).
+     Writing active(1) will activate that software release
+     and cause the unit to reset (response may timeout).
+     Writing active(1) to a Firmware entry whose
+     devFirmwareControlOperStatus is invalid will return BAD VALUE.
+     Writing inactive(2) will always return BAD VALUE."
+::= { devFirmwareControlEntry 4 }
+
+
+--
+--      File Transfer Traps
+--
+
+devFileXferEvent TRAP-TYPE
+   ENTERPRISE devFileXferMIBTraps
+	VARIABLES {  devFileXferStatus , devFileXferErrorStatus,
+                                devFileXferOperation, devFileXferFileType,
+                                devFileXferFileName }
+   DESCRIPTION
+     "This trap is to communicate a couple of things about
+      the completion of a file transfer.
+
+                devFileXferStatus       - Did it complete successfully or not.
+                devFileXferErrorStatus  - If not, what was the error code.
+                devFileXferOperation    - What operation was performed?.
+                devFileXferFileType     - Was it a firmware xfer or config?
+                devFileXferFileName     - The name of the file transfered.
+         "
+
+ ::= 1
+
+END
+

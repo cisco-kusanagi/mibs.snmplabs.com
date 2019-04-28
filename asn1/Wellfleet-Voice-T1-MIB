@@ -1,0 +1,313 @@
+Wellfleet-Voice-T1-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+
+      Counter 
+        FROM RFC1155-SMI
+      OBJECT-TYPE
+        FROM RFC-1212
+      wfVoiceT1Group
+        FROM Wellfleet-COMMON-MIB
+      TRAP-TYPE        
+        FROM RFC-1215;
+
+    wfVoiceT1Table OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfVoiceT1Entry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Voice T1 line record"
+        ::= { wfVoiceT1Group 1  }   
+
+    wfVoiceT1Entry OBJECT-TYPE
+        SYNTAX	WfVoiceT1Entry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the T1 table"
+        INDEX	{ wfVoiceT1Slot,
+    		  wfVoiceT1Connector }
+        ::= { wfVoiceT1Table 1 }
+
+        WfVoiceT1Entry ::= SEQUENCE {
+        wfVoiceT1Delete 		INTEGER,
+    	wfVoiceT1Disable 		INTEGER,
+        wfVoiceT1State          INTEGER,
+    	wfVoiceT1Slot 			INTEGER,
+    	wfVoiceT1Connector 		INTEGER,
+    	wfVoiceT1FrameType 		INTEGER,
+        wfVoiceT1TransmitWaveform       INTEGER,
+        wfVoiceT1LineCode 		INTEGER,
+        wfVoiceT1ReceiveClock   	INTEGER,
+        wfVoiceT1TransmitClock   	INTEGER
+        }
+
+    wfVoiceT1Delete OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    created(1),
+    		    deleted(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "create/delete parameter, dflt = created"
+        DEFVAL	{ created }
+        ::= { wfVoiceT1Entry 1 }
+
+    wfVoiceT1Disable OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    enabled(1),
+    		    disabled(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "enable/disable parameter, dflt = enabled"
+        DEFVAL	{ enabled }
+        ::= { wfVoiceT1Entry 2 }
+
+    wfVoiceT1State OBJECT-TYPE
+        SYNTAX	INTEGER {
+		    init(1),
+    		    sync(2),
+    		    redAlarm(3),
+    		    yellowAlarm(4),
+		    pulseDensityViolation(5)
+    		}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "physical line status, updated by T1 line driver"
+        DEFVAL	{ init }
+        ::= { wfVoiceT1Entry 3 }
+
+    wfVoiceT1Slot OBJECT-TYPE
+        SYNTAX	INTEGER(1..14)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "instance ID Slot, filled in by driver.
+	         For the FBR this is a game slot."
+        ::= { wfVoiceT1Entry 4 }
+
+    wfVoiceT1Connector OBJECT-TYPE
+        SYNTAX	INTEGER 
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "instance ID Connector, filled in by driver.  For the
+                 FBR, this attribute is an encoded value and is equal 
+                 to 'pci slot' * 1000 + 'module'*100 + 'connector'."
+        ::= { wfVoiceT1Entry 5 }
+
+    wfVoiceT1FrameType OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    d4(1),
+    		    esf(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Frame Type - differentiates between two tarrifed framing formats
+                D4 and ESF."
+        DEFVAL	{ esf }
+        ::= { wfVoiceT1Entry 6 }
+
+    wfVoiceT1TransmitWaveform OBJECT-TYPE
+        SYNTAX	INTEGER {
+                long-haul-0point0(1),
+                long-haul-7point5(2),
+                long-haul-15point0(3),
+                long-haul-22point5(4),
+                short-haul-0to110(5),
+                short-haul-110to220(6),
+                short-haul-220to330(7),
+                short-haul-330to440(8),
+                short-haul-440to550(9),
+                short-haul-550to660(10)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies T1 transmit waveform settings.  Legal values are:
+
+                long haul (LBO 0.0dB)
+                long haul (LBO 7.5dB)
+                long haul (LBO 15.0dB)
+                long haul (LBO 22.5dB)
+
+                short haul (0-110 ft)
+                short haul (110-220 ft)
+                short haul (220-330 ft)
+                short haul (330-440 ft)
+                short haul (440-550 ft)
+                short haul (550-660 ft)
+
+                Note that this attribute is not supported by all T1 interfaces.
+                For those interfaces that DO NOT support this attribute, the
+                wfDs1E1PortSignalLevel attribute is used instead."
+        DEFVAL	{ short-haul-0to110 }
+        ::= { wfVoiceT1Entry 7 }
+
+    wfVoiceT1LineCode OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    b8zs(1),
+    		    ami(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Binary 8 zeros suppression or Alternate Mark Inversion"
+        DEFVAL	{ b8zs }
+        ::= { wfVoiceT1Entry 8 }
+
+    wfVoiceT1ReceiveClock OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    primary(1),
+    		    secondary(2),
+    		    ignore(3)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Clock Mode - Specifiess the usage of the T1 receive clock.
+                 Primary: Apply the receive clock of this T1 line as the system 
+		 	  clock source if it is available.
+		 Secondary: When Primary clock source is not available, use 
+			    secondary as the system clock source.
+		 Ignore: Never use this for system clock source. "
+        DEFVAL	{ ignore }
+        ::= { wfVoiceT1Entry 9 }
+
+    wfVoiceT1TransmitClock OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    internal(1),
+    		    external(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Clock Mode - Specifies the source of the T1 transmit clock.
+                 Internal: Apply the system clock source as the transmit 
+		 	   clock source.
+		 External: Loopback, use the receive clock of this T1 line
+                           as the transmit clock source. "
+        DEFVAL	{ internal }
+        ::= { wfVoiceT1Entry 10 }
+
+
+    wfVoiceT1StatusTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfVoiceT1StatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table containing Voice over IP T1 channel status  records"
+        ::= { wfVoiceT1Group 2 }
+
+
+    wfVoiceT1StatusEntry OBJECT-TYPE
+        SYNTAX	WfVoiceT1StatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the voice channel status table"
+        INDEX	{ wfVoiceT1Slot, wfVoiceT1Connector }
+
+        ::= { wfVoiceT1StatusTable 1 }
+
+     WfVoiceT1StatusEntry ::= SEQUENCE {
+          wfVoiceT1BipolarVios 			Counter,
+          wfVoiceT1FrameBitErrs 		Counter,
+          wfVoiceT1LossOfFrameErrs 		Counter,
+          wfVoiceT1SuperFrameErrs 		Counter,
+          wfVoiceT1CRC6Errs 			Counter,
+          wfVoiceT1RcvYelAlarms 		Counter,
+          wfVoiceT1RcvCarrierLoss 		Counter,
+          wfVoiceT1RcvRedAlarms 		Counter
+
+	}
+
+
+   wfVoiceT1BipolarVios OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceT1StatusEntry 1 }
+
+
+   wfVoiceT1FrameBitErrs OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceT1StatusEntry 2 }
+
+   wfVoiceT1LossOfFrameErrs OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceT1StatusEntry 3 }
+
+   wfVoiceT1SuperFrameErrs OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceT1StatusEntry 4 }
+
+   wfVoiceT1CRC6Errs OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceT1StatusEntry 5 }
+
+   wfVoiceT1RcvYelAlarms OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceT1StatusEntry 6 }
+
+   wfVoiceT1RcvCarrierLoss OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceT1StatusEntry 7 }
+
+   wfVoiceT1RcvRedAlarms OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of xGCP control frames successfully rcvd. "
+        ::= { wfVoiceT1StatusEntry 8 }
+
+
+
+
+
+
+    wfVoIPT1Error TRAP-TYPE
+        ENTERPRISE wfVoiceT1Group
+        VARIABLES {wfVoiceT1Slot, wfVoiceT1Connector, wfVoiceT1State}
+        DESCRIPTION
+            "The SNMP trap that is generated when a T1 interface detects
+	     an error."
+        ::= 1
+
+
+
+
+    END  -- Wellfleet-Voice-T1-MIB

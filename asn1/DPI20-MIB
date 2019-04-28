@@ -1,0 +1,164 @@
+-- the DPI 2.0 MIB                                                              
+                                                                                
+-- The MIB objects are implemented by the local SNMP agent                      
+                                                                                
+-- This MIB is based on a RFC1592 for DPI Version 2.0                           
+                                                                                
+        DPI20-MIB DEFINITIONS ::= BEGIN                                         
+                                                                                
+        IMPORTS                                                                 
+                MODULE-IDENTITY, OBJECT-TYPE, enterprises                       
+                        FROM SNMPv2-SMI                                         
+                DisplayString                                                   
+                        FROM SNMPv2-TC                                          
+                MODULE-COMPLIANCE, OBJECT-GROUP                                 
+                        FROM SNMPv2-CONF;                                       
+                                                                                
+        dpi20MIB MODULE-IDENTITY                                                
+          LAST-UPDATED "9609300000Z"                                            
+          ORGANIZATION "IBM Research - T.J. Watson Research Center"             
+          CONTACT-INFO                                                          
+                  "           Bert Wijnen                                       
+                                                                                
+                   Postal:    IBM International Operations                      
+                              Watsonweg 2                                       
+                              1423 ND Uithoorn                                  
+                              The Netherlands                                   
+                                                                                
+                   Tel:       +31 79-322-8316                                   
+                                                                                
+                   E-mail:    wijnen@vnet.ibm.com                               
+                              (IBM internal: wijnen at uitvm1)"                 
+           DESCRIPTION                                                          
+                  "The MIB module describing DPI objects."                      
+           REVISION "9609300000Z"                                               
+           DESCRIPTION                                                          
+                  "Changes in this revision                                     
+                   - Added dpiPathNameForUnixStream "                           
+           REVISION "9605010000Z"                                               
+           DESCRIPTION                                                          
+                  "Changes in this revision                                     
+                   - Change telephone number"                                   
+           REVISION "9505260000Z"                                               
+           DESCRIPTION                                                          
+                  "Changes in this revision                                     
+                   - Enable SNMPv2 items                                        
+                   - import from SNMPv2 documents                               
+                   - Add conformance statements"                                
+           ::= { ibmDPI 1 }                                                     
+                                                                                
+        ibm      OBJECT IDENTIFIER ::= { enterprises 2 }                        
+                                                                                
+        ibmDPI   OBJECT IDENTIFIER ::= { ibm 2 }                                
+                                                                                
+        dpiPort  OBJECT IDENTIFIER ::= { dpi20MIB 1 }                           
+                                                                                
+        dpiPortForTCP       OBJECT-TYPE                                         
+                SYNTAX      INTEGER (0..65535)                                  
+                MAX-ACCESS  read-only                                           
+                STATUS      current                                             
+                DESCRIPTION                                                     
+                    "The TCP port number on which the agent listens for         
+                    DPI connections.                                            
+                    If the value is zero, it means that the agent is            
+                    not listening for TCP DPI connections."                     
+                ::= { dpiPort 1 }                                               
+                                                                                
+        dpiPortForUDP       OBJECT-TYPE                                         
+                SYNTAX      INTEGER (0..65535)                                  
+                MAX-ACCESS  read-only                                           
+                STATUS      current                                             
+                DESCRIPTION                                                     
+                    "The UDP port number on which the agent listens for         
+                    DPI packets.                                                
+                    If the value is zero, it means that the agent is            
+                    not listening for UDP DPI packets."                         
+                ::= { dpiPort 2 }                                               
+                                                                                
+        dpiPathNameForUnixStream OBJECT-TYPE                                    
+                SYNTAX      DisplayString                                       
+                MAX-ACCESS  read-only                                           
+                STATUS      current                                             
+                DESCRIPTION                                                     
+                    "The full path name for a connection via an                 
+                    AF_UNIX stream connection. The empty value                  
+                    means the agent has no DPI AF_UNIX support."                
+                ::= { dpiPort 3 }                                               
+                                                                                
+                                                                                
+        -- conformance information                                              
+                                                                                
+        dpiMIBConformance                                                       
+                     OBJECT IDENTIFIER ::= { dpi20MIB 2 }                       
+                                                                                
+        dpiMIBCompliances                                                       
+                      OBJECT IDENTIFIER ::= { dpiMIBConformance 1 }             
+        dpiMIBGroups  OBJECT IDENTIFIER ::= { dpiMIBConformance 2 }             
+                                                                                
+        -- compliance statements                                                
+                                                                                
+        dpiMIBCompliance MODULE-COMPLIANCE                                      
+            STATUS  current                                                     
+            DESCRIPTION                                                         
+                    "The compliance statement for SNMPv2 entities               
+                     which implement the dpiMIB (DPI MIB)."                     
+            MODULE  -- this module                                              
+                MANDATORY-GROUPS { dpiGroup }                                   
+                                                                                
+--              GROUP   dpiOldGroup                                             
+--              DESCRIPTION                                                     
+--                  "The dpiOldGroup would be implemented by SNMP               
+--                   agents that want to support the old DPI 1.0                
+--                   and DPI 1.1 for backward compatibility."                   
+                                                                                
+            ::= { dpiMIBCompliances 1 }                                         
+                                                                                
+        dpiMIBComplianceUnix MODULE-COMPLIANCE                                  
+            STATUS  current                                                     
+            DESCRIPTION                                                         
+                    "The compliance statement for SNMPv2 entities               
+                     which implement the dpiMIB (DPI MIB), including            
+                     the new dpiGroupUnix group."                               
+            MODULE  -- this module                                              
+                MANDATORY-GROUPS { dpiGroup, dpiGroupUnix }                     
+                                                                                
+--              GROUP   dpiOldGroup                                             
+--              DESCRIPTION                                                     
+--                  "The dpiOldGroup would be implemented by SNMP               
+--                   agents that want to support the old DPI 1.0                
+--                   and DPI 1.1 for backward compatibility."                   
+                                                                                
+            ::= { dpiMIBCompliances 2 }                                         
+                                                                                
+        -- units of conformance                                                 
+                                                                                
+        dpiGroup    OBJECT-GROUP                                                
+            OBJECTS { dpiPortForTCP,                                            
+                      dpiPortForUDP }                                           
+            STATUS  current                                                     
+            DESCRIPTION                                                         
+                    "The dpiGroup defines the objects that are                  
+                     used to figure out the DPI ports supported by              
+                     a DPI 2.0 capable SNMP agent."                             
+            ::= { dpiMIBGroups 1 }                                              
+                                                                                
+        dpiGroupUnix OBJECT-GROUP                                               
+            OBJECTS { dpiPathNameForUnixStream }                                
+            STATUS  current                                                     
+            DESCRIPTION                                                         
+                    "The dpiGroup defines the objects that are                  
+                     used to figure out the DPI ports supported by              
+                     a DPI 2.0 capable SNMP agent."                             
+            ::= { dpiMIBGroups 2 }                                              
+                                                                                
+--      dpiOldGroup OBJECT-GROUP                                                
+--          OBJECTS { dpiPort }                                                 
+--          STATUS  current                                                     
+--          DESCRIPTION                                                         
+--                  "The dpiOldGroup defines the object that was                
+--                   used by DPI 1.0 and DPI 1.1 and so can                     
+--                   optionally be implemented if you want to                   
+--                   support that older (obsoleted) level of DPI."              
+--          ::= { dpiMIBGroups 2 }                                              
+                                                                                
+        END                                                                     

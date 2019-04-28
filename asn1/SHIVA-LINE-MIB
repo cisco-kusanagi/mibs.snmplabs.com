@@ -1,0 +1,411 @@
+--
+-- 	Copyright 1992, 1993, 1995, 1996, 1999 Shiva Corporation
+--
+
+SHIVA-LINE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	line
+		FROM SHIVA-MIB;
+
+
+-- serial line table
+
+-- for the care and feeding of async serial lines with modems attached
+
+    serialLineTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SerialLineEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Table of serial line initialization parameters and status."
+	::= { line 1 }
+
+    serialLineEntry OBJECT-TYPE
+	SYNTAX	SerialLineEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"initialization parameters and status for a serial line."
+	INDEX { serialLineIndex }
+	::= { serialLineTable 1 }
+
+    SerialLineEntry ::= SEQUENCE {
+	serialLineIndex		INTEGER,
+	serialLineSlot		INTEGER,
+	serialLineChan		INTEGER,
+	serialLineLogIndex	INTEGER,
+	serialLinePools		DisplayString,
+	serialLineStatus	INTEGER,
+	serialLineModemName	DisplayString,
+	serialLineAnswerInit	DisplayString,
+	serialLineInitRate	INTEGER,
+	serialLineInitFlow	INTEGER,
+	serialLineSignals	INTEGER,
+	serialLineMode		INTEGER,
+	serialLineInitString	DisplayString,
+	serialLineConnSpeed	INTEGER,
+	serialLineSwitch	INTEGER,
+	serialLineRadap		INTEGER,
+	serialLineTransCap	INTEGER,
+	serialLineSpid		DisplayString,
+	serialLineErrorCorr	INTEGER,
+	serialLineDataCompr	INTEGER,
+	serialLineEQM		INTEGER,
+	serialLineAGC		INTEGER,
+	serialLineStatTab	INTEGER,
+	serialLineStatIndex	INTEGER,
+	serialLineType		INTEGER,
+	serialLineIfIndex	INTEGER
+    }
+
+    serialLineIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Serial line number, densely numbered starting with 1."
+	::= { serialLineEntry 1 }
+
+    serialLineSlot OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Physical slot number, starting with 1.  Skips empty slots."
+	::= { serialLineEntry 2 }
+
+    serialLineChan OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Logical channel number on physical slot.  BRI cards have
+		two channels, all others have one."
+	::= { serialLineEntry 3 }
+
+    serialLineLogIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Logical line number, the number used in the device
+		name (ifDesc) SerialN.  Skips over empty slots."
+	::= { serialLineEntry 4 }
+
+    serialLinePools OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The names of the pools that this line is in, comma-seperated."
+	::= { serialLineEntry 5 }
+
+    serialLineStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		disabled(1),
+		initializing(2),
+		idle(3),
+		packet(4),	-- in use for packet-oriented networking
+		character(5)	-- in use for character-oriented I/O
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Serial line status.  Setting serialLineStatus
+		to initializing(2) forces the line to be reinitialized."
+	::= { serialLineEntry 6 }
+
+    serialLineModemName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the type of modem connected to this line."
+	::= { serialLineEntry 7 }
+
+    serialLineAnswerInit OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The initialization string to put the modem in auto-answer
+		mode."
+	::= { serialLineEntry 8 }
+
+    serialLineInitRate OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The rate in bits per second at which to initialize
+		the line."
+	::= { serialLineEntry 9 }
+
+    serialLineInitFlow OBJECT-TYPE
+	SYNTAX	INTEGER { none(1), hardware(2), software(3) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The flow control setting to initialize the line with."
+	::= { serialLineEntry 10 }
+
+    serialLineSignals OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The current status of control signals on this line,
+		as the sum of the following bits;
+			0	Ready To Send
+			1	Clear To Send
+			2	Data Set Ready
+			3	Data Terminal Ready
+			4	Ring Indicate
+			5	Data Carrier (Rcvd Line Signal) Detect
+			6	Signal Quality Detect
+			7	Signaling Rate Selector
+			8	Secondary RTS
+			9	Secondary CTS
+			10	Secondary DCD."
+	::= { serialLineEntry 11 }
+
+    serialLineMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+                async(2),
+                sync(3)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The tranmission mode currently in use on this line."
+	::= { serialLineEntry 12 }
+
+    serialLineInitString OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The initialization string to put the modem in dial
+		mode."
+	::= { serialLineEntry 13 }
+
+    serialLineConnSpeed OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Line connection speed."
+	::= { serialLineEntry 14 }
+
+    serialLineSwitch OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		dms100(2),
+		dms250(3),
+		ess4(4),
+		ess5(5),
+		vn2(6),
+		vn3(7),
+		vn6(8),
+		cr22(9),
+		nat1(10),
+		nat2(11),
+		euro(12),
+		itr6(13),
+		ins64(14),
+		austel(15),
+		fetex150(16),
+		btnr191(17)
+	}	
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"ISDN switch type configured on this line."
+	::= { serialLineEntry 15 }
+
+    serialLineRadap OBJECT-TYPE
+	SYNTAX	INTEGER {
+		none(1),
+		v110(2),
+		v120(3),
+		v110-v42(4)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"ISDN rate adaptation type."
+	::= { serialLineEntry 16 }
+
+    serialLineTransCap OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		speech(2),
+		audio31(3),
+		audio7(4),
+		video(5),
+		restdig(6),
+		unrestdig(7)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Type of ISDN service on this line"
+	::= { serialLineEntry 17 }
+
+    serialLineSpid OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"ISDN Service Profile ID."
+	::= { serialLineEntry 18 }
+
+    serialLineErrorCorr OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		none(2),
+		lapm(3),
+		mnp4(4),
+		mnp10(5)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"error correction protocol on this line."
+	::= { serialLineEntry 19 }
+
+    serialLineDataCompr OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		none(2),
+		mnp5(3),
+		v42bis(4)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"line data compression type."
+	::= { serialLineEntry 20 }
+
+    serialLineEQM OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"line signal quality."
+	::= { serialLineEntry 21 }
+
+    serialLineAGC OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"line signal strength."
+	::= { serialLineEntry 22 }
+
+    serialLineStatTab OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		rs232table(2)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Statistics table that pertains to this line."
+	::= { serialLineEntry 23 }
+
+    serialLineStatIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Index into statistics table."
+	::= { serialLineEntry 24 }
+
+    serialLineType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		empty(1),
+		unknown(2),
+		uart(3),
+		modem(4),
+		switched56(5),
+		briST(6),
+		usart(7),
+		briU(8),
+		pri(9),
+		dmc(10),
+		shiva-16-v34-modem-card(11),	-- LanRover/E XP16
+		ccm(12),
+		l2f(13),
+		l2tp(14),
+		qbri-st(15),
+		qbri-u(16)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Type of line."
+	::= { serialLineEntry 25 }
+
+    serialLineIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of this serial line."
+	::= { serialLineEntry 26 }
+
+-- serial line group table
+
+    linegroupTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF LinegroupEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of serial line groups.  On a LanRover Access
+		Switch this is a table of outgoing PhoneGroup pools."
+	::= { line 2 }
+
+    linegroupEntry	OBJECT-TYPE
+	SYNTAX	LinegroupEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A serial line group name table entry. On a LanRover
+		Access Switch an outgoing PhoneGroup pool table
+		entry."
+	INDEX { linegroupName }
+	::= { linegroupTable 1 }
+
+    LinegroupEntry ::= SEQUENCE {
+	linegroupName	DisplayString,
+	linegroupDialoutProts INTEGER	
+    }
+
+    linegroupName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A serial line group name.  On a LanRover Access
+		Switch this is an outgoing PhoneGroup pool name."
+	::= { linegroupEntry 1 }
+
+    linegroupDialoutProts	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Bitmask of dialout protocols enabled for group:
+			0x00000001 - IP
+			0x00000002 - IPX
+			0x00000004 - AppleTalk."
+	::= { linegroupEntry 2 }
+
+END

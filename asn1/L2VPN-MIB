@@ -1,0 +1,1551 @@
+-- extracted from draft-weilian-l2vpn-mib-02.txt
+-- at Thu Oct 26 06:07:26 2006
+
+   L2VPN-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,NOTIFICATION-TYPE,
+    Integer32,Unsigned32,Counter32,Counter64,DisplayString,
+    InterfaceIndex
+        FROM SNMPv2-SMI                    -- [RFC2578] 
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP  
+        FROM SNMPv2-CONF                   -- [RFC2580] 
+
+    SnmpAdminString  
+        FROM SNMP-FRAMEWORK-MIB            -- [RFC3411] 
+
+    TEXTUAL-CONVENTION,RowStatus,TimeStamp,StorageType,TimeTicks,
+    TruthValue
+        FROM SNMPv2-TC                     -- [RFC2579] 
+  
+    InterfaceIndexOrZero  
+        FROM IF-MIB                        -- [RFC2863] 
+
+    PerfCurrentCount, PerfIntervalCount  
+        FROM PerfHist-TC-MIB               -- [RFC3593] 
+
+    HCPerfCurrentCount, HCPerfIntervalCount, HCPerfTimeElapsed,  
+    HCPerfValidIntervals  
+        FROM HC-PerfHist-TC-MIB            -- [RFC3705] 
+
+    pwIndex, pwPeerAddr
+        FROM PW-STD-MIB
+
+    l2vpnStdMIB MODULE-IDENTITY
+    LAST-UPDATED "200606160000Z"  -- June 16, 2006
+    ORGANIZATION "ZTE Corporation"
+    CONTACT-INFO
+        "
+         Li Wentao
+         Postal: ZTE Incorporation
+                 No.68 Zijinghua Rd. 
+                 Yuhuatai District, 
+                 Nanjing, China. 
+         Email: li.wentao@zte.com.cn
+
+         Jin Lizhong
+         Postal: ZTE Incorporation
+                 No.68 Zijinghua Rd. 
+                 Yuhuatai District, 
+                 Nanjing, China. 
+         Email: jin.lizhong@zte.com.cn
+         
+         Kong Yong  
+         Postal: ZTE Incorporation
+                 No.68 Zijinghua Rd. 
+                 Yuhuatai District, 
+                 Nanjing, China. 
+         Email: kong.yong@zte.com.cn
+         Feng Jun  
+         Postal: ZTE Incorporation
+                 No.68 Zijinghua Rd. 
+                 Yuhuatai District, 
+                 Nanjing, China. 
+         Email: Feng.jun99@zte.com.cn
+         
+         The L2VPN Working Group (email distribution l2vpn@ietf.org,  
+         http://www.ietf.org/html.charters/l2vpn-charter.html)  
+        "           
+
+    REVISION
+        "200606160000Z"  -- June 16, 2006
+    DESCRIPTION
+        "draft-weilian-l2vpn-mib-02 version. Changes from
+         previous version:
+         1) Updata the content of L2vpn Instance table.
+         2) Change the index and content of L2vpn PW table which 
+            integrate the existing PWE3 MIBs[PWE3-MIB].
+         3) Change the name of L2vpn Interface table to L2vpn AC table.
+         4) Add the L2vpn Bridge table which contains the VPLS Mac 
+            learning and aging information.
+         5) Remove the L2vpn VSI table for it is not compatible with 
+            the existing tables.
+        "                                              
+
+    REVISION
+        "200512200000Z"  -- Dec 20, 2005
+    DESCRIPTION
+        "draft-weilian-l2vpn-mib-01 version. Changes from
+         previous version:
+         1) Updata the content of L2vpn Instance table and PW table.
+         2) Add the L2vpn VSI table.
+        "                                  
+        
+    REVISION "200507260000Z"  -- July 26, 2005
+    DESCRIPTION
+       "draft-weilian-l2vpn-mib-00 - initial version
+        L2vpn queries and configures MIB."
+    ::= { transmission xxxx } --To be assigned by IANA
+
+    --Textual Conventions
+    l2vpnType ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+           "Used to define the type of L2VPN. L2VPN can be 
+            specified to be vpws, vpls, or ipls.  For a 
+            complete definition of l2vpn type, see [L2FRAME]."
+       REFERENCE
+            "[L2FRAME]"
+       SYNTAX INTEGER { unknown(0), vpws(1), vpls(2), ipls(3) }
+      
+    l2vpnStatus ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+           "Used to define the status of L2VPN."
+       SYNTAX INTEGER { up(1), down(2) }
+       
+       
+    -- Top level components of this MIB.
+    l2vpnNotifications     OBJECT IDENTIFIER ::= { l2vpnMIB 0 }
+    l2vpnObjects           OBJECT IDENTIFIER ::= { l2vpnMIB 1 }
+    l2vpnScalars           OBJECT IDENTIFIER ::= { l2vpnObjects 1 }
+    l2vpnConf              OBJECT IDENTIFIER ::= { l2vpnObjects 2 }
+    l2vpnConformance       OBJECT IDENTIFIER ::= { l2vpnMIB 2 }
+    
+    --
+    -- Scalar Objects
+    --
+    
+    l2vpnConfiguredVpws OBJECT-TYPE
+       SYNTAX        Unsigned32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The number of VPWSs that are configured on this node.
+            The total number of VPWSs equals the number of l2vpn 
+            Instance tables with l2vpnInstanceVpnType vpws(1)."
+       ::= { l2vpnScalars 1 }
+    
+    l2vpnActiveVpws OBJECT-TYPE
+       SYNTAX        Unsigned32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The number of VPWSs that are active on this node.
+            That is, those VPWSs whose corresponding 
+            l2vpnInstanceVpwsStatus is up(1). The total number
+            of active VPWSs equals the number of l2vpn Instance
+            tables with l2vpnInstanceVpnType vpws(1) and 
+            l2vpnInstanceVpwsStatus up(1)."
+       ::= { l2vpnScalars 2 }
+    
+    l2vpnConfiguredVpls OBJECT-TYPE
+       SYNTAX        Unsigned32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The number of VPLSs that are configured on this node.
+            The total number of VPLSs equals the number of l2vpn 
+            Instance tables with l2vpnInstanceVpnType vpls(2)."
+       ::= { l2vpnScalars 3 }
+    
+    l2vpnActiveVpls OBJECT-TYPE
+       SYNTAX        Unsigned32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The number of VPLSs that are active on this node.
+            That is, those VPLSs whose corresponding 
+            l2vpnInstanceVplsStatus is up(1). The total number
+            of active VPLSs equals the number of l2vpn Instance
+            tables with l2vpnInstanceVpnType vpls(2) and 
+            l2vpnInstanceVplsStatus up(1)."
+       ::= { l2vpnScalars 4 }
+    
+    l2vpnConfiguredIpls OBJECT-TYPE
+       SYNTAX        Unsigned32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The number of IPLSs that are configured on this node.
+            The total number of IPLSs equals the number of l2vpn 
+            Instance tables with l2vpnInstanceVpnType ipls(3)."
+       ::= { l2vpnScalars 5 }
+    
+    l2vpnActiveIpls OBJECT-TYPE
+       SYNTAX        Unsigned32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The number of IPLSs that are active on this node.
+            That is, those IPLSs whose corresponding 
+            l2vpnInstanceIplsStatus is up(1). The total number
+            of active IPLSs equals the number of l2vpn Instance
+            tables with l2vpnInstanceVpnType ipls(3) and 
+            l2vpnInstanceIplsStatus up(1)."
+       ::= { l2vpnScalars 6 }
+    
+    l2vpnNotificationEnable OBJECT-TYPE
+       SYNTAX        TruthValue
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+            "If this object is true, then it enables the
+             generation of all notifications defined in
+             this MIB.  This object's value should be
+             preserved across agent reboots."
+       DEFVAL { false }
+       ::= { l2vpnScalars 7 }
+    
+    l2vpnVplsConfMaxMac  OBJECT-TYPE
+       SYNTAX        Unsigned32
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+            "The maximum number of MAC addresses that all VPLSs
+             can learn. That is the total number of MAC adress
+             a PE can support."
+       ::= { l2vpnScalars 8 }
+
+    -- L2VPN Instance Table
+    
+    l2vpnInstanceTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF l2vpnInstanceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table saves the L2VPN instance information created 
+        on PE. "
+        ::= { l2vpnConf 1 }
+
+    l2vpnInstanceEntry  OBJECT-TYPE
+        SYNTAX  l2vpnInstanceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Each line in the table represents an L2VPN instance with
+        l2vpnInstanceIndex as index. New lines are created in the 
+        table when the operator creates L2VPN instance on PE by 
+        non SNMP or some kind of auto discovery mechanism. "
+        INDEX  { l2vpnInstanceIndex }
+        ::= { l2vpnInstanceTable 1 }
+
+    l2vpnInstanceEntry ::=
+        SEQUENCE {
+            l2vpnInstanceIndex			    		Unsigned32,
+            l2vpnInstanceName                       SnmpAdminString,
+            l2vpnInstanceDescription                SnmpAdminString,           
+            l2vpnInstanceVpnType	            	l2vpnType,
+            l2vpnInstanceVcId	            	    Unsigned32,
+            l2vpnInstanceActivePws		    	    Unsigned32,
+            l2vpnInstanceAssociatedPws	            Unsigned32,
+            l2vpnInstanceActiveACs          	    Unsigned32,
+            l2vpnInstanceAssociatedACs	            Unsigned32,
+            l2vpnInstanceCreateTime	                TimeStamp,
+            l2vpnInstanceLastChangeTime	            TimeStamp,
+            l2vpnInstanceVpwsStatus                 l2vpnStatus,
+            l2vpnInstanceVplsStatus                 l2vpnStatus,
+            l2vpnInstanceIplsStatus                 l2vpnStatus,
+            l2vpnInstanceRowStatus		    	    RowStatus,
+            l2vpnInstanceAdminStatus                INTEGER,
+            l2vpnInstanceStorageType	    	    StorageType,
+            }
+
+    l2vpnInstanceIndex  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "To indicate concept line index of L2VPN instance in the 
+         L2VPN instance emulation table. "
+        ::= { l2vpnInstanceEntry 1 }
+
+    l2vpnInstanceName  OBJECT-TYPE
+        SYNTAX   	DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-create
+        STATUS  	current
+        DESCRIPTION
+        "When creating L2VPN instance, a name of local meaning can be
+         denominated with a length less than 32 characters. If no 
+         denomination is made, the field is empty. "
+        DEFVAL { "" }
+        ::= { l2vpnInstanceEntry 2 }
+
+    l2vpnInstanceDescription  OBJECT-TYPE
+        SYNTAX   	DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-create
+        STATUS  	current
+        DESCRIPTION
+        "The human-readable description of this L2VPN.When creating 
+         L2VPN instance, a kind of description can be denominated with
+         a length less than 32 characters. If no denomination is made, 
+         the field is empty. "
+        DEFVAL { "" }
+        ::= { l2vpnInstanceEntry 3 }
+   
+    l2vpnInstanceVpnType  OBJECT-TYPE
+        SYNTAX      l2vpnType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "L2VPN instance types, including VPLS, VPWS and IPLS. "
+        ::= { l2vpnInstanceEntry 4}
+
+    l2vpnInstanceVcId  OBJECT-TYPE
+        SYNTAX   Unsigned32 (1..4294967295)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "If l2vpnInstanceType is vpws(1), the l2vpnInstanceVcId is set
+         to zero, for VPWS is uniquely identified by pwID and 
+         pwPeerAddr. The pwID and pwPeerAddr is specified in [PW-MIB].
+         If l2vpnInstanceType is vpls(2) or ipls(3), the 
+         l2vpnInstanceVcId is used to uniquely identify it and equal 
+         to every PWs that associated to the L2vpn service."
+        ::= { l2vpnInstanceEntry 5}
+
+    l2vpnInstanceActivePws  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Total number of PWs associated with the L2VPN Instance with 
+         pwOperStatus up. The pwOperStatus is specified in [PW-MIB]."
+         ::= { l2vpnInstanceEntry 6 }
+         
+    l2vpnInstanceAssociatedPws  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Total number of PWs associated with the L2VPN Instance 
+         (independent of pwOperStatus type)."
+         ::= { l2vpnInstanceEntry 7 }
+
+    l2vpnInstanceActiveACs  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Total number of interfaces connected to the L2VPN Instance
+         with ifOperStatus = up(1)."
+         ::= { l2vpnInstanceEntry 8 }
+
+    l2vpnInstanceAssociatedACs  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Total number of interfaces connected to the L2VPN Instance 
+         (independent of ifOperStatus type)."
+         ::= { l2vpnInstanceEntry 9 }
+
+    l2vpnInstanceCreateTime OBJECT-TYPE
+        SYNTAX   TimeStamp
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The value of System time at which the L2VPN Instance is
+         created. "
+         ::= { l2vpnInstanceEntry 10 }
+
+    l2vpnInstanceLastChangeTime OBJECT-TYPE
+        SYNTAX   TimeStamp
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The value of System time at the time of the last change
+         of this table entry, which includes changes of L2VPN
+         Instance parameters defined in this table or addition or
+         deletion of ACs and PWs associated with this L2VPN
+         Instance."
+         ::= { l2vpnInstanceEntry 11 }
+
+    l2vpnInstanceVpwsStatus  OBJECT-TYPE
+        SYNTAX      l2vpnStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object indicates the operational status of VPWS, it   
+            does not reflect the status of the ACs and PWs. A VPWS 
+            service may be constructed by one AC and a primary PW with
+            many backup PWs. This value is set to down only if the 
+            attached AC and all the PWs are in the 'down' state."
+        DEFVAL { down }            
+        ::= { l2vpnInstanceEntry 12 }
+        
+    l2vpnInstanceVplsStatus  OBJECT-TYPE
+        SYNTAX      l2vpnStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object indicates the operational status of VPLS, it   
+            does not reflect the status of the ACs and PWs. It is set 
+            to down only if less than two of the ACs and PWs are in the
+            'down' state."
+        DEFVAL { down }            
+        ::= { l2vpnInstanceEntry 13 }
+
+    l2vpnInstanceIplsStatus  OBJECT-TYPE
+        SYNTAX      l2vpnStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object indicates the operational status of IPLS, it   
+            does not reflect the status of the ACs and PWs. It is set 
+            to down only if less than two of the ACs and PWs are in the
+            'down' state."
+        DEFVAL { down }
+        ::= { l2vpnInstanceEntry 14 }
+
+    l2vpnInstanceRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "used to create, modify and delete the line. When the object 
+         is active, any objects that can be read and written in the 
+         line can not be changed. The objects can be changed only when
+         they are not in service or not ready. "
+         ::= { l2vpnInstanceEntry 15 }
+
+    l2vpnInstanceAdminStatus OBJECT-TYPE
+       SYNTAX     INTEGER {
+                      up(1),     -- ready to pass packets
+                      down(2),   -- can't pass packets
+                      testing(3) -- in some test mode
+                      }
+       MAX-ACCESS    read-create
+       STATUS        current
+       DESCRIPTION
+       "Indicates the desired operational status of this
+        L2VPN Instance."
+        ::= { l2vpnInstanceEntry 16 }
+  
+    l2vpnInstanceStorageType OBJECT-TYPE
+        SYNTAX      StorageType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "Storage type of the object. "
+         ::= { l2vpnInstanceEntry 17 }
+
+    --L2VPN PW table 
+
+    l2vpnPWTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF l2vpnPWEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table is used to connect the L2VPN Instance with PW. 
+         An L2VPN Instance can be attached by many PWs. The PW
+         management information base is defined in [PW-MIB]"
+        ::= { l2vpnConf 2 }
+
+    l2vpnPWEntry  OBJECT-TYPE
+        SYNTAX  l2vpnPWEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Each line in the table represents a PW connection over
+         packet switching network. New lines are created in the table
+         when the operator creates L2VPN instance on PE by non SNMP. "
+        INDEX  { l2vpnInstanceIndex, l2vpnPWIndex }
+        ::= { l2vpnPWTable 1 }
+
+    l2vpnPWEntry ::=
+        SEQUENCE {
+            l2vpnPWIndex                    PwIndexType,
+            l2vpnPWHubOrSpoke	            INTEGER,
+            l2vpnPWBackUp                   TruthValue,
+            l2vpnPWLocalVccv		        INTEGER,
+            l2vpnPWRemoteVccv			    INTEGER,
+            l2vpnInstanceRowStatus		    RowStatus,
+            l2vpnInstanceStorageType	    StorageType
+            }
+
+    l2vpnPWIndex OBJECT-TYPE
+        SYNTAX  PwIndexType
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "An index used to indicate a PW which is defined in pwTable
+         of the [PW-MIB]. This PW is associated to the specific L2VPN
+         Instance. "
+        ::= { l2vpnPWEntry 1 }
+
+
+    l2vpnLocalHubOrSpoke  OBJECT-TYPE
+        SYNTAX   INTEGER {
+                        hub(1),
+                        spoke(2)
+                         }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "PW types in hierarchical H-VPLS. "
+        ::= { l2vpnPWEntry 2 }
+        
+    l2vpnPWBackUp OBJECT-TYPE  
+        SYNTAX        TruthValue  
+        MAX-ACCESS    read-create  
+        STATUS        current  
+        DESCRIPTION  
+          "The true(1) value of this object indicates a backup PW,
+           otherwise it indicates a primary PW."  
+        DEFVAL { false }  
+        ::= { l2vpnPWEntry 3 }  
+      
+    l2vpnPWLocalVccv  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The object value indicates the local configured Virtual
+         Circuit Connectivity Verification (VCCV) capability
+         that the specified PW supports. The requesting PE 
+         indicates its VCCV capability or capabilities to the 
+         remote PE by including the VCCV parameter with appropriate 
+         options indicating which methods of OAM it supports in 
+         the interface parameter sub-TLV portion of the FEC TLV. ."
+         ::= { l2vpnPWEntry 4 }
+
+    l2vpnPWRemoteVccv  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The object value indicates the remote configured Virtual
+         Circuit Connectivity Verification (VCCV) capability
+         that the specified PW supports. The PE gets the VCCV 
+         parameter from the interface parameter sub-TLV portion of
+         the FEC TLV."
+         ::= { l2vpnPWEntry 5 }
+
+    l2vpnInstanceRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "used to create, modify and delete the line. When the object 
+         is active, any objects that can be read and written in the 
+         line can not be changed. The objects can be changed only when
+         they are not in service or not ready. "
+         ::= { l2vpnPWEntry 6 }
+
+    l2vpnInstanceStorageType OBJECT-TYPE
+        SYNTAX      StorageType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "Storage type of the object. "
+         ::= { l2vpnPWEntry 7 }
+
+    --- L2VPN AC Access table 
+
+    l2vpnAcAccessTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF l2vpnAcAccessEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table saves the interface information related to L2VPN 
+         service,  including the interface added to VPLS field and VPWS
+         service binding interface. "
+        ::= { l2vpnConf 3 }
+
+    l2vpnAcAccessEntry  OBJECT-TYPE
+        SYNTAX      l2vpnAcAccessEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Each line in the table represent an interface associated with
+         L2VPN service. A new line is created in the table when the 
+         L2VPN service is created by non SNMP mode and associated with 
+         local or virtual interface. "
+        INDEX  { l2vpnInstanceIndex, l2vpnAcAccessIndex }
+        ::= { l2vpnAcAccessTable 1 }
+
+    l2vpnAcAccessEntry ::=
+        SEQUENCE {
+            l2vpnAcAccessIndex			    	InterfaceIndexOrZero,
+            l2vpnAcAccessString			        DisplayString,
+            l2vpnAcAccessType  		            ifType,
+            l2vpnAcAccessRowStatus		        RowStatus,
+            l2vpnAcAccessStorageType			StorageType
+            }
+
+    l2vpnAcAccessIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "This is a unique index for an entry in the
+         l2vpnAcAccessTable. A non-zero index for an entry 
+         indicates the ifIndex that associated with the L2VPN 
+         Instance."
+        REFERENCE
+        "RFC2863"
+        ::= { l2vpnAcAccessEntry 1 }
+
+    l2vpnAcAccessString  OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "This object is an interface's name in the ifTable that
+         corresponds to the l2vpnAcAccessIndex. "
+        REFERENCE
+        "RFC2863"         
+        ::= { l2vpnAcAccessEntry 2 }
+
+    l2vpnAcAccessType  OBJECT-TYPE
+        SYNTAX      ifType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Interface type of local or virtual interface associated 
+         with L2VPN Instance in ifTable. "
+        REFERENCE
+        "RFC2863"         
+         ::= { l2vpnAcAccessEntry 3 }
+         
+    l2vpnAcAccessRowStatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Used to create, modify and delete the line. When the object
+         is active, any objects that can be read and written in the 
+         line can not be changed. The objects can be changed only when
+         they are not in service or not ready. "
+         ::= { l2vpnAcAccessEntry 4 }
+
+    l2vpnAcAccessStorageType  OBJECT-TYPE
+        SYNTAX      StorageType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Storage type of the object. "
+         ::= { l2vpnAcAccessEntry 5}
+
+    --L2VPN bridge table
+
+    l2vpnBridgeTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF l2vpnBridgeEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+      "This table contains the bridge attributes that is
+       spcific only for VPLS."
+    ::= { l2vpnConf 5 }
+  
+    l2vpnBridgeEntry OBJECT-TYPE
+      SYNTAX        l2vpnBridgeEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "An entry in this table is created by a PE for 
+           ervery L2VPN Instance capable of supporting
+           l2vpnInstanceVpnType vpls(1)."
+      INDEX { l2vpnInstanceIndex }
+      ::= { l2vpnBridgeTable 1 }
+
+    l2vpnBridgeEntry ::=
+        SEQUENCE {  
+            l2vpnBridgeMaxMembers	        Unsigned32,
+            l2vpnBridgeLearnEnable          TruthValue,
+            l2vpnBridgeLearnMode            INTEGER,
+            l2vpnBridgeMacAgeEnable         TruthValue,
+            l2vpnBridgeAgeTime              INTEGER,
+            l2vpnBridgeDiscardUnknown       TruthValue,
+            l2vpnBridgeMacMax               INTEGER,
+            l2vpnBridgeMacCurrent           INTEGER,
+            l2vpnBridgeMacLocal             INTEGER,
+            l2vpnBridgeMacRemote            INTEGER,
+            l2vpnBridgeStorageType    		StorageType
+            }
+
+    l2vpnBridgeMaxMembers  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "The maximum number of VPLS members including local members
+            AC and remote members PW associated to the L2VPN Instance."
+        ::= { l2vpnBridgeEntry 1 }
+
+    l2vpnBridgeLearnEnable OBJECT-TYPE  
+        SYNTAX        TruthValue  
+        MAX-ACCESS    read-create  
+        STATUS        current  
+        DESCRIPTION  
+          "The true(1) value of this object indicates enable MAC address
+           learning across a VPLS service, otherwise it indicates
+           disable."  
+        DEFVAL { true }  
+        ::= { l2vpnBridgeEntry 2 }
+        
+    l2vpnBridgeLearnMode  OBJECT-TYPE
+        SYNTAX  Unsigned32{
+                    mac-only       (1),   
+                    mac-vlan       (2),  
+                    other          (3),  
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "We define two modes of learning: qualified and unqualified
+            learning. In unqualified learning, all the VLANs of a 
+            single customer are handled by a single VPLS, which means 
+            they all share a single broadcast domain and a single MAC 
+            address space. In qualified learning, each customer VLAN 
+            is assigned to its own VPLS instance, which means each 
+            customer VLAN has its own broadcast domain and MAC address
+            space."
+        REFERENCE  
+             "Martini, et al, 'Pseudowire Setup and Maintenance using  
+              the Label Distribution Protocol." 
+        DEFVAL { mac-only }      
+        ::= { l2vpnBridgeEntry 3 }
+
+    l2vpnBridgeMacAgeEnable OBJECT-TYPE  
+        SYNTAX        TruthValue  
+        MAX-ACCESS    read-create  
+        STATUS        current  
+        DESCRIPTION  
+          "The true(1) value of this object indicates enable MAC 
+           address aging across a VPLS service, otherwise it 
+           indicates disable."  
+        DEFVAL { true }  
+        ::= { l2vpnBridgeEntry 4 }  
+
+    l2vpnBridgeAgeTime  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "The age time refer to maximum time that a MAC address can
+            be reserved in the forwarding table. The aging timer for 
+            MAC address M will be reset when a packet with source 
+            MAC address M is received"
+        REFERENCE  
+             "Martini, et al, 'Pseudowire Setup and Maintenance using  
+              the Label Distribution Protocol."              
+        ::= { l2vpnBridgeEntry 5 }
+
+    l2vpnBridgeDiscardUnknown OBJECT-TYPE  
+        SYNTAX        TruthValue  
+        MAX-ACCESS    read-create  
+        STATUS        current  
+        DESCRIPTION  
+          "The true(1) value of this object indicates enable discarding
+           of packets with unknown destination MAC addresses, 
+           otherwise it indicates disable."  
+        DEFVAL { false }  
+        ::= { l2vpnBridgeEntry 6 }  
+
+    l2vpnBridgeMaxMac  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "The maximum number of MAC addresses that a VPLS service
+            can learn."
+        ::= { l2vpnBridgeEntry 7 }
+
+    l2vpnBridgeMacCurrent  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The current number of MAC addresses that a VPLS service
+            has learned."
+        ::= { l2vpnBridgeEntry 8 }
+
+    l2vpnBridgeMacLocal  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The current number of MAC addresses that a VPLS service
+            has learned from local AC memebers."
+        ::= { l2vpnBridgeEntry 9 }
+        
+    l2vpnBridgeMacRemote  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The current number of MAC addresses that a VPLS service
+            has learned from remote PW memebers."
+        ::= { l2vpnBridgeEntry 10 }
+
+    l2vpnBridgeStorageType  OBJECT-TYPE
+        SYNTAX      StorageType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Storage type of the object. "
+        ::= { l2vpnBridgeEntry 11 }
+
+    --L2VPN traffic statistics current table 
+    
+    l2vpnStatisCurrentTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF l2vpnStatisCurrentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "L2VPN traffic statistics means accumulative statistics of 
+         traffic on an L2VPN at one side of PSN for the current 
+         interval. The statistics values are used for billing, load 
+         balancing and network performance analysis. The table is 
+         indexed by l2vpnInstanceIndex. If the l2vpnType is vpws(1), 
+         the l2vpn traffic statistics is equal to the PW traffic 
+         statistics for the current interval. If the l2vpnType is 
+         vpls(2) and ipls(3), the l2vpn traffic statistic is the 
+         sum of all PWs traffic statistics of the L2VPN for the 
+         current interval. "
+        ::= { l2vpnConf 7 }
+
+    l2vpnStatisCurrentEntry   OBJECT-TYPE
+        SYNTAX      l2vpnStatisCurrentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "For each L2VPN instance, the table item will be created. "
+        INDEX  { l2vpnInstanceIndex }
+        ::= { l2vpnStatisCurrentTable  1 }
+
+    l2vpnStatisCurrentEntry ::=
+        SEQUENCE {
+           l2vpnStatisCurrentRecvHCPkts	        HCPerfCurrentCount,
+           l2vpnStatisCurrentRecvHCBytes	    HCPerfCurrentCount,
+           l2vpnStatisCurrentSndHCPkts	        HCPerfCurrentCount,
+           l2vpnStatisCurrentSndHCBytes	        HCPerfCurrentCount,
+           l2vpnStatisCurrentRecvPkts	        PerfCurrentCount,
+           l2vpnStatisCurrentRecvBytes	        PerfCurrentCount,
+           l2vpnStatisCurrentSndPkts	        PerfCurrentCount,
+           l2vpnStatisCurrentSndBytes	        PerfCurrentCount            
+                 }
+
+    l2vpnStatisCurrentRecvHCPkts  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets received 
+         at PSN side from an L2VPN in the current 15-mimute interval.
+         This is the 64 bit version of l2vpnStatisCurrentRecvPkts, if 
+         l2vpnStatisCurrentRecvHCPkts is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisCurrentEntry 1}
+
+    l2vpnStatisCurrentRecvHCBytes  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes received at PSN
+         side from an L2VPN in the current 15-mimute interval.
+         This is the 64 bit version of l2vpnStatisCurrentRecvBytes, if 
+         l2vpnStatisCurrentRecvHCBytes is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisCurrentEntry 2}
+
+    l2vpnCurrentStatisSndHCPkts  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets sent 
+         by an L2VPN to PSN in the current 15-mimute interval.
+         This is the 64 bit version of l2vpnCurrentStatisSndPkts, if 
+         l2vpnStatisCurrentSndHCPkts is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisCurrentEntry 3}
+
+    l2vpnCurrentStatisSndHCBytes  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes sent by an 
+         L2VPN to PSN in the current 15-mimute interval. This is 
+         the 64 bit version of l2vpnStatisCurrentSndBytes, if 
+         l2vpnStatisCurrentSndHCBytes is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisCurrentEntry 4}
+
+    l2vpnStatisCurrentRecvPkts  OBJECT-TYPE
+        SYNTAX      PerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets received 
+         at PSN side from an L2VPN in the current 15-mimute interval.
+         This is the 32 bit version of l2vpnStatisCurrentRecvHCPkts, if 
+         l2vpnStatisCurrentRecvPkts is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisCurrentEntry 5}
+
+    l2vpnStatisCurrentRecvBytes  OBJECT-TYPE
+        SYNTAX      PerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes received at PSN
+         side from an L2VPN in the current 15-mimute interval.
+         This is the 32 bit version of l2vpnStatisCurrentRecvHCBytes, 
+         if l2vpnStatisCurrentRecvBytes is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisCurrentEntry 6}
+
+    l2vpnStatisCurrentSndPkts  OBJECT-TYPE
+        SYNTAX      PerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets sent 
+         by an L2VPN to PSN in the current 15-mimute interval.
+         This is the 32 bit version of l2vpnStatisCurrentSndPkts, if 
+         l2vpnStatisCurrentSndPkts is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisCurrentEntry 7}
+
+    l2vpnStatisCurrentSndBytes  OBJECT-TYPE
+        SYNTAX      PerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes sent by an 
+         L2VPN to PSN in the current 15-mimute interval. This is 
+         the 32 bit version of l2vpnStatisCurrentSndHCBytes, if 
+         l2vpnStatisCurrentSndBytes is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisCurrentEntry 8}
+
+    --L2VPN Statistic Interval Table
+    
+    l2vpnStatisIntervalTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF l2vpnStatisIntervalEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "L2VPN traffic statistics means accumulative statistics of 
+         traffic on an L2VPN at one side of PSN for the current 
+         interval. The statistics values are used for billing, load 
+         balancing and network performance analysis. The table is 
+         indexed by l2vpnInstanceIndex. If the l2vpnType is vpws(1), 
+         the l2vpn traffic statistics is equal to the PW traffic 
+         statistics for the current interval. If the l2vpnType is 
+         vpls(2) and ipls(3), the l2vpn traffic statistic is the 
+         sum of all PWs traffic statistics of the L2VPN for the 
+         current interval. "
+        ::= { l2vpnConf 8 }
+
+    l2vpnStatisIntervalEntry   OBJECT-TYPE
+        SYNTAX      l2vpnStatisIntervalEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "For each L2VPN instance, the table item will be created. "
+        INDEX  { l2vpnInstanceIndex, l2vpnStatisIntervalNum }
+        ::= { l2vpnStatisIntervalTable  1 }
+
+    l2vpnStatisIntervalEntry ::=
+        SEQUENCE {
+            l2vpnStatisIntervalNum              Integer32,
+            l2vpnStatisIntervalValid            TruthValue,
+            l2vpnStatisTimeElapsed              Integer32,
+            l2vpnStatisIntervalRecvHCPkts	    HCPerfCurrentCount,
+            l2vpnStatisIntervalRecvHCBytes	    HCPerfCurrentCount,
+            l2vpnStatisIntervalSndHCPkts	    HCPerfCurrentCount,
+            l2vpnStatisIntervalSndHCBytes	    HCPerfCurrentCount,
+            l2vpnStatisIntervalRecvPkts	        PerfCurrentCount,
+            l2vpnStatisIntervalRecvBytes	    PerfCurrentCount,
+            l2vpnStatisIntervalSndPkts	        PerfCurrentCount,
+            l2vpnStatisIntervalSndBytes	        PerfCurrentCount 
+                    }
+
+    l2vpnStatisIntervalNum OBJECT-TYPE  
+        SYNTAX  Integer32 (1..96)  
+        MAX-ACCESS  not-accessible  
+        STATUS  current  
+        DESCRIPTION  
+            "A number N, between 1 and 96, which identifies the  
+             interval for which the set of statistics is available.  
+             The interval identified by 1 is the most recently  
+             completed 15 minute interval, and the interval identified  
+             by N is the interval immediately preceding the one  
+             identified by N-1.  
+             The minimum range of N is 1 through 4. The default range  
+             is 1 to 32. The maximum range of N is 1 through 96. "  
+       REFERENCE  
+           "Tesink, K. 'Definitions of Managed Objects for the  
+            SONET/SDH Interface Type', RFC 2558"  
+       ::= { l2vpnStatisIntervalEntry 1 }  
+     
+    l2vpnStatisIntervalValid OBJECT-TYPE  
+       SYNTAX        TruthValue  
+       MAX-ACCESS    read-only  
+       STATUS        current  
+       DESCRIPTION  
+           "This variable indicates if the data for this interval  
+            is valid."  
+       ::= { l2vpnStatisIntervalEntry 2 }  
+
+    l2vpnStatisTimeElapsed OBJECT-TYPE  
+        SYNTAX      HCPerfTimeElapsed   
+        MAX-ACCESS  read-only  
+        STATUS      current  
+        DESCRIPTION  
+          "The duration of this interval in seconds."  
+        ::= { l2vpnStatisIntervalEntry 3 }  
+
+    l2vpnStatisIntervalRecvHCPkts  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets received 
+         at PSN side from an L2VPN in the current 15-mimute interval.
+         This is the 64 bit version of l2vpnStatisIntervalRecvPkts, if 
+         l2vpnStatisIntervalRecvHCPkts is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisIntervalEntry 4}
+
+    l2vpnStatisIntervalRecvHCBytes  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes received at PSN
+         side from an L2VPN in the current 15-mimute interval.
+         This is the 64 bit version of l2vpnStatisIntervalRecvBytes, if 
+         l2vpnStatisRecvIntervalHCBytes is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisIntervalEntry 5}
+
+    l2vpnStatisIntervalSndHCPkts  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets sent 
+         by an L2VPN to PSN in the current 15-mimute interval.
+         This is the 64 bit version of l2vpnStatisIntervalSndPkts, if 
+         l2vpnStatisIntervalSndHCPkts is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisIntervalEntry 6}
+
+    l2vpnStatisIntervalSndHCBytes  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes sent by an 
+         L2VPN to PSN in the current 15-mimute interval. This is 
+         the 64 bit version of l2vpnStatisIntervalSndBytes, if 
+         l2vpnStatisIntervalSndHCBytes is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisIntervalEntry 7}
+
+    l2vpnStatisIntervalRecvPkts  OBJECT-TYPE
+        SYNTAX      PerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets received 
+         at PSN side from an L2VPN in the current 15-mimute interval.
+         This is the 32 bit version of l2vpnStatisIntervalRecvHCPkts, 
+         if l2vpnStatisIntervalRecvPkts is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisIntervalEntry 8}
+
+    l2vpnStatisIntervalRecvBytes  OBJECT-TYPE
+        SYNTAX      PerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes received at PSN
+         side from an L2VPN in the current 15-mimute interval.
+         This is the 32 bit version of l2vpnStatisIntervalRecvHCBytes, 
+         if l2vpnStatisIntervalRecvBytes is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisIntervalEntry 9}
+
+    l2vpnStatisIntervalSndPkts  OBJECT-TYPE
+        SYNTAX      PerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets sent 
+         by an L2VPN to PSN in the current 15-mimute interval.
+         This is the 32 bit version of l2vpnStatisIntervalSndPkts, 
+         if l2vpnStatisIntervalSndPkts is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisIntervalEntry 10}
+
+    l2vpnStatisIntervalSndBytes  OBJECT-TYPE
+        SYNTAX      PerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes sent by an 
+         L2VPN to PSN in the current 15-mimute interval. This is 
+         the 32 bit version of l2vpnStatisIntervalSndHCBytes, if 
+         l2vpnStatisIntervalSndBytes is supported according to the 
+         rules spelled out in RFC2863."
+         ::= { l2vpnStatisIntervalEntry 11}
+
+    --L2VPN Traffic Statistics 1 Day Interval table 
+    
+    l2vpnStatis1DayIntervalTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF l2vpnStatis1DayIntervalEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "L2VPN traffic statistics means accumulative statistics of 
+         traffic on an L2VPN at one side of PSN for the current 
+         day measurment and the previous days. The statistics 
+         values are used for billing, load balancing and network 
+         performance analysis. The table is indexed by 
+         l2vpnInstanceIndex. If the l2vpnType is vpws(1), the 
+         l2vpn traffic statistics is equal to the PW traffic 
+         statistics for the current interval. If the l2vpnType is 
+         vpls(2) and ipls(3), the l2vpn traffic statistic is the 
+         sum of all PWs traffic statistics of the L2VPN for the 
+         current interval. "
+        ::= { l2vpnConf 9 }
+
+    l2vpnStatis1DayIntervalEntry   OBJECT-TYPE
+        SYNTAX      l2vpnStatis1DayIntervalEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "For each L2VPN instance, the table item will be created. "
+        INDEX  { l2vpnInstanceIndex, l2vpnStatis1DayIntervalNum }
+        ::= { l2vpnStatis1DayIntervalTable  1 }
+
+    l2vpnStatis1DayIntervalEntry ::=
+        SEQUENCE {
+                  l2vpnStatis1DayIntervalNum        Unsigned21,
+                  l2vpnStatis1DayIntervalValid      TruthValue,
+                  l2vpnStatis1DayIntervalMoniSecs   HCPerfTimeElapsed,
+                  l2vpnStatisRecvHCPkts	            Counter64,
+                  l2vpnStatisRecvHCBytes	        Counter64,
+                  l2vpnStatisSndHCPkts	            Counter64,
+                  l2vpnStatisSndHCBytes	            Counter64         
+                 }
+                    
+   l2vpnStatis1DayIntervalNum OBJECT-TYPE 
+      SYNTAX      Unsigned32(1..31) 
+      MAX-ACCESS  not-accessible 
+      STATUS      current 
+      DESCRIPTION 
+        "History Data Interval number. Interval 1 is the current day 
+         measuremnet period, Interval 2 is the most recent previous  
+         day; interval 30 is 31 days ago. Intervals 3..31 are  
+         optional." 
+      ::= { l2vpnStatis1DayIntervalEntry 1 } 
+    
+   l2vpnStatis1DayIntervalValid OBJECT-TYPE  
+      SYNTAX        TruthValue  
+      MAX-ACCESS    read-only  
+      STATUS        current  
+      DESCRIPTION  
+          "This variable indicates if the data for this interval  
+           is valid."  
+      ::= { l2vpnStatis1DayIntervalEntry 2 }  
+    
+   l2vpnStatis1DayIntervalMoniSecs OBJECT-TYPE 
+      SYNTAX       HCPerfTimeElapsed 
+      UNITS        "seconds" 
+      MAX-ACCESS   read-only 
+
+      STATUS       current 
+      DESCRIPTION 
+        "The amount of time in the 1-day interval over which the 
+         performance monitoring information is actually counted. 
+         This value will be the same as the interval duration except 
+         in a situation where performance monitoring data could not 
+         be collected for any reason or agaent clock adjustments." 
+      ::= { l2vpnStatis1DayIntervalEntry 3 } 
+
+    l2vpnStatisRecvHCPkts  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets received 
+         at PSN side from an L2VPN in 1 Day interval."
+         ::= { l2vpnStatis1DayIntervalEntry 4}
+
+    l2vpnStatisRecvHCBytes  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes received at PSN
+         side from an L2VPN in 1 Day interval."
+         ::= { l2vpnStatis1DayIntervalEntry 5}
+
+    l2vpnStatisSndHCPkts  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of data packets sent 
+         by an L2VPN to PSN in 1 Day interval."
+         ::= { l2vpnStatis1DayIntervalEntry 6}
+
+    l2vpnStatisSndHCBytes  OBJECT-TYPE
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "High capacity counter for number of bytes sent by an 
+         L2VPN to PSN in 1 Day interval."
+         ::= { l2vpnStatis1DayIntervalEntry 7}
+
+    -- L2VPN Notifications
+    l2vpnStatusChange    NOTIFICATION-TYPE
+        OBJECTS      { l2vpnInstanceIndex,
+                       l2vpnInstanceVCId,
+                       l2vpnInstanceType,
+                       l2vpnInstanceVpwsStatus,
+                       l2vpnInstanceVplsStatus,
+                       l2vpnInstanceIplsStatus,
+                       l2vpnInstanceAdminStatus             
+                     }
+        STATUS       current
+        DESCRIPTION
+        "This type of Notification will be sent when the operating
+         status or administrative status is changed for VPWS, VPLS
+         or IPLS."
+        ::= { l2vpnNotifications 1 }
+
+    l2vpnDelete   NOTIFICATION-TYPE
+        OBJECTS      { l2vpnInstanceIndex,
+                       l2vpnInstanceVCId,
+                       l2vpnInstanceType,
+                       pwPeerAddr
+                     }
+        STATUS       current
+        DESCRIPTION
+        "This type of Notification will be sent when the VPWS, VPLS
+         or IPLS service is deleted."
+        ::= { l2vpnNotifications 2 }
+
+    -- End of L2VPN Notifications.  
+  
+    -- conformance information  
+   
+    l2vpnGroups      OBJECT IDENTIFIER ::= { l2vpnConformance 1 }  
+    l2vpnCompliances OBJECT IDENTIFIER ::= { l2vpnConformance 2 }
+    
+    -- Compliance requirement for fully compliant implementations.  
+    
+    l2vpnModuleFullCompliance MODULE-COMPLIANCE  
+       STATUS  current  
+       DESCRIPTION  
+               "The compliance statement for agents that provide full  
+                support for L2VPN MIB Module. Such devices can then 
+                be monitored and also be configured using this MIB 
+                module."  
+     
+       MODULE  -- this module  
+       MANDATORY-GROUPS { l2vpnScalarGroup,
+                          l2vpnInstanceGroup,
+                          l2vpnPWGroup,  
+                          l2vpnAcAccessGroup,
+                          l2vpnNotificationGroup
+                         }
+     
+       GROUP        l2vpnBridgeGroup  
+       DESCRIPTION "This group MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "  
+     
+       OBJECT       l2vpnConfiguredVpws  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is vpws(1).
+                    "
+
+       OBJECT       l2vpnActiveVpws  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is vpws(1).
+                    "
+   
+       OBJECT       l2vpnConfiguredVpls  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "
+   
+       OBJECT       l2vpnActiveVpls  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "                  
+   
+       OBJECT       l2vpnConfiguredIpls  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is ipls(3).
+                    "
+   
+       OBJECT       l2vpnActiveIpls  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is ipls(3).
+                    "     
+   
+       OBJECT       l2vpnVplsConfMaxMac  
+       MIN-ACCESS   read-only
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "
+   
+       OBJECT       l2vpnInstanceVcId  
+       MIN-ACCESS   read-only
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(1) or ipls(3).
+                    "
+                    
+       OBJECT       l2vpnInstanceVpwsStatus  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is vpws(1).
+                    "
+   
+       OBJECT       l2vpnInstanceVplsStatus  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "
+   
+       OBJECT       l2vpnInstanceIplsStatus  
+       DESCRIPTION "This value MUST be supported if the 
+                    l2vpnInstanceType is ipls(3).
+                    "
+                       
+        ::= { l2vpnCompliances 1 }  
+     
+    -- Compliance requirement for Read Only compliant implementations.  
+     
+    l2vpnModuleReadOnlyCompliance MODULE-COMPLIANCE  
+        STATUS  current  
+        DESCRIPTION  
+                "The compliance statement for agents that provide read  
+                 only support for L2VPN MIB Module. Such devices can  
+                 then be monitored but cannot be configured using this  
+                 MIB module."  
+   
+       MODULE  -- this module  
+       MANDATORY-GROUPS { l2vpnScalarGroup,
+                          l2vpnInstanceGroup,
+                          l2vpnPWGroup,  
+                          l2vpnAcAccessGroup,
+                          l2vpnNotificationGroup
+                         }
+   
+       GROUP        l2vpnBridgeGroup  
+       DESCRIPTION "This group MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "  
+   
+       OBJECT       l2vpnConfiguredVpws  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is vpws(1).
+                    "
+   
+       OBJECT       l2vpnActiveVpws  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is vpws(1).
+                    "
+   
+       OBJECT       l2vpnConfiguredVpls  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "
+
+       OBJECT       l2vpnActiveVpls  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "                  
+   
+       OBJECT       l2vpnConfiguredIpls  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is ipls(3).
+                    "
+   
+       OBJECT       l2vpnActiveIpls  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is ipls(3).
+                    "     
+   
+       OBJECT       l2vpnVplsConfMaxMac  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "          
+   
+       OBJECT       l2vpnInstanceVcId  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(1) or ipls(3).
+                    "
+                    
+       OBJECT       l2vpnInstanceVpwsStatus  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is vpws(1).
+                    "
+                    
+       OBJECT       l2vpnInstanceVplsStatus  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is vpls(2).
+                    "
+
+       OBJECT       l2vpnInstanceIplsStatus  
+       MIN-ACCESS   read-only  
+       DESCRIPTION "Write access is not required.  
+                    This value MUST be supported if the 
+                    l2vpnInstanceType is ipls(3).
+                    "
+                                      
+        ::= { l2vpnCompliances 2 }  
+     
+    -- Units of conformance.  
+   
+    l2vpnScalarGroup OBJECT-GROUP   
+       OBJECTS {  
+                l2vpnConfiguredVpws,
+                l2vpnActiveVpws,
+                l2vpnConfiguredVpls,
+                l2vpnActiveVpls,
+                l2vpnConfiguredIpls,
+                l2vpnActiveIpls,
+                l2vpnNotificationEnable,
+                l2vpnVplsConfMaxMac
+              }  
+     
+       STATUS  current  
+       DESCRIPTION
+           "Collection of scalar objects required for L2VPN 
+            management."  
+       ::= { l2vpnGroups 1 }  
+     
+    l2vpnInstanceGroup OBJECT-GROUP
+       OBJECTS {  
+                l2vpnInstanceIndex,
+                l2vpnInstanceType,
+                l2vpnInstanceVcId,
+                l2vpnInstanceActivePws,
+                l2vpnInstanceAssociatedPws,
+                l2vpnInstanceActiveACs,
+                l2vpnInstanceAssociatedACs,
+                l2vpnInstanceCreateTime,
+                l2vpnInstanceLastChangeTime,
+                l2vpnInstanceVpwsStatus,
+                l2vpnInstanceVplsStatus,
+                l2vpnInstanceIplsStatus,
+                l2vpnInstanceRowStatuss,
+                l2vpnInstanceAdminStatus,
+                l2vpnInstanceStorageType
+              }  
+     
+       STATUS  current  
+       DESCRIPTION  
+           "Collection of objects needed for L2VPN Instance 
+            management."  
+       ::= { l2vpnGroups 2 }  
+     
+    l2vpnPWGroup OBJECT-GROUP   
+       OBJECTS {  
+                l2vpnPWIndex,                   
+                l2vpnInstanceRowStatus,		   
+                l2vpnInstanceStorageType	   
+              }  
+       STATUS  current  
+       DESCRIPTION  
+           "Collection of objects needed for L2VPN PW
+            management."  
+       ::= { l2vpnGroups 3 }       
+     
+    l2vpnAcAccessGroup OBJECT-GROUP   
+       OBJECTS {  
+                l2vpnAcAccessIndex,
+                l2vpnAcAccessRowStatus,
+                l2vpnAcAccessStorageType
+              }  
+     
+       STATUS  current  
+       DESCRIPTION  
+           "Collection of objects needed for L2VPN AC access
+            management."  
+       ::= { l2vpnGroups 4 }  
+     
+    l2vpnBridgeGroup OBJECT-GROUP   
+       OBJECTS {   
+                l2vpnBridgeMaxMembers,
+                l2vpnBridgeLearnEnable,
+                l2vpnBridgeLearnMode,
+                l2vpnBridgeMacAgeEnable,
+                l2vpnBridgeAgeTime,
+                l2vpnBridgeDiscardUnknown,
+                l2vpnBridgeMacMax,
+                l2vpnBridgeMacCurrent,
+                l2vpnBridgeMacLocal,
+                l2vpnBridgeMacRemote,
+                l2vpnBridgeStorageType
+              }  
+     
+       STATUS  current  
+       DESCRIPTION  
+           "Collection of objects needed for VPLS MAC learning
+            and forwarding parameters."  
+       ::= { l2vpnGroups 5 }  
+     
+    l2vpnNotificationGroup OBJECT-GROUP   
+       OBJECTS {  
+                l2vpnStatusChange,
+                l2vpnDelete  
+              }  
+     
+       STATUS  current  
+       DESCRIPTION  
+           "Collection of objects needed for L2VPN notifications."  
+       ::= { l2vpnGroups 6 }  
+     
+   END
+
+--    Copyright (C) The Internet Society (2006). 
+--    
+--    This document is subject to the rights, licenses and restrictions 
+--    contained in BCP 78, and except as set forth therein, the authors 
+--    retain all their rights. 
+-- 
+

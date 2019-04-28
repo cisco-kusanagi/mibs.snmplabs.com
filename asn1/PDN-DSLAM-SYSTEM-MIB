@@ -1,0 +1,702 @@
+PDN-DSLAM-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+-- Version :  1.0 APPROVED
+-- Enterprise pdn DSLAM mib
+-- Copyright (C) 2000 Paradyne Corporation.
+
+-- Created by : Prakash Easwar
+ 
+ IMPORTS
+ TAddress,
+ RowStatus,DisplayString
+ FROM SNMPv2-TC
+ IdslClockMode, SwitchState
+ FROM PDN-TC
+ Counter,IpAddress,TimeTicks
+ FROM RFC1155-SMI
+ OBJECT-TYPE
+ FROM RFC-1212
+ TRAP-TYPE
+ FROM RFC-1215
+ ifIndex, sysObjectID
+ FROM RFC1213-MIB
+ entPhysicalIndex
+ FROM ENTITY-MIB 
+ pdn-dslam
+ FROM PDN-HEADER-MIB
+ ;
+
+ -- The DSLAM MIB. This MIB is specific to portcards and
+ -- DSLAM configuration/stats for MCC and the portcards.
+ -- The objects defined in this mib are specific to some
+ -- products and donot apply to all paradyne devices
+
+sysDevDslamMIBObjects OBJECT IDENTIFIER ::= { pdn-dslam 1 }
+sysDevDslamMIBTraps   OBJECT IDENTIFIER ::= { pdn-dslam 2 }
+
+
+sysDevStats 				OBJECT IDENTIFIER ::= { sysDevDslamMIBObjects 1 }
+sysDevConfig				OBJECT IDENTIFIER ::= { sysDevDslamMIBObjects 2 }
+
+-- The statistics group. The implementation of this group
+-- is mandatory.
+ 
+ loginHistTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF LoginHistTableEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+     "This table shows the most recent 10 logins and all active users 
+	  currently accessing the device. It is indexed by userId
+	  and loginTime."
+ ::= { sysDevStats 1 }
+
+ loginHistTableEntry OBJECT-TYPE
+   SYNTAX  LoginHistTableEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+   		"This object corresponds to an entry in the login history table."
+   INDEX { loginUserId, loginTime }
+ ::= { loginHistTable 1 }
+
+ LoginHistTableEntry ::=
+   SEQUENCE {
+   loginUserId 		DisplayString,
+   loginTime 	TimeTicks,
+   loginAccessApp 	INTEGER,
+   loginAccessHost	IpAddress,
+   loginUserPriv	 	INTEGER,
+   loginStatus 	INTEGER
+   }
+ 
+ loginUserId OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object containes the user login id."
+ ::= { loginHistTableEntry 1 }
+ 
+ loginTime OBJECT-TYPE
+   SYNTAX TimeTicks 
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object containes the login time in seconds 
+	 when the login session is established."
+ ::= { loginHistTableEntry 2 }
+
+ loginAccessApp OBJECT-TYPE
+   SYNTAX INTEGER {
+	console (1),
+	telnet (2),
+	ftp (3)
+   }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object describes the access application used 
+	 by the end user to access the device. This can be 
+	 done through console, using telnet or using ftp."
+ ::= { loginHistTableEntry 3 }
+
+ loginAccessHost OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object containes the ip address of the network
+	 management station when the access application is
+	 telnet or ftp. In case of console, this object contains
+	 0.0.0.0."
+ ::= { loginHistTableEntry 4 }
+
+ loginUserPriv OBJECT-TYPE
+   SYNTAX INTEGER {
+	administrator (1),
+	operator (2)
+   }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object containes the access privileges of the user."
+ ::= { loginHistTableEntry 5 }
+
+ loginStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+	active (1),
+	inactive (2)
+   }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object indicates whether the user is still accessing the
+	 device."
+ ::= { loginHistTableEntry 6 }
+
+ loginFailureCountTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF LoginFailureCountTableEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+     "This table containes the statistics for login failures. It
+	  is indexed by access type i.e console, telnet or ftp."
+ ::= { sysDevStats 2 }
+
+ loginFailureCountTableEntry OBJECT-TYPE
+   SYNTAX  LoginFailureCountTableEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+   "This object corresponds to an entry in the login failure count table."
+   INDEX {loginFailureAccessApp}
+ ::= { loginFailureCountTable 1 }
+
+ LoginFailureCountTableEntry ::=
+   SEQUENCE {
+   loginFailureAccessApp INTEGER,
+   loginFailureCount Counter
+   }
+
+ loginFailureAccessApp OBJECT-TYPE
+   SYNTAX INTEGER {
+	console (1),
+	telnet (2),
+	ftp (3)
+   }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object describes the access application used 
+	 by the end user to access the device. This can be 
+	 done through console, using telnet or using ftp."
+ ::= { loginFailureCountTableEntry 1 }
+
+ loginFailureCount OBJECT-TYPE
+   SYNTAX Counter
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object containes the number of unsuccesful logins for console,
+	 ftp or telnet."
+ ::= { loginFailureCountTableEntry 2 }
+
+ -- The configuration group. The implementation of this group
+ -- is optional.
+
+ enablePowerSourceFailureAlarm OBJECT-TYPE
+   SYNTAX INTEGER {
+     disable (1),
+     enable (2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+     "This objects corresponds to enabling/disabling the 
+      power source failure alarm - for both A and B power sources
+      This object is for the MCC only.
+      The default value of this object should be 1."
+    ::= {sysDevConfig 1 }
+
+ devIfTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF DevIfTableEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+       "This table is used to configure information  for a
+    particular interface"
+    ::= {sysDevConfig 2 }
+
+devIfTableEntry OBJECT-TYPE
+    SYNTAX  DevIfTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "This object corresponds to an entry in the DevifTable "
+    INDEX { ifIndex }
+    ::= { devIfTable 1 }
+ 
+DevIfTableEntry ::=
+    SEQUENCE {
+      devPacketDiscardPolicy INTEGER,
+      devLinkIntegrity        INTEGER
+      }
+devPacketDiscardPolicy OBJECT-TYPE
+    SYNTAX INTEGER {
+	 noOp (1),
+     mrrp (2),
+     lrrp (3)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+     "This object corresponds to the policy for packet discards
+      during periods of congestion :
+      mrrp - most recently received packets are discarded.
+      lrrp - least recently received packets are discarded.
+      The default value of this object should be 2"
+    ::= { devIfTableEntry 1 }
+
+devLinkIntegrity OBJECT-TYPE
+     SYNTAX INTEGER {
+     enable (1),
+     disable (2),
+     none (3)
+       }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "This object corresponds to the enabling or disabling of
+          the ethernet link integrity :
+           enable - enable link integrity
+           disable - disable link integrity
+           none - for interfaces that do not support link integrity
+           The default value of this object should be 1"
+    ::= { devIfTableEntry 2 }
+
+communityTrapAddressInfoTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF CommunityTrapAddressInfoTableEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+        "This table is used to set the trap destination address
+         for a particular community."
+    ::= {sysDevConfig 3 }
+ 
+communityTrapAddressInfoTableEntry OBJECT-TYPE
+   SYNTAX  CommunityTrapAddressInfoTableEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+     "This object corresponds to an entry in the community
+      trap address info table."
+   INDEX { trapCommunityName, trapDestAndPort}
+ ::= { communityTrapAddressInfoTable 1 }
+ 
+CommunityTrapAddressInfoTableEntry ::=
+   SEQUENCE {
+     trapCommunityName DisplayString (SIZE(1..32)),
+     trapDestAndPort   TAddress,
+     trapsEnable       INTEGER,
+     trapRowStatus     RowStatus
+ }
+ 
+trapCommunityName OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE(1..32))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object corresponds to the name of the SNMP Community."
+   ::= { communityTrapAddressInfoTableEntry 1 }
+    
+trapDestAndPort OBJECT-TYPE
+   SYNTAX TAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "The IP Address and Port of the destination to which a trap
+      must be sent."
+   ::= { communityTrapAddressInfoTableEntry 2 }
+ 
+trapsEnable OBJECT-TYPE
+   SYNTAX INTEGER {
+     enable (1),
+     disable (2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+     "This object corresponds to turning traps on/off for a
+      particular destination.
+      enable (1) - traps will be sent to the specified destination.
+      disable (2)- traps will not be sent to the specified 
+      destination.
+      The default value of this object should be 2."
+ ::= { communityTrapAddressInfoTableEntry 3 }
+
+trapRowStatus OBJECT-TYPE
+   SYNTAX RowStatus 
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object is used to add or delete a
+       a row from the table."
+   ::= { communityTrapAddressInfoTableEntry 4 }
+
+entCommunityTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF EntCommunityTableEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+     "This table is used to set the various configuration
+      parameters for a particular community."
+    ::= { sysDevConfig 4 }
+
+entCommunityTableEntry OBJECT-TYPE
+   SYNTAX  EntCommunityTableEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+     "This object corresponds to an entry in the community
+      table."
+   INDEX { entCommunityName }
+   ::= { entCommunityTable 1 }
+
+EntCommunityTableEntry ::=
+   SEQUENCE {
+     entCommunityName
+       DisplayString (SIZE(1..32)),
+     entCommunityType
+       INTEGER,
+     entCommunityRowStatus
+	    RowStatus
+ }
+ 
+entCommunityName OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE(1..32))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object corresponds to the name of the SNMP Community"
+ ::= { entCommunityTableEntry 1 }
+
+entCommunityType OBJECT-TYPE
+   SYNTAX INTEGER {
+     readOnly (1),
+     readWrite (2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+     "The type of the community
+       readOnly - this community is only allowed to do get's
+       readWrite - this community is allowed to do get's and 
+                   set's
+      The default value of this object should be 1"
+ ::= { entCommunityTableEntry 2 }
+
+entCommunityRowStatus OBJECT-TYPE
+   SYNTAX RowStatus 
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "This object is used to add or delete a
+       a row from the table."
+   ::= { entCommunityTableEntry 3 }
+
+
+-- MCC-rq 200-210: A new user account group is added into the Hotwire System MIB
+ 
+sysDevUserAccountTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SysDevUserAccountEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "This table contains the user accounts."
+    ::= { sysDevConfig 5}
+ 
+sysDevUserAccountEntry OBJECT-TYPE
+    SYNTAX  SysDevUserAccountEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry containing user account information."
+    INDEX { sysDevUserAccountUserId }
+    ::= { sysDevUserAccountTable 1 }
+ 
+SysDevUserAccountEntry  ::= SEQUENCE {
+    sysDevUserAccountUserId   DisplayString (SIZE(6..15)),
+    sysDevUserAccountPrivilege INTEGER,
+    sysDevUserAccountUserPassword DisplayString (SIZE(6..15)),
+    sysDevUserAccountAccessPartition DisplayString (SIZE(0..50)),
+    sysDevUserAccountRowStatus RowStatus
+	}
+ 
+sysDevUserAccountUserId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(6..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object corresponds to the login ID of the
+         user account."
+    ::= { sysDevUserAccountEntry 1 }
+ 
+sysDevUserAccountPrivilege OBJECT-TYPE
+    SYNTAX  INTEGER {
+        operator (1),
+        administrator (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object corresponds to the access privilege
+         of the user account.  1 = Operator, 2 = Administrator."
+    ::= { sysDevUserAccountEntry 2 }
+
+sysDevUserAccountUserPassword OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(6..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object corresponds to the password of the
+         user account."
+    ::= { sysDevUserAccountEntry 3 }
+ 
+sysDevUserAccountAccessPartition  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..50))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+    "This object corresponds to the access partition of the
+     user account. The default value of this object is 'all'"
+    ::= { sysDevUserAccountEntry 4 }
+
+sysDevUserAccountRowStatus OBJECT-TYPE
+	SYNTAX  RowStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"This object corresponds to create or delete a row in
+	sysDevUserAccountTable."
+    ::= {sysDevUserAccountEntry 5 }
+
+-- the sysDevIDSLConfig group on the MCC
+
+sysDevIDSLConfigTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF SysDevIDSLConfigEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+    DESCRIPTION
+         "A table that contains configuration information about
+          IDSL Card."
+    ::= { sysDevConfig 6 }
+
+sysDevIDSLConfigEntry OBJECT-TYPE
+   SYNTAX  SysDevIDSLConfigEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+         "A list of information for IDSL device Configuration."
+   INDEX  { entPhysicalIndex }
+    ::= { sysDevIDSLConfigTable 1 }
+
+SysDevIDSLConfigEntry ::=
+    SEQUENCE {
+            sysDevIDSLConfigPrimaryNetClockMode  IdslClockMode,
+            sysDevIDSLConfigSecondaryNetClockMode  IdslClockMode
+             }
+
+sysDevIDSLConfigPrimaryNetClockMode  OBJECT-TYPE
+    SYNTAX IdslClockMode
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object indicates the network clock mode set
+    for the primary network clock. IDSL portcards with a
+    port configured as an NT will be set to
+    portCardDriveClockOnboard(4), both driving the backplane
+    and using the clock for the other Local Timing transceivers
+    on the card. Port cards with only LT ports configured will
+    receive a clock from the backplane using portCardSinkClock(2).
+    portCardDriveClock(3) will drive the backplane alone. The 
+    default value of this object is triState(1)."
+    DEFVAL { triState }
+::= { sysDevIDSLConfigEntry 1 }
+
+sysDevIDSLConfigSecondaryNetClockMode  OBJECT-TYPE
+    SYNTAX IdslClockMode
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object indicates the network clock mode set
+    for the secondary network clock. IDSL portcards with a
+    port configured as an NT will be set to
+    portCardDriveClockOnboard(4), both driving the backplane
+    and using the clock for the other Local Timing transceivers
+    on the card. Port cards with only LT ports configured will
+    receive a clock from the backplane using portCardSinkClock(2).
+    portCardDriveClock(3) will drive the backplane alone. The 
+    default value of this object is triState(1)."
+    DEFVAL { triState }
+::= { sysDevIDSLConfigEntry 2 }
+
+-- The syslog Group
+sysDevDslamSyslog OBJECT IDENTIFIER ::= { sysDevConfig 7 }
+
+sysDevSyslogFtpServerXferStatsEnable OBJECT-TYPE
+  SYNTAX SwitchState
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+    "This object allows the network manager to enable and disable 
+     syslog messages for FTP server file transfer statistics"
+  DEFVAL { disabled }
+::= { sysDevDslamSyslog 1 }
+
+sysDevSyslogTftpServerXferStatsEnable OBJECT-TYPE
+  SYNTAX SwitchState
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+    "This object allows the network manager to enable and disable 
+     syslog messages for TFTP server file transfer statistics"
+  DEFVAL { disabled }
+::= { sysDevDslamSyslog 2 }
+
+--Traps
+
+cCN TRAP-TYPE
+  ENTERPRISE sysDevDslamMIBTraps
+  VARIABLES { ifIndex }
+  DESCRIPTION
+    "This trap signifies a Configuration change  or 
+     software upgrade in the xDSL card. This trap 
+     is of 'warning' class"
+ ::= 7
+
+ authenticationFailure TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   VARIABLES { loginFailureAccessApp, loginFailureCount }
+   DESCRIPTION
+     "This trap signifies an authentication  failure. 
+      Authentication failures can be telnet based or 
+      terminal based. This trap is in addition to the
+      SNMP based authentication failure trap, which
+      is a generic trap."
+ ::= 8
+
+-- the following traps are sent by the MCC *******
+
+ fanModuleFailure TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   DESCRIPTION
+   "This trap indicates the indicates the failure of 
+    the fan module on the device. This trap is 
+    sent only by the MCC card. this trap is of 'minor'
+    class"
+ ::= 9
+
+ fanModuleOperational TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   DESCRIPTION
+   "This trap indicates the indicates the fan module on the 
+    device is operational. This trap is 
+    sent only by the MCC card. This trap is of 'minor'
+    class"
+ ::= 109
+
+ powerSourceAFailure TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   DESCRIPTION
+     "This trap indicates that power source A
+      has failed. This is sent only by the MCC card. This 
+      trap is of 'minor' class."
+ ::= 10
+
+ powerSourceAOperational TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   DESCRIPTION
+     "This trap indicates that the power source A
+      is operational. This is sent only by the MCC card. 
+      This trap is of 'minor' class. This trap compliments
+      powerSourceAFailure trap."
+ ::= 110
+
+slotPollFailure TRAP-TYPE
+  ENTERPRISE sysDevDslamMIBTraps
+  VARIABLES { entPhysicalIndex }
+  DESCRIPTION
+   "This trap indicates a slot poll failure.
+    This is sent only by the MCC card. this trap is
+    of 'major' class."
+ ::= 11
+
+ newCardDetected TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   VARIABLES { entPhysicalIndex }
+   DESCRIPTION
+   "This trap indicates that a new card was detected 
+    in a slot. This is sent only by the MCC card. this trap
+    is of 'warning' class."
+ ::= 111
+
+-- ****************************
+
+ ethernetJabber TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   VARIABLES { ifIndex }
+   DESCRIPTION
+     "This trap indicates that a jabber condition  has been 
+      detected on the ethernet interface. This trap is of 
+      'major' class."
+ ::= 12
+
+ ethernetJabberClear TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   VARIABLES { ifIndex }
+   DESCRIPTION
+     "This trap indicates that the jabber condition that was 
+      detected no longer exists. This trap is of 'major' 
+      class."
+ ::= 112
+
+ ethernetJumbos TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   VARIABLES { ifIndex }
+   DESCRIPTION
+     "This trap indicates ethernet jumbos. this trap
+      is of 'minor' class"
+ ::= 13
+
+ ethernetRunts TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   VARIABLES { ifIndex }
+   DESCRIPTION
+     "This trap indicates ethernet runts. this trap is of 'minor'"
+ ::= 14
+
+ powerSourceBFailure TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   DESCRIPTION
+     "This trap indicates that power source B
+      has failed. This is sent only by the MCC card. This 
+      trap is of 'minor' class."
+ ::= 17
+
+ powerSourceBOperational TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   DESCRIPTION
+     "This trap indicates that the power source B
+      is operational. This is sent only by the MCC card. 
+      This trap is of 'minor' class. This trap compliments
+      powerSourceBFailure trap."
+ ::= 117
+
+ nonIpConservativeCardDetected TRAP-TYPE
+   ENTERPRISE sysDevDslamMIBTraps
+   VARIABLES { entPhysicalIndex }
+   DESCRIPTION
+     "This trap indicates that a non ip conservative DSL card
+      exist in the chassis at the slot 'slotNumber'.This is
+      sent only by the MCC card. This trap is of warning class."
+ ::= 18
+
+nonSupportedMCC TRAP-TYPE
+  ENTERPRISE sysDevDslamMIBTraps
+  VARIABLES { sysObjectID }
+  DESCRIPTION
+    "AN has detected MCC firmware release too low to support
+     this device"
+::= 20
+
+nonSupportedChassis TRAP-TYPE
+  ENTERPRISE sysDevDslamMIBTraps
+  VARIABLES { sysObjectID }
+  DESCRIPTION
+    "AN in slot xx has been installed in a chassis that cannot
+     support one or more of its features. "
+::= 21
+
+END
+

@@ -1,0 +1,227 @@
+-- extracted from draft-shield-eos-extended-error-00.txt
+-- at Fri May 14 06:20:58 2004
+
+   EXTENDED-ERRORS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+          MODULE-IDENTITY,
+          OBJECT-TYPE,
+          enterprises             FROM SNMPv2-SMI
+          ExtendedCapabilities    FROM EXTENDED-CAPABILITIES-TC
+          MODULE-COMPLIANCE,
+          TEXTUAL-CONVENTION      FROM SNMPv2-TC
+          OBJECT-GROUP            FROM SNMPv2-CONF;
+
+   extendedErrorsMib MODULE-IDENTITY
+          LAST-UPDATED "200209060000Z"
+          ORGANIZATION "University of Liverpool"
+          CONTACT-INFO
+              "Postal:    Dave Shield
+                          Computer Science
+                          University of Liverpool
+                          Peach Street
+                          Liverpool
+                          L69 7ZF
+                          United Kingdom
+
+              E-Mail: D.T.Shield@csc.liv.ac.uk"
+          DESCRIPTION
+              "This MIB module defines a framework for reporting
+               additional information regarding problems fulfilling
+               an SNMP request."
+          ::= { enterprises liv(1579) compsci(42) dts(1) eErr(4) 1 }
+
+
+   eErrObjects     OBJECT IDENTIFIER ::= { extendedErrorsMib 1 }
+   eErrConformance OBJECT IDENTIFIER ::= { extendedErrorsMib 2 }
+
+   --
+   --  MIB objects to advertise support for extended capabilities
+   --
+
+   eErrDescr OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A description of the problem causing the SNMP request
+             to fail.  At a minimum, this should apply to the error
+             and varbind indicated by the main error status/error index
+             pair (though this may apply more widely as well)."
+        ::= { eErrObjects 1 }
+
+   --
+   --  MIB objects to report additional errors in the same request
+   --
+
+   eErrAddnlTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EErrAddnlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of alternative sets of extended capabilities,
+             supported by particular MIB subtrees of the agent."
+        ::= { eErrObjects 2 }
+
+   eErrAddnlEntry OBJECT-TYPE
+        SYNTAX      EErrAddnlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION ""
+        INDEX       { eErrAddnlIndex }
+        ::= { eErrTable 1 }
+
+   EErrAddnlEntry ::= SEQUENCE {
+        eErrAddnlIndex            Unsigned32,
+        eErrAddnlStatus           INTEGER,
+        eErrAddnlDescr            DisplayString
+        }
+
+   eErrAddnlIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index of the varbind affected by this problem."
+        ::= { eErrAddnlEntry 1 }
+
+   eErrAddnlStatus OBJECT-TYPE
+        SYNTAX      INTEGER(1..18)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The error-status value (as defined in RFC 1905) that
+            identifies the problem affecting the indicated varbind."
+        ::= { eErrAddnlEntry 2 }
+
+   eErrAddnlDescr OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "An (optional) description providing more information
+             about the error being reported by the corresponding
+             eErrAddnlStatus.  Note that the eErrAddnlDescr object
+             should only be used in conjunction with eErrAddnlStatus,
+             and should not appear in isolation."
+        ::= { eErrAddnlEntry 3 }
+
+   --
+   --  MIB objects to apply an error-status to a range of varbinds
+   --
+
+   eErrRangeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EErrRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A 'pseudo-table', used to indicate which varbinds
+             in a request should involve particular extended
+             capabilities.  This is not a conventional MIB table,
+             and will not appear in the output of walking the agent."
+        ::= { eErrObjects 3 }
+
+   eErrRangeEntry OBJECT-TYPE
+        SYNTAX      EErrRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION ""
+        INDEX       { eErrRangeIndex }
+        ::= { eErrRangeTable 1 }
+
+   EErrRangeEntry ::= SEQUENCE {
+        eErrRangeVBIndex          Unsigned32,
+        eErrRangeRangeStart       Unsigned32,
+        eErrRangeRangeEnd         Unsigned32
+        }
+
+   eErrRangeIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An arpitatrary index into the eErrRangeTable."
+        ::= { eErrRangeEntry 1 }
+
+   eErrRangeStart OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the varbind at the start of the range being
+             specified.  If this is missing for a particular row,
+             this should be taken as equivalent to '1' (i.e. the
+             first data varbind)."
+        ::= { eErrRangeEntry 2 }
+
+   eErrRangeEnd OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the varbind at the end of the range being
+             specified.  If this is missing for a particular row,
+             this should be taken as equivalent to the index of
+             the last data varbind."
+        ::= { eErrRangeEntry 3 }
+
+   --
+   --  MIB objects to advertise support for extended error reporting
+   --
+
+   eErrGroups OBJECT IDENTIFIER ::= { eErrConformance 1 }	
+
+   eErrGeneralGroup OBJECT-GROUP
+      OBJECTS { eErrDescr }
+      STATUS   current
+      DESCRIPTION
+          "Description of the basic error."
+      ::= { eErrGroups 1}
+
+   eErrAddnlGroup OBJECT-GROUP
+      OBJECTS { eErrAddnlStatus, eErrAddnlDescr }
+      STATUS   current
+      DESCRIPTION
+          "Reporting and description of additional errors."
+      ::= { eErrGroups 2}
+
+   eErrRangeGroup OBJECT-GROUP
+      OBJECTS { eErrRangeRangeStart, eErrRangeRangeEnd }
+      STATUS   current
+      DESCRIPTION
+          "Negotiation of extended capabilities to use."
+      ::= { eErrGroups 3}
+
+   END
+
+--  
+--    Copyright (C) The Internet Society (2002). All Rights Reserved. 
+--     
+--    This document and translations of it may be copied and furnished to 
+--    others, and derivative works that comment on or otherwise explain it   
+--    or assist in its implementation may be prepared, copied, published 
+--    and distributed, in whole or in part, without restriction of any 
+--    kind, provided that the above copyright notice and this paragraph 
+--    are included on all such copies and derivative works.  However, this 
+--    document itself may not be modified in any way, such as by removing 
+--    the copyright notice or references to the Internet Society or other 
+--    Internet organizations, except as needed for the purpose of 
+--    developing Internet standards in which case the procedures for 
+--    copyrights defined in the Internet Standards process must be 
+--    followed, or as required to translate it into languages other than 
+--    English. 
+--     
+--    The limited permissions granted above are perpetual and will not be 
+--    revoked by the Internet Society or its successors or assigns. 
+--     
+--    This document and the information contained herein is provided on an 
+--    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING 
+--    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING 
+--    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION 
+--    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF 
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. 
+--  
+-- 
+-- 
+-- This Internet Draft expires: March 2003
+

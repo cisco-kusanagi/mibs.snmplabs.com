@@ -1,0 +1,309 @@
+CBS-VAPGROUP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   NOTIFICATION-TYPE, Integer32             FROM SNMPv2-SMI
+ 
+   TEXTUAL-CONVENTION,
+   DisplayString, TruthValue                FROM SNMPv2-TC
+
+   ProductID, KBytes                        FROM HOST-RESOURCES-MIB
+
+   cbsMIBs, cbsMgmt, cbsTraps               FROM CROSSBEAM-SYSTEMS-MIB
+
+   cbsHwModuleID, ModuleState               FROM CBS-HARDWARE-MIB;
+
+
+cbsVapGroupsMIB MODULE-IDENTITY
+   LAST-UPDATED "200912080000Z"     -- 8 Dec 2009
+   ORGANIZATION "Crossbeam Systems, Inc."
+   CONTACT-INFO "Email:  mib-admin@crossbeamsys.com
+                 Postal: 80 Central Street
+                         Boxborough MA 01719"
+   DESCRIPTION  "XOS, Release 9.5: This MIB module defines the objects 
+                 related to VAPs and VAP groups."
+
+   REVISION     "200809020000Z"     -- 2 Sep 2005
+   DESCRIPTION  "Obsoleted cbsVgRemoteBoxBackup since vapGroupTable
+                 on the device changed."
+
+   REVISION     "200912080000Z"     -- 8 Dec 2009
+   DESCRIPTION  "Add cbsVgIpv6Forward." 
+
+::= { cbsMIBs 4 }
+
+
+cbsVapGroups       OBJECT IDENTIFIER ::= { cbsMgmt 4 }
+cbsVapGroupsTraps   OBJECT IDENTIFIER ::= { cbsTraps 3 }
+
+
+-- VAP group Table
+
+cbsVapGroupTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsVapGroupEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the VAP groups."
+   ::= { cbsVapGroups 1 }
+
+cbsVapGroupEntry OBJECT-TYPE
+   SYNTAX     CbsVapGroupEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the VAP group table."
+   INDEX { cbsVgVapGroupID }
+   ::= { cbsVapGroupTable 1 }
+
+CbsVapGroupEntry ::= SEQUENCE {
+   cbsVgVapGroupID             Integer32,
+   cbsVgVapGroupName           DisplayString,
+   cbsVgLoadPriority           Integer32,
+   cbsVgPreempPriority         Integer32,
+   cbsVgApmList                DisplayString,
+   cbsVgVapCount               Integer32,
+   cbsVgMaxLoadCount           Integer32,
+   cbsVgLBList                 DisplayString,
+   cbsVgBackUpMode             INTEGER,
+   cbsVgIpForward              TruthValue,
+   cbsVgRpFilter               TruthValue,
+   cbsVgLogMartians            TruthValue,
+   cbsVgReloadTimer            Integer32,
+   cbsVgRemoteBoxBackup        TruthValue,
+   cbsVgDelayFlow              Integer32,
+   cbsVgIpv6Forward            TruthValue
+}
+
+cbsVgVapGroupID OBJECT-TYPE
+   SYNTAX     Integer32 (0..2147483647)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The unique Group ID for the VAP group."
+   ::= { cbsVapGroupEntry 1 }
+
+cbsVgVapGroupName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The VAP group name"
+   ::= { cbsVapGroupEntry 2 }
+
+cbsVgLoadPriority OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Defines relative priority while loading VAPs to hardware modules."
+   ::= { cbsVapGroupEntry 3 }
+
+cbsVgPreempPriority OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "If this VAP group requires additional APMs to load its VAPs,
+       this priority is used to determine if APMs can be taken 
+       from another group. If the preemption priority for this group is 
+       higher than the load priority for a currently running VAP, 
+       that VAP is thrown out and this VAP is loaded 
+       instead. A zero value sets the lowest priority level."
+   ::= { cbsVapGroupEntry 4 }
+
+cbsVgApmList OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The APMs that are potentially assigned to support this
+       VAP group."
+   ::= { cbsVapGroupEntry 5 }
+
+cbsVgVapCount OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The number of VAPs to load in this group."
+   ::= { cbsVapGroupEntry 6 }
+
+cbsVgMaxLoadCount OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The maximum number of VAPs in this group."
+   ::= { cbsVapGroupEntry 7 }
+
+cbsVgLBList OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The list of VAPs to be load balanced." 
+   ::= { cbsVapGroupEntry 8 }
+
+cbsVgBackUpMode OBJECT-TYPE
+   SYNTAX     INTEGER
+                { none(0),
+                  pair(1),
+                  group(2) }
+
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies how to perform a backup in case an APM fails.
+       None - no backup
+       Pair - VAPs are paired to provide backup functionality
+       Group - all VAPs in the group back up each other."
+   ::= { cbsVapGroupEntry 9 }
+
+cbsVgIpForward OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies if IP forwarding is enabled or not."
+   ::= { cbsVapGroupEntry 10 }
+
+cbsVgRpFilter OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies if RP filter is enabled or not."
+   ::= { cbsVapGroupEntry 11 }
+
+cbsVgLogMartians OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies if log martians is enabled or not."
+   ::= { cbsVapGroupEntry 12 }
+
+cbsVgReloadTimer OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies the timeout for reloading this VAP group."
+   ::= { cbsVapGroupEntry 13 }
+
+cbsVgRemoteBoxBackup OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     obsolete
+   DESCRIPTION
+      "Specifies if failover of this VAP group to a remote system is enabled
+       or not."
+   ::= { cbsVapGroupEntry 14 }
+
+cbsVgDelayFlow OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies the delay time, in seconds, after the VAP has come up
+       before starting to load balance traffic to this VAP."
+   ::= { cbsVapGroupEntry 15 }
+
+cbsVgIpv6Forward OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies if IPv6 forwarding is enabled or not."
+   ::= { cbsVapGroupEntry 16 }
+
+-- Table of processor Memory utilization
+
+cbsVapMappingTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsVapMappingEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about how the individual VAPs
+       are mapped to hardware modules."
+   ::= { cbsVapGroups 2 }
+
+cbsVapMappingEntry OBJECT-TYPE
+   SYNTAX     CbsVapMappingEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the vap mapping table."
+   INDEX { cbsVmVapGroupID, cbsVmVapIndex }
+   ::= { cbsVapMappingTable 1 }
+
+CbsVapMappingEntry ::= SEQUENCE {
+   cbsVmVapGroupID             Integer32,
+   cbsVmVapGroupName           DisplayString,
+   cbsVmVapName                DisplayString,
+   cbsVmVapIndex               Integer32,
+   cbsVmVapStatus              ModuleState,
+   cbsVmSlotNumber             Integer32
+}
+
+cbsVmVapGroupID OBJECT-TYPE
+   SYNTAX     Integer32 (0..2147483647)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The VAP group ID."
+   ::= { cbsVapMappingEntry 1 }
+
+cbsVmVapGroupName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The VAP group name"
+   ::= { cbsVapMappingEntry 2 }
+
+cbsVmVapName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The VAP name, i.e. cbsVmVapGroupName-cbsVmVapIndex"
+   ::= { cbsVapMappingEntry 3 }
+
+cbsVmVapIndex OBJECT-TYPE
+   SYNTAX     Integer32 (1..10)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Unique index value of a specific VAP within the VAP group."
+   ::= { cbsVapMappingEntry 4 }
+
+cbsVmVapStatus OBJECT-TYPE
+   SYNTAX     ModuleState
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The current operational status of the VAP."
+   ::= { cbsVapMappingEntry 5 }
+
+cbsVmSlotNumber OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The hardware module ID (slot number) that this VAP is currently
+       mapped to."
+   ::= { cbsVapMappingEntry 6 }
+
+
+-- The traps
+
+cbsVapStatusChanged NOTIFICATION-TYPE
+   OBJECTS { cbsVmVapStatus, cbsVmVapName }
+   STATUS  current
+   DESCRIPTION
+     "The VAP status for the given VAP changed."
+   ::= { cbsVapGroupsTraps 1 }
+
+END

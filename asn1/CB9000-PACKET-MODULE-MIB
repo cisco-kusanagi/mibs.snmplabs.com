@@ -1,0 +1,332 @@
+--  CoreBuilder 9000 Packet Module Management Information Base
+--  Version 1.0.0
+--  September 25, 1997
+
+--  3Com Corporation
+--  118 Turnpike Road
+--  Southborough, MA 01772 
+--  (508) 460-8900
+
+-------------------
+--  Change History:
+--  25Sep97 tmcb	Originated.
+-------------------
+
+CB9000-PACKET-MODULE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	cb9000-module-mib                      FROM CB9000-MIB
+	enterprises                            FROM RFC1155-SMI
+	OBJECT-TYPE                            FROM RFC-1212;
+
+
+--
+-- Object identifiers.
+--
+	
+a3Com				OBJECT IDENTIFIER ::= { enterprises 43 }
+
+
+-- CoreBuilder9000 Product family MIBs.
+
+coreBuilder9000-mib		OBJECT IDENTIFIER ::= { a3Com 28 }
+
+
+--
+-- CoreBuilder 9000 Packet Module family MIB.
+--
+-- ( Common to all CB9000 Packet Module Types. )
+--
+
+cb9000PacketModule		OBJECT IDENTIFIER ::= { cb9000-module-mib 1 }
+
+cb9000PktModuleFamily		OBJECT IDENTIFIER ::= { cb9000PacketModule 1 }
+
+cb9000PktFabricCard		OBJECT IDENTIFIER ::= { cb9000PacketModule 2 }
+
+
+--
+-- CB9000 Packet Module MIB groups
+--
+
+cb9000BackplaneMgmt      OBJECT IDENTIFIER ::= { cb9000PktModuleFamily 1 }
+
+
+-- The CB9000 Packet Module MIB backplane management group.Implementation
+-- of this group is mandatory for agents which manage backplane resources.
+
+cb9000BackplaneInterfaceCount OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of backplane interfaces configured for this
+		system."
+::= { cb9000BackplaneMgmt 1 }
+
+
+-- The CB9000 backplane link connection table. This table describes
+-- the backplane interface to backplane link connections in the
+-- system.
+
+cb9000BackplaneConnectTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Cb9000BackplaneConnectEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A list of backplane link connection entries.
+		A single entry exists in this list for each configured
+		backplane link connection in the system."
+::= { cb9000BackplaneMgmt 2 }
+
+cb9000BackplaneConnectEntry OBJECT-TYPE
+	SYNTAX  Cb9000BackplaneConnectEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A backplane link connection entry contains information
+		about a particular backplane link connection in the
+		system."
+	INDEX   { cb9000BackplaneConnectIndex }
+::= { cb9000BackplaneConnectTable 1 }
+
+Cb9000BackplaneConnectEntry ::=
+	SEQUENCE {
+		cb9000BackplaneConnectIndex
+			INTEGER,
+		cb9000BackplaneConnectIfIndex
+			INTEGER,
+		cb9000BackplaneConnectSlotIndex
+			INTEGER,
+		cb9000BackplaneConnectTraceIndex
+			INTEGER
+	}
+
+cb9000BackplaneConnectIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The index of the backplane link connection
+		identified by this entry."
+::= { cb9000BackplaneConnectEntry 1 }
+
+cb9000BackplaneConnectIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The index value which uniquely identifies the
+                backplane interface to which this entry is applicable.
+		The interface identified by a particular value of this
+                index is the same interface as identified by the
+                same value of ifIndex."
+::= { cb9000BackplaneConnectEntry 2 }
+
+cb9000BackplaneConnectSlotIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The index value which uniquely identifies the
+                chassis slot to which the backplane interface in
+		this entry is remotely connected to over the locally
+		attached backplane link."
+::= { cb9000BackplaneConnectEntry 3 }
+
+cb9000BackplaneConnectTraceIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The index value which uniquely identifies the
+                backplane link to which the backplane interface in
+		this entry is connected to."
+::= { cb9000BackplaneConnectEntry 4 }
+
+
+
+--
+-- CB9000 Packet Fabric Card MIB groups
+--
+
+cb9000Layer1CardMgmt		OBJECT IDENTIFIER ::= { cb9000PktFabricCard 1 }
+
+
+-- The CB9000 Layer1 Packet Card Table.
+
+cb9000GenCardTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Cb9000GenCardEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A list of layer1 GEN card entries.  A single entry exists
+		in this list for each layer1 GEN card managed by this agent."
+::= { cb9000Layer1CardMgmt 1 }
+
+cb9000GenCardEntry OBJECT-TYPE
+	SYNTAX	Cb9000GenCardEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+			"An GEN card entry contains information about a
+			particular layer1 GEN card managed by this agent."
+	INDEX	{ cb9000GenCardIndex }
+::= { cb9000GenCardTable 1 }
+
+Cb9000GenCardEntry ::=
+	SEQUENCE {
+		cb9000GenCardIndex
+			INTEGER,
+		cb9000GenCardLocationIndex
+			INTEGER,
+		cb9000GenCardType
+			INTEGER,
+		cb9000GenCardPortCount
+			INTEGER
+}
+
+cb9000GenCardIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the layer1 GEN card identified by this entry,
+		relative to this agent."
+::= { cb9000GenCardEntry 1 }
+
+cb9000GenCardLocationIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The slot index where this layer1 GEN card is located."
+::= { cb9000GenCardEntry 2 }
+
+cb9000GenCardType OBJECT-TYPE
+	SYNTAX	INTEGER {
+				other(1),
+				layer1-2-sc-1000Fx(2),
+				layer1-4-sc-1000Fx(3)
+			}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Layer1 GEN card type. Type labels identify port count,
+		connector type, and transmission medium."
+::= { cb9000GenCardEntry 3 }
+
+cb9000GenCardPortCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of front panel ports on the layer1 GEN card
+		identified by this entry."
+::= { cb9000GenCardEntry 4 }
+
+
+
+-- The CB9000 Layer1 Packet Card Port Table.
+
+cb9000GenPortTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Cb9000GenPortEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A list of layer1 GEN card port entries.  A single entry exists
+		in this list for each layer1 GEN card port managed by this agent."
+::= { cb9000Layer1CardMgmt 2 }
+
+cb9000GenPortEntry OBJECT-TYPE
+	SYNTAX	Cb9000GenPortEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+			"An GEN card port entry contains information about a
+			particular layer1 GEN card port managed by this agent."
+	INDEX	{ cb9000GenPortCardIndex, cb9000GenPortIndex }
+::= { cb9000GenPortTable 1 }
+
+Cb9000GenPortEntry ::=
+	SEQUENCE {
+		cb9000GenPortCardIndex
+			INTEGER,
+		cb9000GenPortIndex
+			INTEGER,
+		cb9000GenPortType
+			INTEGER,
+		cb9000GenPortIfDescr
+			DisplayString,
+		cb9000GenPortAdminState
+			INTEGER,
+		cb9000GenPortOperStatus
+			INTEGER
+}
+
+cb9000GenPortCardIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the layer1 GEN card identified by this entry,
+		relative to this agent. The card identified by a particular
+		value of this index is the same card as identified by the
+		same value of cb9000GenCardIndex."
+::= { cb9000GenPortEntry 1 }
+
+cb9000GenPortIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The port index of this layer1 GEN card port. all index values
+		are unique for a single layer1 GEN card."
+::= { cb9000GenPortEntry 2 }
+
+cb9000GenPortType OBJECT-TYPE
+	SYNTAX	INTEGER {
+				other(1),
+				sc-1000Fx(2),
+				rj45-1000Tx(3)
+			}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Specific port type description for this Layer1 GEN card port."
+::= { cb9000GenPortEntry 3 }
+
+cb9000GenPortIfDescr OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"An ASCII text string describing this layer1 GEN card port."
+::= { cb9000GenPortEntry 4 }
+
+cb9000GenPortAdminState OBJECT-TYPE
+	SYNTAX	INTEGER {
+				enable(1),
+				disable(2)
+			}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The configured state of the layer1 GEN card port."
+::= { cb9000GenPortEntry 5 }
+
+cb9000GenPortOperStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+				up(1),
+				down(2),
+				testing(3)
+			}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The current operational state of the layer1 GEN card port.
+		The testing(3) state indicates that no operational packets can
+		be passed."
+::= { cb9000GenPortEntry 6 }
+
+END

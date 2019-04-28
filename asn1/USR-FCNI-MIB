@@ -1,0 +1,1128 @@
+USR-FCNI-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+	Counter32, IpAddress, OBJECT-TYPE, NOTIFICATION-TYPE,
+        MODULE-IDENTITY, OBJECT-IDENTITY, Integer32, Unsigned32
+			FROM SNMPv2-SMI
+	RowStatus, TruthValue, DisplayString, DateAndTime
+			FROM SNMPv2-TC
+	UsrConfigStatus, common, Time1900, UsrSpecialU32, UsrRegID
+			FROM USR-DEFINITIONS-MIB;
+    usrFCNI MODULE-IDENTITY
+         LAST-UPDATED "200208232000Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects
+                   for the wireless FACN Interface objects"
+--      REVISION "200208232000Z"
+--      DESCRIPTION "Clarify usage via TC of usrFCNISecurRecentViolationSPI,
+--         usrFCNISecurRecentViolationIDHigh, usrFCNISecurRecentViolationIDLow,
+--         usrFCNISecurSPI."
+--      REVISION "200206191515Z"
+--      DESCRIPTION "Added: usrFCNIStatsResetTime.
+--                   Obsoleted: usrFCNIResetStats."
+--      REVISION "200205171500Z"
+--      DESCRIPTION "Added structured trap comments"
+         ::= { common 85 }
+	usrFCNIRegConfig       OBJECT IDENTIFIER ::= { usrFCNI 1 }
+	usrFCNIRegReqRepStats  OBJECT IDENTIFIER ::= { usrFCNI 2 }
+	usrFCNIRegUpdAckStats  OBJECT IDENTIFIER ::= { usrFCNI 3 }
+	usrFCNIHeartbeatConfig OBJECT IDENTIFIER ::= { usrFCNI 4 }
+	usrFCNIHeartbeatStats  OBJECT IDENTIFIER ::= { usrFCNI 5 }
+	usrFCNISecurConfig     OBJECT IDENTIFIER ::= { usrFCNI 6 }
+	usrFCNISecurViolStats  OBJECT IDENTIFIER ::= { usrFCNI 7 }
+	usrFCNICfmConfig       OBJECT IDENTIFIER ::= { usrFCNI 8 }
+	usrFCNITraps           OBJECT IDENTIFIER ::= { usrFCNI 9 }
+-- FACN Interface Registration Configuration Group
+	usrFCNIRegReqTimer OBJECT-TYPE
+		SYNTAX Integer32 (1..300)
+		MAX-ACCESS read-write
+		STATUS deprecated
+		DESCRIPTION
+			"Number of seconds to wait before retransmitting
+			 Registration Request message for which Registration
+			 Reply has not arrived."
+		--CONFIGURABLE
+	::= { usrFCNIRegConfig 1 }
+	usrFCNIRegReqRetrans OBJECT-TYPE
+		SYNTAX Integer32 (0..10)
+		MAX-ACCESS read-write
+		STATUS deprecated
+		DESCRIPTION
+			"Number of times to retransmit Registration Request
+			 message for which Registration Reply has not
+			 arrived.  When this value is equal to zero and the
+			 Registration Reply does not arrive at a pre-
+			 configured interval, then Registration Request will
+			 not be retransmitted and the FACN interface will
+			 be considered as lost."
+		--CONFIGURABLE
+		::= { usrFCNIRegConfig 2 }
+	usrFCNIRegUpdTimer OBJECT-TYPE
+		SYNTAX Integer32 (1..300)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of seconds to wait before retransmitting
+			 Registration Update message for which Registration
+			 Acknowledge has not arrived.  This object is
+			 not currently implemented"
+		::= { usrFCNIRegConfig 3 }
+	usrFCNIRegUpdRetrans OBJECT-TYPE
+		SYNTAX Integer32 (0..10)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of times to retransmit Registration Update
+			 message for which Registration Acknowledge has not
+			 arrived.  When this value is equal to zero and the
+			 Registration Acknowledge does not arrive at a pre-
+			 configured interval, then Registration Update will
+			 not be retransmitted and the FACN interface will
+			 be considered as lost.  This object is not 
+			 currently implemented."
+		::= { usrFCNIRegConfig 4 }
+	usrFCNIResetStats OBJECT-TYPE
+		SYNTAX Integer32 (1..4)
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Resets FACN Interface Statistics to zero.
+                         1: Resets all the statistics.
+                         2: Resets Heartbeat statistics.
+                         3: Resets Registration Request Statistics. 
+                         4: Resets Registration Update Statistics. 
+			This object is replaced by usrFCNIStatsResetTime." 
+		::= { usrFCNIRegConfig 5 }
+	usrFCNIStatsResetTime OBJECT-TYPE
+                SYNTAX      DateAndTime
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+                       "Reading:
+			 Time the FACN Interface  statistics counters were 
+			 last reset. The FACN Interface statistics are valid 
+			 from usrFCNIStatsResetTime until present.
+			 Resetting counters causes a discontinuity in 
+			 the monotonically increasing value of counters.
+			 Management stations that sample these counters
+			 need also to sample this object so that they 
+			 can know that a discontinuity occurred with 
+			 respect to the previous sample.  
+	                Writing:
+                         Writing of DateAndTime causes update of usrFCNIStatsResetTime
+                         to the current time and the FCNI counters to be reset to 0:
+                         This object replaces usrFCNIResetStats."
+		::= { usrFCNIRegConfig 6 }
+-- FACN Interface Registration Request/Registration Reply Statistics Group
+	usrFCNIRegReqSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests sent by the
+			 PDSN to the FACN."
+	::= { usrFCNIRegReqRepStats 1 }
+	usrFCNIRegReqAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests accepted.
+			 The code information element inside the Registration
+			 Reply message is equal to 145 - cached data is
+			 available."
+	::= { usrFCNIRegReqRepStats 2 }
+	usrFCNIRegDenUnspecified OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to an unspecified reason.  The code information
+			 element inside the Registration Reply message is
+			 equal to 128."
+	::= { usrFCNIRegReqRepStats 3 }
+	usrFCNIRegDenAdmProhibited OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to an administrative decision.  The code information
+			 element inside the Registration Reply message is
+			 equal to 129."
+	::= { usrFCNIRegReqRepStats 4 }
+	usrFCNIRegDenAuthFail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to foreign agent's failed authentication.  The code
+			 information element inside the Registration Reply
+			 message is equal to 132."
+	::= { usrFCNIRegReqRepStats 5 }
+	usrFCNIRegDenIDMismatch OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to an identification mismatch.  The code information
+			 element inside the Registration Reply message is
+			 equal to 133."
+	::= { usrFCNIRegReqRepStats 6 }
+	usrFCNIRegDenPoorlyFormedReq OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to a poorly formed request.  The code information
+			 element inside the Registration Accept message is
+			 equal to 134."
+	::= { usrFCNIRegReqRepStats 7 }
+	usrFCNIRegDenNoData OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to cached data not being available.  The code
+			 information element inside the Registration Reply
+			 message is equal to 144."
+	::= { usrFCNIRegReqRepStats 8 }
+	usrFCNIRegReqRepAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ip Address of the 1st configured FACN."
+	::= { usrFCNIRegReqRepStats 9 } 
+	usrFCNIRegReqSentFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests sent by the
+			 PDSN to the 2nd FACN."
+	::= { usrFCNIRegReqRepStats 10 }
+	usrFCNIRegReqAcceptFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests accepted by the
+			 2nd FACN. The code information element inside the
+			 Registration Reply message is equal to 145 cached
+			 data is available."
+	::= { usrFCNIRegReqRepStats 11 }
+	usrFCNIRegDenUnspecifiedFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of FACN 2 Registration Requests denied
+			 due to an unspecified reason.  The code information
+			 element inside the Registration Reply message is
+			 equal to 128."
+	::= { usrFCNIRegReqRepStats 12 }
+	usrFCNIRegDenAdmProhibitedFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of FACN 2 Registration Requests denied due
+			 to an administrative decision.  The code information
+			 element inside the Registration Reply message is
+			 equal to 129."
+	::= { usrFCNIRegReqRepStats 13 }
+	usrFCNIRegDenAuthFailFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of FACN 2 Registration Requests denied due
+			 to foreign agent's failed authentication.  The code
+			 information element inside the Registration Reply
+			 message is equal to 132."
+	::= { usrFCNIRegReqRepStats 14 }
+	usrFCNIRegDenIDMismatchFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of FACN 2 Registration Requests denied due
+			 to an identification mismatch.  The code information
+			 element inside the Registration Reply message is
+			 equal to 133."
+	::= { usrFCNIRegReqRepStats 15 }
+	usrFCNIRegDenPoorlyFormedReqFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of FACN 2 Registration Requests denied 
+			 due to a poorly formed request.  The code information
+			 element inside the Registration Accept message is
+			 equal to 134."
+	::= { usrFCNIRegReqRepStats 16 }
+	usrFCNIRegDenNoDataFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of FACN 2 Registration Requests denied 
+			 due to cached data not being available.  The code
+			 information element inside the Registration Reply
+			 message is equal to 144."
+	::= { usrFCNIRegReqRepStats 17 }
+	usrFCNIRegReqRepAddrFACN2 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ip Address of the 2nd configured FACN."
+	::= { usrFCNIRegReqRepStats 18 } 
+-- FACN Interface Registration Update/Registration Acknowledge Statistics Group
+	usrFCNIRegUpdateSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Updates sent from this
+			 PDSN to a FACN."
+	::= { usrFCNIRegUpdAckStats 1 }
+	usrFCNIRegAcknowledgeRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the FACN with status code of zero."
+	::= { usrFCNIRegUpdAckStats 2 }
+	usrFCNIRegAckRcvdUnspecified OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received with status code of 128 (reason
+			 unspecified)."
+	::= { usrFCNIRegUpdAckStats 3 }
+	usrFCNIRegAckRcvdAdmProhibited OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received with status code of 129 (administratively
+			 prohibited)."
+	::= { usrFCNIRegUpdAckStats 4 }
+	usrFCNIRegAckRcvdFailedAuth OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received with status code of 132 (sending node -
+			 PDSN's foreign agent - failed authentication)."
+	::= { usrFCNIRegUpdAckStats 5 }
+	usrFCNIRegAckRcvdIDMismatch OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received with status code of 133 (identification
+			 mismatch)."
+	::= { usrFCNIRegUpdAckStats 6 }
+	usrFCNIRegAckRcvdPoorlyFormed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received with status code of 134 (poorly formed
+			 Registration Update)."
+	::= { usrFCNIRegUpdAckStats 7 }
+	usrFCNIRegUpdateRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Updates received from
+			 a FACN."
+	::= { usrFCNIRegUpdAckStats 8 }
+	usrFCNIRegAcknowledgeSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's FACN Interface with status code
+			 of zero."
+	::= { usrFCNIRegUpdAckStats 9 }
+	usrFCNIRegAckSentUnspecified OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's FACN Interface with status code
+			 of 128 (reason unspecified)."
+	::= { usrFCNIRegUpdAckStats 10 }
+	usrFCNIRegAckSentAdmProhibited OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's FACN Interface with status code
+			 of 129 (administratively prohibited)."
+	::= { usrFCNIRegUpdAckStats 11 }
+	usrFCNIRegAckSentFailedAuth OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's FACN Interface with status code
+			 of 132 (FACN failed authentication)."
+	::= { usrFCNIRegUpdAckStats 12 }
+	usrFCNIRegAckSentIDMismatch OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's FACN Interface with status code
+			 of 133 (identification mismatch)."
+	::= { usrFCNIRegUpdAckStats 13 }
+	usrFCNIRegAckSentPoorlyFormed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's FACN Interface with status code
+			 of 134 (poorly formed Registration Update)."
+	::= { usrFCNIRegUpdAckStats 14 }
+	usrFCNIRegUpdAckAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ip Address of the 1st configured FACN."
+	::= { usrFCNIRegUpdAckStats 15 } 
+	usrFCNIRegUpdateSentFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Updates sent from this
+			 PDSN to the 2nd FACN."
+	::= { usrFCNIRegUpdAckStats 16 }
+	usrFCNIRegAcknowledgeRcvdFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the 2nd FACN with status code of zero."
+	::= { usrFCNIRegUpdAckStats 17 }
+	usrFCNIRegAckRcvdUnspecifiedFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the 2nd FACN with status code of
+			 128(reason unspecified)."
+	::= { usrFCNIRegUpdAckStats 18 }
+	usrFCNIRegAckRcvdAdmProhibitedFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the 2nd FACN with status code of
+			 129 (administratively prohibited)."
+	::= { usrFCNIRegUpdAckStats 19 }
+	usrFCNIRegAckRcvdFailedAuthFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from 2nd FACN with status code of 132
+			 (sending node - PDSN's foreign agent failed
+			 authentication)."
+	::= { usrFCNIRegUpdAckStats 20 }
+	usrFCNIRegAckRcvdIDMismatchFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from 2nd FACN with status code of 133
+			 (identification mismatch)."
+	::= { usrFCNIRegUpdAckStats 21 }
+	usrFCNIRegAckRcvdPoorlyFormedFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from 2nd FACN with status code of 134
+			 (poorly formed Registration Update)."
+	::= { usrFCNIRegUpdAckStats 22 }
+	usrFCNIRegUpdateRcvdFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Updates received from
+			 2nd FACN."
+	::= { usrFCNIRegUpdAckStats 23 }
+	usrFCNIRegAcknowledgeSentFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's 2nd FACN Interface with status code
+			 of zero."
+	::= { usrFCNIRegUpdAckStats 24 }
+	usrFCNIRegAckSentUnspecifiedFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's 2nd FACN Interface with status
+			 code of 128 (reason unspecified)."
+	::= { usrFCNIRegUpdAckStats 25 }
+	usrFCNIRegAckSentAdmProhibitedFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's 2nd FACN Interface with status code
+			 of 129 (administratively prohibited)."
+	::= { usrFCNIRegUpdAckStats 26 }
+	usrFCNIRegAckSentFailedAuthFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's 2nd FACN Interface with status
+			 code of 132 (FACN failed authentication)."
+	::= { usrFCNIRegUpdAckStats 27 }
+	usrFCNIRegAckSentIDMismatchFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's 2nd FACN Interface with status
+			 code of 133 (identification mismatch)."
+	::= { usrFCNIRegUpdAckStats 28 }
+	usrFCNIRegAckSentPoorlyFormedFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 sent by PDSN's 2nd FACN Interface with status code
+			 of 134 (poorly formed Registration Update)."
+	::= { usrFCNIRegUpdAckStats 29 }
+	usrFCNIRegUpdAckAddrFACN2 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ip Address of the 2nd configured FACN."
+	::= { usrFCNIRegUpdAckStats 30 } 
+-- FACN Interface Heartbeat Configuration Group
+	usrFCNISupported OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Indicates whether this foreign agent is supporting
+			 FACN communications."
+		::= { usrFCNIHeartbeatConfig 1 }
+	usrFCNIHeartbeatInterval OBJECT-TYPE
+		SYNTAX Integer32 (1..300)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This value is used inside INIT Heartbeat message
+			 and Periodic Heartbeat message.  Also, it is used
+			 as a timer for re-transmitting these Heartbeat
+			 message."
+		--CONFIGURABLE
+		::= { usrFCNIHeartbeatConfig 2 }
+	usrFCNIHeartbeatRetrans OBJECT-TYPE
+		SYNTAX Integer32 (1..300)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"If either INIT Heartbeat or Periodic Heartbeat have
+			 been retransmitted the number of times as indicated
+			 by this object's value, then the FACN Interface will
+			 be marked as lost.  However, the Heartbeat message
+			 will continue to be sent out by the PDSN."
+		--CONFIGURABLE
+		::= { usrFCNIHeartbeatConfig 3 }
+-- FACN Interface Heartbeat Statistics Group
+	usrFCNIConnStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			notSupported(1),
+			active(2),
+			lost(3)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Connection status between PDSN and the FACN."
+	::= { usrFCNIHeartbeatStats 1 }
+	usrFCNIHeartbeatINITSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of INIT Heartbeat messages transmitted
+			 by this PDSN."
+	::= { usrFCNIHeartbeatStats 2 }
+	usrFCNIHeartbeatPeriodSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Periodic Heartbeat messages
+			 transmitted by this PDSN."
+	::= { usrFCNIHeartbeatStats 3 }
+	usrFCNIHeartbeatINITRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid INIT Heartbeat Acknowledgements
+			 received from a FACN."
+	::= { usrFCNIHeartbeatStats 4 }
+	usrFCNIHeartbeatINITBadRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of poorly formed INIT Heartbeat 
+			 Acknowledgements from a FACN."
+	::= { usrFCNIHeartbeatStats 5 }
+	usrFCNIHeartbeatPeriodRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid Periodic Heartbeat
+			 Acknowledgements received from a FACN."
+	::= { usrFCNIHeartbeatStats 6 }
+	usrFCNIHeartbeatPeriodBadRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of poorly formed Periodic Heartbeat
+			 Acknowledgements received from a FACN."
+	::= { usrFCNIHeartbeatStats 7 }
+	usrFCNIHeartbeatCRCChange OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Heartbeat Acknowledgements with
+			 CRCs that don't match PDSN's CRC calculation."
+	::= { usrFCNIHeartbeatStats 8 }
+	usrFCNIHeartbeatAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ip Address of the 1st configured FACN."
+	::= { usrFCNIHeartbeatStats 9 } 
+	usrFCNIConnStatusFACN2 OBJECT-TYPE
+		SYNTAX INTEGER {
+			notSupported(1),
+			active(2),
+			lost(3)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Connection status between PDSN and the 2nd FACN."
+	::= { usrFCNIHeartbeatStats 10 }
+	usrFCNIHeartbeatINITSentFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of INIT Heartbeat messages transmitted
+			 by this PDSN to the 2nd FACN."
+	::= { usrFCNIHeartbeatStats 11 }
+	usrFCNIHeartbeatPeriodSentFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Periodic Heartbeat messages
+			 transmitted by this PDSN to the 2nd FACN."
+	::= { usrFCNIHeartbeatStats 12 }
+	usrFCNIHeartbeatINITRcvdFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid INIT Heartbeat Acknowledgements
+			 received from 2nd FACN."
+	::= { usrFCNIHeartbeatStats 13 }
+	usrFCNIHeartbeatINITBadRcvdFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of poorly formed INIT Heartbeat 
+			 Acknowledgements from 2nd FACN."
+	::= { usrFCNIHeartbeatStats 14 }
+	usrFCNIHeartbeatPeriodRcvdFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid Periodic Heartbeat
+			 Acknowledgements received from the 2nd FACN."
+	::= { usrFCNIHeartbeatStats 15 }
+	usrFCNIHeartbeatPeriodBadRcvdFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of poorly formed Periodic Heartbeat
+			 Acknowledgements received from the 2nd FACN."
+	::= { usrFCNIHeartbeatStats 16 }
+	usrFCNIHeartbeatCRCChangeFACN2 OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Heartbeat Acknowledgements with
+			 CRCs that don't match PDSN's CRC calculation."
+	::= { usrFCNIHeartbeatStats 17 }
+	usrFCNIHeartbeatAddrFACN2 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ip Address of the 2nd configured FACN."
+	::= { usrFCNIHeartbeatStats 18 } 
+-- FACN Interface Security Configuration Group
+	usrFCNISecurConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrFCNISecurConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table for configuring mobility security
+			 associations between the Foreign Agent Control
+			 Node and the PDSN."
+		::= { usrFCNISecurConfig 1 }
+	usrFCNISecurConfigEntry OBJECT-TYPE
+		SYNTAX UsrFCNISecurConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the FACN Interface Security
+			 Configuration Table."
+		INDEX { usrFCNISecurSAIndex  }
+		::= { usrFCNISecurConfigTable 1 }
+	UsrFCNISecurConfigEntry ::= SEQUENCE {
+		usrFCNISecurSAIndex           Integer32,
+		usrFCNISecurFACNAddr          IpAddress,
+		usrFCNISecurSPI               UsrSpecialU32,
+		usrFCNISecurSharedSecretKey   OCTET STRING,
+		usrFCNISecurTimeDrift         Integer32,
+		usrFCNISecurStatus            RowStatus
+	}
+	usrFCNISecurSAIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of supported FACN mobility security 
+                         associations.
+                         Current implementation only supports 1 - or 2
+                         if the FACN Redundancy Feature is enabled."
+	::= { usrFCNISecurConfigEntry 1 }
+	usrFCNISecurFACNAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The IP Address of the FACN Node with which
+			 this FACN interface shares the mobility security
+			 association."
+		--CONFIGURABLE
+	::= { usrFCNISecurConfigEntry 2 }
+	usrFCNISecurSPI OBJECT-TYPE
+		SYNTAX UsrSpecialU32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The SPI is the 4-byte opaque index within the
+			 Mobility Security Association which selects the
+			 specific security parameters to be used to
+			 authenticate the FACN."
+		--CONFIGURABLE
+	::= { usrFCNISecurConfigEntry 3 }
+	usrFCNISecurSharedSecretKey OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(0..16))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The shared secret key for the security associations.
+			 Reading this object will always return zero length
+			 value."
+		--CONFIGURABLE
+	::= { usrFCNISecurConfigEntry 4 }
+	usrFCNISecurTimeDrift OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The value represents how close the timestamp,
+			 contained in the Identification information element
+			 of the Registration Request or the Registration
+			 Acknowledge message, should be to the PDSN's time
+			 of day clock.  This time tolerance is used in
+			 conjunction with timestamp replay protection
+			 against replay attacks."
+		--CONFIGURABLE
+	::= { usrFCNISecurConfigEntry 5 }
+	usrFCNISecurStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This object is used to add, modify, and delete
+			 rows for this table."
+		--CONFIGURABLE
+	::= { usrFCNISecurConfigEntry 6 }
+-- FACN Interface Security Violations Statistics Group
+	usrFCNISecurTotalViolations OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations encountered
+			 by this PDSN's FACN Interface."
+	::= { usrFCNISecurViolStats 1 }
+	usrFCNISecurMissingMSA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations due to missing
+			 or improper Mobility Security Association (MSA)
+			 between the FACN and the PDSN."
+	::= { usrFCNISecurViolStats 2 }
+	usrFCNISecurBadAuthenticator OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations due to bad
+			 Authenticator field.  This field is part of either
+			 Registration Reply, Registration Update,
+			 Registration Acknowledge, INIT Heartbeat, or
+			 Periodic Heartbeat messages."
+	::= { usrFCNISecurViolStats 3 }
+	usrFCNISecurBadIdentification OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations due to bad
+			 Identification information element.  This eight
+			 octet element is used by the FACN and the PDSN for
+			 matching the Registration Requests with Registration
+			 Replies and Registration Updates with Registration
+			 Acknowledge messages.  It also protects against the
+			 replay attacks (section 5.6, RFC 2002)."
+	::= { usrFCNISecurViolStats 4 }
+	usrFCNISecurBadSPI OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations due to bad
+			 SPI field.  This field is part of either
+			 Registration Reply, Registration Update,
+			 Registration Acknowledge, INIT Heartbeat, or
+			 Periodic Heartbeat messages."
+	::= { usrFCNISecurViolStats 5 }
+	usrFCNISecurMissingMHAuthExt OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations due to missing
+			 Mobile-Home Authentication Extension inside the
+			 Registration Request message."
+	::= { usrFCNISecurViolStats 6 }
+	usrFCNISecurMissingRUAuthExt OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations due to missing
+			 Registration Update Authentication Extension inside
+			 the Registration Acknowledge message."
+	::= { usrFCNISecurViolStats 7 }
+	usrFCNISecurViolationTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrFCNISecurViolationEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table containing information about each security
+			 violation."
+	::= { usrFCNISecurViolStats 8 }
+	usrFCNISecurViolationEntry OBJECT-TYPE
+		SYNTAX UsrFCNISecurViolationEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information about a particular security violation."
+		INDEX { usrFCNISecurViolatorTableIndex }
+	::= { usrFCNISecurViolationTable 1 }
+	UsrFCNISecurViolationEntry ::= SEQUENCE {
+		usrFCNISecurViolatorTableIndex     Integer32,
+		usrFCNISecurViolatorAddress        IpAddress,
+		usrFCNISecurViolationCounter       Counter32,
+		usrFCNISecurRecentViolationSPI     UsrSpecialU32,
+		usrFCNISecurRecentViolationTime    Time1900,
+		usrFCNISecurRecentViolationIDLow   UsrRegID,
+		usrFCNISecurRecentViolationIDHigh  UsrRegID,
+		usrFCNISecurRecentViolationReason  INTEGER
+	}
+	usrFCNISecurViolatorTableIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of entries that PDSN can store for a 
+                         particular security violation based on the 
+                         violator's IP address. Current implementation
+                         only supports 10 entries."
+	::= { usrFCNISecurViolationEntry 1 }
+	usrFCNISecurViolatorAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Violator's IP address.  This address may not
+			 be in the Mobility Security Association table."
+	::= { usrFCNISecurViolationEntry 2 }
+	usrFCNISecurViolationCounter OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations coming from the
+			 this violator's IP address."
+	::= { usrFCNISecurViolationEntry 3 }
+	usrFCNISecurRecentViolationSPI OBJECT-TYPE
+		SYNTAX UsrSpecialU32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SPI of the most recent security violation coming
+			 from this IP address."
+	::= { usrFCNISecurViolationEntry 4 }
+	usrFCNISecurRecentViolationTime OBJECT-TYPE
+		SYNTAX Time1900
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Time of the most recent security violation coming
+			 from this IP address.
+                         This is NTP time, it will give number of seconds
+                         since Jan 1, 1900"
+	::= { usrFCNISecurViolationEntry 5 }
+	usrFCNISecurRecentViolationIDLow OBJECT-TYPE
+		SYNTAX     UsrRegID
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Low-order 32 bits of identification used in
+			 Registration Reply, Registration Acknowledge,
+			 or Registration Update of the most recent security
+			 violation coming from this IP address."
+	::= { usrFCNISecurViolationEntry 6 }
+	usrFCNISecurRecentViolationIDHigh OBJECT-TYPE
+		SYNTAX     UsrRegID
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"High-order 32 bits of identification used in
+			 Registration Reply, Registration Acknowledge,
+			 or Registration Update of the most recent security
+			 violation coming from this IP address."
+	::= { usrFCNISecurViolationEntry 7 }
+	usrFCNISecurRecentViolationReason OBJECT-TYPE
+		SYNTAX INTEGER {
+			noMobilitySecurityAssociation(1),
+			badAuthenticator(2),
+			badIdentifier(3),
+			badSPI(4),
+			missingSecurityExtension(5),
+			other(6)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Reason for the most recent security violation coming
+			 from this IP address."
+	::= { usrFCNISecurViolationEntry 8 }
+-- FACN Interface CFM Configuration Group
+	usrFCNIConfigFileName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The name of the configuration file for FCNI.  If
+			 this value is empty, then the default file name
+			 is @file://FCNIProcess.cfg."
+	::= { usrFCNICfmConfig 1 }
+	usrFCNICfmStatus OBJECT-TYPE
+		SYNTAX UsrConfigStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The Configuration File Manager Flag for
+			 saving FCNI configurable parameters."
+	::= { usrFCNICfmConfig 2 }
+-- FACN Interface Events Group
+        usrFCNITrapsV2 OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                        "The events for the FACN interface"
+        ::= { usrFCNITraps 0 }
+	usrFCNIRegistrationReplyAuthFailure NOTIFICATION-TYPE
+		OBJECTS {    
+			usrFCNISecurViolatorAddress,
+			usrFCNISecurRecentViolationSPI,
+			usrFCNISecurRecentViolationIDLow,
+			usrFCNISecurRecentViolationIDHigh,
+			usrFCNISecurRecentViolationReason
+		}
+                STATUS current
+		DESCRIPTION
+			"This trap is generated when authentication fails
+			 on the Registration Reply message."
+        --#TYPE "FACN Interface Authentication Event"
+        --#SUMMARY  "Authentication failure from %d on Registration Reply, reason %d"
+        --#ARGUMENTS { 0 4 }
+        --#SEVERITY MAJOR
+        --#STATE    OPERATIONAL
+        --#PROBABLECAUSE "Configuration or Connection Error"
+        ::= { usrFCNITrapsV2 1 }
+	usrFCNIRegistrationUpdateAuthFailure NOTIFICATION-TYPE
+		OBJECTS {    
+			usrFCNISecurViolatorAddress,
+			usrFCNISecurRecentViolationSPI,
+			usrFCNISecurRecentViolationIDLow,
+			usrFCNISecurRecentViolationIDHigh,
+			usrFCNISecurRecentViolationReason
+		}
+                STATUS current
+		DESCRIPTION
+			"This trap is generated when authentication fails
+			 on the Registration Update message."
+        --#TYPE "FACN Interface Authentication Event"
+        --#SUMMARY  "Authentication failure from %d on Registration Update, reason %d"
+        --#ARGUMENTS { 0 4 }
+        --#SEVERITY MAJOR
+        --#STATE    OPERATIONAL
+        --#PROBABLECAUSE "Configuration or Connection Error"
+        ::= { usrFCNITrapsV2 2 }
+	usrFCNIRegistrationAckAuthFailure NOTIFICATION-TYPE
+		OBJECTS {    
+			usrFCNISecurViolatorAddress,
+			usrFCNISecurRecentViolationSPI,
+			usrFCNISecurRecentViolationIDLow,
+			usrFCNISecurRecentViolationIDHigh,
+			usrFCNISecurRecentViolationReason
+		}
+                STATUS current
+		DESCRIPTION
+			"This trap is generated when authentication fails
+			 on the Registration Acknowledge message."
+        --#TYPE "FACN Interface Authentication Event"
+        --#SUMMARY  "Authentication failure from %d on Registration Acknowledge, reason %d"
+        --#ARGUMENTS { 0 4 }
+        --#SEVERITY MAJOR
+        --#STATE    OPERATIONAL
+        --#PROBABLECAUSE "Configuration or Connection Error"
+        ::= { usrFCNITrapsV2 3 }
+	usrFCNIHearbeatINITAuthFailure NOTIFICATION-TYPE
+		OBJECTS {    
+			usrFCNISecurViolatorAddress,
+			usrFCNISecurRecentViolationSPI,
+			usrFCNISecurRecentViolationReason
+		}
+                STATUS current
+		DESCRIPTION
+			"This trap is generated when authentication fails
+			 on the INIT Heartbeat Acknowledge message."
+        --#TYPE "FACN Interface Authentication Event"
+        --#SUMMARY  "Authentication failure from %d on INIT Heartbeat Acknowledge, reason %d"
+        --#ARGUMENTS { 0 2 }
+        --#SEVERITY MAJOR
+        --#STATE    OPERATIONAL
+        --#PROBABLECAUSE "Configuration or Connection Error"
+        ::= { usrFCNITrapsV2 4 }
+	usrFCNIHearbeatPeriodAuthFailure NOTIFICATION-TYPE
+		OBJECTS {    
+			usrFCNISecurViolatorAddress,
+			usrFCNISecurRecentViolationSPI,
+			usrFCNISecurRecentViolationReason
+		}
+                STATUS current
+		DESCRIPTION
+			"This trap is generated when authentication fails
+			 on the Periodic Heartbeat Acknowledge message."
+        --#TYPE "FACN Interface Authentication Event"
+        --#SUMMARY  "Authentication failure from %d on Periodoc Heartbeat Acknowledge, reason %d"
+        --#ARGUMENTS { 0 2 }
+        --#SEVERITY MAJOR
+        --#STATE    OPERATIONAL
+        --#PROBABLECAUSE "Configuration or Connection Error"
+        ::= { usrFCNITrapsV2 5 }
+	usrFCNIHearbeatLost NOTIFICATION-TYPE
+		OBJECTS {
+			usrFCNISecurFACNAddr
+		}
+                STATUS current
+		DESCRIPTION
+			"This trap is generated when a FACN stops responding
+			 to PDSN's messages."
+        --#TYPE "FACN Interface  Event"
+        --#SUMMARY  "FACN connection on interface %d lost"
+        --#ARGUMENTS { 0 }
+        --#SEVERITY MAJOR
+        --#STATE    OPERATIONAL
+        --#PROBABLECAUSE "Configuration or Connection Error"
+        ::= { usrFCNITrapsV2 6 }
+END

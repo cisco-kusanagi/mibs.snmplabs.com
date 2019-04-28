@@ -1,0 +1,242 @@
+-- extracted from draft-stephan-ippm-multicast-metrics-00.txt
+-- at Fri May 14 06:20:56 2004
+
+   IPPM-CONTROL-MIB DEFINITIONS ::= BEGIN 
+    
+   IMPORTS 
+        IppmMib, 
+        InstantaneousUnidirectionalConnectivity,  
+        InstantaneousBidirectionalConnectivity,  
+        intervalUnidirectionalConnectivity , 
+        intervalBidirectionalConnectivity,  
+        intervalTemporalConnectivity,       
+        onewayDelay,                        
+        onewayDelayPoissonStream,         
+        onewayDelayPercentile,             
+        onewayDelayMedian,                 
+        onewayDelayMinimum,                
+        onewayDelayInversePercentile,     
+        onewayPacketLoss,                  
+        onewayPacketLossPoissonStream,   
+        onewayPacketLossAverage,          
+        roundtripDelay,                     
+        roundtripDelayPoissonStream,      
+        roundtripDelayPercentile,          
+        roundtripDelayMedian,              
+        roundtripDelayMinimum,             
+        roundtripDelayInversePercentile 
+                FROM IPPM-MIB 
+        MODULE-IDENTITY, 
+        NOTIFICATION-TYPE, 
+        OBJECT-TYPE, 
+        Integer32, 
+        Counter32, 
+        experimental 
+                FROM SNMPv2-SMI                  
+        OwnerString 
+                FROM RMON-MIB 
+        protocolDir 
+                FROM RMON2-MIB 
+
+        DisplayString, 
+        TimeStamp, 
+        DateAndTime, 
+        TruthValue, 
+        RowStatus, 
+        StorageType, 
+        TEXTUAL-CONVENTION 
+                FROM SNMPv2-TC 
+        MODULE-COMPLIANCE, 
+        OBJECT-GROUP, 
+        NOTIFICATION-GROUP 
+                FROM SNMPv2-CONF; 
+    
+    
+   ippmControlMib MODULE-IDENTITY 
+       LAST-UPDATED "200202111200Z"    -- Feb 21, 2002 
+        ORGANIZATION    "France Telecom - R&D" 
+        CONTACT-INFO 
+        "Postal : Emile Stephan 
+        France Telecom - R&D, Dpt. CPN 
+        2, Avenue Pierre Marzin 
+        Technopole Anticipa 
+        22307 Lannion Cedex 
+        FRANCE 
+        Tel: + 33 2 96 05 36 10 
+        E-mail: emile.stephan@francetelecom.com" 
+        DESCRIPTION      
+   " This memo defines a portion of the Management Information Base 
+   (MIB) for use with network management protocols in TCP/IP-based 
+   internets. In particular, It defines a set of NOTIFICATION-TYPE used 
+   to control IPPM metrics measures, pushing alarms and reporting the 
+   measures results. 
+         
+        --  
+        -- to be assigned by IANA 
+        --  
+        ::= { experimental 10001 } 
+         
+   --            
+   -- IPPM multicast messages for the setup of the measure 
+   -- and the reporting of the result. 
+   -- 
+    
+   ippmMulticastInstantaneousMeasureSetup    NOTIFICATION-TYPE 
+        OBJECTS      { 
+                -- measure setup 
+                ippmMeasureOwner,            
+                ippmMeasureIndex, 
+                 
+                -- Network measure setup 
+                ippmNetworkMeasureSrcTypeP, 
+                ippmNetworkMeasureSrc,       
+                ippmNetworkMeasureDstTypeP, 
+                ippmNetworkMeasureDst,        
+                ippmNetworkMeasureTimeoutDelay,    
+   
+                -- report setup 
+                ippmReportSetupNMS, 
+        } 
+        STATUS       current 
+        DESCRIPTION 
+        "The definition of the setup of an instantaneous multicast 
+        measure is sent by the broadcasting application or the probe in 
+        the multicast channel using a SNMP trap defined in this 
+        NOTIFICATION-TYPE. 
+         
+        On reception of the ippmMulticastInstantaneousMeasureSetup    
+        setup the receiver or the router: 
+         
+           + timestamp the arrival time of the setup; 
+           + considers the following defaults values; 
+           + prepare the ippmMulticastInstantaneousMeasureReport 
+        notification; 
+           + send the report using a SNMP Inform PDU. 
+         
+        Defaults values: 
+         
+        IppmMeasureEntry default values: 
+         
+           ippmMeasureName: 
+                ippmMulticastInstantaneousMeasure; 
+                     
+           ippmMeasureMetrics: { 
+                Type-P-One-way-Delay, 
+                Type-P-One-way-Packet-Loss, 
+                Type-P-Multicast-Instantaneous-Connectivity,  (*) 
+                Type-P-spatial-hop-one-way-delay (*) 
+           } 
+                         
+           ippmMeasureBeginTime:        0 
+                   
+           ippmMeasureClockPeriodUnit:  0 
+           ippmMeasureClockPeriod:      0      
+           ippmMeasureDurationUnit:     0     
+           ippmMeasureDuration:         0 
+           ippmMeasureHystorySize:      0      
+           ippmMeasureStorageType:      other      
+           ippmMeasureStatus:           createAndGo           
+ 
+        IppmNetworkMeasureEntry default values: 
+         
+           IppmNetworkMeasureClockPattern: 0  
+           IppmNetworkMeasureTimeoutDelay: 0 
+           ippmNetworkMeasureL3PacketSize: 0 
+           ippmNetworkMeasureDataPattern:  0 
+         
+        IppmippmReportSetupEntry default values: 
+         
+        IppmReportSetupDefinition: { 
+                onSingleton, 
+                inInformRequestPDU,  
+                clearHistory 
+         
+        } 
+                         
+        ippmReportSetupMetricThreshold:         0          
+        ippmReportSetupEventsDurationThreshold: 0  
+ 
+        (*) only considered by routers. 
+        " 
+        ::= { ippmControlMib 1 } 
+    
+   ippmMulticastInstantaneousMeasureReport NOTIFICATION-TYPE 
+                -- measure setup 
+                ippmMeasureOwner,            
+                ippmMeasureIndex, 
+                 
+                -- Network measure setup 
+                ippmNetworkMeasureSrcTypeP, 
+                ippmNetworkMeasureSrc,       
+                ippmNetworkMeasureDstTypeP, 
+                ippmNetworkMeasureDst,        
+ 
+                -- report of the measure 
+                 
+                -- timestamp 
+                ippmHistoryTimeMark,  
+    
+                -- value of the Type-P-One-way-Delay 
+                ippmHistoryValue, 
+ 
+                -- value of the Type-P-One-way-Packet-Loss 
+                ippmHistoryValue, 
+ 
+                -- value of the  
+                -- Type-P-Multicast-Instantaneous-Connectivity (*) 
+                ippmHistoryValue, 
+                 
+                -- value of the Type-P-spatial-hop-one-way-delay (*) 
+                ippmHistoryValue 
+ 
+        } 
+        STATUS       current 
+        DESCRIPTION 
+                "This NOTIFICATION-TYPE is used by the receiver or the 
+                router to push the result of the measure performed 
+                according the ippmMulticastInstantaneousMeasureSetup 
+                setup. 
+                 
+                (*) is only applicable for router. 
+                { comment:  
+                This report definition has to be split to get one for 
+                receiver and one for router.} 
+                 
+                Note:  
+                An ippmHistoryValue is indexed using the owner, the 
+                owner index, the metric index and the timestamp (e.g.: 
+                acme.1.6.0106150820100100). So the metric index 
+                identifies which metric result (One-way-Delay, Packet-
+                Loss, Connectivity) the ippmHistoryValue carries." 
+        ::= { ippmControlMib 2 } 
+ 
+ 
+   END 
+
+--  
+-- 
+--    "Copyright (C) The Internet Society (2001). All Rights Reserved. 
+--     
+--    This document and translations of it may be copied and furnished to 
+--    others, and derivative works that comment on or otherwise explain it 
+--    or assist its implementation may be prepared, copied, published and 
+--    distributed, in whole or in part, without restriction of any kind, 
+--    provided that the above copyright notice and this paragraph are 
+--    included on all such copies and derivative works. However, this 
+--    document itself may not be modified in any way, such as by removing 
+--    the copyright notice or references to the Internet Society or other 
+--    Internet organizations, except as needed for the purpose of 
+--    developing Internet standards in which case the procedures for 
+--    copyrights defined in the Internet Standards process must be 
+--    followed, or as required to translate it into languages other than 
+--    English. 
+--    The limited permissions granted above are perpetual and will not be 
+--    revoked by the Internet Society or its successors or assigns. 
+--     
+--    This document and the information contained herein is provided on an 
+--    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING 
+--    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING 
+--    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION 
+--    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF 
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. 
+

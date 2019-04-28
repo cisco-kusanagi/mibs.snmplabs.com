@@ -1,0 +1,626 @@
+-- 	$Id: shiva-perf.asn,v 1.2 1996/04/24 10:42:21 jas Exp $
+
+--
+-- 	Copyright 1996 Shiva Corporation
+--
+
+--	Supplementary Performance-Accounting-related variables.
+
+  SHIVA-PERFORMANCE-ACCOUNTING-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+	  Counter
+		  FROM RFC1155-SMI
+	  perfAcct
+		  FROM SHIVA-MIB
+	  OBJECT-TYPE
+		  FROM RFC-1212;
+
+  --  This MIB module uses the extended OBJECT-TYPE macro as
+  --  defined in RFC 1212.
+
+  --  This is the MIB module for the performance accounting and 
+  --  monitoring objects.  It allows various system statistics
+  --  to be tracked for the last 24 hours.  This is done by
+  --  splitting that time day into 96 periods of 15 minutes each.
+  --  The period number is used as an index into these tables,
+  --  with index 1 being the most recently completed 15 minute
+  --  period, and index 96 being the oldest one.  If the system
+  --  has been up less than 24 hours, the higher indices will not
+  --  be present.
+
+  --  The sampling interval for data collection within the 15 minute
+  --  periods is one minute.
+
+  --  The Performance Accounting and Monitoring Group consists of 6 tables:
+  --   System
+  --   Ethernet
+  --   IPX
+  --   IP	
+  --   Appletalk
+  --   T1/E1 Interfaces
+  --  If one of these components is not present (for instance AppleTalk
+  --  in systems with Token-Ring), then the table will not be present.
+
+  -- the Performance Accounting System Table
+
+      perfSystemTable OBJECT-TYPE
+	  SYNTAX  SEQUENCE OF PerfSystemEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The Accounting System table."
+	 ::= { perfAcct 1 }
+
+      perfSystemEntry OBJECT-TYPE
+	  SYNTAX  PerfSystemEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "An entry in the Accounting System table."
+	 INDEX   { perfSystemInterval }
+	 ::= { perfSystemTable 1 }
+
+      PerfSystemEntry ::=
+      SEQUENCE {
+	  perfSystemInterval
+	      INTEGER,
+	  perfSystemAvgCpuIdle
+	      INTEGER,
+	  perfSystemValleyCpuIdle
+	      INTEGER,
+	  perfSystemValleyMemFree
+	      INTEGER
+      }
+
+      perfSystemInterval OBJECT-TYPE
+	  SYNTAX  INTEGER (1..96)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "A number between 1 and 96, where 1 is the most
+	     recently completed 15 minute interval and 96 is
+	     the least recently completed 15 minutes  inter-
+	     val   (assuming   that  all  96  intervals  are
+	     valid)."
+	 ::= { perfSystemEntry 1 }
+
+      perfSystemAvgCpuIdle OBJECT-TYPE
+	  SYNTAX  INTEGER (0..60)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Average idle count during 15 minute period.  This is the
+	      average number of seconds that the system was idle in a
+	      minute."
+	 ::= { perfSystemEntry 2 }
+
+      perfSystemValleyCpuIdle OBJECT-TYPE
+	  SYNTAX  INTEGER (0..60)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Lowest idle time in any one minute sample
+             during the 15 minute period.  This is the number of seconds
+	     the system was idle in the busiest 1 minute period."
+	 ::= { perfSystemEntry 3 }
+
+      perfSystemValleyMemFree OBJECT-TYPE
+	  SYNTAX  INTEGER
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Lowest amount of free memory during any one
+             minute period during the 15 minute period."
+	 ::= { perfSystemEntry 4 }
+	  
+
+  -- the Accounting Ethernet Table
+
+      perfEthernetTable OBJECT-TYPE
+	  SYNTAX  SEQUENCE OF PerfEthernetEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The Accounting Ethernet table."
+	 ::= { perfAcct 2 }
+
+      perfEthernetEntry OBJECT-TYPE
+	  SYNTAX  PerfEthernetEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "An entry in the Accounting System table."
+	 INDEX   { perfEthernetInterval }
+	 ::= { perfEthernetTable 1 }
+
+      PerfEthernetEntry ::=
+      SEQUENCE {
+	  perfEthernetInterval
+	      INTEGER,
+	  perfEthernetNetworkErrors
+	      Counter,
+	  perfEthernetInternalTransmitErrors
+	      Counter,
+	  perfEthernetInternalReceiveErrors
+	      Counter    
+      }
+
+      perfEthernetInterval OBJECT-TYPE
+	  SYNTAX  INTEGER (1..96)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "A number between 1 and 96, where 1 is the most
+	     recently completed 15 minute interval and 96 is
+	     the least recently completed 15 minutes  inter-
+	     val   (assuming   that  all  96  intervals  are
+	     valid)."
+	 ::= { perfEthernetEntry 1 }
+
+      perfEthernetNetworkErrors OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Network error count during 15 minute interval."
+	 ::= { perfEthernetEntry 2 }
+
+      perfEthernetInternalTransmitErrors OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Internal transmit errors during 15 minute interval."
+	 ::= { perfEthernetEntry 3 }
+
+      perfEthernetInternalReceiveErrors OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Internal receive errors during 15 minute interval."
+	 ::= { perfEthernetEntry 4 }
+
+
+  -- the Performance Accounting IPX Table
+
+      perfIPXTable OBJECT-TYPE
+	  SYNTAX  SEQUENCE OF PerfIPXEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The Accounting IPX table."
+	 ::= { perfAcct 3 }
+
+      perfIPXEntry OBJECT-TYPE
+	  SYNTAX  PerfIPXEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "An entry in the Accounting IPX table."
+	 INDEX   { perfIPXInterval }
+	 ::= { perfIPXTable 1 }
+
+      PerfIPXEntry ::=
+      SEQUENCE {
+	  perfIPXInterval
+	      INTEGER,
+	  perfIPXPacketsReceived
+	      Counter,
+	  perfIPXPacketsTransmitted
+	      Counter,
+	  perfIPXReceivesDropped
+	      Counter,
+	  perfIPXTransmitsDropped
+	      Counter    
+      }
+
+      perfIPXInterval OBJECT-TYPE
+	  SYNTAX  INTEGER (1..96)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "A number between 1 and 96, where 1 is the most
+	     recently completed 15 minute interval and 96 is
+	     the least recently completed 15 minutes  inter-
+	     val   (assuming   that  all  96  intervals  are
+	     valid)."
+	 ::= { perfIPXEntry 1 }
+
+      perfIPXPacketsReceived OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "IPX packets received during 15 minute interval."
+	 ::= { perfIPXEntry 2 }
+
+      perfIPXPacketsTransmitted OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "IPX packets transmitted during 15 minute interval."
+	 ::= { perfIPXEntry 3 }
+
+      perfIPXReceivesDropped OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "IPX receives dropped during 15 minute interval."
+	 ::= { perfIPXEntry 4 }
+
+      perfIPXTransmitsDropped OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "IPX transmits dropped during 15 minute interval."
+	 ::= { perfIPXEntry 5 }
+
+
+
+  -- the Performance Accounting IP Table
+
+      perfIPTable OBJECT-TYPE
+	  SYNTAX  SEQUENCE OF PerfIPEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The Accounting IP table."
+	 ::= { perfAcct 4 }
+
+      perfIPEntry OBJECT-TYPE
+	  SYNTAX  PerfIPEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "An entry in the Accounting IP table."
+	 INDEX   { perfIPInterval }
+	 ::= { perfIPTable 1 }
+
+      PerfIPEntry ::=
+      SEQUENCE {
+	  perfIPInterval
+	      INTEGER,
+	  perfIPPacketsReceived
+	      Counter,
+	  perfIPPacketsTransmitted
+	      Counter,
+	  perfIPReceivesDropped
+	      Counter,
+	  perfIPTransmitsDropped
+	      Counter    
+      }
+
+      perfIPInterval OBJECT-TYPE
+	  SYNTAX  INTEGER (1..96)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "A number between 1 and 96, where 1 is the most
+	     recently completed 15 minute interval and 96 is
+	     the least recently completed 15 minutes  inter-
+	     val   (assuming   that  all  96  intervals  are
+	     valid)."
+	 ::= { perfIPEntry 1 }
+
+      perfIPPacketsReceived OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "IP packets received during 15 minute interval."
+	 ::= { perfIPEntry 2 }
+
+      perfIPPacketsTransmitted OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "IP packets transmitted during 15 minute interval."
+	 ::= { perfIPEntry 3 }
+
+      perfIPReceivesDropped OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "IP receives dropped during 15 minute interval."
+	 ::= { perfIPEntry 4 }
+
+      perfIPTransmitsDropped OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "IP transmits dropped during 15 minute interval."
+	 ::= { perfIPEntry 5 }
+
+
+  -- the Performance Accounting Appletalk Table
+
+      perfAppletalkTable OBJECT-TYPE
+	  SYNTAX  SEQUENCE OF PerfAppletalkEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The Accounting Appletalk table."
+	 ::= { perfAcct 5 }
+
+      perfAppletalkEntry OBJECT-TYPE
+	  SYNTAX  PerfAppletalkEntry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "An entry in the Accounting Appletalk table."
+	 INDEX   { perfAppletalkInterval }
+	 ::= { perfAppletalkTable 1 }
+
+      PerfAppletalkEntry ::=
+      SEQUENCE {
+	  perfAppletalkInterval
+	      INTEGER,
+	  perfAppletalkPacketsReceived
+	      Counter,
+	  perfAppletalkPacketsTransmitted
+	      Counter,
+	  perfAppletalkTotalErrors
+	      Counter
+      }
+
+      perfAppletalkInterval OBJECT-TYPE
+	  SYNTAX  INTEGER (1..96)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "A number between 1 and 96, where 1 is the most
+	     recently completed 15 minute interval and 96 is
+	     the least recently completed 15 minutes  inter-
+	     val   (assuming   that  all  96  intervals  are
+	     valid)."
+	 ::= { perfAppletalkEntry 1 }
+
+      perfAppletalkPacketsReceived OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Appletalk packets received during 15 minute interval."
+	 ::= { perfAppletalkEntry 2 }
+
+      perfAppletalkPacketsTransmitted OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Appletalk packets transmitted during 15 minute interval."
+	 ::= { perfAppletalkEntry 3 }
+
+      perfAppletalkTotalErrors OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "Appletalk receives dropped during 15 minute interval."
+	 ::= { perfAppletalkEntry 4 }
+
+
+  -- the Performance Accounting T1E1 Table
+
+  -- The Performance Accounting T1E1 Table contains various statistics
+  -- collected by each T1/E1 Interface over the previous 24 hours of
+  -- operation.  The past 24 hours are broken into 96 completed
+  -- 15 minute intervals.
+
+      perfT1E1Table OBJECT-TYPE
+	  SYNTAX  SEQUENCE OF PerfT1E1Entry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The Accounting T1E1 table."
+	 ::= { perfAcct 6 }
+
+      perfT1E1Entry OBJECT-TYPE
+	  SYNTAX  PerfT1E1Entry
+	  ACCESS  not-accessible
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "An entry in the Accounting T1E1 table."
+	 INDEX   { perfT1E1Index, perfT1E1Interval }
+	 ::= { perfT1E1Table 1 }
+
+  PerfT1E1Entry ::=
+      SEQUENCE {
+	  perfT1E1Index
+	      INTEGER,
+	  perfT1E1Interval
+	      INTEGER,
+	  perfT1E1AvgTrunkInUtil
+	      INTEGER,
+	  perfT1E1AvgTrunkOutUtil
+	      INTEGER,
+	  perfT1E1PeakTrunkInUtil
+	      INTEGER,
+	  perfT1E1PeakTrunkOutUtil
+	      INTEGER,
+	  perfT1E1TrunkInIoErrors
+	      Counter,
+	  perfT1E1TrunkOutIoErrors
+	      Counter,
+	  perfT1E1AnalogCallsAccepted
+	      Counter,
+	  perfT1E1DigitalCallsAccepted
+	      Counter,
+	  perfT1E1CallsRefused
+	      Counter,
+	  perfT1E1ReceiveDrops
+	      Counter,
+	  perfT1E1TransmitDrops
+	      Counter
+      }
+
+      perfT1E1Index OBJECT-TYPE
+	  SYNTAX  INTEGER 
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The ifIndex value which uniquely identifies  the
+	     T1/E1  interface  to which this entry is applica-
+	     ble."
+	 ::= { perfT1E1Entry 1 }
+
+      perfT1E1Interval OBJECT-TYPE
+	  SYNTAX  INTEGER (1..96)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "A number between 1 and 96, where 1 is the most
+	     recently completed 15 minute interval and 96 is
+	     the least recently completed 15 minutes  inter-
+	     val   (assuming   that  all  96  intervals  are
+	     valid)."
+	 ::= { perfT1E1Entry 2 }
+
+      perfT1E1AvgTrunkInUtil OBJECT-TYPE
+	  SYNTAX  INTEGER (0..100)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The average percentage utilization by incoming calls of a
+	     T1/E1 interface in one of the previous 96, individual
+	     15 minute, intervals."
+	 ::= { perfT1E1Entry 3 }
+
+      perfT1E1AvgTrunkOutUtil OBJECT-TYPE
+	  SYNTAX  INTEGER (0..100)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The average percentage utilization by outgoing calls of a
+	     T1/E1 interface in one of the previous
+	     96, individual 15 minute, intervals."
+	 ::= { perfT1E1Entry 4 }
+
+      perfT1E1PeakTrunkInUtil OBJECT-TYPE
+	  SYNTAX  INTEGER (0..100)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The peak percentage utilization by incoming calls of a T1/E1
+	     interface in one of the previous 96, individual 
+	     15 minute, intervals."
+	 ::= { perfT1E1Entry 5 }
+
+      perfT1E1PeakTrunkOutUtil OBJECT-TYPE
+	  SYNTAX  INTEGER (0..100)
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The peak percentage utilization by outgoing calls of a T1/E1
+	     interface in one of the previous 96, individual 
+	     15 minute, intervals."
+	 ::= { perfT1E1Entry 6 }
+
+      perfT1E1TrunkInIoErrors OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "A measure of the input error rate on this T1/E1
+	      interface in one of the previous 96, individual 15 minute,
+	      intervals.  It is the sum of the Errored Seconds,
+	      Bursty Errored Seconds, and Severely Errored Seconds."
+	 ::= { perfT1E1Entry 7 }
+
+      perfT1E1TrunkOutIoErrors OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "A measure of the output error rate on this T1/E1
+	      interface in one of the previous 96, individual 15 minute,
+	      intervals.  It is the sum of the Severely Errored
+	      Framing Seconds and Unavailable Seconds.  These are the error
+	      periods so severe that framing has been lost, and
+	      it is not possible to transmit framed data."
+	 ::= { perfT1E1Entry 8 }
+
+      perfT1E1AnalogCallsAccepted OBJECT-TYPE
+	  SYNTAX  Counter
+	  ACCESS  read-only
+	  STATUS  mandatory
+	  DESCRIPTION
+	     "The number of analog calls accepted 
+	     by a T1/E1 interface in one of the previous
+	     96, individual 15 minute, intervals."
+	 ::= { perfT1E1Entry 9 }
+
+      perfT1E1DigitalCallsAccepted OBJECT-TYPE
+	  SYNTAX Counter
+	  ACCESS read-only
+	  STATUS mandatory
+	  DESCRIPTION
+	     "The number of digital calls accepted 
+	     by a T1/E1 interface in one of the previous
+	     96, individual 15 minute, intervals."
+	 ::= { perfT1E1Entry 10 }
+
+      perfT1E1CallsRefused OBJECT-TYPE
+	  SYNTAX Counter
+	  ACCESS read-only
+	  STATUS mandatory
+	  DESCRIPTION
+	     "The number of calls refused
+	     T1/E1 interface in one of the previous
+	     96, individual 15 minute, intervals."
+	 ::= { perfT1E1Entry 11 }
+
+      perfT1E1ReceiveDrops OBJECT-TYPE
+	  SYNTAX Counter
+	  ACCESS read-only
+	  STATUS mandatory
+	  DESCRIPTION
+	     "The number receive drops
+	     encountered  by a DS1 interface in one of the
+	     previous 96, individual 15 minute intervals."
+      ::= { perfT1E1Entry 12 }
+
+      perfT1E1TransmitDrops OBJECT-TYPE
+	  SYNTAX Counter
+	  ACCESS read-only
+	  STATUS mandatory
+	  DESCRIPTION
+	     "The number transmit drops
+	     encountered  by a DS1 interface in one of the
+	     previous 96, individual 15 minute intervals."
+      ::= { perfT1E1Entry 13 }
+
+  -- Time Keeping Variables
+
+      perfTimeElapsed OBJECT-TYPE
+	  SYNTAX INTEGER (0..899)
+	  ACCESS read-only
+	  STATUS mandatory
+          DESCRIPTION
+	     "The number of seconds that have elapsed  since
+	     the  beginning of the current measurement
+	     period."
+	  ::= { perfAcct 7 }
+
+      perfValidIntervals OBJECT-TYPE
+	  SYNTAX INTEGER (0..96)
+	  ACCESS read-only
+	  STATUS mandatory
+          DESCRIPTION
+	     "The number of  previous  intervals  for  which
+	     valid data was collected.  The value will be 96
+	     unless the system was brought on-line within
+	     the last 24 hours, in which case the value will
+	     be the number of complete 15  minute  intervals
+	     since the system has been online.  Is 0 until
+	     the system has been up for 15 minutes."
+	  ::= { perfAcct 8 }
+
+END

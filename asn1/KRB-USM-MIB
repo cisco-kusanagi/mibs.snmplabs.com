@@ -1,0 +1,240 @@
+-- extracted from draft-thomas-snmpv3-kerbusm-00.txt
+-- at Sun Jul 16 07:07:59 2000
+
+   KRB-USM-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+       MODULE-IDENTITY,
+       OBJECT-TYPE, OBJECT-IDENTITY,
+       snmpModules, Counter32, Unsigned32 FROM SNMPv2-SMI
+       TruthValue, DisplayString          FROM SNMPv2-TC
+       usmUserEntry                       FROM SNMP-USER-BASED-SM-MIB
+
+
+
+   krbUsmMib MODULE-IDENTITY
+           LAST-UPDATED "00071300Z"
+           ORGANIZATION "IETF SNMP V3 Working Group"
+           CONTACT-INFO
+             "Michael Thomas
+              Cisco Systems
+              375 E Tasman Drive
+              San Jose, Ca 95134
+              Phone: +1 408-525-5386
+              Fax: +1 801-382-5284
+              email: mat@cisco.com"
+           DESCRIPTION
+              "This MIB contains the MIB variables to
+               exchange Kerberos credentials and a session
+               key to be used to authenticate and set up
+               USM keys"
+
+           ::= { snmpModules nnn }   -- not sure what needs to be here.
+   krbUsmMibObjects OBJECT INDENTIFIER ::= { krbUsmMib 1 }
+
+   krbUsmMibAuthInAttemps
+               SYNTAX      Counter32
+               MAX-ACCESS  read-only
+               STATUS      current
+               DESCRIPTION
+                   "Counter of the number of Kerberos
+                    authorization attempts as defined by
+                    receipt of a PDU from a Manager with a
+                     krbUsmMibNonce set in the principal table."
+               ::= { krbUsmMibObjects 1 }
+
+   krbUsmMibAuthOutAttemps
+               SYNTAX      Counter32
+               MAX-ACCESS  read-only
+               STATUS      current
+               DESCRIPTION
+                   "Counter of the number of unsolicited Kerberos
+                    authorization attempts as defined by
+                    an Agent sending an INFORM or TRAP PDU with a
+                    krbUsmMibApRep but without krbUsmApMibNonce
+                    varbind."
+               ::= { krbUsmMibObjects 2 }
+   krbUsmMibAuthInFail
+               SYNTAX      Counter32
+               MAX-ACCESS  read-only
+               STATUS      current
+               DESCRIPTION
+                   "Counter of the number of Kerberos
+                    authorization failures as defined by
+                    a Manager setting the krbUsmMibNonce
+                    in the principal table which results
+                    in some sort of failure to install keys
+                    in the requested USM user entry."
+               ::= { krbUsmMibObjects 3 }
+
+   krbUsmMibAuthOutFail
+               SYNTAX      Counter32
+               MAX-ACCESS  read-only
+               STATUS      current
+               DESCRIPTION
+                   "Counter of the number of unsolicited Kerberos
+                    authorization failures as defined by
+                    an Agent sending an INFORM or TRAP PDU with a
+                    krbUsmMibApRep but without a krbUsmMibNonce
+                    varbind which does not result in keys being
+                    installed for that USM user entry."
+               ::= { krbUsmMibObjects 4 }
+
+   krbUsmMibPrinTable OBJECT-TYPE
+               SYNTAX      SEQUENCE OF krbUsmMibEntry
+               MAX-ACCESS  not-accessible
+               STATUS      current
+               DESCRIPTION
+                   "Table which maps Kerberos principals with USM
+                    users as well as the per user variables to key
+                    up sessions"
+               ::= { krbUsmMibObjects 5 }
+
+   krbUsmMibPrinEntry OBJECT-TYPE
+               SYNTAX     KrbUsmMibPrinEntry
+               MAX-ACCESS  not-accessible
+               STATUS      current
+               DESCRIPTION
+                   "an entry into the krbMibPrinTable which is a
+                    parallel table to UsmUserEntry table"
+               AUGMENTS { usmUserEntry }
+               ::= { krbUsmMibPrinTable 1 }
+
+   KrbUsmMibPrinEntry SEQUENCE
+    {
+                   krbUsmMibApReq                  OCTET STRING,
+                   krbUsmMibApRep                  OCTET STRING,
+                   krbUsmMibNonce                  OCTET STRING,
+                   krbUsmMibMgrTGT                 OCTET STRING,
+                   krbUsmMibUnsolicitedNotify      TruthValue,
+    }
+
+
+   krbUsmMibApReq OBJECT-TYPE
+               SYNTAX      OCTET STRING
+               MAX-ACCESS  accessible-for-notify
+               STATUS      current
+               DESCRIPTION
+                   "This variable contains a DER encoded Kerberos
+                    AP-REQ or KRB-ERROR for the USM user which is
+                    to be keyed. This is sent from the Agent to
+                    the Manager in an INFORM or TRAP request.
+                    KRB-ERROR MUST only be sent to the Manager
+                    if it is in response to a keying request from
+                    the Manager.
+                   "
+               ::= { krbUsmMibPrinEntry 1 }
+
+   krbUsmMibApRep OBJECT-TYPE
+               SYNTAX      OCTET STRING
+               MAX-ACCESS  read-write
+               STATUS      current
+               DESCRIPTION
+                   "This variable contains the DER encoded response
+                    to an AP-REQ. This variable is SET by the
+                    Manager to acknowledge receipt of an AP-REQ. If
+                    krbUsmMibApRep contains a Kerberos AP-REP, the
+                    Agent must derive keys from the session key
+                    of the Kerberos ticket in the AP-REQ and place
+                    them in the USM database in a manner specified
+                    by [RFC2574]. If the Manager detects an error,
+                    it will instead place a KRB-ERROR in this
+                    variable to inform the Agent of the error.
+
+                    This variable is in effect a write-only variable.
+                    attempts to read this variable will result in a
+                    null octet string being returned"
+               ::= { krbUsmMibPrinEntry 2 }
+
+   krbUsmMibNonce OBJECT-TYPE
+               SYNTAX      OCTET STRING
+               MAX-ACCESS  read-write
+               STATUS      current
+               DESCRIPTION
+                   "SET'ing a krbUsmMibnonce allows a Manager to
+                    determine whether an INFORM or TRAP from an
+                    Agent is an outstanding keying request, or
+                    unsolicited from the Agent. The Manager
+                    initiates keying for a particular USM user
+                    by writing a nonce into the row for which
+                    desires to establish a security association.
+                    The nonce is an ASCII string of the form
+                    ``host:port?nonce'' where:
+
+                    host:  is either an FQDN, or valid ipv4 or ipv6
+                           numerical notation of the Manager which
+                           desires to initiate keying
+                    port:  is the destination port at which that the
+                           Manager may be contacted
+                    nonce: is a number generated by the Manager to
+                           correlate the transaction
+
+                    The same nonce MUST be sent to the Manager in a
+                    subsequent INFORM or TRAP with a krbUsmApReq.
+                    The Agent MUST use the host address and port
+                    supplied in the nonce as the destination of a
+                    subsequent INFORM or TRAP. Unsolicited keying
+                    requests MUST NOT contain a nonce, and should
+                    instead use the destination stored Notifies of
+                    this type.
+
+                    Nonces MUST be highly collision resistant either
+                    using a time based method or a suitable random
+                    number generator. Managers MUST never create
+                    nonces which are 0.
+
+                    This variable is in effect a write-only variable.
+                    Attempts to read this variable will result in a
+                    nonce of value 0 being returned"
+
+
+               ::= { krbUsmMibPrinEntry 3 }
+
+   krbUsmMibMgrTgt OBJECT-TYPE
+               SYNTAX      OCTET STRING
+               MAX-ACCESS  read-write
+               STATUS      current
+               DESCRIPTION
+                   "If the Manager does not possess a symmetric
+                    key with the KDC as would be the case with
+                    a Manager using PKinit for authentication,
+                    the Manager MUST SET its DER encoded ticket
+                    granting ticket into KrbUsmMgrTgt along
+                    with krbUsmMibNonce.
+
+                    The agent will then attach the Manager's TGT
+                    into the additional tickets field of the
+                    TGS-REQ message to the KDC to get a User-User
+                    service ticket.
+
+                    This variable is in effect a write-only variable.
+                    Attempts to read this variable will result in a
+                    null octet string being returned"
+               ::= { krbUsmMibPrinEntry 4 }
+
+
+   krbUsmMibUnsolicitedNotify OBJECT-TYPE
+               SYNTAX      TruthValue
+               MAX-ACCESS  read-write
+               STATUS      current
+               DESCRIPTION
+                   "If this variable is false, the Agent MUST NOT
+                    send unsolicited INFORM or TRAP PDU's to the
+                    Manager.
+
+                    Attempts to SET this variable by the no-auth
+                    no-priv user MUST be rejected."
+               ::= { krbUsmMibPrinEntry 5 }
+
+   --
+   -- Conformance section... nothing optional.
+
+   krbUsmMibCompliences MODULE-COMPLIANCE
+               STATUS       current
+               DESCRIPTION "The compliance statement for SNMP
+                            engines whichimplement the KRB-USM-MIB
+                   "
+               MODULE       -- this module
+                       MANDATORY-GROUPS { krbUsmMib }
+       ::= { krbUsmMibCompliances 1 }
+
+   END

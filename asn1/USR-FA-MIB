@@ -1,0 +1,1660 @@
+USR-FA-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		OBJECT-TYPE, MODULE-IDENTITY,
+        Counter32, Integer32, IpAddress, Unsigned32
+			FROM SNMPv2-SMI
+		RowStatus, DisplayString, TruthValue, DateAndTime
+			FROM SNMPv2-TC
+		common,	UsrConfigStatus, UsrSPI, UsrSecretDisplay,
+        UsrDisplayIntAsHex
+			FROM USR-DEFINITIONS-MIB;
+    usrFA MODULE-IDENTITY
+         LAST-UPDATED "200208231355Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects
+                  for the Wireless Foreign Agent."
+--      REVISION "200208231355Z"
+--      DESCRIPTION "Use TC for usrFAMPASecret, usrFaSaKey.
+--         usrFAVisitorRegIDLow, usrFAVisitorRegIDHigh,	usrFAVisitor2RegIDLow,
+--         usrFAVisitor2RegIDHigh."
+--      REVISION "200208051030Z"
+--      DESCRIPTION "Added MIBs to support Duplicate IP addresses in the usrFAVisitorListEntry. All the added MIBs end with the digit 2."
+--      REVISION "200208011855Z"
+--      DESCRIPTION "Added object: usrFATotRegReqDeniedUnknownChallenge, 
+--								   usrFATotRegReqDeniedMissingChallenge,
+--								   usrFATotRegReqDeniedUsedChallenge"
+--      REVISION "200207091515Z"
+--      DESCRIPTION "Added comment: usrFATotReRegReqDiscard , usrFATotDeRegReqDiscard"
+--      REVISION "200206191515Z"
+--      DESCRIPTION "Added: usrFAStatsResetTime, usrFAMPAStatsResetTime.
+--                   Obsoleted: usrFAResetStats."
+--      REVISION "200205051915Z"
+--      DESCRIPTION "Converted to SNMPv2"
+         ::= { common 83 }
+	usrFASystemConfig    OBJECT IDENTIFIER ::= { usrFA 1 }
+	usrFARegistration    OBJECT IDENTIFIER ::= { usrFA 2 }
+	usrFACfmConfig       OBJECT IDENTIFIER ::= { usrFA 3 }
+	usrFARegReqStats              OBJECT IDENTIFIER ::= { usrFA 4 }
+	usrFAInitRegReqStats          OBJECT IDENTIFIER ::= { usrFA 5 }
+	usrFAReRegReqStats            OBJECT IDENTIFIER ::= { usrFA 6 }
+	usrFADeRegReqStats            OBJECT IDENTIFIER ::= { usrFA 7 }
+	usrFARegReqDeniedByPDSNStats  OBJECT IDENTIFIER ::= { usrFA 8 }
+	usrFARegReqDeniedByHAStats    OBJECT IDENTIFIER ::= { usrFA 9 }
+	usrFAMIPAuthStats             OBJECT IDENTIFIER ::= { usrFA 10 }
+	usrFAMIPCallReleasedStats     OBJECT IDENTIFIER ::= { usrFA 11 }
+	usrFAMPARegStat      	      OBJECT IDENTIFIER ::= { usrFA 12 }
+	usrFAMIPDataStats              OBJECT IDENTIFIER ::= { usrFA 13 }
+	usrFAServiceOptionStats       OBJECT IDENTIFIER ::= { usrFA 14 }
+	usrFAMIPDMUStats              OBJECT IDENTIFIER ::= { usrFA 15 }
+-- Foreign Agent System Configuration Group
+	usrFAEncapsulationSupported OBJECT-TYPE
+		SYNTAX Integer32 (0..7)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Encapsulation methods supported by this foreign
+			 agent entity.  The foreign agent may support
+			 multiple encapsulation methods or none of them.
+			 This is a bit-mapped value with the following
+			 representation:
+			   7   6   5   4   3   2   1   0
+			 +---+---+---+---+---+---+---+---+
+			 | 0 | 0 | 0 | 0 | 0 | M | G | I |
+			 +---+---+---+---+---+---+---+---+
+			 where,
+			 I - IP Encapsulation within IP
+			 G - Generic Routing Encapsulation as per RFC1701
+			 M - Minimal Encapsulation within IP."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 1 }
+	usrFAAdvRetransmit OBJECT-TYPE
+		SYNTAX Integer32 (1..10)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Number of times to retransmit Agent Advertisement
+			 if a Mobile Node does not respond with a valid
+			 Registration Request."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 2 }
+	usrFAAdvInterval OBJECT-TYPE
+		SYNTAX Integer32 (1..300)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The time (in seconds) between successive
+			 transmissions of Agent Advertisements sent from
+			 this Foreign Agent."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 3 }
+	usrFAMaxAdvLifetime OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The time (in seconds) to be placed in the Lifetime
+			 field of the RFC 1256-portion of the Agent
+			 Advertisement sent from this Foreign Agent."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 4 }
+        usrFAVisitorListSize OBJECT-TYPE
+		SYNTAX Integer32 (0..8000)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+                        "The maximum number of visitors that can be accepted
+                         by this Foreign Agent. If the Performance Feature
+                         is not enabled then the maximum size allowed is
+                         only 4000."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 5 }
+	usrFAChallengeWindow OBJECT-TYPE
+		SYNTAX Integer32 (1..5)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The size of the Challenge window, i.e. how
+			 many of the past challenges plus current
+			 are valid."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 6 }
+	usrFAMnAAAExtForward OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Whether the MN-AAA Extension should be 
+			 forwarded to the HA. true(1), false(2)"
+		--CONFIGURABLE
+	::= { usrFASystemConfig 7 }
+	usrFAAcceptPPPAuth OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Whether the PPP authentication carried
+			 out prior to MIP can be considered valid.
+			 If considered valid FAC will not be done"
+		--CONFIGURABLE
+	::= { usrFASystemConfig 8 }
+	usrFAHARespTimeout OBJECT-TYPE
+		SYNTAX Integer32 (1..20)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The timeout for receiving an HA response.
+			 The current implementation only supports
+			 the range 3..20"
+		--CONFIGURABLE
+	::= { usrFASystemConfig 9 }
+	usrFARegistrationFlagsAllowed OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Encapsulation methods supported by this foreign
+			 agent entity.  The foreign agent may support
+			 multiple encapsulation methods or none of them.
+			 This is a bit-mapped value with the following
+			 representation:
+			   7   6   5   4   3   2   1   0
+			 +___+___+___+___+___+___+___+___+
+			 | S | B | D | M | G | V | T | X |
+			 +___+___+___+___+___+___+___+___+
+			 where,
+			 S - Simultaneous bindings supported
+			 B - Broadcast datagrams
+			 D - Decapsulation by mobile node
+			 M - Minimal Encapsulation
+			 G - Gre Encapsulation
+			 V - Van Jacobson header compression
+			 T - Reverse Tunnelling
+			 X - Reserved"
+		--CONFIGURABLE
+	::= { usrFASystemConfig 10 }
+	usrFARegistrationFlagsRequired OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Encapsulation methods supported by this foreign
+			 agent entity.  The foreign agent may support
+			 multiple encapsulation methods or none of them.
+			 This is a bit-mapped value with the following
+			 representation:
+			   7   6   5   4   3   2   1   0
+			 +___+___+___+___+___+___+___+___+
+			 | S | B | D | M | G | V | T | X |
+			 +___+___+___+___+___+___+___+___+
+			 where,
+			 S - Simultaneous bindings supported
+			 B - Broadcast datagrams
+			 D - Decapsulation by mobile node
+			 M - Minimal Encapsulation
+			 G - Gre Encapsulation
+			 V - Van Jacobson header compression
+			 T - Reverse Tunnelling
+			 X - Reserved"
+		--CONFIGURABLE
+	::= { usrFASystemConfig 11 }
+	usrFARequireHomeAgentInReg OBJECT-TYPE
+		SYNTAX INTEGER {
+			static(1),
+		        dynamic(2),
+		        any(3)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Determines the assignment of the home agent address to the mobile IP call"
+		--CONFIGURABLE
+	::= { usrFASystemConfig 12 }
+	usrFARequireMobileAddrInReg OBJECT-TYPE
+		SYNTAX INTEGER {
+			static(1),
+		        dynamic(2),
+		        any(3)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Determines the mobile address to be used in the mobile IP call"
+		--CONFIGURABLE
+	::= { usrFASystemConfig 13 }
+--usrFAAllowMobileAddrInReg OBJECT-TYPE
+--		SYNTAX INTEGER {
+--			enable(1),
+--		        disable(2)
+--		}
+--		MAX-ACCESS read-write
+--		STATUS     current
+--		DESCRIPTION
+--			"Allow mobile to request a predetermined address
+--			in the registration request"
+--	::= { usrFASystemConfig 14 }
+--	
+	usrFAMaxMPALifetime OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The time (in seconds) to be placed in the Lifetime
+			 field of the MPA registration message sent to 
+			 Home Agent."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 15 }
+	usrFAMPARetransmit OBJECT-TYPE
+		SYNTAX Integer32 (1..5)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Number of times to retransmit MPA registration message
+			 if Home Agent does not respond with a valid
+			 Registration Reply."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 16 }
+	usrFAMPATimeout OBJECT-TYPE
+		SYNTAX Integer32 (1..20)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The timeout for receiving an HA response to the 
+			 MPA registration message.
+			 The current implementation only supports
+			 the range 3..20"
+		--CONFIGURABLE
+	::= { usrFASystemConfig 17 }
+	usrFAMPASpi OBJECT-TYPE
+		SYNTAX UsrSPI (0..2147483647)
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"This number is used for building the MPA registration
+			 request MN-HA authentication extension."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 18 }
+	usrFAMPASecret OBJECT-TYPE
+		SYNTAX     UsrSecretDisplay
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The shared secret to calculate the MN-HA 
+			 authentication extension."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 19 }
+	usrFAMPATunneling OBJECT-TYPE
+		SYNTAX INTEGER {
+			ip-in-ip(1),
+			gre(2)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The MIP tunnels between pdsn and ha."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 20 }
+	usrFAResetStats OBJECT-TYPE
+		SYNTAX Integer32 (1..1)
+		MAX-ACCESS read-write
+		STATUS     obsolete
+		DESCRIPTION
+			"Resets FA Statistics to zero.
+                         This object is replaced by usrFAStatsResetTime."
+	::= { usrFASystemConfig 21 }
+	usrFaSaTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrFaSaEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"A table for configuring FA security
+			 associations between PDSN/FA and the
+			 Home Agent."
+	::= { usrFASystemConfig 22 }
+	usrFaSaEntry OBJECT-TYPE
+		SYNTAX UsrFaSaEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"An entry in the FA-HA Security Association
+			 Table."
+		INDEX { usrFaSaIndexNum }
+	::= { usrFaSaTable 1 }
+	UsrFaSaEntry ::= SEQUENCE {
+		usrFaSaIndexNum    Integer32,
+		usrFaSaIpAddress   IpAddress,
+		usrFaSaSpi         UsrSPI,
+		usrFaSaKey         UsrSecretDisplay,
+		usrFaSaStatus      RowStatus
+	}
+	usrFaSaIndexNum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"PDSN can support up to 100 FA-HA
+			 security associations."
+	::= { usrFaSaEntry 1 }
+	usrFaSaIpAddress OBJECT-TYPE
+		SYNTAX IpAddress 
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The IP address of PDSN/FA."
+		--CONFIGURABLE
+	::= { usrFaSaEntry 2 }
+	usrFaSaSpi OBJECT-TYPE
+		SYNTAX UsrSPI
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The SPI is the 4-byte opaque index within
+			 the FA-HA Security Association which
+			 selects the specific security parameters
+			 to be used to authenticate the peer."
+		--CONFIGURABLE
+	::= { usrFaSaEntry 3 }
+	usrFaSaKey OBJECT-TYPE
+		SYNTAX     UsrSecretDisplay
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The shared secret key for the security associations."
+		--CONFIGURABLE
+	::= { usrFaSaEntry 4 }
+	usrFaSaStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"This object is used to add, modify, and delete
+			 rows for the security association table."
+		--CONFIGURABLE
+	::= { usrFaSaEntry 5 }
+	usrFAAuthStyle OBJECT-TYPE
+		SYNTAX INTEGER {
+			rfc2002(1),
+			rfc2002bis(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The auth style PDSN will adhere to for FA-HA auth ext."
+		--CONFIGURABLE
+	::= { usrFASystemConfig 23 }
+        usrFAStatsResetTime OBJECT-TYPE
+                SYNTAX DateAndTime
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                        "Reading:
+                                Time the FA MIP statistics counters were last
+                                reset. The FA MIP statistics are valid from
+                                usrFAStatsResetTime until present.
+                                Resetting counters causes a discontinuity in
+                                the monotonically increasing value of counters.
+                                Management stations that sample these counters
+                                need also to sample this object so that they
+                                can know that a discontinuity occurred with
+                                respect to the previous sample. Its value is
+                                described in SNMPv2-TC (RFC1903).
+                        Writing:
+                            Writing of DateAndTime causes update of usrFAStatsResetTime
+                                to the current time
+                                and the FA MIP counters to be reset to 0:
+                                usrFARegReqStats
+                                usrFAInitRegReqStats
+                                usrFAReRegReqStats
+                                usrFADeRegReqStats
+                                usrFARegReqDeniedByPDSNStats
+                                usrFARegReqDeniedByHAStats
+                                usrFAMIPAuthStats
+                                usrFAMIPCallReleasedStats
+                        This object replaces usrFAResetStats "
+        ::= { usrFASystemConfig 24 }
+        usrFAMPAStatsResetTime OBJECT-TYPE
+                SYNTAX DateAndTime
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                        "Reading:
+                                Time the FA MPA statistics counters were last
+                                reset. The FA MPA statistics are valid from
+                                usrFAMPAStatsResetTime until present.
+                                Resetting counters causes a discontinuity in
+                                the monotonically increasing value of counters.
+                                Management stations that sample these counters
+                                need also to sample this object so that they
+                                can know that a discontinuity occurred with
+                                respect to the previous sample.  Its value is
+                                described in SNMPv2-TC (RFC1903).
+                        Writing:
+                            Writing of DateAndTime causes update of usrFAMPAStatsResetTime
+                                to the current time
+                                and the FA MPA counters to be reset to 0:
+                                usrFAMPARegStat
+                        This object replaces usrFAResetStats "
+        ::= { usrFASystemConfig 25 }
+-- Foreign Agent Registration Group
+	usrFAVisitorTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrFAVisitorEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"A table containing the foreign agent's visitor
+			 list.  The foreign agent updates this table in
+			 response to registration events from mobile nodes."
+	::= { usrFARegistration 1 }
+	usrFAVisitorEntry OBJECT-TYPE
+		SYNTAX UsrFAVisitorEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"An entry in the Foreign Agent Visitors Table."
+		INDEX { usrFAVisitorHomeAddress }
+	::= { usrFAVisitorTable 1 }
+	UsrFAVisitorEntry ::= SEQUENCE {
+		usrFAVisitorHomeAddress       IpAddress,
+		usrFAVisitorHomeAgentAddress  IpAddress,
+		usrFAVisitorTimeGranted       Integer32,
+		usrFAVisitorTimeRemaining     Integer32,
+		usrFAVisitorRegFlags          Integer32,
+		usrFAVisitorRegIDLow          UsrDisplayIntAsHex,
+		usrFAVisitorRegIDHigh         UsrDisplayIntAsHex,
+		usrFAVisitorRegIsAccepted     TruthValue
+	}
+	usrFAVisitorHomeAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Home IP address of visiting mobile node."
+	::= { usrFAVisitorEntry 1 }
+	usrFAVisitorHomeAgentAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Home agent IP address for this visiting mobile
+			 node."
+	::= { usrFAVisitorEntry 2 }
+	usrFAVisitorTimeGranted OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The lifetime in seconds granted to the mobile
+			 node for this registration.  Only valid if
+			 usrFAVisitorRegIsAccepted is true(1)."
+	::= { usrFAVisitorEntry 3 }
+	usrFAVisitorTimeRemaining OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of seconds remaining until the
+			 registration is expired.  It has the same initial
+			 value as usrFAVisitorTimeGranted and is counted
+			 down by this foreign agent."
+	::= { usrFAVisitorEntry 4 }
+	usrFAVisitorRegFlags OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Registration flags as sent by the mobile node in the
+			 Registration Request message."
+	::= { usrFAVisitorEntry 5 }
+	usrFAVisitorRegIDLow OBJECT-TYPE
+		SYNTAX     UsrDisplayIntAsHex
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Low 32 bits of Identification used in the mobile
+			 node's Registration Request message."
+	::= { usrFAVisitorEntry 6 }
+	usrFAVisitorRegIDHigh OBJECT-TYPE
+		SYNTAX     UsrDisplayIntAsHex
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"High 32 bits of Identification used in the mobile
+			 node's Registration Request message."
+	::= { usrFAVisitorEntry 7 }
+	usrFAVisitorRegIsAccepted OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Whether the registration has been accepted or not.
+			 If it is false(2), this registration is still
+			 pending for reply."
+	::= { usrFAVisitorEntry 8 }
+-- Foreign Agent Registration Group Counters
+	usrFARegRequestsReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of valid Registration Requests
+			 received.
+			Note: obsolete, changed to usrFATotInitRegReqRec"
+	::= { usrFARegistration 2 }
+	usrFARegRequestsRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests relayed to
+			 home agent by this foreign agent.
+			Note: obsolete, changed to usrFATotInitRegReqRelayed"
+	::= { usrFARegistration 3 }
+	usrFARegDenUnspecified OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to an unspecified reason.  The code information
+			 element inside the Registration Reply message is
+			 equal to 64.
+			Note: obsolete, changed to usrFATotInitRegReqDenied"
+	::= { usrFARegistration 4 }
+	usrFARegDenAdmProhibited OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to an administrative decision.  The code information
+			 element inside the Registration Reply message is
+			 equal to 65.
+			Note: obsolete, changed to usrFATotRegReqDeniedAdminProhibited"
+	::= { usrFARegistration 5 }
+	usrFARegDenNoResources OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to insufficient resources.  The code information
+			 element inside the Registration Reply message is
+			 equal to 66.
+			Note: obsolete, changed to usrFATotRegReqDeniedNoResources"
+	::= { usrFARegistration 6 }
+	usrFARegDenMNAuthFail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to mobile node's failed authentication.  The code
+			 information element inside the Registration Reply
+			 message is equal to 67.
+			Note: obsolete, changed to usrFATotRegReqDeniedMNAuthFailed"
+	::= { usrFARegistration 7 }
+	usrFARegDenMNAccessReject OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to Access Reject from the Home AAA.  The code
+			 information element inside the Registration Reply
+			 message is equal to 67.
+			Note: obsolete, changed to usrFATotRegReqDeniedMNAccessReject"
+	::= { usrFARegistration 8 }
+	usrFARegDenLifetimeTooLong OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to a requested lifetime being too long.  The code
+			 information element inside the Registration Reply
+			 message is equal to 69.
+			Note: obsolete, changed to usrFATotRegReqDeniedLifetimeTooLong"
+	::= { usrFARegistration 9 }
+	usrFARegDenPoorlyFormedReq OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to a poorly formed request.  The code information
+			 element inside the Registration Reply message is
+			 equal to 70.
+			Note: obsolete, changed to usrFATotRegReqDeniedPoorlyFormedReq"
+	::= { usrFARegistration 10 }
+	usrFARegDenEncapUnavail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to an unsupported encapsulation request.  The code
+			 information element inside the Registration Reply
+			 message is equal to 72.
+			Note: obsolete, changed to usrFATotRegReqDeniedEncapUnavail"
+	::= { usrFARegistration 11 }
+	usrFARegDenVJCompUnavail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to an inability of foreign agent to perform Van
+			 Jacobson header compression.  The code information
+			 element inside the Registration Reply message is
+			 equal to 73.
+			Note: obsolete, changed to usrFATotRegReqDeniedVJCompUnavail"
+	::= { usrFARegistration 12 }
+	usrFARegDenHAUnreachable OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Requests denied due
+			 to home agent being unreachable by the foreign
+			 agent.  The code information element inside the
+			 Registration Reply message is equal to either
+			 80, 81, 82 or 88.
+			Note: obsolete, changed to usrFATotRegReqDeniedHAUnreachable"
+	::= { usrFARegistration 13 }
+	usrFARegRepliesReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of valid Registration Replies received
+			 from the home agent.
+			Note: obsolete, changed to usrFATotReReqRepValidFromHA"
+	::= { usrFARegistration 14 }
+	usrFARegRepliesRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of valid Registration Replies relayed
+			 to the mobile node by this foreign agent.
+			Note: obsolete, changed to usrFATotReReqRepValidRelayToMN"
+	::= { usrFARegistration 15 }
+	usrFARegDenHAAuthFail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Replies denied due
+			 to home agent failing authentication.  The code
+			 information element inside the Registration Reply
+			 message is equal to 68.
+			Note: obsolete, changed to usrFATotRegDeniedHAAuthFailed"
+	::= { usrFARegistration 16 }
+	usrFARegDenPoorlyFormedRep OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Replies denied due
+			 to a poorly formed reply.  The code information
+			 element inside the Registration Reply message is
+			 equal to 7.
+			Note: obsolete, changed to usrFATotRegDeniedPoorlyFormedRep"
+	::= { usrFARegistration 17 }
+	usrFAAgentAdvertisementSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Agent Advertisements sent by
+			 the Foreign Agent.
+			Note: obsolete, changed to usrFATotAgentAdvFA"
+	::= { usrFARegistration 18 }
+	usrFARegDenNoReverseTunnel OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Replies denied due
+			 Reverse tunnelling not available
+			Note: obsolete, changed to usrFATotRegDeniedNoReverseTunnel"
+	::= { usrFARegistration 19 }
+	usrFARegDenHomeAddrNotAllowed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Replies denied due
+			 to Home Address not allowed in registration 
+			 requests
+			Note: obsolete, changed to usrFATotRegDeniedHomeAddrNotAllowed"
+	::= { usrFARegistration 20 }
+	usrFARegDenHomeAgentReq OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Replies denied due
+			 to Home Agent Address Required in the Registration
+			 request
+			Note: obsolete, changed to usrFATotRegDeniedHomeAgentRequired"
+	::= { usrFARegistration 21 }
+	usrFARegHomeAddrRequired OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Replies denied due
+			 to Home Address required in the Registration 
+			 request
+			Note: obsolete, changed to usrFATotRegDeniedHomeAddrRequired"
+	::= { usrFARegistration 22 }
+-- Foreign Agent CFM Configuration Group
+	usrFAConfigFileName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The name of the configuration file for FA.  If
+			 this value is empty, then the default file name
+			 is @file://FAProcess.cfg."
+	::= { usrFACfmConfig 1 }
+	usrFACfmStatus OBJECT-TYPE
+		SYNTAX UsrConfigStatus
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The Configuration File Manager Flag for
+			 saving Foreign Agent configurable parameters."
+	::= { usrFACfmConfig 2 }
+-- Foreign Agent Registration Request Statistics (usrFARegReqStats 4)
+	usrFATotRegReqRec OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests Received."
+	::= { usrFARegReqStats 1 }
+	usrFATotRegReqAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests Accepted."
+	::= { usrFARegReqStats 2 }
+	usrFATotRegReqReject OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests Rejected/Denied."
+	::= { usrFARegReqStats 3 }
+	usrFATotRegReqDiscard OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests silently Discarded."
+	::= { usrFARegReqStats 4 }
+	usrFATotRegReqRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests relayed."
+	::= { usrFARegReqStats 5 }
+	usrFATotReqReqAuthFailed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests failed Authentication."
+	::= { usrFARegReqStats 6 }
+	usrFATotRegReqDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests denied."
+	::= { usrFARegReqStats 7 }
+	usrFATotRegReqDeniedPDSN OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests denied by PDSN."
+	::= { usrFARegReqStats 8 }
+	usrFATotRegReqDeniedHA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Requests denied by HA."
+	::= { usrFARegReqStats 9 }
+	usrFATotReqRepValidFromHA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Replies Received from HA."
+	::= { usrFARegReqStats 10 }
+	usrFATotReqRepValidRelayToMN OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Registration Replies Relayed to Mobile."
+	::= { usrFARegReqStats 11 }
+	usrFATotAgentAdvFA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Agent Advertisement sent by the FA."
+	::= { usrFARegReqStats 12 }
+-- Foreign Agent Initial Registration Request Statistics (usrFAInitRegReqStats 5)
+	usrFATotInitRegReqRec OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests Received."
+	::= { usrFAInitRegReqStats 1 }
+	usrFATotInitRegReqAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests Accepted."
+	::= { usrFAInitRegReqStats 2 }
+	usrFATotInitRegReqReject OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests Rejected/Denied."
+	::= { usrFAInitRegReqStats 3 }
+	usrFATotInitRegReqDiscard OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests silently Discarded."
+	::= { usrFAInitRegReqStats 4 }
+	usrFATotInitRegReqRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests relayed."
+	::= { usrFAInitRegReqStats 5 }
+	usrFATotInitReqReqAuthFailed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests failed Authentication."
+	::= { usrFAInitRegReqStats 6 }
+	usrFATotInitRegReqDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests denied."
+	::= { usrFAInitRegReqStats 7 }
+	usrFATotInitRegReqDeniedPDSN OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests denied by PDSN."
+	::= { usrFAInitRegReqStats 8 }
+	usrFATotInitRegReqDeniedHA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Initial Registration Requests denied by HA."
+	::= { usrFAInitRegReqStats 9 }
+	usrFATotInitReqRepValidFromHA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of valid Initial Registration Replies received from HA."
+	::= { usrFAInitRegReqStats 10 }
+	usrFATotInitReqRepValidRelayToMN OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of valid Initial Registration Replies relayed to Mobile."
+	::= { usrFAInitRegReqStats 11 }
+-- Foreign Agent Re-Registration Request Statistics (usrFAReRegReqStats 6)
+	usrFATotReRegReqRec OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests Received."
+	::= { usrFAReRegReqStats 1 }
+	usrFATotReRegReqAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests Accepted."
+	::= { usrFAReRegReqStats 2 }
+	usrFATotReRegReqReject OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests Rejected/Denied."
+	::= { usrFAReRegReqStats 3 }
+	usrFATotReRegReqDiscard OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests silently Discarded.
+                         Due to the current protocol implementation the software does not identify
+                         a ReRegReqDiscard case. This object currently returns the value 0.
+                         Future protocol implementations may support a ReRegReqDiscard case."
+	::= { usrFAReRegReqStats 4 }
+	usrFATotReRegReqRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests relayed."
+	::= { usrFAReRegReqStats 5 }
+	usrFATotReReqReqAuthFailed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests failed Authentication."
+	::= { usrFAReRegReqStats 6 }
+	usrFATotReRegReqDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests denied."
+	::= { usrFAReRegReqStats 7 }
+	usrFATotReRegReqDeniedPDSN OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests denied by PDSN."
+	::= { usrFAReRegReqStats 8 }
+	usrFATotReRegReqDeniedHA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Re-Registration Requests denied by HA."
+	::= { usrFAReRegReqStats 9 }
+	usrFATotReReqRepValidFromHA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of valid Re-Registration Replies Received from HA."
+	::= { usrFAReRegReqStats 10 }
+	usrFATotReReqRepValidRelayToMN OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of valid Re-Registration Replies Relayed to Mobile."
+	::= { usrFAReRegReqStats 11 }
+-- Foreign Agent De-Registration Request Statistics (usrFADeRegReqStats 7)
+	usrFATotDeRegReqRec OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs Received."
+	::= { usrFADeRegReqStats 1 }
+	usrFATotDeRegReqAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs Accepted."
+	::= { usrFADeRegReqStats 2 }
+	usrFATotDeRegReqReject OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs Rejected/Denied."
+	::= { usrFADeRegReqStats 3 }
+	usrFATotDeRegReqDiscard OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs silently Discarded.
+                         Due to the current protocol implementation the software does not identify
+                         a DeRegReqDiscard case. This object currently returns the value 0.
+                         Future protocol implementations may support a DeRegReqDiscard case."
+	::= { usrFADeRegReqStats 4 }
+	usrFATotDeRegReqRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs relayed."
+	::= { usrFADeRegReqStats 5 }
+	usrFATotDeReqReqAuthFailed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs failed Authentication."
+	::= { usrFADeRegReqStats 6 }
+	usrFATotDeRegReqDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs denied."
+	::= { usrFADeRegReqStats 7 }
+	usrFATotDeRegReqDeniedPDSN OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs denied by PDSN."
+	::= { usrFADeRegReqStats 8 }
+	usrFATotDeRegReqDeniedHA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of De-Registration Reqs denied by HA."
+	::= { usrFADeRegReqStats 9 }
+	usrFATotDeReqRepValidFromHA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of valid De-Registration Rpls Received from HA."
+	::= { usrFADeRegReqStats 10 }
+	usrFATotDeReqRepValidRelayToMN OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of valid De-Registration Rpls Relayed to Mobile."
+	::= { usrFADeRegReqStats 11 }
+-- Foreign Agent Registration Request Denied by PDSN (usrFARegReqDeniedByPDSNStats 8)
+	usrFATotRegReqDeniedUnspecified OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (reason unspecified)
+			The Registration Reply code field may be equal to 64, 97, 75, 98, 99, 96."
+	::= { usrFARegReqDeniedByPDSNStats 1 }
+	usrFATotRegReqDeniedAdminProhibited OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (administratively prohibited)
+			The Registration Reply code field is equal to 65."
+	::= { usrFARegReqDeniedByPDSNStats 2 }
+	usrFATotRegReqDeniedNoResources OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (insufficient resources)
+			The Registration Reply code field is equal to 66."
+	::= { usrFARegReqDeniedByPDSNStats 3 }
+	usrFATotRegReqDeniedMNAuthFailed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (mobile node failed authentication)
+			Total number of Registration Requests denied due to
+			Authentication problems from the PDSN.
+			The Registration Reply code field is equal to 67."
+	::= { usrFARegReqDeniedByPDSNStats 4 }
+	usrFATotRegReqDeniedMNAccessReject OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (mobile node failed authentication)
+			Total number of Registration Requests denied due to
+			Access Reject from the AAA.
+			This is a subset of usrFATotRegReqDeniedMNAuthFailed.
+			The Registration Reply code field is equal to 67."
+	::= { usrFARegReqDeniedByPDSNStats 5 }
+	usrFATotRegReqDeniedLifetimeTooLong OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (requested Lifetime too long)
+			The Registration Reply code field is equal to 69."
+	::= { usrFARegReqDeniedByPDSNStats 6 }
+	usrFATotRegReqDeniedPoorlyFormedReq OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (poorly formed Request)
+			Total number of Registration Requests denied due to
+			the reserved bit set. [RFC2002]
+			The Registration Reply code field is equal to 70."
+	::= { usrFARegReqDeniedByPDSNStats 7 }
+	usrFATotRegReqDeniedEncapUnavail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (requested encapsulation unavailable)
+			The Registration Reply code field is equal to 72."
+	::= { usrFARegReqDeniedByPDSNStats 8 }
+	usrFATotRegReqDeniedVJCompUnavail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (requested Van Jacobsen compression unavailable)
+			The Registration Reply code field is equal to 73."
+	::= { usrFARegReqDeniedByPDSNStats 9 }
+	usrFATotRegReqDeniedHAUnreachable OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by PDSN, (home agent host unreachable)
+			The Registration Reply code field may be equal to 80, 81, 82, 88."
+	::= { usrFARegReqDeniedByPDSNStats 10 }
+     usrFATotRegReqDeniedMissingNAI OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of RRQ denied by PDSN, (missing NAI)
+               The Registration Reply code field is equal to 97."
+     ::= { usrFARegReqDeniedByPDSNStats 11 }
+     usrFATotRegReqDeniedRevTunnelMandatoryTBitNotSet OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of RRQ denied by PDSN, (rev. tunnel mandatory and T-bit not set)
+               The Registration Reply code field is equal to 75."
+     ::= { usrFARegReqDeniedByPDSNStats 12 }
+     usrFATotRegReqDeniedMissingHomeAgent OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of RRQ denied by PDSN, (missing home agent)
+               The Registration Reply code field is equal to 98."
+     ::= { usrFARegReqDeniedByPDSNStats 13 }
+     usrFATotRegReqDeniedMissingHomeAddress OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of RRQ denied by PDSN, (missing home address)
+               The Registration Reply code field is equal to 99."
+     ::= { usrFARegReqDeniedByPDSNStats 14 }
+     usrFATotRegReqDeniedNonZeroHomeAddressRequested OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of RRQ denied by PDSN, (non-zero home address req)
+               The Registration Reply code field is equal to 96."
+     ::= { usrFARegReqDeniedByPDSNStats 15 }
+     usrFATotRegReqDeniedUnknownChallenge OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of RRQ denied by PDSN, (unknown challenge)
+               The Registration Reply code field is equal to 104."
+     ::= { usrFARegReqDeniedByPDSNStats 16 }
+     usrFATotRegReqDeniedMissingChallenge OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of RRQ denied by PDSN, (missing challenge)
+               The Registration Reply code field is equal to 105."
+     ::= { usrFARegReqDeniedByPDSNStats 17 }
+     usrFATotRegReqDeniedUsedChallenge OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of RRQ denied by PDSN, (used challenge)
+               The Registration Reply code field is equal to 106."
+     ::= { usrFARegReqDeniedByPDSNStats 18 }
+-- Foreign Agent Registration Request Denied by HA (usrFARegReqDeniedByHAStats 9)
+	usrFATotRegDeniedHAAuthFailed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by HA, mobile node failed authentication
+			The HA Registration Reply code field is equal to 131."
+	::= { usrFARegReqDeniedByHAStats 1 }
+	usrFATotRegDeniedPoorlyFormedRep OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"This counter is n/a in this version, its value is 0 and is reserved for the future."
+	::= { usrFARegReqDeniedByHAStats 2 }
+	usrFATotRegDeniedNoReverseTunnel OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by HA, requested reverse tunnel unavailable
+			The HA Registration Reply code field is equal to 137."
+	::= { usrFARegReqDeniedByHAStats 3 }
+	usrFATotRegDeniedHomeAddrNotAllowed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"This counter is n/a in this version, its value is 0 and is reserved for the future."
+	::= { usrFARegReqDeniedByHAStats 4 }
+	usrFATotRegDeniedHomeAgentRequired OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of RRQ denied by HA, unknown home agent address
+			The HA Registration Reply code field is equal to 136."
+	::= { usrFARegReqDeniedByHAStats 5 }
+	usrFATotRegDeniedHomeAddrRequired OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"This counter is n/a in this version, its value is 0 and is reserved for the future."
+	::= { usrFARegReqDeniedByHAStats 6 }
+-- Foreign Agent MIP Authentication Statistics (usrFAMIPAuthStats 10)
+	usrFATotMIPAuthAttempts OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP AAA authentication attempts."
+	::= { usrFAMIPAuthStats 1 }
+	usrFATotMIPAuthFailure OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP AAA authentication failures."
+	::= { usrFAMIPAuthStats 2 }
+	usrFATotMIPAuthSuccess OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP AAA authentication success."
+	::= { usrFAMIPAuthStats 3 }
+	usrFATotMIPAuthFACFailure OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP AAA FAC authentication failures.
+			 MIP Registration Requests rejected by the AAA server
+			 due to authentication failures."
+	::= { usrFAMIPAuthStats 4 }
+	usrFATotMIPAuthFailureOther OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP authentication failures other reasons.
+			 MIP Registration Requests rejected by the PDSN
+			 due to failures during the AAA authentication phase."
+	::= { usrFAMIPAuthStats 5 }
+-- Foreign Agent MIP Call Release Reasons (usrFAMIPCallReleasedStats 11)
+	usrFATotMIPCallReleased OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP Connections Released."
+	::= { usrFAMIPCallReleasedStats 1 }
+	usrFATotMIPCallReleasedIngressFilter OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP Released due to Ingress filtering."
+	::= { usrFAMIPCallReleasedStats 2 }
+	usrFATotMIPCallReleasedAuthFailure OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP Released due to AAA Authentication failure."
+	::= { usrFAMIPCallReleasedStats 3 }
+	usrFATotMIPCallReleasedDeReg OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP Released due to De-Registration."
+	::= { usrFAMIPCallReleasedStats 4 }
+	usrFATotMIPCallReleasedOther OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MIP Released due to other reasons."
+	::= { usrFAMIPCallReleasedStats 5 }
+	usrFAServiceOptionStatsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrFAServiceOptionStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of MIP Registration request stats based on Service Option"
+	::= { usrFAServiceOptionStats 1 }
+	usrFAServiceOptionStatsEntry OBJECT-TYPE
+		SYNTAX UsrFAServiceOptionStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the FA Service Option Stats Table."
+		INDEX { usrFAServiceOptionStatsTableIndex }
+	::= { usrFAServiceOptionStatsTable 1 }
+	UsrFAServiceOptionStatsEntry ::= SEQUENCE {
+		usrFAServiceOptionStatsTableIndex     INTEGER,
+		usrFAServiceOptionRegReqRcvd          Counter32,
+		usrFAServiceOptionInitRegReqRcvd      Counter32,
+		usrFAServiceOptionReRegReqRcvd        Counter32,
+		usrFAServiceOptionDeRegReqRcvd        Counter32
+	}
+	usrFAServiceOptionStatsTableIndex OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The value of Service Option received over All interface by PDSN."
+	::= { usrFAServiceOptionStatsEntry 1 }
+	usrFAServiceOptionRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid MIP Registration Requests
+			 received for the Service Option."
+	::= { usrFAServiceOptionStatsEntry 2 }
+	usrFAServiceOptionInitRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid Initial MIP Registration Requests
+			 received for the Service Option."
+	::= { usrFAServiceOptionStatsEntry 3 }
+	usrFAServiceOptionReRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid Repeat MIP Registration Requests
+			 received for the Service Option."
+	::= { usrFAServiceOptionStatsEntry 4 }
+	usrFAServiceOptionDeRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid MIP Registration Requests
+			 received with a Lifetime of zero (requests
+			 to deregister) for this service option."
+	::= { usrFAServiceOptionStatsEntry 5 }
+-- Foreign Agent MPA Registration Statistics Group
+	usrFAMPACreated OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of Mobile Proxy Agents created
+			 successfully." 
+	::= { usrFAMPARegStat 1 }
+	usrFAMPARegRequestsSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MPA Registration Requests 
+			 sent."
+	::= { usrFAMPARegStat 2 }
+	usrFAMPARegRepliesReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of valid MPA Registration
+			 replies received."
+	::= { usrFAMPARegStat 3 }
+	usrFAMPARegRejectsReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MPA Registration Rejects
+			 received."
+	::= { usrFAMPARegStat 4 }
+	usrFAMPADeRegRequestsSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MPA De-registration 
+			 Requests sent."
+	::= { usrFAMPARegStat 5 }
+	usrFAMPADeRegRepliesReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of valid MPA De-registration 
+			 Replies received."
+	::= { usrFAMPARegStat 6 }
+	usrFAMPADeRegRejectsReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MPA De-registration 
+			 Rejects received."
+	::= { usrFAMPARegStat 7 }
+	usrFAMPARegUpdatesReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MPA Registration Updates
+			 received."
+	::= { usrFAMPARegStat 8 }
+	usrFAMPARegUpdateAckSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of MPA Registration Update
+			 Acknowledgements sent."
+	::= { usrFAMPARegStat 9 }
+	usrFAMPATeardownsPPPInit OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of PPP initiated MPA 
+			 teardowns."
+	::= { usrFAMPARegStat 10 }
+	usrFAMPATeardownsHAInit OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Total number of HA initiated MPA 
+			 teardowns."
+	::= { usrFAMPARegStat 11 }
+-- Foreign Agent MIP Data Statistics (usrFAMIPDataStats 13)
+     usrFATotCurrentMIPConnections OBJECT-TYPE
+          SYNTAX Unsigned32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of current MIP connections"
+     ::= { usrFAMIPDataStats 1 }
+-- Foreign Agent MIP DMU Statistics (usrFAMIPDMUStats 15)
+     usrFAMIPDMUUpdateKeyAR OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of DMU Update Key Access Rejects received from
+               AAA. Update Key state is where the AAA requires that the Mobile
+               generate a new set of keys and update the AAA."
+     ::= { usrFAMIPDMUStats 1 }
+     usrFAMIPDMUKeysUpdatedAR OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "Total number of DMU Keys Updated Access Rejects received from
+               AAA. Keys Updated state is when the AAA has received a new set
+               of keys from the Mobile and the user profile is updated."
+     ::= { usrFAMIPDMUStats 2 }
+-- Foreign Agent visitor tables which support Duplicate IP entries
+	usrFAVisitor2Table OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrFAVisitor2Entry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"A table containing the foreign agent's visitor
+			 list. This MIB supports duplicate entries in the foreign agent
+       visitor table." 
+	::= { usrFARegistration 23 }
+	UsrFAVisitor2Entry ::= SEQUENCE {
+		usrFAVisitor2ConnId            Integer32,
+		usrFAVisitor2SessionId         Integer32,
+		usrFAVisitor2HomeAddress       IpAddress,
+		usrFAVisitor2HomeAgentAddress  IpAddress,
+		usrFAVisitor2TimeGranted       Integer32,
+		usrFAVisitor2TimeRemaining     Integer32,
+		usrFAVisitor2RegFlags          Integer32,
+		usrFAVisitor2RegIDLow          UsrDisplayIntAsHex,
+		usrFAVisitor2RegIDHigh         UsrDisplayIntAsHex,
+		usrFAVisitor2RegIsAccepted     TruthValue
+	}
+	usrFAVisitor2Entry OBJECT-TYPE
+		SYNTAX UsrFAVisitor2Entry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"An entry in the Foreign Agent Visitors Table which supports duplicate IP entries."
+		INDEX { usrFAVisitor2ConnId, usrFAVisitor2SessionId }
+	::= { usrFAVisitor2Table 1 }
+	usrFAVisitor2ConnId OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"The connection Id associated with the PPP connection
+			 that the user is using to register."
+	::= { usrFAVisitor2Entry 9 }
+	usrFAVisitor2SessionId OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"The session Id associated with the visitor session."
+	::= { usrFAVisitor2Entry 10 }
+	usrFAVisitor2HomeAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Home IP address of visiting mobile node."
+	::= { usrFAVisitor2Entry 1 }
+	usrFAVisitor2HomeAgentAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Home agent IP address for this visiting mobile
+			 node."
+	::= { usrFAVisitor2Entry 2 }
+	usrFAVisitor2TimeGranted OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The lifetime in seconds granted to the mobile
+			 node for this registration.  Only valid if
+			 usrFAVisitor2RegIsAccepted is true(1)."
+	::= { usrFAVisitor2Entry 3 }
+	usrFAVisitor2TimeRemaining OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of seconds remaining until the
+			 registration is expired.  It has the same initial
+			 value as usrFAVisitor2TimeGranted and is counted
+			 down by this foreign agent."
+	::= { usrFAVisitor2Entry 4 }
+	usrFAVisitor2RegFlags OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Registration flags as sent by the mobile node in the
+			 Registration Request message."
+	::= { usrFAVisitor2Entry 5 }
+	usrFAVisitor2RegIDLow OBJECT-TYPE
+		SYNTAX     UsrDisplayIntAsHex
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Low 32 bits of Identification used in the mobile
+			 node's Registration Request message."
+	::= { usrFAVisitor2Entry 6 }
+	usrFAVisitor2RegIDHigh OBJECT-TYPE
+		SYNTAX     UsrDisplayIntAsHex
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"High 32 bits of Identification used in the mobile
+			 node's Registration Request message."
+	::= { usrFAVisitor2Entry 7 }
+	usrFAVisitor2RegIsAccepted OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Whether the registration has been accepted or not.
+			 If it is false(2), this registration is still
+			 pending for reply."
+	::= { usrFAVisitor2Entry 8 }
+END

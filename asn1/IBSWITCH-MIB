@@ -1,0 +1,2009 @@
+-- extracted from draft-forbes-ibswitchmib-00.txt
+-- at Sat Jul 14 06:05:23 2001
+
+   IBSWITCH-MIB DEFINITIONS ::= BEGIN 
+     IMPORTS 
+        enterprises, NetworkAddress 
+             FROM RFC1155-SMI 
+        OBJECT-TYPE 
+             FROM RFC1212 
+        TRAP-TYPE 
+             FROM RFC-1215; 
+    
+     -- additional textual conventions 
+    
+     -- DisplayString: comment out the next line if your MIB compiler  
+     -- complains that it is already defined. 
+        DisplayString    ::= OCTET STRING -- displayable octets (ASCII) 
+    
+        GswType     ::= INTEGER { 
+             fcSwitch           (1), 
+             ibSwitch           (2), 
+             ibRouter           (3), 
+             ib2fcEdgeRouter    (4), 
+             iSCSIBasedIPSwitch (5), 
+             ib2iSCSEdgeRouter  (6), 
+             fc2iSCSIEdgeRouter (7) 
+             } 
+    
+        GswLocalId       ::= OCTET STRING (SIZE(8)) 
+    
+        GswGlobalId      ::= OCTET STRING (SIZE(16)) 
+    
+        GswOlsName       ::= OCTET STRING (SIZE(256)) 
+    
+        GswFwVersion     ::= OCTET STRING (SIZE(0..24)) 
+             -- example: 
+             -- v1.0.1 
+    
+        GswDate          ::= OCTET STRING (SIZE(0..64)) 
+             -- example: 
+             -- Wed Mar 21 17:07:17 2001 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 25    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+        GswSwitchStatus     ::=INTEGER { 
+             online           (1),     -- switch is accessible by an  
+                                       -- external port. 
+             offline          (2),     -- switch is not accessible. 
+             testing          (3),     -- switch is in a built-in test  
+                                       -- mode and is not accessible by  
+                                       -- an external port. 
+             faulty           (4),     -- switch is not operational. 
+             reboot           (5),     -- set the switch to reboot in 1  
+                                       -- second. 
+             fastboot         (6)      -- set the switch to fastboot in  
+                                       -- 1 second. 
+                                       -- Fastboot would cause the  
+                                       -- switch to boot but skip over  
+                                       -- the POST. When the switch is 
+                                       -- in faulty state, only three  
+                                       -- states can be set: 
+                                       -- faulty, reboot, and fastboot. 
+             } 
+    
+        GswOnOff     ::= INTEGER { on (1), off (2) } 
+    
+        GswSensorTypeDef ::= INTEGER { 
+             temperature          (1), 
+             fan                  (2), 
+             power-supply         (3) 
+        } 
+    
+        GswSensorStatusDef ::= INTEGER { 
+             unknown              (1), 
+             faulty               (2), 
+             below-min            (3), 
+             nominal              (4), 
+             above-max            (5), 
+             absent               (6) 
+        } 
+    
+        GswIBNodeType      ::= INTEGER { 
+             channelAdapter       (1), 
+             switch               (2), 
+             router               (3) 
+        } 
+    
+        GswIBGUID         ::= OCTET STRING (SIZE(8)) 
+        GswIBGID          ::= OCTET STRING (SIZE(8)) 
+        GswIBLID          ::= OCTET STRING (SIZE(2)) 
+        GswIBLinkWidth     ::= INTEGER { 
+             nop                  (1), 
+             lw1x                 (2), 
+             lw4x                 (3), 
+             lw1x-4x              (4), 
+    
+   Forbes             Expires December 31, 2001                Page 26    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+             lw12x                (9), 
+             lw1x-12x             (10), 
+             lw4x-12x             (11), 
+             lw1x-4x-12x          (12) 
+        } 
+        GswIBLinkSpeed     ::= INTEGER { 
+             ls2-5gbps            (1) 
+        } 
+        GswIBPortState     ::= INTEGER { 
+             nop                  (1), 
+             down                 (2), 
+             initialize           (3), 
+             armed                (4), 
+             actived              (5) 
+        } 
+        GswIBPortPhysState ::= INTEGER { 
+             nop                  (1), 
+             sleep                (2), 
+             polling              (3), 
+             disabled             (4), 
+             portconftrain        (5), 
+             linkup               (6), 
+             linkerrorrec0        (7) 
+        } 
+        GswIBMTU           ::= INTEGER { 
+             mtu256               (1), 
+             mtu512               (2), 
+             mtu1024              (3), 
+             mtu2048              (4), 
+             mtu4096              (5) 
+        } 
+        GswIBVL            ::= INTEGER { 
+             vl0                  (1), 
+             vl0vl1               (2), 
+             vl0vl3               (3), 
+             vl0vl7               (4), 
+             vl0vl14              (5) 
+        } 
+    
+        GswEventSeverity   ::= INTEGER { 
+             none                 (0), 
+             critical             (1), 
+             error                (2), 
+             warning              (3), 
+             informational        (4), 
+             debug                (5) 
+        } 
+    
+   -- 64 bit counter definition 
+        GswCounter64  ::= OCTET STRING (SIZE(16)) 
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 27    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     -- Product Lines or Generic Product information 
+     xrt               OBJECT IDENTIFIER ::= { experimental } 
+    
+     commDev           OBJECT IDENTIFIER ::= { xrt 2 } 
+     genericSwitch     OBJECT IDENTIFIER ::= { commDev 2 } 
+    
+     gsw               OBJECT IDENTIFIER ::= { genericSwitch 1 } 
+     ib1k              OBJECT IDENTIFIER ::= { genericSwitch 2 } 
+    
+     -- various groups 
+     gswMisc           OBJECT IDENTIFIER ::= { gsw 1 } 
+     gswSystem         OBJECT IDENTIFIER ::= { gsw 2 } 
+    
+     gswFabric         OBJECT IDENTIFIER ::= { gsw 5 } 
+     gswModule         OBJECT IDENTIFIER ::= { gsw 6 } 
+    
+     gswPort           OBJECT IDENTIFIER ::= { gsw 10 } 
+     gswPortPerf       OBJECT IDENTIFIER ::= { gsw 11 } 
+    
+     gswNs             OBJECT IDENTIFIER ::= { gsw 13 } 
+    
+     gswEvent          OBJECT IDENTIFIER ::= { gsw 15 } 
+    
+     gswEndDevice      OBJECT IDENTIFIER ::= { gsw 21 } 
+    
+     gswAgtCfg         OBJECT IDENTIFIER ::= { gsw 25 } 
+    
+     -- 
+     -- Misc. Group 
+     -- 
+     gswMIBVersion      OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (4)) 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "MIB version in textual format. 
+             example: 
+                  version 1.0 is represented as 0100 
+                  version 1.1 is represented as 0101" 
+     ::= { gswMisc 1 } 
+    
+     gswMIBCurrentDate  OBJECT-TYPE 
+        SYNTAX          GswDate 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The current date information of the location  
+             of the MIB in displayable textual format." 
+     ::= { gswMisc 2 } 
+     -- 
+     -- End of Misc. Group 
+     -- 
+    
+    
+   Forbes             Expires December 31, 2001                Page 28    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     -- 
+    -- System Group 
+     -- 
+     gswNumOfSwitch     OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the number of switches 
+             represented in gswInventoryTable." 
+     ::= { gswSystem 1 } 
+    
+     gswInventoryTable  OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswInventoryEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "It is a table that contains entries of  
+             switches in a SAN.  A SAN may consist of IB subnets,  
+             FC fabrics, IB-IB routers, and IB-FC edge routers." 
+     ::= { gswSystem 2 } 
+    
+     gswInventoryEntry  OBJECT-TYPE 
+        SYNTAX          GswInventoryEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the switch information." 
+        INDEX          { gswInventoryType, gswInventoryId } 
+     ::= { gswInventoryTable 1 } 
+    
+     GswInventoryEntry ::= SEQUENCE { 
+        gswInventoryType           GswType, 
+        gswInventoryId             GswLocalId, 
+        gswSwitchName              GswOlsName, 
+        gswSwitchGlobalId          GswGlobalId, 
+        gswSwitchEIP               NetworkAddress, 
+        gswSwitchIIP               NetworkAddress, 
+        gswSwitchIGW               NetworkAddress, 
+        gswSwitchSANName           GswOlsName, 
+        gswSwitchFabricName        GswOlsName 
+     } 
+    
+     gswInventoryType   OBJECT-TYPE 
+        SYNTAX          GswType 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object is one of two indices used by 
+             gswInventoryTable. This index denotes the type of 
+             interconnect element." 
+     ::= { gswInventoryEntry 1 } 
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 29    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswInventoryId     OBJECT-TYPE 
+        SYNTAX          GswLocalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is an index used by  
+             gswInventoryTable.  If the gswInventoryType is FC switch  
+             type, the gswInventotyId refers to WWN of the switch.  If  
+             the gswInventoryType is IB switch, IB Router or IB-FC Edge  
+             Router, the gswInventoryId refers to GUID of the  
+             interconnect element.  Since the index corresponds to 
+             either WWN or GUID assigned to each interconnect element, 
+             it is unique but may not be contiguous." 
+     ::= { gswInventoryEntry 2 } 
+    
+     gswSwitchName      OBJECT-TYPE 
+        SYNTAX          GswOlsName 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the name of the interconnect  
+             element that corresponds to the combination of  
+             gswTypeIndex and gswIdIndex." 
+     ::= { gswInventoryEntry 7 } 
+    
+     gswSwitchGlobalId  OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the unique global ID assigned to  
+             the switch expressed in array of 16 octets.  It is the  
+             combination of GUID or WWN and type of an interconnect  
+             element." 
+     ::= { gswInventoryEntry 8 } 
+    
+     gswSwitchEIP       OBJECT-TYPE 
+        SYNTAX          NetworkAddress 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the ethernet IP 
+             address of the switch." 
+     ::= { gswInventoryEntry 9 } 
+    
+     gswSwitchIIP       OBJECT-TYPE 
+        SYNTAX          NetworkAddress 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the in-band IP 
+             address of the switch." 
+     ::= { gswInventoryEntry 10 } 
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 30    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswSwitchIGW       OBJECT-TYPE 
+        SYNTAX          NetworkAddress 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the in-band gateway IP 
+             address of the switch." 
+     ::= { gswInventoryEntry 11 } 
+    
+     gswSwitchSANName   OBJECT-TYPE 
+        SYNTAX          GswOlsName 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the name of the SAN the  
+             interconnect element resides in." 
+     ::= { gswInventoryEntry 12 } 
+    
+     gswSwitchFabricName OBJECT-TYPE 
+        SYNTAX          GswOlsName 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the name of the FC fabric or IB  
+             subnet the interconnect element resides in." 
+     ::= { gswInventoryEntry 13 } 
+    
+     gswSwitchComTable  OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswSwitchComEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "It is a table that contains common fields for 
+             entries of switches in a SAN. SAN may consist of IB  
+             subnets, FC fabrics, IB-IB routers, and IB-FC edge  
+             routers." 
+     ::= { gswSystem 3 } 
+    
+     gswSwitchComEntry  OBJECT-TYPE 
+        SYNTAX          GswSwitchComEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the common switch information." 
+        INDEX          { gswSwitchSwitchId } 
+     ::= { gswSwitchComTable 1 } 
+    
+     GswSwitchComEntry ::= SEQUENCE { 
+        gswSwitchSwitchId          GswGlobalId, 
+        gswSwitchMaxPortNum        INTEGER, 
+        gswSensorsNum              INTEGER, 
+        gswCurrentDate             GswDate, 
+        gswBootDate                GswDate, 
+        gswFWLastUpdated           GswDate, 
+        gswFlashLastUpdated        GswDate, 
+        gswBootPromLastUpdated     GswDate, 
+    
+   Forbes             Expires December 31, 2001                Page 31    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+        gswFirmwareVersion         GswFwVersion, 
+        gswHWRevision              DisplayString (SIZE (0..32)), 
+        gswOperStatus              GswSwitchStatus, 
+        gswAdmStatus               GswSwitchStatus, 
+        gswSsn                     DisplayString (SIZE (0..128)), 
+        gswBeaconOperStatus        GswOnOff, 
+        gswBeaconAdmStatus         GswOnOff, 
+        gswDiagResult              INTEGER, 
+        gswEventTrapLevel          GswEventSeverity, 
+        gswEventNumEntries         INTEGER 
+     } 
+    
+     gswSwitchSwitchId  OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the unique global ID assigned to  
+             the switch expressed in array of 16 octets.  It is the  
+             combination of GUID or WWN and type of an interconnect  
+             element." 
+     ::= { gswSwitchComEntry 1 } 
+    
+     gswSwitchMaxPortNum OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object indicates the maximum number of  
+             ports available on the switch." 
+     ::= { gswSwitchComEntry 2 } 
+    
+     gswSensorsNum      OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the number of sensors 
+             inside the switch." 
+     ::= { gswSwitchComEntry 3 } 
+    
+     gswCurrentDate     OBJECT-TYPE 
+        SYNTAX          GswDate 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The current date information of the switch in 
+             displayable textual format." 
+     ::= { gswSwitchComEntry 10 } 
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 32    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswBootDate        OBJECT-TYPE 
+        SYNTAX          GswDate 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the date and time when the  
+             switch last booted, in displayable textual format." 
+     ::= { gswSwitchComEntry 11 } 
+    
+     gswFWLastUpdated   OBJECT-TYPE 
+        SYNTAX          GswDate 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the date when the  
+             firmware was last updated, in displayable textual format." 
+     ::= { gswSwitchComEntry 12 } 
+    
+     gswFlashLastUpdated OBJECT-TYPE 
+        SYNTAX          GswDate 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the date when the FLASH  
+             was last updated, in displayable textual format." 
+     ::= { gswSwitchComEntry 13 } 
+    
+     gswBootPromLastUpdated OBJECT-TYPE 
+        SYNTAX          GswDate 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the date when the boot  
+             PROM was last updated, in displayable textual format." 
+     ::= { gswSwitchComEntry 14 } 
+    
+     gswFirmwareVersion OBJECT-TYPE 
+        SYNTAX          GswFwVersion 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the current version of  
+             the firmware." 
+     ::= { gswSwitchComEntry 20 } 
+    
+   gswHWRevision        OBJECT-TYPE 
+        SYNTAX          DisplayString(SIZE (0..32)) 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the current revision of  
+             the hardware." 
+     ::= { gswSwitchComEntry 21 } 
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 33    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswOperStatus      OBJECT-TYPE 
+        SYNTAX          GswSwitchStatus 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the current operational  
+             status of the switch." 
+     ::= { gswSwitchComEntry 22 } 
+    
+     gswAdmStatus       OBJECT-TYPE 
+        SYNTAX          GswSwitchStatus 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the desired  
+             administrative status of the switch.  A management station  
+             may place the switch in a desired state by setting this  
+             object accordingly." 
+     ::= { gswSwitchComEntry 23 } 
+    
+     gswSsn             OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..128)) 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the soft serial number of the  
+             switch." 
+     ::= { gswSwitchComEntry 26 } 
+    
+     gswBeaconOperStatus OBJECT-TYPE 
+        SYNTAX          GswOnOff 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the current operational status  
+             of the switch beacon.  When the beacon is on, the switch  
+             will give an indication that it needs attention." 
+     ::= { gswSwitchComEntry 30 } 
+    
+     gswBeaconAdmStatus OBJECT-TYPE 
+        SYNTAX          GswOnOff 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the desired status of the switch  
+             beacon.  When the beacon is on, the switch will give an  
+             indication that it needs attention." 
+     ::= { gswSwitchComEntry 31 } 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 34    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswDiagResult      OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the result of the  
+             power-on self test (POST) diagnostics.  Result of 1  
+             indicate that the switch is OK.  Any other result needs to  
+             be examined based on switch type." 
+     ::= { gswSwitchComEntry 40 } 
+    
+     gswEventTrapLevel  OBJECT-TYPE 
+        SYNTAX          GswEventSeverity 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "This object specifies the gswEventTrap level  
+             in conjunction with an event's severity level.  When an  
+             event occurs and if its severity level is at or below the  
+             value specified by this object instance, the agent will  
+             send the associated gswEventTrap to configured  
+             recipients." 
+     ::= { gswSwitchComEntry 41 } 
+     
+     gswEventNumEntries OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The number of entries in the Event Table." 
+     ::= { gswSwitchComEntry 42 } 
+    
+     gswPortComTable    OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswPortComEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "It is a table that contains common fields for 
+             entries of ports on a switching platform." 
+     ::= { gswSystem 4 } 
+    
+     gswPortComEntry    OBJECT-TYPE 
+        SYNTAX          GswPortComEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the common switch port  
+             information." 
+        INDEX           { gswPortComSwitchId, gswPortComNum } 
+     ::= { gswPortComTable 1 } 
+    
+     GswPortComEntry  ::= SEQUENCE { 
+        gswPortComSwitchId      GswGlobalId, 
+        gswPortComNum           INTEGER, 
+        gswPortComType          INTEGER, 
+        gswPortComName          GswOlsName 
+    
+   Forbes             Expires December 31, 2001                Page 35    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+     } 
+    
+     gswPortComSwitchId OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the unique global ID assigned to  
+             the switch expressed in array of 16 octets. It is the  
+             combination of GUID or WWN and type of an interconnect  
+             element." 
+     ::= { gswPortComEntry 1 } 
+    
+     gswPortComNum      OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object indicates the physical port  
+             number." 
+     ::= { gswPortComEntry 2 } 
+    
+     gswPortComType     OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object indicates the bit mask of native  
+             Protocol supported by the port.  The bits have the  
+             following definition: 
+                  0x00000000 - unknown 
+                  0x00000001 - FC 
+                  0x00000002 - IB" 
+     ::= { gswPortComEntry 3 } 
+    
+     gswPortComName     OBJECT-TYPE 
+        SYNTAX          GswOlsName 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object indicates the assigned port name." 
+     ::= { gswPortComEntry 4 } 
+    
+    
+     -- operating environment sensors  
+     --     (temperature, fan, power supply...) 
+    
+     gswSensorTable     OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswSensorEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "The table of sensor entries." 
+     ::= { gswSystem 10 } 
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 36    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswSensorEntry     OBJECT-TYPE 
+        SYNTAX          GswSensorEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the sensor information." 
+        INDEX          { gswSensorSwitchId, gswSensorIndex } 
+     ::= { gswSensorTable 1 } 
+    
+     GswSensorEntry     ::= SEQUENCE { 
+        gswSensorSwitchId       GswGlobalId, 
+        gswSensorIndex          INTEGER, 
+        gswSensorType           GswSensorTypeDef, 
+        gswSensorStatus         GswSensorStatusDef, 
+        gswSensorValue          INTEGER, 
+        gswSensorInfo           DisplayString (SIZE(0..255)) 
+     } 
+    
+     gswSensorSwitchId  OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is one of two indexes used by 
+             gswSensorTable. This object corresponds to  
+             gswGlobal itchId." 
+     ::= { gswSensorEntry 1 } 
+    
+     gswSensorIndex     OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the sensor." 
+     ::= { gswSensorEntry 2 } 
+    
+     gswSensorType      OBJECT-TYPE 
+        SYNTAX          GswSensorTypeDef 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the sensor type." 
+     ::= { gswSensorEntry 3 } 
+    
+     gswSensorStatus    OBJECT-TYPE 
+        SYNTAX          GswSensorStatusDef 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The current status of the sensor." 
+     ::= { gswSensorEntry 4 } 
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 37    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswSensorValue     OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The current value (reading) of the sensor. 
+             The value, -2147483648, represents an unknown quantity. 
+             It also means that the sensor does not have the capability  
+             to measure the actual value." 
+     ::= { gswSensorEntry 5 } 
+    
+     gswSensorInfo      OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE(0..255)) 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "Additional displayable information on the  
+             sensor.  It contains the sensor type and number 
+             in textual format.  For example, 'Temp 3', 'Fan 6'." 
+     ::= { gswSensorEntry 6 } 
+    
+     gswIBNodeTable     OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswIBNodeEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "This table contains node information  
+             pertaining to NodeDescription and NodeInfo within the  
+             Subnet Management Agent.  Therefore, this table only  
+             applies to IB Switch, IB Router, and IB-FC Edge Router  
+             type indicated by gswInventoryType in gswInventoryTable." 
+     ::= { gswSystem 20 } 
+    
+     gswIBNodeEntry     OBJECT-TYPE 
+        SYNTAX          GswIBNodeEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the IB node information." 
+        INDEX          { gswIBNodeSwitchId } 
+     ::= { gswIBNodeTable 1 } 
+    
+     SwIBNodeEntry  ::= SEQUENCE { 
+        gswIBNodeSwitchId        GswGlobalId, 
+        gswIBNodeString          DisplayString (SIZE(0..64)), 
+        gswIBBaseVersion         INTEGER, 
+        gswIBClassVersion        INTEGER, 
+        gswIBNodeType            GswIBNodeType, 
+        gswIBNumPorts            INTEGER, 
+        gswIBNodeGUID            GswIBGUID, 
+        gswIBPortGUID            GswIBGUID, 
+        gswIBDeviceID            INTEGER, 
+        gswIBRevision            INTEGER, 
+        gswIBVendorID            INTEGER 
+     } 
+    
+   Forbes             Expires December 31, 2001                Page 38    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBNodeSwitchId  OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the index used by  
+             gswIBNodeTable.  This object corresponds to  
+             gswGlobalSwitchId." 
+     ::= { gswIBNodeEntry 1 } 
+    
+     gswIBNodeString    OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE(0..64)) 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is a UNICODE string to describe 
+             node in text format." 
+     ::= { gswIBNodeEntry 2 } 
+    
+     gswIBBaseVersion   OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the supported MAD Base Version. 
+             It indicates that this node supports up to and including 
+             this version." 
+     ::= { gswIBNodeEntry 3 } 
+    
+     gswIBClassVersion  OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the supported Subnet Management  
+             Class (SMP) Version.  It indicates that this node supports  
+             up to and including this version." 
+     ::= { gswIBNodeEntry 4 } 
+    
+     gswIBNodeType      OBJECT-TYPE 
+        SYNTAX          GswIBNodeType 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is node type." 
+     ::= { gswIBNodeEntry 5 } 
+    
+     gswIBNumPorts      OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the number of physical 
+             ports on this node." 
+     ::= { gswIBNodeEntry 6 } 
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 39    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBNodeGUID      OBJECT-TYPE 
+        SYNTAX          GswIBGUID 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the GUID of the switch.  All  
+             ports on the same node shall report the same Node-GUID.   
+             It provides a means to uniquely identify a node within a 
+             subnet and determine co-location of ports." 
+     ::= { gswIBNodeEntry 7 } 
+    
+     gswIBPortGUID      OBJECT-TYPE 
+        SYNTAX          GswIBGUID 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the GUID of this port itself.  
+             One port within a node can return the NodeGUID as its  
+             PortGUID if the port is an integral part of the node and 
+             is not field-replaceable." 
+     ::= { gswIBNodeEntry 8 } 
+    
+     gswIBDeviceID      OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the Device ID information as 
+             assigned by device manufacturer." 
+     ::= { gswIBNodeEntry 9 } 
+    
+     gswIBRevision      OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the device resvision assigned by 
+             device manufacturer." 
+     ::= { gswIBNodeEntry 10 } 
+    
+     gswIBVendorID      OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the Device vendor, per  
+             IEEE." 
+     ::= { gswIBNodeEntry 11 } 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 40    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBSwTable       OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswIBSwEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "This table contains switch information  
+             pertaining to switchInfo within Subnet Management Agent.   
+             Therefore, this table only applies to IB Switch, 
+             IB Router, and IB-FC Edge Router type indicated by  
+             gswInventoryType in gswInventoryTable." 
+     ::= { gswSystem 25 } 
+    
+     gswIBSwEntry       OBJECT-TYPE 
+        SYNTAX          GswIBSwEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the IB node information." 
+        INDEX          { gswIBSwSwitchId } 
+     ::= { gswIBSwTable 1 } 
+    
+     GswIBSwEntry     ::= SEQUENCE { 
+        gswIBSwSwitchId            GswGlobalId,      
+        gswIBBadMKeyCounter        INTEGER, 
+        gswIBBadBKeyCounter        INTEGER, 
+        gswIBSwitchChangeReason    INTEGER 
+     } 
+    
+     gswIBSwSwitchId    OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the index used by gswIBSwTable. 
+             This object corresponds to gswGlobalSwitchId." 
+     ::= { gswIBSwEntry 1 } 
+    
+     gswIBBadMKeyCounter OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     " This object returns the number of M_Key 
+             violations for the switch." 
+     ::= { gswIBSwEntry 6 } 
+    
+     gswIBBadBKeyCounter OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     " This object returns the number of 
+             M_Key violations for the switch." 
+     ::= { gswIBSwEntry 7 } 
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 41    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBSwitchChangeReason OBJECT-TYPE 
+        SYNTAX          INTEGER { 
+                            unknown          (1), 
+                            badMKey          (2), 
+                            badBKey          (3) 
+                        }      
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object is mainly defined to support  
+             switch change traps." 
+     ::= { gswIBSwEntry 8 } 
+    
+     -- 
+     -- End of System Group 
+     -- 
+    
+     -- 
+     -- Fabric Group 
+     -- 
+    
+     gswTopoComTable    OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswTopoComEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "The table contains information regarding how 
+             switches in the SAN are connected." 
+     ::= { gswFabric 1 } 
+    
+     gswTopoComEntry    OBJECT-TYPE 
+        SYNTAX          GswTopoComEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the common topology information." 
+        INDEX          { gswTopoComSwitchId, gswTopoComPortIndex } 
+     ::= { gswTopoComTable 1 } 
+    
+     GswTopoComEntry     ::= SEQUENCE { 
+        gswTopoComSwitchId            GswGlobalId, 
+        gswTopoComPortIndex           INTEGER, 
+        gswTopoComNbSwitchId          INTEGER, 
+        gswTopoComNbSwitchPort        INTEGER, 
+        gswTopoComSwitchStatus        INTEGER 
+     } 
+    
+     gswTopoComSwitchId OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is one of the two indexes used by  
+             gswTopoComTable.  This object corresponds to  
+             gswGlobalSwitchId." 
+    
+   Forbes             Expires December 31, 2001                Page 42    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+     ::= { gswTopoComEntry 1 } 
+    
+     gswTopoComPortIndex OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object is one of two indexes used by 
+             gswTopoComTable.  This object corresponds to the 
+             port number where the link it connected to." 
+     ::= { gswTopoComEntry 2 } 
+    
+     gswTopoComNbSwitchId OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object is the ID of the switch connected  
+             at the end of the port indicated by gswSTSwitchId and  
+             gswSTPortIndex.  It represents the gswSwitchGlobalId." 
+     ::= { gswTopoComEntry 3 } 
+    
+     gswTopoComNbSwitchPort OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     " This object is the port of the switch  
+             connected at the end of the port indicated by  
+             gswTopoComSwitchId and gswTopoComPortIndex ." 
+     ::= { gswTopoComEntry 4 } 
+    
+     gswTopoComSwitchStatus OBJECT-TYPE 
+        SYNTAX         INTEGER { 
+                       no-change      (1), 
+                       switch-added   (2), 
+                       switch-deleted (3), 
+                       link-added     (4), 
+                       link-deleted   (5) 
+                       } 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is defined mainly for trap support. 
+             The object can be set added (2) or deleted (3) 
+             for a topology change trap. Query of the object returns 
+             no-change (1)." 
+     ::= { gswTopoComEntry 5 } 
+    
+     gswIBTopoTable     OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswIBTopoEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "The table contains IB-specific topology  
+             information." 
+     ::= { gswFabric 5 } 
+    
+   Forbes             Expires December 31, 2001                Page 43    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBTopoEntry     OBJECT-TYPE 
+        SYNTAX          GswIBTopoEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the IB topology information." 
+        INDEX          { gswIBTopoSwitchId } 
+     ::= { gswIBTopoTable 1 } 
+    
+     GswIBTopoEntry  ::= SEQUENCE { 
+        gswIBTopoSwitchId         GswGlobalId, 
+        gswIBTopoChangeReason     INTEGER 
+     } 
+    
+     gswIBTopoSwitchId  OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the index used by  
+             gswIBTopoTable.  This object corresponds to  
+             gswGlobalSwitchId." 
+     ::= { gswIBTopoEntry 1 } 
+    
+     gswIBTopoChangeReason  OBJECT-TYPE 
+        SYNTAX          INTEGER { 
+                            unknown                (1), 
+                            add-remove-port        (2), 
+                            add-remove-node        (3), 
+                            add-remove-host        (4), 
+                            add-remove-SM          (5), 
+                            failover-SM            (6), 
+                            add-remove-controller  (7), 
+                            add-remove-iou         (8) 
+                        } 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object is defined mainly for topology  
+             change trap support." 
+     ::= { gswIBTopoEntry 2 } 
+    
+     -- 
+     -- End of Fabric Group 
+     --  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 44    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     -- 
+     -- Port Group 
+     -- 
+    
+     gswIBPortTable     OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswIBPortEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is a table that contains, one entry 
+             for each switch port, configuration and service parameters 
+             of the port. This table mainly represents information 
+             contained in portInfo within Subnet Management Agent. 
+             Therefore, this table only applies to IB Switch, 
+             IB Router, and IB-FC Edge Router type indicated by 
+             gswInventoryType in gswInventoryTable." 
+     ::= { gswPort 5 } 
+    
+     gswIBPortEntry     OBJECT-TYPE 
+        SYNTAX          GswIBPortEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the IB port information." 
+        INDEX          { gswIBPortSwitchId, gswIBPortIndex } 
+     ::= { gswIBPortTable 1 } 
+    
+     GswIBPortEntry      ::= SEQUENCE { 
+        gswIBPortSwitchId              GswGlobalId, 
+        gswIBPortIndex                 INTEGER, 
+        gswIBGidPrefix                 GswIBGID, 
+        gswIBLID                       GswIBLID, 
+        gswIBMasterSMLID               GswIBLID, 
+        gswIBCapabilityMask            INTEGER, 
+        gswIBDiagCode                  INTEGER, 
+        gswIBLinkWidthEnabled          GswIBLinkWidth, 
+        gswIBLinkWidthSupported        GswIBLinkWidth, 
+        gswIBLinkWidthActive           GswIBLinkWidth, 
+        gswIBLinkSpeedSupported        GswIBLinkSpeed, 
+        gswIBPortState                 GswIBPortState, 
+        gswIBPortPhysicalState         GswIBPortPhysState, 
+        gswIBLinkDownDefaultState      INTEGER, 
+        gswIBLMC                       INTEGER, 
+        gswIBLinkSpeedActive           GswIBLinkSpeed, 
+        gswIBLinkSpeedEnabled          GswIBLinkSpeed, 
+        gswIBNeighborMTU               GswIBMTU, 
+        gswIBVLCap                     GswIBVL, 
+        gswIBMTUCap                    GswIBMTU, 
+        gswIBOperationalVLs            GswIBVL, 
+        gswIBMKeyViolations            INTEGER, 
+        gswIBPKeyViolations            INTEGER, 
+        gswIBQKeyViolations            INTEGER, 
+        gswIBLocalPhyErrors            INTEGER, 
+    
+   Forbes             Expires December 31, 2001                Page 45    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+        gswIBOverrunErrors             INTEGER, 
+        gswIBPortChangeReason          INTEGER 
+     } 
+    
+     gswIBPortSwitchId  OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is one of the two indexes used by  
+             gswIBPortTable.  This object corresponds to  
+             gswGlobalSwitchId." 
+     ::= { gswIBPortEntry 1 } 
+    
+     gswIBPortIndex     OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is one of two indexes used by 
+             gswIBPortTable.  The object identifies the physical port  
+             number." 
+     ::= { gswIBPortEntry 2 } 
+    
+     gswIBGidPrefix     OBJECT-TYPE 
+        SYNTAX          GswIBGID 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the GID prefix for this port." 
+     ::= { gswIBPortEntry 6 } 
+    
+     gswIBLID           OBJECT-TYPE 
+        SYNTAX          GswIBLID 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the base LID of this port." 
+     ::= { gswIBPortEntry 7 } 
+    
+     gswIBMasterSMLID   OBJECT-TYPE 
+        SYNTAX          GswIBLID 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the base LID of the master SM 
+             that is managing this port." 
+     ::= { gswIBPortEntry 8 } 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 46    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBCapabilityMask OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the supported  
+             capabilities of this node.  A bit set to 1 for affirmation  
+             of supported capability. 
+                  0: Reserved, shall be zero 
+                  1: IsSM 
+                  2: IsNoticeSupported 
+                  3: IsTrapSupported 
+                  4: IsResetSupported 
+                  5: IsAutomaticMigrationSupported 
+                  6: IsSLMappingSupported 
+                  7: IsMKeyNVRAM (supports M_Key in NVRAM) 
+                  8: IsPKeyNVRAM (supports P_Key in NVRAM) 
+                  9: IsLEDInfoSupported 
+                  10: IsSMdisabled 
+                  11 - 15: Reserved, shall be zero 
+                  16: IsConnectionManagementSupported 
+                  17: IsSNMPTunnelingSupported 
+                  18: Reserved, shall be zero 
+                  19: IsDeviceManagementSupported 
+                  20: IsVendorClassSupported 
+                  21 - 31: Reserved, shall be zero" 
+     ::= { gswIBPortEntry 9 } 
+    
+     gswIBDiagCode      OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the IB Diagnostic code." 
+     ::= { gswIBPortEntry 10 } 
+    
+     gswIBLinkWidthEnabled OBJECT-TYPE 
+        SYNTAX          GswIBLinkWidth 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the enabled link 
+             width." 
+     ::= { gswIBPortEntry 12 } 
+    
+     gswIBLinkWidthSupported OBJECT-TYPE 
+        SYNTAX          GswIBLinkWidth 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the supported link  
+             width." 
+     ::= { gswIBPortEntry 13 } 
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 47    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBLinkWidthActive OBJECT-TYPE 
+        SYNTAX          GswIBLinkWidth 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the currently active link  
+             width." 
+     ::= { gswIBPortEntry 14 } 
+    
+     gswIBLinkSpeedSupported OBJECT-TYPE 
+        SYNTAX          GswIBLinkSpeed 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the supported link  
+             speed." 
+     ::= { gswIBPortEntry 15 } 
+    
+     swIBPortState      OBJECT-TYPE 
+        SYNTAX          SwIBPortState 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the port state." 
+     ::= { gswIBPortEntry 16 } 
+    
+     gswIBPortPhysicalState OBJECT-TYPE 
+        SYNTAX          GswIBPortPhysState 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the port physical state." 
+     ::= { gswIBPortEntry 17 } 
+    
+     gswIBLinkDownDefaultState OBJECT-TYPE 
+        SYNTAX          INTEGER { 
+                            nop     (0), 
+                            sleep   (1), 
+                            polling (2) 
+                        } 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates port down default state." 
+     ::= { gswIBPortEntry 18 } 
+    
+     gswIBLMC           OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the LID mask for multipath  
+             support." 
+     ::= { gswIBPortEntry 20 } 
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 48    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBLinkSpeedActive OBJECT-TYPE 
+        SYNTAX          GswIBLinkSpeed 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the currently active link  
+             speed." 
+     ::= { gswIBPortEntry 21 } 
+    
+     gswIBLinkSpeedEnabled OBJECT-TYPE 
+        SYNTAX          GswIBLinkSpeed 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the enabled link speed." 
+     ::= { gswIBPortEntry 22 } 
+    
+     gswIBNeighborMTU   OBJECT-TYPE 
+        SYNTAX          GswIBMTU 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the active maximum MTU 
+             enabled on this port for transmit." 
+     ::= { gswIBPortEntry 23 } 
+    
+     gswIBVLCap         OBJECT-TYPE 
+        SYNTAX          GswIBVL 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the virtual Lanes  
+             supported on this port." 
+     ::= { gswIBPortEntry 24 } 
+    
+     gswIBMTUCap        OBJECT-TYPE 
+        SYNTAX          GswIBMTU 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the maximum MTU supported by  
+             this port." 
+     ::= { gswIBPortEntry 25 } 
+    
+       gswIBOperationalVLs OBJECT-TYPE 
+        SYNTAX          GswIBVL 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the virtual Lanes  
+             operational on this port." 
+     ::= { gswIBPortEntry 28 } 
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 49    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBMKeyViolations OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object counts the number of SMP packets  
+             that have been received at this port that have had 
+             invalid M_Keys, since power-on or reset.  Increments 
+             till count reaches all 1s and then must be set back 
+             to zero to re-enable incrementing." 
+     ::= { gswIBPortEntry 29 } 
+    
+     gswIBPKeyViolations OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object counts the number of packets that 
+             have been received at this port that have had 
+             invalid P_Keys, since power-on or reset. Increments 
+             till count reaches all 1s and then must be set back 
+             to zero to re-enable incrementing." 
+     ::= { gswIBPortEntry 30 } 
+    
+     gswIBQKeyViolations OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object counts the number of packets that 
+             have been received at this port that have had 
+             invalid Q_Keys, since power-on or reset. Increments till 
+             count reaches all 1s and then must be set back to 
+             zero to re-enable incrementing." 
+     ::= { gswIBPortEntry 32 } 
+    
+     gswIBLocalPhyErrors OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the threshold value. When the 
+             count of marginal link errors exceeds this threshold, 
+             the local link integrity error shall be detected." 
+     ::= { gswIBPortEntry 36 } 
+    
+     gswIBOverrunErrors OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the threshold value. When 
+             the count of buffer overruns over consecutive 
+             flow control update periods exceeds this threshold, 
+             the excessive buffer overrun error shall be detected." 
+     ::= { gswIBPortEntry 37 } 
+    
+   Forbes             Expires December 31, 2001                Page 50    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBPortChangeReason OBJECT-TYPE 
+        SYNTAX          INTEGER { 
+                            unknown (0), 
+                            link-integrity-error (1), 
+                            excessive-buf-overrun (2), 
+                            flow-control-timeout (3), 
+                            bad-p-key (4) 
+                        } 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is mainly implemented to support  
+             traps." 
+     ::= { gswIBPortEntry 38 } 
+    
+     -- 
+     -- End of Port group 
+     -- 
+    
+    
+    
+     -- 
+     -- Port Performance Group 
+     -- 
+    
+     gswIBPortPerfTable OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswIBPortPerfEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "The table contains information pertaining to 
+             portCounters within Performance Management Agent. 
+             Therefore, this table only applies to IB Switch, 
+             IB Router, and IB-FC Edge Router type indicated 
+             by gswInventoryType in gswInventoryTable." 
+     ::= { gswPortPerf 5 } 
+    
+     gswIBPortPerfEntry OBJECT-TYPE 
+        SYNTAX          GswIBPortPerfEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the IB port information." 
+        INDEX          { gswIBPortPerfSwitchId, gswIBPortPerfIndex } 
+     ::= { gswIBPortPerfTable 1 } 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 51    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     GswIBPortPerfEntry          ::= SEQUENCE { 
+        gswIBPortPerfSwitchId                 GswGlobalId, 
+        gswIBPortPerfIndex                    INTEGER, 
+        gswIBSymbolErrorCounter               GswCounter64, 
+        gswIBLinkErrorRecoveryCounter         GswCounter64, 
+        gswIBLinkDownedCounter                GswCounter64, 
+        gswIBPortRcvErrors                    GswCounter64, 
+        gswIBPortRcvRemotePhysicalErrors      GswCounter64, 
+        gswIBPortRcvSwitchRelayErrors         GswCounter64, 
+        gswIBPortXmitDiscards                 GswCounter64, 
+        gswIBPortXmitConstraintErrors         GswCounter64, 
+        gswIBPortRcvConstraintErrors          GswCounter64, 
+        gswIBLocalLinkIntegrityErrors         GswCounter64, 
+        gswIBExcessiveBufferOverrunErrors     GswCounter64, 
+        gswIBVL15Dropped                      GswCounter64, 
+        gswIBPortXmitData                     GswCounter64, 
+        gswIBPortRcvData                      GswCounter64, 
+        gswIBPortXmitPkts                     GswCounter64, 
+        gswIBPortRcvPkts                      GswCounter64 
+     } 
+    
+     gswIBPortPerfSwitchId OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is one of the two indexes used by 
+             gswIBPortPerfTable.  This object corresponds to  
+             gswGlobalSwitchId." 
+     ::= { gswIBPortPerfEntry 1 } 
+    
+     gswIBPortPerfIndex OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is one of two indexes used by 
+             gswIBPortPerfTable.  The object identifies the physical  
+             port number." 
+     ::= { gswIBPortPerfEntry 2 } 
+    
+     gswIBSymbolErrorCounter OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of symbol 
+             errors detected on one or more lanes." 
+     ::= { gswIBPortPerfEntry 3 } 
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 52    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBLinkErrorRecoveryCounter OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of times 
+             the Port Training state machine has successfully 
+             completed the link error recovery process." 
+     ::= { gswIBPortPerfEntry 4 } 
+    
+     gswIBLinkDownedCounter OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of times 
+             the Port Training state machine has failed the link 
+             error recovery process and downed the link." 
+     ::= { gswIBPortPerfEntry 5 } 
+    
+     gswIBPortRcvErrors OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of packets 
+             containing an error that were received on the port." 
+     ::= { gswIBPortPerfEntry 6 } 
+    
+     gswIBPortRcvRemotePhysicalErrors OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of packets 
+             marked with the EBP delimiter received on the port." 
+     ::= { gswIBPortPerfEntry 7 } 
+    
+     gswIBPortRcvSwitchRelayErrors OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of packets 
+             received on the port that were discarded because they 
+             could not be forwarded by the switch relay." 
+     ::= { gswIBPortPerfEntry 8 } 
+    
+     gswIBPortXmitDiscards OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of outbound 
+             packets discarded by the port because the port is down 
+             or congested." 
+     ::= { gswIBPortPerfEntry 9 } 
+    
+   Forbes             Expires December 31, 2001                Page 53    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBPortXmitConstraintErrors OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of packets 
+             not transmitted from the port." 
+     ::= { gswIBPortPerfEntry 10 } 
+    
+     gswIBPortRcvConstraintErrors OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of packets 
+             received on the port that are discarded." 
+     ::= { gswIBPortPerfEntry 11 } 
+    
+     gswIBLocalLinkIntegrityErrors OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the number of times that 
+             the frequency of packets containing local physical errors 
+             exceeded local_phy_errors." 
+     ::= { gswIBPortPerfEntry 12 } 
+    
+     gswIBExcessiveBufferOverrunErrors OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the number of times that 
+             overrun errors consecutive flow control update periods 
+             occurred with at least one overrun error in each period." 
+     ::= { gswIBPortPerfEntry 13 } 
+    
+     gswIBVL15Dropped   OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates the number of incoming 
+             VL15 packets dropped due to resource limitations on port." 
+     ::= { gswIBPortPerfEntry 14 } 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 54    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBPortXmitData  OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of data  
+             octets, divided by 4, transmitted on all VLs from the  
+             port.  This includes all octets between (and not  
+             including) the start of packet delimiter and VCRC.  It  
+             excludes all link packets." 
+     ::= { gswIBPortPerfEntry 15 } 
+    
+     gswIBPortRcvData   OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of data 
+             octets, divided by 4, received on all VLs on the port. 
+             This includes all octets between (and not including) 
+             the start of packet delimiter and VCRC.  It excludes 
+             all link packets." 
+     ::= { gswIBPortPerfEntry 16 } 
+    
+     gswIBPortXmitPkts  OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of packets, 
+             excluding link packets, transmitted on all VLs from the  
+              port." 
+     ::= { gswIBPortPerfEntry 17 } 
+    
+     gswIBPortRcvPkts   OBJECT-TYPE 
+        SYNTAX          GswCounter64 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object indicates total number of packets, 
+             including packets containing errors and excluding 
+             link packets, received from all VLs on the port." 
+     ::= { gswIBPortPerfEntry 18 } 
+    
+     -- 
+     -- End of Port Performance group 
+     -- 
+    
+     -- 
+     -- Name Service group 
+     -- 
+    
+     -- 
+     -- End of Name Service group 
+     -- 
+    
+   Forbes             Expires December 31, 2001                Page 55    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     -- 
+     -- Event Group 
+     -- 
+    
+     -- NOTE 
+     -- Logically, gswEventTable is separate from the error log since  
+     -- it is essentially a view of the error log within a particular  
+     -- time window. 
+     -- The value of gswEventIndex shall indicate the event number that  
+     -- has occurred since the switch booted.  The value will range  
+     -- from 1 through 2147383647 (2^31 - 1). 
+     -- 
+     
+     gswEventTable      OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswEventEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "The table of event entries." 
+     ::= { gswEvent 1 } 
+     
+     gswEventEntry      OBJECT-TYPE 
+        SYNTAX          GswEventEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry of the event table." 
+        INDEX           { gswEventSwitchId, gswEventIndex } 
+     ::= { gswEventTable 1 } 
+     
+     GswEventEntry ::= SEQUENCE { 
+        gswEventSwitchId       GswGlobalId, 
+        gswEventIndex          INTEGER, 
+        gswEventTimeInfo       DisplayString, 
+        gswEventLevel          GswEventSeverity, 
+        gswEventRepeatCount    INTEGER, 
+        gswEventDescr          DisplayString 
+     } 
+    
+     gswEventSwitchId   OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the index used by gswEventTable. 
+             This object corresponds to gswGlobalSwitchId." 
+     ::= { gswEventEntry 1 } 
+    
+     gswEventIndex      OBJECT-TYPE 
+        SYNTAX          INTEGER (1..30) 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the event entry." 
+     ::= { gswEventEntry 2 } 
+    
+   Forbes             Expires December 31, 2001                Page 56    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+     
+     gswEventTimeInfo   OBJECT-TYPE 
+        SYNTAX          DisplayString 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the date and time when  
+             this event occurred, in textual format." 
+     ::= { gswEventEntry 3 } 
+     
+     gswEventLevel      OBJECT-TYPE 
+        SYNTAX          GswEventSeverity 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the severity level of  
+             this event entry." 
+     ::= { gswEventEntry 4 } 
+     
+     gswEventRepeatCount OBJECT-TYPE 
+        SYNTAX          INTEGER 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies how many times this  
+             particular event has occurred." 
+     ::= { gswEventEntry 5 } 
+     
+     gswEventDescr      OBJECT-TYPE 
+        SYNTAX          DisplayString 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the textual description  
+             of the event." 
+     ::= { gswEventEntry 6 } 
+     
+     -- 
+     -- End of Event Group 
+     -- 
+    
+     --  
+     -- EndDevice Group 
+     -- 
+    
+     --  
+     -- End of EndDevice Group 
+     -- 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 57    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     -- 
+     -- SNMP Agent Configuration 
+     -- 
+    
+     gswAgtCmtyTable    OBJECT-TYPE 
+        SYNTAX          SEQUENCE OF GswAgtCmtyEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "A table that contains, one entry for each  
+             Community, the access control and parameters of the  
+             Community." 
+     ::= { gswAgtCfg 11 } 
+    
+     gswAgtCmtyEntry    OBJECT-TYPE 
+        SYNTAX          GswAgtCmtyEntry 
+        ACCESS          not-accessible 
+        STATUS          mandatory 
+        DESCRIPTION     "An entry containing the Community parameters." 
+        INDEX     { gswAgtCmtySwitchId, gswAgtCmtyIdx } 
+     ::= { gswAgtCmtyTable 1 } 
+    
+     GswAgtCmtyEntry ::= SEQUENCE { 
+        gswAgtCmtySwitchId     GswGlobalId, 
+        gswAgtCmtyIdx          INTEGER (1..6), 
+        gswAgtCmtyStr          DisplayString (SIZE (0..16)), 
+        gswAgtTrapRcp          NetworkAddress 
+     } 
+    
+     gswAgtCmtySwitchId OBJECT-TYPE 
+        SYNTAX          GswGlobalId 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "The object is the index used by  
+             gswAgtCmtyTable.  This object corresponds to  
+             gswGlobalSwitchId." 
+     ::= { gswAgtCmtyEntry 1 } 
+    
+     gswAgtCmtyIdx      OBJECT-TYPE 
+        SYNTAX          INTEGER (1..6) 
+        ACCESS          read-only 
+        STATUS          mandatory 
+        DESCRIPTION     "This object identifies the SNMPv1 Community  
+             entry." 
+     ::= { gswAgtCmtyEntry 2 } 
+    
+    
+    
+    
+    
+    
+    
+    
+   Forbes             Expires December 31, 2001                Page 58    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswAgtCmtyStr      OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..16)) 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "This is a Community string supported by the  
+             agent.  If a new value is set successfully, it takes  
+             effect immediately." 
+     ::= { gswAgtCmtyEntry 3 } 
+    
+     gswAgtTrapRcp      OBJECT-TYPE 
+        SYNTAX          NetworkAddress 
+        ACCESS          read-write 
+        STATUS          mandatory 
+        DESCRIPTION     "This is the trap recipient associated with the 
+             Community. If a new value is set successfully, it takes 
+             effect immediately." 
+     ::= { gswAgtCmtyEntry 4 } 
+    
+     -- 
+     -- End of SNMP Agent Configuration Group 
+     -- 
+    
+     -- 
+     -- Traps Group 
+     -- 
+    
+     gswTopoComTrap         TRAP-TYPE 
+        ENTERPRISE          gsw 
+        VARIABLES           { gswTopoComSwitchId, 
+                              gswTopoComNbSwitchId, 
+                              gswTopoComSwitchStatus } 
+        DESCRIPTION          "This trap is generated when changes  
+             happen in a SAN." 
+        ::= 1 
+    
+     gswIBTopoTrap          TRAP-TYPE 
+        ENTERPRISE          gsw 
+        VARIABLES           { gswIBTopoSwitchId, 
+                              gswIBTopoChangeReason } 
+        DESCRIPTION          "This trap is generated when changes  
+             happen in an IB subnet." 
+        ::= 2 
+    
+     gswIBPortTrap          TRAP-TYPE 
+        ENTERPRISE          gsw 
+        VARIABLES           { gswIBPortSwitchId, 
+                              gswIBPortIndex, 
+                              gswIBPortChangeReason } 
+        DESCRIPTION          "This trap is generated when changes  
+             happen in IB switch ports." 
+        ::= 5 
+    
+   Forbes             Expires December 31, 2001                Page 59    Internet Draft       InfiniBand Switch MIB            July 11, 2001 
+                                    
+    
+    
+     gswIBSwitchTrap        TRAP-TYPE 
+        ENTERPRISE          gsw 
+        VARIABLES           { gswIBSwSwitchId, 
+                              gswIBSwitchChangeReason } 
+        DESCRIPTION          "This trap is generated when changes  
+             happen in IB switches." 
+        ::= 8 
+    
+     gswEventTrap       TRAP-TYPE 
+        ENTERPRISE      gsw 
+        VARIABLES       { gswEventSwitchId, 
+                          gswEventIndex, 
+                          gswEventTimeInfo, 
+                          gswEventLevel, 
+                          gswEventRepeatCount, 
+                          gswEventDescr } 
+        DESCRIPTION     "This trap is generated when an event whose 
+             level at or below gswEventTrapLevel occurs." 
+        ::= 10  
+    
+   END 
+
+--     
+--    Copyright (C) The Internet Society (1999).  All Rights Reserved. 
+--     
+--    This document and translations of it may be copied and furnished to 
+--    others, and derivative works that comment on or otherwise explain it 
+--    or assist in its implementation may be prepared, copied, published 
+--    and distributed, in whole or in part, without restriction of any 
+--    kind, provided that the above copyright notice and this paragraph 
+--    are included on all such copies and derivative works.  However, this 
+--    document itself may not be modified in any way, such as by removing 
+--    the copyright notice or references to the Internet Society or other 
+--    Internet organizations, except as needed for the purpose of 
+--    developing Internet standards in which case the procedures for 
+--    copyrights defined in the Internet Standards process must be 
+--    followed, or as required to translate it into languages other than 
+--    English. 
+--     
+--    The limited permissions granted above are perpetual and will not be 
+--    revoked by the Internet Society or its successors or assigns. 
+--     
+--    This document and the information contained herein is provided on an 
+--    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING 
+--    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING 
+--    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION 
+--    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF 
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. 
+

@@ -1,0 +1,164 @@
+RAD-IMA-MIB DEFINITIONS ::= BEGIN
+--Title:    RAD-IMA   MIB
+--
+-- Copyright 1998 RAD Data Communications, Ltd.
+-- All Rights Reserved.  
+-- IMPORTS
+--      OBJECT-TYPE                     FROM RFC-1212
+ --     radWan                          FROM RAD-GEN-MIB;
+--                RAD-IMA MIB   
+--Title:     RAD's IMA INTERFACE MIB
+--Version:   1.0
+--Date:      15.09.98
+--By:        Ilana Schvetz
+--File:      radima.mib
+-- Last Update 20.01.02 by Ilana Schvetz
+	IMPORTS
+		OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+			FROM SNMPv2-SMI
+		radAtm
+			FROM RAD-MIB
+		imaGroupFailureStatus	
+			FROM IMA-MIB
+	;
+radAtmIma  OBJECT IDENTIFIER  ::=  {radAtm 5}
+imaPrimaryClk     OBJECT-TYPE
+              SYNTAX  INTEGER { 
+                             notApplicable(1),           
+		                     link1(2),
+		                     link2(3),
+		                     link3(4),
+		                     link4(5),
+		                     automatic(6)
+              }
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION 
+                       "Clock source to be transmitted to the user side, 
+                        where user module is in 'External' clock source."
+             ::= { radAtmIma 1 }
+-- An extension to the Link Table
+imaXLinkTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF ImaXLinkEntry
+       MAX-ACCESS  	   not-accessible
+       STATUS      current
+       DESCRIPTION
+               "The IMA Link Status and Configuration table.
+                This table contains additional objects for the link table."
+       ::= { radAtmIma 2 }
+imaXLinkEntry  OBJECT-TYPE
+       SYNTAX  	   ImaXLinkEntry 
+       MAX-ACCESS  	   not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry in the IMA Link table."
+ --      AUGMENTS    { imaLinkTable }
+         INDEX   { imaLinkIfIndex }
+       ::= { imaXLinkTable 1 }
+ImaXLinkEntry     ::=
+      SEQUENCE {
+        imaLinkDirection		    INTEGER,
+        imaLinkItcLBClkSrc			INTEGER
+}
+imaLinkDirection  OBJECT-TYPE
+              	SYNTAX  INTEGER { 
+	                    	rx(1),
+							tx(2),
+							both(3)
+	 			}
+              	MAX-ACCESS  read-write
+              	STATUS  current
+              	DESCRIPTION
+                      "the Link direction."
+--	        	DEFAULT { both }	
+              ::= { imaXLinkEntry 1 }
+imaLinkItcLBClkSrc OBJECT-TYPE
+              	SYNTAX  INTEGER { 
+							link1(1),
+							link2(2),
+							link3(3),
+							link4(4),
+							internal (5),
+							external (6),
+							automatic(7),
+							loopback (8)
+	 			}
+              	MAX-ACCESS  read-write
+              	STATUS  current
+              	DESCRIPTION
+              	 		"Clock source for the current Tx-line."  
+              ::= { imaXLinkEntry 2 }
+-- An extension to the Group Table
+imaXGroupTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF ImaXGroupEntry
+       MAX-ACCESS  	   not-accessible
+       STATUS      current
+       DESCRIPTION
+               "The IMA group Status and Configuration table.
+                This table contains additional objects for the Group table."
+       ::= { radAtmIma 3 }
+imaXGroupEntry  OBJECT-TYPE
+       SYNTAX  	   ImaXGroupEntry 
+       MAX-ACCESS  	   not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry in the IMA Group table."
+ --      AUGMENTS    { imaGroupTable }
+         INDEX   { imaGroupIndex }
+       ::= { imaXGroupTable 1 }
+ImaXGroupEntry     ::=
+      SEQUENCE {
+		imaGroupVersion				INTEGER,
+        imaGroupCtcTxClkSrc			INTEGER,
+        imaGroupCtcTxClkSrcPort		Integer32
+      }
+imaGroupVersion     OBJECT-TYPE
+              SYNTAX  INTEGER { 
+                             ver10(1),           
+		                     ver11(2)
+              }
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION 
+                       "IMA Version."
+             ::= { imaXGroupEntry 1 }
+imaGroupCtcTxClkSrc OBJECT-TYPE
+              	SYNTAX  INTEGER { 
+							link1     (1),
+							link2     (2),
+							link3     (3),
+							link4     (4),
+							internal  (5),           
+							external  (6),
+							automatic (7),           
+							loopback  (8),           
+							notApplicable(255)           
+	 			}
+              	MAX-ACCESS  read-write
+              	STATUS  current
+              	DESCRIPTION
+              	 		"The source of the transmitted, common, Clock Source.
+						 Applicable if imaGroupNeTxClkMode=ctc(1).
+                         Automatic - Dynamic source, taken from the currently reference link. 
+                         Internal  - taken from the Internal clock on card.
+                         Loopback  - Looped back from one of the ports. In this case a specific 
+                                     port should be selected for imaGroupCtcTxClkSrcPort parameter.
+                         Link N    - Clock will be looped from one of the links."  
+               ::= { imaXGroupEntry 2 }
+imaGroupCtcTxClkSrcPort OBJECT-TYPE
+               SYNTAX  Integer32
+               MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+                       "This parameter is valid only when imaGroupCtcTxClkSrc=loopback.
+                        The value may be any port identifier."
+               ::= { imaXGroupEntry 3 }
+-- IMA Traps
+--NOTIFICATIONS
+atmImaGroupStatusChangeTrap NOTIFICATION-TYPE
+      OBJECTS  { imaGroupFailureStatus }  
+      STATUS  current
+      DESCRIPTION
+	  	"This trap indicates IMA Group status change."
+	::= { radSysAtmEvents 80 }
+END

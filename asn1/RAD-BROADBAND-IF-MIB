@@ -1,0 +1,1369 @@
+RAD-BROADBAND-IF-MIB DEFINITIONS ::= BEGIN
+--Version:   1.0
+--Date:      14-Feb-2000
+--By:        Smadar Tauber
+--File:      bdband.mib
+
+	IMPORTS
+		OBJECT-TYPE, Integer32, Gauge32
+			FROM SNMPv2-SMI
+		RowStatus, TruthValue
+			FROM SNMPv2-TC
+		diverseIfWanGen
+			FROM RAD-MIB
+		InterfaceIndex
+			FROM IF-MIB
+		SnmpAdminString
+			FROM SNMP-FRAMEWORK-MIB
+	;
+--
+--Last update: 16-Jan-2001 by Liora Gafni
+broadbandIf  OBJECT IDENTIFIER  ::=  {diverseIfWanGen 8}
+bdbandConfig       OBJECT IDENTIFIER  ::=  {broadbandIf 1}
+prtPhyPerfHistory  OBJECT IDENTIFIER  ::=  {broadbandIf 2}
+-- Indication Signal Table
+prtBdbandIndTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PrtBdbandIndEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The Indication Signal table."
+    ::= { bdbandConfig 1 }
+prtBdbandIndEntry OBJECT-TYPE
+    SYNTAX  PrtBdbandIndEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry in the Indication Signal table."
+    INDEX {prtBdbandCnfgIdx, prtBdbandIdx, prtBdbandIndSig, prtBdbandIndEvent}
+    ::= { prtBdbandIndTable 1 }
+PrtBdbandIndEntry ::=
+    SEQUENCE {
+    prtBdbandCnfgIdx
+    Integer32,
+    prtBdbandIdx
+    Integer32,
+	prtBdbandIndSig
+	INTEGER,
+	prtBdbandIndEvent
+	INTEGER,
+	prtBdbandIndSigEnable
+	INTEGER,
+	prtBdbandRowStatus
+	RowStatus
+    }
+prtBdbandCnfgIdx OBJECT-TYPE
+    SYNTAX  Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the Idx of the Agent Cnfg the following 
+     objects refer.
+     255=Temporary Cnfg (when relevant, Set is done only to this configuration).
+     For Agents that support only one configuration, this object will be 
+     constant=1. "
+    ::= { prtBdbandIndEntry 1 }
+prtBdbandIdx OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "This object indicates a unique  port or interface number.
+	 For numbering, see product's spec.
+     For some products, the numbering can equal ifIndex."    
+    ::= { prtBdbandIndEntry 2 }
+prtBdbandIndSig OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+     ais       (1),
+	 rdi       (2),
+	 aisAndRdi (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "This object indicates a unique Indication Signal.
+     ais(1) = AIS = Alarm Indication Signal.
+     rdi(2) = RDI = Remote Defect Indication."
+    ::= { prtBdbandIndEntry 3 }
+prtBdbandIndEvent OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+     notApplicable(1),
+     slm          (2),
+	 fail         (3),
+	 eed          (4),
+	 pathTrace    (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "This object indicates a unique Event that can cause the Indication Signal.
+     slm(2) = SLM = Signal Label Mismatch
+     eed(4) = EED = Excessive Error Defect
+     pathTrace(5) = the end-to-end source/destination of information is wrong."
+    ::= { prtBdbandIndEntry 4 }
+prtBdbandIndSigEnable OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+     notApplicable(1),
+     disable      (2),
+	 enable       (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+    "This object allows user to define if the event specified by prtBdbandIndEvent 
+     will cause creation of the Indication Signal specified by prtBdbandIndSig or not.
+     disable - will not enable causing the signal
+     enable  - will enable causing the signal. "
+    ::= { prtBdbandIndEntry 5 }
+prtBdbandRowStatus OBJECT-TYPE
+    SYNTAX RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+    "Creation/Deletion of rows in the table."
+    ::= { prtBdbandIndEntry 6 }
+-- Port Phy Config Table
+prtPhyConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PrtPhyConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The Phy Config table. Used now for Phy25.6 Mbps."
+    ::= { bdbandConfig 2 }
+prtPhyConfigEntry OBJECT-TYPE
+    SYNTAX  PrtPhyConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry in the Phy Config table. "
+    INDEX   { ifIndex }
+    ::= { prtPhyConfigTable 1 }
+PrtPhyConfigEntry ::=
+    SEQUENCE {
+    prtPhyTimeElapsed
+        Integer32,
+    prtPhyValidIntervals
+        Integer32
+       }
+prtPhyTimeElapsed OBJECT-TYPE
+    SYNTAX  Integer32 (0..899)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of seconds that have elapsed since
+     the beginning of the current error-measurement period."
+   ::= { prtPhyConfigEntry 1 }
+prtPhyValidIntervals OBJECT-TYPE
+     SYNTAX  Integer32 (0..96)
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The number of previous intervals for which valid data was collected.  
+      The value will be	96 unless the interface was brought online within
+      the last 24 hours, in which case the value will be the number of complete 
+      15 minute since the interface has been online."
+     ::= { prtPhyConfigEntry 2 }
+--Phy Performance History Tables
+-- The PHY Current table contains various statistics being
+-- collected for the current 15 minute interval.
+prtPhyCurrentTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PrtPhyCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The 25.6 Mbps Section/Line Current table."
+    ::= { prtPhyPerfHistory 1 }
+prtPhyCurrentEntry OBJECT-TYPE
+    SYNTAX  PrtPhyCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry in the 25.6 Mbps Line Current table.
+     ifIndex of the line 25.6 Mbps layer of type 
+     25.6 Mbps."
+    INDEX   { ifIndex }
+    ::= { prtPhyCurrentTable 1 }
+PrtPhyCurrentEntry ::=
+    SEQUENCE {
+        prtPhyCurrentLOS
+            Gauge32,
+        prtPhyCurrentLSV
+            Gauge32,
+        prtPhyCurrentUAS
+            Gauge32,
+        prtPhyCurrentSES
+            Gauge32,
+        prtPhyCurrentES 
+            Gauge32,
+        prtPhyCurrentStatus 
+            OCTET STRING,
+        prtPhyCurrentLOF 
+            Gauge32
+    }
+prtPhyCurrentLOS OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The counter associated with the number of Loss Of Sync
+     seconds, encountered by a 25.6 Mbps interface in
+     the current 15 minute interval."
+    ::= { prtPhyCurrentEntry 1 }
+prtPhyCurrentLSV OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The counter associated with the number of Line symbol violation
+     seconds, encountered by a 25.6 Mbps
+     interface in the current 15 minute interval."
+    ::= { prtPhyCurrentEntry 2 }
+prtPhyCurrentUAS OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The counter associated with the number of UAS
+     encountered by a 25.6 Mbps
+     interface in the current 15 minute interval."
+    ::= { prtPhyCurrentEntry 3 }
+prtPhyCurrentSES OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The counter associated with the number of SES
+      encountered by a 25.6 Mbps
+      interface in the current 15 minute interval."
+     ::= { prtPhyCurrentEntry 4 }
+prtPhyCurrentES OBJECT-TYPE
+     SYNTAX Gauge32 
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The number of Errored Seconds, encountered  by a
+      25.6 Mbps interface in the current 15 minute interval."
+     ::= { prtPhyCurrentEntry 5 }
+prtPhyCurrentStatus OBJECT-TYPE
+     SYNTAX OCTET STRING  (SIZE (4))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The statuses of the current interval:
+       0 - O.K.
+       1 - The link has been switched by a redundancy mechanism.
+       2 - Module is in/out.
+       4 - Empty - card is out."
+     ::= { prtPhyCurrentEntry 6 }
+prtPhyCurrentLOF OBJECT-TYPE
+     SYNTAX Gauge32 
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The number of Loss of Frames, encountered by an
+      interface in the current 15 minute interval."
+     ::= { prtPhyCurrentEntry 7 }
+-- The PHY interface Interval
+-- The PHY Interval Table contains various statistics
+-- collected by the Interface over the previous 24
+-- hours of operation.  The past 24 hours are broken into 96
+-- completed 15 minute intervals.
+prtPhyIntervalTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF PrtPhyIntervalEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+     "The Line Interval table."
+     ::= { prtPhyPerfHistory 2 }
+prtPhyIntervalEntry OBJECT-TYPE
+     SYNTAX  PrtPhyIntervalEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+     "An entry in the 25.6 Mbps Line Interval table.
+      ifIndex of the line 25.6 Mbps layer of type 25.6 Mbps."
+     INDEX   { ifIndex, prtPhyIntervalNumber }
+     ::= { prtPhyIntervalTable 1 }
+PrtPhyIntervalEntry ::=
+     SEQUENCE {
+        prtPhyIntervalNumber
+            Integer32,
+        prtPhyIntervalLOS
+            Gauge32,
+        prtPhyIntervalLSV
+            Gauge32,
+        prtPhyIntervalUAS
+            Gauge32,
+        prtPhyIntervalSES
+            Gauge32,
+        prtPhyIntervalES
+            Gauge32,
+        prtPhyIntervalStatus
+            OCTET STRING,
+        prtPhyIntervalLOF
+            Gauge32
+      }
+prtPhyIntervalNumber OBJECT-TYPE
+     SYNTAX  Integer32 (1..96)
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "A number between 1 and 96, where 1 is the most
+      recently completed 15 minute interval and 96 is
+      the least recently completed 15 minutes interval
+      (assuming that all 96 intervals are valid)."
+     ::= { prtPhyIntervalEntry 1 }
+prtPhyIntervalLOS OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The counter associated with the number of Loss Of Sync
+      seconds , encountered by a 25.6 Mbps interface in
+      one of the previous 96, individual 15 minute intervals."
+     ::= { prtPhyIntervalEntry 2 }
+prtPhyIntervalLSV OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The counter associated with the number of line symbol violation
+      seconds , encountered by a 25.6 Mbps interface in
+      one of the previous 96, individual 15 minute intervals."
+     ::= { prtPhyIntervalEntry 3 }
+prtPhyIntervalUAS OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The counter associated with the number of UAS
+      encountered by a 25.6 Mbps interface in one of the previous 96, 
+      individual 15	minute intervals."
+     ::= { prtPhyIntervalEntry 4 }
+prtPhyIntervalSES OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The counter associated with the number of SES
+      encountered by a 25.6 Mbps interface in one of the previous 96, 
+      individual 15	minute intervals."
+    ::= { prtPhyIntervalEntry 5 }
+prtPhyIntervalES OBJECT-TYPE
+     SYNTAX Gauge32 
+     MAX-ACCESS  read-only
+     STATUS current 
+     DESCRIPTION
+     "The number of Errored Seconds, encountered  by a
+      25.6 Mbps interface in one of the previous 96, individual 15
+      minute intervals."
+     ::= { prtPhyIntervalEntry 6 }
+prtPhyIntervalStatus OBJECT-TYPE
+     SYNTAX OCTET STRING  (SIZE (4))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     " The statuses of the current interval:
+       0 - O.K.
+       1 - The link has been switched by a redundancy mechanism.
+       2 - Module is in/out.
+       4 - Empty - card is out."
+     ::= { prtPhyIntervalEntry 7 }
+prtPhyIntervalLOF OBJECT-TYPE
+     SYNTAX Gauge32 
+     MAX-ACCESS  read-only
+     STATUS current 
+     DESCRIPTION
+     "The number of Loss of Frames, encountered  by an
+      interface in one of the previous 96, individual 15
+      minute intervals."
+     ::= { prtPhyIntervalEntry 8 }
+-- END
+-- 
+-- file :v:\doc\rdv\mib\ver490\r2.txt
+-- 
+--Title:  RAD's WAN R2 Interface MIB
+--By:     Smadar Tauber
+--Date :  18.04.2000
+--Last Update:  23-June-02
+--By: Smadar Tauber
+--File:  v:\doc\rdv\mib\ver490\r2.txt
+--wanGen   OBJECT IDENTIFIER ::= {radWan 1}
+--diverseIfWanGen OBJECT IDENTIFIER ::= {wanGen 6} (see mpmx.txt)
+r2If OBJECT IDENTIFIER ::= {diverseIfWanGen 9}
+r2ProfileCnfg OBJECT IDENTIFIER ::= {r2If 1}
+r2IfStatus    OBJECT IDENTIFIER ::= {r2If 2}
+--R2 Profile Configuration tables
+--
+--Only the profiles that are defined having agnSigProfType=r2Cas will
+--exist in these tables. 
+--The parameters of the r2CnfgTable are defined per configuration, per Country (RW).
+r2CnfgTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF R2CnfgEntry
+     MAX-ACCESS not-accessible
+     STATUS  current
+     DESCRIPTION
+      "The write operation into the Table Objects is valid only
+       to the TmpCnfg entry."
+     ::= { r2ProfileCnfg 1}
+r2CnfgEntry OBJECT-TYPE
+      SYNTAX R2CnfgEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+	DESCRIPTION  "An entry in table."
+	INDEX {r2CnfgIdx, r2CnfgProfileIdx}
+      ::= { r2CnfgTable 1}
+R2CnfgEntry ::=
+      SEQUENCE {
+      r2CnfgIdx            Integer32,
+      r2CnfgProfileIdx     Integer32,
+      r2Mode               INTEGER,
+      r2Country            Integer32,
+	  r2Delay              INTEGER,
+	  r2MeteringInd        INTEGER,
+	  r2BreakMakeRatio     INTEGER,
+      r2ReleaseGuardT2     Integer32,
+      r2Regret             Integer32,
+      r2SeizeDetect        Integer32,
+	  r2SeizeAckDelay      Integer32,
+	  r2ClearBackDetect    Integer32,
+	  r2ClearFwdDetect     Integer32,
+	  r2FaultDetect        Integer32,
+	  r2FaultRemoveDetect  Integer32,
+	  r2MeterPulseDuration Integer32,
+	  r2SeizeAckWait       Integer32,
+	  r2SeizeAckDetect     Integer32,
+	  r2AnswerDetect       Integer32,
+	  r2BlockRemoveDetect  Integer32,
+	  r2MeterPulseDetect   Integer32,
+	  r2ForcedDisconnect   Integer32,
+	  r2DisconnectAck      Integer32,
+	  r2ReleaseGuardT1     Integer32,
+	  r2CnfgRowStatus      RowStatus
+      }
+r2CnfgIdx OBJECT-TYPE
+      SYNTAX  Integer32 (1..255)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates the Idx of the Cnfg being accessed.
+       255 = TmpCnfg.
+       1   = Current Cnfg. 
+       Write is allowed only to TmpCnfg."
+      ::= {r2CnfgEntry 1}
+r2CnfgProfileIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "Profile Index.
+       Valid values: 1..5
+       Only instances of profiles that are defined having agnSigProfType=r2Cas will
+       exist in this table."
+      ::= {r2CnfgEntry 2}
+r2Mode OBJECT-TYPE
+      SYNTAX  INTEGER
+      { 
+          auto  (2),
+          manual(3)
+      }
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "R2 Mode.
+       auto   - in this mode, default value of timers will be used by R2,
+                according to the selected r2Country.
+       manual - in this mode, user can change the value of R2 timers within the valid
+                limits, specific to each country."
+      ::= {r2CnfgEntry 3}
+r2Country OBJECT-TYPE
+     SYNTAX  Integer32 
+     MAX-ACCESS   read-create
+     STATUS   current
+     DESCRIPTION
+     "R2 Country. R2 Timers can have different range of values and
+      defaults for each country. When r2Mode=auto, the default value is
+	  used by R2 according to this selected country.
+       1=ITU-T (standard values)
+       2=Korea
+       3=India
+       4=Brasil (continuous)
+       5=Brasil (pulsed)
+       6..10 - reserved for future countries."
+     ::= {r2CnfgEntry 4}
+r2Delay OBJECT-TYPE
+      SYNTAX  INTEGER 
+      { 
+       notApplicable (1),
+       terrestrial   (2),
+       satellite     (3)
+      }
+      MAX-ACCESS   read-create
+      STATUS   current
+      DESCRIPTION
+      "This object enables user to configure the link as satellite or terrestrial.
+       The seize acknowledge detect timing is much shorter (msec) for
+       terrestrial link than for satellite link (1-2 sec)."
+      ::= {r2CnfgEntry 5}
+r2MeteringInd OBJECT-TYPE
+      SYNTAX  INTEGER 
+      { 
+      notApplicable (1),
+      cBit          (2), 
+      bBit          (3)
+      }
+      MAX-ACCESS   read-create
+      STATUS   current
+      DESCRIPTION
+      "Which Bit will be used for Metering Indication."
+      ::= {r2CnfgEntry 6}
+r2BreakMakeRatio OBJECT-TYPE
+      SYNTAX    INTEGER
+      { 
+      notApplicable(1),
+      break56Make44(2),
+      break64Make36(3),
+	  break80Make20(4)
+      }
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "This object describes the Break-Make Ratio of Pulse Duration, in [msec].
+       RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 7}
+r2ReleaseGuardT2 OBJECT-TYPE
+      SYNTAX     Integer32 
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+      "Release Guard timing T2.
+       Release guard timing before going to idle, in [msec].
+       RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 8}
+r2Regret OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Regret duration, in [sec].
+       RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 9}
+r2SeizeDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Seize Detect. Timer of the R2 incoming side.
+       Minimum duration to detect a valid seizure, in [msec].
+       RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 10}
+r2SeizeAckDelay OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 incoming side.
+      Delay before sending a valid seize ack signal, in [msec].
+      Applicable only when r2Mode=manual. only when r2Mode=manual."
+      ::= {r2CnfgEntry 11}
+r2ClearBackDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 incoming side.
+      Minimum duration to recognize a valid clear-back, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 12}
+r2ClearFwdDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 incoming side.
+      Minimum duration to recognize a valid clear-forward, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 13}
+r2FaultDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 incoming side.
+      Minimum duration to recognize a block signal, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 14}
+r2FaultRemoveDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 incoming side.
+      Minimum duration to recognize a valid block removal signal, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 15}
+r2MeterPulseDuration OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 incoming side.
+      Duration of metering pulse to be sent, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 16}
+r2SeizeAckWait OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 outgoing side.
+      Minimum duration to receive seizure acknowledge signal, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 17}
+r2SeizeAckDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 outgoing side.
+      Minimum duration to recognize a valid seizure acknowledge signal, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 18}
+r2AnswerDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 outgoing side.
+      Minimum duration to recognize a valid answer signal, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 19}
+r2BlockRemoveDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 outgoing side.
+      Minimum duration to recognize a valid block removal signal, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 20}
+r2MeterPulseDetect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 outgoing side.
+      Minimum duration of incoming meter pulse, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 21}
+r2ForcedDisconnect OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 outgoing side.
+      Minimum duration to recognize disconnect signal, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 22}
+r2DisconnectAck OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 outgoing side.
+      Minimum duration to recognize disconnect acknowledge signal, in [msec].
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 23}
+r2ReleaseGuardT1 OBJECT-TYPE
+      SYNTAX  Integer32  
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Timer of the R2 outgoing side.
+      Minimum duration to release guard, in [msec].
+      During this time, no new call can be initiated.
+      RW only when r2Mode=manual."
+      ::= {r2CnfgEntry 24}
+r2CnfgRowStatus OBJECT-TYPE
+      SYNTAX  RowStatus  
+      --active(1),
+      --destroy(6)
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "This object enables the user to add/delete entries to/from the table."
+      ::= {r2CnfgEntry 25}
+--The configuration parameters of the r2TsTable are defined per configuration, 
+--per Profile, per TS (RW Table).
+r2TsTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF R2TsEntry
+     MAX-ACCESS not-accessible
+     STATUS  current
+     DESCRIPTION
+      "The write operation into the Table Objects is valid only
+       to the TmpCnfg entry."
+     ::= { r2ProfileCnfg 2}
+r2TsEntry OBJECT-TYPE
+    SYNTAX R2TsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+	DESCRIPTION  "An entry in table."
+	INDEX {r2TsCnfgIdx, r2TsProfileIdx, r2TsIdx}
+      ::= { r2TsTable 1}
+R2TsEntry ::=
+      SEQUENCE {
+      r2TsCnfgIdx          Integer32,
+      r2TsProfileIdx       Integer32,
+      r2TsIdx              Integer32,
+      r2TsCallEnable       INTEGER,
+	  r2TsMetering         INTEGER,
+	  r2TsRowStatus        RowStatus,
+	  r2TsReversePolarity  INTEGER
+      }
+r2TsCnfgIdx OBJECT-TYPE
+      SYNTAX  Integer32 (1..255)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates the Idx of the Cnfg being accessed.
+       255 = TmpCnfg.
+       1   = Current Cnfg. 
+       Write is allowed only to TmpCnfg."
+      ::= {r2TsEntry 1}
+r2TsProfileIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "Profile Index.
+       Valid values: 1..5
+       Only instances of profiles that are defined having agnSigProfType=r2Cas will
+       exist in this table."
+      ::= {r2TsEntry 2}
+r2TsIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "TS Index.
+       Valid values: 1..31"
+      ::= {r2TsEntry 3}
+r2TsCallEnable OBJECT-TYPE
+     SYNTAX  INTEGER
+     {
+       incoming      (2),
+       outgoing      (3),
+       both          (4)
+     }
+     MAX-ACCESS   read-create
+     STATUS   current
+     DESCRIPTION
+     "This object indicates the Enabled Call direction for the specific TS."
+     ::= {r2TsEntry 4}
+r2TsMetering OBJECT-TYPE
+     SYNTAX  INTEGER
+     {
+       no   (2),
+       yes  (3)
+     }
+     MAX-ACCESS   read-create
+     STATUS   current
+     DESCRIPTION
+     "This object indicates if the specific TS should support Metering."
+     ::= {r2TsEntry 5}
+r2TsRowStatus OBJECT-TYPE
+      SYNTAX  RowStatus  
+      --active(1),
+      --destroy(6)
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "This object enables the user to add/delete entries to/from the table."
+      ::= {r2TsEntry 6}
+r2TsReversePolarity OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       no   (2),
+       yes  (3)
+      }
+      MAX-ACCESS   read-create
+      STATUS   current
+      DESCRIPTION
+      "This object indicates if the specific TS should support Reverse Polarity."
+      ::= {r2TsEntry 7}
+--R2 Status table (RO) - TS Level, per Link
+--
+--The table is applicable only for E1 Links having an R2 Profile.
+r2StatusTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF R2StatusEntry
+     MAX-ACCESS not-accessible
+     STATUS  current
+     DESCRIPTION
+      "The write operation into the Table Objects is valid only
+       to the TmpCnfg entry."
+     ::= { r2IfStatus 1}
+r2StatusEntry OBJECT-TYPE
+      SYNTAX R2StatusEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+	DESCRIPTION  "An entry in table."
+	INDEX {r2StatusSlotIdx, r2StatusPortIdx, r2StatusTsIdx}
+      ::= { r2StatusTable 1}
+R2StatusEntry ::=
+      SEQUENCE {
+      r2StatusSlotIdx       INTEGER,
+      r2StatusPortIdx       Integer32,
+      r2StatusTsIdx         Integer32,
+      r2StatusSigDirection  INTEGER,
+	  r2StatusTsState       INTEGER,
+	  r2StatusProtocolState INTEGER
+      }
+r2StatusSlotIdx OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+      io1   (5),
+      io2   (6),
+      io3   (7),
+      io4   (8),
+      io5   (9),
+      io6  (10),
+      io7  (11),
+      io8  (12),
+      io9  (13),
+      io10 (14),
+      io11 (15),
+      io12 (16),
+      notApplicable(255)
+            }
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "Slot Index"
+      ::= {r2StatusEntry 1}
+r2StatusPortIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "This object indicates a unique  port number of the ML having 
+       R2 interface.
+       Valid values: exPrt1 (1)..exPrt4 (4)"
+      ::= {r2StatusEntry 2}
+r2StatusTsIdx OBJECT-TYPE
+      SYNTAX  Integer32 (1..31)
+      MAX-ACCESS   read-only
+      STATUS   current
+      DESCRIPTION
+      "Time Slot index."
+      ::= {r2StatusEntry 3}
+r2StatusSigDirection OBJECT-TYPE
+      SYNTAX  INTEGER 
+      { 
+      notApplicable (1),
+      incoming      (2),
+      outgoing      (3)
+      }
+      MAX-ACCESS   read-only
+      STATUS   current
+      DESCRIPTION
+      "R2 Time Slot Signaling Direction."
+      ::= {r2StatusEntry 4}
+r2StatusTsState OBJECT-TYPE
+      SYNTAX  INTEGER 
+      { 
+      notUsed       (1),
+      normal        (2),
+      remoteBlocked (3),
+	  localBlocked  (4),
+	  localLoop     (5),
+	  remoteLoop    (6)
+      }
+      MAX-ACCESS   read-only
+      STATUS   current
+      DESCRIPTION
+      "R2 TS State"
+      ::= {r2StatusEntry 5}
+r2StatusProtocolState OBJECT-TYPE
+      SYNTAX  INTEGER 
+      { 
+      idle                (1),
+      seized              (2),
+      seizureAcknowledged (3),
+	  answered            (4),
+	  clearForward        (5),
+	  clearBack           (6),
+	  blocked             (7),
+	  forcedDisc          (8),
+	  doubleSeizure       (9),
+	  fault              (10),
+	  discAcknowledged   (11),
+	  fault1             (12),
+	  fault6             (13),
+	  fault3             (14) 
+      }
+      MAX-ACCESS   read-only
+      STATUS   current
+      DESCRIPTION
+      "R2 Protocol State."
+      ::= {r2StatusEntry 6}
+-- 
+-- file :v:\doc\rdv\mib\ver506\atm\layer2.txt
+-- 
+-- 
+-- file: v:\doc\rdv\mib\ver495\atm\layer2.txt
+-- 
+--RTR-MIB  
+--
+--Last update: 25-Sep-2002
+--By: Shay Harari 
+-- ************************************************
+-- Link Layer (layer 2)  MIB
+-- ************************************************
+atmLayer2  OBJECT IDENTIFIER  ::=  {radAtm 7}
+ atmLayer2XVclTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AtmLayer2XVclEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    "This table is an extension of VCL table, which is created  
+    for each LAN VCC."
+	::= { atmLayer2 1 }
+ atmLayer2XVclEntry OBJECT-TYPE
+	SYNTAX AtmLayer2XVclEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    "Conceptual row in atmVclTable.
+    This table augments the RFC2515 VCL table."
+ AUGMENTS { atmVclEntry }
+	::= { atmLayer2XVclTable 1 }
+ AtmLayer2XVclEntry ::= SEQUENCE {
+	atmLayer2XVclConnMode       INTEGER,
+    atmLayer2XVclGroupIdx       Integer32 
+ }
+ atmLayer2XVclConnMode OBJECT-TYPE
+	SYNTAX INTEGER { 
+	              main   (1), 
+	              sub    (2) 
+				   }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+    "Each valid LAN VCC is either Main or Sub. 
+	This parameter is configured only once on creation of a LAN VCC.
+	It can not be changed after creation. In order to change the Mode, 
+	user should delete the connection and create a new one.
+    main - A LAN VCC, which holds its own bridge port. 
+           Bridge forwarding and Bridge learning is performed only on Main 
+	       VCCs.
+	       For working on a transparent bridge, that doesn't perform
+	       layer 2 priority mapping, a Main VCC should be opened, which 
+		   is the default connection Mode. 
+		   When working with layer 2 priority, a group of LAN VCCs should
+		   be configured, where each group will be associated with only 
+		   one Main VCC.
+		   A specific Main can not be used by more than one group. 
+	sub  - A LAN VCC is not part of the bridging mechanism. 
+		   A Sub VCC automatically inherit some general definitions from
+		   Main VCC of its group: ATM Slot/Port and LAN Slot/Port.
+		   Max number of Sub VCCs allowed per group is:  
+		   [Number of Priorities - 1]."
+	::= { atmLayer2XVclEntry 1 }
+ atmLayer2XVclGroupIdx OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The group identifier.
+	A VCC Group identifier = 0 if the VCC was not associated with a 
+	group yet.
+	This value is updated according to the group identifier set by 
+	atmLayer2GroupTable."
+	::= { atmLayer2XVclEntry 2 }
+ atmLayer2GroupTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AtmLayer2GroupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"This table contains groups and their members.
+	A group is a bundle of VCCs, which acts as different queues.
+	Main and Sub VCCs should have the same ATM slot and port,
+	and the same LAN slot and port.
+    Each group contains: 1 to <number of priorities> VCCs."
+	::= { atmLayer2 2 }
+ atmLayer2GroupEntry OBJECT-TYPE
+	SYNTAX AtmLayer2GroupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Conceptual row in atmLayer2GroupTable.
+	The indexes: ifIndex, atmVclVpi and atmVclVci indicate 
+	the Network ATM End-Point.
+	Upon a group creation, one Main VCC must be added first.
+	After the group was created, Sub VCCs may be added to the group."
+ INDEX { atmLayer2GroupIdx, ifIndex, atmVclVpi, atmVclVci }
+	::= { atmLayer2GroupTable 1 }
+ AtmLayer2GroupEntry ::= SEQUENCE {
+    atmLayer2GroupIdx          Integer32, 
+    atmLayer2GroupRowStatus    RowStatus, 
+    atmLayer2GroupConnMode     INTEGER, 
+    atmLayer2GroupConnPriority OCTET STRING,
+    atmLayer2GroupName         SnmpAdminString 
+ }
+ atmLayer2GroupIdx OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The group identifier. 
+	0 is not a valid index."
+	::= { atmLayer2GroupEntry 1 }
+ atmLayer2GroupRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Creation/Deletion of rows in the table, and indication of the 
+	entry's status."
+	::= {atmLayer2GroupEntry 2 }
+ atmLayer2GroupConnMode OBJECT-TYPE
+	SYNTAX INTEGER { 
+	              main (1), 
+	              sub  (2) 
+				   }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Each valid LAN VCC is either Main or Sub as configured in 
+	atmLayer2XVclTable."
+	::= { atmLayer2GroupEntry 3 }
+ atmLayer2GroupConnPriority OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This parameter is configured by atmLayer2PriorityRx from 
+	atmLayer2PriorityTable.
+	Each bit in the Octet represents a specific priority as follows:
+             MSB 7  6  5  4  3  2  1  0 LSB	  -> Priorities
+                 |--------------------|
+                 1  0  0  1  0  0  0  1		  ->	  Value
+	In this example, a certain VCC has several priorities: 0, 4 and 7."
+	::= { atmLayer2GroupEntry 4 }
+ atmLayer2GroupName OBJECT-TYPE
+	SYNTAX SnmpAdminString (SIZE (1..32))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Group name. Configured by the user.
+	The name is unique per system.
+	For atmLayer2GroupIdx=0, the name will be null."
+	::= { atmLayer2GroupEntry 5 }
+ atmLayer2PriorityTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AtmLayer2PriorityEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"This table maps all priorities inside a group.
+	Several priorities might be mapped to the same VCC. 
+	Upon priority change, the agent will update the VCCs of the 
+	changed priority in this table, and will update	-
+	atmLayer2GroupConnPriority parameter of both former and new owners 
+	of the changed priority.
+	Changing a VCC value is actually a change of three parameters
+	simultaneously: atmLayer2PriorityIfIndex, atmLayer2PriorityVclVpi
+	and atmLayer2PriorityVclVci. Otherwise, the set will be rejected,
+	since there might be that such VCC doesn't exist in the specific
+	group."
+	::= { atmLayer2 3 }
+ atmLayer2PriorityEntry OBJECT-TYPE
+	SYNTAX AtmLayer2PriorityEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Conceptual row in atmLayer2PriorityTable.
+	Each entry is a Network ATM End-Point per priority.
+	Upon a group creation, all priorities are mapped to the Main VCC. 
+	Number of entries per group is according to the number of 
+	priorities enabled. (For example, for Max priorities = 8,  
+	the agent will create 8 entries)."
+    INDEX { atmLayer2PriorityGroupIdx, atmLayer2PriorityRx }
+	::= { atmLayer2PriorityTable 1 }
+ AtmLayer2PriorityEntry ::= SEQUENCE {
+    atmLayer2PriorityGroupIdx        Integer32, 
+    atmLayer2PriorityRx              Integer32, 
+	atmLayer2PriorityIfIndex	     InterfaceIndex,
+    atmLayer2PriorityVclVpi          Integer32,
+    atmLayer2PriorityVclVci          Integer32        
+ }
+ atmLayer2PriorityGroupIdx OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The group identifier." 
+	::= { atmLayer2PriorityEntry 1 }
+ atmLayer2PriorityRx OBJECT-TYPE
+	SYNTAX Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The priority values.
+	The used values are 0-7, but since this value is part of the index
+	of the table, and in order to avoid '0' as an index, the index syntax 
+	is 1..8, but the real value is atmLayer2PriorityRx-1: 
+		  0 - for Low priority. 
+		  7 - for High priority."
+	::= { atmLayer2PriorityEntry 2 }
+ atmLayer2PriorityIfIndex OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"ATM ifIndex of the network End-Point."
+	::= { atmLayer2PriorityEntry 3 }
+ atmLayer2PriorityVclVpi OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Vpi of the network End-Point."
+	::= { atmLayer2PriorityEntry 4 }
+ atmLayer2PriorityVclVci OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Vci of the network End-Point."
+	::= { atmLayer2PriorityEntry 5 }
+atmLayer2GroupIndexNext  OBJECT-TYPE
+          SYNTAX         Integer32 (0..2147483647)
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION
+           "This object contains an appropriate value to
+            be used for atmLayer2GroupIdx when creating
+            entries in the atmLayer2GroupTable. The value
+            0 indicates that no unassigned entries are
+            available. To obtain the atmLayer2GroupIdx
+            value for a new entry, the manager gets 
+            the current value of this object. The next index
+            will be of the first unassigned entry. It will be 
+            provided by checking the assigned entries."
+          ::= { atmLayer2 4 }
+--VLAN
+ atmLayer2CfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AtmLayer2CfgEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Bridge configuration Table. This table supports multi-bridge 
+	and bridge features within an ATM device."
+	::= { atmLayer2 5 }
+ atmLayer2CfgEntry OBJECT-TYPE
+	SYNTAX AtmLayer2CfgEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Conceptual row in atmLayer2CfgTable.
+	Each entry in this table contains the bridging attributes for
+	both Ethernet and ATM sides.
+	The interface index is the Ethernet port interface.
+	For Ace52: this object represents the Bridge ifIndex."
+ INDEX { ifIndex }
+	::= { atmLayer2CfgTable 1 }
+ AtmLayer2CfgEntry ::= SEQUENCE {
+    atmLayer2CfgBridgingMode            INTEGER, 
+    atmLayer2CfgVlanMode                INTEGER, 
+    atmLayer2CfgAtmAcceptableFrameType  INTEGER,
+    atmLayer2CfgAtmIngressFiltering     TruthValue,
+    atmLayer2CfgAtmTxFrameType          INTEGER,
+    atmLayer2CfgEthAcceptableFrameType  INTEGER,
+    atmLayer2CfgBridgeAction            INTEGER,
+    atmLayer2CfgLearningMode            INTEGER,
+	atmLayer2CfgAgingTime               Integer32	
+ }
+ atmLayer2CfgBridgingMode OBJECT-TYPE
+               SYNTAX  INTEGER {
+                       accessOnly(1),
+                       accessAndSwitching (2)
+               }
+ 	           MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+               "Bridging mode can be one of the following: 
+	            ATM <> Ethernet - Bridging is between the Ethernet 
+	            port and the ATM port (there is no bridging between VCs).
+	            ATM <> Ethernet + ATM - Bridging is done both between 
+	            the Ethernet port and the ATM port and also between VCs."
+	::= { atmLayer2CfgEntry 1 }
+ atmLayer2CfgVlanMode OBJECT-TYPE
+               SYNTAX  INTEGER {
+                       disable   (2),
+                       enable    (3)
+               }
+ 	           MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+               "VLAN Mode. Upon Mode changing, all LAN VCCs will be deleted
+               by the agent from all tables that include LAN VCCs."
+	::= { atmLayer2CfgEntry 2 }
+ atmLayer2CfgAtmAcceptableFrameType OBJECT-TYPE
+	SYNTAX INTEGER { 
+	              notApplicable       (1),
+	              admitAll            (2), 
+	              admitOnlyVlanTagged (3), 
+	              admitOnlyUnTagged   (4) 
+				   }
+ 	           MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+               "The Frame Type that will be acceptable by the VCCs that 
+               are associated with this Ethernet port.
+               Frames which don't match the selected type will be discarded.
+               admitAll -            all frames will be accepted.
+               admitOnlyVlanTagged - only Tagged frames will be accepted.
+               admitOnlyUnTagged   - only unTagged frames will be accepted."
+	::= { atmLayer2CfgEntry 3 }
+ atmLayer2CfgAtmIngressFiltering OBJECT-TYPE
+              SYNTAX      TruthValue
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+              "For the VCCs that are associated with this Ethernet port, 
+              when this is true(1) the device will discard incoming
+              frames for VLANs which do not include this Port in its
+              Member set.  When false(2), the port will accept all
+              incoming frames."
+	::= { atmLayer2CfgEntry 4 }
+ atmLayer2CfgAtmTxFrameType OBJECT-TYPE
+	SYNTAX INTEGER { 
+	              notApplicable(1),
+	              unTagged (2), 
+	              tagged   (3) 
+				   }
+ 	           MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+               "The Frame Type that will be transmitted by the VCCs that 
+               are associated with this Ethernet port. 
+               unTagged -      The transmitted frames will be unTagged.
+               tagged -        The transmitted frames will be Tagged."
+	::= { atmLayer2CfgEntry 5 }
+ atmLayer2CfgEthAcceptableFrameType OBJECT-TYPE
+	SYNTAX INTEGER { 
+	              notApplicable       (1),
+	              admitAll            (2), 
+	              admitOnlyVlanTagged (3), 
+	              admitOnlyUnTagged   (4) 
+				   }
+ 	           MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+               "The Frame Type that this Ethernet port will accept.
+			   (for ACE-52: the Frame Type that this Bridge will accept)
+			   This parameter is notApplicable for atmLayer2VlanMode=disable.
+               Frames which don't match the selected type will be discarded.
+               admitAll -            all frames will be accepted.
+               admitOnlyVlanTagged - only Tagged frames will be accepted.
+               admitOnlyUnTagged -   only unTagged frames will be accepted."
+	::= { atmLayer2CfgEntry 6 }
+ atmLayer2CfgBridgeAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+       deleteLanTable   (7),
+	   noOp             (255)
+     }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+	"This object enables to perform the	specified action on the 
+	selected port."
+	::= { atmLayer2CfgEntry 7 }
+ atmLayer2CfgLearningMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+       svl   (1),
+       ivl   (2)
+     }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+	"This object specifies the mode of the learning process of a bridge.
+	svl - Shared VLAN process. If an individual MAC Address is learned 
+	      in one VLAN, this information is used in forwarding decisions
+	      taken for that address for all other VLANs.
+	ivl - Independent VLAN process. If an individual MAC Address is learned 
+	      in one VLAN, this information is not used in forwarding decisions
+	      taken for that address for all other VLANs."
+	::= { atmLayer2CfgEntry 8 }
+atmLayer2CfgAgingTime OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The timeout period in seconds for aging out
+     dynamically learned forwarding information."
+    ::= { atmLayer2CfgEntry 9 }
+-- 
+-- file :v:\doc\rdv\mib\ver470\atm\fratm.txt
+-- 
+-- 
+-- file: v:\doc\rdv\mib\ver470\atm\frAtm.txt
+-- 
+--FR-ATM-IWF-X-MIB  
+--
+--Last update: 28-Feb-2001
+--By: Ilana Schvetz 
+--atmSuPortFr     OBJECT IDENTIFIER ::= { atmSuPort 4 }
+radAtmFr  OBJECT IDENTIFIER  ::=  {radAtm 8}
+ frAtmIwfXConnectionTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF FrAtmIwfXConnectionEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    "This table is an extension of frAtmIwfXConnectionTable from
+    RFC2955."
+	::= { radAtmFr 1 }
+ frAtmIwfXConnectionEntry OBJECT-TYPE
+	SYNTAX FrAtmIwfXConnectionEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    "Conceptual row in frAtmIwfXConnectionTable.
+    This table augments the RFC2955."
+ AUGMENTS { frAtmIwfConnectionEntry }
+	::= { frAtmIwfXConnectionTable 1 }
+ FrAtmIwfXConnectionEntry ::= SEQUENCE {
+                 frAtmIwfXConnMode         INTEGER,
+                 frAtmIwfXConnSscsDlci     Integer32
+ }
+         frAtmIwfXConnMode OBJECT-TYPE
+             SYNTAX      INTEGER { service(1), network(2) }
+             MAX-ACCESS  read-create
+             STATUS      current
+             DESCRIPTION
+                     "FR IWF Mode. 
+                     service - Service InterWorking (FRF.8),
+                     network - Network InterWorking (FRF.5)."
+	         ::= { frAtmIwfXConnectionEntry 1 }
+         frAtmIwfXConnSscsDlci OBJECT-TYPE
+             SYNTAX      Integer32
+             MAX-ACCESS  read-create
+             STATUS      current
+             DESCRIPTION
+                     "This parameter is relevant for 
+                     frAtmIwfXConnMode=network (FRF.5) only.
+                     This parameter allow configuration of the 
+                     FR SSCS DLCI that is transferred to the 
+                     remote FR unit."
+	         ::= { frAtmIwfXConnectionEntry 2 }
+-- 
+-- file :v:\doc\rdv\mib\ver495\atm\radaal5.txt
+-- 
+-- 
+-- file :v:\doc\rdv\mib\ver495\atm\radaal5.txt
+-- 
+--Last update: 19-Nov-2002 by Ilana Schvetz
+END

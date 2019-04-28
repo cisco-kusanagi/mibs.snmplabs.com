@@ -1,0 +1,165 @@
+-- 	$Id: shiva-ntn.asn,v 1.4 1996/01/16 16:45:29 dfox Exp $
+
+--
+-- 	Copyright 1992, 1993, 1995, 1996 Shiva Corporation
+--
+
+SHIVA-LTL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	DisplayString
+		FROM RFC1213-MIB
+	lanToLAN
+		FROM SHIVA-MIB;
+
+--
+-- LAN-to-LAN session information
+--
+
+    ltlSessionTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF LtlSessionEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of current LAN-to-LAN connections in the box."
+	::= { lanToLAN 1 }
+
+    ltlSessionEntry OBJECT-TYPE
+	SYNTAX	LtlSessionEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A description of a LAN-to-LAN connection in the box."
+	INDEX { ltlSessionInitiation }
+	::= { ltlSessionTable 1 }
+
+    LtlSessionEntry ::= SEQUENCE {
+	ltlSessionInitiation	INTEGER,
+	ltlSessionState		INTEGER,
+	ltlSessionPersistent    INTEGER,
+	ltlSessionLinkType	INTEGER,
+	ltlSessionPhoneNumber	DisplayString
+    }
+
+    ltlSessionInitiation OBJECT-TYPE
+	SYNTAX	INTEGER {
+		remote(1),
+		user(2),
+		timed(3),
+		startup(4)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A description of how the connection was initiated:
+			remote  - Another box initiated the connection.
+			user    - A user on the local box initiated the
+				   connection via a command to the local
+				   box.
+			timed   - A timed connection on the local box
+				   initiated the connection.
+			startup - The local box initiated the connection
+				   during box initialization."
+	::= { ltlSessionEntry 1 }
+
+    ltlSessionState OBJECT-TYPE
+	SYNTAX	INTEGER {
+		idle(1),
+		asking(2),
+		trying(3),
+		manual(4),
+		disconnecting(5),
+		up(6)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A description of the state of the connection:
+			idle	- The connection has just been torn down.
+			asking  - A user is attempting to bring up a
+				   connection but has entered an incorrect
+				   username or password.  The box is waiting
+				   for the user to enter a new password.  
+			trying  - The local box is attempting to establish
+				   a connection with a remote box.
+			manual  - A physical connection, but not a link layer
+				   connection, has been established with a 
+				   remote box.  The user may now enter
+				   commands that will be sent directly to
+				   the modem on the local box.  (Not yet
+				   implemented.)
+			disconnecting  - The local box is in the process
+					  of tearing down the connection to
+					  the remote box.
+			up	- The connection is active."
+	::= { ltlSessionEntry 2 }
+
+    ltlSessionPersistent OBJECT-TYPE
+	SYNTAX	INTEGER {
+		on(1),
+		off(2)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A description of persistency of the connection."
+	::= { ltlSessionEntry 3 }
+
+    ltlSessionLinkType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		ppp(2),
+		aalap(3)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A description of the link level protocol used by the connection."
+	::= { ltlSessionEntry 4 }
+
+    ltlSessionPhoneNumber OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The outgoing phone number used by the connection."
+	::= { ltlSessionEntry 5 }
+
+--
+-- LAN-to-LAN configuration information
+--
+
+--  Start here if we ever add LAN-to-LAN configuration information.
+
+--    ltlConfTable OBJECT-TYPE
+--	SYNTAX	SEQUENCE OF LtlConfEntry
+--	ACCESS	not-accessible
+--	STATUS	mandatory
+--	DESCRIPTION
+--		"A table of the LAN-to-LAN Site configurations in the box."
+--	::= { lanToLAN 2 }
+
+--    ltlConfEntry OBJECT-TYPE
+--	SYNTAX	LtlConfEntry
+--	ACCESS	not-accessible
+--	STATUS	mandatory
+--	DESCRIPTION
+--		"A description of a LAN-to-LAN configuration parameter."
+--	INDEX { ltlconfName }
+--	::= { ltlConfTable 1 }
+
+--    LtlConfEntry ::= SEQUENCE {
+--	ltlconfName	DisplayString
+--    }
+
+--    ltlconfName OBJECT-TYPE
+--	SYNTAX	DisplayString
+--	ACCESS	read-only
+--	STATUS	mandatory
+--	DESCRIPTION
+--		"A description of the Site name."
+--	::= { ltlConfEntry 1 }
+
+END

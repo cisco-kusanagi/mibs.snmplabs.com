@@ -1,0 +1,482 @@
+-- Copyright 1998, 1999 Shiva Corporation
+
+SHIVA-VPN-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  TimeTicks, Counter, IpAddress, Gauge
+      FROM RFC1155-SMI
+  OBJECT-TYPE
+      FROM RFC-1212
+  DisplayString, ifIndex
+      FROM RFC1213-MIB
+  vpnTunnel
+      FROM SHIVA-VPN-DEF;
+
+  tunnelConfig OBJECT IDENTIFIER ::= { vpnTunnel 1 }
+  tunnelStatus OBJECT IDENTIFIER ::= { vpnTunnel 2 }
+  tunnelActions OBJECT IDENTIFIER ::= { vpnTunnel 3 }
+
+  tunnNumberSiteToSite OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of site-to-site tunnels configured
+           on this system."
+      ::= { tunnelConfig 1 }
+
+  tunnNumberRemoteUser OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of single remote user tunnels configured
+           on this system."
+      ::= { tunnelConfig 2 }
+
+  tunnNumberGroupUser OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of multiple remote user (group) tunnels
+           configured on this system."
+      ::= { tunnelConfig 3 }
+
+  tunnCurrentSiteToSite OBJECT-TYPE
+      SYNTAX Gauge -- (0..65535)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of site-to-site tunnels currently
+           operational on this system."
+      ::= { tunnelStatus 1 }
+
+  tunnCurrentRemoteUser OBJECT-TYPE
+      SYNTAX Gauge -- (0..65535)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of single remote user tunnels currently
+           operational on this system."
+      ::= { tunnelStatus 2 }
+
+  tunnCurrentGroupUser OBJECT-TYPE
+      SYNTAX Gauge -- (0..65535)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of multiple remote user (group) tunnels
+           currently operational on this system."
+      ::= { tunnelStatus 3 }
+
+  tunnNoProfileErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of times a tunnel could not be negotiated
+           because a profile did not exist."
+      ::= { tunnelStatus 4 }
+
+  tunnBadSigs OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of times the authentication of a peer
+           failed due to an invalid signature."
+      ::= { tunnelStatus 5 }
+
+  tunnBadCerts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of times tunnel authentication failed
+           becasue the peer provided an invalid certificate."
+      ::= { tunnelStatus 6 }
+
+  tunnOtherFailures OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of times tunnel authentication failed
+           due to errors other than an invalid signature, an invalid
+           certificate, or no profile."
+      ::= { tunnelStatus 7 }
+
+  tunnelsLanded OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of remote user tunnels formed since the
+           VPN Gateway was last configured."
+      ::= { tunnelStatus 8 }
+
+
+  tunnelIfExtTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF TunnelIfExtEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The (conceptual) table containing information
+           on configured tunnels.  This table augments the
+           tunnelIfTable in TUNNEL-MIB, there will be a row
+           for each row in that table. In turn, tunnelIfTable
+           has a row for each entry in ifTable in IF-MIB
+           whose ifType is tunnel(131). Note that entries in
+           the tunnelIfTable and tunnelIfExtTable are ephemeral,
+           so will be reset whenever the corresponding interface
+           transitions to line state up from line state down.
+
+           The MIB guarantees that, if the physical interfaces
+           are numbered 1 to N, the site-to-site entries
+           in the tunnelIfExtTable are numbered consecutively
+           beginning at N+1, the tunnels for remote users
+           appear after that, and the tunnels for remote
+           groups appear last."
+      ::= { tunnelStatus 50 }
+
+  tunnelIfExtEntry OBJECT-TYPE
+      SYNTAX TunnelIfExtEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "An entry (conceptual row) containing the information
+          on a particular configured tunnel."
+      INDEX { ifIndex }
+      ::= { tunnelIfExtTable 1 }
+
+  TunnelIfExtEntry ::=
+      SEQUENCE {
+          tunnelIfExtType
+              INTEGER,
+          tunnelIfExtAuthentication
+              INTEGER,
+          tunnelIfExtName
+              DisplayString,
+          tunnelIfExtCertificateAuthority
+              DisplayString,
+          tunnelIfExtCertificateSerialNumber
+              DisplayString,
+          tunnelIfExtSessionKeyValidity
+              TimeTicks,
+          tunnelIfExtEncryptionErrors
+              Counter,
+          tunnelIfExtDecryptionErrors
+              Counter,
+          tunnelIfExtPadErrors
+              Counter,
+          tunnelIfExtChecksumErrors
+              Counter,
+          tunnelIfExtReplayErrors
+              Counter,
+          tunnelIfExtLocalIp
+              IpAddress,
+          tunnelIfExtRemoteIp
+              IpAddress,
+
+	    tunnelBytesPerSecIn
+
+              Gauge,
+
+          tunnelBytesPerSecOut
+
+              Gauge
+      }
+
+  tunnelIfExtType OBJECT-TYPE
+      SYNTAX INTEGER {
+                 other(1),
+                 siteToSite(2),
+                 remote(3),
+                 group(4)
+             }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object indicates whether this entry represents
+           a site-to-site, a remote user, or a group tunnel. The
+           value of this object does not change from one tunnel
+           instantiation to another."
+      ::= { tunnelIfExtEntry 1 }
+
+  tunnelIfExtAuthentication OBJECT-TYPE
+      SYNTAX INTEGER {
+                 other(1),
+                 x509Sig(2),
+                 sharedSecret(3),
+                 securId(4)
+             }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object indicates the authentication
+           mechanism used to identify the peer. The value
+           x509Sig(2) means that signatures based on public
+           key cryptography were used. The value sharedSecret(3)
+           means that a pre-shared secret was used to
+           authenticate. The value securId(4) means SecurID was
+           used. The value other(1) indicates another currently
+           unsupported mechanism was used to authenticate the peer,
+           and is provided for forward compatibility."
+      ::= { tunnelIfExtEntry 2 }
+
+  tunnelIfExtName OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object gives the distinguished name of the
+           peer associated with this tunnel. If the peer's
+           name has not yet been established, this object's value
+           is the distinguished string <not established>.
+           If the peer used a certificate to authenticate
+           itself, this object provides the distinguished name
+           from the certificate. Otherwise it gives the
+           name the peer provided to identify itself during
+           authentication."
+      ::= { tunnelIfExtEntry 3 }
+
+  tunnelIfExtCertificateAuthority OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "When signatures were used to authenticate this
+           entry's tunnel, this object provides the issuer name
+           of the peer's X.509 certificate. When signatures were
+           not used to authenticate this entry's tunnel, this
+           object's value is NULL."
+      ::= { tunnelIfExtEntry 4 }
+
+  tunnelIfExtCertificateSerialNumber OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "When signatures were used to authenticate this
+           entry's tunnel, this object provides the serial
+           number from the peer's X.509 certificate. When
+           signatures were not used to authenticate this entry's
+           tunnel, this object's value is NULL."
+      ::= { tunnelIfExtEntry 5 }
+
+  tunnelIfExtSessionKeyValidity OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object provides the number of centiseconds remaining
+	   until the key for this tunnel expires, i.e., the
+           time remaining for this tunnel's security association."
+--    If this were SMIv2, we would say:
+--    UNITS centiseconds
+      ::= { tunnelIfExtEntry 6 }
+
+  tunnelIfExtEncryptionErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object counts the number of datagrams this
+           tunnel has discarded due to encryption errors."
+      ::= { tunnelIfExtEntry 7 }
+
+  tunnelIfExtDecryptionErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object counts the number of objects discarded
+           due to decryption errors. The total does not include
+           pad or checksum errors detected after decryption."
+      ::= { tunnelIfExtEntry 8 }
+
+  tunnelIfExtPadErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object counts the number of pad errors detected
+           after decryption."
+      ::= { tunnelIfExtEntry 9 }
+
+  tunnelIfExtChecksumErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object counts the number of checksum errors
+           detected while decapsulating a datagram emerging from
+           this entry's interface's tunnel. Note this total can
+           include AH failures, ESP data integrity failures, and
+           SST checksum failures."
+      ::= { tunnelIfExtEntry 10 }
+
+  tunnelIfExtReplayErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object counts the number of datagrams discarded
+           because they failed to pass the replay screening
+           algorithm."
+      ::= { tunnelIfExtEntry 11 }
+
+  tunnelIfExtLocalIp OBJECT-TYPE
+      SYNTAX IpAddress
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object provides the IP address used to address
+           datagrams sent from this tunnel's interface."
+      ::= { tunnelIfExtEntry 12 }
+
+  tunnelIfExtRemoteIp OBJECT-TYPE
+      SYNTAX IpAddress
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object provides the IP address used to address
+           datagrams sent to this tunnel's peer."
+      ::= { tunnelIfExtEntry 13 }
+
+  tunnelBytesPerSecIn OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This is the number of bytes per second received and
+           decrypted by this tunnel, averaged over approximately
+           the last minute."
+      ::= { tunnelIfExtEntry 14 }
+
+  tunnelBytesPerSecOut OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This is the number of bytes per second transmitted and
+           encrypted by this tunnel, averaged over approximately
+           the last minute."
+      ::= { tunnelIfExtEntry 15 }    
+
+  securityAssociationTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SecurityAssociationEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The (conceptual) table mapping half-duplex security
+           associations to tunnel interface indexes. Entries in
+           this table are ephemeral, appearing and disappearing
+           as security associations are formed and dropped. Note
+           this table does not include IKE security associations,
+           as these require a different indexing structure."
+      ::= { tunnelStatus 51 }
+
+  securityAssociationEntry OBJECT-TYPE
+      SYNTAX SecurityAssociationEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The (conceptual) table entry mapping a particular
+           security association to its tunnel interface."
+      INDEX {
+          securityAssociationIpAddress,
+          securityAssociationSPI,
+          securityAssociationProtocol
+      }
+      ::= { securityAssociationTable 1 }
+
+  SecurityAssociationEntry ::=
+      SEQUENCE {
+          securityAssociationIpAddress
+              IpAddress,
+          securityAssociationSPI
+              OCTET STRING,
+          securityAssociationProtocol
+              INTEGER,
+          securityAssociationLocal
+              INTEGER,
+          securityAssociationIfIndex
+              INTEGER
+      }
+
+  securityAssociationIpAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "This is the IP address identifying this security
+           association."
+      ::= { securityAssociationEntry 1 }
+
+  securityAssociationSPI OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(4))
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "This is the SPI identifying this security
+           association. The bytes of the SPI are in
+           network byte order."
+      ::= { securityAssociationEntry 2 }
+
+  securityAssociationProtocol OBJECT-TYPE
+      SYNTAX INTEGER {
+                 other(1),
+                 esp(50),
+                 ah(51),
+                 sst(2233)
+             }
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "This is the protocol id identifying this security
+           association. The value esp(50) indicates this
+           entry corresponds to an ESP security association.
+           The value ah(51) indicates this entry represents
+           an AH security association. The value sst(2233) means
+           this entry corresponds to an SST security association.
+           The value other(1) is used for all other kinds of
+           security associations; this value exists to support
+           future protocols that might use security associations."
+      ::= { securityAssociationEntry 3 }
+
+  securityAssociationLocal OBJECT-TYPE
+      SYNTAX INTEGER {
+                 local(1),
+                 remote(2)
+             }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object indicates the direction of the security
+           association. The value local(1) means the security
+           association is from the peer system to the local
+           system, i.e., this entry's securityAssociationIpAddress
+           is an IP address for the local system. The value
+           remote(2) means this entry represents a security
+           association from the local system to the peer, and
+           its securityAssociationIpAddress is that of the peer
+           system. Although the distinction between local and
+           remote security associations is artificial for IKE
+           and SST, the securityAssociationTable includes both
+           to provide a uniform management interface for all
+           possible security associations."
+      ::= { securityAssociationEntry 4 }
+
+  securityAssociationIfIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object provides the ifIndex of the tunnel
+           interface implementing this entry's security
+           association."
+      ::= { securityAssociationEntry 5 }
+
+END

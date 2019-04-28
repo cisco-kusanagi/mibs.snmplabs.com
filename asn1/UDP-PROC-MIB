@@ -1,0 +1,402 @@
+-- extracted from draft-persson-v6ops-mib-issue-01.txt
+-- at Thu Nov  9 06:07:30 2006
+
+UDP-PROC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter32, Counter64,
+    TimeTicks, Unsigned32,IpAddress,
+    mib-2                              FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+    InetAddress, InetAddressType,
+    InetPortNumber                     FROM INET-ADDRESS-MIB
+    udpEndpointEntry
+                                       FROM UDP-MIB;
+
+udpProcMIB MODULE-IDENTITY
+   LAST-UPDATED      "200610010000Z"
+   ORGANIZATION        "IETF IPv6 Working Group"
+   CONTACT-INFO
+        "Alain Durand
+        Comcast Cable
+        1500 Market st
+        Philadelphia
+        PA 19102 USA
+        Email: alain_durand@cable.comcast.com
+
+        Anders Persson
+        SUN Microsystems inc.
+        17 Network Circle
+        Menlo Park
+        CA 94025 USA
+        Email: anders.persson@sun.com
+
+        Paul Schauer
+        Comcast Cable
+        183 Inverness Dr West
+        Englewood
+        CO 80112 USA
+        Email: paul_schauer@cable.comcast.com
+
+        David Thaler
+        Microsoft
+        One Microsoft Way
+        Redmond
+        WA 98052 USA
+        Email: dthaler@microsoft.com"
+
+    DESCRIPTION
+           "Test branch for proposed UDP listener information tables"
+
+    REVISION    "200610010000Z"
+    DESCRIPTION
+        "Initial version"
+
+
+    ::= { mib-2 994 }
+
+udpProc      OBJECT IDENTIFIER ::= { mib-2 996 }
+
+--
+-- The proposed new UDP Endpoint Info table.
+--
+
+udpEndpointInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF UdpEndpointInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A table containing additional information about existing UDP
+            endpoints. This table augments the existing udpEndpointTable
+            by providing information for the process that created the
+            endpoint on the listed address/port, not just the
+            process currently associated with the endpoint. This
+            aids identifying processes sharing connections on the same
+            port."
+
+    ::= { udpProc 1 }
+
+udpEndpointInfoEntry OBJECT-TYPE
+    SYNTAX     UdpEndpointInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+
+    DESCRIPTION
+        "The additional time field allows an operator to identify
+        when a partcular UDP endpoint came into existance."
+
+    AUGMENTS { udpEndpointEntry }
+
+    ::= { udpEndpointInfoTable 1 }
+
+UdpEndpointInfoEntry ::= SEQUENCE {
+        udpEndpointInfoCreatorPID               Unsigned32,
+        udpEndpointInfoProcessCreateTime        TimeTicks
+        }
+
+udpEndpointInfoCreatorPID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system's process ID for the process that created
+      this endpoint, even if this process no longer exists
+        or is no longer associated with this connection."
+
+    ::= { udpEndpointInfoEntry 1 }
+
+udpEndpointInfoProcessCreateTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This field provides the time the process created the
+        endpoint on this port.
+        "
+    ::= { udpEndpointInfoEntry 2 }
+
+--
+-- The proposed new UDP Endpoint process table.
+--
+
+udpEndpointProcTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF UdpEndpointProcEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A table containing information about this entity's UDP
+        endpoints on which a local application is currently
+        accepting or sending datagrams.
+        This table delivers functionality beyond the existing
+        udpEndpointTable by providing an entry for each process that
+        creates a shared endpoint on the same port for operating systems
+        that support this functionality. An entry in the
+        udpEndpointTable implies the existance of one or more entries in
+        this table for the connection, and vice-versa."
+
+    ::= { udpProc 2 }
+
+udpEndpointProcEntry OBJECT-TYPE
+    SYNTAX     UdpEndpointProcEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+
+    DESCRIPTION
+           "Information about a particular current UDP endpoint.
+
+            Implementers need to be aware that if the total number
+            of elements (octets or sub-identifiers) in
+            udpEndpointProcLocalAddress and udpEndpointProcRemoteAddress
+            exceeds 111, then OIDs of column instances in this table
+            will have more than 128 sub-identifiers and cannot be
+            accessed using SNMPv1, SNMPv2c, or SNMPv3."
+    INDEX   { udpEndpointProcLocalAddressType,
+              udpEndpointProcLocalAddress,
+              udpEndpointProcLocalPort,
+              udpEndpointProcRemoteAddressType,
+              udpEndpointProcRemoteAddress,
+              udpEndpointProcRemotePort,
+              udpEndpointProcInstance,
+              udpEndpointProcPID
+             }
+    ::= { udpEndpointProcTable 1 }
+
+UdpEndpointProcEntry ::= SEQUENCE {
+        udpEndpointProcLocalAddressType   InetAddressType,
+        udpEndpointProcLocalAddress       InetAddress,
+        udpEndpointProcLocalPort          InetPortNumber,
+        udpEndpointProcRemoteAddressType  InetAddressType,
+        udpEndpointProcRemoteAddress      InetAddress,
+        udpEndpointProcRemotePort         InetPortNumber,
+        udpEndpointProcInstance           Unsigned32,
+          udpEndpointProcPID              Unsigned32
+    }
+
+udpEndpointProcLocalAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The address type of udpEndpointProcLocalAddress.  Only
+            IPv4, IPv4z, IPv6, and IPv6z addresses are expected, or
+            unknown(0) if datagrams for all local IP addresses are
+            accepted."
+
+    ::= { udpEndpointProcEntry 1 }
+
+udpEndpointProcLocalAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The local IP address for this UDP endpoint.
+
+            The value of this object can be represented in three
+            possible ways, depending on the characteristics of the
+            listening application:
+
+            1. For an application that is willing to accept both
+               IPv4 and IPv6 datagrams, the value of this object
+               must be ''h (a zero-length octet-string), with
+               the value of the corresponding instance of the
+               udpEndpointLocalAddressType object being unknown(0).
+
+            2. For an application that is willing to accept only IPv4
+               or only IPv6 datagrams, the value of this object
+               must be '0.0.0.0' or '::', respectively, while the
+               corresponding instance of the
+               udpEndpointLocalAddressType object represents the
+               appropriate address type.
+
+            3. For an application that is listening for data
+               destined only to a specific IP address, the value
+               of this object is the specific IP address for which
+               this node is receiving packets, with the
+               corresponding instance of the
+               udpEndpointLocalAddressType object representing the
+               appropriate address type.
+
+            As this object is used in the index for the
+            udpEndpointProcTable, implementors of this table should be
+            careful not to create entries that would result in OIDs
+            with more than 128 subidentifiers; else the information
+            cannot be accessed using SNMPv1, SNMPv2c, or SNMPv3."
+
+    ::= { udpEndpointProcEntry 2 }
+
+udpEndpointProcLocalPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The local port number for this UDP endpoint."
+
+    ::= { udpEndpointProcEntry 3 }
+
+udpEndpointProcRemoteAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The address type of udpEndpointProcRemoteAddress.  Only
+            IPv4, IPv4z, IPv6, and IPv6z addresses are expected, or
+            unknown(0) if datagrams for all remote IP addresses are
+            accepted.  Also, note that some combinations of
+            udpEndpointProcLocalAddressType and
+            udpEndpointProcRemoteAddressType are not supported.  In
+            particular, if the value of this object is not
+            unknown(0), it is expected to always refer to the
+            same IP version as udpEndpointProcLocalAddressType."
+
+    ::= { udpEndpointProcEntry 4 }
+
+udpEndpointProcRemoteAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The remote IP address for this UDP endpoint.  If
+            datagrams from any remote system are to be accepted,
+            this value is ''h (a zero-length octet-string).
+            Otherwise, it has the type described by
+            udpEndpointProcRemoteAddressType and is the address of the
+            remote system from which datagrams are to be accepted
+            (or to which all datagrams will be sent).
+
+            As this object is used in the index for the
+            udpEndpointProcTable, implementors of this table should be
+            careful not to create entries that would result in OIDs
+            with more than 128 subidentifiers; else the information
+            cannot be accessed using SNMPv1, SNMPv2c, or SNMPv3."
+
+    ::= { udpEndpointProcEntry 5 }
+
+udpEndpointProcRemotePort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The remote port number for this UDP endpoint.  If
+            datagrams from any remote system are to be accepted,
+            this value is zero."
+
+    ::= { udpEndpointProcEntry 6 }
+
+udpEndpointProcInstance OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..'ffffffff'h)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The instance of this tuple.  This object is used to
+            distinguish among multiple processes 'connected' to
+            the same UDP endpoint.  For example, on a system
+            implementing the BSD sockets interface, this would be
+            used to support the SO_REUSEADDR and SO_REUSEPORT
+            socket options."
+
+    ::= { udpEndpointProcEntry 7 }
+
+udpEndpointProcPID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The system's process ID for the process associated with
+            this endpoint.
+            This value corresponds to a row in
+            HOST-RESOURCES-MIB::hrSWRunIndex and SYSAPPL-MIB::
+            sysApplElmtRunIndex for operating systems that
+            support this functionality and the corresponding MIBs."
+
+    ::= { udpEndpointProcEntry 8 }
+
+-- compliance statements
+udpProcMIBConformance OBJECT IDENTIFIER ::= { udpProcMIB 1 }
+
+udpProcMIBCompliances OBJECT IDENTIFIER ::= { udpProcMIBConformance 1 }
+udpProcMIBGroup       OBJECT IDENTIFIER ::= { udpProcMIBConformance 2 }
+
+udpProcMIBCompliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+           "The compliance statement for systems that implement the
+            UDP Process MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { udpEndpointInfoGroup }
+    GROUP  udpEndpointProcessGroup
+    DESCRIPTION
+           "This group should be implemented for operating systems that
+            support multiple listening processes sharing a single
+            address/port. It is left as optional to accommodate
+            operating systems that do not provide sufficient information
+            to express this data."
+
+    ::= { udpProcMIBCompliances 1 }
+
+-- units of conformance
+
+udpEndpointInfoGroup OBJECT-GROUP
+    OBJECTS { udpEndpointInfoCreatorPID,
+              udpEndpointInfoProcessCreateTime }
+    STATUS      current
+    DESCRIPTION
+           ""
+    ::= { udpProcMIBGroups 1 }
+
+udpEndpointProcessGroup OBJECT-GROUP
+    OBJECTS { udpEndpointProcPID }
+    STATUS      current
+    DESCRIPTION
+           ""
+    ::= { udpProcMIBGroups 2 }
+
+END
+
+-- 
+--    Copyright (C) The Internet Society (2006).
+-- 
+--    This document is subject to the rights, licenses and restrictions
+--    contained in BCP 78, and except as set forth therein, the authors
+--    retain all their rights.
+-- 
+--    This document and the information contained herein are provided on an
+--    "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+--    OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+--    ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+--    INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+--    INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+--    WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- 
+-- 
+-- Intellectual Property
+-- 
+--    The IETF takes no position regarding the validity or scope of any
+--    Intellectual Property Rights or other rights that might be claimed to
+--    pertain to the implementation or use of the technology described in
+--    this document or the extent to which any license under such rights
+--    might or might not be available; nor does it represent that it has
+--    made any independent effort to identify any such rights.  Information
+--    on the procedures with respect to rights in RFC documents can be
+--    found in BCP 78 and BCP 79.
+-- 
+--    Copies of IPR disclosures made to the IETF Secretariat and any
+--    assurances of licenses to be made available, or the result of an
+--    attempt made to obtain a general license or permission for the use of
+--    such proprietary rights by implementers or users of this
+--    specification can be obtained from the IETF on-line IPR repository at
+--    http://www.ietf.org/ipr.
+-- 
+--    The IETF invites any interested party to bring to its attention any
+--    copyrights, patents or patent applications, or other proprietary
+--    rights that may cover technology that may be required to implement
+--    this standard.  Please address the information to the IETF at
+--    ietf-ipr@ietf.org.
+-- 
+-- 
+-- Acknowledgment
+-- 
+--    Funding for the RFC Editor function is provided by the IETF
+--    Administrative Support Activity (IASA).
+

@@ -1,0 +1,4824 @@
+USR-USER-MAN-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE, 
+        MODULE-IDENTITY,
+        Counter32, IpAddress, Integer32
+            FROM SNMPv2-SMI
+        TruthValue, RowStatus, DisplayString, DateAndTime
+            FROM SNMPv2-TC
+        common, UsrUserName, UsrDisplayString, UsrAAADisplay
+            FROM USR-DEFINITIONS-MIB;
+usrUserMan     MODULE-IDENTITY
+    LAST-UPDATED "200304081719Z"
+    ORGANIZATION "CommWorks Corporation, a 3Com Company"
+    CONTACT-INFO "Customer Support"
+    DESCRIPTION
+        "The commWorks enterprise defined MIB objects for UserMan."
+--      REVISION "200304081719Z"
+--      DESCRIPTION "Copied uumTunnelClientAuthId mib object from RAS"
+--      REVISION "200302250042Z"
+--      DESCRIPTION "Added usrUserManDomainSelection"
+--      REVISION "200211061520Z"
+--      DESCRIPTION "Changed Syntax of usrUserManPerServerRetryCount and
+--                   usrUserManPerAcctServerRetryCount"
+--      REVISION "200209062045Z"
+--      DESCRIPTION
+--          "Updated description  of the following mib objects
+--          usrUserManHarpDownDetectionTimer
+--          usrUserManHarpUpDetectionScheme"
+--      REVISION "200209051600Z"
+--      DESCRIPTION 
+--          "Deprecated 'active/inactive' values for uumAAAServersStatus
+--          and uumAAADomainServerStatus and added value for 'unknown'."
+--      REVISION "200208292153Z"
+--      DESCRIPTION
+--          "Changed DEFVAL of usrUserManAuthFailTrapsState to disabled.
+--           Added  the following new objects/traps,
+--           usrUserManHarpDownDetectionScheme  - Harp Down detect Scheme,
+--           usrUserManAAADownTrapsState        - AAA Down trap state,
+--           usrUserManAAAUpTrapsState          - AAA Up  trap state
+--           usrUserManAAAUpTrap                - new AAA Up Trap"
+--      REVISION "200208231245Z"
+--      DESCRIPTION
+--          "Use TC for uumAAAGlobalSelectionMask, uumAAAServersSelectionMask,
+--           usrUserManDirectRequestDelimiter.
+--           Clarified usage and labels for uumAAADomainMirroring and
+--           uumAAADomainDNSIpRotation, 
+--           usrRadiusInterimAccountingIntervalEnabled,
+--           usrUserManLogUnauthenticatedCalls, usrRadiiusSendAcctUnauthRecord,
+--           usrUserManRadiusDefaultUserAcct, usrRadiusSendAcctAuthServiceType
+--           usrUserManTODTimerEnabled, usrUserManActiveStopTriggerEnabled."
+--      REVISION "200208201615Z"
+--      DESCRIPTION "Added MIBs for selection mask and obsoleted current values"
+--      REVISION "200208201528Z"
+--      DESCRIPTION "Added Auth Failure alarm for the new AAA implementation"
+--      REVISION "200208091815Z"
+--      DESCRIPTION "Entered default values"
+--      REVISION "200204120515Z"
+--      DESCRIPTION "Converted to SNMPv2"
+::= { common 2 }
+usrUserManGroup    OBJECT IDENTIFIER ::= { usrUserMan 1 }
+usrUserManTraps OBJECT IDENTIFIER ::= { usrUserMan 2 }
+-- Begin managed object definitions here...
+usrUserManRadiusIP    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP address of the RADIUS server"
+    --CONFIGURABLE
+::= { usrUserManGroup 1 }
+usrUserManRadiusAltIP    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The alternate IP address of the RADIUS server"
+    --CONFIGURABLE
+::= { usrUserManGroup 2 }
+usrUserManRadiusAcctIP    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP address of the RADIUS accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 3 }
+usrUserManRadiusAcctAltIP    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP address of the RADIUS alternate accounting
+            server"
+    --CONFIGURABLE
+::= { usrUserManGroup 4 }
+usrUserManLocalAuthSuccesses    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of local authentication successes"
+::= { usrUserManGroup 5 }
+usrUserManLocalAuthFails    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of local authentication failures"
+::= { usrUserManGroup 6 }
+usrUserManRadiusAuthSuccesses    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of radius authentication successes"
+::= { usrUserManGroup 7 }
+usrUserManRadiusAuthFails    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of radius authentication failures"
+::= { usrUserManGroup 8 }
+usrUserManLocalUsers    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of local users"
+::= { usrUserManGroup 9 }
+usrUserManActiveUsers    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of active users"
+::= { usrUserManGroup 10 }
+usrUserManRetransmissions    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of udp packet retransmissions"
+::= { usrUserManGroup 11 }
+usrUserManUdpReceives    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of udp packets received"
+::= { usrUserManGroup 12 }
+usrUserManRadiusRetrans    OBJECT-TYPE
+    SYNTAX        Integer32 (0..100)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of times a timeout will occur when
+         communicating with radius The default value is 3."
+    --CONFIGURABLE
+::= { usrUserManGroup 13 }
+usrUserManRadiusTimeout    OBJECT-TYPE
+    SYNTAX        Integer32 (1..60)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum amount of time in seconds we will wait
+         for a RADIUS response before retransmitting.
+         The default value is 3."
+    --CONFIGURABLE
+::= { usrUserManGroup 14 }
+usrUserManAcctRetrans    OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of times a timeout will occur when
+            communicating with radius accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 15 }
+usrUserManAcctTimeout    OBJECT-TYPE
+    SYNTAX        Integer32 (1..60)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum amount of time in seconds we will wait
+         for a RADIUS accounting response before retransmitting.
+         The value will be zero if not configured."
+    --CONFIGURABLE
+::= { usrUserManGroup 16 }
+usrUserManLocalAuth    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                          enabled(1),
+                          disabled(2)
+                          } 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is local authentication on or off"
+    --CONFIGURABLE
+::= { usrUserManGroup 17 }
+usrUserManAcct    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                          enabled(1),
+                          disabled(2)
+                          } 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is accounting on or off.
+         Not accessible for Wireless products."
+    --CONFIGURABLE
+::= { usrUserManGroup 18 }
+usrUserManAcctServers    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        one(1),
+                        both(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Do we want to consider both servers specified as primary
+         Not accessible for Wireless products."
+    -- CONFIGURABLE
+::= { usrUserManGroup 19 }
+usrUserManRadiusAuth    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is radius authentication on or off"
+    --CONFIGURABLE
+::= { usrUserManGroup 20 }
+usrUserManStartAccountTime    OBJECT-TYPE
+    SYNTAX        INTEGER    {
+                            connectionTime(1),
+                            authenticationTime(2)
+                            }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "When do we want to account from"
+    --CONFIGURABLE
+::= { usrUserManGroup 21 }
+usrUserManSnmpAccess    OBJECT-TYPE
+    SYNTAX        INTEGER    {
+                            enable(1),
+                            disable(2)
+                            }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Do we allow snmp to set our user table"
+    --CONFIGURABLE
+::= { usrUserManGroup 22 }
+usrUserManSaveUsers     OBJECT-TYPE
+    SYNTAX        INTEGER    {
+                            normal(0),
+                            save(2)
+                            }
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "If we hit the save flag the users will be saved to flash"
+::= { usrUserManGroup 23 }
+usrUserManRadiusSecret OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (1..15))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The shared secret between the RADIUS server and pilgrim.
+                 Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 24 }
+-- User managers table definition
+usrUserManTable    OBJECT-TYPE
+    SYNTAX SEQUENCE OF UumEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        ""
+::= { usrUserManGroup 25 }
+    uumEntry    OBJECT-TYPE
+    SYNTAX    UumEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "To create an entry in the table the following data
+         is required:- uumUserName, uumUserPassword,
+         uumServiceType and uumStatus = enabled."
+    INDEX    { uumUserName }
+::= { usrUserManTable 1 }
+    UumEntry ::=
+        SEQUENCE {
+        uumUserName             UsrUserName,
+        uumStatus               INTEGER,
+        uumUserPassword         OCTET STRING,
+        uumServiceType          Integer32,
+        uumFramedProtocol       INTEGER,
+        uumFramedIpAddress      IpAddress,
+        uumFramedIpNetmask      IpAddress,
+        uumFramedRouting        INTEGER,
+        uumFilterIdInput        OCTET STRING,
+        uumFramedMtu            Integer32,
+        uumFramedCompression    INTEGER,
+        uumLoginIpHost          IpAddress,
+        uumLoginService         INTEGER,
+        uumLoginPort            Integer32,
+        uumReplyMessage         OCTET STRING,
+        uumCallbackNumberOne    OCTET STRING,
+        uumExpiration           OCTET STRING,
+        uumFramedRoute          OCTET STRING,
+        uumFramedIpxNetwork     OCTET STRING,
+        uumSessionTimeout       Integer32,
+        uumIdleTimeout          Integer32,
+        uumBearerCapabilities   INTEGER,
+        uumSpeedOfConnection    INTEGER,
+        uumMaxChannels          Integer32,
+        uumChannelExpansion     Integer32,
+        uumChannelDecrement     Integer32,
+        uumExpansionAlgorithm   INTEGER,
+        uumCompressionAlgorithm INTEGER,
+        uumReceiveAccMap        Integer32,
+        uumTransmitAccMap       Integer32,
+        uumWhereCompression     INTEGER,
+        uumCompressionResetMode INTEGER,
+        uumMinCompressionSize   Integer32,
+        uumLocationType         INTEGER,
+        uumIp                   INTEGER,
+        uumIpx                  INTEGER,
+        uumFilterZones          INTEGER,
+        uumFilterIdOutput       OCTET STRING,
+        uumAppletalk            INTEGER,
+        uumBridging             INTEGER,
+        uumSpoofing             INTEGER,
+        uumHostType             INTEGER,
+        uumSendName             OCTET STRING,
+        uumSendPassword         OCTET STRING,
+        uumStartTime            DateAndTime,
+        uumEndTime              DateAndTime,
+        uumSendScript1          OCTET STRING,
+        uumReplyScript1         OCTET STRING,
+        uumSendScript2          OCTET STRING,
+        uumReplyScript2         OCTET STRING,
+        uumSendScript3          OCTET STRING,
+        uumReplyScript3         OCTET STRING,
+        uumSendScript4          OCTET STRING,
+        uumReplyScript4         OCTET STRING,
+        uumSendScript5          OCTET STRING,
+        uumReplyScript5         OCTET STRING,
+        uumSendScript6          OCTET STRING,
+        uumReplyScript6         OCTET STRING,
+        uumTerminalType         OCTET STRING,
+        uumAppletalkNetworkRange OCTET STRING,
+        uumLocalIpAddress       IpAddress,
+        uumRoutingProtocol      INTEGER,   -- deprecated
+        uumCallbackNumberTwo    OCTET STRING,
+        uumModemGroup           OCTET STRING,
+        uumIpxRouting           INTEGER,
+        uumIpxWan               INTEGER,
+        uumIpRipSendDefault     INTEGER,
+        uumIpRipSendRoutes      INTEGER,
+        uumIpRipSendSubnets     INTEGER,
+        uumIpRipAcceptDefault   INTEGER,
+        uumIpRipSplitHorizon    INTEGER,
+        uumIpRipPoisonReverse   INTEGER,
+        uumIpRipFlashUpdate     INTEGER,
+        uumIpRipSimpleAuth      INTEGER,
+        uumIpRipV1Send          INTEGER,
+        uumIpRipV1Receive       INTEGER,
+        uumIpRipV2Receive       INTEGER,
+        uumIpRipSilent          INTEGER,
+        uumSimpleAuthPassword   OCTET STRING,
+        uumIpDefaultRouteOption INTEGER,
+        uumIpRoutingRipV1       INTEGER,
+        uumIpRoutingRipV2       INTEGER,
+        uumIpRoutingOspf        INTEGER,
+        uumOspfAddresslessIfIndex Integer32,
+        uumIpSecPolicyFile      DisplayString,
+        uumIpSecPolicyAccess    INTEGER,
+        uumIpSecPolicyType      INTEGER,
+        uumIpSecPolicyConfiguration INTEGER,
+        uumLoginHostName        OCTET STRING,
+        uumIgmpInterfaceQueryInterval Integer32,
+        uumIgmpInterfaceQueryMaxResponseTime Integer32,
+        uumIgmpInterfaceVersion Integer32,
+        uumIgmpInterfaceRobustness Integer32,
+        uumIgmpInterfaceStatus  INTEGER,
+        uumIgmpInterfaceMcastFwdEnabled    INTEGER,
+        uumIpxRipUpdate         Integer32,
+        uumIpxRipAgeMultiplier  Integer32,
+        uumIpxSapUpdate         Integer32,
+        uumIpxSapAgeMultiplier  Integer32,
+        uumEncryptionAlgorithm  INTEGER,
+        uumTunnelType           INTEGER,
+        uumTunnelMediumType     INTEGER,
+        uumTunnelClientEndpoint OCTET STRING,
+        uumTunnelServerEndpoint OCTET STRING,
+        uumTunnelPassword       OCTET STRING,
+        uumTunnelPrivateGroupID OCTET STRING,
+        uumTunnelSecurity       INTEGER,
+        uumPrimaryDNSServer     IpAddress,
+        uumSecondaryDNSServer   IpAddress,
+        uumUserTapStatus        INTEGER,
+        uumUserTapFormat        INTEGER,
+        uumUserTapOutput        INTEGER,
+        uumUserTapFacility      INTEGER,
+        uumUserTapLoglevel      INTEGER,
+        uumUserTapAddress       IpAddress,
+        uumMulticastProxy       INTEGER,
+        uumNasIpAddress         IpAddress,
+        uumNasPort              Integer32,
+        uumFramedCallbackId     Integer32,
+        uumState                OCTET STRING,    
+        uumClass                OCTET STRING,    
+        uumCalledStationId      OCTET STRING,    
+        uumCallingStationId     OCTET STRING,    
+        uumNasIdentifier        OCTET STRING,
+        uumCipIfName            OCTET STRING,
+        uumPPPLocalIpAddress    IpAddress,
+        uumPPPRemoteIpAddress   IpAddress,
+        uumSessionvars          IpAddress,
+        uumChatScriptName       OCTET STRING,
+        uumPortLimit            Integer32,
+        uumPppSourceIpFilter    Integer32,
+        uumCallbackType         INTEGER,
+        uumIsdnDataCallType     INTEGER,
+        uumDNISReAuth           INTEGER,
+        uumReChapTimeout        Integer32,
+        uumNextHopGateway       IpAddress,
+        uumLocalTcpPort         Integer32,
+        uumConnectionvars       IpAddress,
+        uumShowConnVar          Integer32,
+        uumSpecialXonXoff       INTEGER,
+        uumTelnetOptions        Integer32,
+        uumMlPPPFragThreshold   Integer32,
+        uumVPNName              OCTET STRING,
+        uumVPNID                Integer32,
+        uumVPNGateway           IpAddress,
+        uumTrafficThreshold     Integer32,
+        uumTunnelAssignmentId   OCTET STRING,
+        uumKeepAliveInterval    Integer32,
+		uumTunnelClientAuthId	OCTET STRING,
+    	uumCorrelationId		DisplayString
+    }
+uumUserName    OBJECT-TYPE
+    SYNTAX        UsrUserName
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The users name"
+::= { uumEntry 1 }
+uumStatus    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        delete(1),
+                        inactive(2),
+                        active(3),
+                        enabled(4),
+                        disabled(5),
+                        active-disabled(6)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The status field for the user. This must be set to
+         'enabled' when creating an entry after which it 
+         will automatically revert to inactive when the
+         entry is created. For an existing user the only
+         allowed values are delete(1) and disabled(5)"
+    --CONFIGURABLE
+::= { uumEntry 2 }
+uumUserPassword    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (1..15))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The user's password.
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { uumEntry 3 }
+uumServiceType    OBJECT-TYPE
+    SYNTAX        Integer32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The bitmap indicating one or more types of user:
+        login 0x1, framed or network 0x2, callback or dialback 0x4, 
+        dial-out 0x8, administrative or manage 0x10, administrative-
+        readonly or manage_readonly 0x20, and direct-modem-connect 0x40.
+        DIALOUT and CALLBACK are mutually exclusive.
+        CALLBACK cannot be set on its own it needs to be set as
+        CALLBACK/LOGIN(0x05) or CALLBACK/NETWORK(0x06).
+        MANAGE can only be SET via the CLI."        
+    --CONFIGURABLE
+::= { uumEntry 4 }
+uumFramedProtocol    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        ppp(1),
+                        slip(2),
+                        arap(3),
+                        frame-relay(4)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The framed users protocol"
+    --CONFIGURABLE
+::= { uumEntry 5 }
+uumFramedIpAddress     OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP destination for the framed user"
+    --CONFIGURABLE
+::= { uumEntry 6 }
+uumFramedIpNetmask    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The destinations netmask"
+    --CONFIGURABLE
+::= { uumEntry 7 }
+uumFramedRouting    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        none(0),
+                        broadcastRoutingPackets(1),
+                        listenForRoutingPackets(2),
+                        broadcastAndListen(3)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The routing defined for a framed user"
+    --CONFIGURABLE
+::= { uumEntry 8 }
+uumFilterIdInput    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The input or output filter defined for the user"
+    --CONFIGURABLE
+::= { uumEntry 9 }
+uumFramedMtu    OBJECT-TYPE
+    SYNTAX        Integer32 (0..8192)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The framed maximum transmission unit"
+    --CONFIGURABLE
+::= { uumEntry 10 }
+uumFramedCompression    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        none(0),
+                        tcpIpCompression(1),
+                        ipxCompression(2) -- deprecated
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The compression being used for the framed user"
+    --CONFIGURABLE
+::= { uumEntry 11 }
+uumLoginIpHost    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP destination for the login user"
+    --CONFIGURABLE
+::= { uumEntry 12 }
+uumLoginService    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        telnet(0),
+                        rlogin(1),
+                        tcp(2),
+                        lat(4),
+                        ping(1000)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The login user's protocol"
+    --CONFIGURABLE
+::= { uumEntry 13 }
+uumLoginPort    OBJECT-TYPE
+    SYNTAX        Integer32 (0..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The tcp port the user will use"
+    --CONFIGURABLE
+::= { uumEntry 14 }
+uumReplyMessage    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The message to be displayed to the user"
+    --CONFIGURABLE
+::= { uumEntry 15 }
+uumCallbackNumberOne    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The first phone number configured for this user"
+    --CONFIGURABLE
+::= { uumEntry 16 }
+uumExpiration    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (12))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The users expiration date"
+    --CONFIGURABLE
+::= { uumEntry 17}
+uumFramedRoute    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION 
+        "The framed route for the user"
+::= { uumEntry 18 }
+uumFramedIpxNetwork    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (4))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The ipx network defined for the user"
+    --CONFIGURABLE
+::= { uumEntry 19 }
+uumSessionTimeout    OBJECT-TYPE
+    SYNTAX        Integer32 (0..86400)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The amount of time in seconds before time out"
+    --CONFIGURABLE
+::= { uumEntry 20 }
+uumIdleTimeout    OBJECT-TYPE
+    SYNTAX        Integer32 (0..86400)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The amount of idle time in seconds before time out"
+    --CONFIGURABLE
+::= { uumEntry 21 }
+uumBearerCapabilities    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        digital(1),
+                        analog(2)
+                        }
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The type of transmission"
+    --CONFIGURABLE
+::= { uumEntry 22 }
+uumSpeedOfConnection    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        auto(1),
+                        fifty-six-k(2),
+                        sixty-four-k(3),
+                        voice(4)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The speed of the connection"
+    --CONFIGURABLE
+::= { uumEntry 23 }        
+uumMaxChannels    OBJECT-TYPE
+    SYNTAX        Integer32 (0..16)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of channels that may be used"
+    --CONFIGURABLE
+::= { uumEntry 24 }
+uumChannelExpansion    OBJECT-TYPE
+    SYNTAX        Integer32 (0..100)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The percentage for channel expansion"
+    --CONFIGURABLE
+::= { uumEntry 25 }
+uumChannelDecrement    OBJECT-TYPE
+    SYNTAX        Integer32 (0..100)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The percentage for channel decrement"
+    --CONFIGURABLE
+::= { uumEntry 26 }
+uumExpansionAlgorithm    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        constant(1),
+                        linear(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The expansion algorithm being used"
+    --CONFIGURABLE
+::= { uumEntry 27 }    
+uumCompressionAlgorithm    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        none(0),
+                        stac(1),
+                        ascend(2),
+                        microsoft(3),
+                        auto(4), 
+                        deflate(5)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The compression algorithm to be used"
+    --CONFIGURABLE
+::= { uumEntry 28 }
+uumReceiveAccMap    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The receive acc mapping"
+    --CONFIGURABLE
+::= { uumEntry 29 }
+uumTransmitAccMap    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The transmit acc mapping"
+    --CONFIGURABLE
+::= { uumEntry 30 }
+uumWhereCompression    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        link(1),
+                        bundle(2)
+                        }    
+    MAX-ACCESS    not-accessible
+    STATUS    obsolete
+    DESCRIPTION
+        "The area where compression should be done"
+    -- CONFIGURABLE
+::= { uumEntry 31 }
+uumCompressionResetMode    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        auto(1),
+                        resetEveryPacket(2),
+                        resetEveryError(3)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The mode that the compression should be reset in"
+    --CONFIGURABLE
+::= { uumEntry 32 }
+uumMinCompressionSize    OBJECT-TYPE
+    SYNTAX        Integer32 (0..2048) 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The minimum size for compression"
+    --CONFIGURABLE
+::= { uumEntry 33 }
+uumLocationType    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        continuous(1),
+                        onDemand(2),
+                        manual(3),
+                        timed(4)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The type of location user"
+    --CONFIGURABLE
+::= { uumEntry 34 }
+uumIp    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Ip enabled or disabled"
+    --CONFIGURABLE
+::= { uumEntry 35 }
+uumIpx    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Ipx enabled or disabled"
+    --CONFIGURABLE
+::= { uumEntry 36 }
+uumFilterZones    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Arap needed to define filter zones"
+    --CONFIGURABLE
+::= { uumEntry 37 }    
+uumFilterIdOutput    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The output filter defined for the user"
+    --CONFIGURABLE
+::= { uumEntry 38 }
+uumAppletalk    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Appletalk enabled or disabled"
+    --CONFIGURABLE
+::= { uumEntry 39 }
+uumBridging    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Bridging enabled or disabled"
+    --CONFIGURABLE
+::= { uumEntry 40 }
+uumSpoofing    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Ipx spoofing enabled or disabled"
+    --CONFIGURABLE
+::= { uumEntry 41 }
+uumHostType    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        prompt(1),
+                        default(2),
+                        specified(3)
+                        }
+    MAX-ACCESS    not-accessible
+    STATUS    obsolete
+    DESCRIPTION
+        "The means for specifying a host for this user"
+    -- CONFIGURABLE
+::= { uumEntry 42 }
+uumSendName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (1..240))
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Name we use when challenged for authentication"
+    --CONFIGURABLE
+::= { uumEntry 43 }
+uumSendPassword    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (1..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Password we use when challenged for authentication.
+                 Reading this object will return NULL."
+    --CONFIGURABLE
+::= { uumEntry 44 }
+uumStartTime    OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Daily time we start timed location.
+         Not applicable to wireless users."
+    --CONFIGURABLE
+::= { uumEntry 45 }
+uumEndTime    OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Daily time we stop timed location.
+         Not applicable to wireless users."
+    --CONFIGURABLE
+::= { uumEntry 46 }
+uumSendScript1    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The first send script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 47 }
+uumReplyScript1    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The first reply script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 48 }
+uumSendScript2    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second send script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 49 }
+uumReplyScript2    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second reply script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 50 }
+uumSendScript3    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The third send script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 51 }
+uumReplyScript3    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The third reply script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 52 }
+uumSendScript4    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The fourth send script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 53 }
+uumReplyScript4    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The fourth reply script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 54 }
+uumSendScript5    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The fifth send script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 55 }
+uumReplyScript5    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The fifth reply script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 56 }
+uumSendScript6    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The sixth send script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 57 }
+uumReplyScript6    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The sixth reply script for this dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 58 }
+uumTerminalType    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The terminal type for the user"
+    --CONFIGURABLE
+::= { uumEntry 59 }
+uumAppletalkNetworkRange    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (4))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The appletalk network range for the user"
+    --CONFIGURABLE
+::= { uumEntry 60 }
+uumLocalIpAddress    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The local ip address configured for a dial-out user"
+    --CONFIGURABLE
+::= { uumEntry 61 }
+uumRoutingProtocol    OBJECT-TYPE
+    SYNTAX        INTEGER {
+        rip1(1),
+        rip2(2)
+        }
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "The routing protocol configured for a user"
+    -- CONFIGURABLE
+::= { uumEntry 62 }
+    uumCallbackNumberTwo    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second phone number configured for this user"
+    --CONFIGURABLE
+::= { uumEntry 63 }
+uumModemGroup    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The modem group string for the user"
+    --CONFIGURABLE
+::= { uumEntry 64 }
+uumIpxRouting    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        none(0),
+                        send(1),
+                        listen(2),
+                        respond(3),
+                        all(4)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The ipx routing defined for a framed user"
+    --CONFIGURABLE
+::= { uumEntry 65 }
+uumIpxWan    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is ipx wan enabled or disabled for the user"
+    --CONFIGURABLE
+::= { uumEntry 66 }
+uumIpRipSendDefault    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 67 }
+uumIpRipSendRoutes    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 68 }
+uumIpRipSendSubnets    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 69 }
+uumIpRipAcceptDefault    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 70 }
+uumIpRipSplitHorizon    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 71 }
+uumIpRipPoisonReverse    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 72 }
+uumIpRipFlashUpdate    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 73 }
+uumIpRipSimpleAuth    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+::= { uumEntry 74 }
+uumIpRipV1Send    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 75 }
+uumIpRipV1Receive    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 76 }
+uumIpRipV2Receive    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 77 }
+uumIpRipSilent    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP RIP flag"
+    --CONFIGURABLE
+::= { uumEntry 78 }
+uumSimpleAuthPassword    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP RIP simple authentication password"
+    --CONFIGURABLE
+::= { uumEntry 79 }
+uumIpDefaultRouteOption    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "If enable (1) a default route will be created using
+         the remote users IP address. If disable (2) no such
+         route is created."
+    --CONFIGURABLE
+::= { uumEntry 80 }
+uumLoginHostName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..240))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The destination host name for the login user"
+    --CONFIGURABLE
+::= { uumEntry 81 }
+uumIgmpInterfaceQueryInterval OBJECT-TYPE
+    SYNTAX        Integer32 (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The frequency at which IGMP Host-Query packets are
+         transmitted on this interface."
+    DEFVAL     { 125 }
+    --CONFIGURABLE
+::= { uumEntry 82 }
+uumIgmpInterfaceQueryMaxResponseTime OBJECT-TYPE
+    SYNTAX        Integer32 (1..10)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum query response time advertised in IGMPv2
+         queries on this interface.  Smaller values allow a router to
+         prune groups faster."
+    DEFVAL     { 10 }
+    --CONFIGURABLE                                                    
+::= { uumEntry 83 }
+uumIgmpInterfaceRobustness OBJECT-TYPE
+    SYNTAX        Integer32 (1..5)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The Robustness Variable allows tuning for the expected
+         packet loss on a subnet.  If a subnet is expected to be
+         lousy, the Robustness Variable may be increased.  IGMP is
+         robust to (Robustness Variable-1) packet losses."
+    DEFVAL     { 2 }
+    --CONFIGURABLE                                                    
+::= { uumEntry 84 }
+uumIgmpInterfaceVersion OBJECT-TYPE
+    SYNTAX        Integer32 (1..2)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum query response time advertised in IGMPv2
+        queries on this interface.  Smaller values allow a router to
+        prune groups faster."
+    DEFVAL     { 2 }
+    --CONFIGURABLE                                                    
+::= { uumEntry 85 }
+uumIgmpInterfaceStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "If enabled, Multicast packets will be routed on this
+        user's interface."
+    DEFVAL    { enabled }
+    --CONFIGURABLE
+::= { uumEntry 86 }
+uumIgmpInterfaceMcastFwdEnabled OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write                                                 
+    STATUS        current                                                 
+    DESCRIPTION
+        "If enabled Multicast packets will be forwarded on this
+        user's interface."   
+    DEFVAL    { enabled }
+    --CONFIGURABLE                                                        
+::= { uumEntry 87 }                                        
+uumIpxRipUpdate      OBJECT-TYPE
+    SYNTAX      Integer32 (30..86400)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IPX RIP update interval in seconds"
+    DEFVAL    { 60 }
+    --CONFIGURABLE
+::= { uumEntry 88 }
+uumIpxRipAgeMultiplier      OBJECT-TYPE
+    SYNTAX        Integer32(1..1080) 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IPX RIP multiplier for information received in
+         periodic updates"
+    DEFVAL    { 4 }
+    --CONFIGURABLE
+::= { uumEntry 89 }
+uumIpxSapUpdate      OBJECT-TYPE
+    SYNTAX        Integer32(30..86400) 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IPX SAP update interval in seconds"
+    DEFVAL    { 60 }
+    --CONFIGURABLE
+::= { uumEntry 90 }
+uumIpxSapAgeMultiplier      OBJECT-TYPE
+    SYNTAX        Integer32(1..1080) 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IPX SAP multiplier for information received in
+         periodic updates"
+    DEFVAL    { 4 }
+    --CONFIGURABLE
+::= { uumEntry 91 }
+uumEncryptionAlgorithm    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        none(0),
+                        auto(1),
+                        microsoft40bit(2),
+                        microsoft128bit(3),
+                        required(4),
+                        microsoft56bit(5)
+--                bit40ornone(6),
+--                bit128ornone(7),
+--                bit56ornone(8),
+--                bit128orbit56(9),
+--                bit128orbit56ornone(10),
+--                bit128orbit40(11),
+--                bit128orbit40ornone(12),
+--                bit56orbit40(13),
+--                bit56orbit40ornone(14)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The encryption algorithm to be used"
+    --CONFIGURABLE
+::= { uumEntry 92 }
+uumTunnelType      OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            none(0),
+                            pptp(1),
+                            l2f(2),
+                            l2tp(3),
+                            atmp(4),
+                            vtp(5),
+                            ah(6),
+                            ip-ip(7),
+                            min-ip-ip(8),
+                            esp(9),
+                            gre(10),
+                            dvs(11),
+                            ip-in-ip(12)
+                            }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The tunneling protocol to be used for this user"
+    DEFVAL { pptp }
+    --CONFIGURABLE
+::= { uumEntry 93 }
+uumTunnelMediumType      OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            ipv4(1),
+                            ipv6(2),
+                            nsap(3),
+                            hdlc(4),
+                            bbn1822(5),
+                            e802(6),
+                            e163(7),
+                            e164(8),
+                            f69(9),
+                            x121(10),
+                            ipx(11),
+                            appletalk(12),
+                            decnetIV(13),
+                            banyanVines(14),
+                            e164NSAP(15)
+                            }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object indicates which transport medium to use
+         when creating a tunnel for those protocols (such as
+         L2TP) that can operate over multiple transports."
+    DEFVAL    { ipv4 }
+    --CONFIGURABLE
+::= { uumEntry 94 }
+uumTunnelClientEndpoint      OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..33))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The address of the initiator end of the tunnel."
+    --CONFIGURABLE
+::= { uumEntry 95 }
+uumTunnelServerEndpoint      OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..33))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The address of the server end of the tunnel."
+    --CONFIGURABLE
+::= { uumEntry 96 }
+uumTunnelPassword      OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..4))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The password of the tunnel.
+                 Reading this object will return NULL."
+    --CONFIGURABLE
+::= { uumEntry 97 }
+uumTunnelPrivateGroupID      OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..12))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The group ID for the tunneled session."
+    --CONFIGURABLE
+::= { uumEntry 98 }
+uumTunnelSecurity      OBJECT-TYPE
+    SYNTAX        INTEGER {
+                          none(0),
+                          control-Only(1),
+                          data-Only(2),
+                          both-Data-And-Control(3)
+                          }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The security level of the tunnel."
+    DEFVAL { none }
+    --CONFIGURABLE
+::= { uumEntry 99 }
+uumPrimaryDNSServer OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The primary dns server for the user"
+    DEFVAL { 0  }
+    --CONFIGURABLE
+::= { uumEntry 100 }
+uumSecondaryDNSServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The secondary DNS server for the user"
+    DEFVAL { 0  }
+    --CONFIGURABLE
+::= { uumEntry 101 }
+uumUserTapStatus    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        disabled(0),
+                        enabled(1)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is this user to be tapped"
+    --CONFIGURABLE
+::= { uumEntry 102 }
+uumUserTapFormat    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        ascii(0),
+                        hex(1),
+                        clear(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The tap format if tap is enabled"
+    --CONFIGURABLE
+::= { uumEntry 103 }
+uumUserTapOutput    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        syslog(0)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Send the tapped output to syslog"
+    --CONFIGURABLE
+::= { uumEntry 104 }
+uumUserTapFacility    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        auth(1),
+                        level0(2),
+                        level1(3),
+                        level2(4),
+                        level3(5),
+                        level4(6),
+                        level5(7),
+                        level6(8),
+                        level7(9)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The syslog facility to send the output to."
+    --CONFIGURABLE
+::= { uumEntry 105 }
+uumUserTapLoglevel    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        critical(0),
+                        unusual(1),
+                        common(2),
+                        verbose(3)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The syslog level to send the output to."
+    --CONFIGURABLE
+::= { uumEntry 106 }
+uumUserTapAddress    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The syslogd address"
+    --CONFIGURABLE
+::= { uumEntry 107 }
+uumMulticastProxy OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS read-write                                                 
+    STATUS     current                                                 
+    DESCRIPTION
+        "If Multicast will be proxied"   
+    DEFVAL    { disabled }
+    --CONFIGURABLE                                                        
+::= { uumEntry 108 }            
+uumNasIpAddress     OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The NAS IP address"
+    --CONFIGURABLE
+::= { uumEntry 113 }
+uumNasPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The NAS Port Attribute"
+    --CONFIGURABLE
+::= { uumEntry 114 }
+uumFramedCallbackId    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Framed Callback Identifier  attribute"
+    --CONFIGURABLE
+::= { uumEntry 115 }
+uumState    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..253))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "State attribute"
+    --CONFIGURABLE
+::= { uumEntry 116 }
+uumClass    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..253))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Class attribute"
+    --CONFIGURABLE
+::= { uumEntry 117 }
+uumCalledStationId    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..253))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Called Station Id"
+    --CONFIGURABLE
+::= { uumEntry 118 }
+uumCallingStationId    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..253))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Calling Station Id"
+    --CONFIGURABLE
+::= { uumEntry 119 }
+uumNasIdentifier    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..253))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "NAS ID"
+    --CONFIGURABLE
+::= { uumEntry 120 }
+uumCipIfName    OBJECT-TYPE
+    SYNTAX        OCTET STRING    (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "CIP Interface Name"
+    --CONFIGURABLE
+::= { uumEntry 121 }
+uumPPPLocalIpAddress    OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "PPP Local IP Address"
+    --CONFIGURABLE
+::= { uumEntry 122 }
+uumPPPRemoteIpAddress    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "PPP Remote IP Address"
+    --CONFIGURABLE
+::= { uumEntry 123 }
+uumSessionvars    OBJECT-TYPE
+    SYNTAX        IpAddress 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+::= { uumEntry 126 }
+uumChatScriptName   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The chat script name configured for the user"
+    --CONFIGURABLE
+::= { uumEntry 127 }
+uumPortLimit    OBJECT-TYPE
+    SYNTAX        Integer32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        ""
+    --CONFIGURABLE
+::= { uumEntry 128 }
+uumPppSourceIpFilter    OBJECT-TYPE
+    SYNTAX      Integer32  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "PPP Source Address Ip Filer "
+    --CONFIGURABLE
+::= { uumEntry 129 }
+uumCallbackType OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                       normal(1),
+                       ani(2),   
+                       static(3), 
+                       dynamic(4)
+                       }
+    MAX-ACCESS read-write   
+    STATUS     current
+    DESCRIPTION
+       "The Callback Type.  Normal to dial callback users
+       using the existing phone number field.  ANI to dial
+       callback users using the number supplied with the
+       caller ID.  Static to dial callback users using the
+       numbers provided in the DialGroup specified for this
+       user.  Dynamic to dial callback users using the numbers
+       provided during LCP negotiations."
+        --CONFIGURABLE
+::= { uumEntry 131}  
+uumIsdnDataCallType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                       notConfigured(0),
+                       cleared(1),
+                       dataovervoice(2),
+                       restricted56k(3),
+                       v11056k(4),
+                       unrestricted64k(5),
+                       asynctosyncppp(6)
+                       } 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "The ISDN customized CallType. The values represent a series
+        of AT commands that users of the profile can generate.  For
+        'cleared' no AT command will be generated. 
+        uumUserPassword required.
+               dataovervoice        *V2=3    S67.1=0
+               restricted56k        *V2=4    S67.1=1     S67.2=0
+               v11056k              *V2=2    S67.1=1     S67.2=0
+               unrestricted64k      *V2=4    S67.1=1     S67.2=1
+               asynctosyncppp       *V2=5    S67.1=0
+               where *V2=2 -> V.110 Rate Adaption only
+                        =3 -> Modem/Fax Emulation only
+                        =4 -> Clear Channel only
+                        =5 -> Async to sync PPP
+                   S67.1=0 -> Rate not fixed
+                        =1 -> Rate fixed
+                   S67.2=0 -> Connect at 56k
+                        =1 -> Connect at 64k  "
+        DEFVAL  { 1 }
+        --CONFIGURABLE
+::= { uumEntry 132}
+uumDNISReAuth    OBJECT-TYPE
+        SYNTAX    INTEGER {
+                        none(0),
+                        any(1),
+                        chap(2),
+                        eap(3),
+                        mschap(4),
+                        pap(5),
+                        proxyEap(6)
+                        } 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION     
+            "DNIS Re-Authentication flag "
+        --CONFIGURABLE
+::= { uumEntry 139 }
+uumReChapTimeout    OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Re Chap timeout for PPP"
+    --CONFIGURABLE
+::= { uumEntry 140 }
+uumNextHopGateway    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VPN-neighbour. "
+    --CONFIGURABLE
+::= { uumEntry 130 }
+uumLocalTcpPort OBJECT-TYPE
+    SYNTAX      Integer32     
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION 
+        "Local TCP port of telnet/CTCP login user"
+::= { uumEntry 141 } 
+uumConnectionvars   OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION  
+        ""      
+::= { uumEntry 144 } 
+uumShowConnVar   OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION  
+        "For the CLI command show connection <interface-name>"      
+::= { uumEntry 145 } 
+uumSpecialXonXoff  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION     
+        "Special Xon Xoff flow control \n"
+    --CONFIGURABLE
+::= { uumEntry 160 }
+uumTelnetOptions  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION     
+        "User specific Telnet Options \n"
+    --CONFIGURABLE
+::= { uumEntry 161 }
+uumMlPPPFragThreshold OBJECT-TYPE
+    SYNTAX        Integer32 (64..4096)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Multilink fragmentation threshold"
+    --CONFIGURABLE
+::= { uumEntry 165 }
+uumIpRoutingRipV1    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Enables or disables the IP RIPv1 routing protocol
+         for this User"
+    --CONFIGURABLE
+::= { uumEntry 133 }
+uumIpRoutingRipV2    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Enables or disables the IP RIPv2 routing protocol
+         for this User"
+    --CONFIGURABLE
+::= { uumEntry 134 }
+uumIpRoutingOspf     OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Enables or disables the IP OSPF routing protocol
+         for this User"
+    --CONFIGURABLE
+::= { uumEntry 135 }
+uumOspfAddresslessIfIndex    OBJECT-TYPE
+    SYNTAX        Integer32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "An arbitary 32-bit integer value defined by the user 
+         to be used with Addressless interfaces. This 
+         addresslessIfIndex will bind with the configured OSPF
+         INTF addresslessIfIndex, if one was configured."
+::= { uumEntry 136 }
+uumIpSecPolicyFile    OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..40))
+    MAX-ACCESS    read-write
+    STATUS         current
+    DESCRIPTION
+        "The name of IP Security Policy filename associated with that user. 
+         This feature is available from Hiper ARC 5.0 release onwards."
+    --CONFIGURABLE
+::= { uumEntry 155 }
+uumIpSecPolicyAccess    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(0)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This flag defines whether the IP Security policy access is
+         enabled or disabled. 
+         This feature is available from Hiper ARC 5.0 release onwards."
+        DEFVAL  { disabled }
+::= { uumEntry 156 }
+uumIpSecPolicyType    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        domain-based(0),
+                        user-based(1)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This flag defines whether the IP Security policy type is 
+         user-based or domain-based. 
+        This feature is available from Hiper ARC 5.0 release onwards"
+        DEFVAL  { domain-based }
+::= { uumEntry 157 }
+uumIpSecPolicyConfiguration    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        static(0),
+                        dynamic(1)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This flag specifies whether IP Security Policy is applied 
+         in statically or dynamically. 
+         This feature is available only from Hiper ARC 5.0 onwards."
+        DEFVAL  { static }
+::= { uumEntry 158 }
+uumVPNGateway    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VPN-Gateway. "
+::= { uumEntry 162 }
+uumVPNID    OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VPN-ID. "
+::= { uumEntry 163 }
+uumVPNName    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..253))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VPN-Name. "
+::= { uumEntry 164 }
+uumTrafficThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "traffic threshold based idle timeout"
+    --CONFIGURABLE
+::= { uumEntry 167 }
+uumTunnelAssignmentId    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the L2TP/PPTP tunnel that may be created for the user."
+    --CONFIGURABLE
+::= { uumEntry 168 }
+uumKeepAliveInterval      OBJECT-TYPE
+    SYNTAX        Integer32 (0..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The TCP Keep Alive Interval in seconds"
+    DEFVAL    { 0 }
+    --CONFIGURABLE
+::= { uumEntry 169 }
+uumTunnelClientAuthId    OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+			"Replaces the System Transmit Auth Name. This name is now sent
+			 instead of the System Xmit Auth Name by the PDSN to authenticate
+			 an L2TP tunnel"
+	--CONFIGURABLE       
+::= { uumEntry 174 } 
+uumCorrelationId		 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (1..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Call Correlation Id"
+::= { uumEntry 176 }
+usrUserManCfmFileName    OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (1..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The name of the configuration file"
+::= { usrUserManGroup 26 }
+usrUserManCfmSaveFlag    OBJECT-TYPE
+    SYNTAX        INTEGER    {
+                            normal(1),
+                            save(2),
+                            saving(3), 
+                            load(4),
+                            loading(5)
+                            }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The Configuration File Manager Flag for saving user management
+         scalars. The only value allowed for SET is save(2) and this is
+         only allowed if the current value is normal(1)."
+::= { usrUserManGroup 27 }
+usrUserManRadiusPort    OBJECT-TYPE
+    SYNTAX        Integer32    (0..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The udp port the primary radius server listens at"
+    --CONFIGURABLE
+::= { usrUserManGroup 28 }
+usrUserManRadiusAltPort    OBJECT-TYPE
+    SYNTAX        Integer32    (0..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The udp port the alternate radius server listens at"
+    --CONFIGURABLE
+::= { usrUserManGroup 29 }
+usrUserManRadiusAltSecret    OBJECT-TYPE
+    SYNTAX        OCTET STRING    (SIZE (1..15))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The shared secret between the alternate RADIUS server 
+                 and pilgrim.
+                 Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 30 }
+-- User managers framed route table definition
+usrUserManFramedRouteTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF UumFramedRouteEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        ""
+    --CONFIGURABLE
+::= { usrUserManGroup 31 }
+    uumFramedRouteEntry    OBJECT-TYPE
+        SYNTAX        UumFramedRouteEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            ""
+        INDEX    { uumFramedRouteUserName, uumFramedRoute }
+        --CONFIGURABLE
+    ::= { usrUserManFramedRouteTable 1 }
+    UumFramedRouteEntry ::= 
+        SEQUENCE {
+        uumFramedRouteUserName      UsrUserName,
+        uumFramedRouteIpAddress     IpAddress,
+        uumFramedRouteStatus        INTEGER,
+        uumFramedRouteIpMask        IpAddress,
+        uumFramedRouteIpGateway     IpAddress,
+        uumFramedRouteIpMetric      Integer32
+    }
+uumFramedRouteUserName    OBJECT-TYPE
+    SYNTAX        UsrUserName
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The users name"
+    --CONFIGURABLE
+::= { uumFramedRouteEntry 1 }
+uumFramedRouteIpAddress    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The framed routing ip address for the user"
+    --CONFIGURABLE
+::= { uumFramedRouteEntry 2 }
+uumFramedRouteStatus    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        delete(1),
+                        add(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION    
+        "The status field for the framed route"
+::= { uumFramedRouteEntry 3 }
+uumFramedRouteIpMask    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The framed routing ip mask for the user"
+    --CONFIGURABLE
+::= { uumFramedRouteEntry 4 }    
+uumFramedRouteIpGateway    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The framed routing ip gateway for the user"
+    --CONFIGURABLE
+::= { uumFramedRouteEntry 5 }
+uumFramedRouteIpMetric    OBJECT-TYPE
+    SYNTAX        Integer32 (1..16)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION    
+        "The framed routing ip metric for the user"
+    --CONFIGURABLE
+::= { uumFramedRouteEntry 6 }
+usrUserManRadiusAcctSecret    OBJECT-TYPE
+    SYNTAX        OCTET STRING    (SIZE (1..15))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The radius secret for the primary accounting server.
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 32 }
+usrUserManRadiusAcctAltSecret    OBJECT-TYPE
+    SYNTAX        OCTET STRING    (SIZE (1..15))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The radius secret for the secondary accounting server.
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 33 }
+usrUserManRadiusAcctPort    OBJECT-TYPE
+    SYNTAX        Integer32 (0..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The radius port for the primary accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 34 }
+usrUserManRadiusAcctAltPort    OBJECT-TYPE
+    SYNTAX        Integer32 (0..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The radius port for the secondary accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 35 }
+usrRadiusBusyOutEnabled    OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is the Radius client regularly checking the contact time
+         of the servers so that it can cause the modems to be busied
+         out when the servers are unreachbale."
+    DEFVAL    { 1 }
+    --CONFIGURABLE
+::= { usrUserManGroup 36 }
+usrRadiusHelloFrequency    OBJECT-TYPE
+    SYNTAX        Integer32(1..6000)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The number of seconds the system can go between messages
+         from the RADIUS servers before it sends a Status-Server
+         request to that server."
+    DEFVAL    { 60 }
+    --CONFIGURABLE
+::= { usrUserManGroup 37 }
+usrRadiusAuthState    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        start(1),
+                        up(2),
+                        losingContact(3),
+                        down(4),
+                        gainingContact(5)
+                        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "If the system is tracking RADIUS servers for service
+         loss busy-out, the state of those server."
+    DEFVAL    { 1 }
+::= { usrUserManGroup 38 }
+-- User managers assigned address pool table definition
+usrUserManAddrPoolTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF UumAddrPoolEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Table of address pools a user is configured for."
+    --CONFIGURABLE
+::= { usrUserManGroup 39 }
+    uumAddrPoolEntry    OBJECT-TYPE
+        SYNTAX        UumAddrPoolEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry of an address pool that a user is configured for."
+        INDEX    { uumAddrPoolUserName, uumAddrPoolName}
+        --CONFIGURABLE
+    ::= { usrUserManAddrPoolTable 1 }
+    UumAddrPoolEntry ::= 
+        SEQUENCE {
+        uumAddrPoolUserName    UsrUserName,
+        uumAddrPoolName        DisplayString,
+        uumAddrPoolStatus      INTEGER
+         }
+uumAddrPoolUserName    OBJECT-TYPE
+    SYNTAX        UsrUserName
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The users name"
+    --CONFIGURABLE
+::= { uumAddrPoolEntry 1 }
+uumAddrPoolName    OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(1..16))
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The name of the address pool this user is configured for"
+    --CONFIGURABLE
+::= { uumAddrPoolEntry 2 }
+uumAddrPoolStatus    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        delete(1),
+                        add(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION    
+        "If set to active(2) user is configured to use this pool. If
+         set to delet(1) this pool should be deleted from user's
+         address pool list"
+         --CONFIGURABLE
+::= { uumAddrPoolEntry 3 }
+usrRadiusAcctState    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        start(1),
+                        up(2),
+                        losingContact(3),
+                        down(4),
+                        gainingContact(5)
+                        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A debug value for debugging the service loss subsystem."
+::= { usrUserManGroup 40 }
+usrRadiusAuthSecsMessage    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A debug value for debugging the service loss subsystem."
+::= { usrUserManGroup 41 }
+usrRadiusAcctSecsMessage    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A debug value for debugging the service loss subsystem."
+::= { usrUserManGroup 42 }
+usrRadiusAuthSecsState    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A debug value for debugging the service loss subsystem."
+::= { usrUserManGroup 43 }
+usrRadiusAcctSecsState    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A debug value for debugging the service loss subsystem."
+::= { usrUserManGroup 44 }
+usrUserManRadiusAuthNoResponse    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times radius fails to answer an 
+         authentication request"
+::= { usrUserManGroup 45 }
+usrUserManActiveSessionTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF UumActiveSessionEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        ""
+::= { usrUserManGroup 46 }
+    uumActiveSessionEntry    OBJECT-TYPE
+        SYNTAX        UumActiveSessionEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            ""
+        INDEX    { uumActiveSessionUserName, uumActiveSessionSessionId }
+    ::= { usrUserManActiveSessionTable 1 }
+    UumActiveSessionEntry ::= 
+        SEQUENCE {
+        uumActiveSessionUserName        UsrUserName,
+        uumActiveSessionSessionId       Integer32,
+        uumActiveSessionConnectionType  INTEGER,
+        uumActiveSessionProtocolType    INTEGER,
+        uumActiveSessionAction          INTEGER,
+        uumActiveSessionIfName          OCTET STRING,
+        uumActiveSessionIpAddress       IpAddress,
+        uumActiveSessionConnTime        Integer32,
+        uumActiveSessionIdleTime        Integer32,
+        uumActiveSessionId              Integer32,
+        uumSessionUserName              UsrUserName,  
+        uumActiveSessionInBytes         Integer32,
+        uumActiveSessionOutBytes        Integer32,
+        uumActiveSessionCallId          OCTET STRING
+    }
+uumActiveSessionUserName    OBJECT-TYPE
+    SYNTAX        UsrUserName
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The users name"
+::= { uumActiveSessionEntry 1 }
+uumActiveSessionSessionId    OBJECT-TYPE
+    SYNTAX        Integer32 
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The unique id for the active session"
+::= { uumActiveSessionEntry 2 }
+uumActiveSessionConnectionType    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        unknown(1),
+                        wan(2),
+                        lan(3)
+                        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The connection type for the active session"
+::= { uumActiveSessionEntry 3 }
+uumActiveSessionProtocolType    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        unknown(1),
+                        ppp(2),
+                        slip(3),
+                        arap(4),
+                        telnet(5),
+                        rlogin(6),
+                        cleartcp(7)
+                        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The protocol type for the active session"
+::= { uumActiveSessionEntry 4 }
+uumActiveSessionAction    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        disconnect(6)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "We need to be able to disconnect all users with a
+         particular user name"
+::= { uumActiveSessionEntry 5 }
+uumActiveSessionIfName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Interface Name"
+::= { uumActiveSessionEntry 6 }
+uumActiveSessionIpAddress    OBJECT-TYPE
+    SYNTAX        IpAddress    
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "IP Address of the session. This can be Remote PPP IP address
+         in the case of a framed user or the login host ip address if
+         the user type is login."
+::= { uumActiveSessionEntry 7 }
+uumActiveSessionConnTime    OBJECT-TYPE
+    SYNTAX        Integer32    
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session Connect Time"
+::= { uumActiveSessionEntry 8 }
+uumActiveSessionIdleTime    OBJECT-TYPE
+    SYNTAX        Integer32    
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session Idle Time"
+::= { uumActiveSessionEntry 9 }
+uumActiveSessionId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "We need to display the sessionId"
+::= { uumActiveSessionEntry 10 }
+uumSessionUserName  OBJECT-TYPE
+    SYNTAX      UsrUserName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "We need to display the username"
+::= { uumActiveSessionEntry 11 }
+uumActiveSessionInBytes    OBJECT-TYPE
+    SYNTAX        Integer32    
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session Bytes Count - Input Bytes"
+::= { uumActiveSessionEntry 12 }
+uumActiveSessionOutBytes    OBJECT-TYPE
+    SYNTAX        Integer32    
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session Bytes Count - Output Bytes"
+::= { uumActiveSessionEntry 13 }
+uumActiveSessionCallId    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..64))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session Call ID"
+::= { uumActiveSessionEntry 14 }
+usrUserManSlotSpanChanOffset    OBJECT-TYPE
+    SYNTAX        Integer32 (0..1)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Offset to add to modem's reported slot/span/channel
+        when reporting this information.
+        Default value is 1 for all platforms except
+        Positron which uses a default of 0."
+         --CONFIGURABLE
+::= { usrUserManGroup 47 }
+usrUserManHintAssigned    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is the hint assigned feature enabled?"
+    --CONFIGURABLE
+::= { usrUserManGroup 48 }
+usrUserManAuthorEna    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Is remote authorization on or off"
+    --CONFIGURABLE
+::= { usrUserManGroup 49 }
+usrUserManTcpPacketsRx   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of TCP packets received"
+::= { usrUserManGroup 50 }
+usrUserManTcpPacketsTx   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of TCP packets transmitted"
+::= { usrUserManGroup 51 }
+-- AAA server table definition.  A Direct-Request host name entry refers
+-- to one of the AAA servers in this table.
+usrUserManAAAServersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UumAAAServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of AAA Servers configured. Several default servers
+         are automatically entered. Adding a new entry requires the
+         following objects to be defined:-
+         uumAAAServersName
+         uumAAAServersPref
+         uumAAAServersAAAType"
+::= { usrUserManGroup 52 }
+    uumAAAServersEntry    OBJECT-TYPE
+        SYNTAX      UumAAAServersEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX   { uumAAAServersName, uumAAAServersPref}
+    ::= { usrUserManAAAServersTable 1 }
+    UumAAAServersEntry ::=
+        SEQUENCE {
+        uumAAAServersName           DisplayString,
+        uumAAAServersPref           Integer32,
+        uumAAAServerIpAddress       IpAddress,
+        uumAAAServersSecret         OCTET STRING,
+        uumAAAServersPort           Integer32,
+        uumAAAServersEncryption     INTEGER,
+        uumAAAServersState          INTEGER,
+        uumAAAServersHostName       UsrDisplayString,
+        uumAAAServersPassThru       INTEGER, 
+        uumAAAServersSourcePort     Integer32,
+        uumAAAServersStatus         INTEGER,
+        uumAAAServersMirrorGroup    Integer32,
+        uumAAAServersAAAType        INTEGER,
+        uumAAAServersProtocol       INTEGER,
+        uumAAAServersTimeout        Integer32,
+        uumAAAServersRetransmit     Integer32,
+        uumAAAServersSuccessCount   Counter32,
+        uumAAAServersFailureCount   Counter32,
+        uumAAAServersNoResponseCount Counter32,
+        uumAAAServersContactInterval Integer32,
+        uumAAAServersOperationalStatus INTEGER,
+        uumAAAServersEnableNasRebootIndication INTEGER,
+        uumAAAServersRebootAckReceived INTEGER,
+		uumAAAServersMask  			INTEGER,
+        uumAAAServersSelectionMask  UsrAAADisplay
+    }
+uumAAAServersName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible      
+    STATUS      current
+    DESCRIPTION
+        "Server name; max number of characters is 32."
+    --CONFIGURABLE
+::= { uumAAAServersEntry 1 }
+uumAAAServersPref  OBJECT-TYPE
+    SYNTAX      Integer32 (1..109)
+    MAX-ACCESS  not-accessible      
+    STATUS      current
+    DESCRIPTION
+        "Server preference. This object can be SET to value
+         1-100, 101-109 are reserved."
+    --CONFIGURABLE
+::= { uumAAAServersEntry 2 }
+uumAAAServerIpAddress    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address for the server"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 3 }
+uumAAAServersSecret OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+                "The shared secret between the AAA server and client.
+                 Reading this object will return NULL."
+    --CONFIGURABLE
+::= { uumAAAServersEntry 4 }
+uumAAAServersPort    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The port the AAA server listens at. The default for AUTH
+         type is 1812, for ACCO type the default is 1813."
+    --CONFIGURABLE
+::= { uumAAAServersEntry 5 }
+uumAAAServersEncryption   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                on(1),
+                off(2) 
+            }
+    MAX-ACCESS  read-write
+    STATUS      current 
+    DESCRIPTION
+        "Packet body encryption enabled or disabled.  Disabling encryption
+         works for TACACS+ clients only.  The entire body will be sent as 
+         clear text. Obvious security concern."
+    --CONFIGURABLE
+::= { uumAAAServersEntry 6 }
+uumAAAServersState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current 
+    DESCRIPTION
+        "Is the AAA server enable or disabled"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 7 }
+uumAAAServersHostName OBJECT-TYPE
+    SYNTAX      UsrDisplayString (SIZE (0..240))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the AAA host to be resolved by DNS;
+         current implementation range is 0-64"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 8 }
+uumAAAServersPassThru OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled will allow users access to a domain even if they 
+         authentication fails.
+         This object is used primarily with the direct request feature."
+    --CONFIGURABLE
+::= { uumAAAServersEntry 9 }
+uumAAAServersSourcePort    OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port the AAA server listens at"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 10 }
+uumAAAServersStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown (0),
+                        delete(1)
+                        -- inactive(2) - deprecated
+                        -- active(3) - deprecated
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current 
+    DESCRIPTION
+        "The status field for delete. SETting this value to 1
+         will delete the associated AAA Server. Reading this
+         value is meaningless.
+         active/inactive were deprecated as not applicable
+         to wireless."
+    --CONFIGURABLE
+::= { uumAAAServersEntry 11 }
+uumAAAServersMirrorGroup  OBJECT-TYPE
+    SYNTAX      Integer32  (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Mirror Group for this server;     current implementation
+         only supports from 1-10 and is applicable only to
+         accounting server type."
+    --CONFIGURABLE
+::= { uumAAAServersEntry 12 }
+uumAAAServersSelectionMask OBJECT-TYPE
+    SYNTAX      UsrAAADisplay
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+    "The Selection mask for Server selection
+	 Note: This MIB is not supported anymore, a new MIB has been created for
+	 this purpose"
+::= { uumAAAServersEntry 13 }
+uumAAAServersAAAType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        auth(1),
+                        acco(2) 
+                        }           
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AAA Server type. Can be Authentication/Accounting"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 14 } 
+uumAAAServersProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        tacacsplus(1),
+                        radius(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AAA Server Protocol. For now can be TACACS+ or RADIUS"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 15 }
+uumAAAServersTimeout    OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Timeout value for trying this server.
+         Exceeding the time setting will lead to trying for the
+         next server in the table.
+         Current implementation only supports values 1-60 "
+    --CONFIGURABLE
+::= { uumAAAServersEntry 16 }
+uumAAAServersRetransmit    OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The retry count or retransmission count for this server
+          in the table. 
+          Current implementation only supports values 0-60."
+    DEFVAL { 60 }
+    --CONFIGURABLE
+::= { uumAAAServersEntry 17 }
+uumAAAServersSuccessCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times radius fails to answer an
+         authentication request"
+::= { uumAAAServersEntry 18 }
+uumAAAServersFailureCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times radius fails to answer an
+         authentication request"
+::= { uumAAAServersEntry 19 }
+uumAAAServersNoResponseCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times there was a no response from the server
+         for a AAA request "
+::= { uumAAAServersEntry 20 }
+uumAAAServersContactInterval      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the authentication server was last contacted."
+    DEFVAL { -1 }
+::= { uumAAAServersEntry 21 }
+uumAAAServersOperationalStatus      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Operational Status of Server during AUTH/ACCO "
+    DEFVAL { 1 }
+::= { uumAAAServersEntry 22 }
+uumAAAServersEnableNasRebootIndication   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                       enabled(1),
+                       disabled(2)
+                        }
+    MAX-ACCESS  read-write 
+    STATUS      current  
+    DESCRIPTION
+        "Is the AAA server NAS Reboot Indication Enabled or disabled"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 23 }
+uumAAAServersRebootAckReceived    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        no(0),
+                        yes(1)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Did this domain receive reboot ack. Leave this last in the table"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 24 }
+uumAAAServersMask    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        left(1),
+                        right(2),
+						all(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "server selection mask"
+    --CONFIGURABLE
+::= { uumAAAServersEntry 25 }
+usrUserManDirectRequestStatus    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                          enabled(1),
+                          disabled(2)
+                           } 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is direct request on or off.
+         Not applicable to Wireless products."
+    --CONFIGURABLE
+::= { usrUserManGroup 53 }
+usrUserManDirectRequestDelimiter  OBJECT-TYPE
+    SYNTAX      UsrAAADisplay
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The delimiter string for the direct request service
+         Not applicable to Wireless products."
+    --CONFIGURABLE
+::= { usrUserManGroup 54 }
+usrUserManDirectRequestTimeout  OBJECT-TYPE
+    SYNTAX      Integer32 (0..30)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Timeout feature for the direct request service
+         Not applicable to Wireless products."
+    --CONFIGURABLE
+::= { usrUserManGroup 55 }
+usrUserManRadiusVSA     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Attribute for the compatibility of Sprint CISCO
+         Server. The default is enabled."
+    --CONFIGURABLE
+::= { usrUserManGroup 56 }
+usrUserManRadiusAcctVSA OBJECT-TYPE
+    SYNTAX      INTEGER { 
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Attribute for the compatibility of Sprint CISCO
+         Server. The default is enabled."
+    --CONFIGURABLE
+::= { usrUserManGroup 57 }
+-- ===========AAA Domain Table===========
+-- AAA Domain table definition.
+--      
+usrUserManAAADomainTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UumAAADomainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+::= { usrUserManGroup 67 }
+    uumAAADomainEntry    OBJECT-TYPE 
+        SYNTAX      UumAAADomainEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "A table of AAA Domain Servers configured. Several default 
+         servers are automatically entered. Adding a new entry 
+         requires the following objects to be defined:-
+         uumAAADomainName
+         uumAAADomainAAAType
+         uumAAADomainState"
+        INDEX   { uumAAADomainName, uumAAADomainAAAType }
+    ::= { usrUserManAAADomainTable 1 }
+    UumAAADomainEntry ::=
+        SEQUENCE {
+        uumAAADomainName            UsrDisplayString,
+        uumAAADomainAAAType         INTEGER,
+        uumAAADomainServersUnavail  UsrDisplayString,
+        uumAAADomainSearchAlg       INTEGER,
+        uumAAADomainDNSIpRotation   INTEGER,
+        uumAAADomainInterimAccountingInterval Integer32,
+        uumAAADomainMirroring       INTEGER,
+        uumAAADomainState           INTEGER,
+        uumAAADomainStatus          INTEGER,
+        uumAAADomainRebootAckReceived INTEGER
+    }   
+uumAAADomainName        OBJECT-TYPE
+    SYNTAX      UsrDisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the AAA domain.
+         Currently restricted to 32 characters in PDSN."
+    --CONFIGURABLE
+::= { uumAAADomainEntry 1 }
+uumAAADomainAAAType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        auth(1),
+                        acco(2) 
+                        }  
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION  
+        "AAA Server type. Can be Authorizing/Accounting/AAA"
+    --CONFIGURABLE
+::= { uumAAADomainEntry 2 }
+uumAAADomainServersUnavail      OBJECT-TYPE
+    SYNTAX      UsrDisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the default behaviour/server if other servers 
+         are unavailable. It can be DENY/PERMIT or the Server Name.
+         If it is the Server Name it is an Alphanumeric string.
+         It must begin with a letter or digit, contain letters, 
+         digits, '.' or '-' and end with a letter or digit."
+    DEFVAL { "DENY" }
+    --CONFIGURABLE
+::= { uumAAADomainEntry 3 }
+uumAAADomainSearchAlg    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        fall-Through(1),
+                        round-Robin(2),
+                        active-server(3), -- not implemented
+                        preferred(4),     -- not implemented
+                        load-balancing(5)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Domain Server Search Algorithm"
+    DEFVAL { fall-Through }
+    --CONFIGURABLE
+::= { uumAAADomainEntry 4 }
+uumAAADomainDNSIpRotation    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this domain should be looked up using DNS."
+    DEFVAL { disabled }
+    --CONFIGURABLE
+::= { uumAAADomainEntry 5 }
+uumAAADomainInterimAccountingInterval    OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Checkpoint Interval for looking up this domain.
+        Exceeding the time setting will lead to trying for the
+        next domain in the table. Current PDSN implementation
+        supports range of 5-3600."
+    DEFVAL { 240 }
+    --CONFIGURABLE
+::= { uumAAADomainEntry 6 }
+uumAAADomainMirroring    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the information for this domain is
+         mirrored or not."
+    DEFVAL { disabled }
+    --CONFIGURABLE
+::= { uumAAADomainEntry 7 }
+uumAAADomainState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Is this domain enabled to be used ? "
+    --CONFIGURABLE
+::= { uumAAADomainEntry 8 }
+uumAAADomainStatus    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(0),
+                        delete(1)
+                        -- inactive(2) - deprecated
+                        -- active(3) - deprecated
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used to delete an entry. Reading this alue is meaningless.
+         active/inactive deprecated as inapplicable to wireless."
+    --CONFIGURABLE
+::= { uumAAADomainEntry 9 }
+uumAAADomainRebootAckReceived    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        no(0),
+                        yes(1)
+                        }
+    MAX-ACCESS  not-accessible
+    STATUS  obsolete
+    DESCRIPTION
+        "Did this domain receive reboot ack. Leave this last in the table"
+::= { uumAAADomainEntry 10 }
+-- Global default parameters for Domain Information. Also includes
+-- DIRECT_REQUEST Settings
+uumAAAGlobalSelectionMask  OBJECT-TYPE
+    SYNTAX      UsrAAADisplay
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The Selection mask for Server selection
+		 Note: This MIB is not supported anymore, a new MIB has been created
+		 for this purpose"
+::= { usrUserManGroup 68 }
+uumAAAGlobalServersUnavail OBJECT-TYPE
+    SYNTAX      UsrDisplayString  (SIZE (0..240))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Behaviour if servers are unavailable. Action can be
+         DENY, PERMIT or <domain name> 
+         If it is a Domain Name it is an Alphanumeric string.
+         It must begin with a letter or digit, contain letters, 
+         digits, '.' or '-' and end with a letter or digit.
+         Current implementation only supports 0..64"
+    --CONFIGURABLE
+::= { usrUserManGroup 69 }
+uumAAAGlobalSearchAlg     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        fall-Through(1),
+                        round-Robin(2),
+                        load-Balancing(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Domain Server Search Algorithm"
+    --CONFIGURABLE
+::= { usrUserManGroup 70 }
+uumAAAGlobalDNSIpRotation       OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Should this domain be looked up using DNS ? "
+    --CONFIGURABLE
+::= { usrUserManGroup 71 }
+uumAAAGlobalMirroring     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Should this Domain info. be mirrored ? "
+    --CONFIGURABLE
+::= { usrUserManGroup 73 }
+uumAAAGlobalEnableLogUnauthenticatedCalls    OBJECT-TYPE 
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Is the AAA Global Log Unauthenticated Calls Enabled or disabled.
+         The default is enabled."
+    --CONFIGURABLE  
+::= { usrUserManGroup 245 }
+uumAAAGlobalEnableUseAAAUserName     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Is the AAA Global Use AAA USER NAME is Enabled or disabled.
+         The default is disabled."
+    --CONFIGURABLE
+::= { usrUserManGroup 246 } 
+uumAAAGlobalRealmPassword  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The password for the user send to RADIUS realm directed req case.
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 229 }
+-- Pilgrim20 has elements defined in the range through 57 and 
+-- 90 through 91.  
+usrUserManReportedPortDensity    OBJECT-TYPE
+    SYNTAX        Integer32 (1..256)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Used as slot multiplier for modem slot when reporting RADIUS 
+         NAS-PORT attribute. The reported NAS-PORT attribute for a call is
+         computed as: <slot#> * usrUserManReportedPortDensity +
+                      <channel#> + usrUserManSlotSpanChanOffset
+         This can be used to achieve a dense NAS-PORT # mapping for a
+         chassis with uniform modem port density.  Note that it is possible
+         to configure this attribute such that eroneous aliasing of NAS-PORT #s
+         are generated if the ReportPortDensity is set < the systems true port density.
+         Default value is 256."
+     --CONFIGURABLE
+::= { usrUserManGroup 90 }
+usrUserManFillNullAttributes  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                         disabled(0),
+                         enabled(1)
+                         }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This is the switch to enable/disable Filling of Null Attributes
+          in Radius Accounting records"
+     --CONFIGURABLE
+ ::= { usrUserManGroup 91 }
+-- Radius enhancements for UUNET follow
+-- The source port for the authentication servers
+usrUserManRadiusSrcPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source udp port the primary radius server binds to"
+    --CONFIGURABLE
+::= { usrUserManGroup 92 }
+-- The source port for the accounting servers
+usrUserManRadiusAcctSrcPort     OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source radius port for the primary accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 93 }
+-- The tertiary authentication server details
+usrUserManRadiusTertiaryIP      OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The tertiary IP address of the RADIUS server"
+    --CONFIGURABLE
+::= { usrUserManGroup 94 }
+usrUserManRadiusTertiarySecret  OBJECT-TYPE
+    SYNTAX      OCTET STRING    (SIZE (1..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius secret for the tertiary server.
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 95 }
+usrUserManRadiusTertiaryPort    OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The udp port the tertiary radius server listens at"
+    --CONFIGURABLE
+::= { usrUserManGroup 96 }
+-- The algorithm for authentication
+usrRadiusAuthAlgorithm  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        fallthrough(1),
+                        roundrobin(2),
+                        activeserver(3),
+                        prefered(4)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Takes either the Fall-through or Round-robin algorithm
+         for re-tries"
+    --CONFIGURABLE
+::= { usrUserManGroup 97 }
+-- The USR or UUNET style for attribute values
+usrRadiusAttributeStyle OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        standard(1),
+                        ascend(2),
+                        mci(4)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Takes STANDARD or ASCEND style for attribute values"
+    --CONFIGURABLE
+::= { usrUserManGroup 98 }
+-- The Interim accounting interval for checkpoint accounting
+usrRadiusInterimAccountingIntervalEnabled       OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether checkpoint accounting is enabled"
+    DEFVAL  { enabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 99 }
+usrRadiusInterimAccountingInterval      OBJECT-TYPE
+    SYNTAX      Integer32 (5..3600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time intervals when acct. info is sent to the servers"
+    --CONFIGURABLE
+::= { usrUserManGroup 100 }
+-- Primary server accounting status
+usrUserManPrimAcctStatus        OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Is priamary accounting on or off"
+    --CONFIGURABLE
+::= { usrUserManGroup 101 }
+-- Secondary server accounting status
+usrUserManSecAcctStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Is secondary accounting on or off"
+    --CONFIGURABLE
+::= { usrUserManGroup 102 }
+usrUserManRadiusAcctFirstBackupIP       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the Primary RADIUS First backup accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 103 }
+usrUserManRadiusAcctSecondBackupIP      OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the Primary RADIUS Second backup accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 104 }
+usrUserManRadiusAcctAltFirstBackupIP    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the Secondary RADIUS First backup accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 105 }
+usrUserManRadiusAcctAltSecondBackupIP   OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the Secondary RADIUS Second backup accounting
+ server"
+    --CONFIGURABLE
+::= { usrUserManGroup 106 }
+    usrUserManRadiusAcctFirstBackupSecret   OBJECT-TYPE
+    SYNTAX      OCTET STRING    (SIZE (1..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius secret for the primary first backup accounting server
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 107 }
+usrUserManRadiusAcctSecondBackupSecret  OBJECT-TYPE
+    SYNTAX      OCTET STRING    (SIZE (1..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius secret for the primary second backup accounting server.
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 108 }
+usrUserManRadiusAcctAltFirstBackupSecret        OBJECT-TYPE
+    SYNTAX      OCTET STRING    (SIZE (1..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius secret for the secondary first backup accounting server.
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 109 }
+usrUserManRadiusAcctAltSecondBackupSecret   OBJECT-TYPE
+    SYNTAX      OCTET STRING    (SIZE (1..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius secret for the secondary second backup accounting server
+         Reading this object will return NULL."
+    --CONFIGURABLE
+::= { usrUserManGroup 110 }
+usrUserManRadiusAcctFirstBackupPort     OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius port for the primary first backup accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 111 }
+usrUserManRadiusAcctSecondBackupPort    OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius port for the primary second backup accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 112 }
+usrUserManRadiusAcctAltFirstBackupPort  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius port for the secondary first backup accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 113 }
+    usrUserManRadiusAcctAltSecondBackupPort OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The radius port for the secondary second backup accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 114 }
+usrUserManRadiusAcctRoundRobinCount     OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the servers are switched in the primary server group"
+::= { usrUserManGroup 115 }
+usrUserManRadiusAcctAltRoundRobinCount  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the servers are switched in the secondary server group"
+::= { usrUserManGroup 116 }
+usrUserManRadiusAcctPacketDiscardCount  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets discarded in the primary server group"
+::= { usrUserManGroup 117 }
+usrUserManRadiusAcctAltPacketDiscardCount   OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets discarded in the secondary server group"
+::= { usrUserManGroup 118 }
+usrUserManRadiusAcctQueuePercentFull    OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the queue filled in the primary server group"
+::= { usrUserManGroup 119 }
+usrUserManRadiusAcctAltQueuePercentFull OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the queue filled in the secondary server group"
+::= { usrUserManGroup 120 }
+usrUserManRadiusAcctOutstandingPacketCount  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets outstanding in the primary server group"
+::= { usrUserManGroup 121 }
+usrUserManRadiusAcctAltOutstandingPacketCount   OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets outstanding in the primary server group"
+::= { usrUserManGroup 122 }
+usrTacacsAcctAttrList OBJECT-TYPE 
+    SYNTAX      INTEGER {      
+                        all(1),                     
+                        simple(2),
+                        sprint(3)
+                        }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the tacacs+ accounting attribute lists requested from
+         different customer like SPRINT ...."
+    DEFVAL  { 2 }
+    --CONFIGURABLE
+::= { usrUserManGroup 123 }
+usrUserManAcctAltRetrans    OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of times a timeout will occur for a 
+         secondary server when communicating with radius accounting server"
+    --CONFIGURABLE
+::= { usrUserManGroup 124 }
+usrUserManLogUnauthenticatedCalls    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, all unauthenticated calls will generate
+         a Stop Accounting-Request. If disabled, no Stop
+         Accounting-Requests will be sent."
+    DEFVAL { enabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 125 }
+usrUserManRadiusActiveAuthIP    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP address of the Active RADIUS Authentication Server"
+    --CONFIGURABLE
+::= { usrUserManGroup 126 }
+usrUserManRadiusActiveAcctIPFirst    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP address of the Active RADIUS Accounting  Server of First Group"
+    --CONFIGURABLE
+::= { usrUserManGroup 127 }
+usrUserManRadiusActiveAcctIPSecond    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The IP address of the Active RADIUS Accounting  Server of Second Group"
+    --CONFIGURABLE
+::= { usrUserManGroup 128 }
+usrUserManRadiusFirstBackupAuthSuccesses    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of first backup radius server authentication successes"
+::= { usrUserManGroup 129 }
+usrUserManRadiusFirstBackupAuthFails    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of first backup radius server authentication failures"
+::= { usrUserManGroup 130 }
+usrUserManRadiusSecondBackupAuthSuccesses    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of secondary backup radius server authentication successes"
+::= { usrUserManGroup 131 }
+usrUserManRadiusSecondBackupAuthFails    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of secondary backup radius server authentication failures"
+::= { usrUserManGroup 132 }
+usrUserManRadiusFirstBackupAuthNoResponse    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times first backup radius server fails to answer an 
+         authentication request"
+::= { usrUserManGroup 133 }
+usrUserManRadiusSecondBackupAuthNoResponse    OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times secondary backup radius server fails to answer an 
+         authentication request"
+::= { usrUserManGroup 134 }
+usrUserManRadiusCounterResetTime    OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Daily time we reset all the authentication counter contains to value zero"
+    --CONFIGURABLE
+::= { usrUserManGroup 135 }
+usrUserManRadiusResetAuthCountersToZero    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "An user action to reset all the authentication counter 
+         contains to value zero"
+    --CONFIGURABLE
+::= { usrUserManGroup 136 }
+usrUserManRadiusAcctCounterResetTime    OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Daily time we reset all the accounting counter contains to value zero"
+    --CONFIGURABLE
+::= { usrUserManGroup 137 }
+usrUserManRadiusResetAcctCountersToZero    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "An user action to reset all the accounting counter contains 
+         to value zero"
+    --CONFIGURABLE
+::= { usrUserManGroup 138 }
+-- The usrUserManVTSTermTable is used to terminate a session using
+-- the unique index key made up of usrUserManVTSTermUserName,
+-- usrUserManVTSTermSessionId, usrUserManVTSTermDynamic    IpAddress,
+-- and usrUserManVTSTermSessionKey.
+usrUserManVTSTermTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF UsrUserManVTSTermEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        ""
+::= { usrUserManGroup 139 }
+    usrUserManVTSTermEntry    OBJECT-TYPE
+        SYNTAX        UsrUserManVTSTermEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            ""
+        INDEX    { usrUserManVTSTermUserName, usrUserManVTSTermSessionId,
+                   usrUserManVTSTermDynamic, usrUserManVTSTermSessionKey }
+    ::= { usrUserManVTSTermTable 1 }
+    UsrUserManVTSTermEntry ::= 
+        SEQUENCE {
+        usrUserManVTSTermUserName   UsrUserName,
+        usrUserManVTSTermSessionId  OCTET STRING,
+        usrUserManVTSTermDynamic    IpAddress,
+        usrUserManVTSTermSessionKey OCTET STRING,
+        usrUserManVTSTermAction     INTEGER
+    }
+usrUserManVTSTermUserName    OBJECT-TYPE
+    SYNTAX        UsrUserName
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The users name"
+::= { usrUserManVTSTermEntry 1 }
+usrUserManVTSTermSessionId    OBJECT-TYPE
+    SYNTAX        OCTET STRING  (SIZE(0..255))
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The unique id for the active session"
+::= { usrUserManVTSTermEntry 2 }
+usrUserManVTSTermDynamic    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The dynamic IP address for the active session"
+::= { usrUserManVTSTermEntry 3 }
+usrUserManVTSTermSessionKey    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(16))
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A unique key to identify the active session"
+::= { usrUserManVTSTermEntry 4 }
+usrUserManVTSTermAction    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        disconnectSession(1)
+                        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The action to perform on the active session."
+::= { usrUserManVTSTermEntry 5 }
+-- The usrUserManVTSVerifyTable is used to determine if a session
+-- is still active.
+usrUserManVTSVerifyTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF UsrUserManVTSVerifyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        ""
+::= { usrUserManGroup 140 }
+    usrUserManVTSVerifyEntry    OBJECT-TYPE
+        SYNTAX        UsrUserManVTSVerifyEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            ""
+        INDEX    { usrUserManVTSVerifySessionId }
+::= { usrUserManVTSVerifyTable 1 }
+    UsrUserManVTSVerifyEntry ::= 
+        SEQUENCE {
+        usrUserManVTSVerifySessionId    OCTET STRING,
+        usrUserManVTSVerifyUserName     UsrUserName
+    }
+usrUserManVTSVerifySessionId    OBJECT-TYPE
+    SYNTAX        OCTET STRING  (SIZE(0..255))
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The unique id for the active session"
+::= { usrUserManVTSVerifyEntry 1 }
+usrUserManVTSVerifyUserName    OBJECT-TYPE
+    SYNTAX        UsrUserName
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The users name"
+::= { usrUserManVTSVerifyEntry 2 }
+usrUserManMaxLocalUsers      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum Local users that may be supported on the card"
+    DEFVAL { 450 }
+    --CONFIGURABLE
+::= { usrUserManGroup 141 }
+-- Following MIB Objects are added for Resource Management Feature.
+usrUserManRadiusSrcPortAuth  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This flag state whether to use check the response radius
+         source port same at that configured in the system. The
+         default value is TRUE"
+    --CONFIGURABLE
+::= { usrUserManGroup 142 }
+usrUserManRadiusUseRadUsername  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This flag states whether to use the radius supplied username in the
+         access-accept packet to override the username in the request packet.
+         The default value is FALSE."
+    --CONFIGURABLE
+::= { usrUserManGroup 143 }
+usrResourceMgmtState      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the Resource Management is enabled or disabled."
+    DEFVAL { disabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 144 }
+usrResourceMgmtQueriesReceivedPrimary      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Queries received from the Primary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 145 }
+usrResourceMgmtQueryResponsesPrimary      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Query Responses sent to the Primary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 146 }
+usrResourceMgmtReclaimsReceivedPrimary      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Reclaims received from the Primary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 147 }
+usrResourceMgmtFreeSendPrimary      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Resource Management Frees sent to the Primary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 148 }
+usrResourceMgmtFreeRexmitPrimary      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Frees retransmitted to the Primary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 149 }
+usrResourceMgmtQueriesReceivedSecondary      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Queries received from the Secondary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 150 }
+usrResourceMgmtQueryResponsesSecondary      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Query Responses sent to the Secondary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 151 }
+usrResourceMgmtReclaimsReceivedSecondary  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Reclaims received from the Secondary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 152 }
+usrResourceMgmtFreeSendSecondary  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Resource Management Frees sent to the Secondary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 153 }
+usrResourceMgmtFreeRexmitSecondary  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Frees retransmitted to the Secondary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 154 }
+usrResourceMgmtQueriesReceivedTertiary  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Queries received from the Tertiary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 155 }
+usrResourceMgmtQueryResponsesTertiary  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Query Responses sent to the Tertiary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 156 }
+usrResourceMgmtReclaimsReceivedTertiary  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Reclaims received from the Tertiary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 157 }
+usrResourceMgmtFreeSendTertiary  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successful Resource Management Frees sent to the Tertiary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 158 }
+usrResourceMgmtFreeRexmitTertiary  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Resource Management Frees retransmitted to the Tertiary server."
+    DEFVAL { 0 }
+::= { usrUserManGroup 159 }
+usrResetResourceMgmtCountersToZero    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "An user action to reset all the resource management counters to zero"
+::= { usrUserManGroup 161 }
+usrResetResourceMgmtCountersResetTime    OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Time the resource management counters were last reset to value zero."
+::= { usrUserManGroup 162 }
+usrRadiusAccountingAttributeStyle OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        standard(1),
+                        netserver(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Takes STANDARD or Netserver style for accounting attribute values.
+         For wireless the default is standard or THREEG_ACCT_ATTR_FORMAT."
+    --CONFIGURABLE
+::= { usrUserManGroup 160 }
+usrRadiusSendAcctUnauthRecord      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the Sending unauthenticated STOP records is enabled or disabled."
+    --CONFIGURABLE
+::= { usrUserManGroup 165 }
+-- Accounting Counters for UUNET
+usrUserManRadiusAcctPrimaryServerGroupCounterResetTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Daily time we reset all the accounting counters 
+         for primary group  to value zero"
+    --CONFIGURABLE
+::= { usrUserManGroup  163 }
+usrUserManRadiusAcctSecondaryServerGroupCounterResetTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Daily time we reset all the accounting counters
+         for secondary group to value zero"
+    --CONFIGURABLE
+::= { usrUserManGroup  164 }
+usrUserManRadiusDefaultUserAcct OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether to send accounting records for default users.
+         This object is not used in wireless applications."
+    --CONFIGURABLE
+::= { usrUserManGroup 166 }
+usrUserManTunnelAuthenName   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This option is used for l2tp tunnel authentication.
+         Default/Disabled - System Transmit Authentication Name
+	 Enabled - Used domain name or tunnel name."
+    --CONFIGURABLE
+::= { usrUserManGroup 167 }
+usrPrimaryAuthContactInterval  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Primary Radius authentication 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 168 }
+usrSecondaryAuthContactInterval  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Secondary Radius authentication 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 169 }
+usrTertiaryAuthContactInterval  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Tertiary Radius authentication 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 170 }
+usrAcctGrp1PriContactInterval      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Group 1 Primary Accounting 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 171 }
+usrAcctGrp1FrstBkpContactInterval      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Group 1 First backup accounting 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 172 }
+usrAcctGrp1SecBkpContactInterval      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Group 1 Second Backup Accounting 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 173 }
+usrAcctGrp2PriContactInterval      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Group 2 Primary Accounting 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 174 }
+usrAcctGrp2FrstBkpContactInterval      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Group 2 First backup accounting 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 175 }
+usrAcctGrp2SecBkpContactInterval      OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds since the Group 2 Second backup accounting 
+         server was last contacted."
+    DEFVAL { -1 }
+::= { usrUserManGroup 176 }
+usrUserManSyslogFormat  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Syslog message Format. Specifies which syslog style
+        format is in effect out of the possible range of
+        selections."
+    --CONFIGURABLE
+::= { usrUserManGroup 177 }
+usrUserManIPOnlyForPrimaryLink    OBJECT-TYPE      
+    SYNTAX      INTEGER {
+                         disabled(0),
+                         enabled(1)
+                         }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION 
+         "This is the switch to enable/disable sending 0.0.0.0 ip address
+          for any non primary link in the accounting records. "
+     --CONFIGURABLE
+ ::= { usrUserManGroup 178 }
+usrRadiusAccountingPrioritiseFirstServer    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                         }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This switch is to enable/disable prioritisation of the first server
+          in each server group"
+     --CONFIGURABLE
+ ::= { usrUserManGroup 179 }
+usrUserManOnlySTOPforFailedService    OBJECT-TYPE      
+    SYNTAX      INTEGER {
+                         disabled(0),    
+                         enabled(1)
+                         }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION 
+         "After successful authentication, if the required service
+          start for the user fails, just send acct STOP"
+     --CONFIGURABLE
+ ::= { usrUserManGroup 180 }
+usrRadiusSendAcctAuthServiceType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the Sending of service type in auth-request
+         enabled or disabled."
+    --CONFIGURABLE
+::= { usrUserManGroup 181 }
+usrRadiusAuthStatusPollInitInterval      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Initial Interval for Auth Status Polling"
+    --CONFIGURABLE
+::= { usrUserManGroup 182 }
+usrRadiusAuthStatusPollMaxInterval      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Interval for Auth Status Polling"
+    --CONFIGURABLE
+::= { usrUserManGroup 183 }
+usrRadiusAuthStatusPollIncInterval      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval increment for Auth Status Polling"
+    --CONFIGURABLE
+::= { usrUserManGroup 184 }
+usrRadiusAuthStatusServerUpRetry      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of status server tries before making the server from down to up"
+    --CONFIGURABLE
+::= { usrUserManGroup 185 }
+usrRadiusAuthStatusServerDownRetry      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of status server retries before making the server from up to down"
+    --CONFIGURABLE
+::= { usrUserManGroup 186 }
+usrRadiusAuthStatusPrimServer      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The status of the primary server "
+::= { usrUserManGroup 187 }
+usrRadiusAuthStatusSecServer      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the secondary server "
+::= { usrUserManGroup 188 }
+usrRadiusAuthStatusTerServer      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the tertiary server "
+::= { usrUserManGroup 189 }
+usrRadiusDNISAuthServiceType      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The service type set fot DNIS authenticaton request.
+         Default is 10"
+    --CONFIGURABLE
+::= { usrUserManGroup 190 }
+usrRadiusVTPAccountingFlag     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Flag which decides whether to send acct records
+         for VTP tunnel users or not"
+    --CONFIGURABLE
+::= { usrUserManGroup 194 }
+uumAAAGlobalOpStatusRenewIntvl    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65536)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Time to reenable operationally down servers"
+    DEFVAL { 30 }
+    --CONFIGURABLE
+ ::= { usrUserManGroup 199 }
+ uumAAAGlobalTotalRetransmit     OBJECT-TYPE
+    SYNTAX      Integer32  (0..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total Retransmit, same as RadiusOthers.radius_retrans"
+    DEFVAL { 60 }
+    --CONFIGURABLE
+ ::= { usrUserManGroup 200 }
+usrPortIdStyle  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        contiguous(1),
+                        density-based(2)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port Id generation style. 
+         The value of 1 means that the port id will be given from 
+         a contiguous space. The value 2 means the lowest port id will 
+         be computed based on the density of ports."
+    DEFVAL { 2 }      
+    --CONFIGURABLE   
+::= { usrUserManGroup 201 }
+usrResourceReclaimStyle  OBJECT-TYPE
+    SYNTAX      INTEGER  {
+                        draft-style(1),
+                        mci-style(2)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether resource reclaim is done in MCI style or the IETF draft style
+         Default is DRAFT style"
+    DEFVAL { 1 }      
+    --CONFIGURABLE   
+::= { usrUserManGroup 202 }
+usrAuthSyslogState  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value states whether the Authentication information is sent in 
+         the syslogs."
+    DEFVAL { 2 }      
+    --CONFIGURABLE   
+::= { usrUserManGroup 203 }
+usrAcctSyslogState  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value states whether the Accounting information is sent in 
+         the syslogs."
+    DEFVAL { 2 }      
+    --CONFIGURABLE   
+::= { usrUserManGroup 204 }
+usrAuthSyslogReset  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value states whether or not the authentication counters will be 
+         reset at a configured interval."
+    DEFVAL { 2 }      
+    --CONFIGURABLE   
+::= { usrUserManGroup 205 }
+usrAcctSyslogReset  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value states whether or not the accounting counters will be 
+         reset at a configured interval."
+    DEFVAL { 2 }  
+    --CONFIGURABLE   
+::= { usrUserManGroup 206 }
+usrAuthSyslogFrequency  OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                        one-hour(0),
+                        six-hours(1),
+                        twelve-hours(2),
+                        twentyfour-hours(3),
+                        five-days(4)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the time interval after which the authentication
+         counters will be reset to zero."
+    DEFVAL { 2 }  
+    --CONFIGURABLE   
+::= { usrUserManGroup 207 }
+usrAcctSyslogFrequency  OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                        one-hour(0),
+                        six-hours(1),
+                        twelve-hours(2),
+                        twentyfour-hours(3),
+                        five-days(4)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the time interval after which the accounting
+         counters will be reset to zero."
+    DEFVAL { 2 }  
+    --CONFIGURABLE   
+::= { usrUserManGroup 208 }
+usrUserManRadiusPrimaryPref     OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Primary Auth  Server preference value when using PREFERED
+         algorithm" 
+    --CONFIGURABLE
+::= { usrUserManGroup 209 }
+usrUserManRadiusSecondaryPref   OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Secondary Auth  Server preference value when using PREFERED
+         algorithm"     
+    --CONFIGURABLE
+::= { usrUserManGroup 210 }
+usrUserManRadiusTertiaryPref    OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tertiary Auth  Server preference value when using PREFERED
+         algorithm" 
+    --CONFIGURABLE
+::= { usrUserManGroup 211 }
+usrUserManPerServerRetryCount   OBJECT-TYPE
+    SYNTAX      Integer32 (1..30)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Per Server Retry Count when using PREFERED algorithm"  
+    --CONFIGURABLE
+::= { usrUserManGroup 212 }
+usrUserManPerAcctServerRetryCount       OBJECT-TYPE
+    SYNTAX      Integer32 (0..30)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Per Server Retry Count for Acct Servers"   
+    --CONFIGURABLE
+::= { usrUserManGroup 213 }
+usrUserManRadiusAcctCDRState     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether to send Call Detail Record in ACCT Stop req." 
+    --CONFIGURABLE
+::= { usrUserManGroup 214 }
+usrUserManRadiusAcctAggregateRoundRobinCount     OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of times the servers are switched in the 
+        primary and secondary server group"
+::= { usrUserManGroup 215 }
+usrUserManRadiusAcctAggregatePacketDiscardCount  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets discarded in the primary and 
+        secondary server group"
+::= { usrUserManGroup 216 }
+usrUserManRadiusAcctAverageQueuePercentFull    OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average of percentage of the queue filled in the primary 
+        and secondary server group"
+::= { usrUserManGroup 217 }
+usrUserManRadiusAcctAggregateOutstandingPacketCount      OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets outstanding in the primary 
+        and secondary server group"
+::= { usrUserManGroup 218 }
+uumPrioratizeAuthServer     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   
+        "In Round Robin Feature, Try the first auth server initially"
+    --CONFIGURABLE
+ ::= { usrUserManGroup 219 }
+usrResourceFreeForTunnelInitiator      OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For a tunneled call(l2tp/pptp) user get authenticated at both
+         call initiator and call terminator thus uses 2 resources. If
+         enabled resources at the initiator is freed immediatly after
+         authentication else only when user goes away."
+    DEFVAL { enabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 220 }
+usrRebootIndicationStyle  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        fall-through(1),
+                        preferred-server(2)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether reboot indiaction is sent in fall-through fashion or in 
+        round-robin manner according to server preference. 
+        Default is fall-through style"
+    DEFVAL { 1 }  
+    --CONFIGURABLE   
+::= { usrUserManGroup 222 }
+usrUserManRadiusAcctPrimaryPref    OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Primary Acct  Server preference value"
+    --CONFIGURABLE
+::= { usrUserManGroup 223 }
+usrUserManRadiusAcctSecondaryPref    OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Secondary Acct  Server preference value"
+    --CONFIGURABLE
+::= { usrUserManGroup 224 }
+usrUserManRadiusAcctBackupPrimaryFirstPref    OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acct  Server preference value"
+    --CONFIGURABLE
+::= { usrUserManGroup 225 }
+usrUserManRadiusAcctBackupPrimarySecondPref    OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acct  Server preference value"
+    --CONFIGURABLE
+::= { usrUserManGroup 226 }
+usrUserManRadiusAcctBackupSecondaryFirstPref    OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acct  Server preference value"
+    --CONFIGURABLE
+::= { usrUserManGroup 227 }
+usrUserManRadiusAcctBackupSecondarySecondPref    OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acct  Server preference value"
+    --CONFIGURABLE
+::= { usrUserManGroup 228 }
+-- User managers NAI construction table definition
+usrUserManNAIConfigTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF UumNAIConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table for configuring NAI construction in case there is no authentication."
+::= { usrUserManGroup 232 }
+    uumNAIConfigEntry    OBJECT-TYPE
+        SYNTAX        UumNAIConfigEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in the NAI construction table."
+        INDEX    { uumNAIIndex }
+    ::= { usrUserManNAIConfigTable 1 }
+    UumNAIConfigEntry ::= 
+        SEQUENCE {
+        uumNAIIndex             Integer32,
+        uumNAIMSIDType          INTEGER,
+        uumNAIMSIDRangeMin      Integer32,
+        uumNAIMSIDRangeMax      Integer32,
+        uumNAIRealm             DisplayString,
+        uumNAIStatus            RowStatus,
+        uumNAIMSIDStrRangeMin   OCTET STRING,
+        uumNAIMSIDStrRangeMax   OCTET STRING,
+        uumNAIAuthType          INTEGER
+    }
+uumNAIIndex    OBJECT-TYPE
+    SYNTAX        Integer32 (1..100)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The index of the NAI construction table, it can support up 100 entries."
+::= {uumNAIConfigEntry 1 }
+uumNAIMSIDType    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                          imsi(1),
+                          min(2),
+                          irm(3)
+                          }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The type of the MSID"
+    --CONFIGURABLE
+::= {uumNAIConfigEntry 2 }
+uumNAIMSIDRangeMin    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    not-accessible
+    STATUS        obsolete
+    DESCRIPTION
+        "The lower bound of the MSID range. This value is replaced by its
+         string counterpart below"
+::= {uumNAIConfigEntry 3 }
+uumNAIMSIDRangeMax    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    not-accessible
+    STATUS        obsolete
+    DESCRIPTION
+        "The upper bound of the MSID range. This value is replaced by its 
+         string counterpart below"
+::= {uumNAIConfigEntry 4 }
+uumNAIRealm    OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The realm of the MSID in the range specified"
+    --CONFIGURABLE
+::= {uumNAIConfigEntry 5 }
+uumNAIStatus    OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to add, modify, and delete rows for 
+         the NAI construction table."
+    --CONFIGURABLE
+::= {uumNAIConfigEntry 6 }
+uumNAIMSIDStrRangeMin OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (1..15))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The MSI range requires 15 digits which cannot be accomodated
+        within an     INTEGER. Hence the older object is replaced with this
+        string object"
+    --CONFIGURABLE
+::= {uumNAIConfigEntry 7 }
+uumNAIMSIDStrRangeMax OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (1..15))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The MSI range requires 15 digits which cannot be accomodated
+        within an     INTEGER. Hence the older object is replaced with this
+        string object"
+    --CONFIGURABLE
+::= {uumNAIConfigEntry 8 }
+uumNAIAuthType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        reject(1),
+                        accept(2),
+                        auth(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action taken when a NAI of this type is constructed:
+        reject - drop the call using NAI in accounting record
+        accept - accept the call without consulting AAA using
+                 PDSNDefault user session parameters
+        auth   - consult AAA using constructed NAI as user name.
+        use AAA reply for session parameters if AAA accepts
+        use AAA reject to drop the call"
+    DEFVAL {accept}
+    --CONFIGURABLE
+::=     {uumNAIConfigEntry 9}
+-- User managers TOD table definition
+usrUserManTODConfigTable    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF UumTODConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table for configuring Time Of Day Timer."
+::= { usrUserManGroup 233 }
+    uumTODConfigEntry    OBJECT-TYPE
+        SYNTAX        UumTODConfigEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in the TOD table."
+        INDEX    {uumTODIndex }
+    ::= { usrUserManTODConfigTable 1 }
+    UumTODConfigEntry ::= 
+        SEQUENCE {
+        uumTODIndex     Integer32,
+        uumTODHour      Integer32,
+        uumTODMinute    Integer32,
+        uumTODSecond    Integer32,
+        uumTODStatus    RowStatus
+        }
+uumTODIndex    OBJECT-TYPE
+    SYNTAX        Integer32 (1..5)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The index of the TOD table, it can support up 5 entries."
+::= {uumTODConfigEntry 1 }
+uumTODHour    OBJECT-TYPE
+    SYNTAX        Integer32 (0..23)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The hour of the TOD timer, it is a 24 hour clock."
+    --CONFIGURABLE
+::= {uumTODConfigEntry 2 }
+uumTODMinute    OBJECT-TYPE
+    SYNTAX        Integer32 (0..59)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The minute of the TOD timer."
+    --CONFIGURABLE
+::= {uumTODConfigEntry 3 }
+uumTODSecond    OBJECT-TYPE
+    SYNTAX        Integer32 (0..59)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second of the TOD timer."
+    --CONFIGURABLE
+::= {uumTODConfigEntry 4 }
+uumTODStatus    OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object is used to add and delete rows from the TOD table."
+    --CONFIGURABLE
+::= {uumTODConfigEntry 5 }
+usrUserManTODTimerEnabled    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether TOD timer accounting is enabled"
+    DEFVAL  { enabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 235 }
+usrUserManActiveStopTriggerEnabled    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether Active Stop Airlink Record triggered accounting is enabled"
+    DEFVAL  { disabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 236 }
+usrUserManAuthFailTrapsState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the User Authentication Failure Trap is enabled or disabled."
+    DEFVAL { disabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 231 }
+usrUserMan3GAcctAttrFormat OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        threeGFormat(1),
+                        threeComVSAFormat(2),
+                        rfc2866Format(3)
+                        }       
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This flags determines whether PDSN will send accounting attributes
+         in 3G format, 3Com VSA format, 3G and legacy Radius format"
+    DEFVAL { threeGFormat }
+    --CONFIGURABLE
+::= { usrUserManGroup 244 }
+usrUserManHarpDownDetectionTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1 .. 65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The longest time without responses from HARP/AAA in which
+         HARP/AAA need to be marked Out of Service"
+     DEFVAL { 60 }
+     --CONFIGURABLE
+::= { usrUserManGroup 248 }
+usrUserManHarpUpDetectionScheme OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        timerbased(1),
+                        responsebased(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Flag to indicate whether the HARP/AAA needs to be marked 'Up'
+         based purely on the up timer or based upon either a timer
+         or response from HARP/AAA"
+    DEFVAL { 1 }
+    --CONFIGURABLE
+::= { usrUserManGroup 249 }
+usrUserManAdminAcct    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                          enabled(1),
+                          disabled(2)
+                          } 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Is accounting for admin users on or off"
+    DEFVAL { 2 }
+    --CONFIGURABLE
+::= { usrUserManGroup 255 }
+	usrCorrelationIdFromFacn  OBJECT-TYPE
+	SYNTAX	INTEGER {
+			enabled(1),
+			disabled(2)
+		} 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "This value states whether or not use correlation id received
+        from facn, when facn interface is enabled."
+        DEFVAL { 2 }      
+        --CONFIGURABLE   
+        ::= { usrUserManGroup 256 }
+	uumAAAGlobalDomainSelectionMask     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        left(1),
+                        right(2),
+                        all(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Domain selection mask"
+    --CONFIGURABLE
+::= { usrUserManGroup 258 }
+usrUserManHarpDownDetectionScheme OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        counterbased(1),
+                        timerbased(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Flag to indicate whether the HARP/AAA needs to be marked 'Down'
+         based on tbe count of no-responses to the HARP/AAA or
+         based on the HARP/AAA down detection timer. "
+    DEFVAL { timerbased }
+    --CONFIGURABLE
+::= { usrUserManGroup 259 }
+usrUserManAAADownTrapsState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the HARP/AAA Down Trap is enabled or disabled."
+    DEFVAL { enabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 260 }
+usrUserManAAAUpTrapsState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the HARP/AAA Up Trap is enabled or disabled."
+    DEFVAL { enabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 261 }
+usrUserManDomainSelection    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                          enabled(1),
+                          disabled(2)
+                          } 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Domain selection from NAI: enabled or disabled"
+    DEFVAL { enabled }
+    --CONFIGURABLE
+::= { usrUserManGroup 270 }
+usrUserManTrapsV2 OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Events for the userman process"
+::= { usrUserManTraps 0 }
+usrUserManAuthFailure NOTIFICATION-TYPE
+    OBJECTS {
+            usrUserManRadiusIP,
+            usrUserManRadiusAltIP,
+            usrUserManRadiusTertiaryIP
+            }
+    STATUS      current
+    DESCRIPTION     
+        "This trap is generated when authentication fails for a user."
+    --#TYPE    "Alarm"
+    --#SUMMARY  "Authorization failure from %d"
+    --#ARGUMENTS { 0 }
+    --#SEVERITY MAJOR
+    --#STATE    OPERATIONAL
+    --#PROBABLECAUSE "AuthorizationError"
+::= { usrUserManTrapsV2 1 }
+usrUserManRadiusBusyoutTrap NOTIFICATION-TYPE  
+    OBJECTS {
+            usrUserManRadiusIP,
+            usrUserManRadiusAltIP,
+            usrUserManRadiusTertiaryIP,
+            usrUserManRadiusAcctIP,
+            usrUserManRadiusAcctFirstBackupIP,
+            usrUserManRadiusAcctSecondBackupIP,
+            usrUserManRadiusAcctAltIP, 
+            usrUserManRadiusAcctAltFirstBackupIP,
+            usrUserManRadiusAcctAltSecondBackupIP
+            }
+    STATUS      current
+    DESCRIPTION    
+        "This trap is generated when none of the authentication 
+         or accounting servers can be contacted from the NAS 
+         and we mark the ports busy.
+         Not Applicable to wireless components."
+    --#TYPE "Alarm"
+::= { usrUserManTrapsV2 2 }
+usrUserManHarpDownTrap NOTIFICATION-TYPE  
+    OBJECTS {
+            uumAAAServerIpAddress
+            }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when a HARP does not respond
+        within usrUserManHarpDownDetectionTimer defined seconds
+        and when HARP down detection is present and server is
+        marked UM_DOWN.
+        It sends the IP address of the failing HARP server.
+        This event is only generated under these conditins if
+        HarpDownDetection feature is enabled."
+    --#TYPE     "ALARM"
+    --#SUMMARY  "HARP Server %d failure"
+    --#ARGUMENTS { 0 }
+    --#SEVERITY MAJOR
+    --#STATE    OPERATIONAL
+    --#PROBABLECAUSE "networkError
+::= { usrUserManTrapsV2 3 }
+usrUserManAAAAuthFailure NOTIFICATION-TYPE
+    OBJECTS {
+        	uumAAAServerIpAddress,
+			uumUserName,
+			uumCorrelationId
+            }
+    STATUS      current
+    DESCRIPTION     
+        "This is an Auth Fail trap for the new AAA implementation"
+    --#TYPE    "Alarm"
+    --#SUMMARY  "Authorization failure from %d"
+    --#ARGUMENTS { 0 }
+    --#SEVERITY MAJOR
+    --#STATE    OPERATIONAL
+    --#PROBABLECAUSE "AuthorizationError"
+::= { usrUserManTrapsV2 4 }
+usrUserManAAAUpTrap NOTIFICATION-TYPE  
+    OBJECTS {
+            uumAAAServerIpAddress
+            }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the HARP/AAA is marked operational from
+		down state. Two trigger schemes are detected for this trap. 
+		1. If the HarpDownDetection feature is enabled, the trap is generated
+		either after a configured amount of time (OP. Renewal status interval)
+  		or is generated on receiving a response from the HARP server which is
+		marked down.
+		2. If the  HarpDownDetection feature is disabled, the trap is generated
+		after a configured amount of time (OP. Renewal status interval)"
+    --#TYPE     "ALARM"
+    --#SUMMARY  "HARP(AAA) Server %d is operational"
+    --#ARGUMENTS { 0 }
+    --#SEVERITY MAJOR
+    --#STATE    OPERATIONAL
+    --#PROBABLECAUSE "HARP(AAA) server is operational"
+::= { usrUserManTrapsV2 5 }
+END

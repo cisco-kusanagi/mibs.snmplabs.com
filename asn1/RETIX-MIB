@@ -1,0 +1,4481 @@
+
+
+-- Retix Remote Bridge/Router family MIB
+-- Copyright Retix 1994. 
+-- Retix. 2401 Colorado Ave, Santa Monica. CA 90404.
+
+-- Retix: The OpenNetworking Company.
+--
+-- Date: June 20, 1995.
+--
+-- Version No 2.0 : Addition of description fields and changes to the
+--                  names of a number of statistics objects to pass
+--                  mosy 7.1.
+--
+-- This MIB covers the following Retix Products :-
+--
+--        4820
+--        4850
+--        4880    Remote Bridges
+--
+--        4941
+--        4942
+--        4982    Remote Bridge/Routers
+--
+-- Changes :     Some changes to help ensure MIB compilers can 
+--          compile this mib.
+
+        RETIX-MIB { iso org(3) dod(6) internet(1) mgmt(2) 1 }
+
+        DEFINITIONS ::= BEGIN
+
+    IMPORTS
+    NetworkAddress, IpAddress, Counter, Gauge, TimeTicks,
+    enterprises
+        FROM RFC1155-SMI
+      OBJECT-TYPE
+        FROM RFC1212;
+
+    retix      OBJECT IDENTIFIER ::= { enterprises 72 }
+
+    station    OBJECT IDENTIFIER ::= { retix 1 } -- Station Group
+    lapb       OBJECT IDENTIFIER ::= { retix 2 } -- LAPB Group
+    ieee8023   OBJECT IDENTIFIER ::= { retix 3 } -- IEEE 802.3 Group
+    phySerIf   OBJECT IDENTIFIER ::= { retix 4 } -- Physical Serial Group
+    mlink      OBJECT IDENTIFIER ::= { retix 5 } -- Multilink Group
+    lan        OBJECT IDENTIFIER ::= { retix 6 } -- LAN Group
+    bridge     OBJECT IDENTIFIER ::= { retix 7 } -- Bridge Group
+    product    OBJECT IDENTIFIER ::= { retix 8 } -- Product Group
+    router     OBJECT IDENTIFIER ::= { retix 10 } -- Router Group
+    boot       OBJECT IDENTIFIER ::= { retix 11 } -- Bootp Group
+    boothelper OBJECT IDENTIFIER ::= { retix 12 } -- Boothelper Group
+    remote     OBJECT IDENTIFIER ::= { retix 13 } -- Remote Group
+
+    ipx        OBJECT IDENTIFIER ::= { remote 1 } -- IPX group
+    decnet     OBJECT IDENTIFIER ::= { remote 2 } -- Decnet group
+    rmtLapb    OBJECT IDENTIFIER ::= { remote 3 } -- Remote Lapb group
+    x25        OBJECT IDENTIFIER ::= { remote 4 } -- x25 group
+
+-- object types
+
+    -- Station Group
+
+    stationTime  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The station time is the ime as perceived by the station.
+        The string returned is a subset of UTC Time as specified in the Draft
+        Recommendation X.409 Message Handling Systems : Presentation Transfer
+        Syntax and Notation (ASN 1)."
+        ::=  { station 1 }
+
+    stationCountResets  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is a count of the number of times the
+        station has been reset since the last station intialisation."
+        ::=  { station 2 }
+
+    freeBufferCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of free buffers
+        remaining in this station."
+        ::=  { station 3 }
+
+    freeHeaderCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of free headers 
+        remaining in this station."
+        ::=  { station 4 }
+
+    physBlkSize  OBJECT-TYPE
+        SYNTAX  INTEGER (300..1600)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the current size in bytes of
+        the physical block used by the station's buffer manager."
+        ::=  { station 5 }
+
+    newPhysBlkSize  OBJECT-TYPE
+        SYNTAX  INTEGER (300..1600)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the size in bytes of the 
+        physical block, that will be used by the station's buffer manager,
+        after the next station reset."
+        ::=  { station 6 }
+
+    resetStation  OBJECT-TYPE
+        SYNTAX  INTEGER{
+                        noAction (1),
+                        resetStation (2)
+                       }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used to reset the station.  This action 
+        does not clear any configured data, so that after the reset, the box
+        does not return to the factory defaults.
+        Only two values are valid to use with this object.  A value of 1 is 
+        always returned when a GET is performed upon the object.  To force a 
+        reset, a value of 2 must be used in the SET.  A SET with a value of 1
+        has no effect."
+        ::=  { station 7 }
+
+    initStation  OBJECT-TYPE
+        SYNTAX  INTEGER{
+                       noAction (1),
+                       initialize (2)
+                      }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used to initialise the station.  Any
+        configured data is lost, and all data values are returned to factory 
+        default values.
+        Only two values are valid to use with this object.  A value of 1 is
+        always returned when a GET is performed upon the object.  To force 
+        the initialisation, a value of 2 must be used in the SET.  A SET with
+        a value of 1 has no effect."
+        ::=  { station 8 }
+
+    resetStats  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                         noAction (1),
+                         resetStats (2)
+                         }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The statistics counters are reset to zero by performing 
+        a set on this object.  This reset occurs immediately.  See the 
+        Statistics Objects section for a list of these counters.
+
+        Only two values are valid to use with this object.  A value of 1 is
+        always returned when a GET is performed upon the object.  To force 
+        a reset, a value of 2 must be used in the SET.  A SET with a value of
+        1 has no effect."
+        ::=  { station 9 }
+
+    processorLoading  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Each instance of this object gives the percentage loading
+        on a particular processor.  Currently the first instance gives the
+        percentage loading on the station's main processor and the second
+        instance gives the loading on the station's sub-processor."
+        ::=  { station 10 }
+
+    trapDestinationTable OBJECT IDENTIFIER ::= { station 11 }
+
+    trapDestTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TrapDestEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "A list of destinations to which Traps will be sent."
+        ::=  { trapDestinationTable 1 }
+
+    trapDestEntry  OBJECT-TYPE
+        SYNTAX  TrapDestEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "This table contains the internet addresses of, and
+        the community names allocated to the managers to which the station's
+        agent software will send traps (event information)."
+        INDEX    { trapDestEntryIpAddr }
+    ::=  { trapDestTable 1 }
+
+    TrapDestEntry ::= SEQUENCE {
+        trapDestEntryIpAddr
+            IpAddress,
+        trapDestEntryCommunityName
+            OCTET STRING,
+        trapDestEntryType
+            INTEGER
+        }
+
+    trapDestEntryIpAddr  OBJECT-TYPE
+        SYNTAX   IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object defines the IP addresses of the managers
+        to which the station will send Trap information."
+        ::=  { trapDestEntry 1 }
+
+    trapDestEntryCommunityName  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..10))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is a string, which is inserted into the 
+        community field of a Trap PDU."
+        ::=  { trapDestEntry 2 }
+
+    trapDestEntryType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                         valid (1),
+                         invalid (2)
+                         }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Setting this object to invalid(2) has the effect of 
+        removing the corresponding entry in the trapDestTable. Setting this
+        object to valid(1) has the effect of adding the corresponding entry
+        in the trapDestTable.  If the corresponding entry already existed, 
+        no error is returned."
+        ::=  { trapDestEntry 3 }
+
+    trapDestAction  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                          noAction (1),
+                          clearTable (2)
+                         }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used to clear the complete table.
+
+        Only two values are valid to use with this object.  A value of 1
+        is always returned when a GET is performed upon the object.  To clear
+        the table, a value of 2 must be used in the SET.  A SET with a value
+        of 1 has no effect."
+        ::=  { trapDestinationTable 2 }
+
+    trapDestPage  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(240))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This OCTET STRING contains all the entries in the table. 
+        Each entry is in a 14 byte unit within the string. This unit is 
+        formatted as follows: Bytes 0-3 contain the IP Address, 
+                              Bytes 4-13 contain the community name and 
+                              Byte 14 contains the entry's type."
+        ::=  { trapDestinationTable 3 }
+
+    passWord  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..10))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This string is the password for the local configurator 
+        on the station.  A GET on this object returns to a NULL string, 
+        a SET will reset the password to the new string value as a specified 
+        in the SET request."
+        ::=  { station 12 }
+
+    snmpAccessPolicyObject OBJECT IDENTIFIER ::= { station 13 }
+
+    snmpAccessPolicyTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnmpAccessPolicyEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "This table is a list of entries which are used to 
+        authenticate PDUs received by the station.  This table contains a 
+        maximum of 16 entries."
+        ::=  { snmpAccessPolicyObject 1 }
+
+    snmpAccessPolicyEntry  OBJECT-TYPE
+        SYNTAX   SnmpAccessPolicyEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "This is an entry in the snmpAccesssPolicyTable."
+        INDEX    { accessPolicyIndex }
+        ::=  { snmpAccessPolicyTable 1 }
+
+     SnmpAccessPolicyEntry ::= SEQUENCE {
+        accessPolicyIndex
+            INTEGER,
+        communityName
+            OCTET STRING,
+        accessMode
+            INTEGER,
+        snmpAccessPolicyType
+            INTEGER
+        }
+
+    accessPolicyIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This index is used as the instance for a Get or Set
+        operation on the table."
+        ::=  { snmpAccessPolicyEntry 1 }
+
+    communityName  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (0..10))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is a string, against which the community
+        field in a received PDU is compared.  If there exists no community
+        name in the table, with which the received community field forms
+        a match, authentication of the PDU fails."
+        ::=  { snmpAccessPolicyEntry 2 }
+
+    accessMode  OBJECT-TYPE
+        SYNTAX  INTEGER (0..3)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is a bit field, where setting the bit to
+        a value of 1 enabled the ACCESS  option. Bit 0 represents read access,
+        bit 1 represents write access. Thus to configure an entry to have 
+        read-write ACCESS  this object must be set to a value of 3."
+        ::=  { snmpAccessPolicyEntry 3 }
+
+    snmpAccessPolicyType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                          valid (1),
+                          invalid (2)
+                          }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This entry in the table tells you if the entire entry is
+        valid or invalid, that is, if the community name specified by this
+        entry is currently being used during the SNMP authentication process.  
+        If it is invalid, then it is not being used, and may be overwritten 
+        with a valid entry.  Setting an entry to invalid effectively deletes 
+        the entry from the table, it will, however, appear in the table if 
+        you GET the complete contents of the table."
+        ::=  { snmpAccessPolicyEntry 4 }
+
+    snmpAccessPolicyAction  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                          noAction (1),
+                          clearTable (2)
+                          }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used to invalidate all the entries in 
+        the snmpAccessPolicy Table."
+
+        ::=  { snmpAccessPolicyObject 2 }
+
+    snmpAccessPolicyPage  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(256))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This OCTET STRING contains all the entries in the table. 
+        Each entry is in an 11 byte unit within the string. This unit is 
+        formatted as follows: Bytes 0-9 contain the community name, 
+                              Byte 10 contains the ACCESS  mode and 
+                              Byte 11 contains the entry's type."
+        ::=  { snmpAccessPolicyObject 3 }
+
+    authenticationTrapStatus    OBJECT-TYPE
+        SYNTAX  INTEGER{
+                         enabled (1),
+                         disabled (2)
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object determines if the station will send a Trap 
+        upon detection of an authentication failure error. Set to a value of
+        enabled(1) enables authentication checking and transmission of 
+        authenticationFailure Trap is an authentication problem occurs." 
+        ::=  { station 14 }
+
+    serialTxQueueSize  OBJECT-TYPE
+        SYNTAX  INTEGER (1..127)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates the maximum number of LAPB
+        frames that can be enqueued, waiting for transmission over the 
+        serial interface."
+        ::=  { station 15 }
+
+    internalQueueCurrentLength  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the length of the enqueued information 
+        specific to the internal operation of the bridge."
+        ::=  { station 16 }
+
+    queueUpperLimit  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the upper limit of the enqueued information,
+        for all the queues, specific to the operation of the bridge."
+        ::=  { station 17 }
+
+    lanQueueSize  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This variable reports tohe maximum number of frames
+        that are enqueued waiting for transmission over the LAN interface."
+        ::=  { station 18 }
+
+
+    --  LAPB Group
+
+    lapbNumber  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of LAPB interfaces (regardless of
+        their current state) present on this system."
+        ::=  { lapb 1 }
+
+    lapbTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF LapbEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of LAPB interface entries."
+        ::=  { lapb 2 }
+
+    lapbEntry  OBJECT-TYPE
+        SYNTAX   LapbEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "The LAPB table.  An entry in this table is uniquely 
+        identified by the value of the lapbIndex variable associated with
+        the interface to which the statistics refer."
+        INDEX    { lapbIndex }
+        ::=  { lapbTable 1 }
+
+    LapbEntry ::= SEQUENCE {
+        lapbIndex
+            INTEGER,
+        lapbModeT1
+            INTEGER,
+        lapbAutoT1value
+            INTEGER,
+        lapbManualT1value
+            INTEGER,
+        lapbWindow
+            INTEGER,
+        lapbPolarity
+            INTEGER,
+        lapbCountResets
+            Counter,
+        lapbCountSentFrames
+            Counter,
+        lapbCountRcvFrames
+            Counter,
+        lapbCountSentOctets
+            Counter,
+        lapbCountRcvOctets
+            Counter,
+        lapbCountAborts
+            Counter,
+        lapbCountCrcErrors
+            Counter,
+        lapbState
+            INTEGER,
+        lapbLastResetTime
+            OCTET STRING,
+        lapbLastResetReason
+            INTEGER,
+        lapbLinkReset
+            INTEGER
+        }
+
+    lapbIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The interface on which this entry's equivalence is 
+        effective."
+        ::=  { lapbEntry 1 }
+
+    lapbModeT1  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "If the value of modeT1 is 0 then T1 timer is determined
+        automatically by the software.  If the value of this object is 1 then
+        the timer is settable by the manager.  The value of T1 won't change
+        until the next reset of the station or the next link reset."
+        ::=  { lapbEntry 2 }
+
+    lapbAutoT1value  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is the value of the T1 timer as defined
+        in the 1984 CCITT Recommendation X.25 VOLUME VIII - FASCICLE VIII.3
+        and is determined empirically by the software.  It is the actual 
+        value of the timer in milliseconds."
+        ::=  { lapbEntry 3 }
+
+    lapbManualT1value  OBJECT-TYPE
+        SYNTAX  INTEGER (10..5000)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object allows the manager to set the value of
+        the T1 timer as defined in the 1984 CCITT Recommendation X.25 
+        VOLUME VIII - FASCICLE VIII.3.  The settable range is 10 - 5000
+        which represents the timer value in milliseconds.  This object
+        maybe set at any time, but it is only used if the value of modeT1
+        is 1.  This value will not become active until the next link or 
+        station reset."
+        ::=  { lapbEntry 4 }
+
+    lapbWindow  OBJECT-TYPE
+        SYNTAX  INTEGER (7..127)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the maximum number of 
+        I-frames which can be transmitted before an acknowledgement is 
+        received.  Its value is determined automatically at link reset 
+        to be the optimum for the link in question.  It can have any 
+        value between 7 and 127.  This is the value of k as defined in
+        the 1984 CCITT Recommendation X.25 VOLUME VIII - FASCILE VIII.3"
+        ::=  { lapbEntry 5 }
+
+    lapbPolarity  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the logical 'polarity' of 
+        the port.  LAPB polarity can take on one of two values, if it is 
+        0 then the port is a logical DTE, if its value is 1 then the port 
+        is a logical DCE."
+        ::=  { lapbEntry 6 }
+
+    lapbCountResets  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of link resets
+        performed since the last warm or cold restart of the station or 
+        the last statistics reset."
+        ::=  { lapbEntry 7 }
+
+    lapbCountSentFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of I-frames sent
+        since the last station restart or the last statistics reset."
+        ::=  { lapbEntry 8 }
+
+    lapbCountRcvFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of I-frames 
+        received since the last station restart or the last statistics reset."
+        ::=  { lapbEntry 9 }
+
+    lapbCountSentOctets  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of bytes sent 
+        since the last station restart or the last statistics reset."
+        ::=  { lapbEntry 10 }
+
+    lapbCountRcvOctets  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of bytes
+        received since the last station restart or the last statistics reset."
+        ::=  { lapbEntry 11 }
+
+    lapbCountAborts  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of aborths
+        received since last station restart or the last statistics reset."
+        ::=  { lapbEntry 12 }
+
+    lapbCountCrcErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of CRC errors 
+        received since the last station restart or the last statistics reset."
+        ::=  { lapbEntry 13 }
+
+    lapbState  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates the state of the LAPB link.
+                     This parameter can take on the following values:
+                     inactive (0),
+                     active (1),
+                     unused (2),
+                     tooFast (3)."
+        ::=  { lapbEntry 14 }
+
+    lapbLastResetTime  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Time and date when the last link reset occurred. 
+        The format of this string is the same as that defined for 
+        'stationTime'."
+        ::=  { lapbEntry 15 }
+
+    lapbLastResetReason  OBJECT-TYPE
+        SYNTAX  INTEGER (0..8)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates the reason for the last link 
+        reset. This parameter can take on the following: 
+                           noReason (0),
+                           xpcError (1),
+                           ctsLost (2),
+                           retryLimitExceeded (3),
+                           receivedIdle (4),
+                           personalityModule (5),
+                           softwareWatchdog (6),
+                           nmcInitiated (7)."
+        ::=  { lapbEntry 16 }
+
+    lapbLinkReset  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                          noAction (1),
+                          reset (2)
+                         }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter causes a link reset.  The link reset 
+        occurs after a pre-determined period of time which is implementation 
+        specific.  A value of 1 is always returned when a GET is performed 
+        upon the object.  To force the reset, a value of 2 must be used in 
+        the SET.  A SET with a value of 1 has no effect."
+        ::=  { lapbEntry 17 }
+
+    lapbRetryCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the value of N2 as defined inthe 1984 CCITT
+        Recommendation X.25 VOLUME VIII - FASCICLE VIII.3."
+        ::=  { lapb 3 }
+
+    --  IEEE8023 Group
+
+    ieee8023Number    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of ethernet like interfaces supported
+        by this station."
+        ::= { ieee8023 1 }
+
+    ieee8023Table  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Ieee8023Entry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of IEEE 802.3 Interface entries."
+        ::= { ieee8023 2 }
+
+    ieee8023Entry  OBJECT-TYPE
+        SYNTAX   Ieee8023Entry
+        ACCESS  not-accessible  
+        STATUS  mandatory
+        DESCRIPTION "The statistics table.  An entry in this table is 
+        uniquely identified by the value of the ieee8023Index variable
+        associated with the interface to which the statistics refer."
+        INDEX    { ieee8023Index }
+        ::= { ieee8023Table 1 }
+
+    Ieee8023Entry ::= SEQUENCE {
+        ieee8023Index
+            INTEGER,
+        ieee8023FramesTransmittedOks
+            Counter,
+        ieee8023SingleCollisionFrames
+            Counter,
+        ieee8023MultipleCollisionFrames
+            Counter,
+        ieee8023OctetsTransmittedOks
+            Counter,
+        ieee8023DeferredTransmissions
+            Counter,
+        ieee8023MulticastFramesTransmittedOks
+            Counter,
+        ieee8023BroadcastFramesTransmittedOks
+            Counter,
+        ieee8023LateCollisions
+            Counter,
+        ieee8023ExcessiveCollisions
+            Counter,
+        ieee8023InternalMACTransmitErrors
+            Counter,
+        ieee8023CarrierSenseErrors
+            Counter,
+        ieee8023ExcessiveDeferrals
+            Counter,
+        ieee8023FramesReceivedOks
+            Counter,
+        ieee8023OctetsReceivedOks
+            Counter,
+        ieee8023MulticastFramesReceivedOks
+            Counter,
+        ieee8023BroadcastFramesReceivedOks
+            Counter,
+        ieee8023FrameTooLongs
+            Counter,
+        ieee8023AlignmentErrors
+            Counter,
+        ieee8023FCSErrors
+            Counter,
+        ieee8023inRangeLengthErrors
+            Counter,
+        ieee8023outOfRangeLengthFields
+            Counter,
+        ieee8023InternalMACReceiveErrors
+            Counter,
+        ieee8023InitializeMAC
+            INTEGER,
+        ieee8023PromiscuousReceiveStatus
+            INTEGER,
+        ieee8023MACSubLayerStatus
+            INTEGER,
+        ieee8023TransmitStatus
+            INTEGER,
+        ieee8023MulticastReceiveStatus
+            INTEGER,
+        ieee8023MACAddress
+            OCTET STRING,
+        ieee8023SQETestErrors
+            Counter
+        }
+
+    ieee8023Index    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The index value which uniquely identifies the interface
+        to which this entry is applicable."
+        ::= { ieee8023Entry 1 }
+    
+    ieee8023FramesTransmittedOks  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are successfully
+        transmitted.  This counter is incremented when a frame is successfully
+        transmitted, even if one of the collision Counters (following two 
+        objects) are also counted.  In other words, this count includes 
+        transmissions that succeeded after some number of collisions.  
+        This count includes multicast and broadcast frames."
+        ::= { ieee8023Entry 2 }
+    
+    ieee8023SingleCollisionFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are involved in
+        a single collision, and are subsequently transmitted successfully.
+        If this counter is incremented then the ieee8023FramesTransmittedOKs
+        count will also be incremented AND ieee8023MultipleCollisionFrames 
+        will NOT be incremented."
+        ::= { ieee8023Entry 3 }
+    
+    ieee8023MultipleCollisionFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are involved in 
+        more than one collision and are subsequntly transmitted successfully.
+        If this counter is incremented then the ieee8023FramesTransmittedOKs
+        count will also be incremented AND ieee8023SingleCollisionFrames will
+        NOT be incremented."
+        ::= { ieee8023Entry 4 }
+    
+    ieee8023OctetsTransmittedOks  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of data and padding octets of frames
+        that are successfully transmitted.  This counter includes octets in 
+        broadcast and multicast frames that are transmitted.  This count does
+        not include the address fields, length/type field and CRC field of the
+        frame.  In Ethernet-Speak, it is JUST the data field (IP header, etc)."
+        ::= { ieee8023Entry 5 }
+    
+    ieee8023DeferredTransmissions  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames whose transmission was
+        delayed on its firs attempt because the medium was busy.  Frames
+        involved in collisions are NOT included in this count."
+        ::= { ieee8023Entry 6 }
+    
+    ieee8023MulticastFramesTransmittedOks  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames successfully transmitted 
+        to a group destination (multicast) address other than broadcast."
+        ::= { ieee8023Entry 7 }
+    
+    ieee8023BroadcastFramesTransmittedOks  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames successfully transmitted
+        to the broadcast address.  This does not include frames sent to a 
+        multicast address."
+        ::= { ieee8023Entry 8 }
+    
+    ieee8023LateCollisions  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of times that a collision has been
+        detected later than 512 bit-times into the transmission of a packet.  
+        512 bit-times is 51.2 micro-seconds.  This type of collision is 
+        counted twice:  both as a late collision and as a regurlar, run of the
+        mill collision."
+        ::= { ieee8023Entry 9 }
+    
+    ieee8023ExcessiveCollisions  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that due to excessive
+        collisions are not transmitted successfully."
+        ::= { ieee8023Entry 10 }
+    
+    ieee8023InternalMACTransmitErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames which would otherwise be
+        transmitted by the station, but could not be sent due to an internal
+        MAC sublayer transmit error.  If this counter is incremented then 
+        none of the other Counters in this section are incremented.  The exact
+        meaning and mechanism for incrementing this counter is implementation
+        dependent.  In short, htis is the count of errors for which there
+        are no specific Counters."
+        ::= { ieee8023Entry 11 }
+    
+    ieee8023CarrierSenseErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of times that carrier sense
+        was lost or never appeared when attempting to transmit a packet.  
+        This counter is incremented ONCE per transmission attempt, even if
+        Carrier Sense fluctuates during a transmission attempt."
+        ::= { ieee8023Entry 12 }
+    
+    ieee8023ExcessiveDeferrals  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames which deferred for 
+        an excessive period of time."
+        ::= { ieee8023Entry 13 }
+    
+    ieee8023FramesReceivedOks  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are successfully 
+        received.  This does not include frames received with a frame-too-long,
+        FCS, length, or alignment errors or frames lost due to internal MAC 
+        sublayer error.  This counter includes broadcast and multicast frames
+        that are received."
+        ::= { ieee8023Entry 14 }
+    
+    ieee8023OctetsReceivedOks  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of data and padding octets in frames
+        that are successfully received.  This does not include frames received
+        with a frame-too-long, FCS, length, or alighment errors or frames lost 
+        due to internal MAC sublayer error.  This counter includes octets in 
+        broadcast and multicast frames that are received.  This counter does 
+        not include the octets in the address, length/type and CRC fields."
+        ::= { ieee8023Entry 15 }
+    
+    ieee8023MulticastFramesReceivedOks  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are successfully
+        received and are directed to an active non-broadcast group address.
+        This does not include frames received with a frame-too-long, FCS,
+        length, or alignment errors or frames lost due to internal MAC sublayer
+        error.  Broadcast packets are not included."
+        ::= { ieee8023Entry 16 }
+    
+    ieee8023BroadcastFramesReceivedOks  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are successfully
+        received and are directed to the broadcast group address.  This does
+        not include frames received with a frame-too-long, FCS, length, or
+        alignment errors or frames lost due to internal MAC sublayer error.
+        Multicast packets are not included."
+        ::= { ieee8023Entry 17 }
+    
+    ieee8023FrameTooLongs  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are received and
+        exceed the maximum permitted frame size."
+        ::= { ieee8023Entry 18 }
+    
+    ieee8023AlignmentErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are not an integral
+        number of octets in length and do not pass the FCS check."
+        ::= { ieee8023Entry 19 }
+    
+    ieee8023FCSErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames that are an integral
+        number of octets in length that do not pass the FCS check."
+        ::= { ieee8023Entry 20 }
+    
+    ieee8023inRangeLengthErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames with a length field
+        value between the minimum unpadded LLC data size and the maximum
+        allowed LLC data size inclusive, and does not match the number of LLC
+        data octets received.  The counter also contains frames with a 
+        length field value less than the minimum unpaddes LLC data size."
+        ::= { ieee8023Entry 21 }
+    
+    ieee8023outOfRangeLengthFields  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames with a length field
+        value graeater than the maximum allowed LLC data size."
+        ::= { ieee8023Entry 22 }
+    
+    ieee8023InternalMACReceiveErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of frames which would otherwise
+        be received by the station, but could not be accepted due to an
+        internal MAC sublayer receive error.  If this counter is incremented
+        then none of the other Counters in this section are incremented.
+        The exact meaning and mechanism for incrementing this counter is 
+        implementation dependent.  In short, this is the count of errors for
+        which there are no specific Counters."
+        ::= { ieee8023Entry 23 }
+    
+    ieee8023InitializeMAC  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            initialize (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Resets the MAC layer counters.  When set, only the value
+        initialize may be sued.  When read, this variable always returns
+        the most recent value to which ieee8023InitializeMAC was set to. 
+        At the moment, this function only serves to zero the MAC counters."
+        ::= { ieee8023Entry 24 }
+    
+    ieee8023PromiscuousReceiveStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This variable causes the MAC sublayer to enter 
+        promiscuous receive state."
+        ::= { ieee8023Entry 25 }
+    
+    ieee8023MACSubLayerStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Causes the MAC sublayer to enter the normal operational
+        state at idle."
+        ::= { ieee8023Entry 26 }
+    
+    ieee8023TransmitStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled (1),
+            disabled (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This variable allows the MAC sublayer to be explicitly 
+        enabled/disabled for transmitting frames."
+        ::= { ieee8023Entry 27 }
+    
+    ieee8023MulticastReceiveStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Enables reception of multicast frames."
+        ::= { ieee8023Entry 28 }
+    
+    ieee8023MACAddress  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (6))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object contains the MAC station address i.e. the
+        Ethernet address."
+        ::= { ieee8023Entry 29 }
+    
+    ieee8023SQETestErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This contains a count of times that the SQE test 
+        errors status   was received."
+        ::= { ieee8023Entry 30 }
+    
+    ieee8023NewMACAddress  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Ieee8023NewMACAddressEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of MAC addresses that will be allocated to an 
+        interface after the next station reset."
+        ::= { ieee8023 3 }
+    
+    ieee8023NewMACAddressEntry  OBJECT-TYPE
+        SYNTAX   Ieee8023NewMACAddressEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A sequence defining an interface and the MAC address
+        it will assume after the next station reset."
+        INDEX    { ieee8023NewMACAddressIndex }
+        ::= { ieee8023NewMACAddress 1 }
+
+    Ieee8023NewMACAddressEntry ::= SEQUENCE {
+        ieee8023NewMACAddressIndex
+            INTEGER,
+        ieee8023NewMACAddressValue
+            OCTET STRING
+        }
+
+    ieee8023NewMACAddressIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The index value which uniquely identifies the interface
+        to which this entry is applicable.  The interface identified by a 
+        particular value of this index is the same interface as identified
+        by the same value of ifIndex."
+        ::= { ieee8023NewMACAddressEntry 1 }
+
+    ieee8023NewMACAddressValue   OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (6))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object contains the MAC address which will be
+        allocated to this interface after the next station reset."
+        ::= { ieee8023NewMACAddressEntry 2 }
+
+    --  Physical Serial Group
+
+    phySerIfNumber  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS    read-only
+        STATUS  mandatory
+        DESCRIPTION "The number of Physical Serial interfaces present on 
+        this system."
+        ::=  { phySerIf 1 }
+
+    phySerIfTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PhySerIfEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of interface entries.  The number entries is
+        given by the value of phySerIfNumber."
+        ::=  { phySerIf 2 }
+
+    phySerIfEntry  OBJECT-TYPE
+        SYNTAX   PhySerIfEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "An interface entry containing the objects pertinent
+        to the phySer interface."
+        INDEX    { phySerIfIndex }
+        ::=  { phySerIfTable 1 }
+
+    PhySerIfEntry ::= SEQUENCE {
+        phySerIfIndex
+            INTEGER,
+        phySerIfInterfaceType
+            INTEGER,
+        phySerIfMeasuredSpeed
+            INTEGER,
+        phySerIfIsSpeedsettable
+            INTEGER,
+        phySerIfPortSpeed
+            INTEGER,
+        phySerIfTransitDelay
+            INTEGER,
+        phySerIfT1clockSource
+              INTEGER,
+        phySerIfT1SlotLvalue
+             INTEGER,
+        phySerIfT1SlotHvalue
+             INTEGER,
+        phySerIfT1dRatePerChan
+             INTEGER,
+        phySerIfT1frameAndCode
+             INTEGER,
+        phySerIfMeasuredSpeed
+            INTEGER,
+        phySerIfPartnerAddress
+            OCTET STRING
+        }
+
+
+    phySerIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The interface on which this entry's equivalence is
+        effective."
+        ::=  { phySerIfEntry 1 }
+
+    phySerIfInterfaceType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            x21dte(1),
+            x21dce(2),
+            rs449(3),
+            g703(4),
+            v35(5),
+            v35btb(6),
+            rs232(7),
+            t1(8)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Each of the values above indicates a particular 
+        personality module and hence the physical interface present.  
+        It is only possible to modify certain values of this variable, 
+        as follows: The value x21dte(1) may be modified to x21dce(2), 
+        and vice versa. 
+        The value v35(5) may be modified to v35btb(6), and vice versa. 
+        The changes will occur after the next link reset."
+        ::=  { phySerIfEntry 2 }
+
+    phySerIfMeasuredSpeed  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is the value of the measured channel speed 
+        in bits per second."
+        ::=  { phySerIfEntry 3 }
+
+    phySerIfIsSpeedsettable  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates whether the speed is settable
+        or not for the particular personality module.  This parameter 
+        does not guarantee that this will be the alue of the clock used over
+        the serial link."
+        ::=  { phySerIfEntry 4 }
+
+    phySerIfPortSpeed  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            b1200(1200),
+            b2400(2400),
+            b4800(4800),
+            b9600(9600),
+            b19200(19200),
+            b24000(24000),
+            b32000(32000),
+            b48000(48000),
+            b64000(64000),
+            b256000(256000),
+            b512000(512000),
+            b1024000(1024000),
+            b2048000(2048000)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The port speed is the value of the personality module
+        sourced clock.  It may be accessed if the value of isSpeedSettable
+        is 1.  In many cases a special cable is needed for this parameter 
+        to affect station operation - see product specifications for details.
+
+        For the RS232 personality module the port speed can be set to any 
+        of the values 2400 through 48000 listed above.
+
+        For all the other personality modules for which port speed is a 
+        settable parameter, the values 19600 and 24000 are invalid.  
+        These modules can assume any of the other speeds, dependent upon 
+        the product type - see product specifications for details.
+
+        When a change has been made to this object, the new value will 
+        become effective after the next link reset."
+        ::=  { phySerIfEntry 5 }
+
+    phySerIfTransitDelay  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates the time taken for a frame to 
+        traverse the phySer link between the local and remote station.  Its
+        value is automatically determined by the station's software."
+        ::=  { phySerIfEntry 6 }
+
+    phySerIfT1clockSource  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates from where the clock is being
+        derived.  It can have the following values: 
+                        clockFromData(0),
+                        internalSource (1),
+                        externalSource(2).
+        If its value is clockFromData(0) then the clock signal comes from 
+        the data in the frame being received, if it is internalSource(1) 
+        then the clock is derived from an internal source and if its value 
+        is externalSource(2) the clock source is external.  This parameter 
+        is only relevant for the T1 personality module.  When a change has
+        been made to this object, the new value will become effective after
+        the next link reset."
+        ::=  { phySerIfEntry 7 }
+
+    phySerIfT1SlotLvalue  OBJECT-TYPE
+        SYNTAX  INTEGER (1..24)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the value of the lower time slot chosen withing
+        a frame of the 1.544MHz T1 service.  This parameter is only relevant
+        for the T1 personality module.  When a change has been made to this
+        object, the new value will become effective after the next link reset."
+        ::=  { phySerIfEntry 8 }
+
+    phySerIfT1SlotHvalue  OBJECT-TYPE
+        SYNTAX  INTEGER (1..24)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the alue of the higher time slot chosen within
+        a frame of the 1.544MHz T1 service.  This parameter is only relevant
+        for the T1 personality module.  When a change has been made to this
+        object the new value, will become effective after the next link reset."
+        ::=  { phySerIfEntry 9 }
+
+    phySerIfT1dRatePerChan  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object can have either of two values depending on
+        the data rate required.  If its value is 0 a data rate of 64k is
+        provided, if its value is 4 then the data rate provided is 56k. 
+        This parameter is only relevant for the T1 personality module.  
+        When a change has been made to this object, the new value will 
+        become effective after the next link reset."
+        ::=  { phySerIfEntry 10 }
+
+    phySerIfT1frameAndCode  OBJECT-TYPE
+        SYNTAX  INTEGER (0..3)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The values for this parameter represent the encoding on 
+        the 1.544MHz T1 service. It has the following values:
+                             fcD4andB8zs(0),
+                             fcD4Only(1),
+                             fcEsfAndB8zs(2),
+                             fcEsfOnly (3)."
+        ::=  { phySerIfEntry 11 }
+
+    phySerIfPartnerAddress  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (0..6))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The mac address of the remote station to which this
+        particular serial link is connected."
+        ::=  { phySerIfEntry 12 }
+
+    --  Multilink Group
+
+    mlinkNumber  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The number of multilink interfaces, (regardless of
+        their current state) present on this system."
+        ::=  { mlink 1 }
+
+    mlinkTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MlinkEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of multilink entries.  The number of entries is
+        given by the value of mlinkNumber."
+        ::=  { mlink 2 }
+
+    mlinkEntry  OBJECT-TYPE
+        SYNTAX   MlinkEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "An interface entry containing objects at the multilink
+        layer for a particular interface."
+        INDEX    { mlinkIndex }
+        ::=  { mlinkTable 1 }
+
+    MlinkEntry ::= SEQUENCE {
+        mlinkIndex
+            INTEGER,
+        mlinkState
+            INTEGER,
+        mlinkSendSeq
+             INTEGER,
+        mlinkRcvSeq
+            INTEGER,
+        mlinkSendUpperEdge
+            INTEGER,
+        mlinkRcvUpperEdge
+            INTEGER,
+        mlinkLostFrames
+            Counter,
+        deletedMlinkFrames
+            Counter,
+        expressQueueCurrentLength
+            INTEGER,
+        expressQueueUpperLimit
+            INTEGER,
+        hiPriQueueCurrentLength
+            INTEGER,
+        hiPriQueueUpperLimit
+            INTEGER,
+        loPriQueueCurrentLength
+            INTEGER,
+        loPriQueueUpperLimit
+            INTEGER
+        }
+
+    mlinkIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This value reports the particular instance of multi-link
+        being referenced."
+        ::=  { mlinkEntry 1 }
+
+    mlinkState  OBJECT-TYPE
+        SYNTAX  INTEGER (0..3)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates the current state of the 
+        multilink connection. It can take on any of the folowing 
+        values: negotiating (0),
+                notInUse(1),
+                inUseActive(2),
+                inUseInactive(3)."
+        ::=  { mlinkEntry 2 }
+
+    mlinkSendSeq  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the sequence number of the 
+        next-in-sequence multilink frame to be assigned to an SLP."
+        ::=  { mlinkEntry 3 }
+
+    mlinkRcvSeq  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the sequence number of the
+         next-in-sequence multilink frame to be received."
+        ::=  { mlinkEntry 4 }
+
+    mlinkSendUpperEdge  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is the sum of the alue of the last 
+        received acknowledgement and the value of the multilink window size."
+        ::=  { mlinkEntry 5 }
+
+    mlinkRcvUpperEdge  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is the sum of the value of the sequence 
+        number sent in the last acknowledgement and the receive window size."
+        ::=  { mlinkEntry 6 }
+
+    mlinkLostFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of multilink 
+        packets lost because the out of sequence queue was full or the time
+        spent waiting for an out of sequencce frame (in order to re-establish 
+        the sequence) exceeded some implementation specific period.  It is 
+        the count since the last statistics reset of station restart."
+        ::=  { mlinkEntry 7 }
+
+    deletedMlinkFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of multilink frames which have been
+        deleted, because they arrived out of sequence and were outside of
+        the multi-link window."
+        ::=  { mlinkEntry 8 }
+
+    expressQueueCurrentLength  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of items enqueued in the multilink
+        express queue."
+        ::=  { mlinkEntry 9 }
+
+    expressQueueUpperLimit  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the upper limit of the enqueued information 
+        specific to the multilink express queue."
+        ::=  { mlinkEntry 10 }
+
+    hiPriQueueCurrentLength  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of items enqueued in the multilink 
+        high priority queue."
+        ::=  { mlinkEntry 11 }
+
+    hiPriQueueUpperLimit  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the upper limit of the enqueued information
+        specific to the multilink high priority queue."
+        ::=  { mlinkEntry 12 }
+
+    loPriQueueCurrentLength  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of items enqueued in the multilink
+        low priority queue."
+        ::=  { mlinkEntry 13 }
+
+    loPriQueueUpperLimit  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the upper limit of the enqueued information 
+        specific to the multilink low priority queue."
+        ::=  { mlinkEntry 14 }
+
+    mlinkWindow  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The Multilink window size parameter defines the number
+        of sequentially numbered multilink frames that the DCE or DTE may
+        transfer to its slp beyond the lowest numbered multilink frame 
+        which has not yet been acknowledged.  This parameter is not instaced;
+        it affects all instances of multilink."
+        ::=  { mlink 3 }
+
+    mlinkRxTimeout  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The time, in 50ms units, after which the multilink resets
+        due to a receive sequence error.  This parameter is not instanced; it 
+        affects all instances of multilink."
+        ::=  { mlink 4 }
+
+
+    --  LAN Group
+
+    lanInterfaceType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            tenBase5(1),
+            oneBase5(2),
+            tenBase2(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates the physical medium which 
+        comprises the LAN."
+        ::=  { lan 1 }
+
+
+    --  Bridge Group
+
+    portNumber  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The number of ports supported by the bridging function
+        in this station."
+        ::=  { bridge 1 }
+
+    bridgeStatsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF BridgeStatsEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of bridge statistics entries.  The number of
+        entries is given by the value of bridgeNumber.  This table is only
+        valid for the LAN ports."
+        ::=  { bridge 2 }
+
+    bridgeStatsEntry  OBJECT-TYPE
+        SYNTAX   BridgeStatsEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A bridge statisticcs entry containing objects relevant
+        to the bridging function."
+        INDEX    { bridgeStatsIndex }
+        ::=  { bridgeStatsTable 1 }
+
+    BridgeStatsEntry ::= SEQUENCE {
+        bridgeStatsIndex
+            INTEGER,
+        averageForwardedFrames
+            Counter,
+        maxForwardedFrames
+            Counter,
+        averageRejectedFrames
+            Counter,
+        maxRejectedFrames
+            Counter,
+        lanAccepts
+            Counter,
+        lanRejects
+            Counter,
+        deletedLanFrames
+            Counter
+        }
+
+    bridgeStatsIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "A unique value for each bridge statistics instance."
+        ::=  { bridgeStatsEntry 1 }
+
+    averageForwardedFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This reports the average number of frames per second
+        accepted from the LAN for forwarding to the serial ports over the 
+        sampling period."
+        ::=  { bridgeStatsEntry 2 }
+
+    maxForwardedFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the highest value of 'averageForwarded' 
+        recorded since the previous station or statistics reset."
+        ::=  { bridgeStatsEntry 3 }
+
+    averageRejectedFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This reports the average number of frames per second
+        that have failed the filtering criterion for forwarding to the
+        serial ports over the previous sampling period."
+        ::=  { bridgeStatsEntry 4 }
+
+    maxRejectedFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is a count of the highest value of
+        'averageRejected' recorded since the previous station or statistics 
+        reset."
+        ::=  { bridgeStatsEntry 5 }
+
+    lanAccepts  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This variable reports the total number of frames that
+        have been accepted from the LAN for forwarding over the serial links
+        since the last station or statistics reset."
+        ::=  { bridgeStatsEntry 6 }
+
+    lanRejects  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This reports the total number of frames that have failed
+        the filtering criterion for forwarding to the serial ports since the
+        last station or statistics reset."
+        ::=  { bridgeStatsEntry 7 }
+
+    deletedLanFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The number of LAN frames which have been deleted, 
+        due to an internal lack of resource error, since the last station
+        restart or the last statistics reset."
+        ::=  { bridgeStatsEntry 8 }
+
+    stpTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF StpEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of stp entries.  The number of entries is given
+        by the value of bridgeNumber"
+        ::=  { bridge 3 }
+
+    stpEntry  OBJECT-TYPE
+        SYNTAX   StpEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "An entry containing objects relevant to the spanning 
+        tree algorithm"
+        INDEX    { stpIndex }
+        ::=  { stpTable 1 }
+
+    StpEntry ::= SEQUENCE {
+        stpIndex
+            INTEGER,
+        portSpatState
+            INTEGER,
+        pathCostMode
+            INTEGER,
+        pathCostAutoValue
+            INTEGER,
+        pathCostManualValue
+            INTEGER,
+        portPriorityMode
+            INTEGER,
+        portPriorityAutoValue
+            INTEGER,
+        portPriorityManualValue
+            INTEGER
+        }
+
+
+    stpIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The interface on which this entry's equivalence is
+        effective."
+        ::=  { stpEntry 1 }
+
+    pathCostMode  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This variable controls the mode of determining the path 
+        cost for the port.  If set to 0, the path cost is determined 
+        automatically by the station, if set to 1, it is configured by the
+        manager."
+        ::=  { stpEntry 2 }
+
+    pathCostAutoValue  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the value of path cost assigned to the port
+        automatically by the station."
+        ::=  { stpEntry 3 }
+
+    pathCostManualValue  OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the value of path cost assigned to the port 
+        by the manager."
+        ::=  { stpEntry 4 }
+
+    portSpatState  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates the spanning tree state of a 
+        particular port. It may return one of the following values: 
+                         disabled (-1), 
+                         blocking(0), 
+                         listening(1), 
+                         learning(2) or 
+                         forwarding(3)."
+        ::=  { stpEntry 5 }
+
+    portPriorityMode  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This variable controls the mode of determining the
+        priority for the port.  If set to 0, the priority is determined 
+        automatically by the station, if set to 1, it is configured by the
+         manager."
+        ::=  { stpEntry 6 }
+
+    portPriorityAutoValue  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the value of priority assigned to the port
+        automatically by the station."
+        ::=  { stpEntry 7 }
+
+    portPriorityManualValue  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the value of priority assigned to the port by 
+        the manager."
+        ::=  { stpEntry 8 }
+
+    spanningTree  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object describes whether or not the spanning tree 
+        protocol is enabled on this station. It can take on the following
+        values:
+               disabled (0)
+               enabled (1)."
+        ::=  { bridge 4 }
+
+    spatPriority  OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Each station has a priority, used by the 
+        'spanning Tree' protocol in determining the root bridge of a
+        spanning tree network. The lower the value, which can range 
+        between the values 0 and 65535, the higher the priority."
+        ::=  { bridge 5 }
+
+    spatHelloTimer  OBJECT-TYPE
+        SYNTAX  INTEGER (1..10)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the period of time, in seconds, between the
+        transmission of subsequent configuration BPDUs, used by the 
+        spanning tree algorithm."
+        ::=  { bridge 6 }
+
+    spatResetTimer  OBJECT-TYPE
+        SYNTAX  INTEGER (1..1800)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The length of time, in seconds, after a serial 
+        link reset, for which the corresponding serial port's path cost
+        is forced to its maximum value."
+        ::=  { bridge 7 }
+
+    spatVersion  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  revisionC(3),
+                  revision8(8)
+                  }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This variable determines the version of the spanning
+        tree alogrithm implemented in the station."
+        ::=  { bridge 8 }
+
+    spanningMcastAddr  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (6))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the multicast address of the frames used by
+        the spanning tree protocol.  The multicast address is in hexadecimal
+        form, in network byte order."
+        ::=  { bridge 9 }
+
+    operatingMode  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter determines whether the bridge will 
+        forward frames based only on the static addresses in the filtering 
+        database stored in its preconfigured table, if its value is
+        proconfigured(1), or use its learning algorithm if its value is
+        learning(0)."
+        ::=  { bridge 10 }
+
+    preconfSourceFilter  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter determines whether the bridge will 
+        filter on destination address alone, indicated by a value of 
+        disabled(0), or destination and source addresses, indicated by a 
+        value of enabled (1)."
+        ::=  { bridge 11 }
+
+    typeFilter  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parmaeter is used to enabld or disable frame type
+        filtering. To enable set to a vaue of enabled(1), to disable set to a 
+        value of disabled(0)."
+        ::=  { bridge 12 }
+
+    typePrioritisation  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable or disable the 
+        prioritization of traffic destined for a remote LAN, dependent upon
+        the type field of the frame. To enable type prioritization set this
+        object to a value od enabled(1), a value of disabled(0) disables 
+        this action."
+        ::=  { bridge 13 }
+
+    dynamicLearningInLM  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable or disable dynamic
+        learning when the station is configured to be in 'Learning' mode.
+        A value of enabled(1) enabled this feature whilst a value of 
+        disabled(0) disables it."
+        ::=  { bridge 14 }
+
+    forgetAddressTimer  OBJECT-TYPE
+        SYNTAX  INTEGER (24..1000)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the time, in 5 second units, after which, 
+        if an address has not been seen on the local LAN, it is 'forgotten'
+        from the learning address table."
+        ::=  { bridge 15 }
+
+    deleteAddressTimer  OBJECT-TYPE
+        SYNTAX  INTEGER (1..20000)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the time, in 5 second units, after which,
+        if an address has not been seen on the local LAN, it is 'deleted'
+        from the learning address table."
+        ::=  { bridge 16 }
+
+    multicastDisposition  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter determines the actions of the station
+        upon receiving a multicast frame, when the station is set to 
+        preconfigured mode.  If it is set to 1, multicasts are forwarded
+        unconditionally to the serial link.  If it is set to 0, they are
+        handled like single cast addresses, being forwarded only if the
+        multicast in question is present in the filtering database with 
+        the apropriate disposition."
+        ::=  { bridge 17 }
+
+    filterMatches  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter determines the action of the station 
+        when filtering on frame type.  If it is set to 0, the frame is
+        discarded if the type mateches, and forwarded if it does not.
+        If it is set to 1, the frame is forwarded if it matches, and discarded
+        if it does not."
+        ::=  { bridge 18 }
+
+    ieeeFormatFilter  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter determines whether IEEE802.3 frames will
+        be forwarded or discarded when type filtering is being performed and
+        a match found. To enabled this type of filtering set this object to 
+        a value of enabled(1), to disable set to a value of disabled (0)."
+        ::=  { bridge 19 }
+
+    priorityMatches  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter defines the priority assigned to a 
+        frame if it is being forwarded after type matching. A value of
+        high(0) is used to assign a high priority to the frame whilst a 
+        value of low(1) assigns a low priority."
+        ::=  { bridge 20 }
+
+    ieeeFormatPriority  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter defines the priority assigned to an
+        IEEE802.3 frame if it is being forwarded after type matching. A value
+        of high(0) indicated high priority whilst a value of low(1) indicates
+        a low priority."
+        ::=  { bridge 21 }
+
+    averagePeriod  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the averaging period over which the statistics
+        in the BridgeStatsTable get updated."
+        ::=  { bridge 22 }
+
+    triangulation  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "To enable triangulation this object must be set to a 
+        value of enabled(1). To disable this feature set to a value of 
+        disabled (0)."
+        ::=  { bridge 23 }
+
+    adaptiveRouting  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable, by setting this object
+        to a value of enabled(1), or disable, set to a value of disabled(0),
+        the adaptive routing feature. Adaptive routing can only be enabled if 
+        the spanningTree {bridge 4} has a value of enabled(1). "
+        ::=  { bridge 24 }
+
+    adaptiveMcastAddr  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (6))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the multicast address of the frames used by
+        the adaptive routing protocol.  The multicast address is in 
+        hexadecimal form, in network byte order."
+        ::=  { bridge 25 }
+
+
+    arAddressInfo OBJECT IDENTIFIER ::= { bridge 26 }
+
+    standbyRemote  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object reports the total number of Adaptive Routing
+        Destination Routes."
+        ::=  { arAddressInfo 1 }
+
+    standbyLocal  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object reports the total number of Adaptive Routing
+        Source Routes."
+        ::=  { arAddressInfo 2 }
+
+    activeRemote  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object reports the total number of Adaptive Routing
+        Remote Addresses."
+        ::=  { arAddressInfo 3 }
+
+    activeLocal  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object reports the total number of Adaptive Routing
+        Learned Addresses."
+        ::=  { arAddressInfo 4 }
+
+    maxSerialLoading  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used by the Adaptive Routing protocol.
+        If the loading of a serial link exceeds this value, then any frames 
+        enqueued for this link by Adaptive Routing will be removed from the 
+        queue and enqueued on the other serial link.  The value of this object 
+        is a measure of the percentage loading of the line."
+        ::=    { bridge 27 }
+            
+    serialLoadPeriod  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            ten (10),
+            twenty (20),
+            thirty (30),
+            forty (40),
+            fifty (50),
+            sixty (60)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the sampling period over which the serial links
+        loading is measured, in seconds."
+        ::=    { bridge 28 }
+
+    serialLoading  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Each instance of this object gives the percentage 
+        loading on a particular serial line.  The instances are indexed by
+        the value of ifIndex."
+        ::=  { bridge 29 }
+
+    filteringDataBaseTable OBJECT IDENTIFIER ::= { bridge 30 }
+
+    filteringDbTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FilteringDbEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of filtering data base entries."
+        ::=  { filteringDataBaseTable 1 }
+
+    filteringDbEntry  OBJECT-TYPE
+        SYNTAX  FilteringDbEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "This OCTET STRING contains one entry from the table.
+        Each entry consists of a MAC address, filter disposition, filter
+        status and type."
+        INDEX  { filteringDbMacAddress }
+        ::=  { filteringDbTable 1 }
+
+    FilteringDbEntry ::= SEQUENCE {
+        filteringDbMacAddress
+            OCTET STRING,
+        filteringDbDisposition
+            INTEGER,
+        filteringDbStatus
+            INTEGER,
+        filteringDbType
+            INTEGER
+        }
+
+    filteringDbMacAddress  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(6))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This OCTET STRING contains the MAC address in 
+        hexadecimal from, in network byte order."
+        ::=  { filteringDbEntry 1 }
+
+    filteringDbDisposition  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the disposition applied to the Mac Address. It
+        can have any of the following values:
+                                             discard (0),
+                                             lan (1),
+                                             channel1 (2),
+                                             channel2 (4) or
+                                             flood (7)."
+        ::=  { filteringDbEntry 2 }
+
+    filteringDbStatus    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the status of the Mac Address. Only static may 
+        be configured from SNMP, thus a SetRequest on this object with any
+        a value other than 3 (bit 0 and 1 both set) will fail. 
+        The status is a 8 bit field. The lower 2 bits (bits 0 and 1) can 
+        have the following values: if neither bit set (value of 0), this 
+        indicates a free address. A value of 1 is used for learnt addresses,
+        a value of 2 for un-learnt addresses and a value of 3 for static 
+        addresses.
+        If bit 2 is set then the MAC address is a multicast address, i.e. this
+        object would have a value of 4. 
+        The upper 4 bits of the status field are used to represent different
+        adaptive routing address types. if the upper 4 bits have a value of 2
+        this indicates an Adaptive Routing (AR) source address, a value of 4
+        indicates an AR destination address and a value of 8 an AR remote 
+        address. 
+        These values are not mutually exclusive which is why they are not 
+        listed in the enumeration. The byte can have different combinations
+        of the above settings."
+        ::=  { filteringDbEntry 3 }
+
+    filteringDbType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            valid (1),
+            invalid (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "For a Get or GetNext, a value of valid(1) is always 
+        returned.  For a Set, if the field is set to a value of valid(1)
+        then the entry is added to the table, if the value is invalue(2)
+        then the entry is deleted."
+        ::=  { filteringDbEntry 4 }
+
+    filteringDbAction  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noAction (1),
+            clearTable (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used to clear the Filtering Database
+        Table of all static entries.  Other entries are not affected.  
+        A value of noAction(1) is always returned when a GET is performed 
+        upon the object."
+        ::=  {filteringDataBaseTable 2 }
+
+
+    priorityTable    OBJECT IDENTIFIER ::= { bridge 31 }
+
+    prioritySubTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PriorityTableEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of priority table entries."
+        ::=  { priorityTable 1 }
+
+    priorityTableEntry  OBJECT-TYPE
+        SYNTAX  PriorityTableEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "This sequence defines one entry in the priority table.  
+        There is a maximum of 8 instances of this sequence."
+        INDEX { priorityTableEntryValue }
+        ::=  { prioritySubTable 1 }
+
+    PriorityTableEntry ::= SEQUENCE {
+        priorityTableEntryValue
+            INTEGER,
+        priorityTableEntryType
+            INTEGER
+        }
+
+    priorityTableEntryValue  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The priority being added to, deleted or read from
+        the table."
+        ::=  { priorityTableEntry 1 }
+
+    priorityTableEntryType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            valid (1),
+            invalid (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter determines whether an object is being
+        added to or deleted from the table. A value os valid(1) is used to
+        add entries while invalid(2) is used an entry is to be deleted from
+        the table."
+        ::=  { priorityTableEntry 2 }
+
+    priorityTableAction  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noAction (1),
+            clearTable (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used to clear the priorityTable. 
+        A value of noAction(1) is always returned to a GetRequest for this
+        object. A Set with a value of noAction(1) has no affect."
+        ::=  { priorityTable 2 }
+
+    priorityPage  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(16))
+        ACCESS  read-write
+        STATUS   optional
+        DESCRIPTION "This OCTET STRING contains all of the active entries
+        in the priority table.  Each entry consists of two bytes, the first
+         byte of each entry being the most significant byte of the entry."
+        ::=  { priorityTable 3 }
+
+    filterTable      OBJECT IDENTIFIER ::= { bridge 32 }
+
+    filterSubTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FilterTableEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "This is a list of entries in the filter table."
+        ::=  { filterTable 1 }
+
+    filterTableEntry  OBJECT-TYPE
+        SYNTAX  FilterTableEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "This sequence defines one entry in the filter table.
+        There is a maximum of 8 instances of this object."
+        INDEX { filterTableEntryValue }
+        ::=  { filterSubTable 1 }
+
+    FilterTableEntry ::= SEQUENCE {
+        filterTableEntryValue
+            INTEGER,
+        filterTableEntryType
+            INTEGER
+        }
+
+    filterTableEntryValue  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the value of a filter to be added to, deleted
+        from or read from the filter table."
+        ::=  { filterTableEntry 1 }
+
+    filterTableEntryType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            valid (1),
+            invalid (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to indicate if a filter is
+        to be added to or deleted from the table. A value of valid(1)
+        causes the filter to be added.  A value of invalid(2) causes 
+        it to be deleted.  For a Get, this value is always returned as
+        valid(1)."
+        ::=  { filterTableEntry 2 }
+
+    filterTableAction  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noAction (1),
+            clearTable (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used to clear the filter Table of its
+        static entries, all others are not affected. Only two values are 
+        valid to use with this object.  A value of noAction(1) is always
+        returned when a GET is performed upon the object.  To clear the table
+        of static entries, a value of 2 must be used in the SET.  A SET with
+        a value of 1 has no effect."
+        ::=  { filterTable 2 }
+
+    filterPage  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(16))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This OCTET STRING contains all of the active entries in
+        the filter table.  Each entry consists of two bytes, the first byte
+        of each entry being the most significant byte of that entry."
+        ::=  { filterTable 3 }
+
+
+    --  Router group
+
+    ipRSTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IpRSEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "A list of vairables associated with the router's status
+        and its IP statistics."
+        ::=  { router 1 }
+
+    ipRSEntry  OBJECT-TYPE
+        SYNTAX   IpRSEntry
+        ACCESS  not-accessible 
+        STATUS  mandatory
+        DESCRIPTION "This table contains objects which give information abouti
+        the router's STATUS   and its IP statistics."
+        INDEX  { ipRSIndex}
+        ::=  { ipRSTable 1 }
+
+
+    IpRSEntry ::= SEQUENCE {
+        ipRSIndex
+            INTEGER,
+        gwProtocol
+            INTEGER,
+        ifStatus
+            INTEGER,
+        receivedTotalDgms
+            Counter,
+        transmittedTotalDgms
+            Counter,
+        outDiscardsTotalDgms
+            Counter,
+        noRouteTotalDgms
+            Counter
+        }
+
+
+    ipRSIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The interface on which this entry's equivalence is
+        effective.  The interface identified by a particular value of this
+        index is the same interface as identified by the same value of 
+        ifIndex."
+        ::=  { ipRSEntry 1 }
+
+    gwProtocol  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            none (1),
+            rip (8)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The protocols which are in use by the IP Routing 
+        element to exchange routing information.  This field has two values
+        rip(8) and none (1)."
+        ::=  { ipRSEntry 2 }
+
+    ifStatus   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the status of the interface.
+        For the LAN interface the values possible are rarpFail (2), 
+        inactive (0) and active (1).  For the serial interfaces there are
+         two possible values, inactive (0) and active (1)."
+        ::=  { ipRSEntry 3 }
+
+    receivedTotalDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a count of the total number of IP Datagrams
+        received over this interface."
+        ::=  { ipRSEntry 4 }
+
+    transmittedTotalDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a count of the total number of IP Datagrams 
+        transmitted over this interface."
+        ::=  { ipRSEntry 5 }
+
+    outDiscardsTotalDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a count of the number of IP Datagrams
+        discarded due to exceeding the transmit queue length of this 
+        interface."
+        ::=  { ipRSEntry 6 }
+
+    noRouteTotalDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a count of the number of frames which were
+        received on this interface but discarded because no route could 
+        be found."
+        ::=  { ipRSEntry 7 }
+
+    icmpRSTable OBJECT IDENTIFIER ::= { router 2 }
+
+    destUnreachLastRx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Destination Unreachable message
+        was received.  The format of the returned Octet String is the same 
+        as that defined in section b. of the definition of the stationTime
+        (station.1) object."
+        ::=  { icmpRSTable 1 }
+
+    destUnreachLastTx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Destination Unreachable message 
+        was sent.  The format of the returned Octet String is the same as 
+        that defined in setion b. of the definition of the stationTime 
+        (station.1) object."
+        ::=  { icmpRSTable 2 }
+
+    sourceQuenchLastRx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Source Quench message was received.
+        The format of the returned Octet String is the same as that defined
+        in section b. of the definition of the stationTime (station.1)
+        object."
+        ::=  { icmpRSTable 3 }
+
+    sourceQuenchLastTx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Source Quench message was sent.  
+        The format of the returned Octet String is the same as that defined 
+        in section b. of the definition of the stationTime (station.1)
+        object."
+        ::=  { icmpRSTable 4 }
+
+    redirectsLastRx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Redirects message was received.
+        The format of the returned Octet String is the same as that defined
+        in section b. of the definition of the stationTime (station.1) 
+        object."
+        ::=  { icmpRSTable 5 }
+
+    redirectsLastTx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Redirects message was sent.
+        The format of the returned Octet String is the same as that defined
+        in section b. of the definition of the stationTime (station.1) 
+        object."
+        ::=  { icmpRSTable 6 }
+
+    echoRequestsLastRx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Echo request message was received.
+        The format of the returned Octet String is the same as that defined 
+        in section b. of the definition of the stationTime (station.1) 
+        object."
+        ::=  { icmpRSTable 7 }
+
+    echoRequestsLastTx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Echo request message was sent.
+        The format of the returned Octet String is the same as that defined 
+        in section b. of the definition of the stationTime (station.1) 
+        object."
+        ::=  { icmpRSTable 8 }
+
+    timeExceededLastRx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Time Exceeded message was received.
+        The format of the returned Octet String is the same as that defined
+        in section b. of the definition of the sationTime (station.1) 
+        object."
+        ::=  { icmpRSTable 9 }
+
+    timeExceededLastTx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Time Exceeded message was sent.
+        The format of the returned Octet String is the same as that defined
+        in section b. of the definition of the stationTime (station.1)
+        object."
+        ::=  { icmpRSTable 10 }
+
+    paramProbLastRx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Param Problem message was received.
+        The format of the returned Octet String is the same as that defined 
+        in section b. of the definition of the stationTime (station.1)
+        object."
+        ::=  { icmpRSTable 11 }
+
+    paramProbLastTx  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The last time an ICMP Param Problem message was sent.
+        The format of the returned Octet String is the same as that defined
+        in section b. of the definition of the stationTime (station.1)
+        object."
+        ::=  { icmpRSTable 12 }
+
+    ipRouting  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable IP Routing, it also
+        indicates the current state of the stations IP Routing capability.
+        A value of enabled(1) enables IP Routing whilst a value of disabled(0)
+        disables it."
+        ::=  { router 3 }
+
+    --    Boot group
+
+    bootpRetryCount   OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The number of times a Bootp Request will be transmitted 
+        before the Bootp attempt is considered to have failed.  If this
+        parameter is set to 0, Bootp is skipped and an immediate TFTP 
+        download attempted."
+        ::= { boot 1 }
+
+    downloadRetryCount   OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The number of times the complete Bootp/TFTP
+        download cycle is attempted before the download attempt is 
+        considered to have failed."
+        ::= { boot 2 }
+
+    downloadFilename   OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..128))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This character string is inserted in the 'boot file
+        name' field of the Bootp Request; its semantics is determined by
+        the Boot Server.  If Bootp is skipped and an immediate TFTP download
+        attempted, this parameter is used by TFTP as the name of the file to
+        be downloaded."
+        ::= { boot 3 }
+
+    bootserverIpAddress   OBJECT-TYPE
+        SYNTAX   IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "If this address is null (0.0.0.0), the Boot Request
+        is sent to the IP broadcast address as determined by ipAdEntBcastAddr.
+        Otherwise, it is sent to this address.  It is known that certain
+        bootserver implementations do not respond to the standard limited
+        broadcast, hence the need for this parameter."
+        ::= { boot 4 }
+
+    loadserverIpAddress   OBJECT-TYPE
+        SYNTAX   IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "If this address is null (0.0.0.0), TFTP will request
+        a download from the server address returned in the Bootp Response.
+        Otherwise, it will use this address."
+        ::= { boot 5 }
+
+    uniqueBroadcastAddress   OBJECT-TYPE
+        SYNTAX   IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "A unique broadcast address specified by the user 
+        which does not conform to the standard ip broadcast address format.
+        If the user specifies a unique broadcast address, this will take
+        precedence over the standard IP broadcast address."
+        ::= { boot 6 }
+
+    tftpRetryCount   OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The number of PDU will be retransmitted during a
+        TFTP transfer before declaring the transfer to have failed."
+        ::= { boot 7 }
+
+    tftpRetryPeriod   OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The time in units of 50ms that TFTP will wait for
+        the next requested block before initiating error recovery."
+        ::= { boot 8 }
+
+    initiateBootpDll   OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noAction (1),
+            initiateBoot (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to initiate a bootp downline
+        load from a remote server.  A value of noAction(1) is always
+        returned when a Get Request is performed on this object.  A Set
+        Request with a value of initiateBoot(2) causes the bootp download
+        operation to be initiated."
+        ::= { boot 9 }
+
+
+    --    Boothelper group
+
+    boothelperEnabled   OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable or disable the boot 
+        helper facility. A value of enabled(1) enabled this facility whilst
+        a value of disabled(0) disables it."
+        ::= { boothelper 1 }
+
+    boothelperHopsLimit   OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object repesents the limit on the distance that
+        a boot request is forwarded.  It specifies the maximum number of 
+        times that a boot request may have been forwarded by other boothelpers
+        and still be forwarded by this helper.  A value of 0 means that no
+        boot request shall be forwarded."
+        ::= { boothelper 2 }
+
+    boothelperForwardingAddress   OBJECT-TYPE
+        SYNTAX   IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the IpAddress to which the boot helper will 
+        forward a boot request."
+        ::= { boothelper 3 }
+
+
+--    IPX Group
+
+    ipxRouting  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is used to enable and disable IPX routing.
+        It indicates whether the unit is functioning as an IPX Router.  
+        The default value is disabled (0). A value of enabled(1) is used
+        to enable IPX Routing."
+        ::= { ipx 1 }
+
+    ipxIfNumber  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of interfaces on which you can send 
+        and received ipx datagrams."
+        ::= { ipx 2 }
+
+    ipxIfTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IpxIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This is a list of parameters associated with the 
+        IPX interfaces."
+        ::= { ipx 3 }
+
+    ipxIfEntry  OBJECT-TYPE
+        SYNTAX   IpxIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This table contains objects which give information 
+        about the IPX Router's interfaces."
+        INDEX  { ipxIfIndex } 
+        ::= { ipxIfTable 1 }
+
+    IpxIfEntry ::= SEQUENCE {
+        ipxIfIndex
+            INTEGER,
+        ipxIfNwkNumber
+            OCTET STRING,
+        ipxIfIPXAddress
+            OCTET STRING,
+        ipxIfEncapsulation
+            INTEGER,
+        ipxIfDelay
+            INTEGER
+    }
+
+    ipxIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The interface on which this entry's equivalence
+        is effective."
+        ::= { ipxIfEntry 1 }
+
+    ipxIfNwkNumber  OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is the ascii representation of the network
+        number which, when combined with the Host address, makes up the
+        IPX address of this particular interface.  It can be up to 8
+        characters long."
+        ::= { ipxIfEntry 2 }
+
+    ipxIfIPXAddress  OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(26))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is an octet string which specifies the IPX
+        address of a particular interfae, in ascii format.  The format of
+        the address is as follows: xxxxxxxx:yy.yy.yy.yy.yy.yy
+
+        Where xxxxxxxx represents the network number portion of the
+        address, and may be up to 8 chars long, and yy.yy.yy.yy.yy.yy
+        represents the host address of the device and is always 17 chars long
+        (including decimal points).  The entire string including the colon
+        and decimal points, can be up to 26 characters long."
+        ::= { ipxIfEntry 3 }
+
+    ipxIfEncapsulation  OBJECT-TYPE
+        SYNTAX  INTEGER (0..6)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter indictes the encapsulation which is in
+        use on a particular interface. It can have any one of the following
+        values:
+                ieee8023 (0),
+                ethernet (1),
+                llc (2),
+                snap (3),
+                dummy1 (4),
+                dummy2 (5) or
+                invalid (6).
+        
+		If the mlinkChan48Interop {mlinkEntry 15 } parameter has a value of
+        disabled(0) for a multilink channel then the value of this parameter
+        will be invalid(6). The values dummy1(4) and dummy2(5) are reserved
+        for future expansion and cannot be used in a set operation on this
+        parameter, they will not be returned in response to a Get Request
+        either."
+        ::= { ipxIfEntry 4 }
+
+    ipxIfDelay  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object indicates the delay associated with
+        the network on the interface identified by the instance number
+        used to instance this object.  The delay is an estimate of the
+        time take by a 576 byte IPX packet to traverse the network.  
+        The time is measured in ticks, the units of which are 1/18.2 seconds.
+        The smallest value of ipxIfDelay is 1 tick or 1/18.2 seconds."
+        ::= { ipxIfEntry 5 }
+
+    ipxRoutingTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IpxRITEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This is a list of the entries in the Routing Information
+        Table."
+        ::=  { ipx 4 }
+
+    ipxRITEntry  OBJECT-TYPE
+        SYNTAX   IpxRITEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This table contains the entries in the IPX Routing
+        Information Table."
+        INDEX  { ipxRITDestNwkNumber }
+        ::=  { ipxRoutingTable 1 }
+
+    IpxRITEntry ::= SEQUENCE {
+        ipxRITDestNwkNumber
+            OCTET STRING,
+        ipxRITGwyHostAddress
+            OCTET STRING,
+        ipxRITHopCount
+            INTEGER,
+        ipxRITDelay
+            INTEGER,
+        ipxRITInterface
+            INTEGER,
+        ipxRITDirectConnect
+            INTEGER
+    }
+
+    ipxRITDestNwkNumber  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This string contains the IPX Network number.  The address
+        contained in the returned string is in hexadecimal form.  If the
+        network number is not a full 4 bytes ling, then it is zero-filled
+        eg, a network Number, 0x234fd will appear as 0x000234fd in this 
+        string."
+        ::= { ipxRITEntry 1 }
+
+    ipxRITGwyHostAddress  OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(10))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the Host Address of the gateway to the network
+        specified by the corresponding ipxRITNwkNumber."
+        ::= { ipxRITEntry 2 }
+
+    ipxRITHopCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the hop count to reach the specified network,
+        it has a range of 0 to 15."
+        ::= { ipxRITEntry 3 }
+
+    ipxRITDelay  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the estimated delay to reach the specified
+        network."
+        ::= { ipxRITEntry 4 }
+
+    ipxRITInterface  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the interface through which the IPX datagram
+        is routed to the gateway identified by the corresponding entry for
+        ipxRITGwyHostAddress {ipxRITEntry 2}."
+        ::= { ipxRITEntry 5 }
+
+    ipxRITDirectConnect  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION ""
+        ::= { ipxRITEntry 6 }
+
+    ipxSAPBinderyTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IpxSAPBinderyEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "The table of SAP Bindaries."
+        ::= { ipx 5 }
+
+    ipxSAPBinderyEntry  OBJECT-TYPE
+        SYNTAX   IpxSAPBinderyEntry 
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This is a list of entries in the ipxSAPBinderyTable"
+        INDEX  { ipxSAPBinderyType, ipxSAPBinderyServerIPXAddress }
+        ::= { ipxSAPBinderyTable 1 }
+    
+    IpxSAPBinderyEntry ::= SEQUENCE {
+        ipxSAPBinderyType
+            INTEGER,
+        ipxSAPBinderyServerIPXAddress
+            OCTET STRING,
+        ipxSAPBinderyServerName
+            OCTET STRING,
+        ipxSAPBinderyHopCount
+            INTEGER,
+        ipxSAPBinderySocket
+            INTEGER
+    }
+
+    ipxSAPBinderyType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            user (1),
+            userGroup (2),
+            printQueue (3),
+            fileServer (4),
+            jobServer (5),
+            gateway (6),
+            printServer (7),
+            archiveQueue (8),
+            archiveServer (9),
+            jobQueue (10),
+            administration (11),
+            remoteBridgeServer (36),
+            advertizingPrintServer (71),
+            wild (65535)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the type of the server whose IPX address is
+        given by ipxSAPBinderyIPXAddress {ipxSAPBinderyEntry 2}. If a value
+        of 0 is returned to a Get Request then this indicates an unknown
+        server type."
+        ::= { ipxSAPBinderyEntry 1 }
+
+    ipxSAPBinderyServerIPXAddress  OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(26))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is an octet string which specifies the IPX address
+        of a particular interface, in ascii format.  The format of the
+        address is as follows: xxxxxxxx:yy.yy.yy.yy.yy.yy
+
+        where xxxxxxxx represents the network number portion of the address,
+        and may be up to 8 chars long, and yy.yy.yy.yy.yy.yy represents the
+        host address of the device and is always 17 chars long (including 
+        decimal points).  The entire string including the colon and decimal
+        point, can be up to 26 characters long."
+        ::= { ipxSAPBinderyEntry 2 }
+
+    ipxSAPBinderyServerName  OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..48))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the Name of the Server.  It is a text string
+        up to 48 characters long."
+        ::= { ipxSAPBinderyEntry 3 }
+
+    ipxSAPBinderyHopCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the hop count ot reach the specified server.
+        This object can take on any value in the range 0 to 15."
+        ::= { ipxSAPBinderyEntry 4 }
+
+    ipxSAPBinderySocket  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This number identifies the socket at which the server
+        provides services."
+        ::= { ipxSAPBinderyEntry 5 }
+
+    ipxReceivedDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a count of the total number of IPX datagrams
+        which have been received on the interfaces."
+        ::= { ipx 6 }
+
+    ipxTransmittedDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the total number of IPX
+        datagrams which have been transmitted on the interfaces."
+        ::= { ipx 7 } 
+
+    ipxNotRoutedRxDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the total number of IPX
+        datagrams which have been received on the interface and which 
+        have been discarded due to no route being found for them."
+        ::= { ipx 8 }
+
+    ipxForwardedDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the total number of IPX
+        datagrams which have been received on the interface and routed
+        onwards."
+        ::= { ipx 9 }
+
+    ipxInDelivers  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the total number of IPX
+        datagrams which have been received on the interfaces and delivered
+        internally (routed inwards) to RIP or SAP."
+        ::= { ipx 10 } 
+
+    ipxInHdrErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents a count of the total
+        number of IPX datagrams which have been received on the interfaces
+        and discarded due to having a bad checksum, a length error or
+        hopCountExpiry."
+        ::= { ipx 11 }
+
+    ipxAccessViolations  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents a count of the total number
+        of IPX datagrams which have been received on the interface and 
+        discarded due to an addess violation for the datagram."
+        ::= { ipx 12 }
+
+    ipxInDiscards  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents a count of the total number
+        of IPX datagrams which have been received on the interface and
+        discarded because the internal queue is full."
+        ::= { ipx 13 }
+
+    ipxOutDiscards  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents a count of the total
+        number of IPX datagrams which have been received on the interface
+        and discarded because the transmit queue for this interface is full."
+        ::= { ipx 14 }
+
+    ipxOtherDiscards  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents a count of the total
+        number of IPX datagrams which have been received on the interface
+        and discarded because the interface does not have a configured IPX
+        address or the datagram is addresses to an unsupported socket."
+        ::= { ipx 15 }
+
+-- The Decnet Group
+
+    dcntRouting  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable or disable DECnet
+        routing on this unit. A Set with a value of enabled(1) enabled the
+        DECnet routing feature, whilst a Set with a value of disabled(0)
+        disabled this fature."
+        ::= { decnet 1 }
+
+    dcntIfNumber  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of interfaces on which you can send
+        and receive decnet frames."
+        ::= { decnet 2 }
+
+
+    dcntIfTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcntIfTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This table holds a list of entries of interface-specific
+        configurable data."
+        ::= { decnet 3 }
+
+    dcntIfTableEntry  OBJECT-TYPE
+        SYNTAX   DcntIfTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "A interface entry containing objects pertinent to eachs
+        interface for which Decnet is enabled."
+        INDEX  { dcntIfIndex }
+        ::= { dcntIfTable 1 }
+
+    DcntIfTableEntry ::= SEQUENCE {
+        dcntIfIndex
+            INTEGER,
+        dcntIfCost
+            INTEGER,
+        dcntIfRtrPriority
+            INTEGER,
+        dcntIfDesgntdRtr
+            INTEGER,
+        dcntIfHelloTimerBCT3
+            INTEGER
+        }
+
+    dcntIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION ""
+        ::= { dcntIfTableEntry 1 }
+
+    dcntIfCost  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1023)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the path cost associated with this interface."
+        ::= { dcntIfTableEntry 2 }
+
+    dcntIfRtrPriority  OBJECT-TYPE
+        SYNTAX  INTEGER (0..127)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the priority associated with this interface,
+        it is used to determine the designated route.  The interface with
+        the highest priority is the designated route."
+        ::= { dcntIfTableEntry 3 }
+
+    dcntIfDesgntdRtr  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates if this is the designated 
+        router on this interface. A value of no(0) indicates there isn't
+        a designated router on this interface, whilst a value of yes(1)
+        indicates that there is."
+        ::= { dcntIfTableEntry 4 }
+
+    dcntIfHelloTimerBCT3  OBJECT-TYPE
+        SYNTAX  INTEGER (1..8191)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The maximum time period between two hello messages,
+        transmitted consecutively."
+        ::= { dcntIfTableEntry 5 }
+
+-- DecNet Routing Information Table
+
+    dcntRoutingTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcntRITEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This is the routing table for the area to which this
+        device belongs,  There are a maximum of 1023 entries in this table."
+        ::= { decnet 4 }
+
+     dcntRITEntry  OBJECT-TYPE
+        SYNTAX   DcntRITEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "An entry specifies a particular node's routing 
+        information."
+        INDEX  { dcntRITDestNode }
+        ::= { dcntRoutingTable 1 }
+ 
+    DcntRITEntry ::= SEQUENCE {
+        dcntRITDestNode
+            INTEGER,
+        dcntRITNextHop
+            OCTET STRING,
+        dcntRITCost
+            INTEGER,
+        dcntRITHops
+            INTEGER,
+        dcntRITInterface
+            INTEGER
+        }
+
+     dcntRITDestNode  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the address id of the node which uniquely
+        identify the node within a given area."
+        ::= { dcntRITEntry 1 }
+
+     dcntRITNextHop  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the address of the next hop in the path."
+        ::= { dcntRITEntry 2 }
+
+     dcntRITCost  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the path cost of this route."
+        ::= { dcntRITEntry 3 }
+
+     dcntRITHops  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of hops that have to be traversed
+        to get to the destination."
+        ::= { dcntRITEntry 4 }
+
+     dcntRITInterface  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter identifies the interface on which 
+        messages for this route should be forwarded. It has the following
+        values: 0 for Lan, 1 for channel 1 and 2 for channel 2."
+        ::= { dcntRITEntry 5 }
+
+-- DecNet Area Routing Table
+
+     dcntAreaRoutingTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcntAreaRITEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This is the Area routing table, used to route packets
+        fromt the area in which the device resides to other Areas in the
+        network.  There are a maximum of 63 entries in this table."
+        ::= { decnet 5 }
+
+     dcntAreaRITEntry  OBJECT-TYPE
+        SYNTAX   DcntAreaRITEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "An entry specifies a particular node's routing
+        information."
+        INDEX  { dcntAreaRITDestArea }
+        ::= { dcntAreaRoutingTable 1 }
+ 
+    DcntAreaRITEntry ::= SEQUENCE {
+        dcntAreaRITDestArea
+            INTEGER,
+        dcntAreaRITNextHop
+            OCTET STRING,
+        dcntAreaRITCost
+            INTEGER,
+        dcntAreaRITHops
+            INTEGER,
+        dcntAreaRITInterface
+            INTEGER
+        }
+
+     dcntAreaRITDestArea  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the area id of the node which uniquely
+        identifies the area."
+        ::= { dcntAreaRITEntry 1 }
+
+     dcntAreaRITNextHop  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the address of the next hop in the path."
+        ::= { dcntAreaRITEntry 2 }
+
+     dcntAreaRITCost  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the path cost of this route."
+        ::= { dcntAreaRITEntry 3 }
+
+     dcntAreaRITHops  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of hops between here and the
+        destination."
+        ::= { dcntAreaRITEntry 4 }
+
+     dcntAreaRITInterface  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter identifies the interface on which 
+        messages for this route should be forwarded. It can have the
+        following values: 0 for the Lan interface, 1 for channel 1 and 2
+        for channel 2."
+        ::= { dcntAreaRITEntry 5 }
+
+-- Decnet Statistics
+
+    dcntNodeAddress  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the Node address of the device.  The format of
+        this is as follows: xx.yyyy
+
+        where xx is an ascii representation (range 0-9) of the area id,
+        with a range 0 to 63, and yyyy is an ascii representation (range 0 to
+        9) of the address id, with a range 0 to 1023.  The string can be a 
+        maximum length of seven octets, this includes the decimal point 
+        separating the two components.
+
+        DECnet routing cannot be enabled until this object has been given
+        a valid value. When DECnet routing is disabled this value can be
+        set to a value of NULL. This parameter may be changed to another
+        valid value at any time."
+        ::= { decnet 6 }
+
+     dcntInterAreaMaxCost  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1023)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the maximum cost possible in a path to a
+        reachable area, from the area in which this device is situated."
+        ::= { decnet 7 }
+
+    dcntInterAreaMaxHops  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1023)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The maximum number of Hops allowed in a path to another
+        reachable area."
+        ::= { decnet 8 }
+
+     dcntIntraAreaMaxCost  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1023)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The maximum cost possible in a path from the device
+        to a reachable node within the same area."
+        ::= { decnet 9 }
+
+     dcntIntraAreaMaxHops  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1023)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the Maximum Hops allowed in a path from this
+        device to a reachable node within the same area."
+        ::= { decnet 10 }
+
+     dcntMaxVisits  OBJECT-TYPE
+        SYNTAX  INTEGER (0..63)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The maximum number of nodes which a data packet can
+        traverse, before being discarded."
+        ::= { decnet 11 }
+
+     dcntRtngMsgTimerBCT1  OBJECT-TYPE
+        SYNTAX  INTEGER (5..30)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the maximum time period between broadcasted
+        routing messages on the Ethernet."
+        ::= { decnet 12 }
+
+     dcntRateControlFreqTimerT2  OBJECT-TYPE
+        SYNTAX  INTEGER (1..5)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the rate control frequency timer."
+        ::= { decnet 13 }
+
+    dcntReveivedDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a total count of all Decnet Datagrams 
+        received by the device on all interfaces.  This includes data
+        packets, hello messages and routing messages."
+        ::= { decnet 14 }
+
+    dcntForwardedDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a count of all the data packets which have
+        been forwarded by the device on all interfaces."
+        ::= { decnet 15 }
+
+     dcntOutRequestedDgms  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a count of all Decnet hello and routing
+        messages transmitted by the device on all interfaces."
+        ::= { decnet 16 }
+
+     dcntInDiscards  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is a count of all Decnet packets which have 
+        been received, but discarded.  These frames are discarded by
+        the Decnet protocol layer."
+        ::= { decnet 17 }
+
+     dcntOutDiscards  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the total number of Decnet frames discarded
+        due to lack of internal resources.  These frames are discarded
+        by the Decnet protocol layer."
+        ::= { decnet 18 }
+
+     dcntNoRoutes  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the total number of packets for which no
+        route could be found."
+        ::= { decnet 19 }
+
+     dcntInHdrErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the total number of packets found with an
+        invalid header in the data packet."
+        ::= { decnet 20 }
+
+-- rmtLapb group 
+-- This group takes the place of the lapb group in any bridge or
+-- bridge/router which supports X.25.
+
+-- Remote lapb configuration table
+
+    rmtLapbConfigTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RmtLapbCTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "A list of configurable LapbCT entries, one entry
+        per interface."
+        ::= { rmtLapb 1 }
+
+    rmtLapbCTEntry  OBJECT-TYPE
+        SYNTAX   RmtLapbCTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "A list of configurable data, for each lapb interface."
+        INDEX    { rmtLapbCTIndex }
+        ::= { rmtLapbConfigTable 1 }
+
+    RmtLapbCTEntry ::= SEQUENCE {
+        rmtLapbCTIndex
+            INTEGER,
+        rmtLapbCTLinkAddr
+            INTEGER,
+        rmtLapbCTExtSeqNumbering
+            INTEGER,
+        rmtLapbCTWindow
+            INTEGER,
+        rmtLapbCTModeT1
+            INTEGER,
+        rmtLapbCTManualT1Value
+            INTEGER,
+        rmtLapbCTT3LinkIdleTimer
+            INTEGER,
+        rmtLapbCTN2RetryCount
+            INTEGER,
+        rmtLapbCTLinkReset
+            INTEGER,
+        rmtLapbCTX25PortLineSpeed
+            INTEGER,
+        rmtLapbCTInitLinkConnect
+            INTEGER
+    }
+    
+    rmtLapbCTIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter defines the interface for which
+        this entry is valid."
+        ::= { rmtLapbCTEntry 1 }
+    
+    rmtLapbCTLinkAddr  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter defines both the link level and packet
+        level logical address. A value of dte(0) indicates DTE operation,
+        whilst a value of dce(1) indicates DCE operation."
+        ::= { rmtLapbCTEntry 2 }
+
+    rmtLapbCTExtSeqNumbering  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable/disabled use of
+        extended frame sequence numbering. Modulo 128 numbering is used
+        if this parameter is set to a value of enabled(1), whilst modulo
+        8 numbering is used if this object is set to a value of disabled(0)."
+        ::= { rmtLapbCTEntry 3 }
+
+    rmtLapbCTWindow  OBJECT-TYPE
+        SYNTAX  INTEGER (1..127)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the maximum number of
+        I-frames which can be transmitted before an acknowledgement is 
+        received.  It can have any value between 1 and 127, for this value
+        to be greater than 7, extended sequence numbering must be invoked.
+        This is the value of k as defined in the 1984 CCITT Recommendation
+        X.25 VOLUME VIII - FASCILE VIII.3."
+        ::= { rmtLapbCTEntry 4 }
+
+    rmtLapbCTModeT1  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "If the value of this parameter is automaticT1(0) then
+        the value of the T1 timer is determined automatically by the software.
+        If the value of this object is manualT1(1) then the timer is settable
+        by the manager.  The value of T1 won't change until the next reset of
+        the station or the next link reset."
+        ::= { rmtLapbCTEntry 5 }
+
+    rmtLapbCTManualT1Value  OBJECT-TYPE
+        SYNTAX  INTEGER (10..5000)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object allows the manager to set the value
+        of the T1 timer as defined in the 1984 CCITT Recommendation
+        X.25 VOLUME VIII - FASCICLE VIII.3.  The settable range is 10 
+        to 5000 which represents the timer value in milliseconds.  This
+        object maybe set at any time, but it is only used if the value
+        of modeT1 is 1.  This value will not become active until the 
+        next link or station reset."
+        ::= { rmtLapbCTEntry 6 }
+
+    rmtLapbCTT3LinkIdleTimer  OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the value of the T3 timer, which defines
+        the maximum time which a link can remain in the idle condition
+        before being identified as non-operational."
+        ::= { rmtLapbCTEntry 7 }
+
+    rmtLapbCTN2RetryCount  OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the value of N2 as defined in the 1984
+        CCITT Recommendation X.25 VOLUME VIII - FASCICLE VIII.3."
+        ::= { rmtLapbCTEntry 8 }
+
+    rmtLapbCTLinkReset  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noAction (1),
+            resetLink (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter causes a link reset.  The link
+        reset occurs after a pre-determined period of time which
+        is implementation specific.
+        Set Request with a value of resetLink(2) is used to cause the
+        link reset.  A value of noAction(1) will be returned when a
+        Get Request is performed on this object."
+        ::= { rmtLapbCTEntry 9 }
+
+    rmtLapbCTX25PortLineSpeed  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            b1200 (1200),
+            b2400 (2400),
+            b4800 (4800),
+            b9600 (9600),
+            b19200 (19200),
+            b32000 (32000),
+            b48000 (48000),
+            b64000 (64000)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object allows the user to set the linespeed
+        for X25 operation."
+        ::= { rmtLapbCTEntry 10 }
+
+    rmtLapbCTInitLinkConnect  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noAction (1),
+            connect (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter causes a link connect to take place.
+        A Set Request with a value of connect(2) is used to initiate a
+        link connect.  A value of noAction(1) is returned to returned 
+        when a Get Request is performed on this object."
+        ::= { rmtLapbCTEntry 11 }
+
+-- remote lapb statistics table
+
+    rmtLapbStatsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RmtLapbSTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "A list of LAPB interface entries."
+        ::= { rmtLapb 2 }
+
+    rmtLapbSTEntry  OBJECT-TYPE
+        SYNTAX   RmtLapbSTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "The LAPB table.  An entry in this table is uniquely
+        identified by the value of the rmtLapbSTIndex variable associated
+        with the interface to which the statistics refer."
+        INDEX    {rmtLapbSTIndex }
+        ::= { rmtLapbStatsTable 1 }
+
+    RmtLapbSTEntry ::= SEQUENCE {
+        rmtLapbSTIndex
+            INTEGER,
+        rmtLapbSTState
+            INTEGER,
+        rmtLapbSTAutoT1value
+            INTEGER,
+        rmtLapbSTLastResetTime
+            OCTET STRING,
+        rmtLapbSTLastResetReason
+            INTEGER,
+        rmtLapbSTCountResets
+            Counter,
+        rmtLapbSTCountSentFrames
+            Counter,
+        rmtLapbSTCountRcvFrames
+            Counter,
+        rmtLapbSTCountSentOctets
+            Counter,
+        rmtLapbSTCountRcvOctets
+            Counter,
+        rmtLapbSTCountAborts
+            Counter,
+        rmtLapbSTCountCrcErrors
+            Counter
+        }
+
+
+    rmtLapbSTIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The interface on which this entry's equivalence 
+        is effective.  This object identifies the same physical interface
+        as identified by the phySerIfIndex."
+        ::= { rmtLapbSTEntry 1 }
+
+    rmtLapbSTState  OBJECT-TYPE
+        SYNTAX  INTEGER (0..3)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates the current state of the
+        LAPB link. inactive(0) indicates that LAPB initialization was
+        unsuccessful. A value of active(1) indicates that LAPB init-
+        ialization was successful. A value of unused(2) indicates that,
+        in the case where there are two parallel links between bridges
+        one of which is slower, the slower link has been tagged unused.
+        This is done to concentrate transmissions on the faster link and
+        thus avoid heavy re-ordering overhead due to frames arriving out 
+        of sequence. A value of tooFast(3) indicates that the clock on
+        the received signal is too fast for the interface in question."
+        ::= { rmtLapbSTEntry 2 }
+
+    rmtLapbSTAutoT1value  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is the value of the T1 timer as
+        defined in the 1984 CCITT Recommendation X.25 VOLUME VIII 
+        - FASCICLE VIII.3 and is determined empirically by the software.
+        It is the actual value of the timer in milliseconds."
+        ::= { rmtLapbSTEntry 3 }
+
+    rmtLapbSTLastResetTime  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (13))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Time and date when the last link reset occurred.
+        The format of this string is the same as that defined for
+        'stationTime'."
+        ::= { rmtLapbSTEntry 4 }
+
+    rmtLapbSTLastResetReason  OBJECT-TYPE
+        SYNTAX  INTEGER (0..8)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object defines the reason for the last link reset.
+        It may take on any one of the following values:
+            noReason (0),
+            xpcError (1),
+            ctsLost (2),
+            retryLimitExceeded (3),
+            receivedIdle (4),
+            personalityModule (5),
+            softwareWatchdog (6),
+            nmcInitiated (7),
+            invalidConfiguration (8)."
+        ::= { rmtLapbSTEntry 5 }
+
+    rmtLapbSTCountResets  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of link
+        resets performed since the last warmStart, coldStart or
+        statistics reset of the station."
+        ::= { rmtLapbSTEntry 6 }
+
+    rmtLapbSTCountSentFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of
+        link resets performed since the last warm or cold restart
+        of the station or the last statistics reset."
+        ::= { rmtLapbSTEntry 7 }
+
+    rmtLapbSTCountRcvFrames  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of
+        I-frames sent since the last station restart or the last
+        statistics reset."
+        ::= { rmtLapbSTEntry 8 }
+
+    rmtLapbSTCountSentOctets  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of
+        I-frames received since the last station restart or
+        the last statistics reset."
+        ::= { rmtLapbSTEntry 9 }
+
+    rmtLapbSTCountRcvOctets  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of
+        bytes sent since the last station restart or the last
+        statistics reset."
+        ::= { rmtLapbSTEntry 10 }
+
+    rmtLapbSTCountAborts  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of
+        bytes received since the last station restart or the
+        last statistics reset."
+        ::= { rmtLapbSTEntry 11 }
+
+    rmtLapbSTCountCrcErrors  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter represents the number of
+        aborts received since last station restart or the last
+        statistics reset."
+        ::= { rmtLapbSTEntry 12 }
+
+
+-- X.25 Group
+
+    x25Operation  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable or disable
+        operation of the x.25 (at the packet level) facility on
+        this station. If x.25 PLP is turned on then this markedly
+        affects the manner in which LAPB works. It also affects
+        the relevance and effictiveness of some LAPB managed objects.
+        A Set Request with a value of enabled(1) will enable this
+        facility whilst a Set Request with a value of disabled(0)
+        disables it."
+        ::= { x25 1 }
+
+    x25OperNextReset  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter indicates if x.25 (at the packet
+        level) is to be enabled or disabled after the next reset of
+        this station. A Set Request with a value of enabled(1)  will 
+        enable this  facility whilst a Set Request with a value of
+        disabled(0) disables it."
+        ::= { x25 2 }
+
+-- x25 Connection set-up table
+
+
+    x25ConSetupTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF X25CSTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This table holds configuration data used in setting
+        up each X25 SVC."
+        ::= { x25 3 }
+    
+    x25CSTEntry  OBJECT-TYPE
+        SYNTAX  X25CSTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "Each entry in the Table includes all the configurable
+        objects for each interface."
+        INDEX    { x25CSTIndex }
+        ::= { x25ConSetupTable 1 }
+    
+    X25CSTEntry ::= SEQUENCE {
+        x25CSTIndex
+            INTEGER,
+        x25CST8084Switch
+            INTEGER,
+        x25CSTSrcDTEAddr
+            OCTET STRING,
+        x25CSTDestDTEAddr
+            OCTET STRING,
+        x25CST2WayLgclChanNum
+            INTEGER,
+        x25CSTPktSeqNumFlg
+            INTEGER,
+        x25CSTFlowCntrlNeg
+            INTEGER,
+        x25CSTDefaultWinSize
+            INTEGER,
+        x25CSTDefaultPktSize
+            INTEGER,
+        x25CSTNegWinSize
+            INTEGER,
+        x25CSTNegPktSize
+            INTEGER,
+        x25CSTCUGSub
+            INTEGER,
+        x25CSTLclCUGValue
+            INTEGER,
+        x25CSTRvrsChrgReq
+            INTEGER,
+        x25CSTRvrsChrgAcc
+            INTEGER
+    }
+    
+    x25CSTIndex  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This index defines the interface for which this
+        entry is valid.  This index is equivalent to the phySerIfNumber
+        index representing the physical serial interfaces on the device."
+        ::= { x25CSTEntry 1 }
+
+    x25CST8084Switch  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This object is an operation switch, allowing the
+        user to change the operating mode of x.25 on this interface.
+        A value of x251980(0) sets the operating mode to 1980 operating
+        mode, wheras a value of x251984(4) sets it to 1984."
+        ::= { x25CSTEntry 2 }
+
+    x25CSTSrcDTEAddr  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(15))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the address of the Source DTE associated
+        with this interface.  It can be any number, up to 15 ascii
+        characters long, in the range 0-9."
+        ::= { x25CSTEntry 3 }
+
+    x25CSTDestDTEAddr  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(15))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the address of the Destination DTE 
+        associated with this interface.  It can be any number,
+        up to 15 ascii characters long, in the range 0-9."
+        ::= { x25CSTEntry 4 }
+
+    x25CST2WayLgclChanNum  OBJECT-TYPE
+        SYNTAX  INTEGER (1.. 4095)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This number uniquely identifies the two-way 
+        logical channel number to be used in the DTE/DCE interface
+        when establishing an SVC on this interface."
+        ::= { x25CSTEntry 5 }
+
+    x25CSTPktSeqNumFlg  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            mod8 (1),
+            mod128 (4)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter allows the user to switch between
+        Basic (modulo 8) and Extended (modulo 128) Packet Sequence
+        Numbering.  A value of mod8(1) indicates the use of Basic 
+        numbering, while a value of mod128(4) specifies Extended 
+        numbering."
+        ::= { x25CSTEntry 6 }
+
+    x25CSTFlowCntrlNeg  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable/disable flow control
+        negotiation on this interface. If the value is disable (0), the
+        values of window size and packet size are the specified default
+        values. If the value is enable (1), then this DTE offers its
+        negotiation values and these may be negotiated downwards by the
+        remote entity."
+        ::= { x25CSTEntry 7 }
+
+    x25CSTDefaultWinSize  OBJECT-TYPE
+        SYNTAX  INTEGER (1..127)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the window size used if Negoriation is not
+        enabled.
+        If basic frame numbering is in operation, then it cannot have
+        a value greater than 7.  If extended frame numbering is enabled,
+        then it can have a value up to 127."
+        ::= { x25CSTEntry 8 }
+
+    x25CSTDefaultPktSize  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the packet size used if Negotiation is
+        not enabled.  This must be less than or equal to the Physical
+        Block size on the device."
+        ::= { x25CSTEntry 9 }
+
+    x25CSTNegWinSize  OBJECT-TYPE
+        SYNTAX  INTEGER (1..127)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the window size requested when a connection
+        is being initialised, if Negotiation is enabled.
+        If basic frame numbering is in operation, then it cannot have
+        a value greater than 7.  If extended frame numbering is enabled, 
+        then it can have a value up to 127."
+        ::= { x25CSTEntry 10 }
+
+    x25CSTNegPktSize  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the packet size requested at call setup time,
+        if Negotiation is enabled.  This should not be larger than the
+        Physical Block size defined for this device."
+        ::= { x25CSTEntry 11 }
+
+    x25CSTCUGSub  OBJECT-TYPE
+        SYNTAX  INTEGER (0..4)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter allows the enabling of the Closed
+        User Group (CUG) selection facitily for connections on this
+        interface. A Set Request with a value of cugOnly(4) enables
+        Closed User Group operation whilst a value of disabled(0)
+        disables it."
+        ::= { x25CSTEntry 12 }
+
+    x25CSTLclCUGValue  OBJECT-TYPE
+        SYNTAX  INTEGER (0..99)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This value is the number which uniquely defines
+        the Closed User Group value to be used within the Closed User
+        Group Selection facility of the call packet."
+        ::= { x25CSTEntry 13 }
+
+    x25CSTRvrsChrgReq  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "When a connection is being set up, this device will
+        reuqest that Reverse Charging of the call be accepted by the
+        remote end, if the value of this parameter is set to enable(1).
+        A Set Request with a value of disabled(0) disabled this feature."
+        ::= { x25CSTEntry 14 }
+
+    x25CSTRvrsChrgAcc  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "When a connection is being set up, this station
+        will accept reverse charging of the call, initiated by the
+        remote end, if the value of this object is set to enable(1).
+        A Set Request with a value of disabled(0) disabled this feature."
+        ::= { x25CSTEntry 15 }
+
+-- x25 Connection Control Table
+
+    x25ConControlTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  X25CCTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This table holds configurable data used in 
+        controlling each X25 SVC."
+        ::= { x25 4 }
+    
+    x25CCTEntry  OBJECT-TYPE
+        SYNTAX   X25CCTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "Each entry contains configurable objects allowing
+        the control of the status of the SVC."
+        INDEX    { x25CCTIndex }
+        ::= { x25ConControlTable 1 }
+
+    X25CCTEntry ::= SEQUENCE {
+        x25CCTIndex
+            INTEGER,
+        x25CCTManualConnect
+            INTEGER,
+        x25CCTManualDisconnect
+            INTEGER,
+        x25CCTCfgAutoConRetry
+            INTEGER,
+        x25CCTOperAutoConRetryFlg
+            INTEGER,
+        x25CCTAutoConRetryTimer
+            INTEGER,
+        x25CCTMaxAutoConRetries
+            INTEGER,
+        x25CCTCfgTODControl
+            INTEGER,
+        x25CCTCurrentTODControl
+                INTEGER,
+        x25CCTTODToConnect
+            OCTET STRING,
+        x25CCTTODToDisconnect
+            OCTET STRING
+        }
+    
+    x25CCTIndex  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This index defines the interface for which
+        this entry is valid.  This index is equivalent to the
+        phySerIfNumber index representing the physical serial 
+        interfaces on the device."
+        ::= { x25CCTEntry 1 }    
+
+    x25CCTManualConnect  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noAction (1),
+            connect (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to perform a manual
+        (re)connect of the x.25 SVC, when its value is set to
+        connect(2). A value of noAction(1) is returned in response
+        to Get Requests."
+        ::= { x25CCTEntry 2 }
+    
+    x25CCTManualDisconnect  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noAction (1),
+            disconnect (2)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to perform a manual
+        disconnect of the x.25 SVC, when its value is set to
+        disconnect(2). A value of noAction(1) is returned in response
+        to Get Requests."
+        ::= { x25CCTEntry 3 }
+    
+    x25CCTCfgAutoConRetry  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to allow the user to
+        configure whether retries are to take place when an SVC is
+        being established. If the station is under manual control
+        then the actual value of the automatic connect retry flag
+        may be different to this object's value. 
+        A Set Request with a value of enabled(1) enables this feature
+        whilst a Set Request with a value od disabled(0) disables it."
+        ::= { x25CCTEntry 4 }
+
+    x25CCTOperAutoConRetryFlg  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This parameter is the actual operation flag which
+        tells us if automatic connect retry is currently enabled on this
+        station. The value of the x25CCTCfgAutoConRetry object is the
+        last configured value of the automatic connect retry flag.
+        A Set Request with a value of enabled(1) enables this feature
+        whilst a Set Request with a value od disabled(0) disables it."
+        ::= { x25CCTEntry 5 }
+
+    x25CCTAutoConRetryTimer  OBJECT-TYPE
+        SYNTAX  INTEGER (1..3600)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This is the retry timer, which defines the delay,
+        in seconds, between consecutive attempts to establish the X25
+        SVC."
+        ::= { x25CCTEntry 6 }
+
+    x25CCTMaxAutoConRetries   OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This defines the maximum no of attempts to set
+        up a single X25 SVC allowed.  A value of 0 means there is no
+        limit to the number of retries allowed."
+        ::= { x25CCTEntry 7 }
+
+    x25CCTCfgTODControl  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable/disable the
+        time-of-day control mechanism, which can control the time
+        period for which an SVC may be active, between two devices.
+        Setting this object also sets the current operating value
+        of the underlying variable. However, this value survives a
+        reset whereas the current value may not.
+        A Set Request with a value of enabled(1) enables this feature
+        whilst a Set Request with a value od disabled(0) disables it."
+
+        ::= { x25CCTEntry 8 }
+
+    x25CCTCurrentTODControl  OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter is used to enable/disable the
+        time-of-day control mechanism, which can control the time
+        period for which an SVC is active. A set to this object 
+        only sets the operating value of the underlying variable
+        and does not survive a station reset.
+        A Set Request with a value of enabled(1) enables this feature
+        whilst a Set Request with a value od disabled(0) disables it."
+
+            ::= { x25CCTEntry 9 }
+
+    
+    x25CCTTODToConnect  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(4))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter defined the time of day at
+        which the time-of-day control mechanism, when enabled,
+        will attempt to establish an SVC to the remote end.
+        If the SVC exists at this time then no action is taken.
+        The format of the time is as follows hhmm where hh is the
+        hour and mm is the minute."
+        ::= { x25CCTEntry 10 }
+
+    x25CCTTODToDisconnect   OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(4))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This parameter defined the time of day at
+        which the time-of-day control mechanism, when enabled,
+        will attempt to disconnect an SVC from the remote end.
+        If the SVC is already disconnected at this time then
+        no action is taken. The format of the time is as follows:
+        hhmm where hh is the hour and mm is the minute."
+        ::= { x25CCTEntry 11 }
+
+-- x25 Timer Table
+
+    x25TimerTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF X25TTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This table holds the configurable timers used
+        with each X25 connection (SVC)."
+        ::= { x25 5 }    
+
+    x25TTEntry  OBJECT-TYPE
+        SYNTAX   X25TTEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "Each entry holds the configurable values of
+        timers and retry limits in operation for each SVC."
+        INDEX    { x25TTIndex }
+        ::= { x25TimerTable 1 }
+
+    X25TTEntry ::= SEQUENCE {
+        x25TTIndex
+            INTEGER,
+        x25TTT20Timer
+            INTEGER,
+        x25TTT21Timer
+            INTEGER,
+        x25TTT22Timer
+            INTEGER,
+        x25TTT23Timer
+            INTEGER,
+        x25TTR20Limit
+            INTEGER,
+        x25TTR22Limit
+            INTEGER,
+        x25TTR23Limit
+            INTEGER
+    }
+    
+    x25TTIndex   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This index defines the interface for which this
+        entry is valid.  This index is equivalent to the phySerIfNumber
+        index representing the physical serial interfaces on the device."
+        ::= { x25TTEntry 1 }
+
+    x25TTT20Timer   OBJECT-TYPE
+        SYNTAX  INTEGER (1..1024)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This defines the value of the restart retransmit
+        timer, in seconds."
+        ::= { x25TTEntry 2 }
+
+    x25TTT21Timer   OBJECT-TYPE
+        SYNTAX  INTEGER (1..1024)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This defines the value of the call retransmit
+        timer, in seconds."
+        ::= { x25TTEntry 3 }
+
+    x25TTT22Timer   OBJECT-TYPE
+        SYNTAX  INTEGER (1..1024)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This defines the value of the reset retransmit
+        timer, in seconds."
+        ::= { x25TTEntry 4 }
+
+    x25TTT23Timer   OBJECT-TYPE
+        SYNTAX  INTEGER (1..1024)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This defines the value of the clear retransmit timer,
+        in seconds."
+        ::= { x25TTEntry 5 }
+
+    x25TTR20Limit   OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This defines the maximum value of the restart
+        retransmit count, when operating as a DTE."
+        ::= { x25TTEntry 6 }
+
+    x25TTR22Limit   OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This defines the maximum value of the reset
+        retransmit count, when operating as a DTE."
+        ::= { x25TTEntry 7 }
+
+    x25TTR23Limit   OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "This defines the maximum value of the clear
+        retransmit count, when operating as a DTE."
+        ::= { x25TTEntry 8 }
+    
+-- x25 STATUS   Table 
+
+    x25StatusTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  X25StatusTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This table holds status information for each
+        X25 SVC and for each interface."
+        ::= { x25 6 }
+
+    x25StatusTableEntry  OBJECT-TYPE
+        SYNTAX   X25StatusTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "Each entry keeps status information on each
+        Interface/SVC."
+        INDEX    { x25StatusIndex }
+        ::= { x25StatusTable 1 }
+
+    X25StatusTableEntry ::= SEQUENCE {
+        x25StatusIndex
+            INTEGER,
+        x25StatusIfStatus
+            INTEGER,
+        x25StatusSVCStatus
+            INTEGER,
+        x25StatusWinSize
+            INTEGER,
+        x25StatusPktSize
+            INTEGER,
+        x25StatusCauseLastInClear
+            INTEGER,
+        x25StatusDiagLastInClear
+            INTEGER
+        }
+    
+    x25StatusIndex   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This index pertains to the interface/SVC
+        for which this entry is valid."
+        ::= { x25StatusTableEntry 1 }
+    
+    x25StatusIfStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object defines the current status of the
+        interface.  More specifically, this is the state of the logical
+        channel number 0, which governs the state of the entire SVC."
+        ::= { x25StatusTableEntry 2 }    
+    
+    x25StatusSVCStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object defines the current status of the
+        SVC, more specifically, the state of the active logical
+        channel.  This object has no meaning if the state of the
+        Interface is not r1PktLevelReady."
+        ::= { x25StatusTableEntry 3 }    
+    
+    x25StatusWinSize   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the window size in operation for the
+        current SVC.  This may be less than the Configured Window
+        sized depending on whether Flow Control is enabled, and the 
+        result of the negotiation."
+        ::= { x25StatusTableEntry 4 }    
+    
+    x25StatusPktSize   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the Packet size in use for the current SVC.
+        This may be less than the Configured values, depending on whether
+        Flow Control is enabled and if negotiation has taken place."
+        ::= { x25StatusTableEntry 5 }    
+    
+    x25StatusCauseLastInClear   OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object defines the Cause of the Last Incoming
+        Clear Received on this interface.  It is in th e form of a
+        bit-map, the values and combinations of which are too numerous
+        to list here.  The values may be found by referring to the
+        appropriate section in the X25 PLP standard from CCITT."
+        ::= { x25StatusTableEntry 6 }    
+    
+    x25StatusDiagLastInClear   OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object defines the Diagnostic of the Last
+        Incoming Clear Received on this interface.  It is in the
+        form of a bit-map, the values and combinations of which are
+        too numerous to list here.  The values may be found by referring
+        to the appropriate section in the X25 PLP standard from CCITT."
+        ::= { x25StatusTableEntry 7 }    
+
+-- x25 Statistics Table
+    
+    x25StatsTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  X25StatsTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "This table holds all statistical data for
+        each x25 SVC.  There are two entries in this table, for a 4942."
+        ::= { x25 7 }
+
+    x25StatsTableEntry  OBJECT-TYPE
+        SYNTAX  X25StatsTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION "Each entry in the Table includes all the
+        statistical objects for each interface."
+        INDEX    { x25STSVCIndex }
+        ::= { x25StatsTable 1 }
+
+    X25StatsTableEntry ::= SEQUENCE {
+        x25STSVCIndex
+            Counter,
+        x25STTxDataPkts
+            Counter,
+        x25STRxDataPkts
+            Counter,
+        x25STTxConnectReqPkts
+            Counter,
+        x25STRxIncomingCallPkts
+            Counter,
+        x25STTxClearReqPkts
+            Counter,
+        x25STRxClearIndPkts
+            Counter,
+        x25STTxResetReqPkts
+            Counter,
+        x25STRxResetIndPkts
+            Counter,
+        x25STTxRestartReqPkts
+            Counter,
+        x25STRxRestartIndPkts
+            Counter
+    }
+
+    x25STSVCIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This index pertains to the interface for
+        which this entry is valid."
+        ::= { x25StatsTableEntry 1 }
+    
+    x25STTxDataPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Data Pkts transmitted
+        on this interface."
+        ::= { x25StatsTableEntry 2 }
+    
+    x25STRxDataPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Data Pkts received
+        on this interface."
+        ::= { x25StatsTableEntry 3 }
+    
+    x25STTxConnectReqPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Connect Request packets
+        transmitted on this interface."
+        ::= { x25StatsTableEntry 4 }
+    
+    x25STRxIncomingCallPkts  OBJECT-TYPE
+        SYNTAX  Counter 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of incoming Call request
+        packets received on this interface."
+        ::= { x25StatsTableEntry 5 }
+    
+    x25STTxClearReqPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Clear Request packets
+        transmitted on this interface."
+        ::= { x25StatsTableEntry 6 }
+    
+    x25STRxClearIndPkts  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Clear Indication packets
+        received on this interface."
+        ::= { x25StatsTableEntry 7 }
+    
+    x25STTxResetReqPkts  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Reset Request packets
+        transmitted on this interface."
+        ::= { x25StatsTableEntry 8 }
+    
+    
+    x25STRxResetIndPkts  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Reset Indication packets
+        received on this interface."
+        ::= { x25StatsTableEntry 9 }
+    
+    x25STTxRestartReqPkts  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Restart Request packets
+        transmitted on this interface."
+        ::= { x25StatsTableEntry 10 }
+    
+    x25STRxRestartIndPkts  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This is the number of Restart Indication packets
+        received on this interface."
+        ::= { x25StatsTableEntry 11 }
+
+
+        END
+

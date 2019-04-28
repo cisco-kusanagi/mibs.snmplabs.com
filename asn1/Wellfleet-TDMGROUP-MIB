@@ -1,0 +1,938 @@
+Wellfleet-TDMGROUP-MIB DEFINITIONS ::= BEGIN
+
+-- filename: tdmgroup.mib
+-- Created by Jim Waclawik version 1.0
+-- Creation date: Wed Sep 30 16:06:00 EDT 1998
+-- Updated by Jim Waclawik on 05-19-99
+
+
+    IMPORTS
+
+      Counter, TimeTicks
+        FROM RFC1155-SMI
+      OBJECT-TYPE
+        FROM RFC-1212
+      wfTdmGroup
+        FROM Wellfleet-COMMON-MIB;
+
+
+    wfTdmCctInfoTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WfTdmCctInfoEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The table of TDM Circuits."
+        ::= { wfTdmGroup 1 }
+
+	wfTdmCctInfoEntry OBJECT-TYPE
+	    SYNTAX  WfTdmCctInfoEntry       
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Entry format for TDM Circuit Info"
+	    INDEX   { wfTdmCctInfoNumber }
+	    ::= { wfTdmCctInfoTable 1 }
+
+	WfTdmCctInfoEntry ::= SEQUENCE {
+		wfTdmCctInfoDelete
+		    INTEGER,
+		wfTdmCctInfoNumber
+		    INTEGER,
+		wfTdmCctInfoBus
+		    INTEGER,
+		wfTdmCctInfoResType
+		    INTEGER,
+		wfTdmCctInfoH110CctId
+		    INTEGER,
+		wfTdmCctInfoH110CctState
+		    INTEGER,
+		wfTdmCctInfoH110NumTslots
+		    INTEGER,
+		wfTdmCctInfoH110TslotSubrate
+		    INTEGER,
+		wfTdmCctInfoH110Endpt1Slot
+		    INTEGER,
+		wfTdmCctInfoH110Endpt1Connector
+		    INTEGER,
+		wfTdmCctInfoH110Endpt2Slot
+		    INTEGER,
+		wfTdmCctInfoH110Endpt2Connector
+		    INTEGER,
+    	        wfTdmCctInfoUnderruns
+    		    Counter,
+    	        wfTdmCctInfoOverruns
+    		    Counter
+	    }
+
+        wfTdmCctInfoDelete OBJECT-TYPE
+            SYNTAX INTEGER {
+                           created(1),
+                           deleted(2)
+                           }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Create/Delete parameter"
+            DEFVAL  { created }
+            ::= { wfTdmCctInfoEntry 1 }
+
+	wfTdmCctInfoNumber OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "TDM Circuit Number, filled in by driver.
+		     This is the wfCircuitNumber index from
+		     wfCircuitNameEntry."
+	    ::= { wfTdmCctInfoEntry 2 }
+
+	wfTdmCctInfoBus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			    h110(1)
+			    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "TDM Circuit Bus Type (H.110 or other TDM bus type).
+		     This allows future support of other TDM buses."
+	    DEFVAL  { h110 }
+	    ::= { wfTdmCctInfoEntry 3 }
+
+        wfTdmCctInfoResType OBJECT-TYPE
+            SYNTAX  INTEGER {
+                            notdmresources(1),
+                            switchedh110(2),
+                            routedh110(3),
+                            cesh110(4)
+                            }       
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "TDM resource utilization by this circuit."
+	    DEFVAL  { notdmresources }
+	    ::= { wfTdmCctInfoEntry 4 }
+
+	wfTdmCctInfoH110CctId OBJECT-TYPE
+	    SYNTAX  INTEGER(0..4096)
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "H110 Circuit ID, filled in by driver.
+		     This index is used by software to 
+		     track circuits on the H.110 backplane."
+	    ::= { wfTdmCctInfoEntry 5 }
+
+	wfTdmCctInfoH110CctState OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			    unconfigured(1),
+			    configurednotup(2),
+			    up(3),
+			    disabled(4)
+			    }
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "TDM Circuit state, filled in by driver,
+		     defined for H.110 circuits only."
+	    ::= { wfTdmCctInfoEntry 6 }
+
+       wfTdmCctInfoH110NumTslots  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..32)
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Number of timeslots occupied by this H.110 
+		     TDM circuit, defined for H.110 circuits only.  
+		     Since TDM circuits are full-duplex, setting
+		     this attribute to N will allocate N tx 
+		     timeslots and N rx timeslots."
+	    DEFVAL  { 1 }
+	    ::= { wfTdmCctInfoEntry 7 }
+
+       wfTdmCctInfoH110TslotSubrate OBJECT-TYPE
+            SYNTAX  INTEGER {
+                            subrate64k(1),
+                            subrate56kmsb(2),
+                            subrate56klsb(3)
+                            }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Specifies data rate within each and
+                     every timeslot within this TDM circuit.  
+                     64k is for a full timeslot (8 bits).  
+                     56kmsb sets the first bit on the wire 
+                     to a 1, and data is carried on the next 
+                     7.  56klsb carries data on the first 7 
+                     bits, and sets the last bit to a 1."
+            DEFVAL  { subrate64k }
+	    ::= { wfTdmCctInfoEntry 8 }
+
+	wfTdmCctInfoH110Endpt1Slot OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+                    "The GAME Instance Id Slot of the first 
+                     endpoint of this H.110 TDM Circuit.
+                     For the FBR, the Slot is always 1."
+            DEFVAL  { 1 }
+	    ::= { wfTdmCctInfoEntry 9 }
+
+        wfTdmCctInfoH110Endpt1Connector OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Connector number of the first endpoint of
+		     this H.110 TDM circuit.  This follows the
+                     FBR convention of (PCI slot) * 1000 + 
+                     (module number) * 100 + port."
+            DEFVAL  { 0 }
+	    ::= { wfTdmCctInfoEntry 10 }
+
+	wfTdmCctInfoH110Endpt2Slot OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+                    "The GAME Instance Id Slot of the second 
+                     endpoint of this switchedH110 H.110 TDM 
+                     Circuit.  This attribute is required for 
+                     switchedH110 TDM circuits ONLY.
+                     For the FBR, the Slot is always 1."
+            DEFVAL  { 1 }
+	    ::= { wfTdmCctInfoEntry 11 }
+
+        wfTdmCctInfoH110Endpt2Connector OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Connector number of the second endpoint of
+		     this switchedH110 TDM circuit.  This follows 
+                     the FBR convention of (PCI slot) * 1000 + 
+                     (module number) * 100 + port.  This attribute
+                     is required for switchedH110 TDM circuits ONLY."
+            DEFVAL  { 0 }
+	    ::= { wfTdmCctInfoEntry 12 }
+
+        wfTdmCctInfoUnderruns OBJECT-TYPE
+            SYNTAX	Counter
+            ACCESS	read-only
+            STATUS	mandatory
+            DESCRIPTION
+                    "Number of TDM Circuit underruns"
+            ::= { wfTdmCctInfoEntry 13 }
+
+        wfTdmCctInfoOverruns OBJECT-TYPE
+            SYNTAX	Counter
+            ACCESS	read-only
+            STATUS	mandatory
+            DESCRIPTION
+                    "Number of TDM Circuit overruns"
+            ::= { wfTdmCctInfoEntry 14 }
+
+
+
+    wfH110TimeslotTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WfH110TimeslotEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The table of h.110 timeslots, for all TDM Circuits."
+        ::= { wfTdmGroup 2 }
+
+	wfH110TimeslotEntry OBJECT-TYPE
+	    SYNTAX  WfH110TimeslotEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "An entry that describes a single h.110  
+		     transmit timeslot for a given TDM circuit."
+	    INDEX   { wfH110TimeslotCctId,
+		      wfH110TimeslotIndex  }
+	    ::= { wfH110TimeslotTable 1 }
+
+	WfH110TimeslotEntry ::= SEQUENCE {
+		wfH110TimeslotCctId 
+		    INTEGER,
+		wfH110TimeslotIndex 
+		    INTEGER,
+		wfH110TimeslotTxStreamNumber
+		    INTEGER,
+		wfH110TimeslotTxTimeslotNumber
+		    INTEGER,
+		wfH110TimeslotTxBitMask
+		    OCTET STRING,
+		wfH110TimeslotRxStreamNumber
+		    INTEGER,
+		wfH110TimeslotRxTimeslotNumber
+		    INTEGER,
+		wfH110TimeslotRxBitMask
+		    OCTET STRING
+	    }
+
+	wfH110TimeslotCctId OBJECT-TYPE
+	    SYNTAX  INTEGER(0..4096)
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "H.110 Circuit Id, filled in by driver.
+		     This comes from the wfTdmCctInfoH110CctId
+		     attribute in the wfTdmCctInfoEntry."
+	    ::= { wfH110TimeslotEntry 1 }
+
+	wfH110TimeslotIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Timeslot index for the given H.110 Connection, 
+		     filled in by driver, not to be confused with the 
+		     H.110 timeslot number within a given stream."
+	    ::= { wfH110TimeslotEntry 2 }
+
+	wfH110TimeslotTxStreamNumber OBJECT-TYPE
+	    SYNTAX  INTEGER(0..31)
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "H.110 Transmit stream number, filled in by driver"
+	    ::= { wfH110TimeslotEntry 3 }
+
+	wfH110TimeslotTxTimeslotNumber OBJECT-TYPE
+	    SYNTAX  INTEGER(0..127)
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "H.110 Transmit timeslot number, within the  
+		     given Transmit stream number, filled in by driver"
+	    ::= { wfH110TimeslotEntry 4 }
+
+	wfH110TimeslotTxBitMask OBJECT-TYPE
+	    SYNTAX  OCTET STRING (SIZE (1))
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "H.110 Transmit timeslot 8-bit mask, filled in by driver.
+		     For each bit, 
+		     0 = mask from connection, 
+		     1 = keep in connection."
+	    ::= { wfH110TimeslotEntry 5 }
+
+	wfH110TimeslotRxStreamNumber OBJECT-TYPE
+	    SYNTAX  INTEGER(0..31)
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "H.110 Receive stream number, filled in by driver"
+	    ::= { wfH110TimeslotEntry 6 }
+
+	wfH110TimeslotRxTimeslotNumber OBJECT-TYPE
+	    SYNTAX  INTEGER(0..127)
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "H.110 Receive timeslot number, within the 
+		     given Receive stream number, filled in by driver"
+	    ::= { wfH110TimeslotEntry 7 }
+
+	wfH110TimeslotRxBitMask OBJECT-TYPE
+	    SYNTAX  OCTET STRING (SIZE (1))
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "H.110 Receive timeslot 8-bit mask, filled in by driver.
+		     For each bit, 
+		     0 = mask from connection, 
+		     1 = keep in connection."
+	    ::= { wfH110TimeslotEntry 8 }
+
+
+    wfH110ClockConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WfH110ClockConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "H.110 clock configuration, configured by the user."
+        ::= { wfTdmGroup 3 }
+
+	wfH110ClockConfigEntry OBJECT-TYPE
+	    SYNTAX  WfH110ClockConfigEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "One entry per H.110 backplane, which defines 
+		     the h.110 clock sources.  The priority of a 
+                     clock source is implicit in it's order in the 
+                     entry.  wfH110ClockConfigClk1Connector is the primary, 
+                     wfH110ClockConfigClk2Connector is the secondary, 
+                     and so on."
+	    INDEX   { wfH110ClockConfigSlot  }
+	    ::= { wfH110ClockConfigTable 1 }
+
+	WfH110ClockConfigEntry ::= SEQUENCE {
+		wfH110ClockConfigDelete 
+		    INTEGER,
+		wfH110ClockConfigSlot
+		    INTEGER,
+		wfH110ClockConfigT1E1Clks
+		    INTEGER,
+		wfH110ClockConfigClk1Connector
+		    INTEGER,
+		wfH110ClockConfigClk2Connector
+		    INTEGER,
+		wfH110ClockConfigClk3Connector
+		    INTEGER,
+		wfH110ClockConfigClk4Connector
+		    INTEGER,
+		wfH110ClockConfigClk5Connector
+		    INTEGER,
+		wfH110ClockConfigClk6Connector
+		    INTEGER,
+		wfH110ClockConfigClk7Connector
+		    INTEGER,
+		wfH110ClockConfigClk8Connector
+		    INTEGER,
+		wfH110ClockConfigClk9Connector
+		    INTEGER,
+		wfH110ClockConfigCurrentClockSource
+		    INTEGER,
+		wfH110ClockConfigCurrentClockState
+		    INTEGER
+	    }
+
+	wfH110ClockConfigDelete OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			      created(1),
+			      deleted(2)
+			    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Create/Delete parameter."
+	    DEFVAL  { created }
+	    ::= { wfH110ClockConfigEntry 1 }
+
+	wfH110ClockConfigSlot OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+                    "The GAME Instance Id Slot of the H.110 bus.
+                     For the FBR, the Slot is always 1."
+	    ::= { wfH110ClockConfigEntry 2 }
+
+        wfH110ClockConfigT1E1Clks OBJECT-TYPE
+            SYNTAX  INTEGER {
+                              t1(1),
+                              e1(2)
+                            }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Specifies the frequency (T1 or E1) of the H.110 
+                     clock sources. "
+            DEFVAL  { t1 }
+            ::= { wfH110ClockConfigEntry 3 }
+
+	wfH110ClockConfigClk1Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 1.
+		     To select the local oscillator, use the number
+                     0 (zero) as the connector."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 4 }
+
+	wfH110ClockConfigClk2Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 2.
+		     To select the local oscillator, use the number
+                     0 (zero) as the connector."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 5 }
+
+	wfH110ClockConfigClk3Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 3.
+		     To select the local oscillator, use the number
+                     0 (zero) as the connector."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 6 }
+
+	wfH110ClockConfigClk4Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 4.
+		     To select the local oscillator, use the number
+                     0 (zero) as the connector."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 7 }
+
+	wfH110ClockConfigClk5Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 5.
+		     To select the local oscillator, use the number
+                     0 (zero) as the connector."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 8 }
+
+	wfH110ClockConfigClk6Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 6.
+		     To select the local oscillator, use the number
+                     0 (zero) as the connector."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 9 }
+
+	wfH110ClockConfigClk7Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 7.
+		     To select the local oscillator, use the number
+                     0 (zero) as the connector."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 10 }
+
+	wfH110ClockConfigClk8Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 8.
+		     To select the local oscillator, use the number
+                     0 (zero) as the connector."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 11 }
+
+	wfH110ClockConfigClk9Connector OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Specifies the GAME Instance Id Connector of   
+		     H.110 clock source 9.
+		     This cannot be changed.  It is always 0 (zero) 
+                     which specifies the local oscillator."
+	    DEFVAL  { 0 }
+	    ::= { wfH110ClockConfigEntry 12 }
+
+        wfH110ClockConfigCurrentClockSource OBJECT-TYPE
+            SYNTAX  INTEGER {
+                                clock1(1),
+                                clock2(2),
+                                clock3(3),
+                                clock4(4),
+                                clock5(5),
+                                clock6(6),
+                                clock7(7),
+                                clock8(8),
+                                clock9(9)
+                            }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Number of the currently active H.110 clock
+                     source.  For example, a value of 1 means that 
+                     wfH110ClockConfigClk1Connector is the active  
+                     clock source."
+            DEFVAL  { clock1 }
+            ::= { wfH110ClockConfigEntry 13 }
+
+        wfH110ClockConfigCurrentClockState OBJECT-TYPE
+            SYNTAX  INTEGER {
+                                unknown(1),
+                                good(2),
+                                failed(3)
+                            }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "State of the current clock source 
+                     (good, failed, unknown, etc.).
+                     Filled in by TDM Manager."
+            DEFVAL  { unknown }
+            ::= { wfH110ClockConfigEntry 14 }
+
+
+    wfTdmVirtualTrunkingTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WfTdmVirtualTrunkingEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Virtual Trunking Control, configured by the user."
+        ::= { wfTdmGroup 4 }
+
+	wfTdmVirtualTrunkingEntry OBJECT-TYPE
+	    SYNTAX  WfTdmVirtualTrunkingEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "One entry per FBR, which defines the configuration
+		     of the virtual trunking mechanism.  Changing any 
+		     attributes in this entry will require the TDM 
+		     Manager to restart."
+	    INDEX   { wfTdmVirtualTrunkingSlot  }
+	    ::= { wfTdmVirtualTrunkingTable 1 }
+
+	WfTdmVirtualTrunkingEntry ::= SEQUENCE {
+		wfTdmVirtualTrunkingDelete 
+		    INTEGER,
+		wfTdmVirtualTrunkingSlot
+		    INTEGER,
+		wfTdmVirtualTrunking64KChan
+		    INTEGER,
+		wfTdmVirtualTrunking56KChan
+		    INTEGER
+	    }
+
+	wfTdmVirtualTrunkingDelete OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			      created(1),
+			      deleted(2)
+			    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		    "Create/Delete parameter."
+	    DEFVAL  { created }
+	    ::= { wfTdmVirtualTrunkingEntry 1 }
+
+	wfTdmVirtualTrunkingSlot OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+                    "The GAME Instance Id Slot of the H.110 bus.
+                     For the FBR, the Slot is always 1."
+	    ::= { wfTdmVirtualTrunkingEntry 2 }
+
+        wfTdmVirtualTrunking64KChan OBJECT-TYPE
+            SYNTAX  INTEGER (0..64)
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Specifies the number of channels to reserve for
+                     the 64kb/s virtual trunk. The remainder of the
+                     channels will be reserved for the 56kb/s trunk.
+                     This MUST be an even number!
+                     Note that if you assign N channels to the 64kb/s
+                     trunk, you will have (64-N)/2 channels available
+                     for the 56kb/s trunk."
+            DEFVAL  { 32 }
+            ::= { wfTdmVirtualTrunkingEntry 3 }
+
+        wfTdmVirtualTrunking56KChan OBJECT-TYPE
+            SYNTAX  INTEGER (0..32)
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "This read-only attribute specifies the number of 
+                     channels reserved for the 56kb/s virtual trunk.
+                     This attribute is filled in by the TDM Manager."
+            DEFVAL  { 16 }
+            ::= { wfTdmVirtualTrunkingEntry 4 }
+
+    wfTdmIfTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfTdmIfEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "TDM Interface line record"
+        ::= { wfTdmGroup 5 }
+
+    wfTdmIfEntry OBJECT-TYPE
+        SYNTAX	WfTdmIfEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the TDM Interface table"
+        INDEX	{ wfTdmIfSlot,
+    		  wfTdmIfConnector }
+        ::= { wfTdmIfTable 1 }
+
+    WfTdmIfEntry ::= SEQUENCE {
+    	    wfTdmIfDelete
+    		INTEGER,
+    	    wfTdmIfDisable
+    		INTEGER,
+    	    wfTdmIfState
+    		INTEGER,
+    	    wfTdmIfSlot
+    		INTEGER,
+    	    wfTdmIfConnector
+    		INTEGER,
+    	    wfTdmIfCct
+    		INTEGER,
+	    wfTdmIfTimeslotSubrate
+		INTEGER,
+            wfTdmIfNumTslots
+                INTEGER,
+    	    wfTdmIfRxOctets
+    		Counter,
+    	    wfTdmIfTxOctets
+    		Counter,
+    	    wfTdmIfCableType
+    		INTEGER,
+    	    wfTdmIfLastChange
+    		TimeTicks,
+            wfTdmIfEiaStatus
+                INTEGER,
+            wfTdmIfEiaStatusReset
+                INTEGER,
+    	    wfTdmIfLineNumber
+    		INTEGER
+        }
+
+    wfTdmIfDelete OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    created(1),
+    		    deleted(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Create/Delete parameter"
+        DEFVAL	{ created }
+        ::= { wfTdmIfEntry 1 }
+
+    wfTdmIfDisable OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    enabled(1),
+    		    disabled(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Enable/Disable parameter"
+        DEFVAL	{ enabled }
+        ::= { wfTdmIfEntry 2 }
+
+    wfTdmIfState OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    up(1),
+    		    down(2),
+    		    init(3),
+    		    wait(4),
+    		    notpres(5)
+    		}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Line Driver state variable, Reflects the current state of the
+                Line Driver.  "
+        DEFVAL	{ notpres }
+        ::= { wfTdmIfEntry 3 }
+
+    wfTdmIfSlot OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Instance ID Slot, filled in by driver"
+        ::= { wfTdmIfEntry 4 }
+
+    wfTdmIfConnector OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Instance ID Connector, filled in by driver. For the FBR
+                this attribute is an encoded value and is equal to
+                'pci slot *1000' + 'module'*100 + 'connector'."
+        ::= { wfTdmIfEntry 5 }
+
+    wfTdmIfCct OBJECT-TYPE
+        SYNTAX	INTEGER(1..1023)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "CCT number for this line instance"
+        ::= { wfTdmIfEntry 6 }
+
+    wfTdmIfTimeslotSubrate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    subrate64k(1),
+                    subrate56kmsb(2),
+                    subrate56klsb(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies data rate within each and
+                 every timeslot within a TDM circuit.  
+                 64k is for a full timeslot (8 bits).  
+                 56kmsb sets the first bit on the wire 
+                 to a 1, and data is carried on the next 
+                 7.  56klsb carries data on the first 7 
+                 bits, and sets the last bit to a 1."
+        DEFVAL  { subrate64k }
+        ::= { wfTdmIfEntry 7 }
+
+    wfTdmIfNumTslots  OBJECT-TYPE
+        SYNTAX  INTEGER(1..32)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of TDM circuit timeslots occupied by 
+                 this interface, defined for H.110 circuits only.
+                 Since TDM circuits are full-duplex, setting
+                 this attribute to N will allocate N tx
+                 timeslots and N rx timeslots."
+        DEFVAL  { 1 }
+        ::= { wfTdmIfEntry 8 }
+
+    wfTdmIfRxOctets OBJECT-TYPE
+        SYNTAX	Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of octets received"
+        ::= { wfTdmIfEntry 9 }
+
+    wfTdmIfTxOctets OBJECT-TYPE
+        SYNTAX	Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of octets transmitted"
+        ::= { wfTdmIfEntry 10 }
+
+    wfTdmIfCableType OBJECT-TYPE
+        SYNTAX	INTEGER{
+                    rs232(1), 
+                    rs422(2), 
+                    v35(3), 
+                    x21(4),
+                    null(10)
+                }
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                " Shows the type of Cable attached to the TDM Interface port"
+        ::= { wfTdmIfEntry 11 }
+
+    wfTdmIfLastChange OBJECT-TYPE
+        SYNTAX	TimeTicks
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The value of SysUpTime at the time the interface entered 
+                it's current operational state (UP state).  SysUpTime is 
+                defined as the time (in hundredths of a second) since the 
+                network management portion of the system was last 
+                re-initialized.  Usually the time since boot."
+        ::= { wfTdmIfEntry 12 }
+
+    wfTdmIfEiaStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    txd(1),
+                    rxd(2),
+                    rts(4),
+                    cts(8),
+                    dsr(16),
+                    dcd(32),
+                    txc(64),
+                    rxc(128),
+                    dtr(256),
+                    txdToggled(65536),
+                    rxdToggled(131072),
+                    rtsToggled(262144),
+                    ctsToggled(524288),
+                    dsrToggled(1048576),
+                    dcdToggled(2097152),
+                    txcToggled(4194304),
+                    rxcToggled(8388608),
+                    dtrToggled(16777216)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The state of the EIA signals at the router interface.
+                 The signals are designated as bits in this entry. If the
+                 signal is asserted, it is marked as a 1. If not asserted,
+                 it is marked as a 0. The state of each signal will be updated
+                 every second. Bits 0-15 are reserved for actual signal state.
+                 Bits 16-31 are reserved for indicating toggling of the signal.
+                 Toggling signals are indicated as a 1. Signals not toggling
+                 are indicated with a 0.
+
+                 The following signals are defined and monitored:
+
+                 The bit definition as as follows with bit #0 being the LSB.
+                 * signal status - bits 0-15 *
+                 bit 0 = TXD transmit data
+                     1 = RXD receive data
+                     2 = RTS request to send
+                     3 = CTS clear to send
+                     4 = DSR data set ready
+                     5 = DCD data carrier detect
+                     6 = TXC transmit clock
+                     7 = RXC receive clock
+                     8 = DTR data terminal ready.
+                 * signal toggle status bits 16-31 *
+                 bit 16 = TXD transmit data
+                     17 = RXD receive data
+                     18 = RTS request to send
+                     19 = CTS clear to send
+                     20 = DSR data set ready
+                     21 = DCD data carrier detect
+                     22 = TXC transmit clock
+                     23 = RXC receive clock
+                     24 = DTR data terminal ready."
+        ::= { wfTdmIfEntry 13 }
+
+    wfTdmIfEiaStatusReset OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    reset(1),
+                    noaction(21)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Reset The EIA status for the EIA signals in wfTdmIfEiaStatus.
+                 This is particularly useful for clearing the toggle status. "
+        DEFVAL  { noaction }
+        ::= { wfTdmIfEntry 14 }
+
+    wfTdmIfLineNumber OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "line number for this line instance"
+        ::= { wfTdmIfEntry 15 }
+
+
+
+
+
+    END  -- Wellfleet-TDMGROUP-MIB

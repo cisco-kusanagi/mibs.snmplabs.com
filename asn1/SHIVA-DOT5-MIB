@@ -1,0 +1,226 @@
+-- 	$Id: shiva-dot5.asn,v 1.3 1996/01/16 16:38:00 dfox Exp $
+
+--
+-- 	Copyright 1992, 1993, 1995, 1996 Shiva Corporation
+--
+
+--	Shiva private extensions to the dot5 MIB (RFC1231).
+
+SHIVA-DOT5-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  	Counter
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	tdot5
+		FROM SHIVA-MIB;
+
+-- tdot5 control table
+
+--	control variables for configuration of source routing
+	
+    tdot5ControlTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Tdot5ControlEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"Table of controls for the token ring interfaces of a
+		device."
+	::= { tdot5 1 }
+
+    tdot5ControlEntry OBJECT-TYPE
+	SYNTAX	Tdot5ControlEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of a row object in the tdot5Control table.
+		This represents a single 802.5 Interface.  If an
+		interface is not an 802.5 interface, there will not be
+		a row in this table for that interface's value of
+		ifIndex."
+	INDEX { INTEGER }	-- ifIndex
+	::= { tdot5ControlTable 1 }
+
+    Tdot5ControlEntry ::= SEQUENCE {
+	tdot5SRState		INTEGER,
+	tdot5SRSingleRoute	INTEGER
+    }
+
+    tdot5SRState OBJECT-TYPE
+	SYNTAX INTEGER {
+		off(2),		-- do not perform source routing
+		on(1)		-- attempt to perfrom source routing
+	}
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Controls whether or not a device acts as a source
+		routing end node on this interface.  Regardless of the
+		state of this object, frames which are addressed to
+		this interface, or which are addressed to a functional
+		address recognized by this interface, will be
+		processed, even if they have a source routing
+		information field."
+	::= { tdot5ControlEntry 1 }
+
+    tdot5SRSingleRoute OBJECT-TYPE
+	SYNTAX INTEGER		-- ???
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"??????"
+	::= { tdot5ControlEntry 2 }
+
+-- tdot5 stats table
+
+--	conditions caught by our Token Ring driver
+--	which are not counted in the standard MIB.
+
+    tdot5Table OBJECT-TYPE
+	SYNTAX SEQUENCE OF Tdot5Entry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"Table of statistics for the token ring interfaces of
+		a device."
+	::= { tdot5 2 }
+
+     tdot5Entry OBJECT-TYPE
+	SYNTAX	Tdot5Entry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of a row object in the tdot5 table.  This
+		represents a single 802.5 Interface.  If an interface
+		is not an 802.5 interface, there will not be a row in
+		this table for that interface's value of ifIndex."
+	INDEX { INTEGER }	-- ifIndex
+	::= { tdot5Table 1 }
+
+    Tdot5Entry ::= SEQUENCE {
+	tdot5OpenFails			Counter,
+	tdot5MostRecentOpenFail		INTEGER,
+	tdot5NumReceives		Counter,
+	tdot5ReceiveFails		Counter,
+	tdot5SRReceiveFails		Counter,
+	tdot5NumTransmits		Counter,
+	tdot5TransmitFails		Counter,		
+	tdot5TransmitNQs		Counter,
+	tdot5MostRecentTransmitFail	INTEGER,
+	tdot5SRTransmitFails		Counter,
+	tdot5SRTableSize		INTEGER,
+	tdot5TokenMemErrs		Counter
+    }
+
+    tdot5OpenFails OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times the TROPIC chip open failed."
+	::= { tdot5Entry 1 }
+
+    tdot5MostRecentOpenFail OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Error code of most recent open failure from TROPIC
+		chip (see programmer's guide).  Zero if no failure
+		since last reboot."
+	::= { tdot5Entry 2 }
+
+    tdot5NumReceives OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Total number of error-free packet receives." 
+	::= { tdot5Entry 3 }
+
+    tdot5ReceiveFails OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of receive errors, not counting source routing
+		errors."
+	::= { tdot5Entry 4 }
+
+    tdot5SRReceiveFails OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of frames which were received intact but were
+		discarded by the host software because the source
+		routing header could not be parsed, either because
+		there was a length error or because there was a
+		violation of the header format."
+	::= { tdot5Entry 5 }
+
+    tdot5NumTransmits OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Total number of transmit packets sent to chip (each
+		packet may require multiple chip buffers)."
+	::= { tdot5Entry 6 }
+
+    tdot5TransmitFails OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of frames which failed to transmit, either
+		because they timed out while waiting to be enqueued to
+		the chip, or because there was an error reported from
+		the TROPIC chip on transmission."
+	::= { tdot5Entry 7 }
+
+    tdot5TransmitNQs OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of frames enqueued during transmission because
+		the TROPIC chip was busy."
+	::= { tdot5Entry 8 }
+
+    tdot5MostRecentTransmitFail OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Most recent transmit error code from the TROPIC chip.
+		Zero if none since last reboot."
+	::= { tdot5Entry 9 }
+
+    tdot5SRTransmitFails OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of frames which failed to transmit because no
+		source routing header could be formed."
+	::= { tdot5Entry 10 }
+
+    tdot5SRTableSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of entries currently in source routing table."
+	::= { tdot5Entry 11 }
+
+    tdot5TokenMemErrs OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times a receive buffer could not be obtained."
+	::= { tdot5Entry 12 }
+
+END

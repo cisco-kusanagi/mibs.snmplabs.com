@@ -1,0 +1,343 @@
+-- 	mib/shiva-feat.asn
+--
+-- 	Copyright 1992, 1993, 1995, 1996, 1997 Shiva Corporation
+--
+--	Shiva Features MIB
+--
+
+SHIVA-FEATURES-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+    	OBJECT-TYPE
+    		FROM RFC-1212		-- Concise MIB Definitions
+	DisplayString
+		FROM RFC1213-MIB
+    	features
+    		FROM SHIVA-MIB;
+
+    featureTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF FeatureEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Table of software features present and enabled."
+	::= { features 1 }
+	
+    featureEntry OBJECT-TYPE
+	SYNTAX  FeatureEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Software features for one protocol."
+	INDEX	{ featureProtocol }
+	::= { featureTable 1 }
+ 
+    FeatureEntry ::= SEQUENCE {
+	featureProtocol	    INTEGER,
+	featureDialIn	    INTEGER,
+	featureDialOut	    INTEGER,
+	featureShell	    INTEGER,
+	featureLanToLanOrig INTEGER,
+	featureLanToLanAns  INTEGER
+    }
+
+    featureProtocol OBJECT-TYPE
+	SYNTAX	INTEGER {
+		general(1),
+		ip(2),
+		netware(3),
+		netbeui(4),
+		bridging(5),
+		appletalk(6)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The layer or protocol for which features are represented."
+	::= { featureEntry 1 }
+
+    featureDialIn OBJECT-TYPE
+	SYNTAX	INTEGER {
+		notPresent(1),
+		disabled(2),
+		bridged(3),
+		routed(4)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+	    	"Indicates what dial-in functions (if any) are present
+		and enabled for the indicated layer or protocol family."
+	::= { featureEntry 2 }
+
+    featureDialOut OBJECT-TYPE
+	SYNTAX	INTEGER {
+		notPresent(1),
+		disabled(2),
+		enabled(3)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+	    	"Indicates what dial-out functions (if any) are present
+		and enabled for the indicated layer or protocol family."
+	::= { featureEntry 3 }
+
+    featureShell OBJECT-TYPE
+	SYNTAX	INTEGER {
+		notPresent(1),
+		disabled(2),
+		enabled(3)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+	    	"Indicates if the Shell is present and enabled for us
+		from the indicated layer or protocol family."
+	::= { featureEntry 4 }
+
+    featureLanToLanOrig OBJECT-TYPE
+	SYNTAX	INTEGER {
+		notPresent(1),
+		disabled(2),
+		bridged(3),		-- Not in 3.0!
+		routed(4)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+	    	"Indicates what LAN-to-LAN origination functions (if any) 
+		are present and enabled for the indicated layer or protocol 
+		family."
+	::= { featureEntry 5 }
+
+    featureLanToLanAns OBJECT-TYPE
+	SYNTAX	INTEGER {
+		notPresent(1),
+		disabled(2),
+		bridged(3),		-- Not in 3.0!
+		routed(4)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+	    	"Indicates what LAN-to-LAN answer functions (if any) 
+		are present and enabled for the indicated layer or protocol 
+		family."
+	::= { featureEntry 6 }
+
+    featureMgmtImage OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+	    	"This integer is a bit mask which represent various
+		network management/configuration protocols supported
+		by the system image;
+			0x00000001 - SNMP over UDP
+			0x00000002 - BOOTP/TFTP
+			0x00000004 - RARP/TFTP
+			0x00000008 - SFTP over TCP
+			0x00000010 - FTP over TCP
+			0x00000020 - KLAP3 over UDP
+			0x00000040 - SNMP over IPX
+			0x00000080 - SFTP over SPX
+			0x00000100 - BAP over IPX."
+	::= { features 2 }
+
+    featureWanImage OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+	    	"This integer is a bit mask which represent various
+		wide area network options supported by the system image;
+			0x00000001 - PPP over Async HDLC
+			0x00000002 - SLIP
+			0x00000004 - PPP IPCP
+			0x00000008 - PPP IPXCP
+			0x00000010 - PPP Shiva IPXCP
+			0x00000020 - PPP over Async Frame Relay
+			0x00000040 - PPP Shiva NBCP
+			0x00000080 - PPP Bridging CP
+			0x00000100 - PPP ATCP
+			0x00000200 - AALAP."
+	::= { features 3 }
+
+    featureMgmtVrom OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Network management/configuration protocols supported
+		by the VROM downloader. (see featureMgmtImage for bits)."
+	::= { features 4 }
+
+    featureWanVrom OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+	    	"This integer is a bit mask which represent various
+		wide area network options supported by the VROM downloader.
+		(see featureWanImage for bits)."
+	::= { features 5 }
+
+--	The following variables are for feature licensing.  Licensing
+--	is used to subset features by allowing use of only those
+--	features or sets of features which have validly configured
+--	license keys.
+
+--	This portion of this MIB is new as of the ShivOS 5.0 release.
+
+    featureLicenseTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF FeatureLicenseEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Table of licensable features and feature sets and
+		their licensing information."
+	::= { features 6 }
+
+    featureLicenseEntry OBJECT-TYPE
+	SYNTAX	FeatureLicenseEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A licensable feature or feature set."
+	INDEX	{ featureLicenseIndex }
+        ::= { featureLicenseTable 1 }
+
+    FeatureLicenseEntry ::= SEQUENCE {
+	featureLicenseIndex		INTEGER,
+	featureLicenseName		DisplayString,
+	featureLicenseAbbrName		DisplayString,
+	featureLicenseIsASet		INTEGER,
+	featureLicenseState		INTEGER,
+	featureLicenseRefCount		INTEGER,
+	featureLicenseExpirationDate	INTEGER,
+	featureLicenseSetElements	OCTET STRING
+      }
+
+    featureLicenseIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A unique value, greater than zero, for each entry.
+		Indexes may not be contiguous (in other words, index 6
+		may be followed by index 8 if index 7 is not a license
+		which should be publicly visible)."
+	::= { featureLicenseEntry 1 }
+
+    featureLicenseName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of the licensable feature or feature set.  This
+		name is identical to the parameter name used in the
+		[Licensing] configuration section for entering the
+		license key."
+	::= { featureLicenseEntry 2 }
+
+    featureLicenseAbbrName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Abbreviated name of the licensable feature or feature
+		set.  The abbreviated name is embedded in the license
+		key so that, given a license key, one may determine
+		what it is licensing in case this information is
+		lost."
+	::= { featureLicenseEntry 3 }
+
+    featureLicenseIsASet OBJECT-TYPE
+	SYNTAX	INTEGER {
+		false(1),
+		true(2)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"If true(2) then this entry describes licensing for a
+		feature set, otherwise this entry describes licensing
+		for an individual feature."
+	::= { featureLicenseEntry 4 }
+
+    featureLicenseState OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),		-- should never happen
+		valid(2),		-- license is good
+		invalidNoKey(3),	-- no key configured
+		invalidBadKey(4),	-- incorrect key configured
+		invalidExpired(5),	-- correct but expired key configured
+		invalidBadDate(6)	-- key contains a bad expiration date
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates whether the license for this feature or
+		feature set is valid or not.  If it is not valid then
+		the state indicates the reason."
+	::= { featureLicenseEntry 5 }
+
+    featureLicenseRefCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times that this license has been
+		checked.  In other words, the number of times which
+		something has lookeed at this license to see if it is
+		valid or not.  This is an indication of whether any
+		subsystems in the box actually needs this license in
+		order to operate.
+
+		Note that normally licenses for sets will have a
+		featureLicenseRefCount of zero because these licenses
+		are not checked directly but the licenses for features
+		in the set are checked."
+	::= { featureLicenseEntry 6 }
+
+    featureLicenseExpirationDate OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The date on which this license expires represented as
+		a number of seconds since Midnight on January 1st,
+		1970 GMT.  If the licenseState is valid(1) then a
+		value of zero (0) means the license is unlimited and
+		does not expire.  If the licenseState is any other
+		value than valid(1) then a value of zero (0) indicates
+		the expiration date is not applicable (probably
+		because the license is not valid)."
+	::= { featureLicenseEntry 7 }
+
+    featureLicenseSetElements OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE (0..64))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"If featureLicenseIsASet is true(2) then this row in
+		the featureLicenseTable is for a set, and this object
+		contains a list of the features and sets which are
+		elements of that set.  The elements are encoded as an
+		octet string where each entry uses two octets.  Each
+		two octet entry is the featureLicenseIndex value for
+		that entry.  For example, if featureLicenseSetElements
+		is: 000200050000.  Then this set contains the features
+		or sets from the featureLicenseTable which have
+		featureLicenseIndex values 2 and 5.  The entry 0000
+		indicates the end of the list.
+
+		featureLicenseSetElements is limited to 64 octets, for
+		a total of 31 elements plus the end of list marker.
+
+		If featureLicenseIsAset is false(1) then this row is
+		not for a set and featureLicenseSetElements is empty."
+	::= { featureLicenseEntry 8 }
+
+END

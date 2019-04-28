@@ -1,0 +1,2790 @@
+CBS-MODULE-RESOURCES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   NOTIFICATION-TYPE, Integer32, Gauge32, 
+   Counter64, TimeTicks                     FROM SNMPv2-SMI
+ 
+   TEXTUAL-CONVENTION,
+   DisplayString, TruthValue                FROM SNMPv2-TC
+
+   ProductID, KBytes                        FROM HOST-RESOURCES-MIB
+
+   cbsMIBs, cbsMgmt, cbsTraps               FROM CROSSBEAM-SYSTEMS-MIB
+
+   cbsHwModuleID                            FROM CBS-HARDWARE-MIB
+
+   cbsVgVapGroupID                          FROM CBS-VAPGROUP-MIB;
+
+
+cbsModuleResourcesMIB MODULE-IDENTITY
+   LAST-UPDATED "200909100000Z"     -- 10 September 2009
+   ORGANIZATION "Crossbeam Systems, Inc."
+   CONTACT-INFO "Email:  mib-admin@crossbeamsys.com
+                 Postal: 80 Central Street
+                         Boxborough, MA  01719"
+   DESCRIPTION  "XOS, Release 9.5: This MIB module defines the objects 
+                 that monitor the performance and utilization of 
+                 Module resources."
+
+   REVISION     "200203180000Z"     -- 18 March 2002
+   DESCRIPTION  "Initial Revision"
+
+   REVISION     "200208010000Z"     -- 1 August 2002
+   DESCRIPTION  "Obsoleted cbsModuleMemoryUsageExceeded and
+                cbsModuleMemoryUsageNormal notification types"
+
+   REVISION     "200212110000Z"     -- 11 December 2002
+   DESCRIPTION  "Added cbsModuleCPUUtil objects. Obsoleted cpuLoad
+                exceeded/normal notification types in favor of
+                cpuUtil notification types"
+
+   REVISION     "200712170000Z"     -- 17 December 2007
+   DESCRIPTION  "Added cbsModuleMU, cbsModuleFR, and 
+		cbModuleBU objects"
+
+   REVISION     "200906100000Z"     -- 10 June 2009
+   DESCRIPTION  "Added some objects for module refer to the standard memory
+        mib, such as cbsModuleMemoryTotalFree, cbsModuleMemoryShared, 
+        cbsModuleMemoryBuffer, cbsModuleMemoryCached and etc."
+
+   REVISION     "200907170000Z"     -- 17 July 2009
+   DESCRIPTION  "Added some objects for module refer to the standard memory
+        mib, such as cbsModuleMemoryHiTotal, cbsModuleMemoryHiFree, 
+        cbsModuleMemoryLoTotal, and cbsModuleMemoryLoFree."
+
+   REVISION     "200909100000Z"     -- 10 September 2009
+   DESCRIPTION  "Added cbsModuleDUMgmt object."
+
+   REVISION     "200910160000Z"     -- 16 October 2009
+   DESCRIPTION  "Added cbsModuleCpuCoreHiUtil object."
+   
+   REVISION     "201001070000Z"     -- 07 January 2010
+   DESCRIPTION  "Added cbsModuleSdramCheck trap definition."   
+
+   REVISION     "201004130000Z"     -- 13 April 2010
+   DESCRIPTION  "Added cbsCpmDiskCheck trap definition."
+   
+   REVISION     "201005130000Z"     -- 13 May 2010
+   DESCRIPTION  "Added cbsModuleDUVar object."
+
+   REVISION     "201005220000Z"     -- 22 May 2010
+   DESCRIPTION  "Added application information on each Vap Group."
+
+   REVISION     "201005230000Z"     -- 23 May 2010
+   DESCRIPTION  "Added chassis utilization, Flow By NPM, Flow By VAP."
+   
+::= { cbsMIBs 3 }
+
+UtilSeverityLvl ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Utilization alarm severity level."
+    SYNTAX INTEGER {
+              none(0),
+              minor(1),
+              major(2),
+              critical(3)
+           }
+
+BadSdramMemCfgStat ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Unsupported SDRAM memory configuration error status.
+            no-error                - no memory configuration error detected.
+            no-four-gig-dimms-error - four 1Gig DIMMs not found installed.
+            bad-total-memory-error  - four 1 or 4 Gig DIMMs found installed, but
+                                      memory not fully recognized by system.
+            no-four-4gig-dimms-error - four 4Gig DIMMs not found installed."		
+    SYNTAX INTEGER {
+              no-error(0),
+              no-four-gig-dimms-error(1),
+              bad-total-memory-error(2),
+              no-four-4gig-dimms-error(3)
+           }
+
+BadDiskCfgStat ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Unsupported Disk configuration error status for RAID-1.
+            no-error                            - no disk configuration error detected.
+            no-raid-1-config-error              - not raid 1 configuration.
+            no-two-500GB-or-greater-disks-error - dual HDs of 500GB or greater not found."
+    SYNTAX INTEGER {
+              no-error(0),
+              no-raid-1-config-error(1),
+              no-two-500GB-or-greater-disks-error(2)
+           }
+
+GuestHealthSeverityLvl ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Guest OS alarm severity level."
+    SYNTAX INTEGER {
+              none(0),
+              minor(1),
+              major(2),
+              critical(3)
+           }
+
+
+cbsModuleResources       OBJECT IDENTIFIER ::= { cbsMgmt 3 }
+cbsModuleResourceTraps   OBJECT IDENTIFIER ::= { cbsTraps 2 }
+
+
+-- Table of processor CPU utilization
+
+cbsModuleCPULoadTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleCPULoadEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the CPU utilization of
+      the processor modules."
+   ::= { cbsModuleResources 1 }
+
+cbsModuleCPULoadEntry OBJECT-TYPE
+   SYNTAX     CbsModuleCPULoadEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the CPU load table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleCPULoadTable 1 }
+
+CbsModuleCPULoadEntry ::= SEQUENCE {
+   cbsModuleCPUSpeed             Integer32,
+   cbsModuleCPUCount             Integer32,
+   cbsModuleCPULoad1             Gauge32,
+   cbsModuleCPULoad5             Gauge32,
+   cbsModuleCPULoad15            Gauge32,
+   cbsModuleCPUUtil1             Gauge32,
+   cbsModuleCPUUtil5             Gauge32,
+   cbsModuleCPUUtil15            Gauge32
+}
+
+cbsModuleCPUSpeed OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The speed of the processor(s) in MHz."
+   ::= { cbsModuleCPULoadEntry 1 }
+
+cbsModuleCPUCount OBJECT-TYPE
+   SYNTAX     Integer32 (0..15)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The number of CPUs in the module"
+   ::= { cbsModuleCPULoadEntry 2 }
+
+cbsModuleCPULoad1 OBJECT-TYPE
+   SYNTAX     Gauge32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The average number of processes ready to run in the last
+       minute."
+   ::= { cbsModuleCPULoadEntry 3 }
+
+cbsModuleCPULoad5 OBJECT-TYPE
+   SYNTAX     Gauge32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The average number of processes ready to run in the last
+       5 minutes."
+   ::= { cbsModuleCPULoadEntry 4 }
+
+cbsModuleCPULoad15 OBJECT-TYPE
+   SYNTAX     Gauge32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The average number of processes ready to run in the last
+       15 minutes."
+   ::= { cbsModuleCPULoadEntry 5 }
+
+cbsModuleCPUUtil1 OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "CPU utilization averaged over last 1 minute."
+   ::= { cbsModuleCPULoadEntry 6 }
+
+cbsModuleCPUUtil5 OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "CPU utilization averaged over last 5 minutes."
+   ::= { cbsModuleCPULoadEntry 7 }
+
+cbsModuleCPUUtil15 OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "CPU utilization averaged over last 15 minutes."
+   ::= { cbsModuleCPULoadEntry 8 }
+
+
+-- Table of processor Memory utilization
+
+cbsModuleMemoryTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleMemoryEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the memory utilization of the
+       processor modules."
+   ::= { cbsModuleResources 2 }
+
+cbsModuleMemoryEntry OBJECT-TYPE
+   SYNTAX     CbsModuleMemoryEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the memory utilization table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleMemoryTable 1 }
+
+CbsModuleMemoryEntry ::= SEQUENCE {
+   cbsModuleMemoryTotal          KBytes,
+   cbsModuleMemoryUsed           KBytes,
+   cbsModuleMemoryFree           KBytes,
+   cbsModuleMemoryTotalSwap      KBytes,
+   cbsModuleMemoryAvailSwap      KBytes,
+   cbsModuleMemoryTotalReal      KBytes,
+   cbsModuleMemoryAvailReal      KBytes,
+   cbsModuleMemoryTotalFree      KBytes,
+   cbsModuleMemoryShared         KBytes,
+   cbsModuleMemoryBuffer         KBytes,
+   cbsModuleMemoryCached         KBytes,
+   cbsModuleMemoryHiTotal        KBytes,
+   cbsModuleMemoryHiFree         KBytes,
+   cbsModuleMemoryLoTotal        KBytes,
+   cbsModuleMemoryLoFree         KBytes
+}
+
+cbsModuleMemoryTotal OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total memory that can be used by the operating system."
+   ::= { cbsModuleMemoryEntry 1 }
+
+cbsModuleMemoryUsed OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The amount of memory in use."
+   ::= { cbsModuleMemoryEntry 2 }
+
+cbsModuleMemoryFree OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Amount of memory available for use."
+   ::= { cbsModuleMemoryEntry 3 }
+
+cbsModuleMemoryTotalSwap OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total Swap Size configured for the module."
+   ::= { cbsModuleMemoryEntry 4 }
+
+cbsModuleMemoryAvailSwap OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Available Swap Space on the module."
+   ::= { cbsModuleMemoryEntry 5 }
+
+cbsModuleMemoryTotalReal OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total Real/Physical Memory Size on the module."
+   ::= { cbsModuleMemoryEntry 6 }
+
+cbsModuleMemoryAvailReal OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Available Real/Physical Memory Space on the module."
+   ::= { cbsModuleMemoryEntry 7 }
+
+cbsModuleMemoryTotalFree OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total available memory(Including memory free and swap free)."
+   ::= { cbsModuleMemoryEntry 8 }
+
+cbsModuleMemoryShared OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total shared memory."
+   ::= { cbsModuleMemoryEntry 9 }
+
+cbsModuleMemoryBuffer OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total buffered memory."
+   ::= { cbsModuleMemoryEntry 10 }
+
+cbsModuleMemoryCached OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total cached memory."
+   ::= { cbsModuleMemoryEntry 11 }
+
+cbsModuleMemoryHiTotal OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total amount of memory that is not directly mapped into kernel space."
+   ::= { cbsModuleMemoryEntry 12 }
+
+cbsModuleMemoryHiFree OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total amount of free memory that is not directly mapped into kernel space."
+   ::= { cbsModuleMemoryEntry 13 }
+
+cbsModuleMemoryLoTotal OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total amount of memory that is directly mapped into kernel space."
+   ::= { cbsModuleMemoryEntry 14 }
+
+cbsModuleMemoryLoFree OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total amount of free memory that is directly mapped into kernel space."
+   ::= { cbsModuleMemoryEntry 15 }
+
+
+-- Table of processor swap utilization
+
+cbsModuleSwapTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleSwapEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the swap utilization of the
+       processor modules."
+   ::= { cbsModuleResources 3 }
+
+cbsModuleSwapEntry OBJECT-TYPE
+   SYNTAX     CbsModuleSwapEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the memory utilization table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleSwapTable 1 }
+
+CbsModuleSwapEntry ::= SEQUENCE {
+   cbsModuleSwapTotal          KBytes,
+   cbsModuleSwapUsed           KBytes,
+   cbsModuleSwapFree           KBytes
+}
+
+cbsModuleSwapTotal OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Total swap space available to the operating system."
+   ::= { cbsModuleSwapEntry 1 }
+
+cbsModuleSwapUsed OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The amount of swap space in use."
+   ::= { cbsModuleSwapEntry 2 }
+
+cbsModuleSwapFree OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Amount of free swap space."
+   ::= { cbsModuleSwapEntry 3 }
+
+
+-- Table of disk usage
+
+cbsModuleDUTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleDUEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the disk usage of the
+       processor modules."
+   ::= { cbsModuleResources 4 }
+
+cbsModuleDUEntry OBJECT-TYPE
+   SYNTAX     CbsModuleDUEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the disk usage table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleDUTable 1 }
+
+CbsModuleDUEntry ::= SEQUENCE {
+   cbsModuleDURoot        Gauge32,
+   cbsModuleDUBoot        Gauge32,
+   cbsModuleDUCbconfig    Gauge32,
+   cbsModuleDUTftpboot    Gauge32,
+   cbsModuleDUMgmt        Gauge32,
+   cbsModuleDUVar         Gauge32
+}
+
+cbsModuleDURoot OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The current percentage of disk usage on the / partition."
+   ::= { cbsModuleDUEntry 1 }
+
+cbsModuleDUBoot OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The current percentage of disk usage on the /boot partition."
+   ::= { cbsModuleDUEntry 2 }
+
+cbsModuleDUCbconfig OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The current percentage of disk usage on the /cbconfig partition."
+   ::= { cbsModuleDUEntry 3 }
+
+cbsModuleDUTftpboot OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The current percentage of disk usage on the /tftpboot partition."
+   ::= { cbsModuleDUEntry 4 }
+
+
+cbsModuleDUMgmt OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The current percentage of disk usage on the /mgmt partition."
+   ::= { cbsModuleDUEntry 5 }
+
+cbsModuleDUVar OBJECT-TYPE
+   SYNTAX     Gauge32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The current percentage of disk usage on the /var partition."
+   ::= { cbsModuleDUEntry 6 }
+
+-- Table of AP free page utilization
+
+cbsModuleFreePageTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleFreePageEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the free page utilization of the
+       APMs."
+   ::= { cbsModuleResources 5 }
+
+cbsModuleFreePageEntry OBJECT-TYPE
+   SYNTAX     CbsModuleFreePageEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the free page utilization table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleFreePageTable 1 }
+
+CbsModuleFreePageEntry ::= SEQUENCE {
+   cbsModuleFreePageAvailable           KBytes   
+}
+
+cbsModuleFreePageAvailable OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The number of free pages available to the operating system."
+   ::= { cbsModuleFreePageEntry 1 }
+
+cbsModuleFreePageThreshold OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Free Page threshold setting in cbs_fp_th."
+   ::= { cbsModuleFreePageEntry 2 }
+   
+cbsModuleFreePageSeverity OBJECT-TYPE
+   SYNTAX     KBytes
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The amount severity of the alarm.  0 = No alarm, 1 = Minor, 2 = Major, 3 = Critical"
+   ::= { cbsModuleFreePageEntry 3 }
+   
+   cbsModuleFreePageVapName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The VAP group name.  For example, cbsVmVapGroupName-cbsVmVapIndex"
+   ::= { cbsModuleFreePageEntry 4 }
+      
+   
+
+cbsModuleCPUAvgUtilTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleCPUAvgUtilEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains utilization information for all CPUs on a module"
+   ::= { cbsModuleResources 6 }
+
+cbsModuleCPUAvgUtilEntry OBJECT-TYPE
+   SYNTAX     CbsModuleCPUAvgUtilEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the utilization table."
+   INDEX { cbsHwModuleID}
+   ::= { cbsModuleCPUAvgUtilTable 1 }
+
+CbsModuleCPUAvgUtilEntry ::= SEQUENCE {
+   cbsModuleCPUAvgUtilCore1User                  Integer32,  
+   cbsModuleCPUAvgUtilCore1Nice                  Integer32,  
+   cbsModuleCPUAvgUtilCore1Syst                  Integer32,  
+   cbsModuleCPUAvgUtilCore1Idle                  Integer32,  
+   cbsModuleCPUAvgUtilCore1IRQ                   Integer32,  
+   cbsModuleCPUAvgUtilCore1SoftIRQ               Integer32,  
+   cbsModuleCPUAvgUtilCore1IOWait                Integer32,  
+   cbsModuleCPUAvgUtilCore2User                  Integer32,  
+   cbsModuleCPUAvgUtilCore2Nice                  Integer32,  
+   cbsModuleCPUAvgUtilCore2Syst                  Integer32,  
+   cbsModuleCPUAvgUtilCore2Idle                  Integer32,  
+   cbsModuleCPUAvgUtilCore2IRQ                   Integer32,  
+   cbsModuleCPUAvgUtilCore2SoftIRQ               Integer32,  
+   cbsModuleCPUAvgUtilCore2IOWait                Integer32,  
+   cbsModuleCPUAvgUtilCore3User                  Integer32,  
+   cbsModuleCPUAvgUtilCore3Nice                  Integer32,  
+   cbsModuleCPUAvgUtilCore3Syst                  Integer32,  
+   cbsModuleCPUAvgUtilCore3Idle                  Integer32,  
+   cbsModuleCPUAvgUtilCore3IRQ                   Integer32,  
+   cbsModuleCPUAvgUtilCore3SoftIRQ               Integer32,  
+   cbsModuleCPUAvgUtilCore3IOWait                Integer32,  
+   cbsModuleCPUAvgUtilCore4User                  Integer32,  
+   cbsModuleCPUAvgUtilCore4Nice                  Integer32,  
+   cbsModuleCPUAvgUtilCore4Syst                  Integer32,  
+   cbsModuleCPUAvgUtilCore4Idle                  Integer32,  
+   cbsModuleCPUAvgUtilCore4IRQ                   Integer32,  
+   cbsModuleCPUAvgUtilCore4SoftIRQ               Integer32,  
+   cbsModuleCPUAvgUtilCore4IOWait                Integer32,  
+   cbsModuleCPUAvgUtilCore5User                  Integer32,  
+   cbsModuleCPUAvgUtilCore5Nice                  Integer32,  
+   cbsModuleCPUAvgUtilCore5Syst                  Integer32,  
+   cbsModuleCPUAvgUtilCore5Idle                  Integer32,  
+   cbsModuleCPUAvgUtilCore5IRQ                   Integer32,  
+   cbsModuleCPUAvgUtilCore5SoftIRQ               Integer32,  
+   cbsModuleCPUAvgUtilCore5IOWait                Integer32,  
+   cbsModuleCPUAvgUtilCore6User                  Integer32,  
+   cbsModuleCPUAvgUtilCore6Nice                  Integer32,  
+   cbsModuleCPUAvgUtilCore6Syst                  Integer32,  
+   cbsModuleCPUAvgUtilCore6Idle                  Integer32,  
+   cbsModuleCPUAvgUtilCore6IRQ                   Integer32,  
+   cbsModuleCPUAvgUtilCore6SoftIRQ               Integer32,  
+   cbsModuleCPUAvgUtilCore6IOWait                Integer32,  
+   cbsModuleCPUAvgUtilCore7User                  Integer32,  
+   cbsModuleCPUAvgUtilCore7Nice                  Integer32,  
+   cbsModuleCPUAvgUtilCore7Syst                  Integer32,  
+   cbsModuleCPUAvgUtilCore7Idle                  Integer32,  
+   cbsModuleCPUAvgUtilCore7IRQ                   Integer32,  
+   cbsModuleCPUAvgUtilCore7SoftIRQ               Integer32,  
+   cbsModuleCPUAvgUtilCore7IOWait                Integer32,  
+   cbsModuleCPUAvgUtilCore8User                  Integer32,  
+   cbsModuleCPUAvgUtilCore8Nice                  Integer32,  
+   cbsModuleCPUAvgUtilCore8Syst                  Integer32,  
+   cbsModuleCPUAvgUtilCore8Idle                  Integer32,  
+   cbsModuleCPUAvgUtilCore8IRQ                   Integer32,  
+   cbsModuleCPUAvgUtilCore8SoftIRQ               Integer32,  
+   cbsModuleCPUAvgUtilCore8IOWait                Integer32  
+}
+
+cbsModuleCPUAvgUtilCore1User OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in User state.   "
+::= { cbsModuleCPUAvgUtilEntry 1 }
+
+cbsModuleCPUAvgUtilCore1Nice OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Nice state.   "
+::= { cbsModuleCPUAvgUtilEntry 2 }
+
+cbsModuleCPUAvgUtilCore1Syst OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Syst state.   "
+::= { cbsModuleCPUAvgUtilEntry 3 }
+
+cbsModuleCPUAvgUtilCore1Idle OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Idle state.   "
+::= { cbsModuleCPUAvgUtilEntry 4 }
+
+cbsModuleCPUAvgUtilCore1IRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 5 }
+
+cbsModuleCPUAvgUtilCore1SoftIRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Soft IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 6 }
+
+cbsModuleCPUAvgUtilCore1IOWait OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IOWait state.   "
+::= { cbsModuleCPUAvgUtilEntry 7 }
+
+cbsModuleCPUAvgUtilCore2User OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in User state.   "
+::= { cbsModuleCPUAvgUtilEntry 8 }
+
+cbsModuleCPUAvgUtilCore2Nice OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Nice state.   "
+::= { cbsModuleCPUAvgUtilEntry 9 }
+
+cbsModuleCPUAvgUtilCore2Syst OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Syst state.   "
+::= { cbsModuleCPUAvgUtilEntry 10 }
+
+cbsModuleCPUAvgUtilCore2Idle OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Idle state.   "
+::= { cbsModuleCPUAvgUtilEntry 11 }
+
+cbsModuleCPUAvgUtilCore2IRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 12 }
+
+cbsModuleCPUAvgUtilCore2SoftIRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Soft IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 13 }
+
+cbsModuleCPUAvgUtilCore2IOWait OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IOWait state.   "
+::= { cbsModuleCPUAvgUtilEntry 14 }
+
+cbsModuleCPUAvgUtilCore3User OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in User state.   "
+::= { cbsModuleCPUAvgUtilEntry 15 }
+
+cbsModuleCPUAvgUtilCore3Nice OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Nice state.   "
+::= { cbsModuleCPUAvgUtilEntry 16 }
+
+cbsModuleCPUAvgUtilCore3Syst OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Syst state.   "
+::= { cbsModuleCPUAvgUtilEntry 17 }
+
+cbsModuleCPUAvgUtilCore3Idle OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Idle state.   "
+::= { cbsModuleCPUAvgUtilEntry 18 }
+
+cbsModuleCPUAvgUtilCore3IRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 19 }
+
+cbsModuleCPUAvgUtilCore3SoftIRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Soft IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 20 }
+
+cbsModuleCPUAvgUtilCore3IOWait OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IOWait state.   "
+::= { cbsModuleCPUAvgUtilEntry 21 }
+
+cbsModuleCPUAvgUtilCore4User OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in User state.   "
+::= { cbsModuleCPUAvgUtilEntry 22 }
+
+cbsModuleCPUAvgUtilCore4Nice OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Nice state.   "
+::= { cbsModuleCPUAvgUtilEntry 23 }
+
+cbsModuleCPUAvgUtilCore4Syst OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Syst state.   "
+::= { cbsModuleCPUAvgUtilEntry 24 }
+
+cbsModuleCPUAvgUtilCore4Idle OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Idle state.   "
+::= { cbsModuleCPUAvgUtilEntry 25 }
+
+cbsModuleCPUAvgUtilCore4IRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 26 }
+
+cbsModuleCPUAvgUtilCore4SoftIRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Soft IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 27 }
+
+cbsModuleCPUAvgUtilCore4IOWait OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IOWait state.   "
+::= { cbsModuleCPUAvgUtilEntry 28 }
+
+cbsModuleCPUAvgUtilCore5User OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in User state.   "
+::= { cbsModuleCPUAvgUtilEntry 29 }
+
+cbsModuleCPUAvgUtilCore5Nice OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Nice state.   "
+::= { cbsModuleCPUAvgUtilEntry 30 }
+
+cbsModuleCPUAvgUtilCore5Syst OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Syst state.   "
+::= { cbsModuleCPUAvgUtilEntry 31 }
+
+cbsModuleCPUAvgUtilCore5Idle OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Idle state.   "
+::= { cbsModuleCPUAvgUtilEntry 32 }
+
+cbsModuleCPUAvgUtilCore5IRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 33 }
+
+cbsModuleCPUAvgUtilCore5SoftIRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Soft IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 34 }
+
+cbsModuleCPUAvgUtilCore5IOWait OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IOWait state.   "
+::= { cbsModuleCPUAvgUtilEntry 35 }
+
+cbsModuleCPUAvgUtilCore6User OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in User state.   "
+::= { cbsModuleCPUAvgUtilEntry 36 }
+
+cbsModuleCPUAvgUtilCore6Nice OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Nice state.   "
+::= { cbsModuleCPUAvgUtilEntry 37 }
+
+cbsModuleCPUAvgUtilCore6Syst OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Syst state.   "
+::= { cbsModuleCPUAvgUtilEntry 38 }
+
+cbsModuleCPUAvgUtilCore6Idle OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Idle state.   "
+::= { cbsModuleCPUAvgUtilEntry 39 }
+
+cbsModuleCPUAvgUtilCore6IRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 40 }
+
+cbsModuleCPUAvgUtilCore6SoftIRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Soft IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 41 }
+
+cbsModuleCPUAvgUtilCore6IOWait OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IOWait state.   "
+::= { cbsModuleCPUAvgUtilEntry 42 }
+
+cbsModuleCPUAvgUtilCore7User OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in User state.   "
+::= { cbsModuleCPUAvgUtilEntry 43 }
+
+cbsModuleCPUAvgUtilCore7Nice OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Nice state.   "
+::= { cbsModuleCPUAvgUtilEntry 44 }
+
+cbsModuleCPUAvgUtilCore7Syst OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Syst state.   "
+::= { cbsModuleCPUAvgUtilEntry 45 }
+
+cbsModuleCPUAvgUtilCore7Idle OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Idle state.   "
+::= { cbsModuleCPUAvgUtilEntry 46 }
+
+cbsModuleCPUAvgUtilCore7IRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 47 }
+
+cbsModuleCPUAvgUtilCore7SoftIRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Soft IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 48 }
+
+cbsModuleCPUAvgUtilCore7IOWait OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IOWait state.   "
+::= { cbsModuleCPUAvgUtilEntry 49 }
+
+cbsModuleCPUAvgUtilCore8User OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in User state.   "
+::= { cbsModuleCPUAvgUtilEntry 50 }
+
+cbsModuleCPUAvgUtilCore8Nice OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Nice state.   "
+::= { cbsModuleCPUAvgUtilEntry 51 }
+
+cbsModuleCPUAvgUtilCore8Syst OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Syst state.   "
+::= { cbsModuleCPUAvgUtilEntry 52 }
+
+cbsModuleCPUAvgUtilCore8Idle OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Idle state.   "
+::= { cbsModuleCPUAvgUtilEntry 53 }
+
+cbsModuleCPUAvgUtilCore8IRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 54 }
+
+cbsModuleCPUAvgUtilCore8SoftIRQ OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in Soft IRQ state.   "
+::= { cbsModuleCPUAvgUtilEntry 55 }
+
+cbsModuleCPUAvgUtilCore8IOWait OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/stat.   It represents the percentage of  time (in tenths of a percent) this core was in IOWait state.   "
+::= { cbsModuleCPUAvgUtilEntry 56 }
+
+
+cbsModuleSDPTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleSDPEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains utilization information for all Switched Data Paths on an NPM module"
+   ::= { cbsModuleResources 7 }
+
+cbsModuleSDPEntry OBJECT-TYPE
+   SYNTAX     CbsModuleSDPEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the utilization table."
+   INDEX { cbsHwModuleID}
+   ::= { cbsModuleSDPTable 1 }
+
+CbsModuleSDPEntry ::= SEQUENCE {
+   cbsModuleSDP0OutPkts             Counter64,  
+   cbsModuleSDP0OutOctets           Counter64,     
+   cbsModuleSDP0InPkts              Counter64,     
+   cbsModuleSDP0InOctets            Counter64,
+   cbsModuleSDP1OutPkts             Counter64,  
+   cbsModuleSDP1OutOctets           Counter64,     
+   cbsModuleSDP1InPkts              Counter64,     
+   cbsModuleSDP1InOctets            Counter64,
+   cbsModuleSDP2OutPkts             Counter64,  
+   cbsModuleSDP2OutOctets           Counter64,     
+   cbsModuleSDP2InPkts              Counter64,     
+   cbsModuleSDP2InOctets            Counter64,
+   cbsModuleSDP3OutPkts             Counter64,  
+   cbsModuleSDP3OutOctets           Counter64,     
+   cbsModuleSDP3InPkts              Counter64,     
+   cbsModuleSDP3InOctets            Counter64,
+
+   cbsModuleSDP4OutPkts             Counter64,  
+   cbsModuleSDP4OutOctets           Counter64,     
+   cbsModuleSDP4InPkts              Counter64,     
+   cbsModuleSDP4InOctets            Counter64,
+   cbsModuleSDP5OutPkts             Counter64,  
+   cbsModuleSDP5OutOctets           Counter64,     
+   cbsModuleSDP5InPkts              Counter64,     
+   cbsModuleSDP5InOctets            Counter64,
+   cbsModuleSDP6OutPkts             Counter64,  
+   cbsModuleSDP6OutOctets           Counter64,     
+   cbsModuleSDP6InPkts              Counter64,     
+   cbsModuleSDP6InOctets            Counter64,
+   cbsModuleSDP7OutPkts             Counter64,  
+   cbsModuleSDP7OutOctets           Counter64,     
+   cbsModuleSDP7InPkts              Counter64,     
+   cbsModuleSDP7InOctets            Counter64
+ }
+
+ cbsModuleSDP0OutPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/driver/ap6_8600/link(x)"
+   ::= { cbsModuleSDPEntry 1 }
+
+cbsModuleSDP0OutOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 2 }
+   
+cbsModuleSDP0InPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 3 }
+
+cbsModuleSDP0InOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 4 }
+
+
+ cbsModuleSDP1OutPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/driver/ap6_8600/link(x)"
+   ::= { cbsModuleSDPEntry 5 }
+
+cbsModuleSDP1OutOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 6 }
+   
+cbsModuleSDP1InPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 7 }
+
+cbsModuleSDP1InOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 8 }
+
+
+ cbsModuleSDP2OutPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/driver/ap6_8600/link(x)"
+   ::= { cbsModuleSDPEntry 9 }
+
+cbsModuleSDP2OutOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 10 }
+   
+cbsModuleSDP2InPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 11 }
+
+cbsModuleSDP2InOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 12 }
+
+
+ cbsModuleSDP3OutPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/driver/ap6_8600/link(x)"
+   ::= { cbsModuleSDPEntry 13 }
+
+cbsModuleSDP3OutOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 14 }
+   
+cbsModuleSDP3InPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 15 }
+
+cbsModuleSDP3InOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 16 }
+
+
+ cbsModuleSDP4OutPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/driver/ap6_8600/link(x)"
+   ::= { cbsModuleSDPEntry 17 }
+
+cbsModuleSDP4OutOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 18 }
+   
+cbsModuleSDP4InPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 19 }
+
+cbsModuleSDP4InOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 20 }
+
+ cbsModuleSDP5OutPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/driver/ap6_8600/link(x)"
+   ::= { cbsModuleSDPEntry 21 }
+
+cbsModuleSDP5OutOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 22 }
+   
+cbsModuleSDP5InPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 23 }
+
+cbsModuleSDP5InOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 24 }
+
+ cbsModuleSDP6OutPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/driver/ap6_8600/link(x)"
+   ::= { cbsModuleSDPEntry 25 }
+
+cbsModuleSDP6OutOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 26 }
+   
+cbsModuleSDP6InPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 27 }
+
+cbsModuleSDP6InOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 28 }
+
+ cbsModuleSDP7OutPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/driver/ap6_8600/link(x)"
+   ::= { cbsModuleSDPEntry 29 }
+
+cbsModuleSDP7OutOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 30 }
+   
+cbsModuleSDP7InPkts OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 31 }
+
+cbsModuleSDP7InOctets OBJECT-TYPE
+   SYNTAX     Counter64     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      " Entry from /proc/net/dev/link(x)"
+   ::= { cbsModuleSDPEntry 32 }
+
+
+
+
+
+cbsModuleUptimeTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleUptimeEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains the uptime for all of the modules in the chassis indexed by module ID"
+   ::= { cbsModuleResources 8 }
+
+cbsModuleUptimeEntry OBJECT-TYPE
+   SYNTAX     CbsModuleUptimeEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the Module Uptime table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleUptimeTable 1 }
+
+CbsModuleUptimeEntry ::= SEQUENCE {
+   cbsModuleUptime           TimeTicks  
+}
+
+cbsModuleUptime OBJECT-TYPE
+   SYNTAX     TimeTicks
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Indicates the elapsed time since the last slot reboot."
+   ::= { cbsModuleUptimeEntry 1 }
+
+cbsModuleNPMFlowCountTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleNPMFlowCountEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+   
+      "This table contains concurrent flow count information for all NPM modules"
+   ::= { cbsModuleResources 9 }
+
+cbsModuleNPMFlowCountEntry OBJECT-TYPE
+   SYNTAX     CbsModuleNPMFlowCountEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the NPM Flow count table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleNPMFlowCountTable 1 }
+   
+CbsModuleNPMFlowCountEntry ::= SEQUENCE {
+   cbsModuleNPMFlowCount     Integer32  
+ }
+
+ cbsModuleNPMFlowCount OBJECT-TYPE
+   SYNTAX     Integer32     
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The current percentage full of the NPM active flow cache"
+   ::= { cbsModuleNPMFlowCountEntry 1 }
+
+-- Table of AppMon Status
+
+cbsModuleAppMonTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleAppMonEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the AppMon status on each APM."
+   ::= { cbsModuleResources 10 }
+
+cbsModuleAppMonEntry OBJECT-TYPE
+   SYNTAX     CbsModuleAppMonEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the AppMon table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleAppMonTable 1 }
+
+CbsModuleAppMonEntry ::= SEQUENCE {
+   cbsModuleAppName                       DisplayString,  
+   cbsModuleAppVersion                    DisplayString,  
+   cbsModuleAppRelease                    DisplayString,  
+   cbsModuleAppCPMHostName                DisplayString,  
+   cbsModuleAppCPMIPAddress               DisplayString,  
+   cbsModuleAppVAPGroupName               DisplayString,  
+   cbsModuleAppVAPIndex                   Integer32,  
+   cbsModuleAppOldState                   DisplayString,  
+   cbsModuleAppNewState                   DisplayString,  
+
+   cbsModuleRSWName                       DisplayString,  
+   cbsModuleRSWVersion                    DisplayString,  
+   cbsModuleRSWRelease                    DisplayString,  
+   cbsModuleRSWStartOnBoot                DisplayString,
+   cbsModuleRSWCPMHostName                DisplayString,  
+   cbsModuleRSWCPMIPAddress               DisplayString,  
+   cbsModuleRSWVAPGroupName               DisplayString,  
+   cbsModuleRSWVAPIndex                   Integer32,  
+   cbsModuleRSWOldState                   DisplayString,  
+   cbsModuleRSWNewState                   DisplayString
+
+}
+
+cbsModuleAppName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Application Name"
+   ::= { cbsModuleAppMonEntry 1 }
+
+cbsModuleAppVersion OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Application Version"
+   ::= { cbsModuleAppMonEntry 2 }
+
+cbsModuleAppRelease OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Application Release"
+   ::= { cbsModuleAppMonEntry 3 }
+
+   cbsModuleAppCPMHostName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "Host name of the CPM"
+   ::= { cbsModuleAppMonEntry 4 }
+
+   cbsModuleAppCPMIPAddress OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "IP address of the CPM"
+   ::= { cbsModuleAppMonEntry 5 }
+
+   cbsModuleAppVAPGroupName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Vap Group name to which the routing protocol belongs to"
+   ::= { cbsModuleAppMonEntry 6 }
+
+   cbsModuleAppVAPIndex OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "VAPIndex"
+   ::= { cbsModuleAppMonEntry 7 }
+
+   cbsModuleAppOldState OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The last state of the application"
+   ::= { cbsModuleAppMonEntry 8 }
+
+   cbsModuleAppNewState OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "New (current) state of the application"
+   ::= { cbsModuleAppMonEntry 9 }
+
+
+cbsModuleRSWName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Routing protocol name"
+   ::= { cbsModuleAppMonEntry 10 }
+
+cbsModuleRSWVersion OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Routing protocol version"
+   ::= { cbsModuleAppMonEntry 11 }
+
+cbsModuleRSWRelease OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Routing protocol release"
+   ::= { cbsModuleAppMonEntry 12 }
+
+cbsModuleRSWStartOnBoot OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Indicates whether routing protocol is enabled or not"
+   ::= { cbsModuleAppMonEntry 13 }
+
+cbsModuleRSWCPMHostName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "Host name of the CPM"
+   ::= { cbsModuleAppMonEntry 14 }
+
+cbsModuleRSWCPMIPAddress OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "IP address of the CPM"
+   ::= { cbsModuleAppMonEntry 15 }
+
+cbsModuleRSWVAPGroupName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Vap Group name to which the application belongs"
+   ::= { cbsModuleAppMonEntry 16 }
+
+cbsModuleRSWVAPIndex OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "VAPIndex"
+   ::= { cbsModuleAppMonEntry 17 }
+
+cbsModuleRSWOldState OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The last state of the routing protocol"
+   ::= { cbsModuleAppMonEntry 18 }
+
+cbsModuleRSWNewState OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Current state of the routing protocol"
+   ::= { cbsModuleAppMonEntry 19 }
+
+-- Table of ntpd status
+
+cbsModuleNtpdMonTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleNtpdMonEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the ntpd status on primary CPM."
+   ::= { cbsModuleResources 11 }
+
+cbsModuleNtpdMonEntry OBJECT-TYPE
+   SYNTAX     CbsModuleNtpdMonEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the ntpd monitor table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleNtpdMonTable 1 }
+
+CbsModuleNtpdMonEntry ::= SEQUENCE {
+    cbsModuleNtpdCPMHostName                 DisplayString,
+    cbsModuleNtpdCPMIPAddress                DisplayString,
+    cbsModuleNtpdState                       DisplayString
+}
+
+cbsModuleNtpdCPMHostName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Hostname of the CPM"
+   ::= { cbsModuleNtpdMonEntry 1 }
+
+cbsModuleNtpdCPMIPAddress OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "IP address of the CPM"
+   ::= { cbsModuleNtpdMonEntry 2 }
+
+cbsModuleNtpdState OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+     "Current state of the ntpd"
+   ::= { cbsModuleNtpdMonEntry 3 }
+
+cbsModuleCpuCoreHiUtilTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleCpuCoreHiUtilEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains the CPU core high utilization states for
+       all of the modules in the chassis indexed by module ID"
+   ::= { cbsModuleResources 12 }
+
+cbsModuleCpuCoreHiUtilEntry OBJECT-TYPE
+   SYNTAX     CbsModuleCpuCoreHiUtilEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the Module Cpu Core Utilization table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleCpuCoreHiUtilTable 1 }
+
+CbsModuleCpuCoreHiUtilEntry ::= SEQUENCE {
+   cbsModuleCpuCoreHiUtilSeverity  UtilSeverityLvl,
+   cbsModuleCpuCoreHiUtilPerc      Integer32,   
+   cbsModuleCpuCoreHiUtilDuration  Integer32,  
+   cbsModuleCpuCoreHiUtilCores     BITS
+}
+
+cbsModuleCpuCoreHiUtilSeverity OBJECT-TYPE
+   SYNTAX     UtilSeverityLvl
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The severity level of CPU core utilization alarm."
+   ::= { cbsModuleCpuCoreHiUtilEntry 1 }
+      
+cbsModuleCpuCoreHiUtilPerc OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Highest CPU core utilization percentage seen." 
+   ::= { cbsModuleCpuCoreHiUtilEntry 2 }
+      
+   cbsModuleCpuCoreHiUtilCores OBJECT-TYPE
+   SYNTAX     BITS { core7(0),   core6(1),   core5(2),   core4(3),
+                     core3(4),   core2(5),   core1(6),   core0(7),
+                     core15(8),  core14(9),  core13(10), core12(11),
+                     core11(12), core10(13), core9(14),  core8(15),
+                     core23(16), core22(17), core21(18), core20(19),
+                     core19(20), core18(21), core17(22), core16(23),
+                     core31(24), core30(25), core29(26), core28(27),
+                     core27(28), core26(29), core25(30), core24(31) }
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Bit mask value of CPU cores at or above utilization threshold." 
+   ::= { cbsModuleCpuCoreHiUtilEntry 3 }
+   
+cbsModuleCpuCoreHiUtilDuration OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Amount of time in minutes that a CPU core has exceeded a threshold." 
+   ::= { cbsModuleCpuCoreHiUtilEntry 4 }
+      
+cbsNpmFlowTableUtilTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsNpmFlowTableUtilEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains the chassis-wide NPM flow table
+       usage, the user configured NPM flow table limit and
+       median thresholds, and the NPM flow table utilization
+       severity."
+   ::= { cbsModuleResources 13 }
+
+cbsNpmFlowTableUtilEntry OBJECT-TYPE
+   SYNTAX     CbsNpmFlowTableUtilEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the chassis-wide NPM flow table utilization table.
+       The index is the module ID of the reporting NPM."
+   INDEX { cbsHwModuleID }
+   ::= { cbsNpmFlowTableUtilTable 1 }
+
+CbsNpmFlowTableUtilEntry ::= SEQUENCE {
+   cbsNpmFTUtilSeverity             UtilSeverityLvl,
+   cbsNpmFTTriggerThreshold         Integer32,
+   cbsNpmFTUsage                    Integer32,
+   cbsNpmFTUdpLimitThreshold        Integer32,
+   cbsNpmFTUdpMedianThreshold       Integer32,
+   cbsNpmFTUdpQuotaUsage            Integer32,
+   cbsNpmFTTcpLimitThreshold        Integer32,
+   cbsNpmFTTcpMedianThreshold       Integer32,
+   cbsNpmFTTcpQuotaUsage            Integer32,
+   cbsNpmFTIcmpLimitThreshold       Integer32,
+   cbsNpmFTIcmpMedianThreshold      Integer32,
+   cbsNpmFTIcmpQuotaUsage           Integer32,
+   cbsNpmFTOtherIpLimitThreshold    Integer32,
+   cbsNpmFTOtherIpMedianThreshold   Integer32,
+   cbsNpmFTOtherIpQuotaUsage        Integer32
+}
+
+cbsNpmFTUtilSeverity OBJECT-TYPE
+   SYNTAX     UtilSeverityLvl
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The severity level of chassis-wide NPM flow table 
+       utilization alarm."
+   ::= { cbsNpmFlowTableUtilEntry 1 }
+      
+cbsNpmFTTriggerThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The user configured NPM flow table trigger threshold as
+       percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 2 }
+      
+cbsNpmFTUsage OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The chassis-wide NPM flow table usage as percentage
+       of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 3 }
+
+cbsNpmFTUdpLimitThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The user-configured limit for UDP flows after the
+       the NPM flow table trigger threshold is exceeded,
+       as percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 4 }
+
+cbsNpmFTUdpMedianThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The median of the NPM flow table UDP limit as 
+       percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 5 }
+      
+cbsNpmFTUdpQuotaUsage OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The flow table usage for UDP flows after the NPM
+       flow table trigger threshold is exceeded,
+       as percentage of the NPM flow table size."
+   ::= { cbsNpmFlowTableUtilEntry 6 }
+
+cbsNpmFTTcpLimitThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The user-configured limit for TCP flows after the
+       the NPM flow table trigger threshold is exceeded,
+       as percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 7 }
+
+cbsNpmFTTcpMedianThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The median of the NPM flow table TCP limit as 
+       percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 8 }
+
+cbsNpmFTTcpQuotaUsage OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The flow table usage for TCP flows after the NPM
+       flow table trigger threshold is exceeded,
+       as percentage of the NPM flow table size."
+   ::= { cbsNpmFlowTableUtilEntry 9 }
+
+cbsNpmFTIcmpLimitThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The user-configured limit for ICMP flows after the
+       the NPM flow table trigger threshold is exceeded,
+       as percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 10 }
+
+cbsNpmFTIcmpMedianThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The median of the NPM flow table ICMP limit as 
+       percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 11 }
+
+cbsNpmFTIcmpQuotaUsage OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The flow table usage for ICMP flows after the NPM
+       flow table trigger threshold is exceeded,
+       as percentage of the NPM flow table size."
+   ::= { cbsNpmFlowTableUtilEntry 12 }
+
+cbsNpmFTOtherIpLimitThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The user-configured limit for other-IP flows after the
+       the NPM flow table trigger threshold is exceeded,
+       as percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 13 }
+
+cbsNpmFTOtherIpMedianThreshold OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The median of the NPM flow table other-IP limit as 
+       percentage of the NPM flow table size." 
+   ::= { cbsNpmFlowTableUtilEntry 14 }
+
+cbsNpmFTOtherIpQuotaUsage OBJECT-TYPE
+   SYNTAX     Integer32 (0..100)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The flow table usage for other-IP flows after the NPM
+       flow table trigger threshold is exceeded,
+       as percentage of the NPM flow table size."
+   ::= { cbsNpmFlowTableUtilEntry 15 }
+
+cbsModuleSdramMemCfgStatTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleSdramMemCfgStatEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains the status entries of the unsupported SDRAM 
+       configuration error status"
+   ::= { cbsModuleResources 14 }
+   
+cbsModuleSdramMemCfgStatEntry  OBJECT-TYPE
+   SYNTAX     CbsModuleSdramMemCfgStatEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the Module SDRAM configuration table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleSdramMemCfgStatTable 1 }
+  
+CbsModuleSdramMemCfgStatEntry ::= SEQUENCE {
+   cbsModuleSdramMemCfgStat BadSdramMemCfgStat
+}
+
+cbsModuleSdramMemCfgStat OBJECT-TYPE
+   SYNTAX       BadSdramMemCfgStat
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+      "CPM SDRAM error state"
+   ::= { cbsModuleSdramMemCfgStatEntry 1 }
+
+cbsModuleGuestHealthTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleGuestHealthTableEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "List of traps indicating VE VAPs guests health problems."
+
+   ::= { cbsModuleResources 15 }
+   
+cbsModuleGuestHealthTableEntry  OBJECT-TYPE
+   SYNTAX     CbsModuleGuestHealthTableEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "A trap entry in VE VAPs guest health problem table."
+   INDEX { cbsHwModuleID }
+   ::= { cbsModuleGuestHealthTable 1 }
+  
+CbsModuleGuestHealthTableEntry ::= SEQUENCE {
+   cbsApmGuestHealthSeverity GuestHealthSeverityLvl
+}
+
+cbsApmGuestHealthSeverity OBJECT-TYPE
+   SYNTAX     GuestHealthSeverityLvl
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The severity level of Guest OS Health problem."
+   ::= { cbsModuleGuestHealthTableEntry 1 }
+      
+cbsCpmDiskCfgStat OBJECT-TYPE
+   SYNTAX       BadDiskCfgStat
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+      "CPM DISK error state"
+   ::= { cbsModuleResources 16 }
+
+-- Table of Application
+
+cbsModuleApplicationTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsModuleApplicationEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "This table contains information about the application on each Vap Group."
+   ::= { cbsModuleResources 17 }
+
+cbsModuleApplicationEntry OBJECT-TYPE
+   SYNTAX     CbsModuleApplicationEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the Application table."
+   INDEX { cbsVgVapGroupID }
+   ::= { cbsModuleApplicationTable 1 }
+
+CbsModuleApplicationEntry ::= SEQUENCE {
+   cbsModuleApplicationName       DisplayString,  
+   cbsModuleApplicationVersion    DisplayString,  
+   cbsModuleApplicationRelease    DisplayString,
+   cbsModuleApplicationMonEnabled TruthValue,
+   cbsModuleApplicationVgName     DisplayString
+}
+
+cbsModuleApplicationName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Application Name"
+   ::= { cbsModuleApplicationEntry 1 }
+
+cbsModuleApplicationVersion OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Application Version"
+   ::= { cbsModuleApplicationEntry 2 }
+
+cbsModuleApplicationRelease OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Application Release"
+   ::= { cbsModuleApplicationEntry 3 }
+
+cbsModuleApplicationMonEnabled OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Indicates whether Application Monitoring is enabled or disabled."
+   ::= { cbsModuleApplicationEntry 4 }
+
+cbsModuleApplicationVgName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Vap Group Name"
+   ::= { cbsModuleApplicationEntry 5 }
+
+cbsFlowTablePartitionThreshold OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Flow Table Partition Threshold."
+   ::= { cbsModuleResources 18 }
+   
+cbsFlowTableCriticalAlarm OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "NPM Flow Table Critical Alarm."
+   ::= { cbsModuleResources 19 }
+
+cbsFlowTableUtilization OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Flow Table Utilization."
+   ::= { cbsModuleResources 20 }
+
+cbsFlowTableUtilTcpFlowEntries OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "NPM Flow Table Utilization TCP Flow Entries."
+   ::= { cbsModuleResources 21 }
+   
+cbsFlowTableUtilUdpFlowEntries OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "NPM Flow Table Utilization UDP Flow Entries."
+   ::= { cbsModuleResources 22 }
+
+cbsFlowTableUtilIcmpFlowEntries OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "NPM Flow Table Utilization ICMP Flow Entries."
+   ::= { cbsModuleResources 23 }
+   
+cbsFlowTableUtilOtherIpFlowEntries OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "NPM Flow Table Utilization Other IP Flow Entries."
+   ::= { cbsModuleResources 24 }
+
+cbsNpmFlowDistTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsNpmFlowDistEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "The NPM flow table."
+   ::= { cbsModuleResources 25 }
+
+cbsNpmFlowDistEntry OBJECT-TYPE
+   SYNTAX     CbsNpmFlowDistEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the NPM flow table. The index is the module ID of the reporting NPM."
+   INDEX { cbsNpmSlotId }
+   ::= { cbsNpmFlowDistTable 1 }
+
+CbsNpmFlowDistEntry ::= SEQUENCE {
+   cbsNpmSlotId                Integer32,
+   cbsNpmTcpCurrentFlows       Integer32,
+   cbsNpmUdpCurrentFlows       Integer32,
+   cbsNpmIcmpCurrentFlows      Integer32,
+   cbsNpmOtherIpCurrentFlows   Integer32,
+   cbsNpmNewFlowRate           Integer32,
+   cbsNpmAgedFlowRate          Integer32
+}
+
+cbsNpmSlotId OBJECT-TYPE
+   SYNTAX     Integer32 (1..14)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The module ID of the NPM."
+   ::= { cbsNpmFlowDistEntry 1 }
+   
+cbsNpmTcpCurrentFlows OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The number of TCP flows in the NPM flow table."
+   ::= { cbsNpmFlowDistEntry 2 }
+
+cbsNpmUdpCurrentFlows OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The number of UDP flows in the NPM flow table."
+   ::= { cbsNpmFlowDistEntry 3 }
+
+cbsNpmIcmpCurrentFlows OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The number of ICMP flows in the NPM flow table."
+   ::= { cbsNpmFlowDistEntry 4 }
+
+cbsNpmOtherIpCurrentFlows OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The number of Other IP protocol flows in the NPM flow table."
+   ::= { cbsNpmFlowDistEntry 5 }
+
+cbsNpmNewFlowRate OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The flow rate in bits per second of new flows in the NPM flow table."
+   ::= { cbsNpmFlowDistEntry 6 }
+   
+cbsNpmAgedFlowRate OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The flow rate in bits per second of aged flows in the NPM flow table."
+   ::= { cbsNpmFlowDistEntry 7 }
+
+cbsVapFlowDistTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsVapFlowDistEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "The VAP group's flow statistics."
+   ::= { cbsModuleResources 26 }
+   
+cbsVapFlowDistEntry OBJECT-TYPE
+   SYNTAX     CbsVapFlowDistEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in a VAP group flow table. The index is a combination of the VAP group ID
+       and the index of a VAP in the VAP group."
+   INDEX { cbsVapFlowGroupID, cbsVapFlowIndex }
+   ::= { cbsVapFlowDistTable 1 }
+   
+CbsVapFlowDistEntry ::= SEQUENCE {
+   cbsVapFlowGroupID     Integer32,
+   cbsVapFlowIndex       Integer32,
+   cbsVapName            DisplayString,
+   cbsVapCurrentFlows    Integer32,
+   cbsVapNewFlowRate     Integer32,
+   cbsVapAgedFlowRate    Integer32
+}
+
+cbsVapFlowGroupID OBJECT-TYPE
+   SYNTAX     Integer32 (0..2147483647)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The VAP group ID."
+   ::= { cbsVapFlowDistEntry 1 }
+
+cbsVapFlowIndex OBJECT-TYPE
+   SYNTAX     Integer32 (1..10)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The index value of a VAP in the VAP group."
+   ::= { cbsVapFlowDistEntry 2 }
+      
+cbsVapName    OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The name of the VAP specified by the VAP group ID and the index of the VAP."
+   ::= { cbsVapFlowDistEntry 3 }
+
+cbsVapCurrentFlows OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Current flows for the specified VAP."
+   ::= { cbsVapFlowDistEntry 4 }
+   
+cbsVapNewFlowRate OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The flow rate in bits per second of new flows for the specified VAP."
+   ::= { cbsVapFlowDistEntry 5 }
+   
+cbsVapAgedFlowRate OBJECT-TYPE
+   SYNTAX     Integer32
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The flow rate in bits per second of aged flows for the specified VAP."
+   ::= { cbsVapFlowDistEntry 6 }
+
+-- The traps
+
+cbsModuleCPULoadExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsModuleCPULoad1 }
+   STATUS  obsolete
+   DESCRIPTION
+     "The CPU load on one of the processor modules is excessive.
+      This sends the current value of the one minute load on the
+      CPU module that is experiencing excessive load."
+   ::= { cbsModuleResourceTraps 1 }
+
+cbsModuleCPULoadNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleCPULoad1 }
+   STATUS  obsolete
+   DESCRIPTION
+     "The CPU load on one of the processor modules has returned to
+      normal. This sends the current value of the one minute load
+      on the CPU module that returned to normal."
+   ::= { cbsModuleResourceTraps 2 }
+
+cbsModuleMemoryUsageExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsModuleMemoryTotal, cbsModuleMemoryUsed }
+   STATUS  obsolete
+   DESCRIPTION
+     "The memory usage on the processor modules is excessive. This
+      sends the current values of total and free memory for the
+      module."
+   ::= { cbsModuleResourceTraps 3 }
+
+cbsModuleMemoryUsageNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleMemoryTotal, cbsModuleMemoryUsed }
+   STATUS  obsolete
+   DESCRIPTION
+     "The memory usage on the processor modules that was excessive
+      returned to normal. This sends the current values of total
+      and free memory for the module."
+   ::= { cbsModuleResourceTraps 4 }
+
+cbsModuleCPUUtilExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsModuleCPUUtil1 }
+   STATUS  current
+   DESCRIPTION
+     "The CPU utilization on one of the processor modules is excessive.
+      This sends the current value of the one minute utilization on 
+      the CPU module that is experiencing excessive load."
+   ::= { cbsModuleResourceTraps 5 }
+
+cbsModuleCPUUtilNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleCPUUtil1 }
+   STATUS  current
+   DESCRIPTION
+     "The CPU utilization on one of the processor modules returned to
+      normal. This sends the current value of the one minute utilization
+      on the CPU module that returned to normal."
+   ::= { cbsModuleResourceTraps 6 }
+
+cbsModuleDURootHigh NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDURoot }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the / partition of the processor module is high.
+      This sends the current value of the disk usage on the / partition that
+      is experiencing the high usage."
+   ::= { cbsModuleResourceTraps 7 }
+
+cbsModuleDURootNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDURoot }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the / partition of the processor module returned
+      to normal. This sends the current value of the disk usage on the /
+      partition that returned to normal."
+   ::= { cbsModuleResourceTraps 8 }
+
+cbsModuleDUBootHigh NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUBoot }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /boot partition of the processor module is high.
+      This sends the current value of the disk usage on the /boot partition that
+      is experiencing the high usage."
+   ::= { cbsModuleResourceTraps 9 }
+
+cbsModuleDUBootNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUBoot }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /boot partition of the processor module returned
+      to normal. This sends the current value of the disk usage on the /boot
+      partition that returned to normal."
+   ::= { cbsModuleResourceTraps 10 }
+
+cbsModuleDUCbconfigHigh NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUCbconfig }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /cbconfig partition of the processor module is high.
+      This sends the current value of the disk usage on the /cbconfig partition
+      that is experiencing the high usage."
+   ::= { cbsModuleResourceTraps 11 }
+
+cbsModuleDUCbconfigNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUCbconfig }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /cbconfig partition of the processor module returned
+      to normal. This sends the current value of the disk usage on the /cbconfig
+      partition that returned to normal."
+   ::= { cbsModuleResourceTraps 12 }
+
+cbsModuleDUTftpbootHigh NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUTftpboot }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /tftpboot partition of the processor module is high.
+      This sends the current value of the disk usage on the /tftpboot partition that
+      is experiencing the high usage."
+   ::= { cbsModuleResourceTraps 13 }
+
+cbsModuleDUTftpbootNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUTftpboot }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /tftpboot partition of the processor module returned
+      to normal. This sends the current value of the disk usage on the /tftpboot
+      partition that returned to normal."
+   ::= { cbsModuleResourceTraps 14 }
+
+cbsModuleFreePageAvailableHigh NOTIFICATION-TYPE
+   OBJECTS { cbsModuleFreePageAvailable, cbsModuleFreePageThreshold, 
+             cbsModuleFreePageSeverity, cbsModuleFreePageVapName }
+   STATUS  current
+   DESCRIPTION
+     "The used free page usage on the module is high.  The values passed are the threshold 
+      value and the free page count in /proc/cbs_fp_th on the AP and the VAP group name."
+   ::= { cbsModuleResourceTraps 15 }
+
+cbsModuleFreePageAvailableNorm NOTIFICATION-TYPE
+   OBJECTS { cbsModuleFreePageAvailable , cbsModuleFreePageThreshold, 
+             cbsModuleFreePageSeverity, cbsModuleFreePageVapName }
+   STATUS  current
+   DESCRIPTION
+     "The used free page usage on the module is normal.  The values passed are the threshold 
+      value and the free page count in /proc/cbs_fp_th on the AP and the VAP group name."
+   ::= { cbsModuleResourceTraps 16 }
+
+
+cbsModuleMUHigh NOTIFICATION-TYPE
+   OBJECTS { cbsHwModuleID }
+   STATUS  current
+   DESCRIPTION
+     "Internal memory tables usage on this NPM is high."
+   ::= { cbsModuleResourceTraps 17 }
+
+cbsModuleMUNormal NOTIFICATION-TYPE
+   OBJECTS { cbsHwModuleID }
+   STATUS  current
+   DESCRIPTION
+     "Internal memory table usage on this NPM returned to normal."
+   ::= { cbsModuleResourceTraps 18 }
+
+cbsModuleFRHigh NOTIFICATION-TYPE
+   OBJECTS { cbsHwModuleID }
+   STATUS  current
+   DESCRIPTION
+     "Usage of resources dealing with fragmentation is high."
+   ::= { cbsModuleResourceTraps 19 }
+
+cbsModuleFRNormal NOTIFICATION-TYPE
+   OBJECTS { cbsHwModuleID }
+   STATUS  current
+   DESCRIPTION
+     "Usage of resources dealing with fragmentation returned to normal."
+   ::= { cbsModuleResourceTraps 20 }
+
+cbsModuleBUHigh NOTIFICATION-TYPE
+   OBJECTS { cbsHwModuleID }
+   STATUS  current
+   DESCRIPTION
+     "High usage of packet buffers."
+   ::= { cbsModuleResourceTraps 21 }
+
+cbsModuleBUNormal NOTIFICATION-TYPE
+   OBJECTS { cbsHwModuleID }
+   STATUS  current
+   DESCRIPTION
+     "Usage of packet buffers returned to normal."
+   ::= { cbsModuleResourceTraps 22 }
+
+cbsModuleAppStateChange NOTIFICATION-TYPE
+   OBJECTS {
+      cbsHwModuleID,
+      cbsModuleAppName,  
+      cbsModuleAppVersion,
+      cbsModuleAppRelease,
+      cbsModuleAppCPMHostName,
+      cbsModuleAppCPMIPAddress,
+      cbsModuleAppVAPGroupName,
+      cbsModuleAppVAPIndex,
+      cbsModuleAppOldState,
+      cbsModuleAppNewState  
+     }
+   STATUS  current
+   DESCRIPTION
+     "This describes the full state of the application.  It will be sent ever there is a state change .i.e. 
+     when ever cbsModuleAppNewState changes."
+   ::= { cbsModuleResourceTraps 23 }
+
+cbsModuleNtpdMonStateChange NOTIFICATION-TYPE
+   OBJECTS {
+      cbsHwModuleID,
+      cbsModuleNtpdCPMHostName,
+      cbsModuleNtpdCPMIPAddress,
+      cbsModuleNtpdState
+     }
+   STATUS  current
+   DESCRIPTION
+     "This describes the state of the ntpd. It will be sent when ntpd daemon
+     stop."
+   ::= { cbsModuleResourceTraps 24 }
+
+cbsModuleDUMgmtHigh NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUMgmt }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /mgmt partition of the processor module is high.
+      This sends the current value of the disk usage on the /mgmt partition that
+      is experiencing the high usage."
+   ::= { cbsModuleResourceTraps 25 }
+
+cbsModuleDUMgmtNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUMgmt }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /mgmt partition of the processor module returned
+      to normal. This sends the current value of the disk usage on the /mgmt
+      partition that returned to normal."
+   ::= { cbsModuleResourceTraps 26 }
+
+cbsModuleCpuCoreUtilExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsModuleCpuCoreHiUtilSeverity,
+             cbsModuleCpuCoreHiUtilPerc,
+             cbsModuleCpuCoreHiUtilDuration,
+             cbsModuleCpuCoreHiUtilCores }
+   STATUS  current
+   DESCRIPTION
+     "The utilization of one or more CPU cores on one of the process modules 
+      is excessive."
+   ::= { cbsModuleResourceTraps 27 }
+
+cbsModuleCpuCoreUtilNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleCpuCoreHiUtilPerc }
+   STATUS  current
+   DESCRIPTION
+     "The utilization of all CPU cores on one of the process modules 
+      has returned to normal."
+   ::= { cbsModuleResourceTraps 28 }
+
+cbsNpmFlowTableUsageHigh NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTTriggerThreshold}
+   STATUS  current
+   DESCRIPTION
+     "The chassis-wide NPM flow table usage has exceeded the
+      user configured flow-table partition trigger threshold."
+   ::= { cbsModuleResourceTraps 29 }
+
+cbsNpmFlowTableUsageNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "The chassis-wide NPM flow table usage has returned below the
+      user configured flow-table partition trigger threshold."
+   ::= { cbsModuleResourceTraps 30 }
+
+
+cbsNpmFTUdpLimitExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTUdpLimitThreshold}
+   STATUS  current
+   DESCRIPTION
+     "UDP flow table usage has exceeded the user configured UDP 
+      flow-table partition limit."
+   ::= { cbsModuleResourceTraps 31 }
+
+cbsNpmFTUdpLimitNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "UDP flow table usage has returned below the user configured UDP 
+      flow-table partition limit."
+
+   ::= { cbsModuleResourceTraps 32 }
+
+cbsNpmFTUdpMedianExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTUdpLimitThreshold}
+   STATUS  current
+   DESCRIPTION
+     "UDP flow table usage has exceeded the median of the 
+      user configured UDP flow-table partition limit."
+   ::= { cbsModuleResourceTraps 33 }
+
+cbsNpmFTUdpMedianNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "UDP flow table usage has returned below the median of the 
+      user configured UDP flow-table partition limit."
+   ::= { cbsModuleResourceTraps 34 }
+
+cbsNpmFTTcpLimitExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTTcpLimitThreshold}
+   STATUS  current
+   DESCRIPTION
+     "TCP flow table usage has exceeded the user configured TCP 
+      flow-table partition limit."
+   ::= { cbsModuleResourceTraps 35 }
+
+cbsNpmFTTcpLimitNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "TCP  flow table usage has returned below the user configured TCP
+      flow-table partition limit."
+   ::= { cbsModuleResourceTraps 36 }
+
+cbsNpmFTTcpMedianExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTTcpLimitThreshold}
+   STATUS  current
+   DESCRIPTION
+     "TCP flow table usage has exceeded the median of the 
+      user configured TCP flow-table partition limit."
+   ::= { cbsModuleResourceTraps 37 }
+
+cbsNpmFTTcpMedianNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "TCP flow table usage has returned below the median of the 
+      user configured TCP flow-table partition limit."
+   ::= { cbsModuleResourceTraps 38 }
+
+cbsNpmFTIcmpLimitExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTIcmpLimitThreshold}
+   STATUS  current
+   DESCRIPTION
+     "ICMP flow table usage has exceeded the user configured
+      flow-table partition limit."
+   ::= { cbsModuleResourceTraps 39 }
+
+cbsNpmFTIcmpLimitNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "ICMP flow table usage has returned below the user configured 
+      ICMP flow-table partition limit."
+   ::= { cbsModuleResourceTraps 40 }
+
+cbsNpmFTIcmpMedianExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTIcmpLimitThreshold}
+   STATUS  current
+   DESCRIPTION
+     "ICMP flow table usage has exceeded the median of the 
+      user configured ICMP flow-table partition limit."
+   ::= { cbsModuleResourceTraps 41 }
+
+cbsNpmFTIcmpMedianNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "ICMP flow table usage has returned below the median of the  
+      user configured ICMP flow-table partition limit."
+   ::= { cbsModuleResourceTraps 42 }
+
+cbsNpmFTOtherIpLimitExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTOtherIpLimitThreshold}
+   STATUS  current
+   DESCRIPTION
+     "Other-IP flow table usage has exceeded the user configured
+      flow-table partition limit."
+   ::= { cbsModuleResourceTraps 43 }
+
+cbsNpmFTOtherIpLimitNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "Other-IP flow table usage has returned below the user configured
+      flow-table partition limit."
+   ::= { cbsModuleResourceTraps 44 }
+
+cbsNpmFTOtherIpMedianExceeded NOTIFICATION-TYPE
+   OBJECTS { cbsNpmFTUtilSeverity,
+             cbsNpmFTOtherIpLimitThreshold}
+   STATUS  current
+   DESCRIPTION
+     "Other-IP flow table usage has exceeded the median of the 
+      user configured flow-table partition limit."
+   ::= { cbsModuleResourceTraps 45 }
+
+cbsNpmFTOtherIpMedianNormal NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+     "Other-IP flow table usage has returned below the median of the 
+      user configured flow-table partition limit."
+   ::= { cbsModuleResourceTraps 46 }
+
+cbsModuleSdramCheck NOTIFICATION-TYPE
+   OBJECTS { cbsModuleSdramMemCfgStat }
+   STATUS  current
+   DESCRIPTION
+     "Check of module memory configuration has determined whether or
+      not the current SDRAM memory is supported by the current 
+      version of XOS software or not."
+   ::= { cbsModuleResourceTraps 47 }
+
+cbsApmGuestHealthCheck NOTIFICATION-TYPE
+   OBJECTS { cbsApmGuestHealthSeverity }
+   STATUS  current
+   DESCRIPTION
+     "Guest OS running on VE VAP reports health problem. Please check syslog for
+      details."
+   ::= { cbsModuleResourceTraps 48 }
+
+cbsCpmDiskCheck NOTIFICATION-TYPE
+   OBJECTS { cbsCpmDiskCfgStat }
+   STATUS  current
+   DESCRIPTION
+     "Check of CPM disk configuration has determined whether or
+      not the current disk is supported by the current
+      version of XOS software or not."
+   ::= { cbsModuleResourceTraps 49 }
+
+cbsModuleDUVarHigh NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUVar }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /var partition of the processor module is high.
+      This sends the current value of the disk usage on the /var partition
+that
+      is experiencing the high usage."
+   ::= { cbsModuleResourceTraps 50 }
+
+cbsModuleDUVarNormal NOTIFICATION-TYPE
+   OBJECTS { cbsModuleDUVar }
+   STATUS  current
+   DESCRIPTION
+     "The disk usage on the /var partition of the processor module returned
+      to normal. This sends the current value of the disk usage on the /var
+      partition that returned to normal."
+   ::= { cbsModuleResourceTraps 51 }
+
+cbsModuleRSWStateChange NOTIFICATION-TYPE
+   OBJECTS {
+      cbsHwModuleID,
+      cbsModuleRSWName,  
+      cbsModuleRSWVersion,
+      cbsModuleRSWRelease,
+      cbsModuleRSWStartOnBoot,
+      cbsModuleRSWCPMHostName,
+      cbsModuleRSWCPMIPAddress,
+      cbsModuleRSWVAPGroupName,
+      cbsModuleRSWVAPIndex,
+      cbsModuleRSWOldState,
+      cbsModuleRSWNewState  
+     }
+   STATUS  current
+   DESCRIPTION
+     "This describes the full state of the routing protocol.  It will be sent ever there is a state change .i.e. 
+     when ever cbsModuleRSWNewState changes."
+   ::= { cbsModuleResourceTraps 52 }
+END
+

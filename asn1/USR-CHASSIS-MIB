@@ -1,0 +1,753 @@
+USR-CHASSIS-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Counter32, Integer32
+                  FROM SNMPv2-SMI
+        DateAndTime
+                  FROM SNMPv2-TC
+        UsrDisplayString, common, UsrConfigStatus
+                  FROM USR-DEFINITIONS-MIB;
+    usrChassis MODULE-IDENTITY
+         LAST-UPDATED "200205051700Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects
+                   for the card chassis."
+--       REVISION "200205051700Z"
+--       DESCRIPTION "Converted to SNMPv2"
+         ::= { common 41 }
+	usrChassisConfigFileName OBJECT-TYPE
+		SYNTAX      UsrDisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION		
+		  "The name of a ConfigFile to read/write permanent
+		   database records. If the value of this object is an
+           empty string, then the NMBA process uses the
+           default name `@file://Chassis.cfg'. "
+	::= { usrChassis 1 }
+	usrChassisCFMStatusFlag  OBJECT-TYPE
+	 	SYNTAX	    UsrConfigStatus
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+		  "Setting the value of this object to `save' causes the values
+		   of the ChassisSlotTable to be written out to the
+           current config file, which is stored in the 
+           usrChassisConfigFileName object. While the new
+           ConfigFile is being written, the NMBA process
+		   will set the value of this flag to `saving''. Any
+		   attempts to set the value while it is not `normal'
+		   (i.e. the file is currently being written to the
+		   ConfigFile) while result in a badValue error being
+		   returned. Setting the value to `normal' will result in no
+		   action."
+	::= { usrChassis 2 }
+	usrChassisChassisAwareness  OBJECT-TYPE
+		SYNTAX   INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+		  "The value of this object determines if
+		   chassis awareness messages from the NMC are to be
+           handled or not.  If this object is set to `enabled' 
+           then when a chassis awareness message is received, 
+           the information contained within the message is used 
+           to update the chassis configuration. If this object 
+           is set to `disabled' any chassis awareness messages 
+           received from the NMC are ignored, and the configuration
+           of the chassis must be set statically through SNMP sets,
+           or CLI commands. To be able to SET this object
+           usrChassisDSA must be 'enabled'."            
+	        --CONFIGURABLE
+	::= { usrChassis 3 }
+	usrChassisSlotTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrChassisSlotEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+                  "A table containing one row per slot in the chassis.  Each
+		   row describes the characteristics of the slot"
+	::= { usrChassis 4 }
+	usrChassisSlotEntry OBJECT-TYPE
+         SYNTAX      UsrChassisSlotEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+            ""
+         INDEX   { usrChassisSlot}
+	::= { usrChassisSlotTable 1 }
+	UsrChassisSlotEntry ::=
+         SEQUENCE {
+         usrChassisSlot
+            Integer32,
+         usrChassisOwner
+            INTEGER,
+         usrChassisCardType
+            INTEGER,
+         usrChassisNumPorts
+            Integer32,
+         usrChassisDescription
+            UsrDisplayString,
+	     usrChassisType
+  	        INTEGER,
+         usrChassisConsole
+            INTEGER
+         }
+	usrChassisSlot OBJECT-TYPE
+         SYNTAX  Integer32
+	 MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+            "The slot number of this row."
+	::= { usrChassisSlotEntry 1 }
+	usrChassisOwner OBJECT-TYPE
+		SYNTAX   INTEGER {
+			no(1),
+			yes(2),
+			assigned(3)
+			}
+         MAX-ACCESS   read-write
+         STATUS   current
+         DESCRIPTION
+            "An indication if this slot's card has this Gateway card assigned
+             as the owning gateway"
+         --CONFIGURABLE
+         ::= { usrChassisSlotEntry 2 }
+	usrChassisCardType OBJECT-TYPE
+		SYNTAX   INTEGER {
+			empty(1),
+			unknown(2),
+			quadV32Modem(3),
+			dualT1E1(4),
+			genericQuadIModem(5),
+			hdmsimulator(6),
+			trGatewayNAC(7),
+			x25GatewayNAC(8),
+			dualV34ModemNAC(9),
+			quadV32DigitalTerboModemNAC(10),
+			quadV32AnalogTerboModemNAC(11),
+			quadV32DigAnlTerboModemNAC(12),
+			quadV34DigModemNAC(13),
+			quadV34AnlModemNAC(14),
+			quadV34DigAnlModemNAC(15),
+			singleT1NAC(16),
+			ethernetGatewayNAC(17),
+			accessServer(18),
+			i486TrGatewayNAC(19),
+			i486EthernetGatewayNAC(20),
+			genericQuadModem(21),
+			dualRS232NAC(22),
+			i486X25GatewayNAC(23),
+			i486DXAPINAC(24),
+			applicationServerNAC(25),
+			iSDNGatewayNAC(26),
+			iSDNpriT1NAC(27),
+			clkedNetMgtCard(28),
+			modemPoolManagementNAC(29),
+			modemPoolNetserverNAC(30),
+			modemPoolV34ModemNAC(31),
+			modemPoolISDNNAC(32),
+			nTServerNAC(33),
+			quadV34DigitalG2NAC(34),
+			quadV34AnalogG2NAC(35),
+			quadV34DigAnlgG2NAC(36),
+			nETServerFrameRelayNAC(37),
+			nETServerTokenRingNAC(38),
+			x2524ChannelNAC(39),
+			highDensityModem(41),
+			wirelessGatewayNAC(42),
+			ciscoAS51NAC(43),
+			enhancedAccessServer(44),
+			enhancedISDNGatewayNAC(45),
+			hdm24ChannelNAC(46),
+			hdm30ChannelNAC(47),
+			riscNetserverNAC(48),
+            dualP6NAC(49),
+            p5NMC(50),
+            ss7iHapiCard(51),
+            ds3jhdmt1NAC(52),
+            jhdme1NAC(53),
+            harc2CARD(54)
+			}
+         MAX-ACCESS   read-write
+         STATUS   current
+         DESCRIPTION
+            "The ID of the card that is resident in this slot of
+             the chassis."
+         --CONFIGURABLE
+         ::= { usrChassisSlotEntry 3 }
+	usrChassisNumPorts OBJECT-TYPE
+         SYNTAX  Integer32
+         MAX-ACCESS  read-write
+         STATUS  current
+         DESCRIPTION
+            "The number ports that are enabled on the card in this 
+             chassis slot. This value will be determined when the the
+	     card type for this slot is set, or when a chassis
+             awareness message arrives updating this slot.  If the
+             card type is empty, the number of ports is set to zero."
+         --CONFIGURABLE
+	::= { usrChassisSlotEntry 4 }
+	usrChassisDescription OBJECT-TYPE
+         SYNTAX  UsrDisplayString (SIZE(0..32))
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+            "A string that describes the type of card in this chassis 
+    		   slot."
+	::= { usrChassisSlotEntry 5 }
+	usrChassisType OBJECT-TYPE
+		SYNTAX   INTEGER {
+			static(1),
+			dynamic(2)
+			}
+         MAX-ACCESS   read-write
+         STATUS   current
+         DESCRIPTION
+            "An indicator that tells if this slot's (row's) data was
+             created statically by configuration, or dynamically by
+             the receipt of chassis awareness information from the
+             NMC.  Only static entries are saved to the configuration
+             file.  Dynamic entries are saved as static entries with 
+             an empty card type. If dynamic information is learned
+             it replaces the information in a static entry.  A dynamic
+             entry cannot be changed through the CLI or an SNMP set."
+         ::= { usrChassisSlotEntry 6 }
+    usrChassisConsole OBJECT-TYPE
+        SYNTAX   INTEGER {
+            no(1),
+            yes(2)
+            }
+         MAX-ACCESS   read-write
+         STATUS   current
+         DESCRIPTION
+            "An indicator that tells if this slot supports a packet
+         bus based console."
+    DEFVAL { no }
+         --CONFIGURABLE
+         ::= { usrChassisSlotEntry 7 }
+	usrChassisDSA  OBJECT-TYPE
+		SYNTAX   INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+		  "The value of this object determines if
+		   the card is participating in the
+		   dynamic slot assignment algorithm.
+		   The default is disabled."
+	        --CONFIGURABLE
+	::= { usrChassis 5 }
+	usrChassisDSAQueryReq  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		  "The number of DSA query requests from NMC seen by this card"
+	::= { usrChassis 6 }
+	usrChassisDSAQueryRsp  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		  "The number of DSA query responses sent by this card to NMC"
+	::= { usrChassis 7 }
+	usrChassisDSAServiceReq  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		  "The number of DSA service requests issued to this card"
+	::= { usrChassis 8 }
+	usrChassisDSAServiceAssignments  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		  "The number of DSA assignments performed by this card"
+	::= { usrChassis 9 }
+	usrChassisDSATraps  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		  "The number of DSA traps issued"
+	::= { usrChassis 10 }
+	usrChassisDSAInvalidRX  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		  "The number invalid DSA packets received"
+	::= { usrChassis 11 }
+    usrChassisWhenLastNMCQuery    OBJECT-TYPE
+		SYNTAX		DateAndTime
+		MAX-ACCESS  read-only
+		STATUS		current
+		DESCRIPTION
+			"Time when the last NMC query packet was received"
+	::= { usrChassis 12 }
+	usrChassisDSARebalancing  OBJECT-TYPE
+		SYNTAX   INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+		  "The value of this object determines if
+		   the card allows slot rebalancing when
+		   participating in the dynamic slot assignment algorithm.
+		   The default is enabled."
+	        --CONFIGURABLE
+	::= { usrChassis 13 }
+	usrNMCSnmpForwarding  OBJECT-TYPE
+		SYNTAX   INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+		  "The value of this object determines if Hiper will
+		   accept SNMP forwarded messages from the NMC over NM bus.
+                   or CLI commands."
+	        --CONFIGURABLE
+	::= { usrChassis 14 }
+END         -- End usrChassis MIB definitions
+-- ************************************************************************
+PB-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   Counter
+      FROM RFC1155-SMI
+   OBJECT-TYPE
+      FROM RFC-1212
+   nas
+      FROM USR-DEFINITIONS-MIB;
+pb OBJECT IDENTIFIER ::= { nas 12 }
+pbCfg OBJECT IDENTIFIER ::= { pb 1 }
+pbCfgTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PbCfgEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+"A table containing an configuration information for each 
+Gateway NAC in the NAS chassis."
+::= { pbCfg 1 }
+pbCfgEntry OBJECT-TYPE
+SYNTAX PbCfgEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+"There is one Configuration row for each Gateway Card in the 
+NAS chassis."
+INDEX { pbCfgIndex }
+::= { pbCfgTable 1 }
+PbCfgEntry ::=
+SEQUENCE {
+pbCfgIndex
+    INTEGER,
+pbCfgMaxSessions
+    INTEGER
+}
+pbCfgIndex OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A unique value for each Gateway Card in the chassis. The 
+value of this object matches the value of the index of the 
+corresponding Gateway Card's entry in the entity table of 
+the chassis MIB."
+::= { pbCfgEntry 1 }
+pbCfgMaxSessions OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"This read-only object defines the maximum number of packet 
+bus sessions supported by this entity. This value is used 
+to determine the number of rows present in the 
+pbSessionTable for this entity."
+::= { pbCfgEntry 2 }
+pbSession OBJECT IDENTIFIER ::= { pb 2 }
+pbSessionTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PbSessionEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+"The Packet Bus Session table contains an entry for each 
+manageable Gateway NAC in the chassis.  It provides a means 
+to configure packet bus connections and determine the 
+status of the defined connections.  This table resides in 
+the NAC and can be implemented as either a dense or sparse 
+table."
+::= { pbSession 1 }
+pbSessionEntry OBJECT-TYPE
+SYNTAX PbSessionEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+"There is an row for each Packet Bus connection."
+INDEX { pbSessionEntityIndex, pbSessionIndex }
+::= { pbSessionTable 1 }
+PbSessionEntry ::=
+SEQUENCE {
+pbSessionEntityIndex
+    INTEGER,
+pbSessionIndex
+    INTEGER,
+pbSessionDestSlot
+    INTEGER,
+pbSessionDestChan
+    INTEGER,
+pbSessionDestSess
+    INTEGER,
+pbSessionRowState
+    INTEGER,
+pbSessionStatus
+    INTEGER,
+pbSessionReqStatus
+    INTEGER,
+pbSessionLastRequest
+    INTEGER,
+pbSessionPktSents
+    Counter,
+pbSessionPktRcvds
+    Counter,
+pbSessionPktSize
+    INTEGER,
+pbSessionBusTimeOuts
+    Counter,
+pbSessionErrorStatus
+    INTEGER
+}
+pbSessionEntityIndex OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A unique value for each entity in the chassis.  The value 
+of this object matches the value of the index of the 
+corresponding entry in the entity table of the chassis MIB."
+::= { pbSessionEntry 1 }
+pbSessionIndex OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"An index that uniquely identifies the packet bus session 
+for this entity."
+::= { pbSessionEntry 2 }
+pbSessionDestSlot OBJECT-TYPE
+SYNTAX INTEGER (1..64)
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"A number that identifies the slot of the entity in the 
+chassis to which a packet bus session has been assigned."
+::= { pbSessionEntry 3 }
+pbSessionDestChan OBJECT-TYPE
+SYNTAX INTEGER (1..255)
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"A number that identifies a particular entity in a slot."
+::= { pbSessionEntry 4 }
+pbSessionDestSess OBJECT-TYPE
+SYNTAX INTEGER (0..16320)
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A number that identifies the particular session from the 
+other  communicating Gateway."
+::= { pbSessionEntry 5 }
+pbSessionRowState OBJECT-TYPE
+SYNTAX INTEGER{
+  free(1),
+  used(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"Set availability for this row of packet bus session. 
+Default=free(1)."
+::= { pbSessionEntry 6 }
+pbSessionStatus OBJECT-TYPE
+SYNTAX INTEGER{
+  unassigned(1),
+  assigned(2),
+  connected(3)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"Displays the current status of the packet bus session.  A 
+status of Unassigned coupled with a state of used indicates 
+that a packet bus failure has occurred."
+::= { pbSessionEntry 7 }
+pbSessionReqStatus OBJECT-TYPE
+SYNTAX INTEGER{
+  disconnected(1),
+  connected(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"Used to assign or delete a session between the entities 
+specified by the table indices. A request connect is a 
+issue of packet bus session link start, and a request 
+disconnect is a issue of packet bus session link terminate. 
+Default=disconnected(1)."
+::= { pbSessionEntry 8 }
+pbSessionLastRequest OBJECT-TYPE
+SYNTAX INTEGER{
+  unknown(1),
+  open(2),
+  close(3),
+  listen(4),
+  dial(5),
+  disconnect(6),
+  transmit(7),
+  receive(8),
+  setMode(9),
+  query(10),
+  flush(11),
+  kill(12),
+  reserve(13),
+  answer(14),
+  attach(15)
+}
+ACCESS read-only
+STATUS optional
+DESCRIPTION
+"Indicates the type of communications contained in the last 
+packet sent to the destination entity."
+::= { pbSessionEntry 9 }
+pbSessionPktSents OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A counter that indicates number of packets that have been 
+sent."
+::= { pbSessionEntry 10 }
+pbSessionPktRcvds OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A counter that indicates number of packets that have been 
+received."
+::= { pbSessionEntry 11 }
+pbSessionPktSize OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A number that indicates the packet size of the current or 
+last established session."
+::= { pbSessionEntry 12 }
+pbSessionBusTimeOuts OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A counter that indicates number of packet bus timeout that 
+have occurred."
+::= { pbSessionEntry 13 }
+pbSessionErrorStatus OBJECT-TYPE
+SYNTAX INTEGER{
+  noError(1),
+  invalidParm(2),
+  socketNotOpened(3),
+  noMoreSocket(4),
+  connectionExist(5),
+  connectionFailed(6),
+  noMoreConnObj(7),
+  noActiveConn(8),
+  ackWaitTimeout(9),
+  hwNakRcvd(10),
+  otherBusError(11),
+  linkStartRcvd(12),
+  outOfSeqFrame(13),
+  noMemory(14),
+  nullPointer(15),
+  invalidBlock(16),
+  notInitialized(17),
+  failedToRecv(18),
+  invalidMsgType(19),
+  exceedMaxSends(20),
+  connectionReset(21),
+  socketClosed(22),
+  uiReqPending(23),
+  heartbeatTimeout(24),
+  remoteBusy(25),
+  localBusy(26),
+  noResponse(27),
+  linkdownNoTx(28),
+  noDataToTx(29),
+  txPreAck(30),
+  txTardyAck(31),
+  txBusTimeOut(32),
+  rxBusTimeOut(33),
+  txTAL(34),
+  rxTAL(35),
+  txMasterTimeOut(36),
+  clkVanished(37),
+  clkReturned(38),
+  shutdown(39),
+  frameError(40),
+  xIDTimeOut(41),
+  recvLSinInfoTransferState(42),
+  recvIFrameWithWrongSeq(43),
+  rxMsgBufferOverflow(44),
+  linkDown(45),
+  listenFailed(46),
+  listenRcvFailed(47),
+  dtrDrop(48),
+  answerFailed(49),
+  openFailed(50),
+  closeFailed(51),
+  readFailed(52),
+  writeFailed(53),
+  autoParityFailed(54),
+  setmodeFailed(55),
+  badDataBase(56),
+  padStreamsError(57),
+  padError(58)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"Error return status from last packet command."
+::= { pbSessionEntry 14 }
+pbTrapEna OBJECT IDENTIFIER ::= { pb 3 }
+pbTrapEnaTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PbTrapEnaEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+"A table containing an enable for each trap that a 
+manageable Gateway entity is capable of generating."
+::= { pbTrapEna 1 }
+pbTrapEnaEntry OBJECT-TYPE
+SYNTAX PbTrapEnaEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+"There is one Gateway trap enable row for each Gateway card 
+in the NAS chassis."
+INDEX { pbTrapEnaIndex, pbTrapSessionIndex }
+::= { pbTrapEnaTable 1 }
+PbTrapEnaEntry ::=
+SEQUENCE {
+pbTrapEnaIndex
+    INTEGER,
+pbTrapSessionIndex
+    INTEGER,
+pbTrapEnaSessActive
+    INTEGER,
+pbTrapEnaPktBusCongest
+    INTEGER,
+pbTrapEnaPktBusSessLost
+    INTEGER,
+pbTrapEnaSessionInactive
+    INTEGER,
+pbTrapEnaSessionError
+    INTEGER
+}
+pbTrapEnaIndex OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A unique value for each Gateway Card in the chassis. The 
+value of this object matches the value of the index of the 
+corresponding Gateway Card's entry in the entity table of 
+the chassis MIB."
+::= { pbTrapEnaEntry 1 }
+pbTrapSessionIndex OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+"A value that identifies the packet bus session for trap 
+enable/disable."
+::= { pbTrapEnaEntry 2 }
+pbTrapEnaSessActive OBJECT-TYPE
+SYNTAX INTEGER{
+  enableTrap(1),
+  disableAll(2),
+  enableLog(3),
+  enableAll(4)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"An object which enables or disables the Active Session 
+trap."
+::= { pbTrapEnaEntry 3 }
+pbTrapEnaPktBusCongest OBJECT-TYPE
+SYNTAX INTEGER{
+  enableTrap(1),
+  disableAll(2),
+  enableLog(3),
+  enableAll(4)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"An object to enable or disable the Packet Bus Congestion 
+trap. The Packet Bus Congestion trap is generated when a 
+valid packet bus session is in progress but either the 
+Modem or the Gateway packet bus driver is experiencing 
+congestion problem."
+::= { pbTrapEnaEntry 4 }
+pbTrapEnaPktBusSessLost OBJECT-TYPE
+SYNTAX INTEGER{
+  enableTrap(1),
+  disableAll(2),
+  enableLog(3),
+  enableAll(4)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"An object to enable or disable the trap that is generated 
+when a valid Packet Bus session has been lost."
+::= { pbTrapEnaEntry 5 }
+pbTrapEnaSessionInactive OBJECT-TYPE
+SYNTAX INTEGER{
+  enableTrap(1),
+  disableAll(2),
+  enableLog(3),
+  enableAll(4)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"An object to enable or disable a trap which is generated 
+when a request is made to change a packet bus session from 
+the active to inactive state."
+::= { pbTrapEnaEntry 6 }
+pbTrapEnaSessionError OBJECT-TYPE
+SYNTAX INTEGER{
+  enableTrap(1),
+  disableAll(2),
+  enableLog(3),
+  enableAll(4)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+"An object which enables or disables the packet bus session 
+error trap."
+::= { pbTrapEnaEntry 7 }
+END

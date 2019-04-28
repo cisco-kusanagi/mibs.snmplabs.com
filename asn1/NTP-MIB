@@ -1,0 +1,162 @@
+
+
+
+--
+-- Description:	MIB for Network Time Protocol (NTP).
+-- Date:	November 1991
+-- Author:	M. Davison (davison@cs.utk.edu)
+-- 
+
+NTP-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	unix				FROM BSDUNIX-MIB
+	DisplayString			FROM RFC1213-MIB
+	internet, OBJECT-TYPE, 
+	TimeTicks, NetworkAddress	FROM RFC1155-SMI;
+
+unix	      OBJECT IDENTIFIER	::= { enterprises 4 }
+
+ntp 	OBJECT IDENTIFIER ::= { unix 50 }
+
+
+ntpPeers OBJECT-TYPE
+	SYNTAX SEQUENCE OF NtpPeersEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	    "Table of ntp peers"
+	::= { ntp 1 }
+
+ntpPeersEntry OBJECT-TYPE
+	SYNTAX NtpPeersEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	    "An entry in the ntp peers table."
+	INDEX { ntpPeer }
+	::= {ntpPeers 1 }
+	
+NtpPeersEntry ::= SEQUENCE {
+	    ntpPeer		NetworkAddress,
+	    ntpStratum		INTEGER,
+	    ntpInterval		TimeTicks,
+	    ntpReachability	INTEGER,
+	    ntpDelayI		INTEGER,
+	    ntpDelayF		INTEGER,
+	    ntpOffsetI		INTEGER,
+	    ntpOffsetF		INTEGER,
+	    ntpDispersionI	INTEGER,
+	    ntpDispersionF	INTEGER,
+	    ntpMode		INTEGER
+}
+
+
+ntpPeer OBJECT-TYPE
+	SYNTAX NetworkAddress
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Network address of peer. New peers/servers may
+	     be added by writing to this location."
+	::= {ntpPeersEntry 1}
+
+ntpStratum OBJECT-TYPE
+	SYNTAX INTEGER (1..16)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Stratum of peer"
+	::= {ntpPeersEntry 2}
+
+ntpInterval OBJECT-TYPE
+	SYNTAX TimeTicks
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Polling interval, in seconds"
+	::= {ntpPeersEntry 3}
+
+ntpReachability OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Polling interval, in seconds."
+	::= {ntpPeersEntry 4}
+
+ntpDelayI OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Total delay between peers. (Integral portion)"
+	::= {ntpPeersEntry 5}
+
+ntpDelayF OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Total delay between peers. (Fractional portion)"
+	::= {ntpPeersEntry 6}
+
+ntpOffsetI OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Difference between peer and local clocks. (Integral portion)"
+	::= {ntpPeersEntry 7}
+
+ntpOffsetF OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Difference between peer and local clocks. (Fractional portion)"
+	::= {ntpPeersEntry 8}
+
+ntpDispersionI OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Difference between peer and local clocks. (Integral portion)"
+	::= {ntpPeersEntry 9}
+
+ntpDispersionF OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Difference between peer and local clocks. (Fractional portion)"
+	::= {ntpPeersEntry 10}
+
+ntpMode OBJECT-TYPE
+	SYNTAX INTEGER {
+	    active(1),
+	    passive(2),
+	    client(3),
+	    server(4),
+	    broadcast(5),
+	    control(6),
+	    private(7),
+	    broadcast-client(8),
+	    invalid(9)
+	}
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Mode of the peer relationship. Setting the mode on an 
+		 existing row modifies the mode. Setting the mode on a
+		 non-existant row creates a row.  A mode of 'invalid' 
+		 will delete an existing row and will take no action
+		 on a non-existant row."
+	::= {ntpPeersEntry 11}
+
+END
+
+
+

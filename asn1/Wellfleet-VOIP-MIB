@@ -1,0 +1,871 @@
+Wellfleet-VOIP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+
+      OBJECT-TYPE
+        FROM RFC-1212
+      DisplayString
+        FROM RFC1213-MIB
+      wfVoIPGroup
+        FROM Wellfleet-COMMON-MIB
+      TRAP-TYPE        
+        FROM RFC-1215
+      Counter, Gauge, TimeTicks, IpAddress
+        FROM RFC1155-SMI;
+
+
+
+    -- There is a single table, wfVoIPTable, that contains information about 
+    -- the interface between the router and the gateway. This interface has 
+    -- more than one implementation, the ARN uses ethernet and the FBR a PCI 
+    -- interface, but the wfVoIPTable will control and monitor either type of 
+    -- implementation. This table will provide configuration of the transmit 
+    -- and receive queues for the interface and will provide monitoring 
+    -- information about the number of packets flowing across the interface 
+    -- between the router and the gateway. This table is more "router centric" 
+    -- and provides the same basic configuration and monitoring information 
+    -- that other interfaces on a router would have. The table is indexed by 
+    -- the wfHwSlot slot which corresponds to game slot on the ARN and PCI
+    -- slot on the FBR. 
+
+    wfVoIPTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfVoIPEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table containing Voice over IP interface records"
+        ::= { wfVoIPGroup 1 }
+
+    wfVoIPEntry OBJECT-TYPE
+	SYNTAX	WfVoIPEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the Voice over IP interface table"
+        INDEX	{ wfVoIPHwSlot }
+        ::= { wfVoIPTable 1 }
+
+    WfVoIPEntry ::= SEQUENCE {
+	   wfVoIPDelete                  INTEGER,
+	   wfVoIPGwEnable  	         INTEGER,
+	   wfVoIPState                   INTEGER,
+	   wfVoIPHwSlot        		 INTEGER,
+	   wfVoIPCct                     INTEGER,
+	   wfVoIPMtu                     INTEGER,
+	   wfVoIPMadr                    OCTET STRING,
+	   wfVoIPVoiceFramesRxOk         Counter,
+	   wfVoIPVoiceFramesTxOk         Counter,
+	   wfVoIPOctetsRxOk		 Counter,
+	   wfVoIPOctetsTxOk		 Counter,
+	   wfVoIPBufErrorTx              Counter,
+	   wfVoIPFcsErrorRx              Counter,
+	   wfVoIPTxQueueLength           INTEGER,
+	   wfVoIPRxQueueLength           INTEGER,
+	   wfVoIPRxReplenMisses          Counter,
+	   wfVoIPCfgTxQueueLength        INTEGER,
+	   wfVoIPCfgRxQueueLength        INTEGER,
+	   wfVoIPLineNumber              INTEGER,
+	   wfVoIPLastChange              TimeTicks,
+	   wfVoIPOutQLen                 Gauge,
+	   wfVoIPTxProcessings           Counter,
+	   wfVoIPRxProcessings           Counter,
+	   wfVoIPGwConfigFileName	 DisplayString,
+	   wfVoIPGwConfigFileVersion	 DisplayString,
+	   wfVoIPGwImageName        	 DisplayString,
+	   wfVoIPGwImageVersion     	 DisplayString,	   
+	   wfVoIPGwSystemName       	 DisplayString,
+	   wfVoIPGwMBAddress        	 IpAddress,
+           wfVoIPSubNetMask	         IpAddress,
+	   wfVoIPGwMBTCPPort        	 INTEGER,
+	   wfVoIPGwAddress          	 IpAddress,
+	   wfVoIPGwTCPPort          	 INTEGER,
+	   wfVoIPPrivFramesRxOk 	 Counter,
+	   wfVoIPPrivOctetsRxOk          Counter,
+	   wfVoIPPrivFramesTxOk          Counter,
+	   wfVoIPPrivOctetsTxOk          Counter,
+	   wfVoIPPrivFrameTxDrops        Counter,
+	   wfVoIPGwRestart               INTEGER,
+           wfVoIPPhysicalIfType          INTEGER,
+           wfVoIPDebugLevel              INTEGER,
+           wfVoIPMediaGwProtocol         DisplayString,
+           wfVoIPCCSBackhaulProtocol     DisplayString,
+           wfVoIPPrimaryMGCIpAddr        IpAddress,
+           wfVoIPPrimaryMGCPortNum       INTEGER,
+           wfVoIPSecondaryMGCIpAddr      IpAddress,
+           wfVoIPSecondaryMGCPortNum     INTEGER,
+           wfVoIPPrimarySGCIpAddr        IpAddress,
+           wfVoIPPrimarySGCPortNum       INTEGER,
+           wfVoIPSecondarySGCIpAddr      IpAddress,
+           wfVoIPSecondarySGCPortNum     INTEGER 
+        }
+
+    wfVoIPDelete OBJECT-TYPE
+                SYNTAX  INTEGER {
+                    created(1),
+                    deleted(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "create/delete parameter, dflt = created"
+        DEFVAL  { created }
+        ::= { wfVoIPEntry 1 }
+
+    wfVoIPGwEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables or disables voice gateway."
+        DEFVAL  { disabled }
+        ::= { wfVoIPEntry 2 }
+
+    wfVoIPState OBJECT-TYPE
+        SYNTAX  INTEGER {
+		    connected(1),
+		    configured(2),
+                    up(3),
+                    down(4),
+                    init(5),
+                    notpresent(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Line driver state variable: Not Present, 
+                 Init, Down, Up, Configured, Connected"
+        DEFVAL  { notpresent }
+        ::= { wfVoIPEntry 3 }
+
+    wfVoIPHwSlot OBJECT-TYPE
+        SYNTAX  INTEGER(1..14)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Instance ID Slot, filled in by driver. For the ARN this 
+                  is a GAME slot which is always 1. For the FBR this is a PCI slot."
+        ::= { wfVoIPEntry 4 }
+
+    wfVoIPCct OBJECT-TYPE
+        SYNTAX  INTEGER(1..1023)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "cct number for this line instance"
+        ::= { wfVoIPEntry 5 }
+
+    wfVoIPMtu OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    default(1518)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "mtu parameter, fixed"
+        DEFVAL  { default }
+        ::= { wfVoIPEntry 6 }
+
+    wfVoIPMadr OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "line MAC address, fixed - line driver fills in"
+        ::= { wfVoIPEntry 7 }
+
+
+    wfVoIPVoiceFramesRxOk OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of frames received without error"
+        ::= { wfVoIPEntry 8 }
+
+    wfVoIPVoiceFramesTxOk OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of frames transmitted without error"
+        ::= { wfVoIPEntry 9 }
+
+    wfVoIPOctetsRxOk OBJECT-TYPE
+        SYNTAX	Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of octets received without error"
+        ::= { wfVoIPEntry 10 }
+
+    wfVoIPOctetsTxOk OBJECT-TYPE
+        SYNTAX	Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of octets transmitted without error"
+        ::= { wfVoIPEntry 11 }
+
+    wfVoIPBufErrorTx OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of internal buffer errors"
+        ::= {  wfVoIPEntry 12 }
+
+    wfVoIPFcsErrorRx OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of receiver checksum errors"
+        ::= {  wfVoIPEntry 13 }
+
+    wfVoIPTxQueueLength OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Current Transmit Queue Length"
+        ::= { wfVoIPEntry 14 }
+
+    wfVoIPRxQueueLength OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Current Receive Queue Length"
+        ::= { wfVoIPEntry 15 }
+
+    wfVoIPRxReplenMisses OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packet buffer misses while attempting to replenish driver
+                receive ring."
+        ::= { wfVoIPEntry 16 }
+
+    wfVoIPCfgTxQueueLength OBJECT-TYPE
+        SYNTAX  INTEGER(0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Configured Transmit Queue Length. Values other than zero over-ride
+                the router selected values. A value of zero has a special meaning.
+                Zero causes router based default values to be used. Values larger
+                than the compiled ring size are truncated to the compiled ring
+                size."
+        ::= { wfVoIPEntry 17 }
+
+    wfVoIPCfgRxQueueLength OBJECT-TYPE
+        SYNTAX  INTEGER(0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Configured Receive Queue Length. Values other than zero over-ride
+                the router selected values. A value of zero has a special meaning.
+                Zero causes router based default values to be used. Values larger
+                than the compiled ring size are truncated to the compiled ring
+                size."
+        ::= { wfVoIPEntry 18 }
+
+    wfVoIPLineNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Logical line number associated with this driver entity."
+        ::= { wfVoIPEntry 19 }
+
+    wfVoIPLastChange OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of SysUpTime at the time the interface entered it's current
+                operational state (UP state).  SysUpTime is defined as the time(in
+                hundredths of a second) since the network management portion of the
+                system was last re-initialized.  Usually the time since boot."
+        ::= { wfVoIPEntry 20 }
+
+    wfVoIPOutQLen OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The instantaneous current length of the output packet queue (in packets)."
+        ::= { wfVoIPEntry 21}
+
+    wfVoIPTxProcessings OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Counts the number of times the transmit routine
+                has been called"
+        ::= { wfVoIPEntry 22 }
+
+    wfVoIPRxProcessings OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Counts the number of times RINT processing takes place
+                in the interrupt service routine."
+        ::= { wfVoIPEntry 23 }
+
+    wfVoIPGwConfigFileName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..127))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "A textual string to describe the name of VoIP config. file
+                 to be download on to router flash card. The image name should 
+		 be a fully qualified filename. For ex: vol:filename."
+        ::= { wfVoIPEntry 24 }
+
+    wfVoIPGwConfigFileVersion  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..127))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A textual string to describe the version of the
+		 voice gateway config file."
+        ::= { wfVoIPEntry 25 }
+
+    wfVoIPGwImageName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..127))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "A textual string to describe the name of VoIP image
+                 to be download on to VoIP board. The image name should be
+                 a fully qualified filename. For ex: vol:filename."
+        ::= { wfVoIPEntry 26 }
+
+    wfVoIPGwImageVersion OBJECT-TYPE 
+        SYNTAX  DisplayString (SIZE (0..127))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A textual string to describe the version of the
+		 voice gateway image."
+        ::= { wfVoIPEntry 27 }
+
+    wfVoIPGwSystemName OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Gateway name used to uniquely identify the 
+                 gateway to the call agent."
+        ::= { wfVoIPEntry 28 }
+
+    wfVoIPGwMBAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "IP Address at the motherboard end of the ethernet interface
+                 between mother board and  PDB"
+        ::= { wfVoIPEntry 29 }
+
+
+    wfVoIPSubNetMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The VoIP subnet mask associated with the IP address of
+		 the router and the voice gateway."
+	DEFVAL { 0 }
+        ::= { wfVoIPEntry 30 }
+
+    wfVoIPGwMBTCPPort OBJECT-TYPE
+        SYNTAX   INTEGER(5000..7000)
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+                "TCP Port of the VoIP If Control gate"
+        DEFVAL  { 5074 }
+
+        ::= { wfVoIPEntry 31 }
+
+    wfVoIPGwAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "IP Address at the PDB end of the ethernet interface between
+                 motherboard and PDB"
+        ::= { wfVoIPEntry 32 }
+
+    wfVoIPGwTCPPort OBJECT-TYPE
+        SYNTAX  INTEGER(5000..7000)
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+                "TCP Port of the VGW Process on the PDB"
+        DEFVAL  { 5174 }
+        ::= { wfVoIPEntry 33 }
+
+   wfVoIPPrivFramesRxOk OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of private messages successfully rcvd. "
+        ::= { wfVoIPEntry 34 }
+
+   wfVoIPPrivOctetsRxOk OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of octets in successfully rcvd private messages."
+        ::= { wfVoIPEntry 35 }
+
+
+   wfVoIPPrivFramesTxOk OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of private messages successfully xmitted."
+        ::= { wfVoIPEntry 36 }
+
+
+   wfVoIPPrivOctetsTxOk OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " number of octets in successfully xmitted private messages."
+        ::= { wfVoIPEntry 37 }
+
+
+   wfVoIPPrivFrameTxDrops OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of frames not xmitted due to lack of resources."
+        ::= { wfVoIPEntry 38 }
+
+
+    wfVoIPGwRestart OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables or disables restart of voice gateway."
+        DEFVAL  { disabled }
+        ::= { wfVoIPEntry 39 }
+
+    wfVoIPPhysicalIfType OBJECT-TYPE 
+        SYNTAX  INTEGER {
+                     arn(1), 
+                     t1cas(2),
+                     t1ccs(3),
+                     e1cas(4),
+                     e1ccs(5)
+                 }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The Phaysical Interface Type"
+        ::= { wfVoIPEntry 40 }
+
+    wfVoIPDebugLevel OBJECT-TYPE 
+        SYNTAX  INTEGER {
+                     level1(1), 
+                     level2(2),
+                     level3(3),
+                     level4(4),
+                     level5(5),
+                     level6(6)
+                 }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The Phaysical Interface Type"
+        ::= { wfVoIPEntry 41 }
+ 
+    wfVoIPMediaGwProtocol OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..127))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The version of the Media Gateway Protocol running"
+        ::= { wfVoIPEntry 42 }
+
+    wfVoIPCCSBackhaulProtocol OBJECT-TYPE 
+        SYNTAX  DisplayString (SIZE (0..127))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The version of the CCSBackhaulProtocol running"
+        ::= { wfVoIPEntry 43 }
+
+    wfVoIPPrimaryMGCIpAddr  OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP Address of the Primary MGCP"
+        ::= { wfVoIPEntry 44 }
+
+    wfVoIPPrimaryMGCPortNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number of the Primary MGCP" 
+        ::= { wfVoIPEntry 45 }
+
+    wfVoIPSecondaryMGCIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP Address of the Secondary MGCP"
+        ::= { wfVoIPEntry 46 }
+
+    wfVoIPSecondaryMGCPortNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number of the Secondary MGCP"
+        ::= { wfVoIPEntry 47 }
+
+    wfVoIPPrimarySGCIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP Address of the Primary SGC"
+        ::= { wfVoIPEntry 48 }
+
+    wfVoIPPrimarySGCPortNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number of the Primary SGC"
+        ::= { wfVoIPEntry 49 }
+
+    wfVoIPSecondarySGCIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP Address of the Secondary SGC"
+        ::= { wfVoIPEntry 50 }
+
+    wfVoIPSecondarySGCPortNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number of the Secondary SGC"
+        ::= { wfVoIPEntry 51 }
+
+
+    wfVoIPStatusTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfVoIPStatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "The VFoIP status table, contains monitoring information and
+		 is a proxied MIB."
+        ::= { wfVoIPGroup 2 }
+
+    wfVoIPStatusEntry OBJECT-TYPE
+        SYNTAX	WfVoIPStatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the VFoIP status table"
+        INDEX	{ wfVoIPHwSlot }
+
+        ::= { wfVoIPStatusTable 1 }
+
+     WfVoIPStatusEntry ::= SEQUENCE {
+	   wfVoIPCtlRxMsgSuccessCount    Counter,
+	   wfVoIPCtlOctetsRxOk		 Counter,
+	   wfVoIPCtlTxMsgSuccessCount    Counter,
+	   wfVoIPCtlOctetsTxOk           Counter,
+	   wfVoIPCtlFrameTxRetries	 Counter,
+	   wfVoIPCtlFrameTxDrops	 Counter,
+	   wfVoIPCtlInBadVersionCount    Counter,
+	   wfVoIPCtlUnRecognizedPktCnt   Counter,
+	   wfVoIPRxMsgFailCount		 Counter,
+	   wfVoIPTxMsgFailCount		 Counter,
+	   wfVoIPPackageName	 	 INTEGER
+	}
+
+    wfVoIPCtlRxMsgSuccessCount  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object specifies the count of successful messages
+             received from the Call Agent. 
+
+             Successful messages:                             
+		Receive: Positive ACK is sent to the Media 
+                         Gateway Controller"
+        ::= { wfVoIPStatusEntry 1 }
+
+    wfVoIPCtlOctetsRxOk OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of octets in successfully rcvd xGCP control
+		  frames."
+        ::= { wfVoIPStatusEntry 2 }
+
+    wfVoIPCtlTxMsgSuccessCount  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object specifies the count of successful messages
+             transmitted to the Call Agent. 
+
+             Successful messages:                             
+                  Transmit: Positive ACK is received from the Media  
+                            Gateway Controller"
+        ::= { wfVoIPStatusEntry 3 }
+
+   wfVoIPCtlOctetsTxOk OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of octets in successfully xmited xGCP
+		  control frames."
+        ::= { wfVoIPStatusEntry 4 }
+
+
+   wfVoIPCtlFrameTxRetries OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Number of retried control frame transmissions."
+        ::= { wfVoIPStatusEntry 5 }
+
+   wfVoIPCtlFrameTxDrops OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            " Number of frames not xmitted due to timeout."
+        ::= { wfVoIPStatusEntry 6 }
+
+
+    wfVoIPCtlInBadVersionCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The total number of incoming messages which were delivered to
+             the protocol entity and were for an unsupported protocol 
+             version.
+            "
+    ::= { wfVoIPStatusEntry 7 }
+
+    wfVoIPCtlUnRecognizedPktCnt  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            " This refers to the count of unrecognized packets  
+              since reset."
+    ::= { wfVoIPStatusEntry 8 }
+
+    wfVoIPRxMsgFailCount  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object specifies the count of failed  messages
+             received from the Call Agent.
+
+             Failed messages: 
+                      Receive:  Either Format of the received message is bad or
+                                the request can not be fulfilled."
+    ::= { wfVoIPStatusEntry 9 }
+
+
+    wfVoIPTxMsgFailCount  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object specifies the count of failed  messages
+             received from the Call Agent.
+
+             Failed messages: 
+                Transmit: Either NAK is received from the Media Gateway
+                          Controller or message times out waiting for 
+                          an ACK."
+    ::= { wfVoIPStatusEntry 10 }
+
+
+    wfVoIPPackageName  OBJECT-TYPE
+        SYNTAX         INTEGER {
+			   generic(1),
+			   dtmf(2),
+			   mf(3),
+			   trunk(4),
+			   line(5),
+			   handset(6),
+			   rtp(7),
+			   nas(8),
+			   announcement(9),
+			   script(10),
+			   bay(11)
+		       }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            " This object specifies the Name of the
+              Capability Package in use. 
+
+              The list of basic packages includes the following:
+
+               _______________________________________________
+              | Package                      |   name        |
+              |______________________________|_______________|
+              | Generic Media Package        |   generic     |
+              | DTMF package                 |   dtmf        |
+              | MF Package                   |   mf          |
+              | Trunk Package                |   trunk       |
+              | Line Package                 |   line        |
+              | Handset Package              |   handset     |
+              | RTP Package                  |   rtp         |
+              | Network Access Server Package|   nas         |
+              | Announcement Server Package  |   announcement|
+              | Script Package               |   script      |
+              | Bay Networks Package         |   bay         |
+              |______________________________|_______________|
+         "
+        REFERENCE
+             " Media Gateway Control Protocol (MGCP),
+               version 0.1 draft, Nov 9, 1998 : Section 5.1"
+	DEFVAL { bay }
+    ::= { wfVoIPStatusEntry 11 }
+
+
+
+    wfVoIPPortStatusTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfVoIPPortStatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "The VFoIP port status table, contains voice channel 
+		 status monitoring information for the voice port and 
+		 is a proxied MIB."
+        ::= { wfVoIPGroup 3 }
+
+    wfVoIPPortStatusEntry OBJECT-TYPE
+        SYNTAX	WfVoIPPortStatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the VFoIP port status table."
+        INDEX	{ wfVoIPHwSlot, wfVoIPVoiceConnector, wfVoIPVoiceChannel }
+
+        ::= { wfVoIPPortStatusTable 1 }
+
+
+     WfVoIPPortStatusEntry ::= SEQUENCE {
+        wfVoIPVoiceConnector   INTEGER,
+        wfVoIPVoiceChannel     INTEGER,
+        wfVoIPPortState        INTEGER
+	}
+
+     wfVoIPVoiceConnector OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "instance ID Connector, filled in by driver.  For the
+                 ARN, the Voice Connector refers to the TDB or card
+                 number (and is in the range 1-2). On the
+                 FBR, this attribute is an encoded value and is equal
+                 to 'pci slot' * 1000 + 'module'* 100 + 'connector'."
+        ::= { wfVoIPPortStatusEntry 1 }
+
+
+    wfVoIPVoiceChannel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "For the ARN FXS, FXO, or E&M interfaces, a voice channel
+                 refers to the physical port connector on the TDB. On the
+                 FBR, a voice channel refers to a specific DS0 on a T1."
+        ::= { wfVoIPPortStatusEntry 2 }
+
+    wfVoIPPortState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    disabled(1),
+                    outofservice(2),
+                    idle(3),
+                    busy(4),
+                    recycling(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the state of a specific voice channel."
+	DEFVAL  { disabled }
+        ::= { wfVoIPPortStatusEntry 3 }
+
+
+-- TRAPS
+
+    wfVoIPGwConfigInfo TRAP-TYPE
+        ENTERPRISE wfVoIPGroup
+        VARIABLES {wfVoIPHwSlot, wfVoIPGwConfigFileName, wfVoIPGwConfigFileVersion }
+        DESCRIPTION
+            "The SNMP trap that is generated when a Voice over
+            IP gateway within the router is restarted. 
+	    This trap reports:
+	    	gateway slot
+		gateway configuration file name
+		gateway configuration file version."
+        ::= 1
+
+    wfVoIPGwEnableInfo TRAP-TYPE
+        ENTERPRISE wfVoIPGroup
+        VARIABLES {wfVoIPHwSlot, wfVoIPGwEnable}
+        DESCRIPTION
+            "The SNMP trap that is generated when the 
+	     wfVoIPGwEnable state changes."
+        ::= 2
+
+    wfVoIPGwStatusInfo TRAP-TYPE
+        ENTERPRISE wfVoIPGroup
+        VARIABLES {wfVoIPHwSlot, wfVoIPState}
+        DESCRIPTION
+            "The SNMP trap that is generated when the 
+	     wfVoIPState state changes."
+        ::= 3
+
+END
+

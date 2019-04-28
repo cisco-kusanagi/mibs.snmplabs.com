@@ -1,0 +1,216 @@
+--**************************************************************************
+--                                                                          
+--    Copyright 2003 Broadcom Corporation                                   
+--    All Rights Reserved                                                   
+--    No portions of this material may be reproduced in any form without the
+--    written permission of:                                                
+--             Broadcom Corporation                                         
+--             16251 Laguna Canyon Road                                     
+--             Irvine, California  92618                                    
+--    All information contained in this document is Broadcom Corporation    
+--    company private, proprietary, and trade secret.                       
+--                                                                          
+--                                                                          
+--                                                                          
+--**************************************************************************
+--    Filename: brcm-bfc-mgmt.mib
+--    Author:   Kevin O'Neal
+--    Creation Date: 4-december-2003
+--
+--**************************************************************************
+--    Description:
+--
+--		private MIB for runtime (not factory) BFC management
+--		
+--**************************************************************************
+--    Revision History:
+--
+--**************************************************************************
+
+BRCM-BFC-MGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    cableDataMgmtMIBObjects
+        FROM BRCM-CABLEDATA-MGMT-MIB;
+                
+bfcMgmt MODULE-IDENTITY
+    LAST-UPDATED "200609050000Z"
+    ORGANIZATION "Broadcom Corporation"
+    CONTACT-INFO
+        "	BANANA-CABLEDATA
+                (cableData branch of the
+                Broadcom Assigned Numbers and Naming Authority)
+                Broadcom Corporation
+
+        Postal: 4385 River Green Parkway
+                Duluth, GA  30096
+                USA
+
+           Tel: +1 770 232-0018
+
+        E-mail: banana-cabledata@broadcom.com"
+    DESCRIPTION
+        "Broadcom cabledata management MIB"
+    REVISION      "200312040000Z"
+    DESCRIPTION
+            "Initial version of this MIB module."
+    REVISION      "200505050000Z"
+    DESCRIPTION
+            "Added object bfcSwNumBoots."
+    REVISION      "200609050000Z"
+    DESCRIPTION
+            "Added object bfcSerialConsoleMode."
+    ::= { cableDataMgmtMIBObjects 9 }
+    
+bfcMgmtBase OBJECT IDENTIFIER ::= { bfcMgmt 1 }
+
+bfcSoftware OBJECT IDENTIFIER ::= { bfcMgmtBase 1 }
+
+-- Global system information.
+
+bfcSwDateTime  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time that this image was built."
+    ::= { bfcSoftware 1 }
+
+bfcSwBuiltBy  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user ID of the individual who built this image."
+    ::= { bfcSoftware 2 }
+    
+bfcSwOperatingSystem  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the operating system used for this image."
+    ::= { bfcSoftware 3 }
+
+bfcSwSnmpAgent  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the SNMP agent core used by this image."
+    ::= { bfcSoftware 4 }
+    
+-- bfcApplicationTable includes info for each application component.
+    
+bfcApplicationTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BfcApplicationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of BFC system components, or applications.  A BFC system
+         may contain zero or more of these components."
+    ::= { bfcSoftware 5 }
+    
+bfcApplicationEntry OBJECT-TYPE
+    SYNTAX      BfcApplicationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing the characteristics of a single BFC application
+         from this image."
+    INDEX   { bfcAppIndex }
+    ::= { bfcApplicationTable 1 }
+    
+BfcApplicationEntry ::= 
+    SEQUENCE    {
+                bfcAppIndex           Integer32,
+                bfcAppName            DisplayString,
+                bfcAppVersion         DisplayString,
+                bfcAppReleaseState    INTEGER,
+                bfcAppFeatures        DisplayString
+    }
+
+bfcAppIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the instance number of this BFC system component."
+    ::= { bfcApplicationEntry 1 }
+    
+bfcAppName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of this BFC sytem component."
+    ::= { bfcApplicationEntry 2 }
+    
+bfcAppVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version identifier for this BFC system component."
+    ::= { bfcApplicationEntry 3 }
+    
+bfcAppReleaseState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                release(1),
+                preRelease(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this BFC system component is has been 
+         officially released, or if this component is in a pre-release state."
+    ::= { bfcApplicationEntry 4 }
+    
+bfcAppFeatures OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies any features in this BFC system component."
+    ::= { bfcApplicationEntry 5 }
+    
+bfcSwNumBoots  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides a counter of the number of times that the board
+         has booted.  This value is stored in non-volatile memory and is
+         incremented on each boot."
+    ::= { bfcSoftware 6 }
+    
+--
+-- General system level settings
+--    
+    
+bfcSystem OBJECT IDENTIFIER ::= { bfcMgmtBase 2 }
+    
+bfcSerialConsoleMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                disabled(0),
+                readOnly(1),
+                readWrite(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the operation of the serial console on this device.  If set
+         to disabled(0), serial console input and output will be disabled.  If
+         set to readOnly(1), serial console output will be enabled but input 
+         will be disabled.  If set to readWrite(2), both serial input and 
+         output will be enabled."
+    ::= { bfcSystem 1 }
+        
+END

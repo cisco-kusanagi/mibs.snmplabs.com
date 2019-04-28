@@ -1,0 +1,3132 @@
+IDIRECT-REMOTE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, enterprises, OBJECT-TYPE, Unsigned32,Counter64,Integer32,Counter32,TimeTicks
+    FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+
+    DisplayString
+        FROM SNMPv2-TC;
+
+iDirectMIB MODULE-IDENTITY
+  LAST-UPDATED "1101062010Z"
+  ORGANIZATION "iDirect Technologies, Inc."
+  CONTACT-INFO
+    "Postal:     13865 Sunrise Valley Drive
+            Herndon, VA. 20171  USA
+    Phone:      (703)648-8000
+    Web:        www.idirect.net"
+  DESCRIPTION
+    "This MIB module defines the iDirect SNMP module. iDX 3.3.0.0 "
+    ::= { enterprises 13732 }
+
+
+iDirectObjects OBJECT IDENTIFIER ::= {iDirectMIB 1 }
+
+netmodem     OBJECT IDENTIFIER ::= { iDirectObjects 1 }
+chassis      OBJECT IDENTIFIER ::= { iDirectObjects 2 }
+pp           OBJECT IDENTIFIER ::= { iDirectObjects 3 }
+idirectstats OBJECT IDENTIFIER ::= { iDirectObjects 4 }
+mibGroups OBJECT IDENTIFIER ::= { iDirectObjects 5 }
+
+iDirectTraps OBJECT IDENTIFIER ::= { iDirectMIB 99 }
+nmtraps      OBJECT IDENTIFIER ::= { iDirectTraps 1 }
+chtraps      OBJECT IDENTIFIER ::= { iDirectTraps 2 }
+pptraps      OBJECT IDENTIFIER ::= { iDirectTraps 3 }
+
+--All the traps will need these 2 fields, but im putting it in nmtraps cause
+--it has to go somewhere.
+trap-level OBJECT-TYPE
+    SYNTAX INTEGER {warning(0), alarm(1),cleared(2),offline(3),unknown(4)}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {iDirectTraps 99}
+trap-str OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { iDirectTraps   98 }
+trap-rem-id OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {iDirectTraps 97}
+trap-sn-id OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {iDirectTraps 96}
+trap-rem-desc OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {iDirectTraps 95}
+trap-rem-ip OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {iDirectTraps 94}
+
+-- Chassis
+chassisEntries OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {chassis 0 }
+
+ChassisEntry ::= SEQUENCE {
+  chassisid        Unsigned32,
+  chassisname      DisplayString,
+  chstate          INTEGER,
+  chwarnings       DisplayString,
+  chalarms         DisplayString}
+
+chassisTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { chassis 1 }
+
+chassisEntry OBJECT-TYPE
+    SYNTAX ChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {chassisid}
+    ::= {chassisTable 1 }
+
+chassisid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 1 }
+
+chassisname OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 2 }
+
+chstate OBJECT-TYPE
+    SYNTAX INTEGER {green(0), yellow(1),red(2),yellowRed(3),offline(4)}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {chassisEntry 3}
+chwarnings OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 4 }
+chalarms OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 5 }
+
+--Protocol Processors.
+ppEntries OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Current Number of Protocol Processors"
+    ::= {pp 0 }
+
+PPEntry ::= SEQUENCE {
+  ppid          Unsigned32,
+  ppname        DisplayString,
+  ppteleportid  Unsigned32,
+  ppstate       INTEGER,
+  ppwarnings    DisplayString,
+  ppalarms      DisplayString}
+
+ppTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PPEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { pp 1 }
+
+ppEntry OBJECT-TYPE
+    SYNTAX PPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {ppid}
+    ::= {ppTable 1 }
+
+ppid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ppEntry 1 }
+
+ppname OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ppEntry 2 }
+
+ppteleportid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ppEntry 3 }
+
+ppstate OBJECT-TYPE
+    SYNTAX INTEGER {green(0), yellow(1),red(2),yellowRed(3),offline(4)}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {ppEntry 4}
+ppwarnings OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ppEntry 5 }
+ppalarms OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ppEntry 6 }
+
+--NetModem
+netModemEntries OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Current Number of NetModem Entries"
+    ::= {netmodem 0 }
+
+NetModemEntry ::= SEQUENCE {
+    netdid         Unsigned32,
+    nmppid         Unsigned32,
+    networkid      Unsigned32,
+    nmteleportid   Unsigned32,
+    nmid           Unsigned32,
+    inroutegroupid Unsigned32,
+    nmname         DisplayString,
+    ethipadr       DisplayString,
+    dcmslotnum     Unsigned32,
+    chassid        Unsigned32,
+    typeid         INTEGER,
+    nmstate        INTEGER,
+    nmwarnings     DisplayString,
+    nmalarms       DisplayString,
+    nmstatus       DisplayString,
+    geoloc         DisplayString}
+
+netModemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF NetModemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { netmodem 1 }
+
+netModemEntry OBJECT-TYPE
+    SYNTAX NetModemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {netdid}
+    ::= {netModemTable 1 }
+
+netdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 1 }
+nmppid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= {netModemEntry 2 }
+networkid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= {netModemEntry 3 }
+nmteleportid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= {netModemEntry 4}
+
+nmid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Unique ID for an iDIrect Netmodem"
+    ::= { netModemEntry 5 }
+
+inroutegroupid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 6 }
+
+nmname OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 7 }
+ethipadr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 8 }
+dcmslotnum OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= {netModemEntry 9}
+chassid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 10}
+
+typeid OBJECT-TYPE
+    SYNTAX INTEGER {txHub(0), rxHub(1),txRxHub(2),remote(3),
+            standby(4),fsRepeater(5),standbyFsRepeater(6)}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {netModemEntry 11}
+
+nmstate OBJECT-TYPE
+    SYNTAX INTEGER {green(0), yellow(1),red(2),yellowRed(3),offline(4)}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION ""
+    ::= {netModemEntry 12}
+nmwarnings OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..512))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 13 }
+nmalarms OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 14 }
+nmstatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 15 }
+geoloc OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { netModemEntry 16 }
+
+
+--nmtraps
+snmpProxyStart NOTIFICATION-TYPE
+STATUS  current
+DESCRIPTION  "snmpsvr process has started"
+    ::= { nmtraps 1 }
+
+snmpProxyStop NOTIFICATION-TYPE
+STATUS  current
+DESCRIPTION  "snmpsvr process has stopped"
+    ::= { nmtraps 2 }
+
+upstreamSNR NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Upstream SNR has gone outside specified limits"
+    ::= { nmtraps 3 }
+
+downstreamSNR NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Downstream SNR has gone outside specified limits"
+    ::= { nmtraps 4 }
+
+tempLimit  NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Onboard temperature has gone outside specified limits"
+    ::= { nmtraps 5 }
+
+acqHubModemCRC NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Acquisition CRC count has exceeded upper limit"
+    ::= { nmtraps 6 }
+
+trafficHubModemCRC NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Traffic CRC count has exceeded upper limit"
+    ::= { nmtraps 7 }
+
+latency NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Latency measurement has exceeded upper limit"
+    ::= { nmtraps 8 }
+
+symbolOffset NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Symbol offset has gone outside specified limits"
+    ::= { nmtraps 9 }
+
+ethernetUnplugged NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Local LAN port is not functioning"
+    ::= { nmtraps 10}
+
+ucpLostContact NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Protocol processor has lost contact with a remote"
+    ::= { nmtraps 11}
+llDown NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Protocol processor's link layer interface for a remote has gone
+down"
+
+    ::= { nmtraps 12}
+ucpOutOfNetwork NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Protocol processor declares a remote out of network"
+    ::= { nmtraps 13}
+latTimeout NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Latency measurements are failing"
+    ::= { nmtraps 14}
+-- NOTE DO NOT USE 15, its obsoleted for backward compatibility reasons
+lackHubStats NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  ""
+    ::= { nmtraps 16}
+remoteOffline NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "The NMS is no longer receiving hub statistics"
+    ::= { nmtraps 17}
+
+rxOverflowFramesHubModem NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Receive Overflow Frames, data lost"
+    ::= { nmtraps 18 }
+
+downstreamPpsOverdrive NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Packets-per-second overdrive between PP and line card"
+    ::= { nmtraps 19 }
+
+backplaneLost10Mhz NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "The line card lost the backplane 10 MHz clock signal"
+    ::= { nmtraps 20 }
+
+calibratedTxPower NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Transmit power is above or below the calibrated limit"
+    ::= { nmtraps 21 }
+
+txFrequency NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Transmit frequency is above or below the calibrated limit"
+    ::= { nmtraps 22 }
+
+mobileLostGps NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Mobile remote lost the GPS signal"
+    ::= { nmtraps 23 }
+
+scpcRxErrors NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Received SCPC RX error, data lost"
+    ::= { nmtraps 24 }
+
+fllDacErrors NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Received FLL DAC error, data lost"
+    ::= { nmtraps 25 }
+
+lcFailure NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Line card is failed"
+    ::= { nmtraps 26 }
+
+meshError NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Mesh mode has changed: Remote is not in mesh mode"
+    ::= { nmtraps 27 }
+
+meshTdmLockLost NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TDM lock is lost"
+    ::= { nmtraps 28 }
+
+meshHubRxScpcSnr NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "The Hub Rx SCPC loopback C/N exceeds the calibrated hub clearsky C/N"
+    ::= { nmtraps 29 }
+
+meshHubRxTdmaSnr NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "The Remote Tx TDMA C/N exceeds the calibrated hub clearsky C/N"
+    ::= { nmtraps 30 }
+
+lineCardAGCOutOFRange NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "AGC gain out of range"
+    ::= { nmtraps 31 }
+
+meshRmtRxScpcSnr NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "The remote Rx SCPC C/N exceeds the calibrated remote clearsky C/N"
+    ::= { nmtraps 32 }
+
+meshRmtRxTDMASnr NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "The remote Rx TDMA loopback C/N exceeds the calibrated remote clearsky C/N"
+    ::= { nmtraps 33 }
+
+remoteAgcOutOfRange NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "AGC gain out of range"
+    ::= { nmtraps 34 }
+
+reset NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Reset Warning"
+    ::= { nmtraps 35 }
+
+unready NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Unready"
+    ::= { nmtraps 36 }
+
+flash NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Flash Warning"
+    ::= { nmtraps 37 }
+
+activationStatus NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Activation Status"
+    ::= { nmtraps 38 }
+
+elsewhereError NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Elsewhere Warning"
+    ::= { nmtraps 39 }
+
+fanAlarm NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Fan Alarm"
+    ::= { nmtraps 40 }
+
+backplaneLostSOF NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Backplane Lost Start Of Frame"
+    ::= { nmtraps 41 }
+
+rmtMAXTxPwr NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Remote Max Tx Power Alarm"
+    ::= { nmtraps 42 }
+
+bladeCPUHigh NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "High CPU usage on Blade"
+    ::= { nmtraps 43 }
+
+rmtSleep NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Remote Sleep Alarm"
+    ::= { nmtraps 44 }
+
+hubTenMHzAlarm NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Hub 10MHz Alarm"
+    ::= { nmtraps 45 }
+
+
+gigeFailed NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "GIGE Failed Alarm"
+    ::= { nmtraps 46 }
+
+gigeHealth NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "GIGE Health Warning"
+    ::= { nmtraps 47 }
+
+rxOnly NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "RX Only mode Warning"
+    ::= { nmtraps 48 }
+
+crc8Errors NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "CRC 8 Errors Warning"
+    ::= { nmtraps 49 }
+
+crc32Errors NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "CRC 32 Errors Warning"
+    ::= { nmtraps 50 }
+
+ravenFailed NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Raven Failed Alarm"
+    ::= { nmtraps 51 }
+
+bladeNoEncLic NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id}
+STATUS  current
+DESCRIPTION  "Blade No Encryption License"
+    ::= { nmtraps 52 }
+
+rmtAcqBurst NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id}
+STATUS  current
+DESCRIPTION  "Remote ACQ Burst Warning"
+    ::= { nmtraps 53 }
+
+rmtCAWillExpire NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id}
+STATUS  current
+DESCRIPTION  "Remote CA Will Expire"
+    ::= { nmtraps 54 }
+
+rmtCAExpired NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id}
+STATUS  current
+DESCRIPTION  "Remote CA Has Expired"
+    ::= { nmtraps 55 }
+
+rmtCAInvalid NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id}
+STATUS  current
+DESCRIPTION  "Remote CA Is Invalid"
+    ::= { nmtraps 56 }
+
+rmttxTDMAAcqCrc NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TX TDMA ACQ CRC Warning"
+    ::= { nmtraps 57 }
+
+rmttxTDMADataCrc NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TX TDMA Data CRC Warning"
+    ::= { nmtraps 58 }
+
+rmttxTDMAAcqMismatch NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TX TDMA Acq Mismatch Warning"
+    ::= { nmtraps 59 }
+
+rmttxTDMADataMismatch NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TX TDMA Data Mismatch"
+    ::= { nmtraps 60 }
+
+rmttxTDMADataMissing NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TX TDMA Data Missing"
+    ::= { nmtraps 61 }
+
+rmttxSCPCLostLock NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TX SCPC Lost Lock Alarm"
+    ::= { nmtraps 62 }
+
+rmttxSCPCHdlcError NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TX SCPC HDLC Error"
+    ::= { nmtraps 63 }
+
+rmttxSCPCDataMismatch NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "TX SCPC Data Mismatch"
+    ::= { nmtraps 64 }
+
+rmtStatusChange NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Remote realtime status changed."
+    ::= { nmtraps 65 }
+
+triStateIdle NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Remote inters Idle state"
+    ::= { nmtraps 66 }
+
+triStateDormant NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Remote inters Dormant state"
+    ::= { nmtraps 67 }
+
+rmtMCFPDecryptFail NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id,trap-sn-id,trap-rem-ip}
+STATUS  current
+DESCRIPTION  "Remote unable to decrypt multicast fast path traffic."
+    ::= { nmtraps 68 }
+--chtraps...
+powerAlarm1 NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS  current
+DESCRIPTION  "Power supply 1 has failed"
+    ::= { chtraps 1 }
+
+powerAlarm2 NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS  current
+DESCRIPTION  "Power supply 2 has failed"
+    ::= { chtraps 2 }
+
+powerAlarm3  NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS  current
+DESCRIPTION  "Power supply 3 has failed"
+    ::= { chtraps 3 }
+
+fanAlarmChassis NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS  current
+DESCRIPTION  "One of the fans has failed"
+    ::= { chtraps 4 }
+
+chassisDown NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS  current
+DESCRIPTION  "The NMS cannot contact the chassis"
+    ::= { chtraps 5 }
+
+rcmAAlarm NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "The Reference Clock Module control timer A is in error"
+    ::= {chtraps 6 }
+
+rcmBAlarm NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "The Reference Clock Module control timer B is in error"
+    ::= {chtraps 7 }
+
+lostChassisConnection NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "Lost connection to Chassis Manager Server"
+    ::= {chtraps 8 }
+
+microChassisOverTemp NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "Chassis over temperature alarm"
+    ::= {chtraps 9 }
+
+microRCMANotPresent NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "RCM 1 missing alarm"
+    ::= {chtraps 10 }
+
+microRCMAFault NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "RCM 1 failed alarm"
+    ::= {chtraps 11 }
+
+microRCMBNotPresent NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "RCM 1 missing alarm"
+    ::= {chtraps 12 }
+
+microRCMBFault NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "RCM 2 failed alarm"
+    ::= {chtraps 13 }
+
+microPwrAlarmABad NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "Power supply 1 fault alarm"
+    ::= {chtraps 14 }
+
+microPwrAlarmAOverTemp NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "Power supply 1 over temperature alarm"
+    ::= {chtraps 15 }
+
+microPwrAlarmBBad NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "Power supply 2 fault alarm"
+    ::= {chtraps 16 }
+
+microPwrAlarmBOverTemp NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "Power supply 1 over temperature alarm"
+    ::= {chtraps 17 }
+
+microFSMNotPresent NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "FSM not present alarm"
+    ::= {chtraps 18 }
+
+microFSMFault NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "FSM fault alarm"
+    ::= {chtraps 19 }
+
+microFSMFanFault NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "FSM fan alarm"
+    ::= {chtraps 20 }
+
+microIFMNotPresent NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "IFM not present alarm"
+    ::= {chtraps 21 }
+
+microIFMFault NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "IFM fault alarm"
+    ::= {chtraps 22 }
+
+microAlarmDisabled NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "Audible alarm disable alarm"
+    ::= {chtraps 23 }
+
+microOPMAFault NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "OOPM 1 fault alarm"
+    ::= {chtraps 24 }
+
+microOPMBFault NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS current
+DESCRIPTION "OOPM 2 fault alarm"
+    ::= {chtraps 25 }
+
+-- pptraps...
+ppStateTrap NOTIFICATION-TYPE
+OBJECTS {trap-level,trap-str,trap-rem-id}
+STATUS  current
+DESCRIPTION  "The NMS has stopped hearing from the protocol processor"
+    ::= { pptraps 1 }
+
+ipstatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IpstatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 1 }
+
+ipstatsEntry OBJECT-TYPE
+    SYNTAX IpstatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {nmdid}
+    ::= {ipstatsTable 1 }
+
+IpstatsEntry ::= SEQUENCE {
+  nmdid       Unsigned32,
+  rxtcp       Counter64,
+  rxudp       Counter64,
+  rxicmp      Counter64,
+  rxigmp      Counter64,
+  rxhttp      Counter64,
+  rxother     Counter64,
+  txtcp       Counter64,
+  txudp       Counter64,
+  txicmp      Counter64,
+  txigmp      Counter64,
+  txhttp      Counter64,
+  txother     Counter64,
+  ipstatstime DisplayString }
+
+nmdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 1 }
+
+rxtcp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 2 }
+
+rxudp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 3 }
+
+rxicmp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 4 }
+
+rxigmp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 5 }
+
+rxhttp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 6 }
+
+rxother OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 7 }
+
+txtcp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 8 }
+
+
+txudp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 9 }
+
+txicmp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 10 }
+
+txigmp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 11 }
+
+txhttp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 12 }
+
+txother OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 13 }
+
+ipstatstime    OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipstatsEntry 14}
+
+
+-- OTA Statistics Table
+otastatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OtastatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 2 }
+
+otastatsEntry OBJECT-TYPE
+    SYNTAX OtastatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {otanmdid}
+    ::= {otastatsTable 1 }
+
+OtastatsEntry ::= SEQUENCE {
+  otanmdid                   Unsigned32,
+  otamode                    DisplayString,
+  downstreamreliableBytes    Counter64,
+  downstreamunreliableBytes  Counter64,
+  downstreamoverheadBytes    Counter64,
+  downstreammulticastBytes   Counter64,
+  downstreambroadcastBytes   Counter64,
+  downstreammulticastSymbols Counter64,
+  downstreambroadcastSymbols Counter64,
+  downstreamtotalKiloBytes   Counter64,
+  upstreamreliableBytes      Counter64,
+  upstreamunreliableBytes    Counter64,
+  upstreamoverheadBytes      Counter64,
+  upstreamtotalKiloBytes     Counter64,
+  otastatstime               DisplayString}
+
+otanmdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 1 }
+
+otamode       OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "DVBS2 or Infinity"
+  ::= { otastatsEntry 2}
+
+downstreamreliableBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 3 }
+
+downstreamunreliableBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 4 }
+
+downstreamoverheadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 5 }
+
+downstreammulticastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 6 }
+
+downstreambroadcastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 7 }
+
+downstreammulticastSymbols OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 8 }
+
+downstreambroadcastSymbols OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 9 }
+
+downstreamtotalKiloBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 10 }
+
+upstreamreliableBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 11 }
+
+upstreamunreliableBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 12 }
+
+upstreamoverheadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 13 }
+
+upstreamtotalKiloBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { otastatsEntry 14 }
+
+otastatstime    OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION ""
+  ::= { otastatsEntry 15 }
+
+
+-- Remote UCP Table
+remoteucpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RemoteucpEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 4 }
+
+remoteucpEntry OBJECT-TYPE
+    SYNTAX RemoteucpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {ucpnmdid}
+    ::= {remoteucpTable 1 }
+
+RemoteucpEntry ::= SEQUENCE {
+  ucpnmdid        Unsigned32,
+  upsnr           DisplayString,
+  poweradjustment DisplayString,
+  symboloffset    Integer32,
+  frequencyoffset Integer32,
+  scpcsnrcal      DisplayString,
+  ucpstatstime    DisplayString }
+
+ucpnmdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remoteucpEntry 1 }
+
+upsnr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remoteucpEntry 2 }
+
+poweradjustment OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remoteucpEntry 3 }
+
+symboloffset OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remoteucpEntry 4 }
+
+frequencyoffset OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remoteucpEntry 5 }
+
+scpcsnrcal    OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remoteucpEntry 6 }
+
+ucpstatstime    OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remoteucpEntry 7 }
+
+
+-- Latency Table
+latencystatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF LatencystatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 5 }
+
+latencystatsEntry OBJECT-TYPE
+    SYNTAX LatencystatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {latnmdid}
+    ::= {latencystatsTable 1 }
+
+LatencystatsEntry ::= SEQUENCE {
+  latnmdid        Unsigned32,
+  latnmname       DisplayString,
+  latnmsn         Unsigned32,
+  mgmtipaddress   DisplayString,
+  latencyvalue    DisplayString,
+  networkname     DisplayString,
+  latstatstime    DisplayString }
+
+latnmdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { latencystatsEntry 1 }
+
+latnmname OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { latencystatsEntry 2 }
+
+latnmsn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { latencystatsEntry 3 }
+
+mgmtipaddress OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { latencystatsEntry 4 }
+
+latencyvalue OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { latencystatsEntry 5 }
+
+networkname OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { latencystatsEntry 6 }
+
+latstatstime    OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { latencystatsEntry 7}
+
+-- HUB Statistics Table
+hubstatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HubstatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 6}
+
+hubstatsEntry OBJECT-TYPE
+    SYNTAX HubstatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {linecarddid}
+    ::= { hubstatsTable 1 }
+
+HubstatsEntry ::= SEQUENCE {
+  linecarddid        Unsigned32,
+  linecardsn         Unsigned32,
+  txattempts         Counter32,
+  txbytes            Counter32,
+  txerrors           Counter32,
+  acqcrcerrors       Counter32,
+  trafficcrcerrors   Counter32,
+  bursts             Counter32,
+  rxbytes            Counter32,
+  rxpower            DisplayString,
+  dmareset           Counter32,
+  tunnelrxerrors     Counter32,
+  tunneltxerrors     Counter32,
+  txpower            DisplayString,
+  temp               DisplayString,
+  timeticks          TimeTicks,
+  agcgain            Counter32,
+  mcagcgain          Counter32,
+  gige               DisplayString,
+  bufoverflow        Counter32,
+  fegacdacval        Counter32,
+  gigetxerrors       Counter32,
+  gigerxerrors       Counter32,
+  scpcrxgain         Counter32,
+  scpcrxcof          Counter32,
+  scpclockstat       Counter32,
+  scpclockcntr       Counter32,
+  tdmaagcerrors      Counter32,
+  tdmatrafficerrors  Counter32,
+  tdmabursts         Counter32,
+  tdmabytesrx        Counter32,
+  tdmarxgain         Counter32,
+  hubstatstime       DisplayString }
+
+linecarddid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 1 }
+
+linecardsn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 2 }
+
+txattempts OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 3 }
+
+txbytes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 4 }
+
+txerrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 5 }
+
+acqcrcerrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 6 }
+
+trafficcrcerrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 7 }
+
+bursts OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 8 }
+
+rxbytes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 9 }
+
+rxpower OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 10 }
+
+dmareset OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 11 }
+
+tunnelrxerrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 12 }
+
+tunneltxerrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 13 }
+
+txpower OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 14 }
+
+temp OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 15 }
+
+timeticks OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 16 }
+
+agcgain OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 17 }
+
+mcagcgain OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 18 }
+
+gige OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 19 }
+
+bufoverflow OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 20 }
+
+fegacdacval OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 21 }
+
+gigetxerrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 22 }
+
+gigerxerrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 23 }
+
+scpcrxgain OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 24 }
+
+scpcrxcof OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 25 }
+
+scpclockstat OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 26 }
+
+scpclockcntr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 27 }
+
+tdmaagcerrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 28 }
+
+tdmatrafficerrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 29 }
+
+tdmabursts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 30 }
+
+tdmabytesrx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 31 }
+
+tdmarxgain OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 32 }
+
+hubstatstime    OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubstatsEntry 33 }
+
+
+-- Remote Status Table
+remotestatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RemotestatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 3 }
+
+remotestatusEntry OBJECT-TYPE
+    SYNTAX RemotestatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {rsnmdid}
+    ::= {remotestatusTable 1 }
+
+RemotestatusEntry ::= SEQUENCE {
+  rsnmdid           Unsigned32,
+  downsnr           DisplayString,
+  rstxpower         DisplayString,
+  rsrxpower         DisplayString,
+  digitalrxgain     DisplayString,
+  flldac            Integer32,
+  rxcof             Integer32,
+  rstemp            DisplayString,
+  tdmlost           Counter32,
+  scpcerrors        Counter32,
+  rstimeticks       TimeTicks,
+  lanport           DisplayString,
+  ethmode           DisplayString,
+  ethspeed          DisplayString,
+  ethautonegotiate  DisplayString,
+  telnetsession     DisplayString,
+  isitesession      DisplayString,
+  inmesh            DisplayString,
+  fastfadecorr      Counter32,
+  crc8error         Counter32,
+  crc32error        Counter32,
+  ncrlost           Counter32,
+  plsynclost        Counter32,
+  clockdeltacnt     Counter32,
+  digitalagcgain    Counter32,
+  tuneragcgain      Counter32,
+  fooffset          Counter32,
+  tdmacrcerrors     Counter32,
+  tdmasnrcal        DisplayString,
+  tdmasymoffset     Counter32,
+  tdmafreqoffset    Counter32,
+  rxreliable        Counter32,
+  rxunreliable      Counter32,
+  rxoob             Counter32,
+  txreliable        Counter32,
+  txunreliable      Counter32,
+  txoob             Counter32,
+  remotestatstime   DisplayString }
+
+rsnmdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 1 }
+
+downsnr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 2 }
+
+rstxpower OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 3 }
+
+rsrxpower OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 4 }
+
+digitalrxgain OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 5 }
+
+flldac OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 6 }
+
+rxcof OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 7 }
+
+rstemp OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 8 }
+
+tdmlost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 9 }
+
+scpcerrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 10 }
+
+rstimeticks OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 11 }
+
+lanport OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 12 }
+
+ethmode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 13 }
+
+ethspeed OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 14 }
+
+ethautonegotiate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 15 }
+
+telnetsession OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 16 }
+
+isitesession OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 17 }
+
+inmesh OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 18 }
+
+fastfadecorr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 19 }
+
+crc8error OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 20 }
+
+crc32error OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 21 }
+
+ncrlost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 22 }
+
+plsynclost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 23 }
+
+clockdeltacnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 24 }
+
+digitalagcgain OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 25 }
+
+tuneragcgain OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 26 }
+
+fooffset OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 27 }
+
+tdmacrcerrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 28 }
+
+tdmasnrcal OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 29 }
+
+tdmasymoffset OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 30 }
+
+tdmafreqoffset OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 31 }
+
+rxreliable OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 32 }
+
+rxunreliable OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 33 }
+
+rxoob OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 34 }
+
+txreliable OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 35 }
+
+txunreliable OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 36 }
+
+txoob OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 37 }
+
+remotestatstime    OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { remotestatusEntry 38 }
+
+
+resetAllStatTables OBJECT-TYPE
+    SYNTAX    Unsigned32
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION " This field will reset all the statistical
+          tables under the idirectstats OID. To reset the tables SET
+value = 1."
+    ::= { idirectstats  7}
+
+statsStartTime OBJECT-TYPE
+SYNTAX    DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION " This field will have the stats start up time"
+    ::= { idirectstats  8}
+
+
+-- DVBS2 statistics table for remotes
+dvbS2statsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DVBS2statsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 9 }
+
+dvbS2statsEntry OBJECT-TYPE
+    SYNTAX DVBS2statsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {dvbnmdid}
+    ::= {dvbS2statsTable 1 }
+
+DVBS2statsEntry ::= SEQUENCE {
+  dvbnmdid       Unsigned32,
+  clearskymc     DisplayString,
+  minmc          DisplayString,
+  maxmc          DisplayString,
+  currentmc      Unsigned32,
+  availablemc    Unsigned32,
+  currentsnr     Unsigned32,
+  bytesmc01      Unsigned32,
+  bytesmc02      Unsigned32,
+  bytesmc03      Unsigned32,
+  bytesmc04      Unsigned32,
+  bytesmc05      Unsigned32,
+  bytesmc06      Unsigned32,
+  bytesmc07      Unsigned32,
+  bytesmc08      Unsigned32,
+  bytesmc09      Unsigned32,
+  bytesmc10      Unsigned32,
+  bytesmc11      Unsigned32,
+  bytesmc12      Unsigned32,
+  bytesmc13      Unsigned32,
+  bytesmc14      Unsigned32,
+  bytesmc15      Unsigned32,
+  bytesmc16      Unsigned32,
+  bytesmc17      Unsigned32,
+  bytesmc18      Unsigned32,
+  bytesmc19      Unsigned32,
+  bytesmc20      Unsigned32,
+  bytesmc21      Unsigned32,
+  bytesmc22      Unsigned32,
+  bytesmc23      Unsigned32,
+  bytesmc24      Unsigned32,
+  bytesmc25      Unsigned32,
+  bytesmc26      Unsigned32,
+  bytesmc27      Unsigned32,
+  bytesmc28      Unsigned32,
+  bytesmcTOT     Unsigned32,
+  dvbS2statstime DisplayString }
+
+dvbnmdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 1 }
+
+clearskymc  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 2 }
+
+minmc  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 3 }
+
+maxmc  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 4 }
+
+currentmc  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 5 }
+
+availablemc  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 6 }
+
+currentsnr OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 7 }
+
+bytesmc01 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 8 }
+
+bytesmc02 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 9 }
+
+bytesmc03 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 10 }
+
+bytesmc04 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 11 }
+
+bytesmc05 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 12 }
+
+bytesmc06 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 13 }
+
+bytesmc07 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 14 }
+
+bytesmc08 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 15 }
+
+bytesmc09 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 16 }
+
+bytesmc10 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 17 }
+
+bytesmc11 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 18 }
+
+bytesmc12 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 19 }
+
+bytesmc13 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 20 }
+
+bytesmc14 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 21 }
+
+bytesmc15 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 22 }
+
+bytesmc16 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 23 }
+
+bytesmc17 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 24 }
+
+bytesmc18 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 25 }
+
+bytesmc19 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 26 }
+
+bytesmc20 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 27 }
+
+bytesmc21 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 28 }
+
+bytesmc22 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 29 }
+
+bytesmc23 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 30 }
+
+bytesmc24 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 31 }
+
+bytesmc25 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 32 }
+
+bytesmc26 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 33 }
+
+bytesmc27 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 34 }
+
+bytesmc28 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 35 }
+
+bytesmcTOT OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 36 }
+
+dvbS2statstime  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dvbS2statsEntry 37 }
+
+
+-- DVBS2 statistics table for hubs
+hubS2statsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HUBS2statsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 10 }
+
+hubS2statsEntry OBJECT-TYPE
+    SYNTAX HUBS2statsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {dvbhubdid}
+    ::= {hubS2statsTable 1 }
+
+HUBS2statsEntry ::= SEQUENCE {
+  dvbhubdid      Unsigned32,
+  udprxhigh      Unsigned32,
+  udprxlow       Unsigned32,
+  dummyframes    Unsigned32,
+  hubbytesmc01   Unsigned32,
+  hubbytesmc02   Unsigned32,
+  hubbytesmc03   Unsigned32,
+  hubbytesmc04   Unsigned32,
+  hubbytesmc05   Unsigned32,
+  hubbytesmc06   Unsigned32,
+  hubbytesmc07   Unsigned32,
+  hubbytesmc08   Unsigned32,
+  hubbytesmc09   Unsigned32,
+  hubbytesmc10   Unsigned32,
+  hubbytesmc11   Unsigned32,
+  hubbytesmc12   Unsigned32,
+  hubbytesmc13   Unsigned32,
+  hubbytesmc14   Unsigned32,
+  hubbytesmc15   Unsigned32,
+  hubbytesmc16   Unsigned32,
+  hubbytesmc17   Unsigned32,
+  hubbytesmc18   Unsigned32,
+  hubbytesmc19   Unsigned32,
+  hubbytesmc20   Unsigned32,
+  hubbytesmc21   Unsigned32,
+  hubbytesmc22   Unsigned32,
+  hubbytesmc23   Unsigned32,
+  hubbytesmc24   Unsigned32,
+  hubbytesmc25   Unsigned32,
+  hubbytesmc26   Unsigned32,
+  hubbytesmc27   Unsigned32,
+  hubbytesmc28   Unsigned32,
+  hubbytesmcTOT  Unsigned32,
+  hubs2statstime DisplayString }
+
+dvbhubdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 1 }
+
+udprxhigh OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 2 }
+
+udprxlow OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 3 }
+
+dummyframes OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 4 }
+
+hubbytesmc01 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 5 }
+
+hubbytesmc02 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 6 }
+
+hubbytesmc03 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 7 }
+
+hubbytesmc04 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 8 }
+
+hubbytesmc05 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 9 }
+
+hubbytesmc06 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 10 }
+
+hubbytesmc07 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 11 }
+
+hubbytesmc08 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 12 }
+
+hubbytesmc09 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 13 }
+
+hubbytesmc10 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 14 }
+
+hubbytesmc11 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 15 }
+
+hubbytesmc12 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 16 }
+
+hubbytesmc13 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 17 }
+
+hubbytesmc14 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 18 }
+
+hubbytesmc15 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 19 }
+
+hubbytesmc16 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 20 }
+
+hubbytesmc17 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 21 }
+
+hubbytesmc18 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 22 }
+
+hubbytesmc19 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 23 }
+
+hubbytesmc20 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 24 }
+
+hubbytesmc21 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 25 }
+
+hubbytesmc22 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 26 }
+
+hubbytesmc23 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 27 }
+
+hubbytesmc24 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 28 }
+
+hubbytesmc25 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 29 }
+
+hubbytesmc26 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 30 }
+
+hubbytesmc27 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 31 }
+
+hubbytesmc28 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 32 }
+
+hubbytesmcTOT OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 33 }
+
+hubs2statstime    OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { hubS2statsEntry 34 }
+
+-- Remote Upstream (Rx) statistics
+rxstatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RxstatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION ""
+    ::= { idirectstats 11 }
+
+rxstatsEntry OBJECT-TYPE
+    SYNTAX RxstatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {rxnmdid}
+    ::= { rxstatsTable 1 }
+
+RxstatsEntry ::= SEQUENCE {
+  rxnmdid       Unsigned32,
+  rxstatstype   DisplayString,
+  tacqbursts    Counter64,
+  tacqcrc       Counter64,
+  tacqmissing   Counter64,
+  tacqmismatch  Counter64,
+  tdatabursts   Counter64,
+  tdatacrc      Counter64,
+  tdatamissing  Counter64,
+  tdatamismatch Counter64,
+  tkeepalive    Counter64,
+  sdatapackets  Counter64,
+  shdlcerror    Counter64,
+  sdatamismatch Counter64,
+  skeepalive    Counter64,
+  rxstatstime   DisplayString }
+
+rxnmdid OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 1 }
+
+rxstatstype    OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 2 }
+
+tacqbursts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 3 }
+
+tacqcrc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 4 }
+
+tacqmissing OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 5 }
+
+tacqmismatch OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 6 }
+
+tdatabursts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 7 }
+
+tdatacrc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 8 }
+
+tdatamissing OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 9 }
+
+tdatamismatch OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 10 }
+
+tkeepalive OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 11 }
+
+sdatapackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 12 }
+
+shdlcerror OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 13 }
+
+sdatamismatch OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 14 }
+
+skeepalive OBJECT-TYPE 
+    SYNTAX      Counter64 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION "" 
+    ::= { rxstatsEntry 15 }
+
+rxstatstime    OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rxstatsEntry 16 }
+
+chassisGroup OBJECT-GROUP
+    OBJECTS {
+  chassisid,
+  chassisname,
+  chstate,
+  chwarnings,
+  chalarms,
+  chassisEntries }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing Chassis entity."
+    ::= { mibGroups 1 }
+
+
+ppGroup OBJECT-GROUP
+    OBJECTS {
+  ppid,
+  ppteleportid,
+  ppname,
+  ppstate,
+  ppwarnings,
+  ppalarms,
+  ppEntries}
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing Protocol Processor entity."
+    ::= { mibGroups 2 }
+
+
+netModemGroup OBJECT-GROUP
+    OBJECTS {
+    netdid,
+    nmppid,
+    networkid,
+    nmteleportid,
+    nmid,
+    inroutegroupid,
+    nmname,
+    ethipadr,
+    dcmslotnum,
+    chassid,
+    typeid,
+    nmstate,
+    nmwarnings,
+    nmalarms,
+    nmstatus,
+    geoloc,
+    netModemEntries}
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing NetModem entity."
+    ::= { mibGroups 3 }
+
+
+ipStatsGroup OBJECT-GROUP
+    OBJECTS {
+  nmdid,
+  rxtcp,
+  rxudp,
+  rxicmp,
+  rxigmp,
+  rxhttp,
+  rxother,
+  txtcp,
+  txudp,
+  txicmp,
+  txigmp,
+  txhttp,
+  txother,
+  ipstatstime}
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing IP Statistics entity."
+    ::= { mibGroups 4 }
+
+otaStatsGroup OBJECT-GROUP
+    OBJECTS {
+  otanmdid,
+  otamode,
+  downstreamreliableBytes,
+  downstreamunreliableBytes,
+  downstreamoverheadBytes,
+  downstreammulticastBytes,
+  downstreambroadcastBytes,
+  downstreammulticastSymbols,
+  downstreambroadcastSymbols,
+  downstreamtotalKiloBytes,
+  upstreamreliableBytes,
+  upstreamunreliableBytes,
+  upstreamoverheadBytes,
+  upstreamtotalKiloBytes,
+  otastatstime }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing OTA Statistics entity."
+    ::= { mibGroups 5 }
+
+remoteucpGroup OBJECT-GROUP
+    OBJECTS {
+  ucpnmdid,
+  upsnr,
+  poweradjustment,
+  symboloffset,
+  frequencyoffset,
+  scpcsnrcal,
+  ucpstatstime}
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing Remote UCP entity."
+    ::= { mibGroups 6 }
+
+latencyStatsGroup OBJECT-GROUP
+    OBJECTS {
+  latnmdid,
+  latnmname,
+  latnmsn,
+  mgmtipaddress,
+  latencyvalue,
+  networkname,
+  latstatstime}
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing Latency Statistics entity."
+    ::= { mibGroups 7 }
+
+hubStatsGroup OBJECT-GROUP
+    OBJECTS {
+  linecarddid,
+  linecardsn,
+  txattempts,
+  txbytes,
+  txerrors,
+  acqcrcerrors,
+  trafficcrcerrors,
+  bursts,
+  rxbytes,
+  rxpower,
+  dmareset,
+  tunnelrxerrors,
+  tunneltxerrors,
+  txpower,
+  temp,
+  timeticks,
+  agcgain,
+  mcagcgain,
+  gige,
+  bufoverflow,
+  fegacdacval,
+  gigetxerrors,
+  gigerxerrors,
+  scpcrxgain,
+  scpcrxcof,
+  scpclockstat,
+  scpclockcntr,
+  tdmaagcerrors,
+  tdmatrafficerrors,
+  tdmabursts,
+  tdmabytesrx,
+  tdmarxgain,
+  hubstatstime}
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing HUB Statistics entity."
+    ::= { mibGroups 8 }
+
+remotestatusGroup OBJECT-GROUP
+    OBJECTS {
+  rsnmdid,
+  downsnr,
+  rstxpower,
+  rsrxpower,
+  digitalrxgain,
+  flldac,
+  rxcof,
+  rstemp,
+  tdmlost,
+  scpcerrors,
+  rstimeticks,
+  lanport,
+  ethmode,
+  ethspeed,
+  ethautonegotiate,
+  telnetsession,
+  isitesession,
+  inmesh,
+  fastfadecorr,
+  crc8error,
+  crc32error,
+  ncrlost,
+  plsynclost,
+  clockdeltacnt,
+  digitalagcgain,
+  tuneragcgain,
+  fooffset,
+  tdmacrcerrors,
+  tdmasnrcal,
+  tdmasymoffset,
+  tdmafreqoffset,
+  rxreliable,
+  rxunreliable,
+  rxoob,
+  txreliable,
+  txunreliable,
+  txoob,
+  remotestatstime}
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing remote status entity."
+    ::= { mibGroups 9 }
+
+netmodemNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+    snmpProxyStart,
+    snmpProxyStop,
+    upstreamSNR,
+    downstreamSNR,
+    tempLimit,
+    acqHubModemCRC,
+    trafficHubModemCRC,
+    latency,
+    symbolOffset,
+    ethernetUnplugged,
+    ucpLostContact,
+    llDown,
+    ucpOutOfNetwork,
+    latTimeout,
+    lackHubStats,
+    remoteOffline,
+    rxOverflowFramesHubModem,
+    downstreamPpsOverdrive,
+    backplaneLost10Mhz,
+    calibratedTxPower,
+    txFrequency,
+    mobileLostGps,
+    scpcRxErrors,
+    fllDacErrors,
+    lcFailure, 
+    meshError,
+    meshTdmLockLost,
+    meshHubRxScpcSnr,
+    meshHubRxTdmaSnr,
+    lineCardAGCOutOFRange,
+    meshRmtRxScpcSnr,
+    meshRmtRxTDMASnr,
+    remoteAgcOutOfRange,
+    reset,
+    unready,
+    flash,
+    activationStatus,
+    elsewhereError,
+    fanAlarm,
+    backplaneLostSOF,
+    rmtMAXTxPwr,
+    bladeCPUHigh,
+    rmtSleep,
+    hubTenMHzAlarm,
+    gigeFailed,
+    gigeHealth,
+    rxOnly,
+    crc8Errors,
+    crc32Errors,
+    ravenFailed,
+    rmttxTDMAAcqCrc,
+    rmttxTDMADataCrc,
+    rmttxTDMAAcqMismatch,
+    rmttxTDMADataMismatch,
+    rmttxTDMADataMissing,
+    rmttxSCPCLostLock,
+    rmttxSCPCHdlcError,
+    rmttxSCPCDataMismatch,
+    rmtStatusChange,
+    triStateDormant,
+    triStateDormant,
+	rmtMCFPDecryptFail
+  }
+  STATUS        current
+  DESCRIPTION  "Netmodem Notifications group"
+  ::= { mibGroups 10 }
+
+chassisNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+powerAlarm1,
+powerAlarm2 ,
+powerAlarm3  ,
+fanAlarmChassis ,
+chassisDown ,
+rcmAAlarm ,
+rcmBAlarm }
+    STATUS        current
+    DESCRIPTION
+        "Chassis Notifications group"
+    ::= { mibGroups 11 }
+
+
+ppNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+ppStateTrap }
+    STATUS        current
+    DESCRIPTION
+        "Protocol Processor Notifications group"
+    ::= { mibGroups 12 }
+
+commonGroup OBJECT-GROUP
+    OBJECTS {
+  resetAllStatTables,
+  statsStartTime,
+  trap-rem-desc,
+  trap-rem-ip,
+  trap-sn-id,
+  trap-rem-id,
+  trap-str,
+  trap-level}
+    STATUS  current
+    DESCRIPTION
+        "A collection of common objects used."
+    ::= { mibGroups 13 }
+
+hubs2StatsGroup OBJECT-GROUP
+    OBJECTS {
+  dvbhubdid,
+  udprxhigh,
+  udprxlow,
+  dummyframes,
+  hubbytesmc01,
+  hubbytesmc02,
+  hubbytesmc03,
+  hubbytesmc04,
+  hubbytesmc05,
+  hubbytesmc06,
+  hubbytesmc07,
+  hubbytesmc08,
+  hubbytesmc09,
+  hubbytesmc10,
+  hubbytesmc11,
+  hubbytesmc12,
+  hubbytesmc13,
+  hubbytesmc14,
+  hubbytesmc15,
+  hubbytesmc16,
+  hubbytesmc17,
+  hubbytesmc18,
+  hubbytesmc19,
+  hubbytesmc20,
+  hubbytesmc21,
+  hubbytesmc22,
+  hubbytesmc23,
+  hubbytesmc24,
+  hubbytesmc25,
+  hubbytesmc26,
+  hubbytesmc27,
+  hubbytesmc28,
+  hubbytesmcTOT,
+  hubs2statstime }
+  STATUS  current
+  DESCRIPTION
+    "A collection of objects providing HUB DVBS2 Statistics entity."
+  ::= { mibGroups 14 }
+
+rmts2StatsGroup OBJECT-GROUP
+    OBJECTS {
+  dvbnmdid,
+  clearskymc,
+  minmc,
+  maxmc,
+  currentmc,
+  availablemc,
+  currentsnr,
+  bytesmc01,
+  bytesmc02,
+  bytesmc03,
+  bytesmc04,
+  bytesmc05,
+  bytesmc06,
+  bytesmc07,
+  bytesmc08,
+  bytesmc09,
+  bytesmc10,
+  bytesmc11,
+  bytesmc12,
+  bytesmc13,
+  bytesmc14,
+  bytesmc15,
+  bytesmc16,
+  bytesmc17,
+  bytesmc18,
+  bytesmc19,
+  bytesmc20,
+  bytesmc21,
+  bytesmc22,
+  bytesmc23,
+  bytesmc24,
+  bytesmc25,
+  bytesmc26,
+  bytesmc27,
+  bytesmc28,
+  bytesmcTOT,
+  dvbS2statstime }
+  STATUS  current
+  DESCRIPTION
+    "A collection of objects providing Rmt DVBS2 Statistics entity."
+  ::= { mibGroups 15 }
+
+rxStatsGroup OBJECT-GROUP
+    OBJECTS {
+  rxnmdid,
+  rxstatstype,
+  tacqbursts,
+  tacqcrc,
+  tacqmissing,
+  tacqmismatch,
+  tdatabursts,
+  tdatacrc,
+  tdatamissing,
+  tdatamismatch,
+  tkeepalive,
+  sdatapackets,
+  shdlcerror,
+  sdatamismatch,
+  skeepalive,
+  rxstatstime }
+  STATUS  current
+  DESCRIPTION
+    "A collection of objects providing Remote Accuracy Statistics entity."
+  ::= { mibGroups 16 }
+
+END

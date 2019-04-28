@@ -1,0 +1,2503 @@
+-- Copyright(c) 2002, LSI Logic Corporation 
+-- File: Ver1.14
+-- Previous: Ver 1.13
+-- Date: 08-24-2000
+-- Revision : Changed the types of SubsystemID and Subsystem
+--			  vendor ID from DisplayString to INTEGER
+-- 03/28/2002 : Added support for LSI 320M controller - SAT 667
+-- 04/04/2002 : Changed adpBasePort from PhysAddress to DisplayString - SAT 667
+-- 04/18/2002 : Added SCSCI3 & SCSI4 to scsilevel field.
+--				Also changed field values from lowercase to Hungarian notation (scsi2 to SCSI2)
+--				for better display.
+-- 06/10/2002 : Changed fcDeviceEntry in fcDeviceTable to FcDeviceEntry. Similarly corrected fcChannelEntry,
+--				enclConfigurationEntry, enclFanEntry, enclPowerSupplyEntry, enclTempSensorsEntry.
+--
+-- 07/16/2002 : made new key for lun in physicaldrive table with range (0..7)
+--				changed range of targetID from (0..127) to (0..15)
+
+RAID-Adapter-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    enterprises, Counter    FROM RFC1155-SMI
+--    PhysAddress             FROM RFC1213-MIB
+    DisplayString           FROM RFC1213-MIB
+    OBJECT-TYPE             FROM RFC-1212
+	 TRAP-TYPE FROM RFC-1215;
+
+lsi OBJECT IDENTIFIER ::= { enterprises 3582 }
+megaRaid OBJECT IDENTIFIER ::= { lsi 1 }
+
+megaRaidMib OBJECT IDENTIFIER ::= { megaRaid 1 }
+
+-- Adapter Table Definition
+adapterTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AdapterEntry
+	ACCESS  not-accessible
+	STATUS  optional
+	DESCRIPTION
+		"A List of Adapter Entries containing Information/Properties
+		about the Adapters in the System."
+	::= { megaRaidMib 1 }
+
+	adapterEntry OBJECT-TYPE
+		SYNTAX  AdapterEntry
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An entry in the Adapter Table. Each Entry corresponds 
+			to one Adapter in the System."
+		INDEX   { adpAdapterNumber }
+		::= { adapterTable 1 }
+
+	AdapterEntry ::=
+		SEQUENCE {
+			adpAdapterNumber
+				INTEGER,
+			numLogicalDrives
+				INTEGER,
+			firmwareVersion
+				DisplayString,
+			biosVersion
+				DisplayString,
+			dramSizeInMB
+				INTEGER,        
+			rebuildRateInPercent
+				INTEGER,
+			flushInterval
+				INTEGER,
+			maxConcurrentCmds
+				INTEGER,
+			spinupDelay
+				INTEGER,
+			spinupCount
+				INTEGER,
+			adpIOReadsPerSec
+				INTEGER,
+			adpIOWritesPerSec
+				INTEGER,
+			adpReadKBsPerSec
+				INTEGER,
+			adpWriteKBsPerSec
+				INTEGER,
+			adpReadFailuresPerSec
+				INTEGER,
+			adpWriteFailuresPerSec
+				INTEGER,
+			scanChannels
+				INTEGER,
+			adpBasePort
+--				PhysAddress,
+				DisplayString,
+			numSCSIChannels 
+				INTEGER,
+			numFCLoops
+				INTEGER,
+			subSystemID
+				INTEGER,
+			subSystemVendorID
+				INTEGER,			
+			productName
+				DisplayString,
+			adpSpeed
+				INTEGER
+		}
+
+-- defines for each attribute in AdpaterEntry
+adpAdapterNumber  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Adapter Number for this Instance of Adapter Object. This
+		Entry in the Table, contains Information about the Adapter 
+		Number specified by this variable."
+::= { adapterEntry 1 }
+
+numLogicalDrives OBJECT-TYPE
+	SYNTAX  INTEGER (0..8)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of Logical Drives Configured on this Adapter."
+::= { adapterEntry 2 }
+
+firmwareVersion  OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Firmware Version of the Firmware running on this Adapter."
+::= { adapterEntry 3 }
+				
+biosVersion  OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Bios Version of the BIOS Present in the Flash ROM on 
+		this Adapter."
+::= { adapterEntry 4 }
+				
+dramSizeInMB  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Amount of DRAM in Mega Bytes present on this Adapter."
+::= { adapterEntry 5 }
+
+rebuildRateInPercent  OBJECT-TYPE
+	SYNTAX  INTEGER (0..100)
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"Rebuild Rate for this Adapter. This determines the Priority of 
+		Rebuild/Check-Consistency/Reconstruct Operations versus the 
+		Read-Write Operations."
+::= { adapterEntry 6 }
+				
+flushInterval OBJECT-TYPE
+	SYNTAX  INTEGER {
+		twoSec(2),
+		fourSec(4),
+		sixSec(6),
+		eightSec(8),
+		tenSec(10)
+		}
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"Internal Cache Flush Interval for Logical Drives in WriteBack 
+		Mode."
+::= { adapterEntry 7 }
+				
+maxConcurrentCmds  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Maximum Concurrent Commands Supported by the Adapter."
+::= { adapterEntry 8 }
+				
+spinupDelay  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"This is the Spinup Delay for Spinning Up Physical Drives 
+		at Firmware Initialization Time. The Physical Drives are 
+		divided into Groups, each containing the number of drives 
+		indicated by the spinupCount variable. spinupDelay 
+		variable is the amount of delay used before the drives in 
+		the next group are issued a SPINUP Command."
+
+::= { adapterEntry 9 }
+
+spinupCount  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"This is the Spinup Count for Spinning up Physical Drives at 
+		Firmware Initialization Time. The Physical Drives are divided 
+		into Groups, each containing the number of drives indicated 
+		by this variable. All the drives in a group are issued SPINUP 
+		Command without any delay. Next group is given SPINUP Commands
+		after a delay indicated by the spinupDelay variable."
+::= { adapterEntry 10 }
+
+adpIOReadsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of IO Reads/sec statistics for this adapter."
+::= { adapterEntry 11 }
+
+adpIOWritesPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of IO Writes/sec statistics for this adapter."
+::= { adapterEntry 12 }
+
+adpReadKBsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Amount of Data Transferred in KBs/sec due to READ Transfers."
+::= { adapterEntry 13 }
+
+adpWriteKBsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Amount of Data Transferred in KBs/sec due to WRITE Transfers."
+::= { adapterEntry 14 }
+
+adpReadFailuresPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of Read-Failures/sec statistics for this adapter."
+::= { adapterEntry 15 }
+
+adpWriteFailuresPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of Write-Failures/sec statistics for this adapter."
+::= { adapterEntry 16 }
+
+scanChannels OBJECT-TYPE
+	SYNTAX  INTEGER {
+		scanOver(1),
+		startScan(2),
+		scanInProg(3)
+		}
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"Use this Variable to Discover the Non-Disk Devices attached
+		to the Adapter. Set this Variable to startscan (an integer 
+		value of 2) to start the Channel Scanning."
+::= { adapterEntry 17 }
+
+adpBasePort    OBJECT-TYPE
+--	SYNTAX  PhysAddress
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Maximum Concurrent Commands Supported by the Adapter."
+::= { adapterEntry 18 }
+
+numSCSIChannels OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Maximum number of SCSI Channels Supported by the Adapter."
+::= { adapterEntry 19 }
+ 
+numFCLoops OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of Fibre channel loops Supported by the Adapter."
+::= { adapterEntry 20 }
+				
+subSystemID OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The PCI sub system ID of this controller"
+::= { adapterEntry 21 }
+
+subSystemVendorID OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The PCI sub system vendor ID of this controller"
+::= { adapterEntry 22 }
+
+productName OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The enriched formation of the controller retrieved from the firmware"
+::= { adapterEntry 23 }
+			
+adpSpeed OBJECT-TYPE
+	SYNTAX  INTEGER {
+		fiveMB(1),
+		tenMB(2),
+		twentyMB(3),
+		fortyMB(4),
+		eightyMB(5),
+		oneHundredSixtyMB(6),
+		threeHundredTwentyMB(7),
+		unAvailable(20)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Maximum transfer speed of the adapter."
+::= { adapterEntry 24 }
+
+-- Logical Drive Table Definition
+logicaldriveTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF LogicaldriveEntry
+	ACCESS  not-accessible
+	STATUS  optional
+	DESCRIPTION
+		"A List of Logical Drive Entries containing Information/Properties
+		about the Logical Drives Configured in the System."
+	::= { megaRaidMib 2 }
+
+	logicaldriveEntry OBJECT-TYPE
+		SYNTAX  LogicaldriveEntry
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An Entry in the Logical Drive Table."
+		INDEX           { ldAdapterNumber, logicalDriveNumber }
+		::= { logicaldriveTable 1 }
+
+	LogicaldriveEntry ::=
+		SEQUENCE {
+			ldAdapterNumber
+				INTEGER,
+			logicalDriveNumber
+				INTEGER,
+			status
+				INTEGER,
+			sizeInMB
+				INTEGER,
+			raidLevel
+				INTEGER,
+			stripeSize
+				INTEGER,
+			readPolicy
+				INTEGER,
+			writePolicy
+				INTEGER,
+			cachePolicy
+				INTEGER,
+			enquiryString
+				DisplayString,
+			numberOfSpans
+				INTEGER,
+			numberOfStripes
+				INTEGER,
+			checkConsistencyOrInitializeProgress
+				DisplayString,
+			ldIOReadsPerSec
+				INTEGER,
+			ldIOWritesPerSec
+				INTEGER,
+			ldReadKBsPerSec
+				INTEGER,
+			ldWriteKBsPerSec
+				INTEGER,
+			ldReadFailuresPerSec
+				INTEGER,
+			ldWriteFailuresPerSec
+				INTEGER
+		}
+
+-- defines for each attribute in LogicaldriveEntry
+
+ldAdapterNumber  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Adapter Number for this Instance of Adapter/LogicalDrive 
+		object."
+::= { logicaldriveEntry 1 }
+
+logicalDriveNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Logical Drive Number for this Logical Drive Entry."
+::= { logicaldriveEntry 2 }
+
+status  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		offLine(0),
+		degraded(1),
+		optimal(2),
+		initialize(3),
+		checkConsistency(4)
+		}
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"The Status of this Logical Drive."
+::= { logicaldriveEntry 3 }
+				
+sizeInMB  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Configured Size of this Logical Drive."
+::= { logicaldriveEntry 4 }
+				
+raidLevel  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		rAID0(0),
+		rAID1(1),
+		rAID3(3),
+		rAID5(5)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Configured Raid Level for this Logical Drive."
+::= { logicaldriveEntry 5 }
+				
+stripeSize  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		oneKB(1),
+		twoKB(2),
+		fourKB(4),
+		eightKB(8),
+		sixteenKB(16),
+		thirtyTwoKB(32),
+		sixtyFourKB(64),
+		oneTwentyEightKB(128)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Configured Stripe Size for this Logical Drive."
+::= { logicaldriveEntry 6 }
+				
+readPolicy  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		normal(0),
+		readAhead(1),
+		adaptive(2)
+		}
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"Configured Read Policy for this Logical Drive."
+::= { logicaldriveEntry 7 }
+				
+writePolicy OBJECT-TYPE
+	SYNTAX  INTEGER {
+		writeThru(0),
+		writeBack(1)
+		}
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"Configured Write Policy for this Logical Drive."
+::= { logicaldriveEntry 8 }
+				
+cachePolicy  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		cachedIO(0),
+		directIO(1)
+		}
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"Configured Cache Policy for this Logical Drive."
+::= { logicaldriveEntry 9 }
+				
+enquiryString  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(29..29))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"SCSI Inquiry String for this Logical Drive."
+::= { logicaldriveEntry 10 }
+				
+numberOfSpans  OBJECT-TYPE
+	SYNTAX  INTEGER (1..4)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of Arrays across which this Logical Drive is Spanning."
+::= { logicaldriveEntry 11 }
+
+numberOfStripes  OBJECT-TYPE
+	SYNTAX  INTEGER (1..8)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Configured Number of Stripes for this Logical Drive."
+::= { logicaldriveEntry 12 }
+
+checkConsistencyOrInitializeProgress  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(1..20))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Check Consistency or Initialize Progress for this Logical Drive
+		if the Logical Drive Status is checkconsistencyinprogress or 
+		initializeinprogress."
+::= { logicaldriveEntry 13 }
+
+ldIOReadsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of IO Reads/sec Statistics for this Logical Drive."
+::= { logicaldriveEntry 14 }
+
+ldIOWritesPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of IO Writes/sec Statistics for this Logical Drive."
+::= { logicaldriveEntry 15 }
+
+ldReadKBsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Amount of Data Transferred in KBs/sec due to READ Transfers."
+::= { logicaldriveEntry 16 }
+
+ldWriteKBsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Amount of Data Transferred in KBs/sec due to WRITE Transfers."
+::= { logicaldriveEntry 17 }
+
+ldReadFailuresPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of Read-Failures/sec Statistics for this Logical Drive."
+::= { logicaldriveEntry 18 }
+
+ldWriteFailuresPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of Write-Failures/sec Statistics for this Logical Drive."
+::= { logicaldriveEntry 19 }
+
+
+-- Physical Drive Table Definition
+physicaldriveTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PhysicaldriveEntry
+	ACCESS  not-accessible
+	STATUS  optional
+	DESCRIPTION
+		"A List of Physical Device Entries containing Information
+		about the Physical Devices in the System."
+	::= { megaRaidMib 3 }
+
+	physicaldriveEntry OBJECT-TYPE
+		SYNTAX  PhysicaldriveEntry
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An Entry in the Physical Drive Table."
+		INDEX   { physAdapterNumber, physChannel, targetID ,lunNumber  }
+		::= { physicaldriveTable 1 }
+
+	PhysicaldriveEntry ::=
+		SEQUENCE {
+			physAdapterNumber
+				INTEGER,
+			physChannel
+				INTEGER,
+			targetID
+				INTEGER,
+			state
+				INTEGER,
+			arrayPosition
+				DisplayString,
+			sizeMB
+				INTEGER,
+			deviceType
+				INTEGER,
+			inquiryString
+				DisplayString,
+			scsiLevel
+				INTEGER,
+			maximumQueueDepth
+				INTEGER,
+			rebuildProgress
+				DisplayString,
+			mediumErrors
+				INTEGER,
+			physSlotStatus
+				INTEGER,
+			physSlotNumber
+				INTEGER,
+			otherErrors
+				INTEGER,
+			physTermination
+				INTEGER,
+			physSpeed
+				INTEGER,
+			lunNumber
+				INTEGER
+		}
+
+-- defines for each attribute in PhysicaldriveEntry
+
+physAdapterNumber  OBJECT-TYPE
+	SYNTAX  INTEGER (1..4)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Adapter Number for this Instance of Adapter/Physical-Drive 
+		Instance."
+::= { physicaldriveEntry 1 }
+
+physChannel OBJECT-TYPE
+	SYNTAX  INTEGER (1..3)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Channel Number at Which this Physical Drive is Present."
+::= { physicaldriveEntry 2 }
+
+targetID OBJECT-TYPE
+	SYNTAX  INTEGER(0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"SCSI Target ID at Which This Physical Drive is Present."
+::= { physicaldriveEntry 3 }
+				
+state OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ready(1),
+		online(3),
+		failed(4),
+		rebuild(5),
+		hotSpare(6),
+		nonDisk(20)
+		}
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"Current State of this Physical Drive."
+::= { physicaldriveEntry 4 }
+
+arrayPosition OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(4..20))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Array is a group of Physical Drives used to Configure Logical 
+		Drives. This String Variable has values of the type Ai-j.
+		Example: A1-2 implies that this drive is 2nd member of Array-1."
+::= { physicaldriveEntry 5 }
+
+sizeMB  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Actual Size of this Physical Drive."
+::= { physicaldriveEntry 6 }
+				
+deviceType  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disk(0),
+		tape(1),
+		printer(2),
+		processor(3),
+		wORM(4),
+		cDROM(5),
+		scanner(6),
+		optical(7),
+		changer(8),
+		communication(9),
+		asynchronousLow(10),
+		asynchronousHigh(11),
+		reservedLow(12)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Device Type of this Physical Drive."
+::= { physicaldriveEntry 7 }
+				
+inquiryString  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(29..29))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"SCSI Inquiry String for this Device."
+::= { physicaldriveEntry 8 }
+				
+scsiLevel OBJECT-TYPE
+	SYNTAX  INTEGER {
+		sCSI1(1),
+		sCSI2(2),
+		sCSI3(3),
+		sCSI4(4)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"ANSI SCSI Level Conformance of this Device."
+::= { physicaldriveEntry 9 }
+
+maximumQueueDepth OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The maximum queue depth of this Device."
+::= { physicaldriveEntry 10 }
+				
+rebuildProgress  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(1..25))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Rebuild Progress for this Physical Drive if the Physical 
+		Drive State is Rebuild."
+::= { physicaldriveEntry 11 }
+
+mediumErrors  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Medium Errors Occurred on this Drive Since it was Configured."
+::= { physicaldriveEntry 12 }
+
+physSlotStatus OBJECT-TYPE
+	SYNTAX  INTEGER(0..7)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Indicates the status of interest on the drive slot"
+::= { physicaldriveEntry 13 }
+
+-- Developer Comments
+-- Bit 0: If 0, indicates that the device is not inserted
+--        If 1, indicates that the device is inserted
+-- Bit 1: If 0, indicates that the slot is not ready for device insertion
+--              or removal
+--        If 1, indicates that the slot is ready for device insertion
+--              or removal
+-- Bit 2: If 0, indicates that the slot is not activated for accessing
+--              the inserted drive
+--        If 1, indicates that the slot is activated for accessing
+--              the inserted drive
+-- Developer Comments Ends
+
+physSlotNumber OBJECT-TYPE
+	SYNTAX  INTEGER(0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"SCSI Target Slot Number at Which This Physical Drive 
+		 is Present."
+::= { physicaldriveEntry 14 }
+		
+otherErrors  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Other Errors Occurred on this Drive Since it was Configured."
+::= { physicaldriveEntry 15 }
+
+physTermination OBJECT-TYPE
+	SYNTAX  INTEGER {
+		wide(0),
+		narrow(1),
+		notSupported(20)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Negotiation Information of the physical drive. This field is 
+		applicable only to drives."
+::= { physicaldriveEntry 16 }
+
+physSpeed OBJECT-TYPE
+	SYNTAX  INTEGER {
+		maximum(0),
+		asynchronous(1),
+		fiveMB(2),
+		tenMB(3),
+		twentyMB(4),
+		fortyMB(5),
+		eightyMB(6),
+		oneHundredSixtyMB(7),
+		threeHundredTwentyMB(8),
+		notSupported(20)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Transfer speed of the physical drive. This field is 
+		applicable only to drives."
+::= { physicaldriveEntry 17 }
+
+--Developer comments
+--FASTEST-POSSIBLE-SPEED	Negotiate to fastest possible transfer rate (default)
+--ASYNCHRONOUS-NEGOTIATION	Force Asynchronous negotiation
+--TARGET-TRANSFER-SPEED-1	5 MB transfer/second (10MB/s if wide)
+--TARGET-TRANSFER-SPEED-2	10 MB transfer/second (20MB/s if wide)
+--TARGET-TRANSFER-SPEED-3	20 MB transfer/second (40MB/s if wide)
+--TARGET-TRANSFER-SPEED-4	40 MB transfer/second (80MB/s if wide)
+--TARGET-TRANSFER-SPEED-5	80 MB transfer/second (160MB/s if wide)
+--TARGET-TRANSFER-SPEED-6	160 MB transfer/second (320MB/s if wide)
+--notsupported				If the device is not a disk or if the call fails
+
+lunNumber OBJECT-TYPE
+	SYNTAX  INTEGER(0..7)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"SCSI LUN ID of this Physical Device"
+::= { physicaldriveEntry 18 }
+				
+
+
+-- Channel Table Definition
+channelTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF ChannelEntry
+	ACCESS  not-accessible
+	STATUS  optional
+	DESCRIPTION
+		"A List of Channel Entries containing Information/Properties
+		about the Channels on the Adapter."
+	::= { megaRaidMib 4 }
+
+	channelEntry OBJECT-TYPE
+		SYNTAX  ChannelEntry
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An Entry in the channel table."
+		INDEX   { chanAdapterNumber, channel }
+		::= { channelTable 1 }
+
+	ChannelEntry ::=
+		SEQUENCE {
+			chanAdapterNumber
+				INTEGER,
+			channel
+				INTEGER,
+			terminations
+				INTEGER,
+			channelStatus
+				INTEGER,
+            channelType
+				INTEGER
+		}
+
+-- defines for each attribute in ChannelEntry
+
+chanAdapterNumber  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Adapter Number for this Instance of Adapter/Channel Instance."
+::= { channelEntry 1 }
+
+channel OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Channel Number for this Channel."
+::= { channelEntry 2 }
+
+terminations OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disabled(0),
+		higher8Bits(1),
+		wideTerminations(2)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Current Terminations Effective on this Channel"
+::= { channelEntry 3 }
+				
+channelStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		quiet(1),
+		active(2)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Current Activity Status (QUIET/ACTIVE) for this Channel."
+::= { channelEntry 4 }
+
+channelType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		sCSI(0),
+		rAID(1)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Type of the channel(RAID/SCSI)."
+::= { channelEntry 5 }
+
+fcDeviceTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF FcDeviceEntry
+	ACCESS	not-accessible
+	STATUS	optional
+DESCRIPTION	"A List of Entries containing Information about the FC Devices in the System."
+::= { megaRaidMib 5 } 
+
+fcDeviceEntry OBJECT-TYPE
+SYNTAX	FcDeviceEntry
+	ACCESS	not-accessible
+	STATUS	optional
+	DESCRIPTION	"An Entry in the FC Device Table."
+	INDEX		{ fcPhysAdapterNumber, fcPhysChannel, fcTargetId  }
+	::= { fcDeviceTable 1 }
+
+FcDeviceEntry ::=
+		SEQUENCE {
+			fcPhysAdapterNumber
+				INTEGER,
+			fcPhysChannel
+				INTEGER,
+			fcTargetId
+				INTEGER,
+			fcLoopID-0 
+				INTEGER,
+			fcLoopID-1
+				INTEGER,
+			fcWwn	
+				DisplayString,
+			fcState
+				INTEGER,
+			fcArrayPosition
+				DisplayString,
+			fcSizeMB
+				INTEGER,
+			fcInquiryString
+				DisplayString,
+			fcScsiLevel
+				INTEGER,
+			fcRebuildProgress
+				DisplayString,
+			fcMediumErrors
+				INTEGER,
+			fcOtherErrors
+				INTEGER
+		}
+	
+-- defines for each attribute in fcDeviceEntry
+fcPhysAdapterNumber  OBJECT-TYPE
+	SYNTAX  INTEGER (1..4)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Adapter Number for this Instance of Adapter/Physical-Drive 
+		Instance."
+::= { fcDeviceEntry 1 }
+
+ fcPhysChannel OBJECT-TYPE
+	SYNTAX  INTEGER (0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Channel Number for this Instance of Adapter/Physical-Drive "
+::= { fcDeviceEntry 2 }
+
+ fcTargetId  OBJECT-TYPE
+	SYNTAX  INTEGER (0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Target Number for this Instance of Adapter/Physical-Drive" 
+::= { fcDeviceEntry 3 }
+
+ fcLoopID-0 OBJECT-TYPE
+	SYNTAX  INTEGER {
+		inLoop0(1),
+		inLoop1(2),
+		notInTheLoop(255)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Loop ID of this FC Drive."
+::= { fcDeviceEntry 4}
+
+ fcLoopID-1 OBJECT-TYPE
+	SYNTAX  INTEGER {
+		inLoop0(1),
+		inLoop1(2),
+		notInTheLoop(255)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Loop ID of this FC Drive."
+::= { fcDeviceEntry 5}
+
+ fcWwn OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(4..20))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"WWN is the World Wide Name of this FC device"
+::= { fcDeviceEntry 6}
+
+
+ fcState OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ready(1),
+		online(3),
+		failed(4),
+		rebuild(5),
+		hotspare(6),
+		nonDisk(20)
+		}
+	ACCESS  read-write
+	STATUS  optional
+	DESCRIPTION
+		"Current State of this Physical Drive."
+::= { fcDeviceEntry 7}
+
+
+ fcArrayPosition OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(4..20))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Array is a group of Physical Drives used to Configure Logical 
+		Drives. This String Variable has values of the type Ai-j.
+		Example: A1-2 implies that this drive is 2nd member of Array-1."
+::= { fcDeviceEntry 8}
+
+ fcSizeMB  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Actual Size of this Physical Drive."
+::= { fcDeviceEntry 9}
+				
+ fcInquiryString  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(29..29))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"SCSI Inquiry String for this Device."
+::= { fcDeviceEntry 10 }
+
+ fcScsiLevel OBJECT-TYPE
+	SYNTAX  INTEGER {
+		sCSI1(1),
+		sCSI2(2),
+		sCSI3(3),
+		sCSI4(4)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"ANSI SCSI Level Conformance of this Device."
+::= { fcDeviceEntry 11 }
+
+ fcRebuildProgress  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(1..25))
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Rebuild Progress for this Physical Drive if the Physical 
+		Drive State is Rebuild."
+::= { fcDeviceEntry 12}
+
+ fcMediumErrors  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Medium Errors Occurred on this Drive Since it was Configured."
+::= { fcDeviceEntry 13}
+
+ fcOtherErrors  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Other Errors Occurred on this Drive Since it was Configured."
+::= { fcDeviceEntry 14}
+
+fcChannelTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF	FcChannelEntry
+	ACCESS	not-accessible
+	STATUS	optional
+	DESCRIPTION
+		"A List of FC Channel Entries containing Information about the FC Channels on the Adapter."
+	::= { megaRaidMib 6 }
+
+fcChannelEntry OBJECT-TYPE
+		SYNTAX  FcChannelEntry
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An Entry in the FC channel table."
+		INDEX   { fcChanAdapterNumber, fcChannel }
+		::= { fcChannelTable 1 }
+
+	FcChannelEntry ::=
+		SEQUENCE {
+			fcChanAdapterNumber
+				INTEGER,
+			fcChannel 
+				INTEGER,
+			fcLoopNumber
+				INTEGER,
+			fcLoopStatus
+				INTEGER,
+			fcNumberofDevices
+				INTEGER,
+			fcProcessorType
+				INTEGER
+		}
+
+-- defines for each attribute in FC-ChannelEntry
+
+fcChanAdapterNumber  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Adapter Number for this Instance of Adapter/fc-Channel Instance."
+::= { fcChannelEntry 1 }
+
+fcChannel  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Channel Number for this Instance "
+::= { fcChannelEntry 2 }
+
+fcLoopNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Loop Index for this fcChannel."
+::= { fcChannelEntry 3 }
+ 
+fcLoopStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		quiet(1),
+		active(2)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Current Activity Status (QUIET/ACTIVE) for this fcChannel."
+::= { fcChannelEntry 4 }
+
+fcNumberofDevices OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The number of FC devices in this fcChannel"
+::= { fcChannelEntry 5 }
+
+fcProcessorType OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The processor type on this fcChannel"
+::= { fcChannelEntry 6 }
+
+
+-- Scalar MIB Variables
+
+ioReadsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Total IO-Reads/Sec Statistics on all Adapters."
+::= { megaRaidMib 9 }
+
+ioWritesPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Total IO-Writes/Sec Statistics on all Adapters."
+::= { megaRaidMib 10 }
+
+readKBsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Total Read KBs Per Second Statistics on all Adapters."
+::= { megaRaidMib 11 }
+
+writeKBsPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Total Write KBs Per Second Statistics on all Adapters."
+::= { megaRaidMib 12 }
+
+readFailuresPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Total Read Failures Per Second Statistics on all Adapters."
+::= { megaRaidMib 13 }
+
+writeFailuresPerSec  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Total Write Failures Per Second Statistics on all Adapters."
+::= { megaRaidMib 14 }
+
+-- Enclosure Configuration Table Definition
+enclConfigurationTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EnclConfigurationEntry
+	ACCESS  not-accessible
+	STATUS  optional
+	DESCRIPTION
+		"A List of Enclosure Configuration Entries containing 
+		Information about the SAF-TE Enclosures in the System."
+	::= { megaRaidMib 15 }
+
+	enclConfigurationEntry OBJECT-TYPE
+		SYNTAX  EnclConfigurationEntry 
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An Entry in the Enclosure Configuration Table."
+		INDEX   { enclNumber  }
+		::= { enclConfigurationTable 1 }
+
+	EnclConfigurationEntry ::=
+		SEQUENCE {
+			enclAdapterNumber
+				INTEGER,
+			enclNumber
+				INTEGER,
+			enclChannel
+				INTEGER,
+			enclNumDeviceSlots
+				INTEGER,
+			enclNumFans
+				INTEGER,
+			enclNumTempSensors
+				INTEGER,
+			enclNumPowerSupplies
+				INTEGER,
+			enclDoorLockStatus
+				INTEGER,
+			enclAudibleAlarm
+				INTEGER,
+			enclAlarmStatus
+				INTEGER,
+			enclTemperatureScale 
+				INTEGER,
+			enclTotalPowerOnMins
+				INTEGER,
+			enclTotalPowerOnCycles
+				INTEGER
+		}
+
+-- defines for each attribute in enclConfigurationEntry 
+
+enclAdapterNumber OBJECT-TYPE
+	SYNTAX  INTEGER (1..4)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Adapter Number for this Instance of Adapter/Enclosure 
+		Instance."
+::= { enclConfigurationEntry 1 }
+
+enclNumber OBJECT-TYPE
+	SYNTAX  INTEGER(1..3)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Indicates the enclosure number for this Enclosure. The
+		 numbering is w.r.t adapter and not w.r.t Channel"
+::= { enclConfigurationEntry 2 }
+				
+enclChannel OBJECT-TYPE
+	SYNTAX  INTEGER (1..3)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Channel Number at Which this Enclosure is Present."
+::= { enclConfigurationEntry 3 }
+
+enclNumDeviceSlots OBJECT-TYPE
+	SYNTAX  INTEGER(0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Total number of device slots on the channel for this Enclosure"
+::= { enclConfigurationEntry 4 }
+
+enclNumFans OBJECT-TYPE
+	SYNTAX  INTEGER(0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Total number SEP manageable of fans for this Enclosure"
+::= { enclConfigurationEntry 5 }
+
+enclNumTempSensors OBJECT-TYPE
+	SYNTAX  INTEGER(0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Number of SEP manageable Temperature Sensors for 
+		 this Enclosure"
+::= { enclConfigurationEntry 6 }
+
+enclNumPowerSupplies OBJECT-TYPE
+	SYNTAX  INTEGER(0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Maximum number of SEP manageable Power Supplies for 
+		 this Enclosure"
+::= { enclConfigurationEntry 7 }
+
+enclDoorLockStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		notInstalled(0),
+		unlocked(1),
+		locked(2),
+		other(3)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Indicates whether this enclosure has door lock  
+		 installed/locked/unlocked"
+::= { enclConfigurationEntry 8 }
+				
+enclAudibleAlarm OBJECT-TYPE
+	SYNTAX  INTEGER {
+		noAudibleAlarm(0),
+		audibleAlarm(1),
+		other(2)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Indicates the availability of Audible Alarm with this 
+		 Enclosure"
+::= { enclConfigurationEntry 9 }
+				
+enclAlarmStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		off(0),
+		on(1),
+		other(2)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Indicates whether this Enclosure speaker is ON or OFF"
+::= { enclConfigurationEntry 10 }
+
+enclTemperatureScale OBJECT-TYPE
+	SYNTAX  INTEGER {
+		fahrenheit(0),
+		celsius(1)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Indicates whether this Enclosure reports temperature
+		 in Celsius or Fahrenheit"
+::= { enclConfigurationEntry 11 }
+
+enclTotalPowerOnMins OBJECT-TYPE
+	SYNTAX  INTEGER(0..4294967295)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"This indicates the total time in minutes that the
+		 RAID device has been powered ON. It is cumulative
+		 over the life of the device"
+::= { enclConfigurationEntry 12 }
+
+enclTotalPowerOnCycles OBJECT-TYPE
+	SYNTAX  INTEGER(0..4294967295)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"This indicates the count of number of times that the
+		 RAID device has been powered ON. It is cumulative
+		 over the life of the device"
+::= { enclConfigurationEntry 13 }
+
+
+-- Enclosure Fan Table Definition
+enclFanTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EnclFanEntry
+	ACCESS  not-accessible
+	STATUS  optional
+	DESCRIPTION
+		"A List of SAF-TE Enclosure Fan Entries"
+	::= { megaRaidMib 16 }
+
+	enclFanEntry OBJECT-TYPE
+		SYNTAX  EnclFanEntry 
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An Entry in the Enclosure Fan Table."
+		INDEX   { enclNumberFan, enclFanIndex }
+		::= { enclFanTable 1 }
+
+	EnclFanEntry ::=
+		SEQUENCE {
+			enclNumberFan
+				INTEGER,
+			enclFanIndex
+				INTEGER,
+			enclFanStatus
+				INTEGER
+		}
+
+-- defines for each attribute in EnclFanEntry 
+
+enclNumberFan OBJECT-TYPE
+	SYNTAX  INTEGER (1..3)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Enclosure Number at Which this Enclosure with the Fan is 
+		 Present."
+::= { enclFanEntry 1 }
+
+enclFanIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..255)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The instance of the fan in the enclosure for the adapter/channel"
+::= { enclFanEntry 2 }
+
+enclFanStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		operational(0),
+		malfunction(1),
+		notInstalled(2),
+		unknown(128)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Status of this fan"
+::= { enclFanEntry 3 }
+
+-- Enclosure Power Supply Table Definition
+enclPowerSupplyTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EnclPowerSupplyEntry
+	ACCESS  not-accessible
+	STATUS  optional
+	DESCRIPTION
+		"A List of SAF-TE Enclosure Power Supply Entries"
+	::= { megaRaidMib 17 }
+
+	enclPowerSupplyEntry OBJECT-TYPE
+		SYNTAX  EnclPowerSupplyEntry 
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An Entry in the Enclosure Power Supply Table."
+		INDEX   { enclNumberPower, enclPowerSupplyIndex }
+		::= { enclPowerSupplyTable 1 }
+
+	EnclPowerSupplyEntry ::=
+		SEQUENCE {
+			enclNumberPower
+				INTEGER,
+			enclPowerSupplyIndex
+				INTEGER,
+			enclPowerSupplyStatus
+				INTEGER
+		}
+
+-- defines for each attribute in enclPowerSupplyEntry 
+
+
+enclNumberPower OBJECT-TYPE
+	SYNTAX  INTEGER (1..3)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"enclosure number at Which this Enclosure with the Power Supply 
+		 is Present."
+::= { enclPowerSupplyEntry 1 }
+
+enclPowerSupplyIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..255)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The instance of the PowerSupply in the enclosure for the 
+		 adapter/channel"
+::= { enclPowerSupplyEntry 2 }
+
+enclPowerSupplyStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		operationalON(0),
+		operationalOFF(1),
+		malfunctionON(2),
+		malfunctionOFF(3),
+		notPresent(4),
+		present(5),
+		unknown(128)
+		}
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The Status of this PowerSupply"
+::= { enclPowerSupplyEntry 3 }
+
+-- Enclosure Temperature Sensor Table Definition
+enclTempSensorsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EnclTempSensorsEntry
+	ACCESS  not-accessible
+	STATUS  optional
+	DESCRIPTION
+		"A List of SAF-TE Enclosure Temperature Sensor Entries"
+	::= { megaRaidMib 18 }
+
+	enclTempSensorsEntry OBJECT-TYPE
+		SYNTAX  EnclTempSensorsEntry
+		ACCESS  not-accessible
+		STATUS  optional
+		DESCRIPTION
+			"An Entry in the Enclosure Temperature Sensor Table."
+		INDEX   { enclNumberTemp, enclTempSensorIndex}
+		::= { enclTempSensorsTable 1 }
+
+	EnclTempSensorsEntry ::=
+		SEQUENCE {
+			enclNumberTemp
+				INTEGER,
+			enclTempSensorIndex
+				INTEGER,
+			enclTemperature
+				INTEGER
+		}
+
+-- defines for each attribute in enclTempSensorsEntry
+
+
+enclNumberTemp OBJECT-TYPE
+	SYNTAX  INTEGER (1..3)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"enclosure number at Which this Enclosure with the temperature 
+		 sensor is Present."
+::= { enclTempSensorsEntry 1 }
+
+enclTempSensorIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..15)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The instance of the temperature sensor indices in the 
+		 enclosure for the adapter/channel"
+::= { enclTempSensorsEntry 2 }
+
+enclTemperature OBJECT-TYPE
+	SYNTAX  INTEGER(-10..245)
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Indicates the temperature reported by the sensor in degree
+		 Fahrenheit"
+::= { enclTempSensorsEntry 3 }
+
+
+-- Following are the Objects defined for Traps
+
+raidTraps OBJECT IDENTIFIER ::= { megaRaidMib 200 }
+
+rtAdapterNumber  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Adapter Number for which Trap is generated."
+::= { raidTraps 1001 }
+
+rtLogicalDriveNumber  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Logical Drive Number for which Trap is generated."
+::= { raidTraps 1002 }
+
+rtChannelNumber  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Channel Number on the Adapter for which Trap is Generated."
+::= { raidTraps 1003 }
+
+rtTargetID  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Device ID of the Physical Drive for which Trap is Generated."
+::= { raidTraps 1004 }
+
+rtOldDriveState  OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Old State of Logical/Physical Drive, when a State Change Trap 
+		is Generated."
+::= { raidTraps 1005 }
+
+rtNewDriveState  OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"New State of Logical/Physical Drive, when a State Change Trap 
+		is Generated."
+::= { raidTraps 1006 }
+
+rtSenseKey  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Check Condition Sense-Key reported by Physical Drive for which 
+		Trap is Generated."
+::= { raidTraps 1007 }
+
+rtASC  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Check Condition Additional Sense Code (ASC) reported by Physical 
+		Drive for which Trap is Generated."
+::= { raidTraps 1008 }
+
+rtASCQ  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Check Condition Additional Sense Code Qualifier (ASCQ) reported by 
+		Physical Drive for which Trap is Generated."
+::= { raidTraps 1009 }
+
+rtDriveVendor  OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Vendor Identification String from the SCSI Inquiry Data for the
+		Drive."
+::= { raidTraps 1010 }
+
+rtEnclNumber  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Enclosure Number reported by the RAID Controller."
+::= { raidTraps 1011 }
+
+rtEnclTempSensorIndex  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Enclosure Temperature Sensor Number reported by the
+		 SEP device"
+::= { raidTraps 1012 }
+
+rtEnclTemperature  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Enclosure Temperature in Fahrenheit reported by the
+		 SEP device"
+::= { raidTraps 1013 }
+
+rtEnclFanIndex  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Enclosure Fan Number reported by the SEP device"
+::= { raidTraps 1014 }
+
+rtEnclPowerSupplyIndex  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Enclosure Power Supply Number reported by the SEP device"
+::= { raidTraps 1015 }
+
+
+rtWWN	OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"The World Wide Name of the FC device whose loop ID or State changes"
+::= { raidTraps 1016 }
+		
+rtOldLoopID	OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Index of the loop before its state changed"
+::= { raidTraps 1017 }
+		
+rtNewLoopID	OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  optional
+	DESCRIPTION
+		"Index of the loop after its state changed"
+::= { raidTraps 1018 }
+		
+
+
+-- Following are the trap definitions, which use variables defined
+-- within the object megaRaidMib.
+rtConfigUpdated TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES { rtAdapterNumber }
+	DESCRIPTION
+		"Adapter-%d: A New Configuration has been written."
+	--#TYPE "RAID Trap: Configuration Updated"
+	--#SUMMARY "Host Adapter-%d: A New Configuration has been written."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9001
+
+rtPhysicalDriveStateChange TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#TYPE "RAID Trap: Physical Drive State Change"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9002
+
+rtLogicalDriveStateChange TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#TYPE "RAID Trap: Logical Drive State Change"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9003
+
+rtInitializeStarted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Initialization Started."
+	--#TYPE "RAID Trap: Initialize Started"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Initialization Started."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9004
+
+rtInitializeCompleted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Initialization Completed Successfully."
+	--#TYPE "RAID Trap: Initialize Completed"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Initialization Completed Successfully."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9005
+
+rtInitializeAborted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Initialization Aborted by User."
+	--#TYPE "RAID Trap: Initialize Aborted"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Initialization Aborted by User."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9006
+
+rtInitializeFailed TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Initialization Failed."
+	--#TYPE "RAID Trap: Initialize Failed"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Initialization Failed."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9007
+
+rtCheckConsistencyStarted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Check Consistency Started."
+	--#TYPE "RAID Trap: Check Consistency Started"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Check Consistency Started."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9008
+
+rtCheckConsistencyCompleted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Check Consistency Completed. No 
+		Inconsistencies Found."
+	--#TYPE "RAID Trap: Check Consistency Completed"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Check Consistency Completed. No"
+	--#SUMMARY "Inconsistencies Found."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9009
+
+rtCheckConsistencyAborted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Check Consistency Aborted by User."
+	--#TYPE "RAID Trap: Check Consistency Aborted"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Check Consistency Aborted by User."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9010
+
+rtConsistencyCorrected TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Check Consistency Operation Completed. 
+		Inconsistencies have been Cured." 
+	--#TYPE "RAID Trap: Check Consistency Corrected"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Check Consistency Operation"
+	--#SUMMARY "Completed. Inconsistencies have been Cured." 
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9011
+
+rtCheckConsistencyFailed TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Check Consistency Failed."
+	--#TYPE "RAID Trap: Check Consistency Failed"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Check Consistency Failed."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9012
+
+rtReconstructionStarted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Reconstruction Started."
+	--#TYPE "RAID Trap: Reconstruction Started"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Reconstruction Started."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9013
+
+rtReconstructionCompleted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Reconstruction Completed Successfully."
+	--#TYPE "RAID Trap: Reconstruction Completed"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Reconstruction Completed Successfully."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9014
+
+rtReconstructionFailed TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: Reconstruction Failed."
+	--#TYPE "RAID Trap: Reconstruction Failed"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: Reconstruction Failed."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9015
+
+rtPredictiveFailuresExceeded TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtDriveVendor,
+		rtSenseKey,
+		rtASC,
+		rtASCQ
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Reported Predictive Failure.
+		Drive Identification String = %s
+		Sense Key = 0x%x, ASC = 0x%x, ASCQ = 0x%x."
+	--#TYPE "RAID Trap: Physical Drive Failure Prediction Threshold Exceeded"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Reported Predictive 
+	--#SUMMARY "Failure. (Failure Threshold Exceeded)"
+	--#SUMMARY "Drive Identification String = %s"
+	--#SUMMARY "Sense Key = 0x%x, ASC = 0x%x, ASCQ = 0x%x."
+	--#ARGUMENTS { 0, 1, 2, 3, 4, 5, 6 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9016
+
+rtPredictiveFailuresFalse TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtDriveVendor,
+		rtSenseKey,
+		rtASC,
+		rtASCQ
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Reported Failure Prediction
+		Threshold Exceeded [FALSE].
+		Drive Identification String = %s
+		Sense Key = 0x%x, ASC = 0x%x, ASCQ = 0x%x."
+	--#TYPE "RAID Trap: Physical Drive Predictive Failures [FALSE]"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Reported Predictive 
+	--#SUMMARY "Failure. (Failure Prediction Threshold Exceeded [FALSE])"
+	--#SUMMARY "Drive Identification String = %s"
+	--#SUMMARY "Sense Key = 0x%x, ASC = 0x%x, ASCQ = 0x%x."
+	--#ARGUMENTS { 0, 1, 2, 3, 4, 5, 6 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9017
+
+rtCheckConditionStatus TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtSenseKey,
+		rtASC,
+		rtASCQ
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Command Completed with 
+		Sense-Key-0x%x ASC-0x%x ASCQ-0x%x."
+	--#TYPE "RAID Trap: Physical Drive Check Conditions"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Command Completed with"
+	--#SUMMARY "Sense-Key-0x%x ASC-0x%x ASCQ-0x%x."
+	--#ARGUMENTS { 0, 1, 2, 3, 4, 5 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9018
+
+rtNewDriveInserted TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: New Device Inserted."
+	--#TYPE "RAID Trap: New Drive Inserted"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: New Device Inserted."
+	--#ARGUMENTS { 0, 1, 2 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9019
+
+rtBatteryMissing TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ rtAdapterNumber }
+	DESCRIPTION
+		"Adapter-%d: Battery Module is missing."
+	--#TYPE "RAID Trap: Battery Missing"
+	--#SUMMARY "Adapter-%d: Battery Module is missing."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9020
+
+rtBatteryVolatageLow TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ rtAdapterNumber }
+	DESCRIPTION
+		"Adapter-%d: Battery Module Voltage is Low."
+	--#TYPE "RAID Trap: Battery Voltage Low"
+	--#SUMMARY "Adapter-%d: Battery Module Voltage is Low."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9021
+
+rtBatteryTemperatureHigh TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ rtAdapterNumber }
+	DESCRIPTION
+		"Adapter-%d: Battery Module Temperature Exceeded Danger Threshold."
+	--#TYPE "RAID Trap: Battery Temperature High"
+	--#SUMMARY "Adapter-%d: Battery Module Temperature Exceeded Danger Threshold."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9022
+
+
+rtPhysicalDriveStateReady TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#TYPE "RAID Trap: Physical Drive State Change"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9023
+
+
+rtPhysicalDriveStateOnline TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#TYPE "RAID Trap: Physical Drive State Change "
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9024
+
+
+rtPhysicalDriveStateFailed TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#TYPE "RAID Trap: Physical Drive State Change"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY CRITICAL 
+	--#STATE OPERATIONAL
+	::= 9025
+
+rtPhysicalDriveStateRebuild TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#TYPE "RAID Trap: Physical Drive State Change"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY     WARNING 
+	--#STATE OPERATIONAL
+	::= 9026
+
+
+rtPhysicalDriveStateHotspare TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtTargetID,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#TYPE "RAID Trap: Physical Drive State Change"
+	--#SUMMARY "Adapter-%d, Channel-%d, Target-%d: Drive State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9027
+
+
+rtLogicalDriveStateOffline TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#TYPE "RAID Trap: Logical Drive State Change"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY CRITICAL 
+	--#STATE OPERATIONAL
+	::= 9028
+
+rtLogicalDriveStateDegraded TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#TYPE "RAID Trap: Logical Drive State Change"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY CRITICAL 
+	--#STATE OPERATIONAL
+	::= 9029
+
+
+rtLogicalDriveStateOptimal TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#TYPE "RAID Trap: Logical Drive State Change"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9030
+
+rtLogicalDriveStateInitialize TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#TYPE "RAID Trap: Logical Drive State Change"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY WARNING 
+	--#STATE OPERATIONAL
+	::= 9031
+
+rtLogicalDriveStateChkConsist TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtLogicalDriveNumber,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#TYPE "RAID Trap: Logical Drive State Change"
+	--#SUMMARY "Adapter-%d, Logical Drive-%d: State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY WARNING 
+	--#STATE OPERATIONAL
+	::= 9032
+
+rtEnclTemperatureOutofRange TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtEnclNumber,
+		rtEnclTempSensorIndex,
+		rtEnclTemperature
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Enclosure-%d, Temperature Sensor
+		 -%d: Temperature %d is out of Range"
+	--#TYPE "SAFTE Trap: Temperature Out of Range"
+	--#SUMMARY "Adapter-%d, Channel-%d, Enclosure-%d, Temperature Sensor-%d: Temperature %d is out of Range"
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY CRITICAL 
+	--#STATE OPERATIONAL
+	::= 9033
+
+rtEnclTemperatureNormal TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtEnclNumber,
+		rtEnclTempSensorIndex,
+		rtEnclTemperature
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Enclosure-%d, Temperature Sensor
+		 -%d: Temperature %d is Normal"
+	--#TYPE "SAFTE Trap: Temperature Back to Normal"
+	--#SUMMARY "Adapter-%d, Channel-%d, Enclosure-%d, Temperature Sensor -%d: Temperature %d is within the operable range"
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY INFORMATIONAL 
+	--#STATE OPERATIONAL
+	::= 9034
+
+rtEnclFanMalfunction TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtEnclNumber,
+		rtEnclFanIndex
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Enclosure-%d, Fan-%d: Fan is 
+		 Malfunctioning"
+	--#TYPE "SAFTE Trap: Fan Malfunction"
+	--#SUMMARY "Adapter-%d, Channel-%d, Enclosure-%d, Fan-%d: Fan is Malfunctioning"
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY WARNING 
+	--#STATE OPERATIONAL
+	::= 9035
+
+rtEnclFanOk TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtEnclNumber,
+		rtEnclFanIndex
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Enclosure-%d, Fan-%d: Fan is 
+		 operating properly"
+	--#TYPE "SAFTE Trap: Fan Okay"
+	--#SUMMARY "Adapter-%d, Channel-%d, Enclosure-%d, Fan-%d: Fan is operating properly"
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY INFORMATIONAL 
+	--#STATE OPERATIONAL
+	::= 9036
+
+rtEnclPowerSupplyMalfunction TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtEnclNumber,
+		rtEnclPowerSupplyIndex
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Enclosure-%d, Power Supply-%d: 
+		 Power Supply is Malfunctioning"
+	--#TYPE "SAFTE Trap: Power Supply is Malfunctioning"
+	--#SUMMARY "Adapter-%d, Channel-%d, Enclosure-%d, Power Supply-%d: Power Supply is Malfunctioning"
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY CRITICAL 
+	--#STATE OPERATIONAL
+	::= 9037
+
+rtEnclPowerSupplyOk TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtChannelNumber,
+		rtEnclNumber,
+		rtEnclPowerSupplyIndex
+		}
+	DESCRIPTION
+		"Adapter-%d, Channel-%d, Enclosure-%d, Power Supply-%d: 
+		 Power Supply is operating properly"
+	--#TYPE "SAFTE Trap: Power Supply is operating properly"
+	--#SUMMARY "Adapter-%d, Channel-%d, Enclosure-%d, Power Supply-%d: Power Supply is operating properly"
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY INFORMATIONAL 
+	--#STATE OPERATIONAL
+	::= 9038
+
+rtFCLooplStateChange TRAP-TYPE
+	ENTERPRISE raidTraps
+	VARIABLES 
+		{ 
+		rtAdapterNumber,
+		rtOldLoopID,
+		rtOldDriveState,
+		rtNewDriveState
+		}
+	DESCRIPTION
+		"Adapter-%d, LoopId-%d: Loop State Changed from %s to %s."
+	--#TYPE "RAID Trap: Loop State Change"
+	--#SUMMARY "Adapter-%d, LoopID-%d: Loop State Changed from %s to %s."
+	--#ARGUMENTS { 0, 1,2,3 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 9040
+
+
+-- This marks end of the MIB definitions
+END

@@ -1,0 +1,194 @@
+--
+-- 	Copyright 1996, 1998, 1999 Shiva Corporation
+--
+
+--	RADIUS protocol related variables.
+
+SHIVA-RADIUS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	Gauge, IpAddress, TimeTicks
+		FROM RFC1155-SMI
+	tRadius
+		FROM SHIVA-MIB
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+--  This MIB module uses the extended OBJECT-TYPE macro as
+--  defined in RFC 1212.
+
+--  This is the MIB module for the RADIUS authorization and
+--  accounting protocol objects.  It is in the temporary
+--  branch of the Shiva tree on the assumption that it will
+--  later be superseded by an IETF standardized MIB by
+--  the RADIUS working group.
+
+--  There are two seperate major portions of this MIB.
+--  The first is the authorization protocol, the second
+--  is the accounting protocol.
+
+    -- RADIUS authorization
+    -- To be defined.  If we get to it before the IETF.
+    -- Commented out because it core-dumps the SunNet Manager 2.3B
+    -- mib2schema program.
+
+--  radAuth OBJECT IDENTIFIER ::= { tRadius 1 }
+
+
+    -- RADIUS accounting
+
+    radAcct OBJECT IDENTIFIER ::= { tRadius 2 }
+
+    -- RADIUS accounting configuration group.
+
+    radAcctConf OBJECT IDENTIFIER ::= { radAcct 1 }
+
+    radAcctNumServers OBJECT-TYPE
+	SYNTAX	INTEGER (0..3)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Count of the number of configured RADIUS accounting
+		servers."
+	::= { radAcctConf 1 }
+
+    radAcctServerTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF RadAcctServerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Table of all the configured RADIUS accouting servers.
+		Only one of them is used at a time."
+	::= { radAcctConf 2 }
+
+    radAcctServerEntry OBJECT-TYPE
+	SYNTAX	RadAcctServerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A RADIUS accounting server."
+	INDEX	{ radAcctServerIndex }
+        ::= { radAcctServerTable 1 }
+
+    RadAcctServerEntry ::=
+    SEQUENCE {
+	radAcctServerIndex
+	    INTEGER (1..3),
+	radAcctServerAddress
+	    IpAddress,
+	radAcctServerPort
+	    INTEGER (0..65535)
+      }
+
+    radAcctServerIndex OBJECT-TYPE
+	SYNTAX	INTEGER (1..3)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Index of this entry in the table."
+	::= { radAcctServerEntry 1 }
+
+    radAcctServerAddress OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"IP address of this RADIUS accouting server."
+	::= { radAcctServerEntry 2 }
+
+    radAcctServerPort OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"UDP port that packets to this RADIUS accounting
+		server will be sent to."
+	::= { radAcctServerEntry 3 }
+
+    -- Deliberately don't define radAcctServerSharedSecret, since
+    -- SNMP Version 1 can't keep that secure.
+
+    -- RADIUS accounting status/statistics group.
+
+    radAcctStat OBJECT IDENTIFIER ::= { radAcct 2 }
+
+    radAcctCurrServerIndex OBJECT-TYPE
+	SYNTAX	INTEGER (0..3)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Index into radAcceServerTable of the RADIUS
+		accounting server presently receiving accounting
+		messages.  0 if none."
+	::= { radAcctStat 1 }
+
+    radAcctCurrServerStartTime OBJECT-TYPE
+	SYNTAX	TimeTicks
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The value of sysUpTime at the time the current
+		RADIUS accounting server become operational.
+		Has a zero value if none."
+	::= { radAcctStat 2 }
+
+    radAcctRecvQLength OBJECT-TYPE
+	SYNTAX	Gauge
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Length of the input packet queue for the RADIUS
+		accounting client."
+        ::= { radAcctStat 3 }
+
+    radAcctPrevServerIndex OBJECT-TYPE
+	SYNTAX	INTEGER (0..3)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Index into radAcceServerTable of the RADIUS
+		accounting server previously receiving accounting
+		messages.  0 if none."
+	::= { radAcctStat 4 }
+
+    radAcctTotalUnacknowledgedEvents OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of accounting events that are
+		queued pending acknowledgement from the RADIUS
+		accounting server.  This includes events stored
+		both in voltatile and non-volatile memory."
+	::= { radAcctStat 5 }
+
+    radAcctVolatileUnacknowledgedEvents OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of volatile accounting events that are
+		queued pending acknowledgement from the RADIUS
+		accounting server.  This includes only accounting
+		events stored in volatile memory, which would be
+		lost in the case of a power failure."
+	::= { radAcctStat 6 }
+
+    -- Traps about RADIUS
+
+    radAcctTraps OBJECT IDENTIFIER ::= { radAcct 3 }
+
+    radAcctServerTrap TRAP-TYPE
+	ENTERPRISE
+		radAcctTraps
+	VARIABLES {
+		radAcctPrevServerIndex	-- one that failed
+	}
+	DESCRIPTION
+		"This trap is generated when a configured
+		RADIUS accounting server has been determined to
+		have failed, and the agent shifts to a new
+		RADIUS accounting server."
+	::= 1
+END

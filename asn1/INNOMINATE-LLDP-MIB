@@ -1,0 +1,296 @@
+--
+-- This file was generated on Fri May 26 17:25:27 CEST 2006.
+-- **** DO NOT MODIFY MANUALLY! ****
+--
+INNOMINATE-LLDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeStamp, TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    AddressFamilyNumbers
+        FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB;
+
+innominateLldpMIB MODULE-IDENTITY
+    LAST-UPDATED "200508240000Z" -- August 24, 2005
+    ORGANIZATION "Innominate Security Technologies AG"
+    CONTACT-INFO "Martin Dickopp"
+    DESCRIPTION
+      "This MIB contains the proprietary extensions to the LLDP standard."
+    REVISION     "200508240000Z" -- August 24, 2005
+    DESCRIPTION 
+      "Published as is."
+    ::= { enterprises innominate(15450) innominateConfiguration(3) 7 }
+
+TimeFilter ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "To be used for the index to a table.  Allows an application
+        to download only those rows changed since a particular time.
+        A row is considered changed if the value of any object in the
+        row changes or if the row is created or deleted.
+
+        When sysUpTime is equal to zero, this table shall be empty.
+
+        One entry exists for each past value of sysUpTime, except that
+        the whole table is purged should sysUpTime wrap.
+
+        As this basic row is updated new conceptual rows are created
+        (which still share the now updated object values with all
+        other instances).  The number of instances which are created
+        is determined by the value of sysUpTime at which the basic row
+        was last updated.  One instance will exist for each value of
+        sysUpTime at the last update time for the row.  A new
+        timeMark instance is created for each new sysUpTime value.
+        Each new conceptual row will be associated with the timeMark
+        instance which was created at the value of sysUpTime with
+        which the conceptual row is to be associated.
+
+        By definition all conceptual rows were updated at or after
+        time zero and so at least one conceptual row (associated with
+        timeMark.0) must exist for each underlying (basic) row.
+
+        See the appendix for further discussion of this variable.
+
+        Consider the following fooTable:
+
+        fooTable ...
+        INDEX { fooTimeMark, fooIndex }
+
+        FooEntry {
+           fooTimeMark  TimeFilter
+           fooIndex     INTEGER,
+           fooCounts    Counter
+        }
+
+        Should there be two basic rows in this table (fooIndex == 1,
+        fooIndex == 2) and row 1 was updated most recently at time 6,
+        while row 2 was updated most recently at time 8, and both rows
+        had been updated on several earlier occasions such that the
+        current values were 5 and 9 respectively then the following
+        fooCounts instances would exist.
+
+        fooCounts.0.1  5
+        fooCounts.0.2  9
+        fooCounts.1.1  5
+
+        fooCounts.1.2  9
+        fooCounts.2.1  5
+        fooCounts.2.2  9
+        fooCounts.3.1  5
+        fooCounts.3.2  9
+        fooCounts.4.1  5
+        fooCounts.4.2  9
+        fooCounts.5.1  5
+        fooCounts.5.2  9
+        fooCounts.6.1  5
+        fooCounts.6.2  9
+        fooCounts.7.2  9    -- note that row 1 doesn't exist for
+        fooCounts.8.2  9    -- times 7 and 8"
+    SYNTAX TimeTicks
+
+innominateLLDPConfig     OBJECT IDENTIFIER ::= { innominateLldpMIB 1 }
+innominateLLDPStatistics OBJECT IDENTIFIER ::= { innominateLldpMIB 2 }
+
+innominateLLDPAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "DURABLE:
+        Enables/disables the IEEE802.1AB functionality
+        on this device.
+        If disabled(2), the LLDP protocol is inactive,
+        but the LLDP MIBs can be accessed."
+    DEFVAL { 1 }
+    ::= { innominateLLDPConfig 1 }
+
+innominateLLDPInterfaceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF InnominateLLDPIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains variables for each interface of
+        the switch."
+    ::= { innominateLLDPConfig 2 }
+
+innominateLLDPIfEntry OBJECT-TYPE
+    SYNTAX InnominateLLDPIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { innominateLLDPIfaceGroupID, innominateLLDPIfaceID }
+    ::= { innominateLLDPInterfaceTable 1 }
+
+InnominateLLDPIfEntry ::= SEQUENCE {
+        innominateLLDPIfaceGroupID      INTEGER,
+        innominateLLDPIfaceID           INTEGER,
+        innominateLLDPIfaceMaxNeighbors INTEGER,
+        innominateLLDPIfaceHirmaMode    INTEGER,
+        innominateLLDPIfaceFDBMode      INTEGER
+    }
+
+innominateLLDPIfaceGroupID OBJECT-TYPE
+    SYNTAX INTEGER (1..5)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index to identify an interface card. This value is never
+        greater than innominateSysGroupCapacity."
+    ::= { innominateLLDPIfEntry 1 }
+
+innominateLLDPIfaceID OBJECT-TYPE
+    SYNTAX INTEGER (1..32)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index to identify an interface within an interface card."
+    ::= { innominateLLDPIfEntry 2 }
+
+innominateLLDPIfaceHirmaMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        txOnly(1),
+        rxOnly(2),
+        txAndRx(3),
+        disabled(4)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configure Hirschmann LLDP on this physical port.
+        If an IEEE802.1AB capable device not manufactured by Hirschmann
+        is connected to a port, innominateLLDPIfaceHirmaMode should be set to
+        disabled (4) for this port."
+    DEFVAL { 3 }
+    ::= { innominateLLDPIfEntry 3 }
+
+innominateLLDPIfaceFDBMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        lldpOnly(1),
+        macOnly(2),
+        both(3),
+        autoDetect(4)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If configured to lldpOnly(1), only received LLDP messages
+        will be used to populate the LLDP-MIB's remTable.
+        If configured to macOnly(2), learned mac addresses out of the switch's forwarding database (FDB)
+        will be used to populate the LLDP-MIB's remTable.
+        If configured to both(3), both received LLDP messages
+        and learned mac addresses out of the switch's forwarding database (FDB)
+        will be used to populate the LLDP-MIB's remTable.
+        If configured to autoDetect(4) and LLDP messages are received on this port,
+        this mode will behave like lldpOnly(1), otherwise it will behave like macOnly(2)."
+    DEFVAL { 1 }
+    ::= { innominateLLDPIfEntry 4 }
+
+innominateLLDPIfaceMaxNeighbors OBJECT-TYPE
+    SYNTAX INTEGER (1..50)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configure Hirschmann LLDP on this physical port.
+        This value limits the number of entries in the remTable for this port."
+    DEFVAL { 10 }
+    ::= { innominateLLDPIfEntry 5 }
+
+innominateLLDPStatsIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF InnominateLLDPStatsIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains variables for each interface of
+        the switch."
+    ::= { innominateLLDPStatistics 1 }
+
+innominateLLDPStatsIfEntry OBJECT-TYPE
+    SYNTAX InnominateLLDPStatsIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { innominateLLDPStatsIfaceGroupID, innominateLLDPStatsIfaceID }
+    ::= { innominateLLDPStatsIfTable 1 }
+
+InnominateLLDPStatsIfEntry ::= SEQUENCE {
+        innominateLLDPStatsIfaceGroupID            INTEGER,
+        innominateLLDPStatsIfaceID                 INTEGER,
+        innominateLLDPStatsIfaceTotalFDBEntryCount INTEGER,
+        innominateLLDPStatsIfaceTotalEntryCount    INTEGER,
+        innominateLLDPStatsIfaceIEEEEntryCount     INTEGER,
+        innominateLLDPStatsIfaceHirmaEntryCount    INTEGER,
+        innominateLLDPStatsIfaceFDBEntryCount      INTEGER
+    }
+
+innominateLLDPStatsIfaceGroupID OBJECT-TYPE
+    SYNTAX INTEGER (1..5)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index to identify an interface card. This value is never
+        greater than innominateSysGroupCapacity."
+    ::= { innominateLLDPStatsIfEntry 1 }
+
+innominateLLDPStatsIfaceID OBJECT-TYPE
+    SYNTAX INTEGER (1..32)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index to identify an interface within an interface card."
+    ::= { innominateLLDPStatsIfEntry 2 }
+
+innominateLLDPStatsIfaceTotalFDBEntryCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of learned entries in the forwarding database (FDB) for this port."
+    ::= { innominateLLDPStatsIfEntry 3 }
+
+innominateLLDPStatsIfaceTotalEntryCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of remote connections in the LLDP MIB's remTable for this port."
+    ::= { innominateLLDPStatsIfEntry 4 }
+
+innominateLLDPStatsIfaceIEEEEntryCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of remote connections in the LLDP MIB's remTable for this port
+        that were detected because an LLDP message from an IEEE source was received."
+    ::= { innominateLLDPStatsIfEntry 5 }
+
+innominateLLDPStatsIfaceHirmaEntryCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of remote connections in the LLDP MIB's remTable for this port
+        that were detected because an LLDP message from an Hirschmann source was received."
+    ::= { innominateLLDPStatsIfEntry 6 }
+
+innominateLLDPStatsIfaceFDBEntryCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of remote connections in the LLDP MIB's remTable for this port
+        that were detected in the forwarding database (FDB) for this port."
+    ::= { innominateLLDPStatsIfEntry 7 }
+
+END

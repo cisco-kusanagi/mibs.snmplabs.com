@@ -1,0 +1,425 @@
+--
+-- 	Copyright 1992, 1993, 1995, 1996, 1998, 1999 Shiva Corporation
+--
+
+--	MIB for parameters related to slots in the device.
+
+SHIVA-SLOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	slot
+		FROM SHIVA-MIB;
+
+
+--  Table of the slots in the system, what is in them, and revision
+--  and status information thereon.
+
+    internalSlotTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF InternalSlotEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of internal slots."
+	::= { slot 1 }
+
+    internalSlotEntry OBJECT-TYPE
+	SYNTAX	InternalSlotEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Internal slot parameters."
+	INDEX { internalSlotIndex }
+	::= { internalSlotTable 1 }
+
+    InternalSlotEntry ::= SEQUENCE {
+	internalSlotIndex	INTEGER,
+	internalSlotType	INTEGER,
+	internalSlotName	DisplayString,
+	internalSlotFirmRev	DisplayString,
+	internalSlotHWRev	DisplayString,
+	internalSlotStatus	INTEGER,
+	internalSlotNumLines	INTEGER,
+	internalSlotSwitch	INTEGER,
+	internalSlotDchanStat   INTEGER,
+	internalSlotCardType	INTEGER,
+	internalSlotBusType	INTEGER,
+	internalSlotCardBusType	INTEGER
+    }
+
+    internalSlotIndex OBJECT-TYPE
+	SYNTAX	INTEGER (1..11)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Slot number for this slot in the server.  The range is
+		(1..1) for a NetModem, (1..8) for a LanRover, and
+		(1..11) for a LanRover Access Switch."
+	::= { internalSlotEntry 1 }
+
+    internalSlotType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		empty(1),
+		unknown(2),
+		uart(3),
+		modem(4),
+		switched56(5),
+		bri-st(6),
+		usart(7),
+		bri-u(8),
+		cpu(20),
+		wan(21),
+		lan(22),
+		dmc(23),
+		uartcard(24),		-- in LanRover/E XP16
+		shiva-16-v34-modem-card(25) -- in LanRover/E XP16
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Internal slot class.  This is the generic type of
+		the device in the slot."
+	::= { internalSlotEntry 2 }
+
+    internalSlotName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Internal slot name.  This is the name of the device
+		in the slot."
+	::= { internalSlotEntry 3 }
+
+    internalSlotFirmRev OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Internal slot firmware revision."
+	::= { internalSlotEntry 4 }
+
+    internalSlotHWRev OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Internal slot hardware/datapump revision.  It is the
+		hardware revision for all values of internalSlotType
+		except modem, where it is the datapump version."
+	::= { internalSlotEntry 5 }
+
+    internalSlotStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		init(2),	-- initializing
+		alive(3),	-- happy
+		dead(4),	-- failed self-test
+		needscode(5),	-- microcode missing
+		downloader(6),	-- in process of downloading code
+		admindown(7),	-- administratively down
+		adminbusy(8)	-- administratively busy
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Internal slot status.  Writing the value to init(2)
+		will re-initialize the device."
+	::= { internalSlotEntry 6 }
+
+    internalSlotNumLines OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of lines or channels supported on this internal slot."
+	::= { internalSlotEntry 7 }
+
+    internalSlotSwitch OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		dms100(2),
+		dms250(3),
+		ess4(4),
+		ess5(5),
+		vn2(6),
+		vn3(7),
+		vn6(8),
+		cr22(9),
+		nat1(10),
+		nat2(11),
+		euro(12),
+		itr6(13),
+		ins64(14),
+		austel(15),
+		fetex150(16),
+		btnr191(17)
+	}	
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"ISDN switch type on this slot, if internalSlotType is
+		bri-st or bri-u.  Otherwise 0."
+	::= { internalSlotEntry 8 }
+
+    internalSlotDchanStat OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),
+		dead(2),
+		layer1-active(3),
+		layer2-active(4),
+		tei-assigned(5),
+		userid-assigned(6),
+		q931-active(7),
+		invalidprofile(8)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"ISDN D channel status, if internalSlotType is bri-st
+		or bri-u.  Otherwise 0."
+	::= { internalSlotEntry 9 }
+
+    internalSlotCardType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		none(1),		-- slot empty
+		unknown(2),		-- slot contains unsupported card
+		v32bis-modem(3),	-- LanRover PLUS 14.4 V.32bis modem
+		v34-modem(4),		-- LanRover PLUS 28.8 V.34 modem
+		async(5),		-- LanRover PLUS async RS-232
+		sync-async(6),		-- LanRover PLUS sync/async RS-232
+					-- (cancelled)
+		bri-st(7),		-- LanRover PLUS ISDN BRI 
+					-- with S/T interface
+		bri-u(8),		-- LanRover PLUS ISDN BRI 
+					-- with ANSI T1.602 (US) U interface
+		shiva-68040-cpu(9),	-- Development
+		shiva-68060-cpu(10),	-- LanRover Access Switch and
+					-- LanRover D56 CPU card
+		pri-isa24(11),		-- Xircom single T1 PRI and Channelized
+		pri-isa32(12),		-- Xircom single E1 (CEPT 2.048) PRI
+		pri-isa48(13),		-- Xircom dual T1 PRI and Channelized
+		pri-isa64(14),		-- Xircom dual E1 (CEPT 2.048) PRI
+		shiva-dmc-v1(15),	-- Shiva Digital Modem Card V1 
+					-- (12 28.8 V.34 modems)
+		shiva-ethernet-v1(16),	-- Shiva PCI Ethernet
+					-- 10 megabit/second
+		fujistu-ethernet(17),	-- Fujistu ISA Ethernet (development)
+		pri-isa8b(18),		-- 4 line BRI (8 B-channels)
+		pri-generic(19),	-- any of pri-isa24, pri-isa32,
+					-- pri-isa48, or pri-isa64
+		ibm-token-ring(20),	-- IBM SkyLine Token Ring PCI
+		shiva-pci48(21),	-- Shiva PCI Dual T1
+		shiva-pci64(22),	-- Shiva PCI Dual E1
+		shiva-pci96(23),	-- Shiva PCI Quad T1 (cancelled)
+		v34-flash-modem(24),	-- LanRover PLUS flash 28.8 V.34 modem
+		shiva-ethernet-10-100(27),
+					-- Shiva PCI Ethernet 
+					-- 10/100 megabit/second
+		shiva-pci24(28),	-- Shiva PCI Single T1
+		shiva-pci32(29),	-- Shiva PCI Single E1
+		shiva-dmc1256k(30),     -- Shiva Digital Modem Card 
+					-- (12 56k V.90 modems)
+		shiva-pci-dser(31),	-- Shiva PCI Dual Serial
+		shiva-16-v34-modem(32), -- LanRover/XP16 16 V.34 Modem Card
+		-- 40			   cancelled
+		-- 41			   cancelled
+		-- 42			   cancelled
+		netaccess-pci8b(43),    -- Netaccess PCI Quad BRI 
+					-- (8 B-channels)
+                v90-flash-modem(44),    -- LanRover PLUS flash 56k V.90 modem
+	        shiva-hdmc-v90(50)      -- Shiva Digital Modem Card
+	                                -- (24 to 36 56k V.90 modems)
+        }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The specific type of card in this slot. Note that for
+		the pri-isa cards that 'pri' refers to the
+		manufacturer (Primary Rate Inc., now part of Xircom).
+		Similarly, 'shiva' and 'fujitsu' refer to card
+		manufacturers in the context of this enumeration."
+	::= { internalSlotEntry 10 }
+
+    internalSlotBusType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		none(1),
+		mic(2),		-- MIC, used on LanRover Plus
+		pci(3),
+		pci-isa(4)	-- both PCI and ISA in this slot
+	}	
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Type of bus connector(s) available in this internal slot."
+	::= { internalSlotEntry 11 }
+
+    internalSlotCardBusType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		none(1),
+		mic(2),		-- MIC, used on LanRover Plus
+		pci(3),		-- PCI card
+		isa(4)		-- ISA (PC) card
+	}	
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of bus connector on the card in this internal slot."
+	::= { internalSlotEntry 12 }
+
+
+--  Table of slots and units (lines) thereon in the system.
+--  Presently implemented only on LanRover Access Switch.
+
+    slotLineTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SlotLineEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of internal slots and lines, allowing
+		cross-referencing between physical (slot/line)
+		and logical (ifIndex) addressing."
+	::= { slot 2 }
+
+    slotLineEntry OBJECT-TYPE
+	SYNTAX	SlotLineEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Internal slot and line data."
+	INDEX { slSlot, slLine }
+	::= { slotLineTable 1 }
+
+    SlotLineEntry ::= SEQUENCE {
+	slSlot			INTEGER,
+	slLine			INTEGER,
+	slType			INTEGER,
+	slIfIndex		INTEGER,
+	slAdminType		INTEGER,
+	slAdminStatus		INTEGER,
+	slOperStatus		INTEGER
+    }
+
+    slSlot OBJECT-TYPE
+	SYNTAX	INTEGER (1..11)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The slot number of the slot that this line or unit
+		is in."
+	::= { slotLineEntry 1 }
+
+    slLine OBJECT-TYPE
+	SYNTAX	INTEGER (1..36)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The line (or unit) within a slot that this line (or unit) is."
+	::= { slotLineEntry 2 }
+
+    slType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		async(1),		-- async RS-232
+		sync(2),		-- sync/async RS-232
+		v32bis-modem(3),	-- ITU-T V.32bis modem
+		v34-modem(4),		-- ITU-T V.34 modem
+		v34-dmc-modem(5),	-- ITU-T V.34 modem on Digital
+					-- Modem Card
+		ethernet(6),		-- Ethernet
+		t1(7),			-- a T1 interface
+		e1(8),			-- an E1 (CEPT 2048) interface
+		bri(9),			-- an ISDN BRI interface
+		token-ring(10),		-- Token Ring
+                high-speed-sync(11),    -- Fast Sync (X21,V35) interface
+		v90-dmc-modem(12)	-- ITU-T V.90 modem on Digital
+					-- Modem Card
+  	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Type of entity in this slot/line or slot/unit."
+	::= { slotLineEntry 3 }
+
+    slIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of the entry in the ifTable in the
+		RFC1213-MIB (MIB-II) that represents this entity."
+	::= { slotLineEntry 4 }
+
+    slAdminType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		up(1),	-- interface can be enabled
+		down(2), -- interface can be disabled
+		testing(4), -- interface can be put in testing mode
+		gracefuldown(8)  -- interface can be brought down gracefully
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This bitmap describes the administrative capabilities
+		 of each line, and is the sum of the capabilities.
+		 Set any bits that are appropriate."  
+	::= { slotLineEntry 5 }
+
+    slAdminStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+                   up(1),		-- ready to pass packets
+                   down(2),
+                   testing(3),		-- in some test mode
+		   gracefuldown(4)	-- bring the line down gracefully
+               }
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION
+               "The desired state of the interface.  The testing(3)
+               state indicates that no operational packets can be
+               passed.  When a managed system initializes, all
+               interfaces start in the down(2)
+               state.  As a result of either explicit management
+               action or per configuration information retained by
+               the managed system, callWanInterfaceAdminStatus is 
+	       then changed to either the up(1) or testing(3) states 
+	       (or remains in the down(2) state)
+
+	       Use gracefuldown(4) to cause the system to wait for all
+	       timeslots on the wan interface to go down before
+	       bringing down the wan interface."
+       ::= { slotLineEntry 6 }
+       
+
+    slOperStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+                   up(1),       -- ready to pass packets
+                   down(2),
+                   testing(3),  -- in some test mode
+                   unknown(4),  -- status can not be determined
+                                -- for some reason.
+                   dormant(5)
+               }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+               "The current operational state of the interface.  The
+               testing(3) state indicates that no operational packets
+               can be passed.  If slAdminStatus is down(2) then
+               slOperStatus should be down(2).  If slAdminStatus is
+               changed to up(1) then slOperStatus should
+	       change to up(1) if the interface is ready to transmit and
+               receive network traffic; it should change to
+               dormant(5) if the interface is waiting for external
+               actions (such as a serial line waiting for an
+               incomming connection); it should remain in the down(2)
+               state if and only if there is a fault that prevents if
+               from going to the up(1) state."
+       ::= { slotLineEntry 7 }
+END
+
+
+
+
+

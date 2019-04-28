@@ -1,0 +1,258 @@
+USR-CALEA-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		OBJECT-TYPE,MODULE-IDENTITY, NOTIFICATION-TYPE, 
+        Integer32, IpAddress 
+			FROM SNMPv2-SMI
+        DisplayString
+            FROM SNMPv2-TC
+		UsrDisplayString, common, UsrConfigStatus, UsrSecretDisplay
+			FROM USR-DEFINITIONS-MIB;
+         usrCalea MODULE-IDENTITY
+         LAST-UPDATED "200208231330Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects
+                   for CALEA"
+--       REVISION "200208231330Z"
+--       DESCRIPTION "Use TC usrCaleaDFSecret, usrCaleaNAI.""
+--       REVISION "200208091300Z"
+--       DESCRIPTION "Corrected definitions for usrCaleaDFAlarmStatus,
+--          usrCaleaDFAuthEnabled, usrCaleaPingFrequency,
+--          usrCaleaPingPingMissesAllowed and usrCaleaPingTimeout."
+--       REVISION "200205141545Z"
+--       DESCRIPTION "Added structured trap comments"
+         ::= { common 92 }
+	usrCaleaConnConfig     OBJECT IDENTIFIER ::= { usrCalea 1 }
+	usrCaleaConnStats      OBJECT IDENTIFIER ::= { usrCalea 2 }
+	usrCaleaTraps          OBJECT IDENTIFIER ::= { usrCalea 3 }
+	usrCaleaCfmConfig      OBJECT IDENTIFIER ::= { usrCalea 4 }
+	-- Delivery Function settings
+	usrCaleaDFAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This four octet value identifies the IP address of
+             the Intercept Platform in DF that terminates the d-Interface"
+		--CONFIGURABLE
+    ::= { usrCaleaConnConfig 1}
+	usrCaleaDFPort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value identifies the port number of
+             the Intercept Platform in DF that terminates the d-Interface"
+		--CONFIGURABLE
+    ::= { usrCaleaConnConfig 2}
+	usrCaleaDFAlarmStatus OBJECT-TYPE
+        SYNTAX Integer32 (1 | 2)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value identifies whether the Alarm is to be raised
+			 when the DF is unreachable. A value of 1 is enabled,
+             and a value of 2 is disabled."
+		--CONFIGURABLE
+    ::= { usrCaleaConnConfig 3}
+	-- Settings used for Pinging the DF and packet managers
+	usrCaleaPingTimeout OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value identifies the timeout value for each ping
+             request that is sent out"
+		--CONFIGURABLE
+    ::= { usrCaleaConnConfig 4}
+	usrCaleaPingFrequency OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value identifies the number of seconds separating two 
+             ping requests for the same host."
+		--CONFIGURABLE
+    ::= { usrCaleaConnConfig 5}
+	usrCaleaPingMissesAllowed OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value identifies the number of misses that will be 
+						allowed before declaring a host unreachable"
+		--CONFIGURABLE
+    ::= { usrCaleaConnConfig 6}
+	-- Global Settings for the DF sessions
+	usrCaleaLifeTimer OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This is the value of lifetime that PDSN requests for each session.
+             Currently supported values are 30..65535."
+		--CONFIGURABLE
+	::= { usrCaleaConnConfig 7 }
+	usrCaleaRespTimer OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Number of seconds to wait for the Response from DF.
+             Currently supported values are 1..15."
+		--CONFIGURABLE
+	::= { usrCaleaConnConfig 8 }
+	usrCaleaNumRegReqRetrans OBJECT-TYPE
+		SYNTAX Integer32 (0..15)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Number of times the registration request is retransmitted"
+		--CONFIGURABLE
+	::= { usrCaleaConnConfig 9 }
+	usrCaleaMaxSessions OBJECT-TYPE
+		SYNTAX Integer32 (1..30)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Number of times the registration request is retransmitted"
+		--CONFIGURABLE
+	::= { usrCaleaConnConfig 10 }
+	usrCaleaDFAuthEnabled OBJECT-TYPE
+        SYNTAX Integer32 (1 | 2)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value identifies whether authentication is enabled
+			 between DF and PDSN. A value of 1 is enabled,
+             and a value of 2 is disabled."
+		--CONFIGURABLE
+    ::= { usrCaleaConnConfig 11}
+	usrCaleaDFSecret OBJECT-TYPE
+        SYNTAX UsrSecretDisplay
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value identifies the secret used for authentication
+			 between PDSN and DF."
+		--CONFIGURABLE
+    ::= { usrCaleaConnConfig 12}
+  --DF Session related definitions
+	usrCaleaSessions OBJECT-TYPE
+        SYNTAX SEQUENCE OF UsrCaleaSessionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This value identifies the table holding all the sessions with DF"
+	::= { usrCaleaConnStats 1}
+	UsrCaleaSessionEntry ::= SEQUENCE {
+        usrCaleaHomeIPAddress        IpAddress,
+        usrCaleaSessionKey           Integer32,
+        usrCaleaImsi                 OCTET STRING,
+        usrCaleaNAI                  DisplayString,
+        usrCaleaNumIPPacketsDuplicated  Integer32,
+        usrCaleaPacketManagerIPAddress IpAddress
+	}
+	usrCaleaSessionEntry OBJECT-TYPE
+        SYNTAX UsrCaleaSessionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This variable represents one entry in the DF Session Table."
+        INDEX { usrCaleaSessionKey }
+	::= { usrCaleaSessions 1 }
+	usrCaleaNumIPPacketsDuplicated OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value identifies the number of IP packets that have been duplicated
+						for this mobile node in this session"
+	::= { usrCaleaSessionEntry 1}
+	usrCaleaHomeIPAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value identifies Home IP Address of the mobile being tapped"
+  ::= { usrCaleaSessionEntry 2}
+	usrCaleaPacketManagerIPAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value identifies IP Address of the Packet Manager to which packets will be copied."
+    ::= { usrCaleaSessionEntry 3}
+	usrCaleaSessionKey OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value identifies the key used by PDSN to communicate with the DF. 
+			 The key is unique for this particular session."
+    ::= { usrCaleaSessionEntry 4}
+	usrCaleaImsi OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value identifies the IMSI of the mobile being tapped"
+    ::= { usrCaleaSessionEntry 5}
+	usrCaleaNAI OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(0..128))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value identifies the NAI of the mobile being tapped"
+  ::= { usrCaleaSessionEntry 6}
+-- Traps sent by CALEA process
+   usrCaleaDeliveryFunctionUnreachable NOTIFICATION-TYPE
+    OBJECTS {
+      usrCaleaDFAddr,
+      usrCaleaDFPort
+    }
+    STATUS current
+    DESCRIPTION
+      "This trap is generated when delivery function is unreachable."
+    --#TYPE    "Calea Delivery Function unreachable event"
+    --#SUMMARY "Calea destination %d unreachable, port %d"
+    --#ARGUMENTS { 0 1 }
+    --#SEVERITY MAJOR
+    --#STATE    OPERATIONAL
+    --#PROBABLECAUSE "Configuration or Network Error"
+    ::= { usrCaleaTraps 1 }
+   usrCaleaDeliveryFunctionUnreachableClear NOTIFICATION-TYPE
+    OBJECTS {
+      usrCaleaDFAddr,
+      usrCaleaDFPort
+    }
+    STATUS current
+    DESCRIPTION
+      "This trap is generated when delivery function is reachable again."
+    --#TYPE    "Calea Delivery Function unreachable event"
+    --#SUMMARY "Calea destination %d restored, port %d"
+    --#ARGUMENTS { 0 1 }
+    --#SEVERITY CLEARED
+    --#STATE    OPERATIONAL
+    --#PROBABLECAUSE "Error Condition Cleared"
+    ::= { usrCaleaTraps 2 }
+-- CALEA CFM Configuration Group
+	usrCaleaConfigFileName OBJECT-TYPE
+		SYNTAX     UsrDisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The name of the configuration file for VHA.  If
+			 this value is empty, then the default file name
+			 is @file://VHAProcess.cfg."
+	::= { usrCaleaCfmConfig 1 }
+	usrCaleaCfmStatus OBJECT-TYPE
+		SYNTAX UsrConfigStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The Configuration File Manager Flag for
+			 saving VHA configurable parameters."
+	::= { usrCaleaCfmConfig 2 }
+END

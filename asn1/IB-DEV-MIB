@@ -1,0 +1,971 @@
+-- extracted from draft-swortwood-mib-ib-device-agent-00.txt
+-- at Thu Nov  8 06:06:41 2001
+
+  IB-DEV-MIB DEFINITIONS ::= BEGIN 
+ 
+   IMPORTS  
+       MODULE-IDENTITY, OBJECT-TYPE, experimental,  
+       Counter32, NOTIFICATION-TYPE     FROM SNMPv2-SMI  
+       TEXTUAL-CONVENTION,  
+       TruthValue                       FROM SNMPv2-TC  
+       SnmpAdminString                  FROM SNMP-FRAMEWORK-MIB 
+       MODULE-COMPLIANCE, OBJECT-GROUP,  
+       NOTIFICATION-GROUP  
+                                        FROM SNMPv2-CONF  
+       InterfaceIndex                   FROM IF-MIB  
+       TRAP-TYPE                        FROM RFC-1215 
+       IpoibGuid, IpoibDataPort,  
+     
+   Swortwood      Internet Draft- Expires April 2002                 3 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+       IpoibDlid 
+                                        FROM IPOIB-TC-MIB;  
+ 
+   ibdev MODULE-IDENTITY  
+          LAST-UPDATED    "200110200000Z"  
+          ORGANIZATION    "Sanera Systems, Inc."  
+          CONTACT-INFO  
+           "       Sanera Systems  
+           Postal: 1925 Amberglen Parkway  
+                Suite 155  
+                Beaverton, Oregon, 97006 USA  
+              Tel: 503-601-0261  
+           E-mail: billiam@sanera.net  
+              Web: www.sanera.net"  
+ 
+          DESCRIPTION  
+             "This module defines device management agent   
+              instrumentation for an InfiniBand Device  
+              Management Agent."  
+          REVISION    "200110200000Z"  
+          DESCRIPTION " 0.1 Draft Revision."  
+ 
+       ::= { experimental XXXX } -- TO BE ASSIGNED BY IANA  
+  -----------------------------------------------------------  
+  -- Device Groups - mapped to attribute types 
+  -----------------------------------------------------------  
+ 
+  ibdevMIBObjects          OBJECT IDENTIFIER  ::= { ibdev 1 }  
+  ibdevClassPortInfo       OBJECT IDENTIFIER  ::= { ibdevMIBObjects 1 }  
+  ibdevIOUnitInfo          OBJECT IDENTIFIER  ::= { ibdevMIBObjects 2 }  
+  ibdevIOControllerList    OBJECT IDENTIFIER  ::= { ibdevMIBObjects 3 } 
+  ibdevIOControllerProfile OBJECT IDENTIFIER  ::= { ibdevMIBObjects 4 }  
+  ibdevServiceEntries      OBJECT IDENTIFIER  ::= { ibdevMIBObjects 5 }  
+  ibdevDiagnostics         OBJECT IDENTIFIER  ::= { ibdevMIBObjects 6 }  
+  ibdevTrap                OBJECT IDENTIFIER  ::= { ibdevMIBObjects 7 }  
+  -----------------------------------------------------------  
+  -- Device ClassPortInfo Objects 
+  -----------------------------------------------------------  
+  ibdevClassPortinfoTable OBJECT-TYPE  
+       SYNTAX      SEQUENCE OF IbdevClassPortinfoEntry  
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          "A table containing ClassPortInfo Data per port"  
+       ::= { ibdevClassPortInfo   1 }  
+ 
+     
+   Swortwood      Internet Draft- Expires April 2002                 4 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+  ibdevClassPortinfoEntry OBJECT-TYPE  
+       SYNTAX      IbdevClassPortinfoEntry  
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          "A conceptual row of the containing information about a  
+          ClassPortInfo  entry."  
+       INDEX { ibdevPortIndex }   
+       ::= { ibdevClassPortinfoTable 1 }  
+ 
+ 
+ IbdevClassPortinfoEntry ::= SEQUENCE { 
+   ibdevPortIndex    INTEGER , 
+   ibdevBaseVersion  Integer32, 
+   ibdevClassVersion Integer32, 
+   ibDevCapIsNoticeSupported  TruthValue , 
+   ibdevCapIsTrapSupported    TruthValue,  
+   ibdevRespTimeValue      Integer32, 
+   ibdevRedirectGID    OCTET STRING , 
+   ibdevRedirectTC     Integer32, 
+   ibdevRedirectSL     Integer32, 
+   ibdevRedirectFL     Integer32 , 
+   ibdevRedirectLID    IpoibDlid, 
+   ibdevRedirectPKey   Integer32, 
+   ibdevRedirectQP     Integer32, 
+   ibdevRedirectQKey   Integer32, 
+   ibdevTrapGID        IpovibGID, 
+   ibdevTrapTC         Integer32, 
+   ibdevTrapSL         Integer32 ,     
+   ibdevTrapFL         Integer32, 
+   ibdevTrapLID        IpoibDlid, 
+   ibdevTrapPKey       Integer32 ,    
+   ibdevTrapHL         Integer32 ,    
+   ibdevTrapQP         Integer32, 
+   ibdevTrapQKey       Integer32 
+} 
+ 
+  ibdevPortIndex        OBJECT-TYPE 
+    SYNTAX      INTEGER (SIZE(1..255)) 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION  "The interface index of the port." 
+    ::= {   ibdevClassPortinfoEntry 1  } 
+ 
+  ibdevBaseVersion OBJECT-TYPE 
+    SYNTAX             Integer32 
+     
+   Swortwood      Internet Draft- Expires April 2002                 5 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+    MAX-ACCESS         read-only 
+    STATUS             current  
+    DESCRIPTION  " 
+    Current supported MAD Base Version. Indicates that this  
+    channel adapter, switch, or router supports up to and  
+    including this version.  " 
+    ::= { ibdevClassPortinfoEntry 2  } 
+ 
+   ibdevClassVersion  OBJECT-TYPE 
+     SYNTAX      Integer32 
+     MAX-ACCESS  read-only 
+     STATUS      current  
+     DESCRIPTION  " Current supported management class version.  
+     Indicates that this channel adapter, switch, or router  
+     supports up to and including this version. " 
+      ::= {  ibdevClassPortinfoEntry 3   } 
+ 
+   ibDevCapIsNoticeSupported  OBJECT-TYPE 
+       SYNTAX             TruthValue  
+       MAX-ACCESS         read-only 
+       STATUS             current  
+       DESCRIPTION "Truth value from this port's capability mask. 
+        Notice buffer is/is not supported  " 
+        ::= {  ibdevClassPortinfoEntry 4   } 
+ 
+   ibdevCapIsTrapSupported   OBJECT-TYPE  
+       SYNTAX             TruthValue  
+       MAX-ACCESS         read-only 
+       STATUS             current  
+       DESCRIPTION "Truth value from this port's capability mask. 
+        Traps are / are not supported." 
+        ::= { ibdevClassPortinfoEntry 5  } 
+ 
+   ibdevRespTimeValue OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " Integer value to calculate response time." 
+       ::= { ibdevClassPortinfoEntry 6  } 
+ 
+   ibdevRedirectGID OBJECT-TYPE 
+       SYNTAX      OCTET STRING (SIZE(16)) 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The GID a requester shall use as the destination GID in the  
+     
+   Swortwood      Internet Draft- Expires April 2002                 6 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+       GRH of messages used to access redirected class  
+       services. If redirection is not 
+       being performed, this shall be set to zero." 
+       ::= {  ibdevClassPortinfoEntry 7  } 
+ 
+  ibdevRedirectTC  OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+        The Traffic Class a requester shall use in the GRH of  
+        messages used to access redirected class services. " 
+        ::= { ibdevClassPortinfoEntry 8  } 
+ 
+  ibdevRedirectSL   OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The SL a requester shall use to access the class services. " 
+        ::= {   ibdevClassPortinfoEntry 9  } 
+ 
+  ibdevRedirectFL    OBJECT-TYPE 
+      SYNTAX        Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The Flow Label a requester shall use in the GRH  
+       of messages used to  access redirected class services. " 
+       ::= {  ibdevClassPortinfoEntry 10   } 
+ 
+  ibdevRedirectLID   OBJECT-TYPE  
+       SYNTAX      IpoibDlid 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       If this value is non-zero, it is the DLID a requester  
+       shall use to access the class services. If this value 
+       is zero, the redirect requires  
+       the requester to use the supplied RedirectGID to  
+       request further path  
+       resolution from subnet administration.  " 
+       ::= { ibdevClassPortinfoEntry 11   } 
+ 
+  ibdevRedirectPKey    OBJECT-TYPE 
+       SYNTAX      Integer32 
+     
+   Swortwood      Internet Draft- Expires April 2002                 7 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " The P_Key a requester shall use to access  
+       the class services." 
+       ::= {  ibdevClassPortinfoEntry 12   } 
+ 
+ 
+  ibdevRedirectQP    OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  "The QP a requester shall use to access  
+                     the class services.  
+                     Zero is illegal." 
+       ::= {  ibdevClassPortinfoEntry 13   } 
+ 
+  ibdevRedirectQKey    OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The Q_Key associated with the RedirectQP.  
+       This Q_Key shall be set to 
+       the well known Q_Key." 
+       ::= {  ibdevClassPortinfoEntry 14   } 
+ 
+  ibdevTrapGID    OBJECT-TYPE 
+      SYNTAX       IpoibGID 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The GID to be used as the destination GID in the  
+       GRH of trap messages originated by this service.  
+      If all zeroes, no GRH is inserted in trap messages. 
+       " 
+       ::= { ibdevClassPortinfoEntry 15    } 
+ 
+  ibdevTrapTC   OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The Traffic Class to be placed in the GRH of trap  
+       messages originated by this service. " 
+      ::= {  ibdevClassPortinfoEntry 16   } 
+ 
+     
+   Swortwood      Internet Draft- Expires April 2002                 8 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+ 
+  ibdevTrapSL    OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+      The SL that shall be used when sending trap messages  
+      originated by this service." 
+       ::= {  ibdevClassPortinfoEntry 17   } 
+ 
+  ibdevTrapFL    OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+      The Flow Label to be placed in the GRH of trap 
+      messages originated by this service." 
+       ::= {  ibdevClassPortinfoEntry 18   } 
+ 
+  ibdevTrapLID    OBJECT-TYPE 
+       SYNTAX      IpoibDlid 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The DLID to where trap messages shall be sent  
+       by this service. If all zeroes, traps shall not 
+       be sent from this port." 
+       ::= {  ibdevClassPortinfoEntry 19   } 
+ 
+  ibdevTrapPKey    OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The P_Key to be placed in the header for traps  
+       originated by this service." 
+       ::= {  ibdevClassPortinfoEntry 20  } 
+ 
+  ibdevTrapHL    OBJECT-TYPE 
+       SYNTAX       Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+      The Hop Limit to be placed in the GRH of trap  
+      messages originated by  this service.  
+      This specifies the maximum number of routers  
+     
+   Swortwood      Internet Draft- Expires April 2002                 9 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+      Through which the message containing the GRH  
+      specified here may pass. The default value is 255." 
+      ::= {  ibdevClassPortinfoEntry 21   } 
+ 
+  ibdevTrapQP    OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+       The QP to which trap messages originated 
+       by this service traps shall be 
+        sent. Must not be zero." 
+        ::= {  ibdevClassPortinfoEntry 22  } 
+ 
+  ibdevTrapQKey    OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " The Q_Key associated with the TrapQP. " 
+       ::= {  ibdevClassPortinfoEntry  23  } 
+ 
+-------------------------------------------------------- 
+-- IOUNITINFO Attribute Objects 
+-------------------------------------------------------- 
+ 
+   ibdevChangeID   OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  "Incremented, with rollover, by  
+                    any change to ControllerList. " 
+       ::= {   ibdevIOUnitInfo  1 } 
+ 
+   ibdevMaxControllers   OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+        Number of slots in ControllerList. " 
+           ::= {   ibdevIOUnitInfo  2 } 
+ 
+   ibdevOptionROM    OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " Indicates presence of Option ROM.  " 
+     
+   Swortwood      Internet Draft- Expires April 2002                10 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+           ::= {   ibdevIOUnitInfo  3 } 
+ 
+-------------------------------------------------------- 
+-- IOControllerListTable 
+-- List of all IOCs present in a given IOU.  
+-- Each IOU may support up to  256 controllers. 
+-------------------------------------------------------- 
+ 
+  ibdevIOControllerListTable OBJECT-TYPE  
+       SYNTAX      SEQUENCE OF IbdevIOControllerListEntry 
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          "A table containing ClassPortInfo Data per port"  
+       ::= { ibdevIOControllerList  1 } 
+ 
+   ibdevIOControllerListEntry OBJECT-TYPE  
+       SYNTAX      IbdevIOControllerListEntry 
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          "A conceptual row of the containing information  
+           about a ClassPortInfo  entry."  
+       INDEX { ibdevControllerIndex  }   
+       ::= { ibdevIOControllerListTable  1 } 
+ 
+   IbdevIOControllerListEntry ::= SEQUENCE { 
+     ibdevControllerIndex INTEGER, 
+     ibdevControllerEntry INTEGER 
+   } 
+ 
+ 
+   ibdevControllerIndex OBJECT-TYPE 
+    SYNTAX      INTEGER (SIZE(1..256)) 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION " Each entry represents a controller  
+                   slot in the IOU. " 
+    ::= {   ibdevIOControllerListEntry  1 } 
+ 
+   ibdevControllerEntry  OBJECT-TYPE 
+   SYNTAX      INTEGER { 
+          notinstalled (0), 
+          present(1), 
+          nosuchslot(16) 
+       } 
+     
+   Swortwood      Internet Draft- Expires April 2002                11 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  "  
+       Each entry represents a slot in the IOU. values: 
+       0 = IOC not installed 
+       1 = IOC present 
+       16 = slot does not exist " 
+    ::= {   ibdevIOControllerListEntry  2 } 
+ 
+-------------------------------------------------------- 
+-- IOControllerProfile 
+-- Profile Information. Attribute Modifier 
+-- identifies the IOC. 
+-------------------------------------------------------- 
+ 
+  ibdevIOControllerProfileTable OBJECT-TYPE  
+       SYNTAX      SEQUENCE OF IbdevIOControllerProfileEntry  
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          "A table containing IO contoller profile information."  
+       ::= { ibdevIOControllerProfile 1  }  
+ 
+  ibdevIOControllerProfileEntry OBJECT-TYPE  
+       SYNTAX       IbdevIOControllerProfileEntry  
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          ""  
+       INDEX {  ibdevIocIndex }   
+       ::= {   ibdevIOControllerProfileTable 1 }  
+ 
+   IbdevIOControllerProfileEntry ::= SEQUENCE { 
+  ibdevIocIndex     INTEGER, 
+  ibdevIocGUID        OCTET STRING ,    
+  ibdevIocVendorID     OCTET STRING , 
+  ibdevDeviceID        Integer32, 
+  ibdevDeviceVersion   Integer32,      
+  ibdevVendorID        OCTET STRING , 
+  ibdevSubsystemID     Integer32, 
+  ibdevIOClass         Integer32,    
+  ibdevIOSubclass      Integer32, 
+  ibdevProtocol        Integer32,     
+  ibdevProtocolVersion      Integer32,    
+  ibdevServiceConnections   Integer32, 
+  ibdevInitiatorsSupported  Integer32,  
+     
+   Swortwood      Internet Draft- Expires April 2002                12 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+  ibdevSendMessageDepth     Integer32,    
+  ibdevRDMAreadDepth        Integer32, 
+  ibdevSendMessageSize      Integer32,     
+  ibdevRDMATransferSize     Integer32, 
+  ibdevControlOpsSendToMsg        TruthValue ,     
+  ibdevControlOpsSendFromMsg      TruthValue, 
+  ibdevControlOpsReadReqToIoc     TruthValue ,      
+  ibdevControlOpsReadReqFromIoc   TruthValue ,    
+  ibdevControlOpsRDMAReadFromIoc  TruthValue, 
+  ibdevControlOpsRDMAReadToIoc    TruthValue ,    
+  ibdevControlOpsRDMAWriteFromIoc TruthValue, 
+  ibdevControlOpsRDMAWriteToIoc   TruthValue, 
+  ibdevControlOpsAtomicOptToIoc   TruthValue, 
+  ibdevControlOpsAtomicOptFromIoc TruthValue, 
+  ibdevIocSupportsConsoleSvcs     TruthValue, 
+  ibdevIocSupportsSBWP            TruthValue, 
+  ibdevIocSupportsNBWP            TruthValue ,   
+  ibdevServiceEntriesCount        Integer32,  
+  ibdevIDString           SnmpAdminString  
+   } 
+ 
+   ibdevIocIndex        OBJECT-TYPE 
+    SYNTAX      INTEGER (SIZE(1..255)) 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION "    " 
+    ::= {   ibdevIOControllerProfileEntry  1 } 
+ 
+ 
+  ibdevIocGUID  OBJECT-TYPE 
+       SYNTAX      OCTET STRING (SIZE(8)) 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " 
+        An EUI-64 GUID used to uniquely identify the controller.  
+       This could be the same one as the Node/Port GUID if there  
+       is only one controller. " 
+       ::= { ibdevIOControllerProfileEntry   2 } 
+ 
+   ibdevIocVendorID OBJECT-TYPE 
+       SYNTAX      OCTET STRING (SIZE(4)) 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  "IO controller vendor ID, IEEE format." 
+       ::= { ibdevIOControllerProfileEntry 3 } 
+ 
+     
+   Swortwood      Internet Draft- Expires April 2002                13 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+ 
+   ibdevDeviceID OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION " 
+      A number assigned by the vendor to identify the type  
+     of controller.  
+      This can be used by an Operating System to select a  
+      device driver. " 
+     ::= {ibdevIOControllerProfileEntry 4 } 
+ 
+   ibdevDeviceVersion OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "A number assigned by the vendor to  
+                   identify the device  version." 
+     ::= {ibdevIOControllerProfileEntry 5 } 
+ 
+   ibdevVendorID  OBJECT-TYPE 
+       SYNTAX      OCTET STRING (SIZE(2)) 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "ID of the vendor of the enclosure,  
+       if any, in which the I/O controller resides in  
+       IEEE format; otherwise zero." 
+    ::= {ibdevIOControllerProfileEntry 6 } 
+        
+ 
+   ibdevSubsystemID  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "A number identifying the subsystem where the  
+       controller resides." 
+         ::= {ibdevIOControllerProfileEntry 7 } 
+ 
+  ibdevIOClass  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION " 
+        0x0000-0xfffe = Reserved pending I/O class  
+                       specification approval. 
+        0xffff = Vendor-specific. " 
+     
+   Swortwood      Internet Draft- Expires April 2002                14 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+       ::= { ibdevIOControllerProfileEntry 8 } 
+ 
+  ibdevIOSubclass  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "     
+        0x0000-0xfffe = Reserved pending I/O subclass  
+        specification approval. 
+        0xffff = Vendor-specific. 
+        This must be set to 0xffff if the I/O Class component  
+        is set to 0xffff." 
+       ::= {ibdevIOControllerProfileEntry  9 } 
+ 
+   ibdevProtocol  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "             
+       0x0000-0xfffe = Reserved pending I/O protocol  
+       specification approval. 
+       0xffff = Vendor-specific 
+       This must be set to 0xffff if the I/O Class component  
+       is set to 0xffff." 
+        ::= { ibdevIOControllerProfileEntry 10 } 
+ 
+   ibdevProtocolVersion  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "    Version , Protocol specific." 
+       ::= { ibdevIOControllerProfileEntry  11 } 
+ 
+   ibdevServiceConnections OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "    Number of service connections controller 
+                        can support. " 
+       ::= { ibdevIOControllerProfileEntry 12 } 
+ 
+   ibdevInitiatorsSupported  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION " Number of initiators that this IOC can support. " 
+     
+   Swortwood      Internet Draft- Expires April 2002                15 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+       ::= { ibdevIOControllerProfileEntry 13 } 
+ 
+  ibdevSendMessageDepth  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "Maximum Depth of the Send Message Queue." 
+       ::= { ibdevIOControllerProfileEntry 14 } 
+ 
+  ibdevRDMAreadDepth  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION "Maximum Depth of the per-channel RDMA Read Queue." 
+       ::= { ibdevIOControllerProfileEntry 15 } 
+ 
+ 
+  ibdevSendMessageSize   OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " Maximum size of Send Messages in bytes. " 
+       ::= { ibdevIOControllerProfileEntry 16 } 
+ 
+  ibdevRDMATransferSize  OBJECT-TYPE 
+       SYNTAX     Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " Maximum size of outbound RDMA transfers  
+       initiated by the IOC  in bytes." 
+       ::= { ibdevIOControllerProfileEntry 17 } 
+ 
+  ibdevControlOpsSendToMsg  OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " Supports Send Messages To IOCs." 
+       ::= { ibdevIOControllerProfileEntry 18 } 
+ 
+  ibdevControlOpsSendFromMsg OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " Supports Send Messages From IOCs." 
+       ::= { ibdevIOControllerProfileEntry 19 } 
+ 
+     
+   Swortwood      Internet Draft- Expires April 2002                16 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+  ibdevControlOpsReadReqToIoc OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+      DESCRIPTION  " Supports Read Requests to IOCs." 
+       ::= { ibdevIOControllerProfileEntry 20 } 
+ 
+  ibdevControlOpsReadReqFromIoc OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current  
+       DESCRIPTION  " Supports Read Requests to IOCs."     
+       ::= { ibdevIOControllerProfileEntry  21} 
+ 
+  ibdevControlOpsRDMAReadFromIoc OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " Supports RDMA Read Requests from IOCs."  
+       ::= { ibdevIOControllerProfileEntry 22 } 
+ 
+  ibdevControlOpsRDMAReadToIoc OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " Supports RDMA Read Requests to IOCs." 
+       ::= { ibdevIOControllerProfileEntry 23 } 
+ 
+  ibdevControlOpsRDMAWriteFromIoc OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " Supports RDMA wrtite Requests from IOCs." 
+       ::= { ibdevIOControllerProfileEntry 24 } 
+ 
+  ibdevControlOpsRDMAWriteToIoc OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current        
+       DESCRIPTION  " Supports RDMA wrtite Requests to IOCs." 
+       ::= { ibdevIOControllerProfileEntry 25 } 
+ 
+  ibdevControlOpsAtomicOptToIoc OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+     
+   Swortwood      Internet Draft- Expires April 2002                17 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+       DESCRIPTION  " Supports Atomic Operations To IOCs. " 
+       ::= { ibdevIOControllerProfileEntry 26 } 
+ 
+  ibdevControlOpsAtomicOptFromIoc OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " Supports Atomic Operations From IOCs. " 
+               ::= { ibdevIOControllerProfileEntry 27 } 
+         
+ 
+  ibdevIocSupportsConsoleSvcs OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  "  CS; Console Services supported." 
+       ::= { ibdevIOControllerProfileEntry 28 } 
+ 
+  ibdevIocSupportsSBWP OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " SBWP; Storage Boot Wire Protocol supported." 
+       ::= { ibdevIOControllerProfileEntry 29 } 
+ 
+  ibdevIocSupportsNBWP OBJECT-TYPE 
+       SYNTAX      TruthValue 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  " NBWP; Network Boot Wire Protocol supported." 
+       ::= { ibdevIOControllerProfileEntry 30 } 
+ 
+ 
+  ibdevServiceEntriesCount OBJECT-TYPE 
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  "Number of entries in the ServiceEntries table." 
+       ::= { ibdevIOControllerProfileEntry 31 } 
+ 
+   ibdevIDString   OBJECT-TYPE 
+       SYNTAX      SnmpAdminString (SIZE(64)) 
+       MAX-ACCESS  read-only 
+       STATUS      current       
+       DESCRIPTION  "String for identifying the controller to 
+operator." 
+     
+   Swortwood      Internet Draft- Expires April 2002                18 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+       ::= { ibdevIOControllerProfileEntry 32 } 
+ 
+-------------------------------------------------------- 
+-- SERVICE ENTRIES 
+-------------------------------------------------------- 
+  ibdevServiceEntriesTable OBJECT-TYPE  
+       SYNTAX      SEQUENCE OF IbdevServiceEntriesEntry  
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          "List of supported services and their associated Service IDs. 
+           Each IOC has a table with at most 0x100 ServiceEntries."  
+       ::= { ibdevServiceEntries 1 }  
+ 
+  ibdevServiceEntriesEntry OBJECT-TYPE  
+       SYNTAX      IbdevServiceEntriesEntry  
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          " Entries of Service entries, with 256 possible service 
+entries 
+            per IOC."  
+       INDEX { ibdevIOCIndex, ibdevEntryIndex }   
+       ::= {   ibdevServiceEntriesTable 1 }  
+ 
+        
+  IbdevServiceEntriesEntry ::= SEQUENCE { 
+      ibdevIOCIndex    Integer32,        
+      ibdevEntryIndex  Integer32, 
+      ibdevServiceName SnmpAdminString,     
+      ibdevServiceId   Integer64             
+      } 
+ 
+  ibdevIOCIndex OBJECT-TYPE 
+    SYNTAX      Integer32 (SIZE(1..256)) 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION " Major index of IO Controllers. " 
+    ::= {  ibdevServiceEntriesEntry  1 } 
+ 
+  ibdevEntryIndex        OBJECT-TYPE 
+    SYNTAX      Integer32 (SIZE(1..256)) 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION " " 
+   ::= {  ibdevServiceEntriesEntry  2 } 
+     
+   Swortwood      Internet Draft- Expires April 2002                19 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+ 
+  ibdevServiceName  OBJECT-TYPE 
+    SYNTAX      SnmpAdminString (SIZE(40)) 
+    MAX-ACCESS  read-only 
+    STATUS      current  
+    DESCRIPTION  " String of Service name. " 
+   ::= {  ibdevServiceEntriesEntry  3 } 
+ 
+  ibdevServiceId   OBJECT-TYPE 
+   SYNTAX      Integer64 
+   MAX-ACCESS  read-only 
+   STATUS      current   
+   DESCRIPTION  " An identifier of the associated Service." 
+   ::= {  ibdevServiceEntriesEntry  4 } 
+         
+ 
+-------------------------------------------------------- 
+-- DiagnosticTimeout  
+-- Response indicates maximum time for completion  
+-- of diagnostic test. Target device is   
+-- identified by the Attribute Modifier. Tests not  
+-- completing within this period may  
+-- indicate device failure. Specified in multiples  
+-- of milliseconds. 
+-------------------------------------------------------- 
+ 
+ ibdevDiagnosticsTable OBJECT-TYPE  
+       SYNTAX      SEQUENCE OF IbdevDiagnosticsEntry  
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          ""  
+       ::= {  ibdevDiagnostics  1 }  
+ 
+  ibdevDiagnosticsEntry OBJECT-TYPE  
+       SYNTAX      IbdevDiagnosticsEntry  
+       MAX-ACCESS  not-accessible  
+       STATUS      current  
+       DESCRIPTION  
+          " Diagnostics Entries."  
+       INDEX { ibdevDiagnosticIndex }   
+       ::= { ibdevDiagnosticsTable 1 }  
+ 
+   
+  IbdevDiagnosticsEntry ::= SEQUENCE { 
+      ibdevDiagnosticIndex Integer32, 
+     
+   Swortwood      Internet Draft- Expires April 2002                20 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+      ibdevMaxDiagTime  Integer32, 
+      ibdevPrepareToTestValue INTEGER, 
+      ibdevTestDeviceOnce TruthValue, 
+      ibdevTestDeviceLoop TruthValue, 
+      ibdevDiagCode   SnmpAdminString  
+        } 
+ 
+  ibdevDiagnosticIndex  OBJECT-TYPE 
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION " Diagnostics are per controller." 
+    ::= {  ibdevDiagnosticsEntry 1 } 
+ 
+ ibdevMaxDiagTime  OBJECT-TYPE 
+    SYNTAX      Integer32  
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION " Maximum time to finish a diagnostic  
+                 operation in milliseconds." 
+   ::= {  ibdevDiagnosticsEntry 2 }       
+ 
+  ibdevPrepareToTestValue OBJECT-TYPE 
+    SYNTAX      INTEGER { 
+        readytotest(0), 
+        invalidattribute(1), 
+        deviceNotReady(2), 
+        deviceNotResponding(3), 
+        diagnosticsNotSupported(4) 
+    }  
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION " Indicates current test status : 
+    0 = Ready for diagnostic test 
+    1 = Invalid Attribute Modifier 
+    2 = Device not ready 
+    3 = Device not responding 
+    4 = Diagnostics not supported " 
+    ::= {  ibdevDiagnosticsEntry 3 } 
+ 
+  ibdevTestDeviceOnce   OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION "A Set instructs the device to initiate a  
+    single diagnostic  test and run it once. " 
+     
+   Swortwood      Internet Draft- Expires April 2002                21 
+                  InfiniBand Device Management Agent         Oct. 2001 
+                     Management Information Base 
+    
+    ::= {  ibdevDiagnosticsEntry 4  } 
+ 
+ 
+  ibdevTestDeviceLoop   OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION " When set instructs the device to initiate  
+                  a single diagnostic test and run it continuously 
+                  in a loop." 
+    ::= {  ibdevDiagnosticsEntry 5 } 
+ 
+   ibdevDiagCode  OBJECT-TYPE 
+    SYNTAX        SnmpAdminString  
+    MAX-ACCESS    read-only 
+    STATUS        current 
+    DESCRIPTION " Data returned by diagnostic test." 
+    ::= {  ibdevDiagnosticsEntry 6 }     
+ 
+-------------------------------------------------------- 
+--  READYtoTEST DeviceTrap 
+-------------------------------------------------------- 
+ 
+readyToTest NOTIFICATION-TYPE  
+      OBJECTS {  ibdevPrepareToTestValue, ibdevControllerIndex }  
+      STATUS  current  
+      DESCRIPTION  " 514: Device <DEVICE> readiness is <STATUS>."  
+      ::= { ibdevTrap 1 }   
+ 
+ 
+END 

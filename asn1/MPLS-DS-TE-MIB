@@ -1,0 +1,853 @@
+-- extracted from draft-nadeau-mpls-ds-te-mib-01.txt
+-- at Sat Jul 21 06:05:35 2001
+
+MPLS-DS-TE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   experimental, Integer32, Counter32, Unsigned32,
+   Counter64, Gauge32, TimeTicks
+      FROM SNMPv2-SMI
+      
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF
+      
+   TEXTUAL-CONVENTION, TruthValue, RowStatus, StorageType,
+   RowPointer, TimeStamp
+      FROM SNMPv2-TC
+      
+   InterfaceIndex, InterfaceIndexOrZero
+      FROM IF-MIB
+
+SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB
+
+   AddressFamilyNumbers
+      FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+
+   MplsLabel
+      FROM MPLS-LSR-MIB
+
+   InetAddress, InetAddressType
+      FROM INET-ADDRESS-MIB;
+
+
+mplsDsTeMIB MODULE-IDENTITY
+   LAST-UPDATED "200107181200Z"  -- 18 July 2001 12:00:00 EST
+   ORGANIZATION "Internet Engineering Task Force."
+
+   CONTACT-INFO
+       "        Thomas D. Nadeau
+        Postal: Cisco Systems, Inc.
+                250 Apollo Drive
+                Chelmsford, MA 01824
+                USA
+        Tel:    +1-978-244-3051
+        Email:  tnadeau@cisco.com
+
+                Francois Le Faucheur
+        Postal: Cisco Systems, Inc.
+                Petra B - Les Lucioles - 291, 
+                rue Albert Caquot - 06560 Valbonne 
+                France
+        Tel:    +33 4 92 96 75 64
+        Email:  flefauch@cisco.com 
+
+                Angela Chiu
+        Postal: Celion Networks
+                1 Sheila Drive, Suite 2
+                Tinton Falls, NJ 07724
+                Tel: +1-732-747-9987
+                Email: angela.chiu@celion.com
+
+                William Townsend
+        Postal: Tenor Networks
+                100 Nagog Park
+                Acton, MA 01720
+                USA
+        Tel:    +1-978-264-4900
+        Email:  btownsend@tenornetworks.com 
+
+        Postal: Darek Skalecki
+                Nortel Networks
+                3500 Carling Ave,
+                Nepean K2H 8E9
+                CANADA
+        Tel:    +1-613-765-2252
+        Email:  dareks@nortelnetworks.com
+
+        General Discussion and Questions: mpls@uu.net
+        "
+   
+
+   DESCRIPTION
+        "This MIB contains managed object definitions for
+         Diff-Serv-aware MPLS Traffic Engineering as described in 
+         [DSTEREQS][DSTEEXTS]."
+   
+-- Revision history.
+REVISION
+       "200107181200Z"  -- 18 July 2001 12:00:00 EST
+   DESCRIPTION
+      "Updated draft to keep alive."
+
+REVISION
+       "200102151200Z"  -- 15 February 2001 12:00:00 EST
+   DESCRIPTION
+      "Initial draft version."
+   ::= { experimental 9999 } -- To be assigned
+
+
+-- Textual Conventions.
+
+-- Top level components of this MIB.
+
+mplsDsTeNotifications OBJECT IDENTIFIER ::= { mplsDsTeMIB 0 }
+mplsDsTeObjects       OBJECT IDENTIFIER ::= { mplsDsTeMIB 1 }
+mplsDsTeScalarObjects OBJECT IDENTIFIER ::= { mplsDsTeObjects 1 }
+mplsDsTeConformance   OBJECT IDENTIFIER ::= { mplsDsTeMIB 2 }
+
+
+-- Scalars
+
+mplsDsTeNumConfIfs  OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Indicates the number of interfaces which are configured for 
+        DiffServ-Aware TE MPLS capability on this device."
+   ::= { mplsDsTeScalarObjects 1 }
+
+
+-- DiffServ-Aware TE Interface Configuration Table
+
+mplsDsTeIfConfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF MplsDsTeIfConfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies per-interface DiffServ-Aware TE MPLS 
+        capability and associated information. The entries in this
+        table correspond to MPLS-enabled interfaces which must also be
+        present in the mplsInterfaceConfTable [LSR-MIB]."
+   ::= { mplsDsTeObjects 2 }
+
+mplsDsTeIfConfEntry OBJECT-TYPE
+   SYNTAX        MplsDsTeIfConfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for every
+        interface capable of supporting MPLS DiffServ-Aware Traffic 
+        Engineering. Each entry in this table should correspond to an 
+        entry in the mplsInterfaceConfTable [LSR-MIB], and will have a
+        corresponding Interfaces MIB entry as well. Administrators 
+        wishing to enable the DS-TE feature on an interface without
+        this feature already enabled should first create entries in
+        the MPLS interface conf table in the MPLS-LSR-MIB. Next, the
+        agent should create a corresponding entry in this table to 
+        specifically enable the DS-TE feature on the MPLS
+        interface. This order or operation should be enforced by the 
+        agent to preserve consistency and interoperability. This table
+        'extends' the Interfaces MIB in that each entry in this table 
+        MUST correspond to an entry in the Interfaces MIB. Therefore
+        the index used in this table must correspond to one found in
+        the Interfaces MIB."
+   INDEX       { mplsDsTeIfConfIndex }
+      ::= { mplsDsTeIfConfTable 1 }
+
+MplsDsTeIfConfEntry ::= SEQUENCE {
+  mplsDsTeIfConfIndex                 InterfaceIndex,
+  mplsDsTeIfMaxAggrResBw              Unsigned32,
+  mplsDsTeIfMaxAddrUnresBw            Unsigned32,
+  mplsDsTeIfAggrResBwUsed             Unsigned32,
+  mplsDsTeIfAggrUnresBwUsed           Unsigned32,
+  mplsDsTeIfDsTeAdminStatus           INTEGER,
+  mplsDsTeIfDsTeOperStatus            INTEGER,
+  mplsDsTeIfRowStatus                 RowStatus,
+  mplsDsTeIfConfStorageType           StorageType
+}
+
+mplsDsTeIfConfIndex OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+      "This is a unique index for an entry in the
+       MplsDsTeIfConfTable. A non-zero index for an entry indicates
+       the ifIndex for the corresponding Interfaces MIB entry. Note
+       that this table does not necessarily correspond one-to-one with
+       all entries in the Interface MIB having an ifType of
+       MPLS-layer; rather, only those which are enabled for MPLS 
+       DiffServ-Aware TE functionality."
+   REFERENCE
+       "RFC 2233 - The Interfaces Group MIB using SMIv2,
+        McCloghrie, K., and F. Kastenholtz, Nov. 1997"
+   ::= { mplsDsTeIfConfEntry 1 }
+
+
+mplsDsTeIfMaxAggrResBw              OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "The maximum bandwidth reservable on an aggregated basis among all 
+       bandwidth classes. Note that overbooking of this value is
+       allowed, and sometimes desirable."
+   ::= { mplsDsTeIfConfEntry 2 }
+
+ mplsDsTeIfMaxAddrUnresBw            OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "The maximum bandwidth which is un-reservable on an aggregated basis 
+      among all bandwidth classes. Note that overbooking of this value
+      is allowed, and sometimes desirable."
+   ::= { mplsDsTeIfConfEntry 3 }
+
+  
+mplsDsTeIfAggrResBwUsed             OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "The amount of reservable bandwidth which currently in use an
+      aggregated basis among all bandwidth classes."
+   ::= { mplsDsTeIfConfEntry 4 }
+
+   
+mplsDsTeIfAggrUnresBwUsed           OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "The amount of un-reservable bandwidth which currently in use an
+       aggregated basis among all bandwidth classes."
+   ::= { mplsDsTeIfConfEntry 5 }
+
+mplsDsTeIfAdminStatus  OBJECT-TYPE
+   SYNTAX   INTEGER { enabled(1),    -- enables the feature 
+                      disabled(2),   -- disables the feature
+                    }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "This object is used to indicate the desired DiffServ-Aware TE 
+      functionality status (i.e.: enable/disable) on the corresponding 
+      MPLS interface."
+   ::= { mplsDsTeIfConfEntry 6 }
+
+mplsDsTeIfOperStatus  OBJECT-TYPE
+   SYNTAX   INTEGER { up(1), -- ready to pass packets 
+                      down(2), 
+                      testing(3),       -- in some test mode 
+                      unknown(4),       -- status cannot be determined 
+                      dormant(5), 
+                      notPresent(6),    -- some component is missing 
+                      lowerLayerDown(7) -- down due to the state of 
+                                     -- lower layer interfaces
+
+                    }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "This object is used to indicate the actual status of the 
+       DiffServ-Aware TE feature on this interface."
+   ::= { mplsDsTeIfConfEntry 7 }
+
+mplsDsTeIfConfRowStatus  OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The row status for a row in this table."
+   ::= { mplsDsTeIfConfEntry 8 }
+
+mplsDsTeIfConfStorageType  OBJECT-TYPE
+   SYNTAX      StorageType
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The storage type for this entry."
+   ::= { mplsDsTeIfConfEntry 9 }
+
+
+-- DS TE Interface Class Type Table
+
+mplsDsTeIfClassTypeTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF MplsDsTeIfClassTypeEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies per-interface DiffServ-Aware TE class
+        type information. This table AUGMENTS the 
+        mplsDsTeIfConfTable."
+   ::= { mplsDsTeObjects 3 }
+
+mplsDsTeIfClassTypeEntry OBJECT-TYPE
+   SYNTAX        MplsDsTeIfClassTypeEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for every
+        interface capable of supporting MPLS DiffServ-Aware Traffic 
+        Engineering. Specifically, an entry in this table must
+        correspond to an entry in the mplsDsTeIfConfTable. Each entry
+        in this table corresponds to a specific class type associated 
+        with an interface. The entries in this table are used to
+        expose the bandwidth classes associated with each
+        interface. At the moment, only 4 bandwidth classes are 
+        supported."
+   AUGMENTS { mplsDsTeIfConfTable }
+      ::= { mplsDsTeClassTypeTable 1 }
+
+MplsDsTeIfClassTypeEntry ::= SEQUENCE {
+        mplsDsTeIfClassTypeZeroMaxResBw         Unsigned32,
+        mplsDsTeIfClassTypeZeroUnresBw          Unsigned32,
+        mplsDsTeIfClassTypeOneMaxResBw          Unsigned32,
+        mplsDsTeIfClassTypeOneUnresBw           Unsigned32,
+        mplsDsTeIfClassTypeTwoMaxResBw          Unsigned32,
+        mplsDsTeIfClassTypeTwoUnresBw           Unsigned32,
+        mplsDsTeIfClassTypeThreeMaxResBw        Unsigned32,
+        mplsDsTeIfClassTypeThreeUnresBw         Unsigned32,
+}
+
+mplsDsTeIfClassTypeZeroMaxResBw  OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the maximum reservable bandwidth for 
+       class type 0."
+   DEFVAL { 0 }
+   ::= { mplsDsTeIfClassTypeEntry 1 }
+
+mplsDsTeIfClassTypeZeroUnresBw   OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the maximum unreservable bandwidth for 
+       class type 0."
+   DEFVAL { 0 }
+   ::= { mplsDsTeIfClassTypeEntry 2 }
+
+mplsDsTeIfClassTypeOneMaxResBw  OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "This value indicates the maximum reservable bandwidth for 
+      class type 1."
+   DEFVAL { 0 }
+   ::= { mplsDsTeIfClassTypeEntry 3 }
+
+mplsDsTeIfClassTypeOneUnresBw   OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the maximum unreservable bandwidth for 
+       class type 1."
+   DEFVAL { 0 }
+   ::= { mplsDsTeIfClassTypeEntry 4 }
+
+mplsDsTeIfClassTypeTwoMaxResBw  OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the maximum reservable bandwidth for 
+       class type 2."
+
+   DEFVAL { 0 }
+   ::= { mplsDsTeIfClassTypeEntry 5 }
+
+mplsDsTeIfClassTypeTwoUnresBw   OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the maximum unreservable bandwidth for 
+       class type 2."
+   DEFVAL { 0 }
+   ::= { mplsDsTeIfClassTypeEntry 6 }
+
+mplsDsTeIfClassTypeThreeMaxResBw  OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the maximum reservable bandwidth for class
+       type 3."
+   DEFVAL { 0 }
+   ::= { mplsDsTeIfClassTypeEntry 7 }
+
+mplsDsTeIfClassTypeThreeUnresBw   OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "This value indicates the maximum unreservable bandwidth for
+      class type 3."
+   DEFVAL { 0 }
+   ::= { mplsDsTeIfClassTypeEntry 8 }
+
+
+-- LSP Table
+
+mplsDsTeLspTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF MplsDsTeLspEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table indicates which DiffServ-Aware TE class particular 
+        LSPs. This table 'extends' the mplsXCTable, as it uses the
+        same indexing scheme utilized therein."
+   ::= { mplsDsTeObjects 4 }
+
+mplsDsTeLspEntry OBJECT-TYPE
+   SYNTAX        MplsDsTeLspEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for every LSP 
+        capable of supporting MPLS DiffServ-Aware Traffic
+        Engineering. Specifically, an entry in this table must
+        correspond to an entry in the mplsXCTable from the
+        MPLS-LSR-MIB [MPLS-LSR-MIB]."
+INDEX  { mplsDsTeLspXCIndex, mplsDsTeLspInSegmentIfIndex,
+         mplsDsTeLspInSegmentLabel, mplsDsTeLspOutSegmentIndex }
+      ::= { mplsDsTeLspTable 1 }
+
+MplsDsTeIfClassTypeEntry ::= SEQUENCE {
+        mplsDsTeLspXCIndex               Integer32,
+        mplsDsTeLspInSegmentIfIndex      InterfaceIndex,
+        mplsDsTeLspInSegmentLabel        MplsLabel,
+        mplsDsTeLspOutSegmentIndex       Integer32,
+        mplsDsTeLspClassType             Integer32,
+        mplsDsTeLspAdminStatus           INTEGER,
+        mplsDsTeLspOperStatus            INTEGER,
+        mplsDsTeLspRowStatus             RowStatus,
+        mplsDsTeLspStorageType           StorageType
+       }
+
+mplsDsTeLspXCIndex               OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the primary index of the LSP which can be
+       found in the MPLS-LSR-MIB's [LSR-MIB] XCTable. The entry MUST 
+       exist in the MPLS-LSR-MIB before an entry in this table may be 
+       transition into the operStatus of up(1). If the entry is not 
+       ready or has not yet been created in the MPLS-LSR-MIB, the 
+       operStatus of this value must contain the value notPresent(6) 
+       to indicate that this entry will be activated as soon as the 
+       entry is available in the MPLS-LSR-MIB."
+   ::= { mplsDsTeLspEntry 1 }
+
+mplsDsTeLspInSegmentIfIndex      OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the secondary index of the LSP which can be
+       found in the MPLS-LSR-MIB's [LSR-MIB] XCTable. The entry MUST 
+       exist in the MPLS-LSR-MIB before an entry in this table may be 
+       transition into the operStatus of up(1). If the entry is not 
+       ready or has not yet been created in the MPLS-LSR-MIB, the 
+       operStatus of this value must contain the value notPresent(6) 
+       to indicate that this entry will be activated as soon as the 
+       entry is available in the MPLS-LSR-MIB."
+   ::= { mplsDsTeLspEntry 2 }
+
+mplsDsTeLspInSegmentLabel      OBJECT-TYPE
+   SYNTAX        MplsLabel
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the tertiary index of the LSP which can be
+       found in the MPLS-LSR-MIB's [LSR-MIB] XCTable. The entry MUST 
+       exist in the MPLS-LSR-MIB before an entry in this table may be 
+       transition into the operStatus of up(1). If the entry is not 
+       ready or has not yet been created in the MPLS-LSR-MIB, the 
+       operStatus of this value must contain the value notPresent(6) 
+       to indicate that this entry will be activated as soon as the 
+       entry is available in the MPLS-LSR-MIB."
+   ::= { mplsDsTeLspEntry 3 }
+
+mplsDsTeLspOutSegmentIndex      OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the fourth index of the LSP which can be
+       found in the MPLS-LSR-MIB's [LSR-MIB] XCTable. The entry MUST 
+       exist in the MPLS-LSR-MIB before an entry in this table may be 
+       transition into the operStatus of up(1). If the entry is not 
+       ready or has not yet been created in the MPLS-LSR-MIB, the 
+       operStatus of this value must contain the value notPresent(6) 
+       to indicate that this entry will be activated as soon as the 
+       entry is available in the MPLS-LSR-MIB."
+   ::= { mplsDsTeLspEntry 4 }
+
+mplsDsTeLspClassType   OBJECT-TYPE
+   SYNTAX   Integer32 (0..3)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "This object indicates the DiffServ-Aware TE class to which 
+       this LSP has been assigned."
+   ::= { mplsDsTeLspEntry 5 }
+
+mplsDsTeLspAdminStatus  OBJECT-TYPE
+   SYNTAX   INTEGER { enabled(1),    -- enables the feature 
+                      disabled(2),   -- disables the feature
+                    }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This object is used to indicate the desired DiffServ-Aware 
+       TE functionality status (i.e.: enable/disable) on this LSP."
+   ::= { mplsDsTeLspEntry 6 }
+
+mplsDsTeLspOperStatus  OBJECT-TYPE
+   SYNTAX   INTEGER { up(1),            -- ready to pass packets 
+                      down(2), 
+                      testing(3),       -- in some test mode 
+                      unknown(4),       -- status cannot be determined 
+                      dormant(5), 
+                      notPresent(6),    -- some component is missing 
+                      lowerLayerDown(7) -- down due to the state of 
+                                        -- lower layer interfaces
+
+                    }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "This object is used to indicate the actual status of the 
+       DiffServ-Aware TE feature on this LSP."
+   ::= { mplsDsTeLspEntry 7 }
+
+mplsDsTeLspRowStatus  OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The row status for a row in this table."
+   ::= { mplsDsTeLspEntry 8 }
+
+mplsDsTeLspStorageType  OBJECT-TYPE
+   SYNTAX      StorageType
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The storage type for this entry."
+   ::= { mplsDsTeLspEntry 9 }
+
+
+-- Tunnel Table (Applies only to tunnel heads at this LSR)
+
+mplsDsTeTunTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF MplsDsTeTunEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table indicates which DiffServ-Aware TE class particular 
+        Traffic Engineering tunnels have been assigned to. This table 
+        'extends' the mplsTunnelTable from the MPLS-TE-MIB[TEMIB], as 
+        it uses the same indexing scheme utilized therein."
+   ::= { mplsDsTeObjects 5 }
+
+mplsDsTeTunEntry OBJECT-TYPE
+   SYNTAX        MplsDsTeTunEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for every traffic 
+        engineering tunnel instance capable of supporting MPLS 
+        DiffServ-Aware Traffic Engineering. We must include all
+        indexes here to indicate which instances of tunnels are in
+        which bandwidth class, as it is entirely possible (and
+        sometimes desirable) to include different instances in
+        different classes."
+INDEX  { mplsDsTeTunTunnelIndex, mplsDsTeTunTunnelInstance,
+         mplsDsTeTunTunnelIngressLSRId, mplsDsTeTunTunnelEgressLSRId }
+      ::= { mplsDsTeTunTable 1 }
+
+MplsDsTeTunEntry ::= SEQUENCE {
+        mplsDsTeTunTunnelIndex           MplsTunnelIndex,
+        mplsDsTeTunTunnelInstance        MplsTunnelInstanceIndex,
+        mplsDsTeTunTunnelIngressLSRId    MplsLsrId,
+        mplsDsTeTunTunnelEgressLSRId     MplsLsrId,
+        mplsDsTeTunClassType             Integer32,
+        mplsDsTeTunAdminStatus           INTEGER,
+        mplsDsTeTunOperStatus            INTEGER,
+        mplsDsTeTunRowStatus             RowStatus,
+        mplsDsTeTunStorageType           StorageType
+    }
+
+mplsDsTeTunTunnelIndex           OBJECT-TYPE
+   SYNTAX        MplsTunnelIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the primary index of the tunnel entry
+       which can be found in the MPLS-TE-MIB's [TEMIB]
+       mplsTunnelTable. The entry MUST exist in the MPLS-TE-MIB before
+       an entry in this table may be transition into the operStatus of
+       up(1). If the entry is not ready or has not yet been created in
+       the MPLS-TE-MIB, the operStatus of this value must contain the 
+       value notPresent(6) to indicate that this entry will be
+       activated as soon as the entry is available in the MPLS-TE-MIB."
+   ::= { mplsDsTeTunEntry 1 }
+
+
+mplsDsTeTunTunnelInstance        OBJECT-TYPE
+   SYNTAX        MplsTunnelInstanceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the secondary index of the tunnel entry
+       which can be found in the MPLS-TE-MIB's [TEMIB]
+       mplsTunnelTable. The entry MUST exist in the MPLS-TE-MIB before
+       an entry in this table may be transition into the operStatus of
+       up(1). If the entry is not ready or has not yet been created in
+       the MPLS-TE-MIB, the operStatus of this value must contain the 
+       value notPresent(6) to indicate that this entry will be
+       activated as soon as the entry is available in the
+       MPLS-TE-MIB."
+   ::= { mplsDsTeTunEntry 2 }
+
+mplsDsTeTunTunnelIngressLSRId    OBJECT-TYPE
+   SYNTAX        MplsLsrId
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the third index of the tunnel entry
+       which can be found in the MPLS-TE-MIB's [TEMIB]
+       mplsTunnelTable. The entry MUST exist in the MPLS-TE-MIB before
+       an entry in this table may be transition into the operStatus of
+       up(1). If the entry is not ready or has not yet been created in
+       the MPLS-TE-MIB, the operStatus of this value must contain the 
+       value notPresent(6) to indicate that this entry will be
+       activated as soon as the entry is available in the
+       MPLS-TE-MIB."
+   ::= { mplsDsTeTunEntry 3 }
+
+mplsDsTeTunTunnelEgressLSRId     OBJECT-TYPE
+   SYNTAX        MplsLsrId
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This value indicates the fourth index of the tunnel entry
+       which can be found in the MPLS-TE-MIB's [TEMIB]
+       mplsTunnelTable. The entry MUST exist in the MPLS-TE-MIB before
+       an entry in this table may be transition into the operStatus of
+       up(1). If the entry is not ready or has not yet been created in
+       the MPLS-TE-MIB, the operStatus of this value must contain the 
+       value notPresent(6) to indicate that this entry will be
+       activated as soon as the entry is available in the
+       MPLS-TE-MIB."
+   ::= { mplsDsTeTunEntry 4 }
+
+mplsDsTeLspClassType   OBJECT-TYPE
+   SYNTAX   Integer32 (0..3)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "This object indicates the DiffServ-Aware TE class to which this
+       LSP has been assigned."
+   ::= { mplsDsTeTunEntry 5 }
+
+mplsDsTeLspAdminStatus  OBJECT-TYPE
+   SYNTAX   INTEGER { enabled(1),    -- enables the feature 
+                      disabled(2),   -- disables the feature
+                    }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "This object is used to indicate the desired DiffServ-Aware 
+       TE functionality status (i.e.: enable/disable) on this LSP."
+   ::= { mplsDsTeTunEntry 6 }
+
+mplsDsTeLspOperStatus  OBJECT-TYPE
+   SYNTAX   INTEGER { up(1),            -- ready to pass packets 
+                      down(2), 
+                      testing(3),       -- in some test mode 
+                      unknown(4),       -- status cannot be determined 
+                      dormant(5), 
+                      notPresent(6),    -- some component is missing 
+                      lowerLayerDown(7) -- down due to the state of 
+                                        -- lower layer interfaces
+                    }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "This object is used to indicate the actual status of the 
+       DiffServ-Aware TE feature on this LSP."
+   ::= { mplsDsTeTunEntry 7 }
+
+mplsDsTeLspRowStatus  OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The row status for a row in this table."
+   ::= { mplsDsTeTunEntry 8 }
+
+mplsDsTeLspStorageType  OBJECT-TYPE
+   SYNTAX      StorageType
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The storage type for this entry."
+   ::= { mplsDsTeTunEntry 9 }
+
+
+-- Notifications
+
+-- TBD.
+-- Conformance Statement
+
+mplsDsTeGroups
+   OBJECT IDENTIFIER ::= { mplsDsTeConformance 1 }
+
+mplsDsTeCompliances
+   OBJECT IDENTIFIER ::= { mplsDsTeConformance 2 }
+
+
+-- Module Compliance
+
+mplsDsTeModuleCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+       "Compliance statement for agents that support MPLS Diff-Serv 
+        Aware Traffic Engineering."
+   MODULE -- this module
+
+      -- The mandatory groups have to be implemented
+      -- by all LSRs supporting MPLS DS TE. However, 
+      -- they may all be supported
+      -- as read-only objects in the case where 
+      -- configuration through this MIB is unsupported.
+
+      MANDATORY-GROUPS    { mplsDsTeScalarGroup,
+                            mplsDsTeIfGroup,
+                            mplsDsTeIfClassGroup,
+                            mplsDsTeLspGroup,
+                            mplsDsTeTunGroup
+                          }
+
+::= { mplsDsTeCompliances 1 }
+
+-- Units of conformance.
+
+mplsDsTeScalarGroup OBJECT-GROUP
+   OBJECTS { mplsDsTeNumConfIfs }
+             
+   STATUS  current
+   DESCRIPTION
+          "Collection of scalar objects required for DS TE 
+           management."
+   ::= { mplsDsTeGroups 1 }
+
+mplsDsTeIfGroup OBJECT-GROUP
+   OBJECTS { mplsDsTeIfConfIndex,
+             MplsDsTeIfMaxAggrResBw,
+             mplsDsTeIfMaxAddrUnresBw,
+             mplsDsTeIfAggrResBwUsed,
+             mplsDsTeIfAggrUnresBwUsed
+             MplsDsTeIfDsTeAdminStatus,
+             MplsDsTeIfDsTeOperStatus,          
+             MplsDsTeIfRowStatus,           
+             mplsDsTeIfConfStorageType
+        }
+          
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects needed for MPLS DS TE interface 
+           management."
+   ::= { mplsDsTeGroups 2 }
+
+
+mplsDsTeIfClassGroup OBJECT-GROUP
+   OBJECTS { mplsDsTeIfClassTypeZeroMaxResBw,
+             mplsDsTeIfClassTypeZeroUnresBw,
+             mplsDsTeIfClassTypeOneMaxResBw,
+             mplsDsTeIfClassTypeOneUnresBw,
+             mplsDsTeIfClassTypeTwoMaxResBw,
+             mplsDsTeIfClassTypeTwoUnresBw,
+             mplsDsTeIfClassTypeThreeMaxResBw,
+             mplsDsTeIfClassTypeThreeUnresBw
+       }
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects needed for MPLS DS TE interface 
+           class management."
+   ::= { mplsDsTeGroups 3 }
+
+
+      mplsDsTeLspGroup OBJECT-GROUP 
+      OBJECTS { mplsDsTeLspXCIndex,
+                mplsDsTeLspInSegmentIfIndex,
+                mplsDsTeLspInSegmentLabel,
+                mplsDsTeLspOutSegmentIndex,
+                mplsDsTeLspClassType,
+                mplsDsTeLspAdminStatus,
+                mplsDsTeLspOperStatus,
+                mplsDsTeLspRowStatus,
+                mplsDsTeLspStorageType           
+           }
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects needed for MPLS DS TE LSP management."
+   ::= { mplsDsTeGroups 4 }
+
+
+      mplsDsTeTunGroup OBJECT-GROUP 
+      OBJECTS { mplsDsTeTunTunnelIndex,
+                mplsDsTeTunTunnelInstance,
+                mplsDsTeTunTunnelIngressLSRId,
+                mplsDsTeTunTunnelEgressLSRId,
+                mplsDsTeTunClassType,
+                mplsDsTeTunAdminStatus,
+                mplsDsTeTunOperStatus,
+                mplsDsTeTunRowStatus,
+                mplsDsTeTunStorageType           
+           }
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects needed for MPLS DS TE Tunnel management."
+   ::= { mplsDsTeGroups 5 }
+-- End of MPLS-DS-TE-MIB
+
+END
+
+--    
+-- Copyright (C) The Internet Society (2000).  All Rights Reserved.
+-- This document and translations of it may be copied and furnished to 
+-- others, and derivative works that comment on or otherwise explain it 
+-- or assist in its implementation may be prepared, copied, published
+-- and distributed, in whole or in part, without restriction of any
+-- kind, provided that the above copyright notice and this paragraph 
+-- are included on all such copies and derivative works. However, this
+-- document itself may not be modified in any way, such as by removing 
+-- the copyright notice or references to the Internet Society or other 
+-- Internet organizations, except as needed for the  purpose of
+-- developing Internet standards in which case the procedures for
+-- copyrights defined in the Internet Standards process must be followed,
+-- or as required to translate it into languages other than English.
+--    
+-- The limited permissions granted above are perpetual and will not be 
+-- revoked by the Internet Society or its successors or assigns. This 
+-- document and the information contained herein is provided on an "AS 
+-- IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK 
+-- FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+-- LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL
+-- NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY
+-- OR FITNESS FOR A PARTICULAR PURPOSE.
+

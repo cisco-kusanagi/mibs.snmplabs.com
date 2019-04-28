@@ -1,0 +1,486 @@
+-- extracted from draft-kakkar-ospf-ospfv3-trap-mib-00.txt
+-- at Thu Dec  1 06:40:09 2005
+
+    OSPFv3-TRAP-MIB DEFINITIONS ::= BEGIN 
+    
+       IMPORTS 
+          MODULE-IDENTITY,OBJECT-TYPE,NOTIFICATION-TYPE,IpAddress 
+              FROM SNMPv2-SMI 
+          MODULE-COMPLIANCE, OBJECT-GROUP 
+              FROM SNMPv2-CONF 
+          TEXTUAL-CONVENTION  
+              FROM SNMPv2-TC  
+          InetAddress, InetAddressPrefixLength  
+              FROM INET-ADDRESS-MIB  
+          ospfv3RouterId, ospfv3IfIndex, ospfv3IfInstId, ospfv3IfState, 
+          ospfv3NbrIfIndex, ospfv3NbrIfInstId, ospfv3VirtIfAreaId, 
+          ospfv3VirtIfNeighbor, ospfv3VirtIfState, ospfv3NbrRtrId, 
+          ospfv3NbrState, ospfv3VirtNbrArea, ospfv3VirtNbrRtrId, 
+          ospfv3VirtIfInstId, ospfv3VirtNbrState,  
+          ospfv3ExtAreaLsdbLimit, Ospfv3RouterIdTc, Ospfv3AreaIdTc 
+              FROM OSPFV3-MIB; 
+    
+       ospfv3Trap MODULE-IDENTITY 
+          LAST-UPDATED "200511151600Z" -- Tue Nov 15 16:00:00 IST 2005 
+          ORGANIZATION "" 
+          CONTACT-INFO 
+          "Nitin Kakkar 
+           Postal:         Huawei Technologies India Pvt Ltd 
+                           Level-3, Leela Galleria, 
+                           The Leela Palace, #23 Airport Road,  
+                           Bangalore 560008, India 
+          Tel:             +91 80 5217192 
+          E-Mail:          nitink@huawei.com                 " 
+          DESCRIPTION 
+             "The MIB module to describe traps for the OSPF Version-3 
+              Protocol." 
+         ::= { ospfv3Objects 13 } 
+    
+   -- Trap Support Objects 
+    
+   -- The following are support objects for the OSPFv3 traps. 
+    
+   ospfv3TrapControl OBJECT IDENTIFIER ::= { ospfv3Trap 1 } 
+   ospfv3Traps OBJECT IDENTIFIER ::= { ospfv3Trap 2 } 
+    
+       ospfv3SetTrap  OBJECT-TYPE 
+          SYNTAX      OCTET STRING (SIZE(4)) 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "A four-octet string serving as a bit  map  for 
+              the trap events defined by the OSPFv3 traps. This 
+              object is used to enable and  disable  specific 
+              OSPFv3 traps where a 1 in the bit field represents  
+              enabled. The right-most bit  (least significant)  
+              represents trap 0." 
+          ::= { ospfv3TrapControl 1 } 
+    
+       ospfv3ConfigErrorType OBJECT-TYPE 
+          SYNTAX   INTEGER   { 
+                     badVersion (1), 
+                     areaMismatch (2), 
+                     unknownNbmaNbr (3), -- Router is Dr eligible 
+                     unknownVirtualNbr (4), 
+                     helloIntervalMismatch (5), 
+                     deadIntervalMismatch (6), 
+                     optionMismatch (7), 
+                     instanceMismatch (8) } 
+          MAX-ACCESS  read-only 
+          STATUS   current 
+          DESCRIPTION 
+             "Potential types of configuration conflicts. 
+              Used by the ospfv3ConfigError and ospfv3ConfigVir- 
+              tError traps." 
+          ::= { ospfv3TrapControl 2 } 
+    
+       ospfv3PacketType OBJECT-TYPE 
+          SYNTAX   INTEGER   { 
+                     hello (1), 
+                     dbDescript (2), 
+                     lsReq (3), 
+                     lsUpdate (4), 
+                     lsAck (5) } 
+          MAX-ACCESS  read-only 
+          STATUS   current 
+          DESCRIPTION 
+             "OSPFv3 packet types." 
+          ::= { ospfv3TrapControl 3 } 
+    
+       ospfv3PacketSrc OBJECT-TYPE 
+          SYNTAX   InetAddress 
+          MAX-ACCESS   read-only 
+          STATUS   current 
+          DESCRIPTION 
+             "The IPv6 address of an inbound packet that  can- 
+              not be identified by a neighbor instance." 
+          ::= { ospfv3TrapControl 4 } 
+    
+       ospfv3LsdbAreaId OBJECT-TYPE  
+          SYNTAX          Ospfv3AreaIdTc  
+          MAX-ACCESS      not-accessible  
+          STATUS          current  
+          DESCRIPTION  
+             "The 32-bit identifier of the Area from which the  
+              LSA was received." 
+          REFERENCE  
+             "OSPF Version 2, Appendix C.2 Area parameters"  
+          ::= { ospfv3TrapControl 5 }  
+    
+       ospfv3LsdbType OBJECT-TYPE  
+          SYNTAX          Unsigned32(0..'FFFFFFFF'h)  
+          MAX-ACCESS      not-accessible  
+          STATUS          current  
+          DESCRIPTION  
+             "The type of the link state advertisement.  
+              Each link state type has a separate  
+              advertisement format. Area-Scope LSAs unrecognized  
+              by the router are also stored in this database."  
+          ::= { ospfv3TrapControl 6 }  
+    
+       ospfv3LsdbRouterId OBJECT-TYPE  
+          SYNTAX          Ospfv3RouterIdTc  
+          MAX-ACCESS      not-accessible  
+          STATUS          current  
+          DESCRIPTION  
+             "The 32-bit number that uniquely identifies the  
+              originating router in the Autonomous System."  
+          REFERENCE  
+             "OSPF Version 2, Appendix C.1 Global parameters"  
+          ::= { ospfv3TrapControl 7 }  
+    
+       ospfv3LsdbLsid OBJECT-TYPE  
+          SYNTAX          Unsigned32  
+          MAX-ACCESS      not-accessible  
+          STATUS          current  
+          DESCRIPTION  
+             "The Link State ID is an LS Type Specific field 
+              containing a unique identifier; 
+              it identifies the piece of the routing domain 
+              that is being described by the advertisement.  
+              In contrast to OSPFv2, the LSID has no  
+              addressing semantics."  
+           ::= { ospfv3TrapControl 8 }  
+   -- Traps 
+    
+       ospfv3IfStateChange NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3IfIndex, 
+                     ospfv3IfInstId, 
+                     ospfv3IfState -- The new state 
+                    } 
+
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3IfStateChange trap signifies that there 
+             has been a change in the state of a non-virtual 
+             OSPF interface. This trap should  be  generated 
+             when  the interface state regresses (e.g., goes 
+             from Dr to Down) or progresses  to  a  terminal 
+             state  (i.e.,  Point-to-Point, DR Other, Dr, or 
+             Backup)." 
+          ::= { ospfv3Traps 1 } 
+    
+       ospfv3VirtIfStateChange NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3VirtIfAreaId, 
+                     ospfv3VirtIfNeighbor, 
+                     ospfv3VirtIfInstId, 
+                     ospfv3VirtIfState  -- The new state 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3IfStateChange trap signifies that there 
+             has  been a change in the state of an OSPF virtual 
+             interface. 
+    
+             This trap should be generated when  the  inter- 
+             face  state  regresses  (e.g., goes from Point- 
+             to-Point to Down) or progresses to  a  terminal 
+             state (i.e., Point-to-Point)." 
+          ::= { ospfv3Traps 2 } 
+    
+       ospfv3NbrStateChange NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3NbrIfIndex,  
+                     ospfv3NbrIfInstId,  
+                     ospfv3NbrRtrId, 
+                     ospfv3NbrState  -- The new state 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3NbrStateChange trap signifies that 
+             there has been a change in the state of a non- 
+             virtual OSPF neighbor. This trap should be 
+             generated when the neighbor state regresses 
+             (e.g., goes from Attempt or Full  to  1-Way  or 
+             Down)  or progresses to a terminal state (e.g., 
+             2-Way or Full).  When an  neighbor  transitions 
+             from  or  to Full on non-broadcast multi-access 
+             and broadcast networks, the trap should be gen- 
+             erated  by the designated router.  A designated 
+             router transitioning to Down will be  noted  by 
+             ospfv3IfStateChange." 
+          ::= { ospfv3Traps 3 } 
+    
+       ospfv3VirtNbrStateChange NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3VirtNbrArea, 
+                     ospfv3VirtNbrIfInstId, 
+                     ospfv3VirtNbrRtrId, 
+                     ospfv3VirtNbrState  -- The new state 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3IfStateChange trap signifies that there 
+             has  been a change in the state of an OSPF vir- 
+             tual neighbor.  This trap should  be  generated 
+             when  the  neighbor state regresses (e.g., goes 
+             from Attempt or  Full  to  1-Way  or  Down)  or 
+             progresses to a terminal state (e.g., Full)." 
+          ::= { ospfv3Traps 4 } 
+    
+       ospfv3IfConfigError NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3IfIndex, 
+                     ospfv3IfInstId, 
+                     ospfv3PacketSrc,  -- The source IPv6 address 
+                     ospfv3ConfigErrorType, -- Type of error 
+                     ospfv3PacketType 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3IfConfigError  trap  signifies  that  a 
+             packet  has  been received on a non-virtual in- 
+             terface  from  a  router  whose   configuration 
+             parameters  conflict  with this router's confi- 
+             guration parameters.  Note that the  event  op- 
+             tionMismatch  should  cause  a  trap only if it 
+             prevents an adjacency from forming." 
+          ::= { ospfv3Traps 5 } 
+    
+       ospfv3VirtIfConfigError NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3VirtIfAreaId, 
+                     ospfv3VirtIfNeighbor, 
+                     ospfv3VirtIfInstId, 
+                     ospfv3ConfigErrorType, -- Type of error 
+                     ospfv3PacketType 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3VirtIfConfigError trap signifies that a 
+             packet has been  received  on a virtual interface 
+             from a router  whose  configuration  parameters 
+             conflict   with   this  router's  configuration 
+             parameters.  Note that the event optionMismatch 
+             should  cause a trap only if it prevents an ad- 
+             jacency from forming." 
+          ::= { ospfv3Traps 6 } 
+    
+      ospfv3IfRxBadPacket NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3IfIndex, 
+                     ospfv3IfInstId, 
+                     ospfv3PacketSrc,  -- The source IPv6 address 
+                     ospfv3PacketType 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3IfRxBadPacket trap  signifies  that  an 
+             OSPF  packet has been received on a non-virtual 
+             interface that cannot be parsed." 
+          ::= { ospfv3Traps 7 } 
+    
+       ospfv3VirtIfRxBadPacket NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3VirtIfAreaId, 
+                     ospfv3VirtIfNeighbor, 
+                     ospfv3VirtIfInstId, 
+                     ospfv3PacketType 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+              "An ospfv3VirtIfRxBadPacket trap signifies that an 
+              OSPFv3 packet has been received on a virtual  
+              interface that cannot be parsed." 
+          ::= { ospfv3Traps 8 } 
+    
+       ospfv3TxRetransmit NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3IfIndex, 
+                     ospfv3IfInstId, 
+                     ospfv3NbrRtrId, -- Destination 
+                     ospfv3PacketType, 
+                     ospfv3LsdbType, 
+                     ospfv3LsdbLsid, 
+                     ospfv3LsdbRouterId 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3TxRetransmit  trap  signifies  than  an 
+             OSPF  packet  has  been retransmitted on a non- 
+             virtual interface.  All packets that may be re- 
+             transmitted  are associated with an LSDB entry. 
+             The LS type, LS ID, and Router ID are  used  to 
+             identify the LSDB entry." 
+          ::= { ospfv3Traps 9 } 
+    
+       ospfv3VirtIfTxRetransmit NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3VirtIfAreaId, 
+                     ospfv3VirtIfNeighbor, 
+                     ospfv3VirtIfInstId, 
+                     ospfv3PacketType, 
+                     ospfv3LsdbType, 
+                     ospfv3LsdbLsid, 
+                     ospfv3LsdbRouterId 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3VirtIfTxRetransmit  trap  signifies  than 
+             an OSPF packet has been retransmitted on a virtual 
+             interface.  All packets that may be retransmitted 
+             are  associated with an LSDB entry. The LS type, 
+             LS ID, and Router ID are used to identify the LSDB 
+             entry." 
+          ::= { ospfv3Traps 10 } 
+    
+       ospfv3OriginateLsa NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3LsdbAreaId,  -- 0.0.0.0 for AS Externals 
+                     ospfv3LsdbType, 
+                     ospfv3LsdbLsid, 
+                     ospfv3LsdbRouterId 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3OriginateLsa trap signifies that a new 
+             LSA  has  been originated by this router.  This 
+             trap should not be invoked for simple refreshes 
+             of  LSAs  (which happesn every 30 minutes), but 
+             instead will only be invoked  when  an  LSA  is 
+             (re)originated due to a topology change.  Addi- 
+             tionally, this trap does not include LSAs  that 
+             are  being  flushed  because  they have reached 
+             MaxAge." 
+          ::= { ospfv3Traps 11 } 
+    
+       ospfv3MaxAgeLsa NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3LsdbAreaId,  -- 0.0.0.0 for AS Externals 
+                     ospfv3LsdbType, 
+                     ospfv3LsdbLsid, 
+                     ospfv3LsdbRouterId 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3MaxAgeLsa trap signifies  that  one  of 
+             the LSA in the router's link-state database has 
+             aged to MaxAge." 
+          ::= { ospfv3Traps 12 } 
+    
+       ospfv3UnknownLsa NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfLsid, 
+                     ospfv3IfIndex, -- Input interface 
+                     ospfv3IfInstId, 
+                     ospfOrigRouterId, -- Originator routerID 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3UnknownLsa trap signifies  that  one  of 
+             the Nbr has sent an UNknown LSA. Only DR generate  
+             this trap and If NBR state is less than Exchange 
+             need not originate this trap" 
+          ::= { ospfv3Traps 13 } 
+    
+       ospfv3LsdbOverflow NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3ExtAreaLsdbLimit 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3LsdbOverflow trap  signifies  that  the 
+             number of LSAs in the router's link-state data- 
+             base has exceeded ospfv3ExtAreaLsdbLimit." 
+          ::= { ospfv3Traps 14 } 
+    
+       ospfv3LsdbApproachingOverflow NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                     ospfv3ExtAreaLsdbLimit 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3LsdbApproachingOverflow trap  signifies 
+             that  the  number of LSAs in the router's link- 
+             state database has exceeded ninety  percent  of 
+             ospfv3ExtAreaLsdbLimit." 
+          ::= { ospfv3Traps 15 } 
+      
+      ospfv3AsbrStatusChange NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3AsbrStatusChange trap signifies 
+             that  device's Asbr Status has changed." 
+          ::= { ospfv3Traps 16 } 
+                             
+      ospfv3AbrStatusChange NOTIFICATION-TYPE 
+          OBJECTS   { 
+                     ospfv3RouterId, -- The originator of the trap 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "An ospfv3AbrStatusChange trap  signifies 
+             that  device's Abr Status has changed. 
+             There are two distinct definitions  
+             of ABR given by IBM & Cisco, Implementations are free 
+             to follow their own interpretation of ABR while 
+             originating this trap" 
+           ::= { ospfv3Traps 17 }  
+       
+   -- conformance information 
+    
+   ospfv3TrapConformance OBJECT IDENTIFIER ::= { ospfv3Trap 3 } 
+    
+   ospfv3TrapGroups      OBJECT IDENTIFIER ::= { ospfv3TrapConformance 1 
+   } 
+   ospfv3TrapCompliances OBJECT IDENTIFIER ::= { ospfv3TrapConformance 2 
+   } 
+   -- compliance statements 
+    
+       ospfv3TrapCompliance MODULE-COMPLIANCE 
+          STATUS  current 
+          DESCRIPTION 
+             "The compliance statement " 
+          MODULE  -- this module 
+          MANDATORY-GROUPS { ospfv3TrapControlGroup } 
+    
+          GROUP       ospfv3TrapControlGroup 
+          DESCRIPTION 
+             "This group is optional but recommended for all 
+             OSPFv3 systems" 
+    
+          ::= { ospfv3TrapCompliances 1 } 
+    
+   -- units of conformance 
+    
+       ospfv3TrapControlGroup    OBJECT-GROUP 
+          OBJECTS   { 
+                     ospfv3SetTrap, 
+                     ospfv3ConfigErrorType, 
+                     ospfv3PacketType, 
+                     ospfv3PacketSrc 
+                    } 
+          STATUS     current 
+          DESCRIPTION 
+             "These objects are required  to  control  traps 
+             from OSPF systems." 
+          ::= { ospfv3TrapGroups 1 } 
+    
+   END 
+
+--   
+--    Copyright (C) The Internet Society (2005).  This document is  
+--    subject to the rights, licenses and restrictions contained in BCP   
+--    78, and except as set forth therein, the authors retain all their  
+--    rights. 
+

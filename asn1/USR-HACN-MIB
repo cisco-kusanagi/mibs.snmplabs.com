@@ -1,0 +1,688 @@
+USR-HACN-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress
+			FROM SNMPv2-SMI
+		common, UsrConfigStatus, UsrSpecialU32
+			FROM USR-DEFINITIONS-MIB
+		TruthValue, DisplayString
+			FROM SNMPv2-TC;
+    usrHACN MODULE-IDENTITY
+         LAST-UPDATED "200301221300Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects
+                   for HACN functionality."
+--      REVISION "200301221300Z"
+--      DESCRIPTION "Added usrHACNHAMultipleLogins"
+--      REVISION "200208231350Z"
+--      DESCRIPTION "Clarified usage of usrHacnMbrID1, usrVirtualHAIPSecFlag.
+--          usrPhysicalHAIPSecFlag."
+--	    REVISION	"200202080600Z"
+--	    DESCRIPTION "Fix MIB syntax errors"
+--      REVISION "200201101935Z"
+--      DESCRIPTION " "
+         ::= { common 91 }
+	-- Textual Conventions
+        IpxNetwork ::= OCTET STRING (SIZE(4))
+	usrHACNConfig             OBJECT IDENTIFIER   ::= { usrHACN 1 }
+	usrHACNCfmConfig          OBJECT IDENTIFIER   ::= { usrHACN 2 }
+	usrHACNLoadBalanceConfig  OBJECT IDENTIFIER   ::= { usrHACN 3 }
+-- RP Connection Configuration Group
+usrHACNRunIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The IP Address to be used while running."
+    --CONFIGURABLE
+    ::= { usrHACNConfig 1 }     
+usrHACNSecret OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The secret configured between HACN and HA."
+    DEFVAL { "secret" }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 2 }  
+usrHACNPacketRetryCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..6)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The packet retry count for HACN"
+    DEFVAL { 2 }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 3 }     
+usrHACNPacketRetryTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (3..30)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The packet retry timeout for HACN."
+    DEFVAL { 3 }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 4 }     
+--
+-- VIRTUAL HA CONFIGURATION
+--  
+usrVirtualHAConfigTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF USRVirtualHAConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    	"List of configured Virtual HA's"
+    ::= { usrHACNConfig 5 }
+    usrVirtualHAConfigEntry OBJECT-TYPE
+	SYNTAX USRVirtualHAConfigEntry			
+	MAX-ACCESS not-accessible			
+	STATUS current
+	DESCRIPTION
+		"The table of Virtual HA's"
+	INDEX { usrVirtualHAConfigIndexNum }
+	::= { usrVirtualHAConfigTable 1 }
+    USRVirtualHAConfigEntry ::= SEQUENCE {
+	usrVirtualHAConfigIndexNum 	Integer32,
+	usrVirtualHARunIP 		IpAddress,
+	usrVirtualHAIpPoolStart 	IpAddress,
+	usrVirtualHAIpPoolSize		Integer32,
+	usrVirtualHALifetime 		Integer32,
+	usrVirtualHATimeStampDrift	Integer32,
+	usrVirtualHAIPSecFlag		INTEGER,
+	usrVirtualHACmdType		Integer32
+    }
+    usrVirtualHAConfigIndexNum OBJECT-TYPE
+	SYNTAX Integer32 (1..14)
+	MAX-ACCESS read-only 
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA configuration table entry index"
+	::= { usrVirtualHAConfigEntry 1 }
+    usrVirtualHARunIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA Run IP"
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 2 }
+    usrVirtualHAIpPoolStart OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA IP Pool Start"
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 3 }
+    usrVirtualHAIpPoolSize OBJECT-TYPE
+	SYNTAX Integer32 (1..10000)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA IP Pool Size"
+	--CONFIGURABLE
+		::= { usrVirtualHAConfigEntry 4 }
+    usrVirtualHALifetime OBJECT-TYPE
+	SYNTAX Integer32 (5..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA Lifetime value"
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 5 }
+    usrVirtualHATimeStampDrift OBJECT-TYPE
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA Timestamp drift"
+	DEFVAL { 10 }
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 6 }
+    usrVirtualHACmdType OBJECT-TYPE
+	SYNTAX Integer32 (1..4)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA configuration command.
+         This object should get values 1, 2, 3 or 4
+         depends upon the operation to be performed.
+         Possible values are ADD(1), SET(2), DELETE(3) and GET(4)."
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 7 }
+    usrVirtualHAIPSecFlag OBJECT-TYPE
+	SYNTAX INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA IP Sec Flag"
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 8 }
+--
+-- PHYSICAL HA CONFIGURATION
+--
+usrPhysicalHATable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF USRPhysicalHAEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    	"Each list contains the Physica HA's"
+    ::= { usrHACNConfig 6 }
+    usrPhysicalHAEntry OBJECT-TYPE
+	SYNTAX USRPhysicalHAEntry			
+	MAX-ACCESS not-accessible			
+	STATUS current
+	DESCRIPTION
+		"The table of HA's"
+	INDEX{usrPhysicalHAIndexNum}
+	::= { usrPhysicalHATable 1 }
+    USRPhysicalHAEntry ::= SEQUENCE {
+	usrPhysicalHAIndexNum	Integer32,
+	usrPhysicalHABootIP	IpAddress,
+    usrPhysicalHAIPSecFlag  INTEGER
+    }
+    usrPhysicalHAIndexNum OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only 
+	STATUS current
+	DESCRIPTION
+		"The index to the HA Boot IP table"
+	::= { usrPhysicalHAEntry 1 }
+    usrPhysicalHABootIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The HA Boot IP"
+	::= { usrPhysicalHAEntry 2 }
+-- usrPhysicalHACmdType OBJECT-TYPE
+--	SYNTAX Integer32
+--	MAX-ACCESS read-only
+--	STATUS deprecated
+--	DESCRIPTION
+--		"The Physical HA configuration cmd used by CLI"
+--	::= { usrPhysicalHAEntry 3 }
+    usrPhysicalHAIPSecFlag OBJECT-TYPE
+	SYNTAX INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Physical HA IP Sec Flag"
+	::= { usrPhysicalHAEntry 4 }
+usrHACNRedundantBootIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The Boot IP Address of the redundant HACN."
+    --CONFIGURABLE
+    ::= { usrHACNConfig 7}     
+--
+-- HACN HA STATS
+--
+usrHACNHAStatsTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF USRHACNHAStatsEntry
+	MAX-ACCESS not-accessible			
+	STATUS current
+	DESCRIPTION
+		"Table of HACN-HA Statistics"
+	::= { usrHACNConfig 8 }
+        usrHACNHAStatsEntryIndex OBJECT-TYPE
+		SYNTAX USRHACNHAStatsEntry			
+		MAX-ACCESS not-accessible			
+		STATUS current
+		DESCRIPTION
+			"Index into the HACN-HA Statistics Table"
+		INDEX{usrHACNHAStatsIndexNum}
+		::= { usrHACNHAStatsTable 1 }
+	USRHACNHAStatsEntry ::= SEQUENCE
+	{
+		usrHACNHAStatsIndexNum     Integer32,
+		usrPhysicalHAIP            IpAddress,
+		usrVirtualHAIP             DisplayString,
+		usrHARole                  DisplayString,
+		usrHAStatus                DisplayString,
+		usrTotalNumReg             Integer32,
+		usrCurrentActiveCalls      Integer32,
+		usrCurrentActiveCallsOnHA  Integer32,
+		usrHAIPSecFlag             TruthValue
+	}
+	usrHACNHAStatsIndexNum OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only 
+		STATUS current
+		DESCRIPTION
+			"The Index into the table"
+		::= { usrHACNHAStatsEntryIndex 1 }
+	usrPhysicalHAIP OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Physical HA IP Address"
+		::= { usrHACNHAStatsEntryIndex 2 }
+	usrVirtualHAIP OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Virtual HA IP Address"
+		::= { usrHACNHAStatsEntryIndex 3 }
+	usrHARole OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The HA Role"
+		::= { usrHACNHAStatsEntryIndex 4 }
+	 usrHAStatus OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The HA Status"
+		::= { usrHACNHAStatsEntryIndex 5 }
+	usrTotalNumReg OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS deprecated
+		DESCRIPTION
+			"The Total number of registration requests received
+             by HACN which are forwarded to this HA.
+             Note for Deprecated : In 3.0 HACN-HA release, HACN will not
+             forward any calls to HA, so this object will not be used "
+		::= { usrHACNHAStatsEntryIndex 6 }
+	usrCurrentActiveCalls OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Current number of active calls (MBRs) stored
+                         on HACN for this HA"
+		::= { usrHACNHAStatsEntryIndex 7 }
+	usrCurrentActiveCallsOnHA OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Current number of active calls on HA. This 
+                         information is received by HACN in the Heartbeat
+                         message from HA."
+		::= { usrHACNHAStatsEntryIndex 8 }
+	usrHAIPSecFlag OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The HA IP Sec Flag"
+		::= { usrHACNHAStatsEntryIndex 9 }
+usrTotalNumRegReq OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+     "Total number of registration requests forwarded by HACN to
+      all the HA's.
+      Note for DEPRECATED: In 3.0 HACN-HA release, HACN will not
+      forward any calls to the HAs, so this object will not be used."
+    ::= { usrHACNConfig 9 }     
+usrCurrNumRedundantHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of redundant HAs."
+    ::= { usrHACNConfig 10 }   
+usrCurrNumOfActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of active HAs."
+    ::= { usrHACNConfig 11 }  
+usrTotalNumberOfHASwitchOvers OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The total number of HA switchovers"
+    ::= { usrHACNConfig 12 }
+usrTotalNumOfFailedSwitchOvers OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The total number of failed switchovers"
+    ::= { usrHACNConfig 13 }  
+usrRedundantHACNStat OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "Status of the redundant HACN"
+    ::= { usrHACNConfig 14 }     
+usrHACNHAHeartBeatPeriod OBJECT-TYPE
+    SYNTAX      Integer32 (6..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The HACN HA Heartbeat Period"
+    DEFVAL { 6 }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 15 }     
+usrHACNRole OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "Role assumed by the HACN"
+    ::= { usrHACNConfig 16 }     
+usrHacnMobileRegDump OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+     "Specifies if Mobile Registrations Dump is enabled on HACN.
+      Note for DEPRECATED: In 3.0 HACN-HA release, HACN will not
+      receive any reg request/reply, so this object will not be used."
+    --CONFIGURABLE
+    ::= { usrHACNConfig 17 }     
+usrHACNHACNHeartBeatPeriod OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The HACN HACN Heartbeat Period"
+    ::= { usrHACNConfig 18 }     
+-- HACN MBR list
+usrHacnMbrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsrHacnMbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "A table containing the HACN MBR List. The HACN updates
+      this table in response to MBR update messages fron HAs."
+    ::= { usrHACNConfig 19 }
+    usrHacnMbrEntry OBJECT-TYPE
+        SYNTAX      UsrHacnMbrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "An entry in the HACN MBR list."
+	INDEX { usrHacnMbrIndex }
+	::= { usrHacnMbrTable 1 }
+    UsrHacnMbrEntry ::= SEQUENCE
+    {
+        usrHacnMbrIndex		Integer32,
+        usrHacnMbrHA		IpAddress,
+        usrHacnMbrMN		IpAddress,
+        usrHacnMbrCOA		IpAddress,
+        usrHacnMbrRegFlags	Integer32,
+        usrHacnMbrID1		UsrSpecialU32,
+        usrHacnMbrLifetime	Integer32,
+        usrHacnMbrNAI       DisplayString,
+        usrHacnMbrNextHop   IpAddress
+    }
+    usrHacnMbrIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..140000)
+        MAX-ACCESS  read-only
+        STATUS      current
+	DESCRIPTION
+	 "Index of the entry in the HACN MBR Table."
+	::= { usrHacnMbrEntry 1 }
+    usrHacnMbrHA OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Home Agent IP address."
+	::= { usrHacnMbrEntry 2 }
+    usrHacnMbrMN OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Mobile node's home (IP) address."
+	::= { usrHacnMbrEntry 3 }
+    usrHacnMbrCOA OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Mobile node's care-of-address.  One mobile node can have
+	  multiple bindings with different care-of-addresses."
+	::= { usrHacnMbrEntry 4 }
+    usrHacnMbrRegFlags OBJECT-TYPE
+	SYNTAX      Integer32 (0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Registration flags sent by mobile node.
+	  This is a bit-mapped value with the following represenentation:
+	    7   6   5   4   3   2   1   0
+	  +___+___+___+___+___+___+___+___+
+	  | S | B | D | M | G | V | T | R |
+	  +___+___+___+___+___+___+___+___+
+	  where,
+	 	S - Simultaneous Bindings
+		B - Broadcast Datagrams
+		D - Decapsulation by mobile node
+		M - Minimal Encapsulation
+		G - GRE Encapsulation
+		V - V.J. Compression
+		T - Reverse Tunneling
+		R - Reserved Bit"
+	::= { usrHacnMbrEntry 5 }
+    usrHacnMbrID1 OBJECT-TYPE
+	SYNTAX      UsrSpecialU32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Low 32 bits of Identification used in that binding by the
+	  mobile node."
+	::= { usrHacnMbrEntry 6 }
+    usrHacnMbrLifetime OBJECT-TYPE
+	SYNTAX      Integer32
+	UNITS       "seconds"
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "The lifetime in seconds granted to the mobile node for this
+	  registraion."
+	::= { usrHacnMbrEntry 7 }
+    usrHacnMbrNAI OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "User name ( NAI )."
+	::= { usrHacnMbrEntry 8 }
+    usrHacnMbrNextHop OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Next hop gateway address returned by AAA, used for VLAN tagging
+      feature."
+	::= { usrHacnMbrEntry 9 }
+usrCurrNumOfNonIPSecActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of Non IPSec Group Active HAs."
+    ::= { usrHACNConfig 20 }  
+usrCurrNumOfIPSecActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of IPSec Group Active HAs."
+    ::= { usrHACNConfig 21 }  
+usrCurrNumNonIPSecRedundantHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of Non IPSec Redundant HAs."
+    ::= { usrHACNConfig 22 }   
+usrCurrNumIPSecRedundantHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of IPSec Redundant HAs."
+    ::= { usrHACNConfig 23 }   
+usrHACNHAMaxCallCapacity OBJECT-TYPE
+    SYNTAX      Integer32 (1..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "HA Max Call Capacity assigned to it when HACN assigns it an
+      Active Role."
+    DEFVAL { 10000 }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 24 }     
+usrCurrNumOfNonIPSecSoftbusyActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of Non IPSec Group Softbusy Active HAs.
+      The load information of these HAs will not be used in 
+      calculating the Average System Load and list of least 
+      loaded HAs."
+    ::= { usrHACNConfig 25 }  
+usrHACNHAMultipleLogins OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "HACN sends this setting to the all the HAs. This setting 
+      will override the individual HA setting. The setting indicates
+      whether HA will allow Multiple Logins for same user or not.
+      The user can only configure this setting on Master HACN."
+    DEFVAL { enabled }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 26 }
+-- RP CFM Configuration Group
+usrHACNConfigFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The name of the configuration file for HACN.  If
+      this value is empty, then the default file name
+      is @file://HACNProcess.cfg."
+    ::= { usrHACNCfmConfig 1 }
+usrHACNCfmStatus OBJECT-TYPE
+    SYNTAX      UsrConfigStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The Configuration File Manager Flag for
+      saving HACN configurable parameters."
+    ::= { usrHACNCfmConfig 2 }
+-- HACN Passive Load Balancing Statistics
+usrAverageSystemLoad OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Average Load on all Non IPSec Group In-service 
+      (Non-Softbusy) Active HAs in the System"
+    ::= { usrHACNLoadBalanceConfig 1 }     
+usrLeastLoadedHA1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The IP Address of Least Loaded HA #1"
+    ::= { usrHACNLoadBalanceConfig 2 }     
+usrCurrLoadOnHA1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Current Load on Least Loaded HA #1"
+    ::= { usrHACNLoadBalanceConfig 3 }     
+usrLeastLoadedHA2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The IP Address of Least Loaded HA #2"
+    ::= { usrHACNLoadBalanceConfig 4 }     
+usrCurrLoadOnHA2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Current Load on Least Loaded HA #2"
+    ::= { usrHACNLoadBalanceConfig 5 }     
+usrLeastLoadedHA3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The IP Address of Least Loaded HA #3"
+    ::= { usrHACNLoadBalanceConfig 6 }     
+usrCurrLoadOnHA3 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Current Load on Least Loaded HA #3"
+    ::= { usrHACNLoadBalanceConfig 7 }     
+usrLeastLoadedHA4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The IP Address of Least Loaded HA #4"
+    ::= { usrHACNLoadBalanceConfig 8 }     
+usrCurrLoadOnHA4 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Current Load on Least Loaded HA #4"
+    ::= { usrHACNLoadBalanceConfig 9 }     
+usrTotalSystemLoad OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Total Load on all Non IPSec Group In-service 
+      (Non-Softbusy) Active HAs in the System"
+    ::= { usrHACNLoadBalanceConfig 10 }     
+usrRemainderAvgSystemLoad OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Remainder load left after calculating Average System
+      Load on all Non IPSec Group In-service (Non-Softbusy) 
+      Active HAs in the System"
+    ::= { usrHACNLoadBalanceConfig 11 }     
+usrCurrNumOfNonIPSecInserviceActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of Non IPSec Group In-service 
+      (Non-Softbusy) Active HAs. The load information of 
+      only these HAs will be used in calculating the Average 
+      System Load and list of least loaded HAs."
+    ::= { usrHACNLoadBalanceConfig 12 }     
+END	-- USR-HACN-MIB Definitions

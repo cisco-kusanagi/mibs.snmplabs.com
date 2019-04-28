@@ -1,0 +1,725 @@
+CBS-VRRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   NOTIFICATION-TYPE, Integer32,
+   TimeTicks, IpAddress                     FROM SNMPv2-SMI
+ 
+   TEXTUAL-CONVENTION,
+   DisplayString, TruthValue                FROM SNMPv2-TC
+
+   ProductID, KBytes                        FROM HOST-RESOURCES-MIB
+
+   InetAddressType, InetAddress             FROM INET-ADDRESS-MIB
+
+   cbsMIBs, cbsMgmt, cbsTraps               FROM CROSSBEAM-SYSTEMS-MIB
+
+   cbsVgVapGroupID, cbsVgVapGroupName       FROM CBS-VAPGROUP-MIB
+
+   cbsHwModuleID, ModuleState, cbsTrapSeverity  FROM CBS-HARDWARE-MIB;
+
+
+cbsVrrpMIB MODULE-IDENTITY
+   LAST-UPDATED "200508300000Z"     -- 30 August 2005
+   ORGANIZATION "Crossbeam Systems, Inc."
+   CONTACT-INFO "Email:  mib-admin@crossbeamsys.com
+                 Postal: 80 Central Street
+                         Boxborough, MA  01719"
+   DESCRIPTION  "XOS, Release 9.5: This MIB module defines the objects 
+                 related to Crossbeam VRRP Traps."
+ 
+   REVISION     "200508300000Z"     -- 30 August 2005
+   DESCRIPTION  "Initial Revision"
+
+   REVISION     "201007280000Z"     -- 28 July 2010
+   DESCRIPTION  "Added cbsVrrpFailGrTable, cbsVrrpFailGrCompTable,
+                 cbsVrrpRemoteBoxPathTable and some new traps."
+
+
+::= { cbsMIBs 5 }
+
+FailGroupStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Failover group status"
+    SYNTAX INTEGER {
+             init(0), 
+             master(1), 
+             backup(2),
+             down(3)
+           }
+
+RemoteBoxPathStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Remote box path's status"
+    SYNTAX INTEGER {
+             down(0),
+             secondary(1),
+             standby(2),
+             active(3)
+           }
+
+cbsVrrp   OBJECT IDENTIFIER ::= { cbsMgmt 5 }
+cbsVrrpTraps   OBJECT IDENTIFIER ::= { cbsTraps 4 }
+
+cbsVrrpOperations  OBJECT IDENTIFIER ::= { cbsVrrp 1 }
+
+-- The trap variables
+
+cbsVrrpTrapNewMasterReason OBJECT-TYPE
+   SYNTAX      INTEGER {
+       priority  (0),
+       preempted (1),
+       masterNoResponse (2)
+   }
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+              "This indicates the reason for NewMaster trap.
+               Used by cbsVrrpTrapNewMaster trap."
+   ::= { cbsVrrpOperations 1 }
+
+cbsVrrpTrapNewMasterFailGrName OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+              "This object contains the VRRP Failover Group 
+               name. Used by cbsVrrpTrapNewMaster trap."
+   ::= { cbsVrrpOperations 2 }
+
+cbsVrrpTrapNewMasterVrId OBJECT-TYPE
+   SYNTAX       Integer32 
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+              "This object contains the Virtual Router Identifier (VRID).
+               Used by cbsVrrpTrapNewMaster trap."
+   ::= { cbsVrrpOperations 3 }
+
+cbsVrrpTrapNewMasterCirId OBJECT-TYPE
+   SYNTAX       Integer32
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+              "This object contains the circuit ID.
+               Used by cbsVrrpTrapNewMaster trap."
+   ::= { cbsVrrpOperations 4 }
+
+cbsVrrpTrapNewMasterCirName OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+              "This object contains the circuit name.
+               Used by cbsVrrpTrapNewMaster trap."
+   ::= { cbsVrrpOperations 5 }
+
+cbsVrrpTrapProtoErrReason OBJECT-TYPE
+   SYNTAX  INTEGER {
+        hopLimitError (0),
+        versionError  (1),
+        checksumError (2),
+        vridError(3)
+   }
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+               "This indicates the reason for protocol error trap.
+                Used by cbsVrrpTrapProtoError trap."
+   ::= { cbsVrrpOperations 6 }
+
+cbsVrrpTrapFailGrOldStatus OBJECT-TYPE
+   SYNTAX     FailGroupStatus
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The old status for the failover group."
+   ::= { cbsVrrpOperations 7 }
+
+cbsVrrpTrapFailGrNewStatus OBJECT-TYPE
+   SYNTAX     FailGroupStatus
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The new status for the failover group."
+   ::= { cbsVrrpOperations 8 }
+
+cbsVrrpTrapFailGrStatusChgReason OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Indicates the reason of the status changed, e.g. 
+       1. Down   -->  Master:    Priority is 255
+       2. Down   -->  Master:    Priority higher than remote box <id>
+       3. Down   -->  Master:    Timed out waiting for master
+       4. Down   -->  Backup:    Remote box <id> has higher priority
+       5. Down   -->  Backup:    Master <id> has lower priority, but preemption is disabled
+
+       6. Master -->  Backup:    Relinquished by user  
+       7. Master -->  Backup:    Preempted by remote box <id>
+       8. Master -->  Down:      Priority is 0
+       9. Master -->  Down:      Vrrp failover group is disabled.
+      10. Master -->  Down:      No valid virtual routers configured
+
+      11. Backup -->  Master:    Priority higher than remote box <id>
+      12. Backup -->  Master:    Priority is 255
+      13. Backup -->  Master:    Timed out waiting for master
+      14. Backup -->  Down:      Priority is 0
+      15. Backup -->  Down:      Vrrp failover group is disabled
+      16. Backup -->  Down:      No valid virtual routers configured
+      "
+   ::= { cbsVrrpOperations 9 }
+
+cbsVrrpTrapFailGrOldPriority OBJECT-TYPE
+   SYNTAX     Integer32 (0..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The failover group's old actual priority."
+   ::= { cbsVrrpOperations 10 }
+
+cbsVrrpTrapFailGrNewPriority OBJECT-TYPE
+   SYNTAX     Integer32 (0..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The failover group's new actual priority."
+   ::= { cbsVrrpOperations 11 }
+
+cbsVrrpTrapFailGrPriorityChgReason OBJECT-TYPE
+   SYNTAX      INTEGER {
+       configured(0),
+       vrDown(1),
+       vrUp(2),
+       virturRouter(3),
+       verifyNextHop(4),
+       monitorCircuit(5),
+       monitorInterface(6),
+       monitorGroupInterface(7),
+       activeVapThreshold(8)
+   }
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+      "This indicates the reason for PriorityChanged trap.
+       Used by cbsVrrpTrapFailGrPriorityChanged trap.
+       configured     - configured priority changed
+       vrDown         - failover group down due to deleted/disabled or invalid configuration 
+       vrUp           - failover group up due to becoming enable or valid
+       virtualRouter  - priority delta of involved virtual router changed
+       verifyNextHop  - priority delta of involved nexthop changed
+       monitorCircuit - priority delta of involved monitored circuit changed
+       monitorInterface - priority delta of involved monitored interface changed
+       monitorGroupInterface - priority delta of involved monitored group interface changed
+       activeVapThreshold - priority delta of involved active vap changed
+      " 
+   ::= { cbsVrrpOperations 12 }
+
+cbsVrrpTrapRemoteBoxPathOldStatus OBJECT-TYPE
+   SYNTAX      RemoteBoxPathStatus
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+              "Old status of the specified path of remote box."
+   ::= { cbsVrrpOperations 13 }
+
+cbsVrrpTrapRemoteBoxPathNewStatus OBJECT-TYPE
+   SYNTAX      RemoteBoxPathStatus
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+              "New status of the specified path of remote box."
+   ::= { cbsVrrpOperations 14 }
+
+cbsVrrpRemBoxPathAddrs OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+              "All paths' IP addresses of the remote box, they are separated
+               by comma."
+   ::= { cbsVrrpOperations 15 }
+
+-- Failover Group Table
+
+cbsVrrpFailGrTable  OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsVrrpFailGrEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+     "This table contains information about the VRRP failover groups."
+  ::= { cbsVrrp 2 }
+
+-- The failover group entry 
+cbsVrrpFailGrEntry OBJECT-TYPE
+   SYNTAX     CbsVrrpFailGrEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the failover group table."
+   INDEX { cbsVrrpFailGrID }
+   ::= { cbsVrrpFailGrTable 1 }
+
+CbsVrrpFailGrEntry ::= SEQUENCE {
+   cbsVrrpFailGrID               Integer32,
+   cbsVrrpFailGrName             DisplayString,
+   cbsVrrpFailGrStatus           FailGroupStatus,
+   cbsVrrpFailGrConfigPriority   Integer32,
+   cbsVrrpFailGrActualPriority   Integer32,
+   cbsVrrpFailGrEnabled          TruthValue,
+   cbsVrrpFailGrPreemption       TruthValue,
+   cbsVrrpFailGrLastChangeTime   TimeTicks,
+   cbsVrrpFailGrLastChangeReason DisplayString,
+   cbsVrrpFailGrMasterSysID      Integer32,
+   cbsVrrpFailGrMasterPriority   Integer32
+}
+
+cbsVrrpFailGrID OBJECT-TYPE
+   SYNTAX     Integer32 (1..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The unique Group ID for the failover group."
+   ::= { cbsVrrpFailGrEntry 1 }
+
+cbsVrrpFailGrName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The name for the failover group."
+   ::= { cbsVrrpFailGrEntry 2 }
+
+cbsVrrpFailGrStatus OBJECT-TYPE
+   SYNTAX     FailGroupStatus
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The status for the failover group."
+   ::= { cbsVrrpFailGrEntry 3 }
+
+cbsVrrpFailGrConfigPriority OBJECT-TYPE
+   SYNTAX     Integer32 (1..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The configured priority for the failover group."
+   ::= { cbsVrrpFailGrEntry 4 }
+
+cbsVrrpFailGrActualPriority OBJECT-TYPE
+   SYNTAX     Integer32 (0..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The actual priority for the failover group."
+   ::= { cbsVrrpFailGrEntry 5 }
+
+cbsVrrpFailGrEnabled OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies if failover group is enabled or not."
+   ::= { cbsVrrpFailGrEntry 6 }
+
+cbsVrrpFailGrPreemption OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies preemption for the failover group is off or on."
+   ::= { cbsVrrpFailGrEntry 7 }
+
+cbsVrrpFailGrLastChangeTime OBJECT-TYPE
+   SYNTAX     TimeTicks
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Indicates the elapsed time since the status last changed."
+   ::= { cbsVrrpFailGrEntry 8 }
+
+cbsVrrpFailGrLastChangeReason OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Indicates the reason of the status last changed, e.g. 
+       1. Down   -->  Master:    Priority is 255
+       2. Down   -->  Master:    Priority higher than remote box <id>
+       3. Down   -->  Master:    Timed out waiting for master
+       4. Down   -->  Backup:    Remote box <id> has higher priority
+       5. Down   -->  Backup:    Master <id> has lower priority, but preemption is disabled
+
+       6. Master -->  Backup:    Relinquished by user  
+       7. Master -->  Backup:    Preempted by remote box <id>
+       8. Master -->  Down:      Priority is 0
+       9. Master -->  Down:      Vrrp failover group is disabled.
+      10. Master -->  Down:      No valid virtual routers configured
+
+      11. Backup -->  Master:    Priority higher than remote box <id>
+      12. Backup -->  Master:    Priority is 255
+      13. Backup -->  Master:    Timed out waiting for master
+      14. Backup -->  Down:      Priority is 0
+      15. Backup -->  Down:      Vrrp failover group is disabled
+      16. Backup -->  Down:      No valid virtual routers configured
+      "
+   ::= { cbsVrrpFailGrEntry 9 }
+
+cbsVrrpFailGrMasterSysID OBJECT-TYPE
+   SYNTAX     Integer32 (1..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The system ID of the platform that is operating as the master of this
+       failover group."
+   ::= { cbsVrrpFailGrEntry 10 }
+
+cbsVrrpFailGrMasterPriority OBJECT-TYPE
+   SYNTAX     Integer32 (0..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The master failover group's actual priority."
+   ::= { cbsVrrpFailGrEntry 11 }
+
+
+-- Failover Group Component Table
+
+cbsVrrpFailGrCompTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsVrrpFailGrCompEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+     "This table contains information about the components of VRRP 
+      failover groups"
+   ::= { cbsVrrp 3 }
+
+cbsVrrpFailGrCompEntry OBJECT-TYPE
+   SYNTAX     CbsVrrpFailGrCompEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the VRRP failover group component table."
+   INDEX { cbsVrrpFailGroupID, cbsVrrpFailGrCompIndex }
+   ::= { cbsVrrpFailGrCompTable 1 }
+
+CbsVrrpFailGrCompEntry ::= SEQUENCE {
+   cbsVrrpFailGroupID                Integer32,
+   cbsVrrpFailGroupName              DisplayString,
+   cbsVrrpFailGrCompIndex            Integer32,
+   cbsVrrpFailGrCompType             INTEGER,
+   cbsVrrpFailGrCompDescr            DisplayString,
+   cbsVrrpFailGrCompDelta            DisplayString
+}
+
+cbsVrrpFailGroupID OBJECT-TYPE
+   SYNTAX     Integer32 (1..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The ID of the VRRP failover group."
+   ::= { cbsVrrpFailGrCompEntry 1 }
+
+cbsVrrpFailGroupName OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The name of the VRRP failover group."
+   ::= { cbsVrrpFailGrCompEntry 2 }
+
+cbsVrrpFailGrCompIndex OBJECT-TYPE
+   SYNTAX     Integer32 (1..2147483647)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The index for the component."
+   ::= { cbsVrrpFailGrCompEntry 3 }
+
+cbsVrrpFailGrCompType OBJECT-TYPE
+   SYNTAX     INTEGER
+                { vr(0), 
+                  mc(1),
+                  mi(2),
+                  mg(3),
+                  vg(4),
+                  nh(5) }
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The type of the component."
+   ::= { cbsVrrpFailGrCompEntry 4 }
+
+cbsVrrpFailGrCompDescr OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The detailed description about the component, 
+       the format depend on the type of the component, e.g.:
+       vr - virtual router circuit name/virtual router id/OSPF cost increment
+       mc - monitored circuit name
+       mi - monitored interface
+       mg - monitored group interface
+       vg - vap group (active-vap-threshold)
+       nh - verify-next-hop IP/virtual router ID"
+   ::= { cbsVrrpFailGrCompEntry 5 }
+
+cbsVrrpFailGrCompDelta OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The vrrp component's configured priority delta as well as 
+       information about its usage:
+       10 : priority delta of a component configured as 10
+            failover group priority NOT decremented by
+            this delta (no failure)
+       -10: priority delta of a component configured as 10
+            failover group priority decremented by this
+            delta (component failure)
+       10* or -10*: unknown next hop status"
+   ::= { cbsVrrpFailGrCompEntry 6 }
+
+-- Remote Box Path Table
+
+cbsVrrpRemoteBoxPathTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF CbsVrrpRemoteBoxPathEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+     "This table contains information about the path of VRRP 
+      remote box"
+   ::= { cbsVrrp 4 }
+
+cbsVrrpRemoteBoxPathEntry OBJECT-TYPE
+   SYNTAX     CbsVrrpRemoteBoxPathEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry in the VRRP remote box path table."
+   INDEX { cbsVrrpRemoteBoxID, cbsVrrpRemoteBoxPathIndex}
+   ::= { cbsVrrpRemoteBoxPathTable 1 }
+
+CbsVrrpRemoteBoxPathEntry ::= SEQUENCE {
+   cbsVrrpRemoteBoxID                  Integer32,
+   cbsVrrpRemoteBoxPathIndex           Integer32,
+   cbsVrrpRemoteBoxPathAddr            IpAddress,
+   cbsVrrpRemoteBoxPathLocalIntf       DisplayString,
+   cbsVrrpRemoteBoxPathLocalAddr       IpAddress,
+   cbsVrrpRemoteBoxPathStatus          RemoteBoxPathStatus,
+   cbsVrrpRemoteBoxPathLastChangeTime  TimeTicks,
+   cbsVrrpRemoteBoxPathLinkQuality     Gauge32 
+}
+
+cbsVrrpRemoteBoxID OBJECT-TYPE
+   SYNTAX     Integer32 (1..255)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The system ID of the VRRP remote box."
+   ::= { cbsVrrpRemoteBoxPathEntry 1 }
+
+cbsVrrpRemoteBoxPathIndex OBJECT-TYPE
+   SYNTAX     Integer32 (1..5)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The index for path of VRRP remote box."
+   ::= { cbsVrrpRemoteBoxPathEntry 2 }
+
+cbsVrrpRemoteBoxPathAddr OBJECT-TYPE
+   SYNTAX     IpAddress 
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The path's IP address of the VRRP remote box."
+   ::= { cbsVrrpRemoteBoxPathEntry 3 }
+
+cbsVrrpRemoteBoxPathLocalIntf OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The path's IP address can be reachable via this local
+       interface."
+   ::= { cbsVrrpRemoteBoxPathEntry 4 }
+
+cbsVrrpRemoteBoxPathLocalAddr OBJECT-TYPE
+   SYNTAX     IpAddress 
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The IP address of the local interface."
+   ::= { cbsVrrpRemoteBoxPathEntry 5 }
+
+cbsVrrpRemoteBoxPathStatus OBJECT-TYPE
+   SYNTAX     RemoteBoxPathStatus
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The path's status of the VRRP remote box."
+   ::= { cbsVrrpRemoteBoxPathEntry 6 }
+
+cbsVrrpRemoteBoxPathLastChangeTime OBJECT-TYPE
+   SYNTAX     TimeTicks
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Indicates the elapsed time since the status last changed."
+   ::= { cbsVrrpRemoteBoxPathEntry 7 }
+
+cbsVrrpRemoteBoxPathLinkQuality OBJECT-TYPE
+   SYNTAX      Gauge32 (0..100)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The link quality of the remote box path."
+   ::= { cbsVrrpRemoteBoxPathEntry 8 }
+
+-- The traps
+
+cbsVrrpTrapNewMaster NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpTrapNewMasterFailGrName,
+                  cbsVrrpTrapNewMasterVrId,
+                  cbsVrrpTrapNewMasterCirId,
+                  cbsVrrpTrapNewMasterCirName,
+                  cbsVrrpTrapNewMasterReason
+                        }
+   STATUS       current
+   DESCRIPTION
+               "The newMaster trap indicates that the sending agent
+                transitioned to 'Master' state."
+   ::= { cbsVrrpTraps 1 }
+
+cbsVrrpTrapProtoError NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpTrapProtoErrReason
+                }
+   STATUS       current
+   DESCRIPTION
+               "The error trap indicates that the sending agent
+                encountered the protocol error indicated by
+                vrrpTrapProtoErrorReason."
+   ::= { cbsVrrpTraps 2 }
+
+cbsVrrpTrapFailGrStatusChanged NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpFailGrID,
+                  cbsVrrpFailGrName,
+                  cbsVrrpTrapFailGrOldStatus,
+                  cbsVrrpTrapFailGrNewStatus,
+                  cbsVrrpTrapFailGrStatusChgReason,
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The StatusChanged trap indicates that failover group of 
+                the sending agent transitioned from old to new state."
+   ::= { cbsVrrpTraps 3 }
+
+cbsVrrpTrapFailGrPriorityChanged NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpFailGrID,
+                  cbsVrrpFailGrName,
+                  cbsVrrpTrapFailGrOldPriority,
+                  cbsVrrpTrapFailGrNewPriority,
+                  cbsVrrpTrapFailGrPriorityChgReason,
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The PriorityChanged trap indicates that priority of
+                the sending agent's failover group changed."
+   ::= { cbsVrrpTraps 4 }
+
+cbsVrrpTrapRemoteBoxPathStatusChanged NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpRemoteBoxID, 
+                  cbsVrrpRemoteBoxPathAddr,
+                  cbsVrrpRemoteBoxPathLocalIntf, 
+                  cbsVrrpRemoteBoxPathLocalAddr, 
+                  cbsVrrpTrapRemoteBoxPathOldStatus,
+                  cbsVrrpTrapRemoteBoxPathNewStatus,
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The StatusChanged trap indicates that one path of
+                remote box on the sending agent's transitioned from
+                old to new state."
+   ::= { cbsVrrpTraps 5 }
+
+cbsVrrpTrapRemoteBoxNoActivePath NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpRemoteBoxID,
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The trap indicates that there is no active path for the
+                remote box."
+   ::= { cbsVrrpTraps 6 }
+
+cbsVrrpTrapRemoteBoxNoSecondaryPath NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpRemoteBoxID,
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The trap indicates that there is no secondary path for the
+                remote box that contains 2 CPMs."
+   ::= { cbsVrrpTraps 7 }
+
+cbsVrrpTrapRemoteBoxNoStandbyPath NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpRemoteBoxID,
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The trap indicates that there is 1 active path but no standby
+                path for the remote box."
+   ::= { cbsVrrpTraps 8 }
+
+cbsVrrpTrapRemoteBoxPathSharedIntf NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpRemoteBoxID, 
+                  cbsVrrpRemBoxPathAddrs,
+                  cbsVrrpRemoteBoxPathLocalIntf, 
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The trap indicates that all paths of the
+                remote box only are reachable via single local interface
+                on the sending agent."
+   ::= { cbsVrrpTraps 9 }
+
+cbsVrrpTrapNoRemoteBoxConfigured NOTIFICATION-TYPE
+   OBJECTS      { cbsHwModuleID,
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The trap indicates that VRRP configured but there is no
+                remote box configured."
+   ::= { cbsVrrpTraps 10 }
+
+cbsVrrpTrapOnlyOnePathDefined NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpRemoteBoxID, 
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The trap indicates that the remote box configured with only
+                one path."
+   ::= { cbsVrrpTraps 11 }
+
+cbsVrrpTrapRemoteBoxRunLegacyXOS NOTIFICATION-TYPE
+   OBJECTS      { cbsVrrpRemoteBoxID, 
+                  cbsTrapSeverity
+                }
+   STATUS       current
+   DESCRIPTION
+               "The trap indicates that the remote box is running legacy XOS."
+   ::= { cbsVrrpTraps 12 }
+
+END
+

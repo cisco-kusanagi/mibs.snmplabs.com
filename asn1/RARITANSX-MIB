@@ -1,0 +1,985 @@
+-- Enterprise MIB for SX 
+
+-- Raritan SX Enterprise MIB - V2 
+-- Copyright (C) 2004 Raritan Inc 
+-- Raritan Private Enterprise is registered with IANA organization 
+
+-- 04/30/2007 Sujata Osowski (Eventum CR 7476)
+-- restructured DSX MIB to pass level 6 validation
+--    Import section is revised
+--    Module Identity section is updated
+--    Conformance information is added towards the end
+
+
+RARITANSX-MIB DEFINITIONS ::= BEGIN
+	IMPORTS		
+		OBJECT-TYPE
+			 FROM RFC-1212
+
+		DisplayString
+			FROM SNMPv2-TC
+
+		MODULE-IDENTITY, NOTIFICATION-TYPE, 
+		enterprises, TimeTicks, IpAddress
+			FROM SNMPv2-SMI
+
+		MODULE-COMPLIANCE,
+                NOTIFICATION-GROUP,
+                OBJECT-GROUP        
+                         FROM SNMPv2-CONF;
+
+sxMIBIdentity MODULE-IDENTITY
+	LAST-UPDATED "200704301545Z"
+	ORGANIZATION "Raritan Inc"
+	CONTACT-INFO "http://www.raritan.com"
+	DESCRIPTION "MIB for the SNMP functionality of the Dominion SX."
+
+	REVISION "200704301545Z"
+	DESCRIPTION "Updated for SX 3.0 and standards compliance."
+	::= { enterprises 13742 2 15 }
+raritansx OBJECT IDENTIFIER ::= { enterprises raritan(13742) sx(2) }
+-- GW same location as TRAPS (implied raritansx#) so that it is compatible with the previous MIB.
+raritansxnotifications OBJECT IDENTIFIER ::= { raritansx 0 }
+
+-- We will define Get and trap Objects
+-- Image Version is a Get Operation
+-- SXObjectImageCurrentVersion is subtree 1 of the raritansx  mib
+-- 
+-- Set MIB Managed Objects can be added to this 
+
+sxObjectImageCurrentVersion OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-only
+	STATUS	current
+	DESCRIPTION
+		 " Current Image Version that is running  "
+	::= { raritansx 1 }
+
+--We will define MIB Object for the Query Get Active Users 
+
+
+sxActiveUsersTable   OBJECT-TYPE
+        SYNTAX        SEQUENCE OF SxActiveUsersEntry
+        MAX-ACCESS   not-accessible
+        STATUS        current
+        DESCRIPTION   
+                      " This table contains all the information for 
+                        Querying the Active Users."
+        ::= { raritansx 2 }
+
+sxActiveUsersEntry   OBJECT-TYPE
+         SYNTAX        SxActiveUsersEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "Active users table entry."
+         INDEX         { sxActiveUserName }
+         ::= { sxActiveUsersTable 1 }
+
+SxActiveUsersEntry ::=
+         SEQUENCE {
+                 sxActiveUserName DisplayString,
+                 sxLoginTime TimeTicks,
+                 sxPortConnected DisplayString,
+                  sxPortName DisplayString,
+                  sxUserLoggingFromIP IpAddress,
+                  sxApplicationType INTEGER,
+                  sxAuthenticationType INTEGER,
+                  sxInterfaceType INTEGER
+         }
+
+
+sxActiveUserName 		OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS        read-write
+        STATUS        current
+        DESCRIPTION   "SX User name "
+        ::= { sxActiveUsersEntry 1 }
+
+sxLoginTime		 OBJECT-TYPE
+        SYNTAX        TimeTicks
+
+        MAX-ACCESS        read-write
+        STATUS	      current
+        DESCRIPTION   " User Logged in time"
+                      	 ::= { sxActiveUsersEntry 2 }
+
+sxPortConnected OBJECT-TYPE
+        SYNTAX        DisplayString 
+        MAX-ACCESS        read-write
+        STATUS        current
+        DESCRIPTION   "Physical port connected"
+          
+        ::= {  sxActiveUsersEntry 3 }
+
+sxPortName OBJECT-TYPE
+        SYNTAX        DisplayString 
+        MAX-ACCESS        read-write
+        STATUS        current
+        DESCRIPTION   "Logical port name connected"
+          
+        ::= {  sxActiveUsersEntry 4 }
+
+
+sxUserLoggingFromIP OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS        read-write
+        STATUS        current
+        DESCRIPTION   "IP Address of the source, where the connection is established "
+          
+        ::= {  sxActiveUsersEntry 5 }
+
+
+sxApplicationType OBJECT-TYPE
+        SYNTAX        INTEGER {
+		        
+                         raritanConsole(1),               -- Raritan Console
+                         powerBoard(2),
+			  ipmi(3)
+ 	              }
+        MAX-ACCESS        read-write
+        STATUS        current
+        DESCRIPTION   "Application Type"
+          
+        ::= {  sxActiveUsersEntry 6 }
+
+ 
+
+sxAuthenticationType OBJECT-TYPE
+        SYNTAX        INTEGER {
+			radius(1),
+			ldap(2),
+			activeDirectory(3),
+			local(4),
+			tacacs(5),
+			kerberos(6),
+			other (7)
+			}
+        MAX-ACCESS        read-write
+        STATUS        current
+        DESCRIPTION   "Authentication Type"
+          
+        ::= {  sxActiveUsersEntry 7 }
+
+  sxInterfaceType OBJECT-TYPE
+	SYNTAX INTEGER {
+		lan(1),
+		modem(2)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "Interface type access (lan/modem)"
+          
+        ::= {  sxActiveUsersEntry 8}
+
+
+-- Define Traps for SX
+-- 
+-- Define all the Trap ASN variables
+-- sxObjectName, sxObjectInstance, sxUserName, sxUserSessionID,
+-- sxUserNameInitiated, sxUserNameTerminated
+-- sxImageType,sxImageVersion, sxImageVersionStatus, 
+-- sxUserWhoAdded, sxUserWhoDeleted, sxUserWhoModified
+-- sxPortNumber, sxAlertString, sxPowerPort
+
+sxObjectName OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " Object class name - SX  "
+	::= { raritansx 3 }
+
+sxObjectInstance OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " Object class instance - datacenter-sx1  "
+	::= { raritansx 4}
+
+sxUserName OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " User Name  "
+	::= { raritansx 5}
+
+sxUserSessionID OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " User name session ID  "
+	::= { raritansx 6 }
+
+sxUserNameInitiated OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " User Name, who initiated the session termination  "
+	::= { raritansx 7 }
+
+sxUserNameTerminated OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " User Name, whose session got terminated  "
+	::= { raritansx 8 }
+
+
+ sxImageType OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " Image Type to tftp  "
+	::= { raritansx 9 }
+
+sxImageVersion OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " Image version "
+	::= { raritansx 10 }
+
+sxImageVersionStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+			success(1),
+			failure(2)
+			}
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " Download image status "
+	::= { raritansx 11 }
+
+
+sxUserWhoAdded OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " SX User who added an User to the system"
+	::= { raritansx 12}
+sxUserWhoDeleted  OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " SX User who Deleted an User to the system"
+	::= { raritansx 13}
+sxUserWhoModified OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " SX User who added an User to the system"
+	::= { raritansx 14}
+
+-- GW duplicate sxUserWhoAdded was here. 15 is now used for the MODULE-IDENTITY above.
+
+sxPortNumber OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " SX port number for Alert string "
+	::= { raritansx 16}
+sxAlertString OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " SX Alert string on a port"
+	::= { raritansx 17}
+
+
+-- GW superceded by sxPowerPort
+-- this position is now free.
+-- sxAttachedPort  OBJECT-TYPE
+--	SYNTAX	DisplayString
+--	MAX-ACCESS   read-write
+--	STATUS	deprecated
+--	DESCRIPTION
+--		 " SX port attached for power supply failure[R5] "
+--	::= { raritansx 18}
+
+sxIPaddress OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " IP address of the source for the log in session "
+	::= { raritansx 19}
+sxInterface OBJECT-TYPE
+	SYNTAX	INTEGER {
+				lan(1),
+				modem(2)
+			}
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " Interface type  "
+	::= { raritansx 20}
+
+
+sxAppType OBJECT-TYPE
+        SYNTAX        INTEGER {
+		        
+                         raritanConsole(1),               -- Raritan Console
+                         powerBoard(2),
+			  ipmi(3)
+ 	              }
+        MAX-ACCESS        read-write
+        STATUS        current
+        DESCRIPTION   "Application Type"
+          
+        ::= {  raritansx 21 }
+
+ 
+
+sxAuthType OBJECT-TYPE
+        SYNTAX        INTEGER {
+			radius(1),
+			ldap(2),
+			activeDirectory(3),
+			local(4),
+			tacacs(5),
+			kerberos(6),
+			other (7)
+			}
+        MAX-ACCESS        read-write
+        STATUS        current -- GW this line needs to be here.
+	DESCRIPTION   "Application Type"
+          
+        ::= {  raritansx 22 }
+
+-- GW moved from the sxActiveUsersEntry
+sxEthernetInterface OBJECT-TYPE
+	SYNTAX INTEGER {
+		lan0(0),
+		lan1(1)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "Ethernet Interface"
+
+        ::= {  raritansx 23 }
+
+-- GW Added to replace sxAttachedPort
+sxPowerPort OBJECT-TYPE
+	SYNTAX INTEGER {
+		psu0(0),
+		psu1(1)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "Power Supply Unit"
+
+        ::= {  raritansx 24 }
+
+sxDirectAccessAction OBJECT-TYPE
+	SYNTAX INTEGER {
+		enabled(0),
+		disabled(1)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "Direct Access Lockout"
+
+        ::= {  raritansx 25 }
+
+sxBackUpRestoreAction OBJECT-TYPE
+	SYNTAX INTEGER {
+		backup(0),
+		restore(1)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "Backup Restore Action"
+
+        ::= {  raritansx 26 }
+
+sxTargetConnectionStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		disconnected(0),
+		connected(1)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "Status of the port connection."
+
+        ::= {  raritansx 27 }
+sxCertificateAuthorityName OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " SX Client CA Name"
+	::= { raritansx 28}
+
+sxStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+			success(1),
+			failure(2)
+			}
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " SX status string "
+	::= { raritansx 29 }
+sxAction OBJECT-TYPE
+	SYNTAX INTEGER {
+		enabled(0),
+		disabled(1)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "SX Action string "
+
+        ::= {  raritansx 30 }
+
+sxBannerAction OBJECT-TYPE
+	SYNTAX INTEGER {
+		declined(0),
+		accepted(1)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "User Acceptance / Rejection of Initial Banner Consent"
+
+        ::= {  raritansx 31 }
+
+sxPowerAction OBJECT-TYPE
+	SYNTAX INTEGER {
+		cycle(0),
+		on(1),
+		off(2)}
+	MAX-ACCESS read-write
+	STATUS        current
+        DESCRIPTION   "SX Power Control Action"
+
+        ::= {  raritansx 32 }
+sxDeviceName OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS   read-write
+	STATUS	current
+	DESCRIPTION
+		 " SX Device Name / Power Strip Name"
+	::= { raritansx 33}
+
+-- Start the Traps 
+
+
+
+sxRebootStarted 		NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX Boot process started"
+	::= { raritansxnotifications 1 }
+
+sxRebootCompleted 	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX Boot process completed[R6] "
+	::= { raritansxnotifications 2 }
+
+sxUserLogin 		NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxIPaddress,
+			 sxInterface
+			 }
+	STATUS 		 current	 
+	DESCRIPTION
+		"SX User Log in "
+	::= { raritansxnotifications 3 }
+
+sxUserLogout 		NOTIFICATION-TYPE
+	
+	OBJECTS		{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxIPaddress,
+			 sxInterface
+			 }
+	STATUS 		 current
+
+	DESCRIPTION
+		"SX User Log out "
+	::= { raritansxnotifications 4 }
+
+sxSerialSessionStarted  	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxUserSessionID,
+			 sxPortName,
+			 sxPortConnected,
+			 sxAuthType,
+			 sxAppType
+			 }
+
+	STATUS 		 current
+	DESCRIPTION
+		"SX Serial Session started "
+	::= { raritansxnotifications 5 }
+
+
+sxSerialSessionStopped 	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxUserSessionID,
+			 sxPortName,
+			 sxPortConnected,
+			 sxAuthType,
+			 sxAppType
+
+			 }
+	STATUS 		 current		 
+	DESCRIPTION
+		"SX Serial Session stopped "
+	::= { raritansxnotifications 6 }
+
+sxSerialSessionTerminated 	NOTIFICATION-TYPE -- logoff user
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserNameInitiated,
+			 sxUserNameTerminated,
+			 sxUserSessionID
+
+
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX Serial Session Terminated "
+	::= { raritansxnotifications 7 }
+
+sxImageUpgradeStarted	 NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxImageType,
+			 sxImageVersion
+
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX Image Upgrade started "
+	::= { raritansxnotifications 8 }
+
+sxImageUpgradeResults 	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxImageType,
+			 sxImageVersion,
+			 sxImageVersionStatus
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX Image Upgrade results"
+	::= { raritansxnotifications 9 }
+
+sxUserAdded		NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxUserWhoAdded
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX new user added "
+	::= { raritansxnotifications 10 }
+
+sxUserDeleted		 NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxUserWhoDeleted
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX user deleted "
+	::= { raritansxnotifications 11 }
+
+sxUserModified  		NOTIFICATION-TYPE
+
+	
+	OBJECTS		{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxUserWhoModified
+			 }
+	STATUS 		 current		 
+	DESCRIPTION
+		"SX user modified "
+	::= { raritansxnotifications 12 }
+
+sxUserAuthenticationFailure	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX user authentication failure "
+	::= { raritansxnotifications 13 }
+
+sxPortAlert		NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxPortNumber,
+			 sxAlertString
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX detected a port alert string on a specific port "
+	::= { raritansxnotifications 14 }
+
+sxPowerSupplyFailure	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxPowerPort
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX detected a power supply failure on a port "
+	::= { raritansxnotifications 15 }
+
+sxFailOverEthernet	NOTIFICATION-TYPE
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxEthernetInterface
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX detected an Ethernet Failure on a LAN port"
+	::= { raritansxnotifications 16 }
+
+sxDirectAccessLockOut	NOTIFICATION-TYPE
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxDirectAccessAction,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		" SX Direct Access Lock Out"
+	::= { raritansxnotifications 17 }
+
+sxBackUpRestore		NOTIFICATION-TYPE
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxBackUpRestoreAction,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		" SX Backup Restore "
+	::= { raritansxnotifications 18 }
+
+sxTargetConnection	NOTIFICATION-TYPE
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxPortNumber,
+			 sxTargetConnectionStatus
+			}
+	STATUS 		 current
+	DESCRIPTION
+		" SX port target connection status "
+	::= { raritansxnotifications 19 }
+
+sxForcedLogOut 	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserNameInitiated,
+			 sxUserNameTerminated
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX user forced off by another user."
+	::= { raritansxnotifications 20 }
+
+sxStrongPasswordConfig	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX Strong Password Configuration Updated"
+	::= { raritansxnotifications 21 }
+
+sxStrongPasswordExpired	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX user Password Expired "
+	::= { raritansxnotifications 22 }
+
+sxStrongPasswordLoginExpired	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX user Login Expired "
+	::= { raritansxnotifications 23 }
+
+sxStrongPasswordLoginDeactivated	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX user Deactivated "
+	::= { raritansxnotifications 24 }
+
+sxSecurityBanner	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName,
+			 sxBannerAction
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SXUser Acceptance/Rejection of Security Banner "
+	::= { raritansxnotifications 25 }
+
+sxStrongPasswordAccountLockedout	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxUserName
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"SX user Account Lockedout"
+	::= { raritansxnotifications 26 }
+
+sxFirewall	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxAction
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"Firewall Enabled or Disabled "
+	::= { raritansxnotifications 27 }
+
+-- 28 = unused/empty [not qualified as absolete/depricated] 
+
+sxIPTables	NOTIFICATION-TYPE
+	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance
+			 }
+	STATUS 		 current
+	DESCRIPTION
+		"IPTables Saved "
+	::= { raritansxnotifications 29 }
+
+sxClientCertCAAdded	 NOTIFICATION-TYPE
+        OBJECTS         {sxObjectName,
+	                 sxObjectInstance,
+			 sxCertificateAuthorityName
+			 }
+        STATUS           current
+        DESCRIPTION
+                "Client Cert CA added to SX "
+	::= { raritansxnotifications 30 }
+
+sxClientCertCADeleted	 NOTIFICATION-TYPE
+        OBJECTS         {sxObjectName,
+	                 sxObjectInstance,
+			 sxCertificateAuthorityName
+			 }
+        STATUS           current
+        DESCRIPTION
+                "Client Cert CA removed from SX "
+	::= { raritansxnotifications 31 }    
+
+sxClientAuth 	NOTIFICATION-TYPE
+        OBJECTS	        {sxObjectName,
+	                 sxObjectInstance,
+			 sxAction
+			 }
+        STATUS           current
+        DESCRIPTION
+                "Client Cert Authorization "
+	::= { raritansxnotifications 32 }    
+
+sxClientCertCRLExpired	 NOTIFICATION-TYPE
+        OBJECTS         {sxObjectName,
+	                 sxObjectInstance,
+			 sxCertificateAuthorityName
+			 }
+        STATUS           current
+        DESCRIPTION
+                "Client Cert CRL Expired "
+	::= { raritansxnotifications 33 } 
+
+sxClientCertCRLUpdated	 NOTIFICATION-TYPE
+        OBJECTS         {sxObjectName,
+	                 sxObjectInstance,
+			 sxCertificateAuthorityName,
+			 sxStatus
+			 }
+        STATUS           current
+        DESCRIPTION
+                "Client Cert CRL Updated "
+	::= { raritansxnotifications 34 } 
+
+
+sxPowerChange  	NOTIFICATION-TYPE	
+	OBJECTS 	{sxObjectName,
+			 sxObjectInstance,
+			 sxDeviceName,
+			 sxPortConnected,
+			 sxPowerAction
+			 }
+
+	STATUS 		 current
+	DESCRIPTION
+		"Power Device Outlet Status Change"
+	::= { raritansxnotifications 35 }  
+
+-- *
+-- * SNMPv2 Conformance Information *******************************************
+-- *
+
+sxMibConformance   OBJECT IDENTIFIER ::= { raritan 9 }
+sxMibCompliances   OBJECT IDENTIFIER ::= { sxMibConformance 1 }
+sxMibGroups        OBJECT IDENTIFIER ::= { sxMibConformance 2 }
+
+sxMibCompliance    MODULE-COMPLIANCE
+    STATUS              current
+    DESCRIPTION         "Compliance statement for the private Raritan SX MIB."
+    MODULE              -- Module Raritan-DSX-MIB
+    MANDATORY-GROUPS    {
+                            sxMibBasicGroup,
+                            sxMibTrapGroup
+                        }
+    ::= { sxMibCompliances 1 }
+
+sxMibBasicGroup    OBJECT-GROUP
+    OBJECTS             {
+                            sxObjectImageCurrentVersion,
+                            sxActiveUserName, 
+                            sxLoginTime, 
+                            sxPortConnected, 
+                            sxPortName, 
+                            sxUserLoggingFromIP, 		
+                            sxApplicationType,  	
+                            sxAuthenticationType, 	
+                            sxInterfaceType, 	
+		
+                            
+                            sxObjectName, 
+                            sxObjectInstance, 
+                            sxUserName, 		
+                            sxUserSessionID,  	
+                            sxUserNameInitiated, 	
+                            sxUserNameTerminated, 	
+                            sxImageType,	
+                            sxImageVersion, 	
+                            sxImageVersionStatus,	
+                            sxUserWhoAdded,		
+                            sxUserWhoDeleted,  	
+                            sxUserWhoModified,  
+                            sxPortNumber, 		
+                            sxAlertString,  	
+                            sxIPaddress, 	
+                            sxInterface, 	
+                            sxAppType,	
+                            sxAuthType, 	
+                            sxEthernetInterface,	
+                            sxPowerPort,		
+                            sxDirectAccessAction,  	
+                            sxBackUpRestoreAction,  	
+                            sxTargetConnectionStatus, 		
+                            sxCertificateAuthorityName,  	
+                            sxStatus, 	
+                            sxAction, 	
+                            sxBannerAction,	
+                            sxPowerAction, 	
+                            sxDeviceName			
+			}
+    STATUS              current
+    DESCRIPTION         "Objects used in the traps."
+    ::= { sxMibGroups 1 }
+
+
+sxMibTrapGroup         NOTIFICATION-GROUP
+    NOTIFICATIONS       {
+                            sxRebootStarted,		
+                            sxRebootCompleted, 	
+                            sxUserLogin, 		
+                            sxUserLogout, 		
+                            sxSerialSessionStarted,  	
+                            sxSerialSessionStopped, 	
+                            sxSerialSessionTerminated, 	
+                            sxImageUpgradeStarted,	
+                            sxImageUpgradeResults, 		
+                            sxUserAdded,
+                            sxUserDeleted,  	
+                            sxUserModified,	
+                            sxUserAuthenticationFailure,	
+                            sxPortAlert, 	
+                            sxPowerSupplyFailure,	
+                            sxFailOverEthernet, 	
+                            sxDirectAccessLockOut,
+                            sxBackUpRestore, 	
+                            sxTargetConnection, 
+                            sxForcedLogOut, 
+                            sxStrongPasswordConfig, 	
+                            sxStrongPasswordExpired, 	
+                            sxStrongPasswordLoginExpired, 	
+                            sxStrongPasswordLoginDeactivated, 	
+                            sxSecurityBanner, 	
+                            sxStrongPasswordAccountLockedout, 	
+                            sxFirewall, 	
+                            sxIPTables, 	
+                            sxClientCertCAAdded, 	
+                            sxClientCertCADeleted,		
+                            sxClientAuth,		 
+                            sxClientCertCRLExpired,  		
+                            sxClientCertCRLUpdated,	
+                            sxPowerChange
+                        }
+    STATUS              current
+    DESCRIPTION         "Raritan DSX traps."
+    ::= { sxMibGroups 2 } 
+
+END

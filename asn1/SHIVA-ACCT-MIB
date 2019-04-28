@@ -1,0 +1,224 @@
+--
+-- 	Copyright 1996 Shiva Corporation
+--
+
+--	Connection accounting related variables.
+
+SHIVA-ACCT-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	Counter
+		FROM RFC1155-SMI
+	acct
+		FROM SHIVA-MIB
+	memoryFree
+		FROM SHIVA-MEM-MIB
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+--  This MIB module uses the extended OBJECT-TYPE macro as
+--  defined in RFC 1212.
+
+--  This is the MIB module for the overall system of accounting
+--  system resources by connected users.  It shows the configuration
+--  of this portion of the system, and the current status of
+--  information stored in it.
+
+    -- Connection accounting configuration group.
+
+    acctConf OBJECT IDENTIFIER ::= { acct 1 }
+
+    acctEnabled OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates if connection accounting is enabled."
+	::= { acctConf 1 }
+
+    acctRadiusEnabled OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates if connection accounting via RADIUS is enabled.
+		See SHIVA-RADIUS-MIB."
+	::= { acctConf 2 }
+
+    acctEventLogEnabled OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates if connection accounting via Event Loggging
+		is enabled."
+	::= { acctConf 3 }
+
+    acctMaxDram OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Maximum amount of system heap (DRAM) that the connection
+		accounting is allowed to use if non-volatile memory (SRAM)
+		is not available."
+	::= { acctConf 4 }
+
+    acctMinHeap OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Minimum amount of system heap (DRAM) that the connection
+		accounting must leave free when using DRAM because
+		non-volatile memory (SRAM) is not available.  See
+		memoryFree in SHIVA-MEM-MIB."
+	::= { acctConf 5 }
+
+    acctMaxSram OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Maximum amount of system heap (SRAM) that the connection
+		accounting is allowed to use if pre-allocated memory (SRAM)
+		is not available.  This variable is not used by 
+		the LanRover Access Switch."
+	::= { acctConf 6 }
+
+    -- Connection accounting status/statistics group.
+
+    acctStat OBJECT IDENTIFIER ::= { acct 2 }
+
+    acctCurrentTotalRecordCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of accounting records that are
+		active or are waiting to be safely stored by the active 
+		accounting protocols.  This includes records in
+		non-volatile (SRAM) and volatile (DRAM) memory."
+	::= { acctStat 1 }
+
+    acctCurrentVolatileRecordCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of volatile accounting records 
+		that are active or are waiting to be safely stored by
+		the active accounting protocols.  This includes only
+		accounting events stored in volatile (DRAM) memory,
+		which would be lost in the case of a power failure."
+	::= { acctStat 2 }
+
+    acctRecordCount OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of accounting records processed."
+	::= { acctStat 3 }
+
+    acctEventCount OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of accounting events processed."
+	::= { acctStat 4 }
+
+    acctDropCount OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of accounting records dropped for lack
+		of memory."
+	::= { acctStat 5 }
+
+    acctLostRecordsRestart OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of accounting records that were in
+		volatile memory the last time the system restarted, and thus
+		were lost."
+	::= { acctStat 6 }
+
+    acctLostEventsRestart OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of accounting events that were in
+		volatile memory the last time the system restarted, and thus
+		were lost.  (Events are incomplete components of records.)"
+	::= { acctStat 7 }
+
+    -- Traps about connection accounting.
+
+    acctTraps OBJECT IDENTIFIER ::= { acct 3 }
+
+    acctLostRecordTrap TRAP-TYPE
+	ENTERPRISE
+		acctTraps
+	VARIABLES {
+		acctLostRecordsRestart,	-- number of records lost
+		acctLostEventsRestart	-- number of events lost
+	}
+	DESCRIPTION
+		"This trap is generated when the system
+		restarts, and determines that there had
+		been accounting records or events stored in volatile
+		memory when the system went down.  Volatile memory
+		being volatile, those records and events have been lost,
+		and will not be sent to an accounting server."
+	::= 1
+
+    acctMemoryUnavailableTrap TRAP-TYPE
+	ENTERPRISE
+		acctTraps
+	VARIABLES {
+		memoryFree,			-- volatile mem avail
+		acctCurrentTotalRecordCount,	-- total records
+		acctCurrentVolatileRecordCount	-- records in volatile mem
+	}
+	DESCRIPTION
+		"This trap is generated when the accounting
+		system runs out of volatile memory to store 
+		accounting records in."
+	::= 2
+
+    acctMemoryAvailableTrap TRAP-TYPE
+	ENTERPRISE
+		acctTraps
+	VARIABLES {
+		memoryFree,			-- volatile mem avail
+		acctCurrentTotalRecordCount,	-- total records
+		acctCurrentVolatileRecordCount	-- records in volatile mem
+	}
+	DESCRIPTION
+		"This trap is generated when the accounting
+		system is no longer out of volatile memory to store 
+		accounting records in."
+	::= 3
+
+    acctVolatileTrap TRAP-TYPE
+	ENTERPRISE
+		acctTraps
+	VARIABLES {
+		memoryFree,			-- volatile mem avail
+		acctCurrentTotalRecordCount,	-- total records
+		acctCurrentVolatileRecordCount	-- records in volatile mem
+	}
+	DESCRIPTION
+		"This trap is generated when the system
+		runs out of memory in non-volatile memory for
+		accounting records, and starts using volatile memory
+		that could be lost in a power failure."
+	::= 4
+END

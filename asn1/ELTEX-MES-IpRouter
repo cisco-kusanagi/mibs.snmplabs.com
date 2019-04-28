@@ -1,0 +1,86 @@
+ELTEX-MES-IpRouter DEFINITIONS ::= BEGIN
+
+-- Title:      Eltex MES IP Router Private Extension
+-- Version:    1.0
+-- Date:       12 Feb 2014
+
+--  OSPF md5 authentication table
+
+IMPORTS
+    OBJECT-TYPE                                 FROM SNMPv2-SMI
+    eltMesOspf                                  FROM ELTEX-MES-IP
+    Unsigned32, IpAddress                       FROM SNMPv2-SMI
+    RowStatus                                   FROM SNMPv2-TC;
+
+eltOspfAuthTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF EltOspfAuthEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The OSPF Interface Table describes the  inter-
+           faces from the viewpoint of OSPF."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3  Router  interface
+          parameters"
+      ::= { eltMesOspf 1 }
+
+eltOspfAuthEntry OBJECT-TYPE
+        SYNTAX EltOspfAuthEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The OSPF Interface Entry describes one  inter-
+           face from the viewpoint of OSPF."
+       INDEX { eltOspfIfIpAddress, eltOspfAuthKeyId}
+       ::= { eltOspfAuthTable 1 }
+
+EltOspfAuthEntry ::=
+    SEQUENCE {
+        eltOspfIfIpAddress       IpAddress,
+        eltOspfAuthKeyId         Unsigned32,
+        eltOspfAuthKey           OCTET STRING,
+        eltOspfAuthStatus        RowStatus
+    }
+
+eltOspfIfIpAddress OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The IP address of this OSPF interface."
+       ::= { eltOspfAuthEntry 1 }
+
+eltOspfAuthKeyId OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The md5 authentication key ID.  The value must be
+            (1 to 255). This field identifies the algorithm and secret
+            key used to create the message digest appended to the OSPF
+            packet.  Key Identifiers are unique per-interface
+            (or equivalently, per-subnet)."
+       ::= { eltOspfAuthEntry 2 }
+
+eltOspfAuthKey OBJECT-TYPE
+         SYNTAX   OCTET STRING (SIZE (0..16))
+         MAX-ACCESS   read-write
+         STATUS   current
+         DESCRIPTION
+            "The MD5 Authentication Key.  If the Area's Authorization
+            Type is md5, and the key length is shorter than 16 octets,
+            the agent will left adjust and zero fill to 16 octets.
+            When read, snOspfIfMd5AuthKey always returns an Octet String
+            of length zero."
+         ::= { eltOspfAuthEntry 3 }
+
+eltOspfAuthStatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "This variable displays the status of  the  en-
+           try."
+       ::= { eltOspfAuthEntry 4 }
+
+END

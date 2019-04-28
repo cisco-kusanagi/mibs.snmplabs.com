@@ -1,0 +1,872 @@
+Wellfleet-DSQMS-MIB DEFINITIONS ::= BEGIN
+
+-- This note is a reminder for Hung Trinh.  It will be removed later.
+--
+-- This file is copied from diffserv.mib.  In wfcommon.mib, the
+-- wfDiffServAppGroup is under wfApplication.  DSQMS may make its
+-- own group "wfDsqmsGroup" directly under wfApplication or
+-- directly under wfDataLink (which is under wfApplication).
+-- wfDsqmsGroup can be under wfQoSPolicyGroup.  Regardless, this
+-- file should be updated to reflect which group it belongs to.
+-- For now, I assume there is wfDsqmsGroup!
+--
+-- For compiling purpose, I put wfDsqmsGroup under wfDataLink.
+
+    IMPORTS
+
+      Counter
+        FROM RFC1155-SMI
+      OBJECT-TYPE
+        FROM RFC-1212
+      wfDsqmsGroup
+        FROM Wellfleet-COMMON-MIB;
+
+
+    wfDsqmsIfTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfDsqmsIfEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table of DSQMS (DiffServ Queue Management and 
+                 Scheduler) interfaces."
+        ::= { wfDsqmsGroup 1 }
+
+    wfDsqmsIfEntry OBJECT-TYPE
+        SYNTAX	WfDsqmsIfEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "DSQMS interface table entry."
+        INDEX	{ wfDsqmsIfLineNumber }
+        ::= { wfDsqmsIfTable 1 }
+
+    WfDsqmsIfEntry ::= SEQUENCE {
+    	    wfDsqmsIfCreate
+    		INTEGER,
+    	    wfDsqmsIfEnable
+    		INTEGER,
+    	    wfDsqmsIfState
+    		INTEGER,
+    	    wfDsqmsIfLineNumber
+    		INTEGER,
+    	    wfDsqmsIfRestart
+    		INTEGER,
+    	    wfDsqmsIfTotalNumQueues
+    		INTEGER,
+    	    wfDsqmsIfNumPQueues
+    		INTEGER,
+    	    wfDsqmsIfNumWQueues
+    		INTEGER,
+    	    wfDsqmsIfNumPQInUse
+    		INTEGER,
+    	    wfDsqmsIfNumWQInUse
+    		INTEGER,
+    	    wfDsqmsIfDebugLevel
+    		INTEGER,
+	    wfDsqmsIfBestEffortQueueId
+		INTEGER,
+    	    wfDsqmsIfPacketCount
+    		INTEGER,
+    	    wfDsqmsIfByteCount
+    		INTEGER,
+    	    wfDsqmsIfXmitPkts
+    		Counter,
+    	    wfDsqmsIfXmitBytes
+    		Counter,
+    	    wfDsqmsIfDroppedPkts
+    		Counter,
+    	    wfDsqmsIfDroppedBytes
+    		Counter,
+    	    wfDsqmsIfDequeueAtLineRate
+    		INTEGER
+        }
+
+    wfDsqmsIfCreate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    created(1),
+                    deleted(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+
+                "Create/Delete parameter. Default is created."
+        DEFVAL  { created }
+        ::= { wfDsqmsIfEntry 1 }
+
+    wfDsqmsIfEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Enable/Disable parameter. Default is enabled."
+        DEFVAL  { enabled }
+        ::= { wfDsqmsIfEntry 2 }
+
+    wfDsqmsIfState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    up(1),
+                    down(2),
+                    init(3),
+                    holddown(4),
+                    notpres(5)
+                }
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Current state of DSQMS on this interface."
+        DEFVAL  { notpres }
+        ::= { wfDsqmsIfEntry 3 }
+
+    wfDsqmsIfLineNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Identifies the instance for this interface."
+        ::= { wfDsqmsIfEntry 4 }
+
+    wfDsqmsIfRestart OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    set(1),
+                    notset(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Setting this attribute to a 'set(1)'  will
+                cause immediate updating of wfDsqmsIfQueueEntry MIB
+                on the same line number.  Once activated, this attribute
+                should be reset to 'notset(2)' to allow subsequent activations."
+        DEFVAL  { notset }
+        ::= { wfDsqmsIfEntry 5 }
+
+    wfDsqmsIfTotalNumQueues OBJECT-TYPE
+        SYNTAX  INTEGER(0..30)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The total number of queues configured for this interface."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfEntry 6 }
+
+    wfDsqmsIfNumPQueues OBJECT-TYPE
+        SYNTAX  INTEGER(0..30)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of priority queues configued for this interface."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfEntry 7 }
+
+    wfDsqmsIfNumWQueues OBJECT-TYPE
+        SYNTAX  INTEGER(0..30)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of weighted queues configued for this interface."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfEntry 8 }
+
+    wfDsqmsIfNumPQInUse OBJECT-TYPE
+        SYNTAX  INTEGER(0..30)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of priority queues that are currently in use
+                 for this interface."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfEntry 9 }
+
+    wfDsqmsIfNumWQInUse OBJECT-TYPE
+        SYNTAX  INTEGER(0..30)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of weighted queues that are currently in use
+                 for this interface."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfEntry 10 }
+
+    wfDsqmsIfDebugLevel OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    none(1),
+                    trace(2),
+                    detailed(3)
+        }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the level of debug.
+                 none      - default.  No debug information is displayed
+                 trace      - displaying related DSQMS function names
+                 detailed  - in additional to log messages of 'high' level,
+                             some environment variables, queue info will
+                             be logged.
+                 Note: DO NOT set to 'trace' or 'detailed' debug level
+                 in operational environment as it will likely flood the
+                 logging facility.  This attribute is reserved for specialized
+                 debugging in a controlled lab environment."
+        DEFVAL  { none }
+        ::= { wfDsqmsIfEntry 11 }
+
+    wfDsqmsIfBestEffortQueueId OBJECT-TYPE
+        SYNTAX  INTEGER(0..30)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The Queue Id that is selected for best effort traffic
+                 for this interface."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfEntry 12 }
+
+    wfDsqmsIfPacketCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of currently queued packets in DSQMS module on this
+                 interface."
+        ::= { wfDsqmsIfEntry 13 }
+
+    wfDsqmsIfByteCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of currently queued bytes in DSQMS module on this
+                 interface."
+        ::= { wfDsqmsIfEntry 14 }
+
+    wfDsqmsIfXmitPkts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of xmitted packets from DSQMS module on this
+                 interface."
+        ::= { wfDsqmsIfEntry 15 }
+
+    wfDsqmsIfXmitBytes OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of xmitted bytes from DSQMS module on this
+                 interface."
+        ::= { wfDsqmsIfEntry 16 }
+
+    wfDsqmsIfDroppedPkts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of dropped packets from DSQMS module on this
+                 interface."
+        ::= { wfDsqmsIfEntry 17 }
+
+    wfDsqmsIfDroppedBytes OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of dropped bytes from DSQMS module on this
+                 interface."
+        ::= { wfDsqmsIfEntry 18 }
+
+    wfDsqmsIfDequeueAtLineRate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Determines whether the dequeuing from the
+                 queues is to be done at the line rate
+                 instead of the conventional technique or
+                 not."
+        DEFVAL  { disabled }
+        ::= { wfDsqmsIfEntry 19 }
+
+
+    wfDsqmsIfQueueTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfDsqmsIfQueueEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table of DSQMS (DiffServ Queue Management and 
+                 Scheduler) queues."
+        ::= { wfDsqmsGroup 2 }
+
+    wfDsqmsIfQueueEntry OBJECT-TYPE
+        SYNTAX	WfDsqmsIfQueueEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "DSQMS queue table entry."
+        INDEX	{ wfDsqmsIfQueueLineNumber,
+                  wfDsqmsIfQueueId }
+        ::= { wfDsqmsIfQueueTable 1 }
+
+    WfDsqmsIfQueueEntry ::= SEQUENCE {
+    	    wfDsqmsIfQueueCreate
+    		INTEGER,
+    	    wfDsqmsIfQueueEnable
+    		INTEGER,
+    	    wfDsqmsIfQueueState
+    		INTEGER,
+    	    wfDsqmsIfQueueLineNumber
+    		INTEGER,
+    	    wfDsqmsIfQueueId
+    		INTEGER,
+    	    wfDsqmsIfQueueType
+    		INTEGER,
+    	    wfDsqmsIfQueueBestEffort
+    		INTEGER,
+    	    wfDsqmsIfQueuePrioLevel
+    		INTEGER,
+    	    wfDsqmsIfQueuePrioTimeQuantum
+    		INTEGER,
+    	    wfDsqmsIfQueueCfgPktLimit
+    		INTEGER,
+    	    wfDsqmsIfQueuePktLimit
+    		INTEGER,
+    	    wfDsqmsIfQueueByteLimit
+    		INTEGER,
+    	    wfDsqmsIfQueueCfgWeight
+    		INTEGER,
+    	    wfDsqmsIfQueueWeight
+    		INTEGER,
+    	    wfDsqmsIfQueueQuantum
+    		INTEGER,
+    	    wfDsqmsIfQueueFlowFairnessEnable
+    		INTEGER,
+    	    wfDsqmsIfQueueJitterConst
+    		INTEGER,
+    	    wfDsqmsIfQueueBucketQuantum
+    		INTEGER,
+    	    wfDsqmsIfQueueDropType
+    		INTEGER,
+    	    wfDsqmsIfQueuePktCount
+    		INTEGER,
+    	    wfDsqmsIfQueueByteCount
+    		INTEGER,
+    	    wfDsqmsIfQueueXmitPkts
+    		Counter,
+    	    wfDsqmsIfQueueXmitBytes
+    		Counter,
+    	    wfDsqmsIfQueueDroppedPkts
+    		Counter,
+    	    wfDsqmsIfQueueDroppedBytes
+    		Counter,
+	    wfDsqmsIfQueueRedEwqaGain
+		INTEGER,
+	    wfDsqmsIfQueueRedIdleLossRate
+		INTEGER
+        }
+
+    wfDsqmsIfQueueCreate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    created(1),
+                    deleted(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+
+                "Create/Delete parameter. Default is created."
+        DEFVAL  { created }
+        ::= { wfDsqmsIfQueueEntry 1 }
+
+    wfDsqmsIfQueueEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Enable/Disable parameter. Default is disabled."
+        DEFVAL  { disabled }
+        ::= { wfDsqmsIfQueueEntry 2 }
+
+    wfDsqmsIfQueueState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    active(1),
+                    inactive(2),
+                    init(3),
+                    invalid(4)
+                }
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicate whether the particular queue is operational."
+        DEFVAL  { invalid }
+        ::= { wfDsqmsIfQueueEntry 3 }
+
+    wfDsqmsIfQueueLineNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Identifies the interface this queue belongs to."
+        ::= { wfDsqmsIfQueueEntry 4 }
+
+    wfDsqmsIfQueueId OBJECT-TYPE
+        SYNTAX  INTEGER(1..30)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Identifies the instance of this queue."
+        ::= { wfDsqmsIfQueueEntry 5 }
+
+    wfDsqmsIfQueueType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    priority(1),
+                    weighted(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Selects the queue scheduling type, strict priority or
+                 weighted round robin.  In strict priority, the queues are
+                 serviced in the order of highest priority to lowest
+                 priority.  In weighted round robin, each queue is serviced
+                 according to the weights."
+        DEFVAL  { priority }
+        ::= { wfDsqmsIfQueueEntry 6 }
+
+    wfDsqmsIfQueueBestEffort OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    yes(1),
+                    no(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The indication of whether or not this queue is used for
+                best effort traffic.  It is default to not a best effort
+                queue."
+        DEFVAL  { no }
+        ::= { wfDsqmsIfQueueEntry 7 }
+
+    wfDsqmsIfQueuePrioLevel OBJECT-TYPE
+        SYNTAX  INTEGER(0..29)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Priority level for this queue, 0=highest priority.
+                A possible lowest priority can be 29.  This parameter
+                is applicable to priority queue only."
+        ::= { wfDsqmsIfQueueEntry 8 }
+
+    wfDsqmsIfQueuePrioTimeQuantum OBJECT-TYPE
+        SYNTAX  INTEGER(0..5000)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the maximum amount of time (in msec) the queue is allowed
+                to transmit data.  This intends to avoid starvation of
+                other queues.  This parameter is applicable to priority
+                queue only."
+        DEFVAL  { 100 }
+        ::= { wfDsqmsIfQueueEntry 9 }
+
+    wfDsqmsIfQueueCfgPktLimit OBJECT-TYPE
+        SYNTAX  INTEGER(0..2147483647)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Configured maximum number of packets this queue can hold.
+                If this value is not configured, default to zero, the system
+                will determine the limit based on the number of buffers
+                available and the number of queues configured on the slot."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfQueueEntry 10 }
+
+    wfDsqmsIfQueuePktLimit OBJECT-TYPE
+        SYNTAX  INTEGER(0..2147483647)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Maximum number of packets this queue can hold.
+                This value is filled in by the system if wfDsqmsIfQueueCfgPktLimit
+                is set to default(0), otherwise it is wfDsqmsIfQueueCfgPktLimit."
+        ::= { wfDsqmsIfQueueEntry 11 }
+
+    wfDsqmsIfQueueByteLimit OBJECT-TYPE
+        SYNTAX  INTEGER(0..2147483647)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Maximum number of bytes this queue can hold.
+                Default to zero.  If zero, no byte limit."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfQueueEntry 12 }
+
+    wfDsqmsIfQueueCfgWeight OBJECT-TYPE
+        SYNTAX  INTEGER(1..100)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the relative ratio of this queue over the sum
+                of all the weighted queues on the same interface.  For
+                instance, this queue's CfgWeight is 5 and two other
+                queues' CfgWeight are 3 and 2.  This queue will get
+                the weight of 5 over 10 (5+3+2) or 50%.  The other queues's
+                weights are 30% and 20%, respectively.
+                This parameter is applicable to weighted queue only."
+        DEFVAL  { 1 }
+        ::= { wfDsqmsIfQueueEntry 13 }
+
+    wfDsqmsIfQueueWeight OBJECT-TYPE
+        SYNTAX  INTEGER(0..100)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Actual weight, in percentage, is currently used."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfQueueEntry 14 }
+
+    wfDsqmsIfQueueQuantum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Amount of data (in bytes) this queue is allowed to
+                transmit per scheduler's invocation.  This value is
+                calculated."
+        ::= { wfDsqmsIfQueueEntry 15 }
+
+    wfDsqmsIfQueueFlowFairnessEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates whether or not hash table should be used.
+                When this parameter is enabled, hash table is used
+                to separate data packets into buckets within this queue.
+                This mechanism will improve the fairness among flows
+                within a queue."
+        DEFVAL  { disabled }
+        ::= { wfDsqmsIfQueueEntry 16 }
+
+    wfDsqmsIfQueueJitterConst OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    small(1),
+                    normal(2),
+                    large(4)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Categorizes how sensitive traffic of this queue is to
+                jitter effect, thus this parameter provides an indicator
+                for calculating the bucket quantum."
+        DEFVAL  { normal }
+        ::= { wfDsqmsIfQueueEntry 17 }
+
+    wfDsqmsIfQueueBucketQuantum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Amount of data (in bytes) a bucket within this queue is
+                allowed to transmit per scheduler's invocation.  This value
+                is calculated based on queue quantum and the jitter constant
+                parameters.  This parameter is applicable to the flow fairness
+                enable parameter."
+        ::= { wfDsqmsIfQueueEntry 18 }
+
+    wfDsqmsIfQueueDropType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    red(1),
+                    tail-drop(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates whether or not RED (Random Earlt Detection) is used
+                for active queue management.  If disabled, tail drop
+                is used for this queue.  This parameter is default
+                to disabled."
+        DEFVAL  { tail-drop }
+        ::= { wfDsqmsIfQueueEntry 19 }
+
+    wfDsqmsIfQueuePktCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Current number of packets in this queue."
+        ::= { wfDsqmsIfQueueEntry 20 }
+
+    wfDsqmsIfQueueByteCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Current number of bytes in this queue."
+        ::= { wfDsqmsIfQueueEntry 21 }
+
+    wfDsqmsIfQueueXmitPkts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Total number of packets transmitted out of this queue
+                since creation or last reset.  This is a statistics parameter."
+        ::= { wfDsqmsIfQueueEntry 22 }
+
+    wfDsqmsIfQueueXmitBytes OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Toal number of bytes transmitted out of this queue
+                since creation or last reset.  This is a statistics parameter."
+        ::= { wfDsqmsIfQueueEntry 23 }
+
+    wfDsqmsIfQueueDroppedPkts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Total number of packets dropped from this queue
+                since creation or last reset.  This is a statistics parameter."
+        ::= { wfDsqmsIfQueueEntry 24 }
+
+    wfDsqmsIfQueueDroppedBytes OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Total number of bytes dropped from this queue
+                since creation or last reset.  This is a statistics parameter."
+        ::= { wfDsqmsIfQueueEntry 25 }
+
+    wfDsqmsIfQueueRedEwqaGain OBJECT-TYPE
+        SYNTAX  INTEGER(1..100)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+		"Gain value used in exp-weighted que average calculations. Value
+		is expressed as percent 1%-100%"
+	DEFVAL  { 30 }
+        ::= { wfDsqmsIfQueueEntry 26 }
+
+    wfDsqmsIfQueueRedIdleLossRate OBJECT-TYPE
+        SYNTAX  INTEGER(1..99)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+		"Rate - derivative from gain value for the case of empty queue.
+		Rate with which average value is diminishes. For instance 30%,
+		means 'Average size diminishes by 30% per second.' Value
+		is expressed as percent 1%-99%"
+	DEFVAL  { 30 }
+        ::= { wfDsqmsIfQueueEntry 27 }
+
+
+
+    wfDsqmsIfClassifierTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfDsqmsIfClassifierEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table of DSQMS (DiffServ Queue Management and 
+                 Scheduler) classifier."
+        ::= { wfDsqmsGroup 3 }
+
+    wfDsqmsIfClassifierEntry OBJECT-TYPE
+        SYNTAX	WfDsqmsIfClassifierEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "DSQMS classifier table entry.  Classifier entry is used
+                to select the queue and red function for IP packets, based on
+                DS byte in the IP header."
+        INDEX	{ wfDsqmsIfClassifierLineNumber,
+                  wfDsqmsIfClassifierDSCP }
+
+        ::= { wfDsqmsIfClassifierTable 1 }
+
+    WfDsqmsIfClassifierEntry ::= SEQUENCE {
+    	    wfDsqmsIfClassifierCreate
+    		INTEGER,
+    	    wfDsqmsIfClassifierLineNumber
+    		INTEGER,
+    	    wfDsqmsIfClassifierDSCP
+    		INTEGER,
+    	    wfDsqmsIfClassifierQueueId
+    		INTEGER,
+    	    wfDsqmsIfClassifierRedId
+    		INTEGER
+        }
+        
+    wfDsqmsIfClassifierCreate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    created(1),
+                    deleted(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Create/Delete parameter. Default is created."
+        DEFVAL  { created }
+        ::= { wfDsqmsIfClassifierEntry 1 }
+
+    wfDsqmsIfClassifierLineNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Identifies the interface this classifier belongs to."
+        ::= { wfDsqmsIfClassifierEntry 2 }
+
+    wfDsqmsIfClassifierDSCP OBJECT-TYPE
+        SYNTAX  INTEGER(0..255)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "DS Code Point (DSCP) for this classifier.  This is also
+                an identifier for this instance."
+        ::= { wfDsqmsIfClassifierEntry 3 }
+
+    wfDsqmsIfClassifierQueueId OBJECT-TYPE
+        SYNTAX  INTEGER(1..30)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the queue to be used for IP packets whose DSCPs
+                match with this classifier's DSCP."
+        ::= { wfDsqmsIfClassifierEntry 4 }
+
+    wfDsqmsIfClassifierRedId OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the RED function to be used for IP packets
+                whose DSCPs match with this classifier's DSCP.  RedId
+                of zero means RED is not applicable for this DSCP
+                in the queue indicated by QueueId parameter."
+        DEFVAL  { 0 }
+        ::= { wfDsqmsIfClassifierEntry 5 }
+
+
+    wfDsqmsRedTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfDsqmsRedEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table of DSQMS (DiffServ Queue Management and 
+                 Scheduler) RED (Random Early Detection)."
+        ::= { wfDsqmsGroup 4 }
+
+    wfDsqmsRedEntry OBJECT-TYPE
+        SYNTAX	WfDsqmsRedEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "DSQMS Red table entry.  Red entry is used to configure
+                te RED parameters to make up RED drop probability."
+        INDEX	{ wfDsqmsRedId }
+        ::= { wfDsqmsRedTable 1 }
+
+     WfDsqmsRedEntry ::= SEQUENCE {
+	wfDsqmsRedCreate
+    		INTEGER,	
+	wfDsqmsRedId
+    		INTEGER,
+	wfDsqmsRedCfgStatus
+    		INTEGER,
+	wfDsqmsRed2ndOrderConst
+    		INTEGER,
+	wfDsqmsRed1stOrderConst
+    		INTEGER,
+	wfDsqmsRedMinTh
+    		INTEGER,
+	wfDsqmsRedMaxTh
+    		INTEGER
+	}
+
+	wfDsqmsRedCreate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    created(1),
+                    deleted(2)
+                }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Create/Delete parameter. Default is created."
+        DEFVAL  { created }
+        ::= { wfDsqmsRedEntry 1 }
+
+	wfDsqmsRedId OBJECT-TYPE
+        SYNTAX  INTEGER(1..65535) 
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Unique identifier."
+        ::= { wfDsqmsRedEntry 2 }
+
+	wfDsqmsRedCfgStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    defined(1),
+                    unDefined(2),
+		    notPresent(8)
+                }
+        ACCESS	read-only
+        STATUS	mandatory
+        DEFVAL  { notPresent }
+        ::= { wfDsqmsRedEntry 3 }
+
+	wfDsqmsRed2ndOrderConst OBJECT-TYPE
+        SYNTAX  INTEGER (0 .. 1000)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Highest order constant"
+        DEFVAL  { 10 }
+        ::= { wfDsqmsRedEntry 4 }
+
+	wfDsqmsRed1stOrderConst OBJECT-TYPE
+        SYNTAX  INTEGER (0 .. 100)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+		"Lowest order constant"
+	DEFVAL  { 1 }
+        ::= { wfDsqmsRedEntry 5 }
+
+	wfDsqmsRedMinTh OBJECT-TYPE
+        SYNTAX  INTEGER (0 .. 100)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Lower portion of the average queue value (percent)
+		where prob. of being dropped is always 0 (zero)"
+        DEFVAL  { 20 }
+        ::= { wfDsqmsRedEntry 6 }
+
+	wfDsqmsRedMaxTh OBJECT-TYPE
+        SYNTAX  INTEGER (1 .. 100)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Upper portion of the average queue value (percent)
+		where prob. of being dropped is always 0 (zero)"
+        DEFVAL  { 80 }
+        ::= { wfDsqmsRedEntry 7 }
+
+
+
+    END  -- Wellfleet-DSQMS-MIB

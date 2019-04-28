@@ -1,0 +1,293 @@
+-- extracted from draft-ietf-rserpool-mib-00.txt
+-- at Fri May 10 06:09:04 2002
+
+   RSERPOOL--MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+   	MODULE-IDENTITY,
+   	OBJECT-TYPE,
+   	TimeTicks,
+   	Unsigned32
+   		FROM SNMPv2-SMI;
+
+   rserpoolMIB MODULE-IDENTITY
+     LAST-UPDATED "200111120000Z"
+     ORGANIZATION "Netlab, TEMPLE UNIVERSITY"
+     CONTACT-INFO
+            " JAIWANT-MULIK
+              PHILLIP-CONRAD
+              KEVIN-PINZHOFFER
+
+              Postal: 1805, N Broad St.
+                      Philadelphia, PA
+                      USA 19121
+
+              Phones: +1 215 204 7910
+
+              Emails: jmulik@temple.edu
+                      conrad@acm.org
+                      kpinzhof@temple.edu"
+     DESCRIPTION
+             "The MIB module for managing a RserPool implementation"
+     ::= { xxxx } -- IANA Assigned
+
+   -- Top level definitions
+
+   nameServer OBJECT IDENTIFIER ::= { rserpoolMIB 1 }
+   poolElements OBJECT IDENTIFIER ::= { rserpoolMIB 2 }
+
+   -- Definition of the pool handle table
+
+   poolHandleCount OBJECT-TYPE
+                   SYNTAX Unsigned32
+                   MAX-ACCESS read-only
+                   STATUS current
+                   DESCRIPTION
+                    "The total number of pool handles supported by this name server"
+                   ::= { nameServer 1 }
+
+   poolHandleTable OBJECT-TYPE
+                   SYNTAX SEQUENCE OF poolHandleEntry
+                   MAX-ACCESS read-only
+                   STATUS     current
+                   DESCRIPTION
+                     "The conceptual table listing the pool handles served
+                      by this name server"
+                   ::= { nameServer 2 }
+
+   poolHandleEntry OBJECT-TYPE
+                   SYNTAX PoolHandleEntry
+                   MAX-ACCESS read-only
+                   STATUS     current
+                   DESCRIPTION
+                     "The conceptual row in poolHandleTable."
+                   INDEX { poolHandleIndex }
+                   ::= { poolHandleTable 1 }
+
+   PoolHandleEntry ::= SEQUENCE {
+                       poolHandleIndex     Unsigned32,
+                       poolElementCount    Unsigned32,
+                       poolHandle          OCTET STRING }
+
+   poolHandleIndex OBJECT-TYPE
+                   SYNTAX UNSIGNED32
+                   MAX-ACCESS not-accessible
+                   STATUS current
+                   DESCRIPTION
+                    "Index to the poolHandleTable. This value is between,
+                     0 and (poolHandleCount-1)"
+                   ::= { poolHandleEntry 1}
+
+   poolElementCount OBJECT-TYPE
+                  SYNTAX UNSIGNED32
+                  MAX-ACCESS read-only
+                  STATUS current
+                  DESCRIPTION
+                   "The number of pool elements that belong to this
+                    pool handle"
+                  ::= { poolHandleEntry 2 }
+
+   poolHandle      OBJECT-TYPE
+                   SYNTAX OCTET STRING
+                   MAX-ACCESS read-only
+                   STATUS  current
+                   DESCRIPTION
+                    "The pool handle of this row"
+                    ::= { poolHandleEntry 3 }
+
+   -- Definition of pool element table
+
+   poolElementTable OBJECT-TYPE
+                    SYNTAX SEQUENCE OF poolElementEntry
+                    MAX-ACCESS read-only
+                    STATUS    current
+                    DESCRIPTION
+                     "The conceptual table listing the PEs per pool handle"
+                    ::= { nameServer 3 }
+
+
+   poolElementEntry OBJECT-TYPE
+                    SYNTAX PoolELementEntry
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                     "The conceptual row in poolElementTable. Note the compound
+                      index element. We are using the table-in-table idea here."
+                    INDEX { poolHandleIndex, poolElementIndex }
+                    ::= { poolElementTable 1 }
+
+   PoolElementEntry ::= SEQUENCE {
+                    poolElementIndex Unsigned32,
+                    poolElementIPAddressCount Unsigned32,
+                    poolElementHostname OCTET STRING,
+                    policyType Unsigned32,
+                    policyValue Unsigned32,
+                    noOfRequests Unsigned32,
+                    noOfRequestsInQueue Unsigned32,
+                    sctpPort INTEGER,
+                    upTimePE TimeTicks }
+
+   poolElementIndex OBJECT-TYPE
+                    SYNTAX UNSIGNED32
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                    "Indexes into the poolElementTable. This value is between,
+                     0 and (poolElementCount-1) of the
+                     corresponding poolHandleTable"
+                   ::={ poolElementEntry 1 }
+
+
+   poolElementIPAddressCount OBJECT-TYPE
+                    SYNTAX UNSIGNED32
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                    "Counts the number of IP addresses assigned to a hostname"
+                    ::= { poolElementEntry 2 }
+
+
+
+   poolElementHostname OBJECT-TYPE
+                    SYNTAX OCTET STRING
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                    "Hostname of a pool element"
+                    ::= { poolElementEntry 3 }
+
+
+   policyType OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                 "The policy type for this pool element"
+                ::= { poolElementEntry 4 }
+
+
+   policyValue OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                 "The policy value for this pool element"
+                 ::= { poolElementEntry 5 }
+
+   noOfRequests OBJECT-TYPE
+               SYNTAX Unsigned32
+               MAX-ACCESS read-only
+               STATUS current
+               DESCRIPTION
+                "The number of service requests that this PE is currenly processing"
+               ::= { poolElementEntry 6}
+
+   noOfRequestsInQueue OBJECT-TYPE
+               SYNTAX Unsigned32
+               MAX-ACCESS read-only
+               STATUS current
+               DESCRIPTION
+                "The number of service requests currently queued by the PE"
+               ::= { poolElementEntry 7 }
+
+   sctpPort OBJECT-TYPE
+              SYNTAX INTEGER (0..65535)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+               "The SCTP port from this pool elements PE parameter"
+              ::= { poolElementEntry 8 }
+
+   upTimePE OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+             "Time since last start of the PE"
+            ::= { poolElementEntry 9 }
+
+
+   --- Definition of addresslist Table
+
+   addrListTable   OBJECT-TYPE
+                   SYNTAX SEQUENCE OF addrListTableEntry
+                   MAX-ACCESS read-only
+                   STATUS current
+                   DESCRIPTION
+                   "This table holds all the IP addresses of a multi-homed host"
+                   ::= { nameServer 4 }
+
+   addrListTableEntry  OBJECT-TYPE
+                   SYNTAX AddrListTableEntry
+                   MAX-ACCESS read-only
+                   STATUS current
+                   INDEX { poolHandleIndex, poolElementIndex, addrListTableIndex }
+                   DESCRIPTION
+                   "A row in the addrList table"
+                   ::= { addrListTable 1 }
+
+
+   AddrListTableEntry ::= SEQUENCE {
+                    addrListTableIndex Unsigned32,
+                    hostIPAddress IpAddress }
+
+   addrListTableIndex OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS not-accessible
+                    STATUS current
+   		 DESCRIPTION
+                    "Indexes into the addrListTable. This values is between
+                    0 and (poolElementIPAddressCount-1)."
+                    ::= { addrListTableEntry 1}
+
+   hostIPAddress OBJECT-TYPE
+                 SYNTAX IpAddress
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                 " The address column in the addrListTable "
+                 ::= { addrListTableEntry 2 }
+
+
+   --
+
+   uptimeNS  OBJECT-TYPE
+                   SYNTAX TimeTicks
+                   MAX-ACCESS read-only
+                   STATUS current
+                   DESCRIPTION
+                   "Time since the last start of this service"
+                 ::= { nameServer 5 }
+
+
+
+   END
+
+-- 
+--    Copyright (C) The Internet Society (2002).  All Rights Reserved.
+-- 
+--    This document and translations of it may be copied and furnished to
+--    others, and derivative works that comment on or otherwise explain it
+--    or assist in its implementation may be prepared, copied, published
+--    and distributed, in whole or in part, without restriction of any
+--    kind, provided that the above copyright notice and this paragraph are
+--    included on all such copies and derivative works.  However, this
+--    document itself may not be modified in any way, such as by removing
+--    the copyright notice or references to the Internet Society or other
+--    Internet organizations, except as needed for the purpose of
+--    developing Internet standards in which case the procedures for
+--    copyrights defined in the Internet Standards process must be
+--    followed, or as required to translate it into languages other than
+--    English.
+-- 
+--    The limited permissions granted above are perpetual and will not be
+--    revoked by the Internet Society or its successors or assigns.
+-- 
+--    This document and the information contained herein is provided on an
+--    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+--    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+--    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+--    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- 
+

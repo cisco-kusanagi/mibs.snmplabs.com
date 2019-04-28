@@ -1,0 +1,3721 @@
+USR-IPOA-ARP-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+      OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+      Integer32, Counter32, IpAddress
+          FROM SNMPv2-SMI
+      TEXTUAL-CONVENTION, RowStatus
+          FROM SNMPv2-TC
+      AtmConnKind, AtmAddr
+          FROM ATM-TC-MIB
+      ipNetToMediaNetAddress, ipNetToMediaIfIndex,
+      ipAdEntAddr, DisplayString
+          FROM RFC1213-MIB
+      InterfaceIndex,UsrConfigStatus, usrAtmArp, InterfaceIndexOrZero,
+      common
+          FROM USR-DEFINITIONS-MIB;
+    usrIpoa  MODULE-IDENTITY
+             LAST-UPDATED "200204061346Z"
+             ORGANIZATION "CommWorks Corporation, a 3Com Company"
+             CONTACT-INFO "Customer Support"
+             DESCRIPTION
+                   "The commWorks enterprise defined MIB objects for
+                    IP over ATM with ARP."
+--           REVISION  "200204061346Z"
+--           DESCRIPTION "Added Module-IDENTITY and corrected SNMPv2 syntax."
+   ::= { common 46 }
+  --***************************************************************
+  -- Textual Conventions
+  --***************************************************************
+  IpoaEncapsType ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION
+          "The encapsulation type used on a VC."
+      SYNTAX      INTEGER {
+                      llcSnap(1),
+                      vcMuxed(2),
+                      other(3)
+                  }
+  IpoaVpiInteger ::= TEXTUAL-CONVENTION
+      STATUS     current
+      DESCRIPTION
+          "An integer large enough to hold a VPI."
+      SYNTAX     Integer32 (0..255)
+  IpoaVciInteger ::= TEXTUAL-CONVENTION
+      STATUS     current
+      DESCRIPTION
+          "An integer large enough to hold a VCI."
+      SYNTAX     Integer32 (0..65535)
+  IpoaAtmAddr ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "1x"
+     STATUS  current
+     DESCRIPTION
+       "The ATM address used by the network entity.
+        The address type can be determined by the
+        OCTET STRING size. IpoaAtmAddr can be comprised
+        of both an ATM Address and a subaddress. The
+        ATM Address portion is required and must be
+        first in the OCTET STRING.
+        An implementation must use BCD encoding to
+        represent a E.164 address as a MIB object."
+     SYNTAX   OCTET STRING (SIZE(0..40))
+  --
+  -- Top-level structure of the MIB
+  --
+  usrIpoaObjects        OBJECT IDENTIFIER ::= { usrIpoa 1 }
+  usrIpoaNotifications  OBJECT IDENTIFIER ::= { usrIpoa 2 }
+  usrIpoaConformance    OBJECT IDENTIFIER ::= { usrIpoa 3 }
+  -- ***************************************************************
+  -- MIB Objects
+  -- ***************************************************************
+  -- The Logical IP Subnet Table
+  usrIpoaLisTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF IpoaLisEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "There is one entry in this table for every Logical IP
+          Subnet (LIS) that this system is a member of."
+      ::= { usrIpoaObjects 2 }
+  usrIpoaLisEntry OBJECT-TYPE
+      SYNTAX      IpoaLisEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Information about a single LIS that this system is a
+          member of.
+          This table is indexed by an IP subnet address.
+          Membership in a LIS is independent of the actual ATM
+          physical interfaces being used. The usrIpoaLisTable defines
+          all LISes that a system is a member of. The ipAddrTable
+          and the usrIpoaClientTable provides the mapping from local
+          IP address to ATM physical interface. The
+          ipoaLisIfMappingTable provides the mappings between
+          Logical IP Subnets and interfaces.
+          The ipoaLisTable is indexed by ipoaLisSubnetAddr.
+          An entry in the ipAddrTable should exist for each
+          ipAddrEntry that is associated with an IP over ATM
+          interface. Its ipAdEntAddr and ipAdEntNetMask when ANDed
+          should map to a ipoaLisSubnetAddr."
+      INDEX       { usrIpoaLisSubnetAddr }
+      ::= { usrIpoaLisTable 1 }
+-- Expires January 1998                                           [Page 15]
+-- Greene et al.        IP and ARP over ATM (IPOA) MIB         11 July 1997
+  IpoaLisEntry ::= SEQUENCE {
+      usrIpoaLisSubnetAddr          IpAddress,
+      usrIpoaLisDefaultMtu          Integer32,
+      usrIpoaLisDefaultEncapsType   IpoaEncapsType,
+      usrIpoaLisInactivityTimer     Integer32,
+      usrIpoaLisMinHoldingTime      Integer32,
+      usrIpoaLisQDepth              Integer32,
+      usrIpoaLisMaxCalls            Integer32,
+      usrIpoaLisCacheEntryAge       Integer32,
+      usrIpoaLisRetries             Integer32,
+      usrIpoaLisTimeout             Integer32,
+      usrIpoaLisDefaultPeakCellRate Integer32,
+      usrIpoaLisActiveVcs           Counter32,
+      usrIpoaLisRowStatus           RowStatus }
+  usrIpoaLisSubnetAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The IP subnet address associated with this LIS."
+      ::= { usrIpoaLisEntry 1 }
+  usrIpoaLisDefaultMtu OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The default MTU used within this LIS. Note that the actual
+          size used for a VC between two members of the LIS may be
+          negotiated during connection setup and may be different than
+          this value. The usrIpoaVcNegotiatedMtu object indicates the
+          actual MTU in use for a particular VC."
+      DEFVAL { 9180 }
+      ::= { usrIpoaLisEntry 2 }
+  usrIpoaLisDefaultEncapsType OBJECT-TYPE
+      SYNTAX      IpoaEncapsType
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The default encapsulation to use on VCs created for this
+          LIS. Note that the actual encapsulation type may be negotiated
+          during connection setup and may be different than this
+          value. The usrIpoaVcNegotiatedEncapsType object indicates the
+          actual encapsulation in use for a particular VC."
+      DEFVAL { llcSnap }
+      ::= { usrIpoaLisEntry 3 }
+-- Expires January 1998                                           [Page 16]
+-- Greene et al.        IP and ARP over ATM (IPOA) MIB         11 July 1997
+  usrIpoaLisInactivityTimer OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "seconds"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The time, in seconds, before a call established for an
+          ipNetToMediaEntry on a client will timeout due to no
+          traffic being passed on the VC. A value of 0 implies
+          no time out."
+      REFERENCE
+          "RFC1755, Sec. 3.4 VC Teardown"
+      DEFVAL      { 300 }
+      ::= { usrIpoaLisEntry 4 }
+  usrIpoaLisMinHoldingTime OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      UNITS       "seconds"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The minimum amount of time, in seconds, that a call will
+           remain open. If 0 then usrIpoaInactivityTimer will
+           completely determine when a call is terminated."
+      REFERENCE
+          "RFC1755, Sec. 3.4 VC Teardown"
+      DEFVAL      { 60 }
+      ::= { usrIpoaLisEntry 5 }
+  usrIpoaLisQDepth OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      UNITS       "packets"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The maximum number of outstanding requests that are
+           allowed while waiting for ATMARP replies and
+           In_ATMARP replies for this LIS."
+      DEFVAL      { 1 }
+      ::= { usrIpoaLisEntry 6 }
+  usrIpoaLisMaxCalls OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The maximum number of SVCs that can be established
+          simultaneously."
+-- Expires January 1998                                           [Page 17]
+-- Greene et al.        IP and ARP over ATM (IPOA) MIB         11 July 1997
+      DEFVAL      { 500 }
+      ::= { usrIpoaLisEntry 7 }
+  usrIpoaLisCacheEntryAge OBJECT-TYPE
+      SYNTAX      Integer32 (60..1200)
+      UNITS       "seconds"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The time, in seconds, before an ipNetToMediaEntry will age
+          out of the table. Note that the default value will be
+          different for a client and a server. A ATMARP server should
+          use a default of 1200 and a client should use 900."
+      DEFVAL      { 900 }
+      ::= { usrIpoaLisEntry 8 }
+  usrIpoaLisRetries OBJECT-TYPE
+      SYNTAX      Integer32 (0..10)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The number of times the ATMARP request will be retried when
+          no response is received in the timeout interval indicated by
+          usrIpoaLisTimeout."
+      DEFVAL      { 2 }
+      ::= { usrIpoaLisEntry 9 }
+  usrIpoaLisTimeout OBJECT-TYPE
+      SYNTAX      Integer32 (1..60)
+      UNITS       "seconds"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The time to wait, in seconds, before retransmission of an ARP
+          PDU."
+      DEFVAL      { 10 }
+      ::= { usrIpoaLisEntry 10 }
+  usrIpoaLisDefaultPeakCellRate OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "This object is the signalling parameter that
+           should be used when setting up all best effort
+           VCCs. This parameter applies to the forward and
+           backward direction on a per best effort VCC basis.
+           A value of zero implies that no configured default
+           exists and that local policy should be used to
+           determine the actual default to used during
+           call setup. ATM Signaling Support for IP over ATM
+           (RFC 1755) recommends 1/10th of the ATM interface's
+           speed."
+      ::= { usrIpoaLisEntry 11 }
+  usrIpoaLisActiveVcs OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Number of active SVCs."
+      ::= { usrIpoaLisEntry 12 }
+  usrIpoaLisRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "This object allows entries to be created and deleted in the
+          usrIpoaLisTable.
+          When the usrIpoaLisRowStatus deleted (by setting this object to
+          destroy(6)), this has the side-effect of removing all
+          entries from the ipNetToMediaTable that are associated with
+          this LIS (in other words, it flushes the entity's ATMARP
+          cache). It also removes the usrIpoaVcTable entries that were
+          associated with those ipNetToMediaTable entries. Destroying
+          the row also removes the corresponding entries in the
+          usrIpoaArpSrvrTable, usrIpoaArpClientTable,
+          usrIpoaLisIfMappingTable and usrIpoaArpRemoteSrvrTable.
+          Entries in both the ipNetToMediaTable and the usrIpoaVcTable
+          that are associated with a usrIpoaConfigPvcEntry are not
+          effected by changes to usrIpoaLisRowStatus."
+      REFERENCE
+          "RFC 1903, 'Textual Conventions for version 2 of the Simple
+          Network Management Protocol (SNMPv2).'"
+      ::= { usrIpoaLisEntry 13 }
+  --
+  -- The ATMARP Client Table
+  --
+  usrIpoaArpClientTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF UsrIpoaArpClientEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The ATMARP clients running on this system."
+      ::= { usrIpoaObjects 4 }
+  usrIpoaArpClientEntry OBJECT-TYPE
+      SYNTAX      UsrIpoaArpClientEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Information about a single ATMARP Client. Clients can be
+          started and stopped by adding and removing entries from this
+          table. Note that adding and removing entries from this table
+          may have the same effect on the corresponding ipAddrTable
+          entry. An entry in the usrIpoaArpClientTable has a corresponding
+          entry in the ipAddrTable. Both are indexed by ipAdEntAddr.
+          The ifIndex and subnet mask of a client entry are the
+          ipAddrEntry's ipAdEntIfIndex and ipAdEntNetMask respectively.
+          A remote creation of an object in this table requires
+          that either the corresponding ipAddrTable entry exists or
+          that ipAdEntIfIndex and ipAdEntNetMask be specified in the
+          creation of a usrIpoaArpClientEntry at a minimum in order
+          to create the corresponding ipAddrEntry. Specification
+          of ipAdEntBcastAddr and ipAdEntReasmMaxSize to complete a
+          ipAddrEntry is implementation dependent."
+      INDEX       { ipAdEntAddr }
+      ::= { usrIpoaArpClientTable 1 }
+  UsrIpoaArpClientEntry ::= SEQUENCE {
+      usrIpoaArpClientAtmAddr             IpoaAtmAddr,
+      usrIpoaArpClientSrvrInUse           IpoaAtmAddr,
+      usrIpoaArpClientInArpReqsIn         Counter32,
+      usrIpoaArpClientInArpReqsOut        Counter32,
+      usrIpoaArpClientInArpRepliesIn      Counter32,
+      usrIpoaArpClientInArpRepliesOut     Counter32,
+      usrIpoaArpClientInArpInvalidReqsIn  Counter32,
+      usrIpoaArpClientInArpInvalidReqsOut Counter32,
+      usrIpoaArpClientArpReqsIn           Counter32,
+      usrIpoaArpClientArpReqsOut          Counter32,
+      usrIpoaArpClientArpRepliesIn        Counter32,
+      usrIpoaArpClientArpRepliesOut       Counter32,
+      usrIpoaArpClientArpNaksIn           Counter32,
+      usrIpoaArpClientArpNaksOut          Counter32,
+      usrIpoaArpClientArpOpUnknown        Counter32,
+      usrIpoaArpClientArpSrvrNoResp       Counter32,
+      usrIpoaArpClientRowStatus           RowStatus }
+  usrIpoaArpClientAtmAddr OBJECT-TYPE
+      SYNTAX      IpoaAtmAddr
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The ATM address of the client."
+	 --CONFIGURABLE
+      ::= { usrIpoaArpClientEntry 1 }
+  usrIpoaArpClientSrvrInUse OBJECT-TYPE
+      SYNTAX      IpoaAtmAddr
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The ATM address of the ATMARP Server in use by this
+           client. A value of 0 implies that communication with
+           a ATMARP Server is not in effect."
+      DEFVAL { ''H }
+      ::= { usrIpoaArpClientEntry 2 }
+  usrIpoaArpClientInArpReqsIn OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of InATMARP requests received by this client."
+      ::= { usrIpoaArpClientEntry 3 }
+  usrIpoaArpClientInArpReqsOut OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of InATMARP requests sent by this client."
+      ::= { usrIpoaArpClientEntry 4 }
+  usrIpoaArpClientInArpRepliesIn OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of InATMARP replies received by this client."
+      ::= { usrIpoaArpClientEntry 5 }
+  usrIpoaArpClientInArpRepliesOut OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Total number of InATMARP replies sent by this client."
+      ::= { usrIpoaArpClientEntry 6 }
+  usrIpoaArpClientInArpInvalidReqsIn OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of times that this client detected an invalid
+           InATMARP request."
+      ::= { usrIpoaArpClientEntry 7 }
+  usrIpoaArpClientInArpInvalidReqsOut OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of times that this client did not receive
+           a InATMARP reply."
+      ::= { usrIpoaArpClientEntry 8 }
+  usrIpoaArpClientArpReqsIn OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Total number of ATMARP requests received by this client."
+      ::= { usrIpoaArpClientEntry 9 }
+  usrIpoaArpClientArpReqsOut OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Total number of ATMARP requests sent by this client."
+      ::= { usrIpoaArpClientEntry 10 }
+  usrIpoaArpClientArpRepliesIn OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Total number of ATMARP replies received by this client."
+      ::= { usrIpoaArpClientEntry 11 }
+  usrIpoaArpClientArpRepliesOut OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Total number of ATMARP replies sent by this client."
+      ::= { usrIpoaArpClientEntry 12 }
+  usrIpoaArpClientArpNaksIn OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Total number of negative ATMARP replies
+           received by this client."
+      ::= { usrIpoaArpClientEntry 13 }
+  usrIpoaArpClientArpNaksOut OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Total number of negative ATMARP replies
+           send by this client."
+      ::= { usrIpoaArpClientEntry 14 }
+  usrIpoaArpClientArpOpUnknown OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of times that this client received
+           an ATMARP message with an operation code for which it
+           is not coded to support."
+      ::= { usrIpoaArpClientEntry 15 }
+  usrIpoaArpClientArpSrvrNoResp OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of times this client failed to receive
+           a response from a ATMARP Server within the
+           usrIpoaLisTimeout value for usrIpoaLisRetries times.
+           This may imply that the client will re-elect a
+           primary ATMARP server for this LIS from the
+           usrIpoaArpRemoteSrvrTable."
+      ::= { usrIpoaArpClientEntry 16 }
+  usrIpoaArpClientRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "This object allows entries to be created and deleted from the
+          usrIpoaArpClientTable."
+      REFERENCE
+          "RFC 1903, 'Textual Conventions for version 2 of the Simple
+          Network Management Protocol (SNMPv2).'"
+	 --CONFIGURABLE
+      ::= { usrIpoaArpClientEntry 17 }
+  -- The Remote ATMARP Server Table
+  usrIpoaArpRemoteSrvrTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF UsrIpoaArpRemoteSrvrEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A table of non-local ATMARP servers associated with a LIS.
+          An entry in this table has three indexes: first the
+          usrIpoaLisSubnetAddr of the LIS that the corresponding
+          ATMARP server provides ATMARP services for, then the
+          usrIpoaArpRemoteSrvrAtmAddr, which is the ATM address of the
+          remote ATMARP server and finally the ifIndex of the
+          interface on which the VC to the ATMARP Remote Server
+          will be opened. A ifIndex value of 0 should be used
+          when a single VC is to be shared for ATMARP purposes
+          by multiple interfaces."
+      ::= { usrIpoaObjects 6 }
+  usrIpoaArpRemoteSrvrEntry OBJECT-TYPE
+      SYNTAX      UsrIpoaArpRemoteSrvrEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Information about one non-local ATMARP server."
+      INDEX  { usrIpoaLisSubnetAddr, usrIpoaArpRemoteSrvrAtmAddr,
+               usrIpoaArpRemoteSrvrIfIndex }
+      ::= { usrIpoaArpRemoteSrvrTable 1 }
+  UsrIpoaArpRemoteSrvrEntry ::= SEQUENCE {
+      usrIpoaArpRemoteSrvrAtmAddr   IpoaAtmAddr,
+      usrIpoaArpRemoteSrvrRowStatus RowStatus,
+      usrIpoaArpRemoteSrvrIfIndex   InterfaceIndexOrZero,
+      usrIpoaArpRemoteSrvrIpAddr    IpAddress }
+  usrIpoaArpRemoteSrvrAtmAddr OBJECT-TYPE
+      SYNTAX      IpoaAtmAddr
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The ATM address of the remote ATMARP server."
+      ::= { usrIpoaArpRemoteSrvrEntry 1 }
+  usrIpoaArpRemoteSrvrRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "This object allows entries to be created and deleted from the
+          usrIpoaArpRemoteSrvrTable as well as indicating the weather a
+          VC exists to the Remote ATMARP Server.
+          usrIpoaArpRemoteSrvrRowStatus states:
+          active(1)       - VC exists to Remote ATMARP Server who's IP
+                            Address is stored in
+                            usrIpoaArpRemoteSrvrIpAddr.
+                            This VC can be determined by searching the
+                            usrIpoaVcTable using usrIpoaArpRemoteSrvrIfIndex
+                            (if not 0 otherwise ignore
+                            ipNetToMediaIfIndex
+                            index) and usrIpoaArpRemoteSrvrIpAddr. A
+                            usrIpoaArpClientEntry should exist were its
+                            usrIpoaArpClientSrvrInUse object has the same
+                            value as usrIpoaArpRemoteSrvrAtmAddr.
+         notInService(2)  - Entry exists without an active VC to
+                            the Remote ATMARP Server.
+         notReady(3)      - usrIpoaArpRemoteSrvrEntry is incomplete.
+         createAndGo(4)   - Value used to remotely create an entry
+                            and then active it.
+         createAndWait(5) - Value used to remotely create an entry and
+                            leave entry inactive with either
+                            notInService or notReady state.
+         destroy(6)       - When usrIpoaArpRemoteSrvrRowStatus is set with
+                            this value the corresponding table entry is
+                            deleted."
+      REFERENCE
+          "RFC 1903, 'Textual Conventions for version 2 of the Simple
+          Network Management Protocol (SNMPv2).'"
+	 --CONFIGURABLE
+      ::= { usrIpoaArpRemoteSrvrEntry 2 }
+  usrIpoaArpRemoteSrvrIfIndex OBJECT-TYPE
+      SYNTAX      InterfaceIndexOrZero
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The ifIndex of the interface that the VC to the
+           Remote ATMARP Server is associated with."
+      ::= { usrIpoaArpRemoteSrvrEntry 3 }
+  usrIpoaArpRemoteSrvrIpAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The IP Address of the Remote ATMARP Server. A value of
+           0 implies that this address isn't known."
+      DEFVAL { 0 }
+      ::= { usrIpoaArpRemoteSrvrEntry 4 }
+  --
+  -- The VC Table
+  --
+  usrIpoaVcTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF UsrIpoaVcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A system that support IP over ATM is an IP system and
+          therefore must support all of the appropriate tables from
+          RFC1213, MIB-II. This includes the ipNetToMediaTable (the ARP
+          cache). This usrIpoaVcTable keeps a set of VCs for each entry in
+          the ARP cache that was put there by this IP over ATM system
+          acting as either a host or server."
+      ::= { usrIpoaObjects 7 }
+  usrIpoaVcEntry OBJECT-TYPE
+      SYNTAX      UsrIpoaVcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A VC (permanent or switched) that this host or server has
+          opened with another member of a LIS. Additional information
+          can be determined about the VC from RFC1695, the AToM MIB.
+          In an SVC environment, entries can not be created in
+          this table by a management application. Entries are
+          automatically
+          added by the system as the result of ATMARP processing.
+          In a PVC environment, an entry is automatically added to
+          this table when an entry is created in the usrIpoaConfigPvcTable
+          and the IP Address at the end of the PVC is discovered using
+          In_ATMARP. An entry also is added to the ipNetToMediaTable."
+      INDEX       { ipNetToMediaIfIndex,
+                    ipNetToMediaNetAddress,
+                    usrIpoaVcVpi,
+                    usrIpoaVcVci
+                  }
+      ::= { usrIpoaVcTable 1 }
+  UsrIpoaVcEntry ::= SEQUENCE {
+      usrIpoaVcVpi                  IpoaVpiInteger,
+      usrIpoaVcVci                  IpoaVciInteger,
+      usrIpoaVcType                 AtmConnKind,
+      usrIpoaVcNegotiatedMtu        Integer32,
+      usrIpoaVcNegotiatedEncapsType IpoaEncapsType }
+  usrIpoaVcVpi OBJECT-TYPE
+      SYNTAX      IpoaVpiInteger
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The VPI value for the Virtual Circuit."
+      ::= { usrIpoaVcEntry 1 }
+  usrIpoaVcVci OBJECT-TYPE
+      SYNTAX      IpoaVciInteger
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The VCI value for the Virtual Circuit."
+      ::= { usrIpoaVcEntry 2 }
+  usrIpoaVcType OBJECT-TYPE
+      SYNTAX      AtmConnKind
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The type of the Virtual Circuit."
+      ::= { usrIpoaVcEntry 3 }
+  usrIpoaVcNegotiatedEncapsType OBJECT-TYPE
+      SYNTAX      IpoaEncapsType
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The encapsulation type used when communicating over this
+          circuit."
+      ::= { usrIpoaVcEntry 4 }
+  usrIpoaVcNegotiatedMtu OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The MTU used when communicating over this circuit."
+      ::= { usrIpoaVcEntry 5 }
+  usrIpoaConfigPvcTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF UsrIpoaConfigPvcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "This table must be supported when PVCs are intended to
+          be supported in order to enable the setup of PVCs for use
+          by IP."
+      ::= { usrIpoaObjects 8 }
+  usrIpoaConfigPvcEntry OBJECT-TYPE
+      SYNTAX      UsrIpoaConfigPvcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Defines a single PVC that exists at this host for use by
+          IP. "
+      INDEX       { usrIpoaConfigPvcIfIndex,
+                    usrIpoaConfigPvcVpi,
+                    usrIpoaConfigPvcVci
+                  }
+      ::= { usrIpoaConfigPvcTable 1 }
+  UsrIpoaConfigPvcEntry ::= SEQUENCE {
+      usrIpoaConfigPvcIfIndex              InterfaceIndex,
+      usrIpoaConfigPvcVpi                  IpoaVpiInteger,
+      usrIpoaConfigPvcVci                  IpoaVciInteger,
+      usrIpoaConfigPvcDefaultMtu           Integer32,
+      usrIpoaConfigPvcRowStatus            RowStatus}
+  usrIpoaConfigPvcIfIndex OBJECT-TYPE
+      SYNTAX      InterfaceIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The ifIndex of the ATM AAL Interface that this PVC
+           is associated with."
+	 --CONFIGURABLE
+      ::= { usrIpoaConfigPvcEntry 1 }
+  usrIpoaConfigPvcVpi OBJECT-TYPE
+      SYNTAX      IpoaVpiInteger
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The VPI value for the Virtual Circuit."
+	 --CONFIGURABLE
+      ::= { usrIpoaConfigPvcEntry 2 }
+  usrIpoaConfigPvcVci OBJECT-TYPE
+      SYNTAX      IpoaVciInteger
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The VCI value for the Virtual Circuit."
+      ::= { usrIpoaConfigPvcEntry 3 }
+  usrIpoaConfigPvcDefaultMtu OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "Classic2 allows use of other MTU values for PVCs
+         but considers the how a value other than 9180 could
+         be selected to be out of scope. usrIpoaConfigPvcDefaultMtu
+         can be used to configure the MTU to be used for the PVC.
+         Both ends must have the same value configured."
+      DEFVAL { 9180 }
+	 --CONFIGURABLE
+      ::= { usrIpoaConfigPvcEntry 4 }
+  usrIpoaConfigPvcRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "This object allows rows to be created and deleted in the
+          usrIpoaConfigPvcTable. Creation of a entry in this table
+          should eventually result in the creation of a
+          ipNetToMediaEntry
+          and a corresponding usrIpoaVcEntry after InATMARP has
+          determined the destination address of system that the
+          PVC is connected to. Setting this object to destroy(6)
+          should remove the corresponding ipNetToMediaTable and
+          usrIpoaVcTable entries.  In this implementation, setting
+          this object to destroy also removes the corresponding 
+          entry in the AtmArpPvcTable."
+     REFERENCE
+         "RFC 1903, 'Textual Conventions for version 2 of the Simple
+         Network Management Protocol (SNMPv2).'"
+	 --CONFIGURABLE
+     ::= { usrIpoaConfigPvcEntry 5 }
+  usrAtmArpPvcTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF UsrAtmArpPvcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "This table must be supported when PVCs are intended to
+          be supported in order to enable the setup of PVCs for use
+          by IP.  This table contains additional implementation
+          specific information required for RFC 1577 PVCs. This table
+          is mainly used to translate the IP Over ATM PVC name to the
+          corresponding Ifindex, VPI and VCI values used to identify
+          this PVC in the ConfigPvc table."
+      ::= { usrAtmArp 1 }
+  usrAtmArpPvcEntry OBJECT-TYPE
+      SYNTAX      UsrAtmArpPvcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Defines a single PVC that exists at this host for use by
+          IP. Entries in this table must be created at the same time
+          entries are created in the IpoaConfigPvc table. "
+      INDEX       { usrAtmArpPvcName }
+      ::= { usrAtmArpPvcTable 1 }
+  UsrAtmArpPvcEntry ::= SEQUENCE {
+      usrAtmArpPvcName                     DisplayString,
+      usrAtmArpPvcIfIndex                  InterfaceIndex,
+      usrAtmArpPvcVpi                      IpoaVpiInteger,
+      usrAtmArpPvcVci                      IpoaVciInteger,
+	 usrAtmArpPvcNetworkName              DisplayString,
+	 usrAtmArpPvcInterfaceName            DisplayString,
+      usrAtmArpPvcNetIfIndex               InterfaceIndex,
+	 usrAtmArpPvcEnabledFlag              INTEGER}
+  usrAtmArpPvcName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..32))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "A string containing the name of the RFC1577 PVC."
+      ::= { usrAtmArpPvcEntry 1 }
+  usrAtmArpPvcIfIndex OBJECT-TYPE
+      SYNTAX      InterfaceIndex
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The ifIndex of the ATM AAL Interface that this PVC
+           is associated with."
+      --CONFIGURABLE
+      ::= { usrAtmArpPvcEntry 2 }
+  usrAtmArpPvcVpi OBJECT-TYPE
+      SYNTAX      IpoaVpiInteger
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The VPI value for the Virtual Circuit."
+      --CONFIGURABLE
+      ::= { usrAtmArpPvcEntry 3 }
+  usrAtmArpPvcVci OBJECT-TYPE
+      SYNTAX      IpoaVciInteger
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The VCI value for the Virtual Circuit."
+      --CONFIGURABLE
+      ::= { usrAtmArpPvcEntry 4 }
+  usrAtmArpPvcNetworkName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..32))
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "A string containing the name of the network of this RFC1577 PVC."
+      --CONFIGURABLE
+      ::= { usrAtmArpPvcEntry 5 }
+  usrAtmArpPvcInterfaceName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..32))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "A string containing the name of the ATMAAL interface where this RFC1577 PVC is established."
+      ::= { usrAtmArpPvcEntry 6 }
+  usrAtmArpPvcNetIfIndex OBJECT-TYPE
+      SYNTAX      InterfaceIndex
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The ifIndex of the ATM Net Interface that this PVC
+           is associated with."
+      --CONFIGURABLE
+      ::= { usrAtmArpPvcEntry 7 }
+  usrAtmArpPvcEnabledFlag OBJECT-TYPE
+      SYNTAX      INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "This flag indicates if this ATM 1577 PVC is enabled or disabled."
+      ::= { usrAtmArpPvcEntry 8 }
+	usrAtmArpConfigFileName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+          STATUS      current
+		DESCRIPTION		
+		  "The name of a ConfigFile to read/write permanent
+		   database records. If the value of this object is an
+             empty string, then ATM ARP uses the default
+             name `@file://Atmarp.cfg'. "
+     ::= { usrAtmArp 2 }
+	usrAtmArpCFMStatusFlag  OBJECT-TYPE
+	 	SYNTAX	  UsrConfigStatus
+		MAX-ACCESS  read-write
+	     STATUS      current
+		DESCRIPTION
+		  "Setting the value of this object to `save' causes the values
+		   of the ATM ARP MIB objects to be written out to the
+             current config file, which is stored in the 
+             usrIpoaArpConfigFileName object. While the new
+             ConfigFile is being written, ATM ARP
+		   will set the value of this flag to `saving''. Any
+		   attempts to set the value while it is not `normal'
+		   (i.e. the file is currently being written to the
+		   ConfigFile) while result in a badValue error being
+		   returned. Setting the value to `normal' will result in no
+		   action."
+     ::= { usrAtmArp 3 }
+  usrAtmArpServerNameTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF UsrAtmArpServerNameEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+           "atm arp remote server name config table."
+      ::= { usrAtmArp 4 }
+  usrAtmArpServerNameEntry OBJECT-TYPE
+      SYNTAX      UsrAtmArpServerNameEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "entry in the atm arp server name table"
+      INDEX       { usrAtmArpServerName }
+      ::= { usrAtmArpServerNameTable 1 }
+  UsrAtmArpServerNameEntry ::= SEQUENCE {
+      usrAtmArpServerName                  DisplayString,
+      usrAtmArpLISSubnetAddress	           IpAddress, 
+      usrAtmArpRemoteServerAtmAddr	   AtmAddr, 
+      usrAtmArpRemoteServerIfIndex	   Integer32, 
+      usrAtmArpRemoteServerIfName	   DisplayString, 
+      usrAtmArpServerRowStatus             Integer32
+  }
+  usrAtmArpServerName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..32))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "A string containing the name of the atm arp server."
+      ::= { usrAtmArpServerNameEntry 1 }
+  usrAtmArpLISSubnetAddress OBJECT-TYPE
+      SYNTAX  IpAddress
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "LIS subnet address."
+	 --CONFIGURABLE
+      ::= { usrAtmArpServerNameEntry 2}
+  usrAtmArpRemoteServerAtmAddr OBJECT-TYPE
+      SYNTAX  AtmAddr
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "Remote arp server atm address."
+	 --CONFIGURABLE
+      ::= { usrAtmArpServerNameEntry 3 }
+  usrAtmArpRemoteServerIfIndex OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "Interface index"
+	 --CONFIGURABLE
+      ::= { usrAtmArpServerNameEntry 4 }
+  usrAtmArpServerRowStatus OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "server name index. dummy object, used to figure out
+          server name in the list."
+      ::= { usrAtmArpServerNameEntry 5 }
+  usrAtmArpRemoteServerIfName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "Interface index"
+      ::= { usrAtmArpServerNameEntry 6 }
+  -- ***************************************************************
+  -- Notifications
+  -- ***************************************************************
+  usrIpoaMtuExceeded NOTIFICATION-TYPE
+    OBJECTS {
+          ipNetToMediaIfIndex,
+          ipNetToMediaNetAddress,
+          usrIpoaVcVpi,
+          usrIpoaVcVci
+     }
+      STATUS  current
+      DESCRIPTION
+          "A frame was received that exceeds the negotiated MTU size."
+      --#TYPE    "IPOA Frame Error"
+      --#SUMMARY  "Received Frame on interface %d, path %d, circuit %d too big"
+      --#ARGUMENTS { 0 2 3 }
+      --#SEVERITY MAJOR
+      --#STATE    OPERATIONAL
+      --#PROBABLECAUSE "dataCorruptionOrConfigError"
+      ::= { usrIpoaNotifications 1 }
+  END -- End of USR-IPOA-ARP-MIB DEFINITIONS
+-- ************************************************************************
+--
+--	usr_atm_cc.mib - MIB defined for supporting CLI commands for
+--                       VC Cross Connect. In addition to rfc1695-atmnet.mib
+--
+-- Author:         
+--
+               USR-ATM-CROSS-CONNECT-MIB DEFINITIONS ::= BEGIN
+               IMPORTS
+                  OBJECT-TYPE, MODULE-IDENTITY,
+                  Integer32
+                      FROM SNMPv2-SMI
+                  RowStatus
+                      FROM SNMPv2-TC
+                  DisplayString
+                      FROM RFC1213-MIB
+                  IfIndex
+		      FROM ATM-MIB-ATMNET
+                  common
+		      FROM USR-DEFINITIONS-MIB;
+    usrAtmCrossConnect  MODULE-IDENTITY
+                        LAST-UPDATED "200204061356Z"
+                        ORGANIZATION "CommWorks Corporation, a 3Com Company"
+                        CONTACT-INFO "Customer Support"
+                        DESCRIPTION
+                                "The commWorks enterprise defined MIB objects
+                                 for VC Cross Connect."
+--                      REVISION  "200204061356Z"
+--                      DESCRIPTION " Added MODULE-IDENTITY and corrected
+--                                    SNMPv2 syntax."
+                        ::= { common 50 }
+               --  The ATM VC Cross Connect for cli commands
+               usrAtmVcCrossConnectTable OBJECT-TYPE
+                    SYNTAX  SEQUENCE OF UsrAtmVcCrossConnectEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                     "This usrAtmVcCrossConnectTable keeps cross connect name
+                      and corresponding cross connect index
+                      pcr is used to obtain traffic descriptor Index."
+                    ::= { usrAtmCrossConnect 1 }
+               usrAtmVcCrossConnectEntry OBJECT-TYPE
+                    SYNTAX  UsrAtmVcCrossConnectEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION " "
+                    INDEX { usrAtmVcCrossConnectName}
+                    ::= { usrAtmVcCrossConnectTable 1 }
+               UsrAtmVcCrossConnectEntry ::= SEQUENCE {
+                    usrAtmVcCrossConnectName           DisplayString,
+                    usrAtmVcCrossConnectIndex          Integer32,
+                    usrAtmVcCrossConnectLowIfIndex     IfIndex,
+                    usrAtmVcCrossConnectLowVpi         Integer32,
+                    usrAtmVcCrossConnectLowVci         Integer32,
+                    usrAtmVcCrossConnectHighIfIndex    IfIndex,
+                    usrAtmVcCrossConnectHighVpi        Integer32,
+                    usrAtmVcCrossConnectHighVci        Integer32,
+                    usrAtmVcCrossConnectLowPort        Integer32,
+                    usrAtmVcCrossConnectHighPort       Integer32,
+                    usrAtmVcCrossConnectPcr            Integer32,
+                    usrAtmVcCrossConnectRowStatus      RowStatus
+               }
+               usrAtmVcCrossConnectName OBJECT-TYPE
+                    SYNTAX  DisplayString
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION "VC Cross connect name used as index"
+                    --CONFIGURABLE
+                    ::= { usrAtmVcCrossConnectEntry 1 }
+               usrAtmVcCrossConnectIndex OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "cross connect index for the entry  "
+                    --CONFIGURABLE
+                    ::= { usrAtmVcCrossConnectEntry 2 }
+               usrAtmVcCrossConnectLowIfIndex OBJECT-TYPE
+                    SYNTAX  IfIndex
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "ifindex of the vc with low val "
+                    --CONFIGURABLE
+                    ::= { usrAtmVcCrossConnectEntry 3 }
+               usrAtmVcCrossConnectLowVpi OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "vpi value of the vc with low ifindex"
+                    --CONFIGURABLE
+                    ::= { usrAtmVcCrossConnectEntry 4 }
+               usrAtmVcCrossConnectLowVci OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "vci of the vc with low ifindex val"
+                    --CONFIGURABLE
+                    ::= { usrAtmVcCrossConnectEntry 5 }
+               usrAtmVcCrossConnectHighIfIndex OBJECT-TYPE
+                    SYNTAX  IfIndex
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "vc associated with high ifindex param"
+                    --CONFIGURABLE
+                    ::= { usrAtmVcCrossConnectEntry 6 }
+               usrAtmVcCrossConnectHighVpi OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "vpi of the vc with high ifindex param"
+                    --CONFIGURABLE
+                    ::= { usrAtmVcCrossConnectEntry 7 }
+               usrAtmVcCrossConnectHighVci OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "vci of the vc eith high ifindex val"
+                    --CONFIGURABLE
+                    ::= { usrAtmVcCrossConnectEntry 8 }
+               usrAtmVcCrossConnectLowPort OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "low end port number"
+                    ::= { usrAtmVcCrossConnectEntry 9 }
+               usrAtmVcCrossConnectHighPort OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "high end port number"
+                    ::= { usrAtmVcCrossConnectEntry 10 }
+               usrAtmVcCrossConnectPcr OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "peak cell rate -as traffic descr index created"
+                    ::= { usrAtmVcCrossConnectEntry 11 }
+               usrAtmVcCrossConnectRowStatus OBJECT-TYPE
+                    SYNTAX  RowStatus
+                    MAX-ACCESS   read-only
+                    STATUS  current
+                    DESCRIPTION  "cross connect row status"
+                    ::= { usrAtmVcCrossConnectEntry 12 }
+               END -- End of USR-ATM-CROSS-CONNECT-MIB DEFINITIONS
+-- ************************************************************************
+--
+--	usr_dsx3.mib - A MIB file for the Netserver gateway card
+--                    Dsx3 MIB
+--
+-- Author:         Jay D. Miller
+--
+USR-DSX3-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+        UsrDisplayString, usrDsx3, UsrConfigStatus
+            FROM USR-DEFINITIONS-MIB;
+	usrDsx3ConfigFileName OBJECT-TYPE
+		SYNTAX      UsrDisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION		
+		  "The name of a ConfigFile to read/write permanent
+		   database records. If the value of this object is an
+                   empty string, then the NMBA process uses the
+                   default name `@file://Dsx3.cfg'. "
+	::= { usrDsx3 1 }
+	usrDsx3CFMStatusFlag  OBJECT-TYPE
+	 	SYNTAX	  UsrConfigStatus
+		MAX-ACCESS      read-write
+		STATUS      current
+		DESCRIPTION
+		  "Setting the value of this object to `save' causes the values
+		   of the Dsx3SlotTable to be written out to the
+                   current config file, which is stored in the 
+                   usrDsx3ConfigFileName object. While the new
+                   ConfigFile is being written, the NMBA process
+		   will set the value of this flag to `saving''. Any
+		   attempts to set the value while it is not `normal'
+		   (i.e. the file is currently being written to the
+		   ConfigFile) while result in a badValue error being
+		   returned. Setting the value to `normal' will result in no
+		   action."
+	::= { usrDsx3 2 }
+    usrDsx3ConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF UsrDsx3ConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "USR Specific variable Config table."
+        ::= { usrDsx3 3 }
+    usrDsx3ConfigEntry OBJECT-TYPE
+        SYNTAX  UsrDsx3ConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "An entry in the DSX3/E3 Configuration table."
+        INDEX   { usrDsx3LineIndex }
+        ::= { usrDsx3ConfigTable 1 }
+    UsrDsx3ConfigEntry ::=
+        SEQUENCE {
+            usrDsx3LineIndex
+                INTEGER,
+            usrDsx3CableLength
+                INTEGER,
+            usrDsx3FrameType
+                INTEGER,
+            usrDsx3PayloadScrambling
+                INTEGER,
+            usrDsx3TransmitCells
+                INTEGER,
+            usrDsx3RecieveCells
+                INTEGER
+        }
+    usrDsx3LineIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "This object is the identifier of a DSX3/E3
+        Interface on a managed device.  If there is an
+        ifEntry that is directly associated with this
+        and only this DSX3/E3 interface, it should have
+        the same value as ifIndex.  Otherwise, number
+        the dsx3LineIndices with an unique identifier
+        following the rules of choosing a number that
+        is greater than ifNumber and numbering the
+        inside interfaces (e.g., equipment side) with
+        even numbers and outside interfaces (e.g,
+        network side) with odd numbers."
+	::= { usrDsx3ConfigEntry 1 }
+	usrDsx3CableLength  OBJECT-TYPE
+		SYNTAX   INTEGER {
+         usrDsx3ShortHaul(1),
+         usrDsx3LongHaul(2)
+			}
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                  "This variable indicates which compensation 
+                  measures are to be used with varying cable
+                  lengths.
+                  usrDsx3ShortHaul refers to cable lengths
+                  shorter than xx meters. atmDsx3LongHaul handles
+                  cable lengths longer than that."
+	        --CONFIGURABLE
+	::= { usrDsx3ConfigEntry 2 }
+	usrDsx3FrameType  OBJECT-TYPE
+		SYNTAX   INTEGER {
+         usrDsx3Adm(1),
+         usrDsx3Plcp(2)
+			}
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                "This variable indicates which frame type
+                 to use in transmission.
+                 usrDsx3Adm sets the Phy to use Direct Mapping
+                 on transmit , and usrDsx3Plcp uses the PLCP
+                 framing format."
+	        --CONFIGURABLE
+	::= { usrDsx3ConfigEntry 3 }
+	usrDsx3PayloadScrambling OBJECT-TYPE
+		SYNTAX   INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+      MAX-ACCESS      read-write
+      STATUS      current
+      DESCRIPTION
+            "An indicator that tells if this interface is using
+             Payload Scrambling.  Setting the variable to enabled
+             sets the Phy interface allow scrambling."
+	        --CONFIGURABLE
+   ::= { usrDsx3ConfigEntry 4 }
+    usrDsx3TransmitCells OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "This object contains the number of cells
+        transmitted in the current valid interval. At
+        the end of each interval the count is reset."
+	::= { usrDsx3ConfigEntry 5 }
+    usrDsx3RecieveCells OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "This object contains the number of cells
+        received in the current valid interval. At
+        the end of each interval the count is reset."
+	::= { usrDsx3ConfigEntry 6 }
+END         -- End usrDsx3 MIB definitions
+-- ************************************************************************
+--
+--	usr_atm_1483_pvc.mib - A MIB file for the Netserver ATM
+--                             RFC1483 PVC MIB. 
+--
+-- Author:         Mike Redden
+--
+  USR-ATM-1483-PVC-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+      OBJECT-TYPE, MODULE-IDENTITY, 
+      IpAddress, Integer32
+          FROM SNMPv2-SMI
+      RowStatus
+          FROM SNMPv2-TC
+      common, UsrConfigStatus, UsrDisplayString
+          FROM USR-DEFINITIONS-MIB
+      AtmVpIdentifier, AtmVcIdentifier
+	  FROM ATM-TC-MIB;
+  usrAtm1483Pvc    MODULE-IDENTITY
+                   LAST-UPDATED "200204061409Z"
+                   ORGANIZATION "CommWorks Corporation, a 3Com Company"
+                   CONTACT-INFO "Customer Support"
+                   DESCRIPTION
+                           "The commWorks enterprise defined MIB objects for
+                            the Netserver ATM."
+--                 REVISION     "200204061409Z"
+--                 DESCRIPTION  "Added MODULE-IDENTITY and corrected SNMPv2 
+--                               syntax."
+                   ::= { common 47 }
+  usrAtm1483PvcConfigFileName OBJECT-TYPE
+      SYNTAX      UsrDisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION		
+	 "The name of a ConfigFile to read/write permanent
+	  database records. If the value of this object is an
+          empty string, then ATM 1483 uses the default
+          name `@file://Atm1483.cfg'. "
+     ::= { usrAtm1483Pvc 1 }
+  usrAtm1483PvcCFMStatusFlag  OBJECT-TYPE
+      SYNTAX	  UsrConfigStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	  "Setting the value of this object to `save' causes the values
+	   of the ATM ARP MIB objects to be written out to the
+           current config file, which is stored in the 
+           usrIpoaArpConfigFileName object. While the new
+           ConfigFile is being written, ATM ARP
+	   will set the value of this flag to `saving''. Any
+	   attempts to set the value while it is not `normal'
+	   (i.e. the file is currently being written to the
+	   ConfigFile) while result in a badValue error being
+	   returned. Setting the value to `normal' will result in no
+	   action."
+     ::= { usrAtm1483Pvc 2 }
+  --
+  -- The ATM 1483 PVC Table
+  --
+  usrAtm1483PvcTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF UsrAtm1483PvcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "This usrAtm1483PvcTable keeps a set of PVCs and
+           creates a corresponding entry in the appropriate
+           protocol ARP cache or equivalent."
+      ::= { usrAtm1483Pvc 3 }
+  usrAtm1483PvcEntry OBJECT-TYPE
+      SYNTAX      UsrAtm1483PvcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A PVC that this host has opened with another host for
+          data transfer of datagrams using the encapsulation
+          specified in RFC1483. Additional information
+          can be determined about the VC from RFC1695, the AToM MIB.
+	  When an entry is added to this table, if the corresponding
+          network protocol is IP, an entry is added to the 
+          ipNetToMediaTable (ARP Cache) to allow the translation of 
+          an IP address to the RFC1483 PVC created in this table, 
+          and the PVC created in the RFC1695 AToM MIB."
+      INDEX       { usrAtm1483PvcName
+                  }
+      ::= { usrAtm1483PvcTable 1 }
+  UsrAtm1483PvcEntry ::= SEQUENCE {
+      usrAtm1483PvcName                 UsrDisplayString,
+      usrAtm1483PvcVpi                  AtmVpIdentifier,
+      usrAtm1483PvcVci                  AtmVcIdentifier,
+      usrAtm1483PvcPort			Integer32,
+      usrAtm1483PvcPcr			Integer32,
+      usrAtm1483PvcNetworkName          UsrDisplayString,
+      usrAtm1483PvcNetworkAddr          IpAddress,
+      usrAtm1483PvcProtocol             INTEGER,
+      usrAtm1483PvcRowStatus            RowStatus }
+  usrAtm1483PvcName OBJECT-TYPE
+      SYNTAX      UsrDisplayString (SIZE(0..32))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "A string containing the name of the RFC1483 PVC."
+      --CONFIGURABLE
+      ::= { usrAtm1483PvcEntry 1 }
+  usrAtm1483PvcVpi OBJECT-TYPE
+      SYNTAX      AtmVpIdentifier
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The VPI value for the RFC1483 PVC."
+	 --CONFIGURABLE
+      ::= { usrAtm1483PvcEntry 2 }
+  usrAtm1483PvcVci OBJECT-TYPE
+      SYNTAX      AtmVcIdentifier
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "The VCI value for the RFC1483 PVC."
+	 --CONFIGURABLE
+      ::= { usrAtm1483PvcEntry 3 }
+  usrAtm1483PvcPort OBJECT-TYPE
+      SYNTAX Integer32(1..2)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "The port number for the RFC1483 PVC."
+      --CONFIGURABLE
+      ::= { usrAtm1483PvcEntry 4 }
+  usrAtm1483PvcPcr OBJECT-TYPE
+      SYNTAX Integer32(1000..100000)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "The peak cell rate value to use when creating this PVC."
+      --CONFIGURABLE
+      ::= { usrAtm1483PvcEntry 5 }
+  usrAtm1483PvcNetworkName OBJECT-TYPE
+      SYNTAX      UsrDisplayString (SIZE(0..32))
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "A string containing the name of the network of this RFC1483 PVC."
+      --CONFIGURABLE
+      ::= { usrAtm1483PvcEntry 6 }
+  usrAtm1483PvcNetworkAddr OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "The network layer address of the end station that this
+          RFC1483 PVC connects to.  This value is placed in the 
+          ARP cache as a static entry so that the IP forwarder
+          may map traffic destined for this network address to 
+          this RFC1483 PVC."
+      --CONFIGURABLE
+      ::= { usrAtm1483PvcEntry 7 }
+  usrAtm1483PvcProtocol OBJECT-TYPE
+      SYNTAX INTEGER {
+		     ip(1),
+		     ipx(2),
+		     at(3)
+		     }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The Level 3 protocol running over this RFC1483 PVC."
+      --CONFIGURABLE
+      ::= { usrAtm1483PvcEntry 8 }
+  usrAtm1483PvcRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "This object allows rows to be created and deleted in the
+          usrAtm1483PvcTable. For a PVC on an IP network, an entry 
+          in this table will have a corresponding ipNetToMediaEntry 
+          to allow the translation of an IP address to this PVC. Setting 
+          this object to destroy(6) removes the corresponding 
+          ipNetToMediaTable entry, if any."
+     REFERENCE
+         "RFC 1903, 'Textual Conventions for version 2 of the Simple
+         Network Management Protocol (SNMPv2).'"
+	 --CONFIGURABLE
+     ::= { usrAtm1483PvcEntry 9 }
+  usrAtm1483PvcDefaultPcr OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "An integer containing the default peak cell rate to use
+	  when establishing VCs.  This value is one tenth the speed
+          of the physical interface expressed as a cell rate."
+      ::= { usrAtm1483Pvc 4 }
+  END -- End of USR-ATM-1483-PVC-MIB DEFINITIONS
+-- ************************************************************************
+--
+--	usr_atm_1577_pvc.mib - MIB defined for supporting CLI commands for
+--                             1577 PVCs.
+--
+-- Author:         
+--
+               USR-ATM-1577-PVC-MIB DEFINITIONS ::= BEGIN
+               IMPORTS
+                  OBJECT-TYPE
+                      FROM SNMPv2-SMI
+                  DisplayString
+                      FROM RFC1213-MIB
+		  RowStatus
+	              FROM SNMPv2-TC
+                  IfIndex
+		      FROM ATM-MIB-ATMNET
+	          usrAtm1577Pvc
+	              FROM USR-DEFINITIONS-MIB
+                  ;    
+               --  The ATM 1577 PVCs for cli commands
+               usrAtm1577PvcTable OBJECT-TYPE
+                    SYNTAX  SEQUENCE OF UsrAtm1577PvcEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                     "This usrAtm1577PvcTable keeps PVC name
+                      and corresponding index values for the
+                      VCL table row. It also contains mib objects
+   		      that may be used in retrieving values for
+ 	              display of 1577 PVCs."
+                    ::= { usrAtm1577Pvc 1 }
+               usrAtm1577PvcEntry OBJECT-TYPE
+                    SYNTAX  UsrAtm1577PvcEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION "This is the name of the RFC1577 PVC."
+                    INDEX { usrAtm1577PvcName}
+                    ::= { usrAtm1577PvcTable 1 }
+               UsrAtm1577PvcEntry ::= SEQUENCE {
+                    usrAtm1577PvcName	        DisplayString,
+                    usrAtm1577PvcIfIndex        IfIndex,
+                    usrAtm1577PvcVpi		INTEGER,
+		    usrAtm1577PvcVci		INTEGER,
+		    usrAtm1577PvcNetworkName    DisplayString,
+		    usrAtm1577PvcPort           INTEGER,
+		    usrAtm1577PvcPcr            INTEGER,
+	 	    usrAtm1577PvcRowStatus      RowStatus
+               }
+               usrAtm1577PvcName OBJECT-TYPE
+                    SYNTAX  DisplayString
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION "ATM 1577 PVC name used as an index"
+                    ::= { usrAtm1577PvcEntry 1 }
+               usrAtm1577PvcIfIndex OBJECT-TYPE
+                    SYNTAX  IfIndex
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "IfIndex of the ATMNET interface for this entry"
+		    --CONFIGURABLE
+                    ::= { usrAtm1577PvcEntry 2 }
+               usrAtm1577PvcVpi OBJECT-TYPE
+                    SYNTAX  INTEGER (0..4095)
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "VPI value of this ATM 1577 PVC "
+                    --CONFIGURABLE
+                    ::= { usrAtm1577PvcEntry 3 }
+               usrAtm1577PvcVci OBJECT-TYPE
+                    SYNTAX  INTEGER (0..65535)
+                    MAX-ACCESS  read-create
+                    STATUS  current
+                    DESCRIPTION  "VCI value of this ATM 1577 PVC "
+                    --CONFIGURABLE
+                    ::= { usrAtm1577PvcEntry 4 }
+               usrAtm1577PvcPort OBJECT-TYPE
+		    SYNTAX INTEGER(1..2)
+                    MAX-ACCESS  read-only
+                    STATUS      current
+                    DESCRIPTION
+                    "The port number for the RFC1577 PVC."
+                    ::= { usrAtm1577PvcEntry 5 }
+               usrAtm1577PvcPcr OBJECT-TYPE
+                    SYNTAX INTEGER(1000..100000)
+                    MAX-ACCESS  read-only
+                    STATUS      current
+                    DESCRIPTION
+                    "The peak cell rate configured for this PVC."
+                    ::= { usrAtm1577PvcEntry 6 }
+               usrAtm1577PvcNetworkName OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(0..32))
+                    MAX-ACCESS  read-only
+                    STATUS      current
+                    DESCRIPTION
+                    "A string containing the name of the network of this RFC1577 PVC."
+                    ::= { usrAtm1577PvcEntry 7 }
+               usrAtm1577PvcRowStatus OBJECT-TYPE
+                    SYNTAX  RowStatus
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION  "1577 PVC VCL row status"
+                    ::= { usrAtm1577PvcEntry 8 }
+               END -- End of USR-ATM-1577-PVC-MIB DEFINITIONS
+-- ************************************************************************
+--
+--	usr_atmcfg.mib - A MIB file for ATM configuration for the
+--                   Netserver gateway card
+--                   AtmCfg MIB
+--
+-- Author:         Mike Clarke
+--
+USR-ATMCFG-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+        UsrDisplayString, usrAtmCfg
+            FROM USR-DEFINITIONS-MIB;
+    usrAtmCfgTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF UsrAtmCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "USR Specific ATM Config table."
+    ::= { usrAtmCfg 1 }
+    usrAtmCfgEntry OBJECT-TYPE
+        SYNTAX     UsrAtmCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry in the Atm Configuration table."
+        INDEX   { usrAtmIfName }
+    ::= { usrAtmCfgTable 1 }
+    UsrAtmCfgEntry ::=
+        SEQUENCE {
+           usrAtmIfName         UsrDisplayString,
+           usrSigAdminStatus    INTEGER,
+           usrSigOperStatus     INTEGER,
+           usrIlmiAdminStatus   INTEGER,
+           usrIlmiOperStatus    INTEGER
+        }
+    usrAtmIfName OBJECT-TYPE
+        SYNTAX      UsrDisplayString
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "This object is the identifier of a ATM (AAL)
+        Interface on a managed device."
+	::= { usrAtmCfgEntry 1 }
+    usrSigAdminStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The desired state of Signalling on a desired interface.
+             The interface name, specified by usrAtmIfName represents
+             the AAL interface to enable or disable signalling on. If
+             the state is 'enable' then signalling messages will flow
+             on the interface. If the state is changed to disable,
+             then all signalling messages will stop on the interface."
+    --CONFIGURABLE
+	::= { usrAtmCfgEntry 2 }
+    usrSigOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual state of Signalling on a desired interface.
+             This state should follow the state set by
+             usrSigAdminStatus."
+	::= { usrAtmCfgEntry 3 }
+    usrIlmiAdminStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The desired state of ILMI on a desired interface.  The
+             interface name, specified by usrAtmIfName represents the
+             AAL interface to enable or disable ILMI on. If the state
+             is 'enable' then ILMI messages will flow on the
+             interface. If the state is changed to disable, then all
+             ILMI messages will stop on the interface."
+    --CONFIGURABLE
+	::= { usrAtmCfgEntry 4 }
+    usrIlmiOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual state of ILMI on a desired interface.  This
+             state should follow the state set by usrSigAdminStatus."
+	::= { usrAtmCfgEntry 5 }
+END         -- End usrAtmCfg MIB definitions
+USR-HACN-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress
+			FROM SNMPv2-SMI
+		common, UsrConfigStatus, UsrSpecialU32
+			FROM USR-DEFINITIONS-MIB
+		TruthValue, DisplayString
+			FROM SNMPv2-TC;
+    usrHACN MODULE-IDENTITY
+         LAST-UPDATED "200301221300Z"
+         ORGANIZATION "CommWorks Corporation, a 3Com Company"
+         CONTACT-INFO "Customer Support"
+         DESCRIPTION
+                 "The commWorks enterprise defined MIB objects
+                   for HACN functionality."
+--      REVISION "200301221300Z"
+--      DESCRIPTION "Added usrHACNHAMultipleLogins"
+--      REVISION "200208231350Z"
+--      DESCRIPTION "Clarified usage of usrHacnMbrID1, usrVirtualHAIPSecFlag.
+--          usrPhysicalHAIPSecFlag."
+--	    REVISION	"200202080600Z"
+--	    DESCRIPTION "Fix MIB syntax errors"
+--      REVISION "200201101935Z"
+--      DESCRIPTION " "
+         ::= { common 91 }
+	-- Textual Conventions
+        IpxNetwork ::= OCTET STRING (SIZE(4))
+	usrHACNConfig             OBJECT IDENTIFIER   ::= { usrHACN 1 }
+	usrHACNCfmConfig          OBJECT IDENTIFIER   ::= { usrHACN 2 }
+	usrHACNLoadBalanceConfig  OBJECT IDENTIFIER   ::= { usrHACN 3 }
+-- RP Connection Configuration Group
+usrHACNRunIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The IP Address to be used while running."
+    --CONFIGURABLE
+    ::= { usrHACNConfig 1 }     
+usrHACNSecret OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The secret configured between HACN and HA."
+    DEFVAL { "secret" }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 2 }  
+usrHACNPacketRetryCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..6)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The packet retry count for HACN"
+    DEFVAL { 2 }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 3 }     
+usrHACNPacketRetryTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (3..30)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The packet retry timeout for HACN."
+    DEFVAL { 3 }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 4 }     
+--
+-- VIRTUAL HA CONFIGURATION
+--  
+usrVirtualHAConfigTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF USRVirtualHAConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    	"List of configured Virtual HA's"
+    ::= { usrHACNConfig 5 }
+    usrVirtualHAConfigEntry OBJECT-TYPE
+	SYNTAX USRVirtualHAConfigEntry			
+	MAX-ACCESS not-accessible			
+	STATUS current
+	DESCRIPTION
+		"The table of Virtual HA's"
+	INDEX { usrVirtualHAConfigIndexNum }
+	::= { usrVirtualHAConfigTable 1 }
+    USRVirtualHAConfigEntry ::= SEQUENCE {
+	usrVirtualHAConfigIndexNum 	Integer32,
+	usrVirtualHARunIP 		IpAddress,
+	usrVirtualHAIpPoolStart 	IpAddress,
+	usrVirtualHAIpPoolSize		Integer32,
+	usrVirtualHALifetime 		Integer32,
+	usrVirtualHATimeStampDrift	Integer32,
+	usrVirtualHAIPSecFlag		INTEGER,
+	usrVirtualHACmdType		Integer32
+    }
+    usrVirtualHAConfigIndexNum OBJECT-TYPE
+	SYNTAX Integer32 (1..14)
+	MAX-ACCESS read-only 
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA configuration table entry index"
+	::= { usrVirtualHAConfigEntry 1 }
+    usrVirtualHARunIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA Run IP"
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 2 }
+    usrVirtualHAIpPoolStart OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA IP Pool Start"
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 3 }
+    usrVirtualHAIpPoolSize OBJECT-TYPE
+	SYNTAX Integer32 (1..10000)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA IP Pool Size"
+	--CONFIGURABLE
+		::= { usrVirtualHAConfigEntry 4 }
+    usrVirtualHALifetime OBJECT-TYPE
+	SYNTAX Integer32 (5..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA Lifetime value"
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 5 }
+    usrVirtualHATimeStampDrift OBJECT-TYPE
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA Timestamp drift"
+	DEFVAL { 10 }
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 6 }
+    usrVirtualHACmdType OBJECT-TYPE
+	SYNTAX Integer32 (1..4)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA configuration command.
+         This object should get values 1, 2, 3 or 4
+         depends upon the operation to be performed.
+         Possible values are ADD(1), SET(2), DELETE(3) and GET(4)."
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 7 }
+    usrVirtualHAIPSecFlag OBJECT-TYPE
+	SYNTAX INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Virtual HA IP Sec Flag"
+	--CONFIGURABLE
+	::= { usrVirtualHAConfigEntry 8 }
+--
+-- PHYSICAL HA CONFIGURATION
+--
+usrPhysicalHATable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF USRPhysicalHAEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    	"Each list contains the Physica HA's"
+    ::= { usrHACNConfig 6 }
+    usrPhysicalHAEntry OBJECT-TYPE
+	SYNTAX USRPhysicalHAEntry			
+	MAX-ACCESS not-accessible			
+	STATUS current
+	DESCRIPTION
+		"The table of HA's"
+	INDEX{usrPhysicalHAIndexNum}
+	::= { usrPhysicalHATable 1 }
+    USRPhysicalHAEntry ::= SEQUENCE {
+	usrPhysicalHAIndexNum	Integer32,
+	usrPhysicalHABootIP	IpAddress,
+    usrPhysicalHAIPSecFlag  INTEGER
+    }
+    usrPhysicalHAIndexNum OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only 
+	STATUS current
+	DESCRIPTION
+		"The index to the HA Boot IP table"
+	::= { usrPhysicalHAEntry 1 }
+    usrPhysicalHABootIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The HA Boot IP"
+	::= { usrPhysicalHAEntry 2 }
+-- usrPhysicalHACmdType OBJECT-TYPE
+--	SYNTAX Integer32
+--	MAX-ACCESS read-only
+--	STATUS deprecated
+--	DESCRIPTION
+--		"The Physical HA configuration cmd used by CLI"
+--	::= { usrPhysicalHAEntry 3 }
+    usrPhysicalHAIPSecFlag OBJECT-TYPE
+	SYNTAX INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Physical HA IP Sec Flag"
+	::= { usrPhysicalHAEntry 4 }
+usrHACNRedundantBootIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The Boot IP Address of the redundant HACN."
+    --CONFIGURABLE
+    ::= { usrHACNConfig 7}     
+--
+-- HACN HA STATS
+--
+usrHACNHAStatsTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF USRHACNHAStatsEntry
+	MAX-ACCESS not-accessible			
+	STATUS current
+	DESCRIPTION
+		"Table of HACN-HA Statistics"
+	::= { usrHACNConfig 8 }
+        usrHACNHAStatsEntryIndex OBJECT-TYPE
+		SYNTAX USRHACNHAStatsEntry			
+		MAX-ACCESS not-accessible			
+		STATUS current
+		DESCRIPTION
+			"Index into the HACN-HA Statistics Table"
+		INDEX{usrHACNHAStatsIndexNum}
+		::= { usrHACNHAStatsTable 1 }
+	USRHACNHAStatsEntry ::= SEQUENCE
+	{
+		usrHACNHAStatsIndexNum     Integer32,
+		usrPhysicalHAIP            IpAddress,
+		usrVirtualHAIP             DisplayString,
+		usrHARole                  DisplayString,
+		usrHAStatus                DisplayString,
+		usrTotalNumReg             Integer32,
+		usrCurrentActiveCalls      Integer32,
+		usrCurrentActiveCallsOnHA  Integer32,
+		usrHAIPSecFlag             TruthValue
+	}
+	usrHACNHAStatsIndexNum OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only 
+		STATUS current
+		DESCRIPTION
+			"The Index into the table"
+		::= { usrHACNHAStatsEntryIndex 1 }
+	usrPhysicalHAIP OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Physical HA IP Address"
+		::= { usrHACNHAStatsEntryIndex 2 }
+	usrVirtualHAIP OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Virtual HA IP Address"
+		::= { usrHACNHAStatsEntryIndex 3 }
+	usrHARole OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The HA Role"
+		::= { usrHACNHAStatsEntryIndex 4 }
+	 usrHAStatus OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The HA Status"
+		::= { usrHACNHAStatsEntryIndex 5 }
+	usrTotalNumReg OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS deprecated
+		DESCRIPTION
+			"The Total number of registration requests received
+             by HACN which are forwarded to this HA.
+             Note for Deprecated : In 3.0 HACN-HA release, HACN will not
+             forward any calls to HA, so this object will not be used "
+		::= { usrHACNHAStatsEntryIndex 6 }
+	usrCurrentActiveCalls OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Current number of active calls (MBRs) stored
+                         on HACN for this HA"
+		::= { usrHACNHAStatsEntryIndex 7 }
+	usrCurrentActiveCallsOnHA OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Current number of active calls on HA. This 
+                         information is received by HACN in the Heartbeat
+                         message from HA."
+		::= { usrHACNHAStatsEntryIndex 8 }
+	usrHAIPSecFlag OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The HA IP Sec Flag"
+		::= { usrHACNHAStatsEntryIndex 9 }
+usrTotalNumRegReq OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+     "Total number of registration requests forwarded by HACN to
+      all the HA's.
+      Note for DEPRECATED: In 3.0 HACN-HA release, HACN will not
+      forward any calls to the HAs, so this object will not be used."
+    ::= { usrHACNConfig 9 }     
+usrCurrNumRedundantHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of redundant HAs."
+    ::= { usrHACNConfig 10 }   
+usrCurrNumOfActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of active HAs."
+    ::= { usrHACNConfig 11 }  
+usrTotalNumberOfHASwitchOvers OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The total number of HA switchovers"
+    ::= { usrHACNConfig 12 }
+usrTotalNumOfFailedSwitchOvers OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The total number of failed switchovers"
+    ::= { usrHACNConfig 13 }  
+usrRedundantHACNStat OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "Status of the redundant HACN"
+    ::= { usrHACNConfig 14 }     
+usrHACNHAHeartBeatPeriod OBJECT-TYPE
+    SYNTAX      Integer32 (6..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The HACN HA Heartbeat Period"
+    DEFVAL { 6 }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 15 }     
+usrHACNRole OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "Role assumed by the HACN"
+    ::= { usrHACNConfig 16 }     
+usrHacnMobileRegDump OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+     "Specifies if Mobile Registrations Dump is enabled on HACN.
+      Note for DEPRECATED: In 3.0 HACN-HA release, HACN will not
+      receive any reg request/reply, so this object will not be used."
+    --CONFIGURABLE
+    ::= { usrHACNConfig 17 }     
+usrHACNHACNHeartBeatPeriod OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The HACN HACN Heartbeat Period"
+    ::= { usrHACNConfig 18 }     
+-- HACN MBR list
+usrHacnMbrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsrHacnMbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "A table containing the HACN MBR List. The HACN updates
+      this table in response to MBR update messages fron HAs."
+    ::= { usrHACNConfig 19 }
+    usrHacnMbrEntry OBJECT-TYPE
+        SYNTAX      UsrHacnMbrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "An entry in the HACN MBR list."
+	INDEX { usrHacnMbrIndex }
+	::= { usrHacnMbrTable 1 }
+    UsrHacnMbrEntry ::= SEQUENCE
+    {
+        usrHacnMbrIndex		Integer32,
+        usrHacnMbrHA		IpAddress,
+        usrHacnMbrMN		IpAddress,
+        usrHacnMbrCOA		IpAddress,
+        usrHacnMbrRegFlags	Integer32,
+        usrHacnMbrID1		UsrSpecialU32,
+        usrHacnMbrLifetime	Integer32,
+        usrHacnMbrNAI       DisplayString,
+        usrHacnMbrNextHop   IpAddress
+    }
+    usrHacnMbrIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..140000)
+        MAX-ACCESS  read-only
+        STATUS      current
+	DESCRIPTION
+	 "Index of the entry in the HACN MBR Table."
+	::= { usrHacnMbrEntry 1 }
+    usrHacnMbrHA OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Home Agent IP address."
+	::= { usrHacnMbrEntry 2 }
+    usrHacnMbrMN OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Mobile node's home (IP) address."
+	::= { usrHacnMbrEntry 3 }
+    usrHacnMbrCOA OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Mobile node's care-of-address.  One mobile node can have
+	  multiple bindings with different care-of-addresses."
+	::= { usrHacnMbrEntry 4 }
+    usrHacnMbrRegFlags OBJECT-TYPE
+	SYNTAX      Integer32 (0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Registration flags sent by mobile node.
+	  This is a bit-mapped value with the following represenentation:
+	    7   6   5   4   3   2   1   0
+	  +___+___+___+___+___+___+___+___+
+	  | S | B | D | M | G | V | T | R |
+	  +___+___+___+___+___+___+___+___+
+	  where,
+	 	S - Simultaneous Bindings
+		B - Broadcast Datagrams
+		D - Decapsulation by mobile node
+		M - Minimal Encapsulation
+		G - GRE Encapsulation
+		V - V.J. Compression
+		T - Reverse Tunneling
+		R - Reserved Bit"
+	::= { usrHacnMbrEntry 5 }
+    usrHacnMbrID1 OBJECT-TYPE
+	SYNTAX      UsrSpecialU32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Low 32 bits of Identification used in that binding by the
+	  mobile node."
+	::= { usrHacnMbrEntry 6 }
+    usrHacnMbrLifetime OBJECT-TYPE
+	SYNTAX      Integer32
+	UNITS       "seconds"
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "The lifetime in seconds granted to the mobile node for this
+	  registraion."
+	::= { usrHacnMbrEntry 7 }
+    usrHacnMbrNAI OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "User name ( NAI )."
+	::= { usrHacnMbrEntry 8 }
+    usrHacnMbrNextHop OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	 "Next hop gateway address returned by AAA, used for VLAN tagging
+      feature."
+	::= { usrHacnMbrEntry 9 }
+usrCurrNumOfNonIPSecActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of Non IPSec Group Active HAs."
+    ::= { usrHACNConfig 20 }  
+usrCurrNumOfIPSecActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of IPSec Group Active HAs."
+    ::= { usrHACNConfig 21 }  
+usrCurrNumNonIPSecRedundantHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of Non IPSec Redundant HAs."
+    ::= { usrHACNConfig 22 }   
+usrCurrNumIPSecRedundantHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of IPSec Redundant HAs."
+    ::= { usrHACNConfig 23 }   
+usrHACNHAMaxCallCapacity OBJECT-TYPE
+    SYNTAX      Integer32 (1..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "HA Max Call Capacity assigned to it when HACN assigns it an
+      Active Role."
+    DEFVAL { 10000 }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 24 }     
+usrCurrNumOfNonIPSecSoftbusyActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of Non IPSec Group Softbusy Active HAs.
+      The load information of these HAs will not be used in 
+      calculating the Average System Load and list of least 
+      loaded HAs."
+    ::= { usrHACNConfig 25 }  
+usrHACNHAMultipleLogins OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "HACN sends this setting to the all the HAs. This setting 
+      will override the individual HA setting. The setting indicates
+      whether HA will allow Multiple Logins for same user or not.
+      The user can only configure this setting on Master HACN."
+    DEFVAL { enabled }
+    --CONFIGURABLE
+    ::= { usrHACNConfig 26 }
+-- RP CFM Configuration Group
+usrHACNConfigFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The name of the configuration file for HACN.  If
+      this value is empty, then the default file name
+      is @file://HACNProcess.cfg."
+    ::= { usrHACNCfmConfig 1 }
+usrHACNCfmStatus OBJECT-TYPE
+    SYNTAX      UsrConfigStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "The Configuration File Manager Flag for
+      saving HACN configurable parameters."
+    ::= { usrHACNCfmConfig 2 }
+-- HACN Passive Load Balancing Statistics
+usrAverageSystemLoad OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Average Load on all Non IPSec Group In-service 
+      (Non-Softbusy) Active HAs in the System"
+    ::= { usrHACNLoadBalanceConfig 1 }     
+usrLeastLoadedHA1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The IP Address of Least Loaded HA #1"
+    ::= { usrHACNLoadBalanceConfig 2 }     
+usrCurrLoadOnHA1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Current Load on Least Loaded HA #1"
+    ::= { usrHACNLoadBalanceConfig 3 }     
+usrLeastLoadedHA2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The IP Address of Least Loaded HA #2"
+    ::= { usrHACNLoadBalanceConfig 4 }     
+usrCurrLoadOnHA2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Current Load on Least Loaded HA #2"
+    ::= { usrHACNLoadBalanceConfig 5 }     
+usrLeastLoadedHA3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The IP Address of Least Loaded HA #3"
+    ::= { usrHACNLoadBalanceConfig 6 }     
+usrCurrLoadOnHA3 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Current Load on Least Loaded HA #3"
+    ::= { usrHACNLoadBalanceConfig 7 }     
+usrLeastLoadedHA4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The IP Address of Least Loaded HA #4"
+    ::= { usrHACNLoadBalanceConfig 8 }     
+usrCurrLoadOnHA4 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Current Load on Least Loaded HA #4"
+    ::= { usrHACNLoadBalanceConfig 9 }     
+usrTotalSystemLoad OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Total Load on all Non IPSec Group In-service 
+      (Non-Softbusy) Active HAs in the System"
+    ::= { usrHACNLoadBalanceConfig 10 }     
+usrRemainderAvgSystemLoad OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The Remainder load left after calculating Average System
+      Load on all Non IPSec Group In-service (Non-Softbusy) 
+      Active HAs in the System"
+    ::= { usrHACNLoadBalanceConfig 11 }     
+usrCurrNumOfNonIPSecInserviceActiveHA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The current number of Non IPSec Group In-service 
+      (Non-Softbusy) Active HAs. The load information of 
+      only these HAs will be used in calculating the Average 
+      System Load and list of least loaded HAs."
+    ::= { usrHACNLoadBalanceConfig 12 }     
+END	-- USR-HACN-MIB Definitions
+USR-MIP-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		OBJECT-TYPE,
+        MODULE-IDENTITY,
+		Integer32,
+		Counter32,
+		IpAddress,
+		Unsigned32,
+		Gauge32
+			FROM SNMPv2-SMI
+		RowStatus,
+		TruthValue,
+        DisplayString
+			FROM SNMPv2-TC
+		NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		OBJECT-IDENTITY
+			FROM SNMPv2-SMI
+        common,
+		UsrConfigStatus,
+        UsrSecretDisplay,
+        UsrSpecialU32
+			FROM USR-DEFINITIONS-MIB;
+usrMIP  MODULE-IDENTITY
+        LAST-UPDATED "200301221300Z"
+        ORGANIZATION "CommWorks Corporation, a 3Com Company"
+        CONTACT-INFO "Customer Support"
+        DESCRIPTION   "Added usrMipHaSendICMPforPMTUDiscovery"
+--      REVISION      "200301221300Z"
+--      DESCRIPTION   "Added usrMipMultipleLoginsStatus,
+--         usrMipHaDuplicateNaiDiscs, usrMipHaClearMBRDiscs."
+--      REVISION      "200211061300Z"
+--      DESCRIPTION   "Added usrMipHaDuplicateIPDiscs"
+--      REVISION      "200211011330Z"
+--      DESCRIPTION   "Added usrMipHaGarpUponRereg"
+--      REVISION      "200208301200Z"
+--      DESCRIPTION   "Added usrMipHaGarpUponRereg"
+--      REVISION      "200208231825Z"
+--      DESCRIPTION   "Clarified usage of objects usrMipHaTunnelDeleteAll,
+--         usrMipHaTunDelByNAI, usrMipHaMnSaIndexKey, usrMipHaFaSaKey,
+--         usrMipHaHacnSecret, usrMipHaMobilityBindingRegIDLow, 
+--         usrMipHaMobilityBindingRegIDHigh, usrMipHaMobilityBindingNAI,
+--         usrMipHaHacnStatus, usrMipHaIdleTimerStatus,
+--         usrMipHaUsingBothPorts, usrMipHaBroadcastBit, usrMipHaStatusIPSec,
+--         usrMipHaTrapThreshold, usrMipHaTrapIdleTimer, 
+--         usrMipHaRunIPNetworkStatus."
+--      REVISION      "200208151730Z"
+--      DESCRIPTION   "Added structured trap comments"
+--      REVISION      "200208021630Z"
+--      DESCRIPTION   "Corrected definitions of usrMipHaMnSaIndexKey  
+--                     and usrMipHaFaSaKey"
+--      REVISION      "200208011400Z"
+--      DESCRIPTION   "Added usrMipMNHAKeyPadding"
+--      REVISION      "200207181445Z"
+--      DESCRIPTION   "obsoleted usrMipHaTunnelByAddr"
+--      REVISION      "200205051330Z"
+--      DESCRIPTION   "Created MODULE-IDENTITY for Mobile IP MIB"
+        ::= { common 82 }
+	usrMipHaConfig           OBJECT IDENTIFIER ::= { usrMIP 1 }
+	usrMipHaStats            OBJECT IDENTIFIER ::= { usrMIP 2 }
+	usrMipHaCfmConfig        OBJECT IDENTIFIER ::= { usrMIP 3 }
+	usrMipHaTrapsSettings    OBJECT IDENTIFIER ::= { usrMIP 4 }
+	usrMipHaTraps            OBJECT IDENTIFIER ::= { usrMIP 5 }
+	usrMipHaStatus           OBJECT IDENTIFIER ::= { usrMIP 6 }
+	usrMipHaMobileInfo       OBJECT IDENTIFIER ::= { usrMIP 7 } 
+	usrMipHaLoadInfo         OBJECT IDENTIFIER ::= { usrMIP 8 } 
+	usrMipHacnSettings       OBJECT IDENTIFIER ::= { usrMIP 9 }
+	usrMipHacnStats          OBJECT IDENTIFIER ::= { usrMIP 10 }
+-- Home Agent MIP configurable parameters
+	usrMipHaMaxLifetime OBJECT-TYPE
+		SYNTAX Integer32 (5..65535)
+		UNITS "seconds"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The longest lifetime in seconds that the Home
+			 Agent is willing to accept in any Registration
+			 Request."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 1 }
+	usrMipHaDomainName OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(0..128))
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"The HA domain name.
+			 OBSOLETE:
+			 This object is never used on HA."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 2 }
+	usrMipHaDomainSpi OBJECT-TYPE
+		SYNTAX Unsigned32 (0..4294967295) 
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"The SPI is the 4-byte opaque index within
+			 the Mobility Security Association which
+			 selects the specific security parameters
+			 to be used to authenticate the peer.
+			 OBSOLETE:
+			 This object is never used on HA."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 3 }
+	usrMipHaDomainKey OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(0..16))
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"The shared secret key for the security associations.
+			 Reading this object will always return zero length
+			 value.
+			 OBSOLETE:
+			 This object is never used on HA."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 4 }
+	usrMipHaHacnAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Home Agent Control Node's RUN IP Address."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 5 }
+	usrMipFaDomainSpi OBJECT-TYPE
+		SYNTAX Unsigned32 (0..4294967295)
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"The SPI is the 4-byte opaque index within
+			 the Mobility Security Association which
+			 selects the specific security parameters
+			 to be used to authenticate the peer.
+			 OBSOLETE:
+			 This object is never used on HA."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 6 }
+	usrMipFaDomainKey OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(0..16))
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"The shared secret key for the security associations.
+			 Reading this object will always return zero length
+			 value.
+			 OBSOLETE:
+			 This object is never used on HA."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 7 }
+	usrMipHaTimeDrift OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		UNITS "seconds"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The value represents how close the timestamp,
+			 contained in the Identification information element
+			 of the Registration Request or the Registration
+			 Acknowledge message, should be to the PDSN's time
+			 of day clock.  This time tolerance is used in
+			 conjunction with timestamp replay protection
+			 against replay attacks."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 8 }
+	usrMipHaMaxTunnels OBJECT-TYPE
+		SYNTAX INTEGER (0..10000)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Maximum number of tunnels that can be established
+			 by this Home Agent."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 9 }
+	usrMipHaHacnStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+       		"Specifies if the HACN Interface is available.
+             When set for the first time all active HA tunnels will
+             be deleted prior to initialization. Enabling an already
+             active interface has no action and returns no error.
+             Disabling an active interface will cause deleteion of
+             all tunnels and services provided on the interface.
+             Disabling an inactive interface has no action and
+             returns no error."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 10 }
+	usrMipHaMobileRegDump OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS deprecated
+		DESCRIPTION
+			"Specifies if the MIP debugging is enabled.
+            DEPRECATED:
+            The CLI command Set Mobile Reg_dump on/off removed."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 11 }
+	usrMipHaMnSaTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrMipHaMnSaEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table for configuring mobility security
+			 associations between mobile nodes and the
+			 Home Agent."
+	::= { usrMipHaConfig 12 }
+	usrMipHaMnSaEntryIndex OBJECT-TYPE
+		SYNTAX UsrMipHaMnSaEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the Home Agent Security Association
+			 Table."
+		INDEX { usrMipHaMnSaIndexNum }
+	::= { usrMipHaMnSaTable 1 }
+	UsrMipHaMnSaEntry ::= SEQUENCE {
+		usrMipHaMnSaIndexNum    INTEGER,
+		usrMipHaMnSaIndexSpi    Unsigned32,
+		usrMipHaMnSaIndexKey    UsrSecretDisplay,
+		usrMipHaMnSaIndexStatus RowStatus
+	}
+	usrMipHaMnSaIndexNum OBJECT-TYPE
+		SYNTAX INTEGER (1..1000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Home Agent can support up to 1000 mobility
+			 security associations."
+	::= { usrMipHaMnSaEntryIndex 1 }
+	usrMipHaMnSaIndexSpi OBJECT-TYPE
+		SYNTAX Unsigned32 (256..4294967295) 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The SPI is the 4-byte opaque index within
+			 the Mobility Security Association which
+			 selects the specific security parameters
+			 to be used to authenticate the peer."
+		--CONFIGURABLE
+	::= { usrMipHaMnSaEntryIndex 2 }
+	usrMipHaMnSaIndexKey OBJECT-TYPE
+		SYNTAX     UsrSecretDisplay
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The shared secret key for the security associations."
+		--CONFIGURABLE
+	::= { usrMipHaMnSaEntryIndex 3 }
+	usrMipHaMnSaIndexStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This object is used to add, modify, and delete
+			 rows for the security association table."
+		--CONFIGURABLE
+	::= { usrMipHaMnSaEntryIndex 4 }
+	usrMipHaTunIPToDel OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Delete a tunnel specified by this IP address."
+	::= { usrMipHaConfig 13 }
+	usrMipHaTunnelDeleteAll OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"When this flag is FALSE it indicates that HACN should not be 
+             updated with a delete MBR. This case will happen if the HACN 
+             interface is disabled on HA and re-enabled before HACN can 
+             find out that it happened. If this happens then at least HACN 
+             can download MBRs to the this HA. If this flag is set to TRUE
+             all MBR's are deleted from HA. This flag will always return
+             FALSE on a read."
+	::= { usrMipHaConfig 14 }
+	usrMipHaHacnSoftbusy OBJECT-TYPE
+   		SYNTAX  INTEGER {
+			disabled(0),
+			enabled(1)
+		}
+   		MAX-ACCESS  read-write
+   		STATUS  current
+   		DESCRIPTION
+       		"HA is softbusy or not.
+            From 3.0 onwards it means that this HA will try to forward the
+            Registration Request received by it and in case it can not find 
+            a HA to which Registration Request can be forwarded, this HA 
+            will process that request.
+            Softbusy state can be changed only for ACTIVE non IPSec HA."
+	::= { usrMipHaConfig 15 }
+	usrMipHaHacnSecret OBJECT-TYPE
+   		SYNTAX  UsrSecretDisplay
+   		MAX-ACCESS  read-write
+   		STATUS  current
+   		DESCRIPTION
+       		"Secret shared between HA and HACN."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 16 }
+	usrMipHaIdleTimer OBJECT-TYPE
+		SYNTAX Unsigned32 (5..600)
+		UNITS "seconds"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The value represents the time interval when a process 
+             will be run to delete the MBRs for the MNs on which 
+             there have been no activity for certain time (which
+             is equal to maximum idle time). This value should be
+			 less than MaxIdleTime. The default is 10 secs."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 17 }
+	usrMipHaIdleTimerStatus OBJECT-TYPE
+   		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    } 
+   		MAX-ACCESS  read-write
+   		STATUS  current
+   		DESCRIPTION
+       		"Idle Timer Enabled or Disabled. The default is Disabled.
+             Attempting to enable/disable the Idle TImer while any
+             call is active will return an error."
+        --CONFIGURABLE
+	::= { usrMipHaConfig 18 }
+	usrMipHaMaxIdleTime OBJECT-TYPE
+		SYNTAX Unsigned32 (10..65535)
+		UNITS "seconds"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The value represents the time for the maximum idle
+             time. If for this much time there is no activity  
+             (data transfer), then the MBR for this MN will be 
+             deleted. This value should be greater than 
+             IdleTimer. The default value is 65535 secs."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 19 }
+	usrMipHaWAPCCStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+       		"Specifies if WAP Call Clearing is enabled.
+             Enabling if already enabled has no action and no
+             error is returned. Disabling this feature while
+             any update message is pending will return an error."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 20 }
+	usrMipHaTunnelByAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Display a tunnel specified by this IP address.
+			 OBSOLETE:
+			 This object is never used on HA."
+	::= { usrMipHaConfig 21 }
+    usrMipHaStatsResetTime OBJECT-TYPE
+        SYNTAX	Unsigned32 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+                "Reading:
+				Time the HA statistics counters were last 
+			 	reset. The HA statistics are valid from 
+				usrMipHAStatsResetTime until present.
+	        		Resetting counters causes a discontinuity in 
+				the monotonically increasing value of counters.
+				Management stations that sample these counters
+				need also to sample this object so that they 
+				can know that a discontinuity occurred with 
+				respect to the previous sample.  
+                Its value is in NTP format.
+		        Writing:
+		   	    Writing 0 causes update of usrMipHAStatsResetTime
+				and the HA counters to be reset to 0."
+	::= { usrMipHaConfig 22 }
+	usrMipHaUsingBothPorts OBJECT-TYPE
+		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+   			"Specifies if HA is using both ports. Port 1 (eth:1) will
+             always be used for interfacing with PDSN/FA/HACN"
+		--CONFIGURABLE
+	::= { usrMipHaConfig 23 }
+	usrMipHaTunDelByNAI OBJECT-TYPE
+		SYNTAX     DisplayString 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Delete tunnel(s) specified by this NAI. Reading this
+             value returns NULL."
+	::= { usrMipHaConfig 24 }
+	usrMipHaBroadcastBit OBJECT-TYPE
+		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+   			"This flag specifies if HA should accept a registration
+             request with B bit set in registration flags or not. By
+             default this bit is set and HA will accept reg req with 
+             B bit set."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 25 }
+	usrMipHaNAICheck OBJECT-TYPE
+		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+   			"Specifies if HA is checking NAI for re-registration requests
+             or not. If it is enable then NAI is checked for each
+             Re-Registration Requests otherwise NAI is not checked. By
+             default NAI check is enabled."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 26 }
+	usrMipHaFaSaTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrMipHaFaSaEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table for configuring FA security
+			 associations between PDSN/FA and the
+			 Home Agent."
+	::= { usrMipHaConfig 27 }
+	usrMipHaFaSaEntryIndex OBJECT-TYPE
+		SYNTAX UsrMipHaFaSaEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the FA-HA Security Association
+			 Table."
+		INDEX { usrMipHaFaSaIndexNum }
+	::= { usrMipHaFaSaTable 1 }
+	UsrMipHaFaSaEntry ::= SEQUENCE {
+		usrMipHaFaSaIndexNum    INTEGER,
+		usrMipHaFaSaIpAddress   IpAddress,
+		usrMipHaFaSaSpi         Unsigned32,
+		usrMipHaFaSaKey         UsrSecretDisplay,
+		usrMipHaFaSaStatus      RowStatus
+	}
+	usrMipHaFaSaIndexNum OBJECT-TYPE
+		SYNTAX INTEGER (1..100)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Home Agent can support up to 100 FA-HA
+			 security associations."
+	::= { usrMipHaFaSaEntryIndex 1 }
+	usrMipHaFaSaIpAddress OBJECT-TYPE
+		SYNTAX IpAddress 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The IP address of PDSN/FA."
+		--CONFIGURABLE
+	::= { usrMipHaFaSaEntryIndex 2 }
+	usrMipHaFaSaSpi OBJECT-TYPE
+		SYNTAX Unsigned32 (256..4294967295) 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The SPI is the 4-byte opaque index within
+			 the FA-HA Security Association which
+			 selects the specific security parameters
+			 to be used to authenticate the peer."
+		--CONFIGURABLE
+	::= { usrMipHaFaSaEntryIndex 3 }
+	usrMipHaFaSaKey OBJECT-TYPE
+		SYNTAX     UsrSecretDisplay
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The shared secret key for the security associations."
+		--CONFIGURABLE
+	::= { usrMipHaFaSaEntryIndex 4 }
+	usrMipHaFaSaStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This object is used to add, modify, and delete
+			 rows for the security association table."
+		--CONFIGURABLE
+	::= { usrMipHaFaSaEntryIndex 5 }
+-- HA Load information table
+	usrMipHaLoadInfoSystemLoad OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This specifies the average load on the system. This is calculated
+            by HACN and distributed to all the HAs in the heartbeat ack
+            message."
+	::= { usrMipHaLoadInfo 1 }
+	usrMipHaLoadInfoLLHA1 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"IP address of the least loaded HA 1 in the system. This information
+            is passed by HACN."
+	::= { usrMipHaLoadInfo 2 }
+	usrMipHaLoadInfoLLHA2 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"IP address of the least loaded HA 2 in the system. This information
+            is passed by HACN."
+	::= { usrMipHaLoadInfo 3 }
+	usrMipHaLoadInfoLLHA3 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"IP address of the least loaded HA 3 in the system. This information
+            is passed by HACN."
+	::= { usrMipHaLoadInfo 4 }
+	usrMipHaLoadInfoLLHA4 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"IP address of the least loaded HA 4 in the system. This information
+            is passed by HACN."
+	::= { usrMipHaLoadInfo 5 }
+	usrMipHaLoadInfoLoadHA1 OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current load of least loaded HA1."
+	::= { usrMipHaLoadInfo 6 }
+	usrMipHaLoadInfoLoadHA2 OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current load of least loaded HA2."
+	::= { usrMipHaLoadInfo 7 }
+	usrMipHaLoadInfoLoadHA3 OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current load of least loaded HA3."
+	::= { usrMipHaLoadInfo 8 }
+	usrMipHaLoadInfoLoadHA4 OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current load of least loaded HA4."
+	::= { usrMipHaLoadInfo 9 }
+	usrMipHaStatusIPSec OBJECT-TYPE
+		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+		MAX-ACCESS read-write
+		STATUS current
+   		DESCRIPTION
+       		"Indicates this HA is IPSec enabled or not. If enabled 
+             then this HA will be used to service IPSec calls. 
+            In case HACN is present, this HA will accept only ipsec 
+            enabled virtual HA profile during role assignment."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 28 }
+	usrMipAuthenticationStyle OBJECT-TYPE
+   		SYNTAX  INTEGER {
+			rfc2002(1),
+			rfc2002bis(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+   		DESCRIPTION
+       		"Indicates the authentication style on HA for registration requests.
+            The HA can authenticate request according to RFC2002 standards or 
+            RFC2002bis standards.
+            RFC2002 and RFC2002BIS are the only two valid values
+            Value 1 will specify RFC2002 Auth Style and 
+            value 2 will specify RFC2002BIS Auth Style."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 29 }
+	usrMipMNHAKeyTransportScheme OBJECT-TYPE
+   		SYNTAX  INTEGER {
+			threecom-vsa(1),
+			is-835(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+   		DESCRIPTION
+       		"Indicates the MN_HA Key Transport Scheme for access request to AAA.
+            The radius attribute returned by AAA for MN-HA secret will depend upon
+            the Key Transport Scheme. 
+            ThreeCom-VSA and IS-835 are the only two valid values
+            Value 1 will specify 3Com VSA and 
+            value 2 will specify IS-835."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 30 }
+    usrMipMNHAKeyPadding OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+   		DESCRIPTION
+       		"Indicates whether HA has MN-HA Key padding enabled or disabled.
+            If enabled, the key will be padded and if disabled the exact
+            length of the key will be taken.
+            Padding can be set only if there are no calls up in the system.
+            By default the Key will be padded."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 31 }
+    usrMipLoadBalancingStatus OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+   		DESCRIPTION
+       		"Indicates whether HA will forward MIP Registration Requests to
+            other HAs for Load Balancing or not. If enabled HA will do load
+            balancing else it will not forward MIP RRQ.
+            By default the HA will do Load Balancing."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 32 }
+    usrMipHaGarpUponRereg OBJECT-TYPE
+   		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+   		DESCRIPTION
+       		"Indicates whether G-ARP upon MIP Re-Registration is enabled or disabled.
+            If enabled, the HA will send G-ARP for the MN address for
+            Re-Registration request else it will not be sent. G-ARP is always sent 
+            for Initial Registration request."
+		--CONFIGURABLE
+	::= { usrMipHaConfig 33 }
+    usrMipHaSendICMPforPMTUDiscovery OBJECT-TYPE
+   		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+   		DESCRIPTION
+       		"Indicates whether HA will send ICMP message when it receives a packet
+             with size bigger than Tunnel MTU size for Path MTU Discovery.
+             Note: The CLI description was later changed to 'Check Tunnel MTU'. 
+             CEM should also change the description to the same."
+        DEFVAL { enabled }
+		--CONFIGURABLE
+	::= { usrMipHaConfig 34 }
+    usrMipMultipleLoginsStatus OBJECT-TYPE
+   		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+   		DESCRIPTION
+       		"Indicates whether HA will allow Multiple Logins for same user or not."
+        DEFVAL { enabled }
+		--CONFIGURABLE
+	::= { usrMipHaConfig 44 }
+-- Home Agent registration counters for all mobile nodes.
+	usrMipHaRegReqsIn OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests processed
+			 by the home agent."
+	::= { usrMipHaStats 1 }
+	usrMipHaRegAccptsSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registrations Requests accepted
+			 by the home agent (Code 0)."
+	::= { usrMipHaStats 2 }
+	usrMipHaRegRejsSent OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number Registration Requests denied by the
+			 home agent."
+	::= { usrMipHaStats 3 }
+	usrMipHaRegReqsDropped OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests that were
+			 discarded by the home agent."
+	::= { usrMipHaStats 4 }
+	usrMipHaMnAuthFailures OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied by
+			 the home agent - mobile node failed authentication
+			 (Code 131)."
+	::= { usrMipHaStats 5 }
+	usrMipHaFaAuthFailures OBJECT-TYPE
+		SYNTAX Counter32
+ 		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied by
+			 the home agent - foreign agent failed
+			 authentication (Code 132)."
+	::= { usrMipHaStats 6 }
+	usrMipHaRegsMalformedIn OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied by
+			 the home agent - poorly formed request (Code 134.)"
+	::= { usrMipHaStats 7 }
+	usrMipHaRegReqsBadHaIn OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied by
+			 the home agent - unknown home agent address
+			 (Code 136.)"
+	::= { usrMipHaStats 8 }
+	usrMipHaTimeCheckFailures OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Time Check Failures."
+	::= { usrMipHaStats 9 }
+	usrMipHaNAICheckFailures OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of NAI Check Failures."
+	::= { usrMipHaStats 10 }
+	usrMipHaInsuffResources OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+   		DESCRIPTION
+			"Total number of Registration Requests denied by
+			 the home agent - insufficient resources
+			 (Code 130.)"
+	::= { usrMipHaStats 11 }
+	usrMipHaLifetimeDiscs OBJECT-TYPE
+		SYNTAX Counter32
+   		MAX-ACCESS read-only
+		STATUS current
+   		DESCRIPTION
+			"Total number of home agent initiated disconnects
+			 due to Lifetime expiry event."
+	::= { usrMipHaStats 12 }
+	usrMipHaDeregDiscs OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests received
+			 by the home agent with a Lifetime of zero
+			 (requests to deregister)."
+	::= { usrMipHaStats 13 }
+	usrMipHaManualDiscs OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of manual disconnects initiated
+			 by this home agent."
+	::= { usrMipHaStats 14 }
+	usrMipHaTotalSessions OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of sessions handled by this home
+			 agent."
+	::= { usrMipHaStats 15 }
+	usrMipHaUnsupEncapFailures OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS deprecated
+		DESCRIPTION
+			"Total number of Registration Requests denied by
+			 the home agent - Unsupported Encapsulation (Code 139.)
+			DEPRECATED:
+			HA does not report this error code any more.
+			If HA receives M Bit in registration request, it gives 129 error
+			code."
+	::= { usrMipHaStats 17 }
+	usrMipHaCurrentSessions OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Current number of active sessions."
+	::= { usrMipHaStats 16 }
+-- More statistics counter after Home agent binding list
+-- Home Agent mobility binding list
+	usrMipHaMobilityBindingTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrMipHaMobilityBindingEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table containing the home agent's mobility
+			 binding list.  The home agent updates this
+			 table in response to registration events from
+			 mobile nodes."
+	::= { usrMipHaStats 18 }
+	usrMipHaMobilityBindingEntry OBJECT-TYPE
+		SYNTAX UsrMipHaMobilityBindingEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the mobility binding list."
+		INDEX { usrMipHaMobilityBindingIndex }
+	::= { usrMipHaMobilityBindingTable 1 }
+	UsrMipHaMobilityBindingEntry ::= SEQUENCE {
+		usrMipHaMobilityBindingIndex         INTEGER,
+		usrMipHaMobilityBindingMN            IpAddress,
+		usrMipHaMobilityBindingCOA           IpAddress,
+		usrMipHaMobilityBindingRegFlags      INTEGER,
+		usrMipHaMobilityBindingRegIDLow      UsrSpecialU32,
+		usrMipHaMobilityBindingRegIDHigh     UsrSpecialU32,
+		usrMipHaMobilityBindingTimeGranted   Integer32,
+		usrMipHaMobilityBindingTimeRemaining Gauge32,
+		usrMipHaMobilityBindingMtu           Unsigned32,
+		usrMipHaMobilityBindingNAI           DisplayString,
+        usrMipHaMobilitySetupTime            Unsigned32,
+        usrMipHaMobilityBindingNextHop       IpAddress
+		}
+	usrMipHaMobilityBindingIndex OBJECT-TYPE
+		SYNTAX INTEGER (1..10000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Index of the entry in the Mobility Binding Table."
+	::= { usrMipHaMobilityBindingEntry 1 }
+	usrMipHaMobilityBindingMN OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Mobile node's home (IP) address."
+	::= { usrMipHaMobilityBindingEntry 2 }
+	usrMipHaMobilityBindingCOA OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Mobile node's care-of-address.  One mobile node
+			 can have multiple bindings with different
+			 care-of-addresses."
+	::= { usrMipHaMobilityBindingEntry 3 }
+	usrMipHaMobilityBindingRegFlags OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Registration flags sent by mobile node.
+			 This is a bit-mapped value with the following
+			 representation:
+			   7   6   5   4   3   2   1   0
+			 +---+---+---+---+---+---+---+---+
+			 | S | B | D | M | G | V | T | R |
+			 +---+---+---+---+---+---+---+---+
+			 where,
+			 S - Simultaneous Bindings
+			 B - Broadcast Datagrams
+			 D - Decapsulation by mobile node
+			 M - Minimal Encapsulation
+			 G - GRE Encapsulation
+			 V - V.J. Compression
+			 T - Reverse Tunneling
+			 R - Reserved Bit"
+	::= { usrMipHaMobilityBindingEntry 4 }
+	usrMipHaMobilityBindingRegIDLow OBJECT-TYPE
+		SYNTAX UsrSpecialU32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Low 32 bits of Identification used in that
+			 binding by the mobile node."
+	::= { usrMipHaMobilityBindingEntry 5 }
+	usrMipHaMobilityBindingRegIDHigh OBJECT-TYPE
+		SYNTAX UsrSpecialU32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"High 32 bits of Identification used in that
+			 binding by the mobile node."
+	::= { usrMipHaMobilityBindingEntry 6 }
+	usrMipHaMobilityBindingTimeGranted OBJECT-TYPE
+		SYNTAX Integer32
+		UNITS "seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The lifetime in seconds granted to the mobile
+			 node for this registration."
+	::= { usrMipHaMobilityBindingEntry 7 }
+	usrMipHaMobilityBindingTimeRemaining OBJECT-TYPE
+		SYNTAX Gauge32
+		UNITS "seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of seconds remaining until the
+			 registration is expired. It has the same initial
+			 value as usrMipHaMobilityBindingTimeGranted,
+			 and is counted down by the home agent."
+	::= {usrMipHaMobilityBindingEntry 8 }
+	usrMipHaMobilityBindingMtu OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The size of the MTU."
+	::= {usrMipHaMobilityBindingEntry 9 }
+	usrMipHaMobilityBindingNAI OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"User name ( NAI )."
+	::= {usrMipHaMobilityBindingEntry 10 }
+	usrMipHaMobilitySetupTime OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Actual time when the tunnel was setup on this HA. Time is in NTP 
+            format."
+	::= {usrMipHaMobilityBindingEntry 11 }
+    usrMipHaMobilityBindingNextHop OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Next hop gateway address returned by AAA, used for VLAN tagging
+            feature."
+	::= { usrMipHaMobilityBindingEntry 14 }
+--	usrMipHaTunnelPacketOut OBJECT-TYPE
+--		SYNTAX Unsigned32
+--		MAX-ACCESS read-only
+--		STATUS current
+--		DESCRIPTION
+--			"Number of packets sent on tunnel."
+--	::= {usrMipHaMobilityBindingEntry 12 }
+--	usrMipHaTunnelPacketIn OBJECT-TYPE
+--		SYNTAX Unsigned32
+--		MAX-ACCESS read-only
+--		STATUS current
+--		DESCRIPTION
+--			"Number of packets received from the tunnel."
+--	::= {usrMipHaMobilityBindingEntry 13 }
+-- Home agent statistics counter
+	usrMipHaTotalSessionReleased OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied by
+			 the home agent - Unsupported Encapsulation (Code 139.)"
+	::= { usrMipHaStats 19 }
+	usrMipHaNewRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of new Registration Requests received by
+			 the home agent."
+	::= { usrMipHaStats 20 }
+	usrMipHaNewRegReqAccepted OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of new Registration Requests accepted by
+			 the home agent."
+	::= { usrMipHaStats 21 }
+	usrMipHaNewRegReqRejected OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of new Registration Requests rejected by
+			 the home agent."
+	::= { usrMipHaStats 22 }
+	usrMipHaReRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of Re-Registration Requests received by
+			 the home agent."
+	::= { usrMipHaStats 23 }
+	usrMipHaReRegReqAccepted OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of Re-Registration Requests accepted by
+			 the home agent."
+	::= { usrMipHaStats 24 }
+	usrMipHaReRegReqRejected OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of Re-Registration Requests rejected by
+			 the home agent."
+	::= { usrMipHaStats 25 }
+	usrMipHaDeRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of De-Registration Requests received by
+			 the home agent."
+	::= { usrMipHaStats 26 }
+	usrMipHaDeRegReqAccepted OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of De-Registration Requests accepted by
+			 the home agent."
+	::= { usrMipHaStats 27 }
+	usrMipHaDeRegReqRejected OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of De-Registration Requests rejected by
+			 the home agent."
+	::= { usrMipHaStats 28 }
+	usrMipHaAdminProhibited OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests rejected by
+			 the home agent with error code 129"
+	::= { usrMipHaStats 29 }
+	usrMipHaRegReqForwarded OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests forwarded by
+			 the home agent."
+	::= { usrMipHaStats 30 }
+	usrMipHaForwardedRegReq OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+   		STATUS current
+		DESCRIPTION
+			"Total number of forwarded Registration Requests received by
+			 the home agent."
+	::= { usrMipHaStats 31 }
+   	usrMipHaDuplicateIPDiscs OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of disconnects due to duplicate IP address.
+             This can happen when an MBR already exists with the
+             same address as as assigned to MN."
+	::= { usrMipHaStats 32 }
+  	usrMipHaDuplicateNaiDiscs OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of disconnects due to duplicate NAI.
+             This can happen when Multiple Logins is disabled and
+             an MBR already exists with the same NAI."
+	::= { usrMipHaStats 39 }
+  	usrMipHaClearMBRDiscs OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of disconnects due to Clear MBR message 
+             received from HACN. This can happen in two scenarios, 
+             first when HACN detects Duplicate MN IP, it sends Clear
+             MBR message to first HA. Second when Multiple Logins is
+             disabled and HACN detects Duplicate NAI. It will send 
+             Clear MBR to first HA."
+	::= { usrMipHaStats 40 }
+-- Home Agent MIP CFM Configuration Group
+	usrMipHaConfigFileName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..64))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The name of the configuration file for HA MIP.  If
+			 this value is empty, then the default file name
+			 is @file://MipHandler.cfg."
+	::= { usrMipHaCfmConfig 1 }
+	usrMipHaCfmStatus OBJECT-TYPE
+		SYNTAX UsrConfigStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The Configuration File Manager Flag for
+			 saving Home Agent MIP configurable parameters."
+	::= { usrMipHaCfmConfig 2 }
+-- Home Agent MIP Interface Events Settings Group
+	usrMipHaUpperThreshold OBJECT-TYPE
+		SYNTAX INTEGER (1..100)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+       			"Specifies the upper Water Mark for Active Session
+                         Threshold. If the active call capacity exceeds this
+                         limit, then a trap is sent."
+		--CONFIGURABLE
+	::= { usrMipHaTrapsSettings 1 }
+	usrMipHaLowerThreshold OBJECT-TYPE
+		SYNTAX INTEGER (1..100)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+       			"Specifies the lower Water Mark for Active Session
+                         Threshold. If the active call capacity touches 
+                         this lower threshold after touching the Upper
+                         threshold, then only a trap will be sent whenever
+                         next time it exceeds the Upper Threshold."
+		--CONFIGURABLE
+	::= { usrMipHaTrapsSettings 2 }
+	usrMipHaTrapThreshold OBJECT-TYPE
+   		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+   		MAX-ACCESS  read-write
+   		STATUS  current
+   		DESCRIPTION
+	        "Threshold Trap Enabled or Disabled."
+        --CONFIGURABLE
+	::= { usrMipHaTrapsSettings 3 }
+	usrMipHaTrapIdleTimer OBJECT-TYPE
+   		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+   		MAX-ACCESS  read-write
+   		STATUS  current
+   		DESCRIPTION
+	        "Idle Timer Trap Enabled or Disabled."
+        --CONFIGURABLE
+	::= { usrMipHaTrapsSettings 4 }
+-- Home Agent MIP Interface Events Group
+    usrMipHaTrapsV2 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION "The Traps for MIP"
+        ::= {usrMipHaTraps 0}
+	usrMipHaActiveSessionThresholdReached NOTIFICATION-TYPE
+		OBJECTS {    
+                    usrMipHaUpperThreshold,
+                    usrMipHaLowerThreshold,
+	                usrMipHaCurrentSessions
+		}
+        STATUS  current
+		DESCRIPTION
+			"This trap is generated when Active Session Threshold 
+             is reached based on the calculation -
+             (ActiveSessions * 100) / MaxTunnels being greater
+             than the UpperThreshold."
+	    --#TYPE	"Interface Capacity Alarm"
+	    --#SUMMARY	"Total Sessions %d reached upper threshold of %d"
+	    --#ARGUMENTS { 2 0 }
+	    --#SEVERITY MAJOR
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "resourceAtOrNearingCapacity"
+        ::= {usrMipHaTrapsV2 1}
+	usrMipHaIdleTimerExpired NOTIFICATION-TYPE
+		OBJECTS {    
+		        usrMipHaMobilityBindingMN
+		}
+        STATUS  current
+		DESCRIPTION
+			"This trap is generated when the Idle Timer has expired
+             and the tunnel has been disconnected. The trap contains
+             the MobileNode's home IP address."
+	    --#TYPE	"Timeout"
+	    --#SUMMARY	"Tunnel disconnected for MN %d"
+	    --#ARGUMENTS { 0 }
+	    --#SEVERITY MINOR
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "communicationsProblem"
+        ::= {usrMipHaTrapsV2 2}
+-- Home Agent status
+	usrMipHaStatusHacnInterfaceStatus OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+   		DESCRIPTION
+       		"HACN Interface status"
+	::= { usrMipHaStatus 1 }
+	usrMipHaStatusHaRole OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+   		DESCRIPTION
+       		"HA Role. This makes sense only if HACN interface is enabled. If
+            HACN interface is not enabled, then HA role will be unassigned."
+	::= { usrMipHaStatus 2 }
+	usrMipHaStatus2EthPortStatus OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+   		DESCRIPTION
+       		"Status of second ethernet port. If both port are in use and
+            second ethernet port goes down then HA stops accepting reg req."
+	::= { usrMipHaStatus 3 }
+	usrMipHaStatusHaRunIp OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS deprecated
+		DESCRIPTION
+			"Home Agent RUN IP Address.
+			DEPRECATED:
+			This object has been replaced by usrMipHacnSettingsHaRunIp"
+	::= { usrMipHaStatus 4 }
+	usrMipHaStatusHacnResponding OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+   		DESCRIPTION
+       		"This indicates whether HACN is responding to heartbeats or not."
+	::= { usrMipHaStatus 5 }
+	usrMipHaRunIPNetworkStatus OBJECT-TYPE
+   		SYNTAX INTEGER {
+                    enabled(1),
+                    disabled(2)
+                    }
+   		MAX-ACCESS  read-write
+   		STATUS  current
+   		DESCRIPTION
+            "HA RunIP Network added on HA Enabled or Disabled.
+             If the HA role is not active then no action, enabled
+             or disabled, is allowed; an error will be returned.
+             An error will also be returned if an attempt is made
+             to enable/disable and active calls exist."
+        --CONFIGURABLE
+	::= { usrMipHaStatus 6 }
+-- Home Agent Control Node settings
+	usrMipHacnSettingsHaRunIp OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Home Agent RUN IP Address."
+	::= { usrMipHacnSettings 1 }
+	usrMipHacnSettingsHeartbeatPeriod OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Heartbeat period set by HACN. This value is set in HACN and is
+            sent to HA during Role Assignment and in each Heartbeat ACK. This
+            is the time period after which HA is supposed to send a heartbeat
+            message to HACN."
+	::= { usrMipHacnSettings 2 }
+	usrMipHacnSettingsPacketRetryPeriod OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Packet Retry period set by HACN. This value is set in HACN and is
+            sent to HA during Role Assignment and in each Heartbeat ACK. This
+            is the time period after which HA is supposed to retry a message
+            in case HA does not gets a ack for the previous message."
+	::= { usrMipHacnSettings 3 }
+	usrMipHacnSettingsPacketRetryCount OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Packet Retry count set by HACN. This value is set in HACN and is
+            sent to HA during Role Assignment and in each Heartbeat ACK. This
+            is the number of times a retry message will be sent to HACN."
+	::= { usrMipHacnSettings 4 }
+-- Home Agent Control Node statistics
+	usrMipHacnStatsHeartbeatSent OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total Number of heartbeats sent to HACN."
+	::= { usrMipHacnStats 1 }
+	usrMipHacnStatsHeartbeatAckRcvd OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total Number of heartbeat ack received from HACN."
+	::= { usrMipHacnStats 2 }
+	usrMipHacnStatsHeartbeatRetried OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total Number of heartbeats retried."
+	::= { usrMipHacnStats 3 }
+    usrMipHacnStatsResetTime OBJECT-TYPE
+        SYNTAX	Unsigned32 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+                "Reading:
+				Time the HACN statistics counters were last 
+			 	reset. The HACN statistics are valid from 
+				usrMipHacnStatsResetTime until present.
+	        		Resetting counters causes a discontinuity in 
+				the monotonically increasing value of counters.
+				Management stations that sample these counters
+				need also to sample this object so that they 
+				can know that a discontinuity occurred with 
+				respect to the previous sample.  
+                Its value is in NTP format.
+		        Writing:
+		   	    Writing 0 causes update of usrMipHacnStatsResetTime
+				and the HACN counters to be reset to 0."
+	::= { usrMipHacnStats 4 }
+-- Mobile Node Information
+        usrMobileInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrMobileInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+                        "A table containing Mobile Node Information."
+	::= {usrMipHaMobileInfo 1 }
+	usrMobileInfoEntry OBJECT-TYPE
+		SYNTAX UsrMobileInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the Mobile Node Information list."
+		INDEX { usrMipHaMobilityBindingIndex }
+	::= { usrMobileInfoTable 1 }
+        UsrMobileInfoEntry ::= SEQUENCE {
+                usrMipHaMobilePacketOut    Unsigned32,
+                usrMipHaMobilePacketIn     Unsigned32,
+                usrMipHaMobileByteOut      Unsigned32,
+                usrMipHaMobileByteIn       Unsigned32
+        }
+	usrMipHaMobilePacketOut OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of packets sent out on the tunnel."
+	::= {usrMobileInfoEntry 1 }
+	usrMipHaMobilePacketIn OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of packets received from the tunnel."
+	::= {usrMobileInfoEntry 2 }
+	usrMipHaMobileByteOut OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of data bytes sent out on the tunnel."
+	::= {usrMobileInfoEntry 3 }
+	usrMipHaMobileByteIn OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of data bytes received from the tunnel."
+	::= {usrMobileInfoEntry 4 }
+END	-- USR-MIP-MIB Definitions

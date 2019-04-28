@@ -1,0 +1,86 @@
+TGT-ADDRESS-MASK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+        TAddress
+            FROM SNMPv2-TC
+        snmpTargetAddrEntry
+            FROM SNMP-TARGET-MIB
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF;
+
+
+    tgtAddressMaskMIB MODULE-IDENTITY
+        LAST-UPDATED "9801160000"
+        ORGANIZATION "SNMP Research, Inc."
+        CONTACT-INFO
+                      ""
+        DESCRIPTION
+              ""
+        ::= { snmpResearchMIBs 36 }
+
+
+    --
+    -- The tgtAddressMaskObjects Group
+    --
+
+    tgtAddressMaskObjects OBJECT IDENTIFIER ::=
+        { tgtAddressMaskMIB 1 }
+    tgtAddressMaskConformance OBJECT IDENTIFIER ::=
+        { tgtAddressMaskMIB 3 }
+
+    --
+    -- The tgtAddressMaskTable
+    --
+
+    tgtAddressMaskTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF TgtAddressMaskEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+              "Table to add an address mask to the
+               snmpTargetAddrTable."
+        ::= { tgtAddressMaskObjects 1 }
+
+    tgtAddressMaskEntry OBJECT-TYPE
+        SYNTAX       TgtAddressMaskEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                   "Adds an address mask to an snmpTargetAddrEntry."
+        AUGMENTS { snmpTargetAddrEntry }
+        ::= { tgtAddressMaskTable 1 }
+
+    TgtAddressMaskEntry ::= SEQUENCE {
+        tgtAddressMask     TAddress
+    }
+
+    tgtAddressMask OBJECT-TYPE
+        SYNTAX       TAddress
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+              "This object is used to qualify the value of the
+               corresponding instance of snmpTargetAddrTAddress.
+               The format of this object is determined by the
+               corresponding instance of snmpTargetAddrTDomain.
+
+               When performing transport address validation on
+               a received packet, the value of this object is
+               used as a mask to determine whether a source
+               address matches a particular entry in the
+               snmpTargetAddrTable.  In general, the comparison
+               using this mask value is performed as follows for
+               each octet contained in the source address and
+               snmpTargetAddrTAddress value:
+                   (sourceAddr & tgtAddressMask) ==
+                      (snmpTargetAddrTAddress & tgtAddressMask)
+               if the values are equal for all octets, the source
+               address matches the entry."
+         DEFVAL { ''H }     -- the empty string
+        ::= { tgtAddressMaskEntry 1 }
+
+END

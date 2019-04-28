@@ -1,0 +1,565 @@
+-- **********************************************************************
+-- TOS-IF.mib
+--
+-- Topsec Enterprise Specific MIB: Structure of Management Information
+--
+-- Copyright (c) 1998-2008, Beijing Topsec Network Security Technology Co.,Ltd. 
+-- All Rights Reserved
+--
+-- The contents of this document are subject to change without notice.
+-- **********************************************************************
+--
+--  Change History:
+--
+--	Mar 13,2008 - Edit by tos lk 
+--
+--  Mar 13,2008 - splited from old mib TOSVI-new.mib
+--
+-- **********************************************************************
+
+TOS-IF DEFINITIONS ::= BEGIN
+
+	IMPORTS
+	    MODULE-IDENTITY,NOTIFICATION-TYPE,OBJECT-TYPE,
+	    Integer32, Opaque,Gauge,IpAddress   
+	    FROM SNMPv2-SMI
+	    
+	    TEXTUAL-CONVENTION,DisplayString,DateAndTime
+			FROM SNMPv2-TC
+			
+			tosMib
+			FROM TOS-SMI;
+			
+--	start list TOS interface table information
+--tosIfTable OBJECT-TYPE
+	tosIfTable  MODULE-IDENTITY
+		  LAST-UPDATED "08-03-14" 
+	    ORGANIZATION "TOPSEC"
+	    CONTACT-INFO
+	            " Topsec Beijing
+	              China
+	              E-mail: support@topsec.com.cn "
+			DESCRIPTION
+	        "The (conceptual) table containing information about Network Interface card status."
+	    
+	    REVISION     "05-09-14" 
+	    DESCRIPTION
+	            "Initial version."
+	    
+	    REVISION    "20080109"
+	    DESCRIPTION
+	            "for TP add some oid object"
+	            
+	    REVISION    "20080313"
+	    DESCRIPTION
+	            "split the whole mib file into several part"
+
+	    REVISION    "20080313"
+	    DESCRIPTION
+	            "edit the file tos-if.mib"
+
+	::= { tosMib 5 }
+
+	tosIfEntry	OBJECT-TYPE
+	    SYNTAX     TosIfEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	            "information about NIC status."
+	    INDEX      { ifIndex }
+	    ::= { tosIfTable 1 }
+	
+	TosIfEntry ::= SEQUENCE {
+	    ifIndex		         INTEGER,
+	    ifDescr		         DisplayString,
+	    ifDuplex           	         DisplayString, -- auto,half,full,NA
+	    ifAutoNegotiate				-- working in autoneg mode or not, tp
+	    ifMtu						INTEGER   --Size of mtu, tp
+	    ifSpeed		     Gauge,	-- 10000000/100000000/1000000000,0
+	    ifNoLock			 INTEGER,	-- always 1
+	    ifAdminStatus			 INTEGER,	-- no shutdown 
+	    ifOperStatus			 INTEGER,	-- link up
+	    ifSwitchMode	 INTEGER			--working in switchport or not, tp
+	    ifNotBad			 INTEGER,	-- just ok 
+
+	    ifPhysAddress		 PhysAddress,
+	    ifAddress	     	         IpAddress,
+	    ifSubMask			IpAddress --subnet address, --tp
+
+	    ifInPkts           	         Counter32,     -- dirver statistics
+	    ifInOctets			 Counter32,     -- similar to MIBII
+	    ifInErrors			 Counter32,
+	    ifInDiscards		 Counter32,
+
+	    ifInErrorsRate		 Integer32,	-- 5 minutes average
+	    ifInDiscardsRate		 Integer32,	-- Bit/s
+	    ifInSpeed			 Integer32,	-- 
+
+	    ifOutPkts                    Counter32,
+	    ifOutOctets			 Counter32,	    
+	    ifOutErrors			 Counter32,	    
+            ifOutDiscards		 Counter32,
+
+	    ifOutErrorsRate		 Integer32,	-- 5 minutes average
+	    ifOutDiscardsRate		 Integer32,	-- Bit/s
+	    ifOutSpeed			 Integer32,	-- 
+
+	    ifBandInUse			 Integer32,	-- 
+
+	    ifRcvChkSumErr               Counter32,	-- tos protocol stack statistis
+	    ifRcvL3bCast								 Counter32,
+	    ifRcvOtherErrPkts						 Counter32, --tp
+	    ifRcvIpPkts                  Counter32,
+	    ifRcvIpBytes								 Counter32, --tp
+	    ifRcvArpPkts                 Counter32,
+	    ifRcvArpBytes								 Counter32, --tp
+	    ifRcvUdpPkts                 Counter32,
+	    ifRcvUdpBytes								 Counter32, --tp
+	    ifRcvTcpPkts                 Counter32,
+	    ifRcvTcpBytes								 Counter32, --tp
+	    ifRcvIcmpPkts                Counter32,
+	    ifRcvIcmpBytes						   Counter32, --tp
+	    ifRcvL3mCast                 Counter32,
+	    ifRcvL2bCastPkts						 Counter32, --tp
+	    ifRcvRejectPkts							 Counter32, --tp
+	    ifRcvIpoptionPkts						 Counter32, --tp
+	    ifRcvFragPkts		 Counter32,
+	    ifDropPkts		         Counter32,
+	    ifColliPkts                  Counter32	    	    
+    }
+	
+	ifIndex OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		    "Table index."
+		::= { tosIfEntry 1 }
+		
+	ifDescr OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "Name of the NIC."
+		::= { tosIfEntry 2 }
+
+	ifNoLock OBJECT-TYPE
+		SYNTAX     INTEGER 
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "No safe lock"
+		::= { tosIfEntry 3 }
+
+	-- mode and speed
+
+	ifDuplex OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "current interface work in full-duplex or halp-duplex"
+		::= { tosIfEntry 4 }
+		
+	ifAutoNegotiate OBJECT-TYPE
+	  SYNTAX  INTEGER {
+	   						enable(1),       -- on the autonegotiation mode
+              	disable(0)			 -- not on the autonegotiation mode
+                     }
+    ACCESS  read-only                         
+    STATUS  current
+    DESCRIPTION
+             "The negotiation state of the interface. "
+     ::= { tosIfEntry 5 }
+     
+  ifMtu OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+              "The size of the largest datagram which can be
+               sent/received on the interface, specified in
+               octets.  For interfaces that are used for
+               transmitting network datagrams, this is the size
+               of the largest network datagram that can be sent
+               on the interface."
+    ::= { tosIfEntry 6 }
+     
+
+	ifSpeed OBJECT-TYPE
+		SYNTAX     Gauge 
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The interface's current bandwidth in bits per second."
+		::= { tosIfEntry 7 }
+
+	-- link and line status
+
+	ifAdminStatus OBJECT-TYPE
+		SYNTAX     INTEGER 
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The desired state of the interface, shutdown or no shutdown."
+		::= { tosIfEntry 8 }
+
+	ifOperStatus OBJECT-TYPE
+		SYNTAX     INTEGER 
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The current operational state of the interface, link up or not."
+		::= { tosIfEntry 9 }
+
+	ifSwitchMode OBJECT-TYPE
+		SYNTAX     INTEGER {
+	   						switchmode(1),       -- on the switch mode
+              	no-switchmode(2)			 --  on the no switch mode
+                     }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "current interface work in switch mode or not"
+		::= { tosIfEntry 10 }
+		
+		
+	ifNotBad OBJECT-TYPE
+		SYNTAX     INTEGER 
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "No hardware error."
+		::= { tosIfEntry 11 }
+
+	-- mac, ip address
+
+	ifPhysAddress OBJECT-TYPE
+		SYNTAX     PhysAddress
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "Physical address of the NIC."
+		::= { tosIfEntry 12 }
+
+	ifAddress OBJECT-TYPE
+		SYNTAX     IpAddress
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "First IP address of the NIC."
+		::= { tosIfEntry 13 }
+	
+	ifSubMask OBJECT-TYPE
+		SYNTAX     IpAddress
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "Submask of First IP address of the NIC."
+		::= { tosIfEntry 14 }
+		
+	-- nic driver statistics
+	-- inboud 
+	ifInPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The total number of the packets received."
+		::= { tosIfEntry 15 }
+
+	ifInOctets OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The total number of octets received."
+		::= { tosIfEntry 16 }
+
+	ifInDiscards OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The number of inbound packets which were chosen to be
+			discarded even though no errors had been detected to
+			prevent their being deliverable to a higher-layer protocol."
+		::= { tosIfEntry 17 }
+
+	ifInErrors OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The number of inbound packets that contained errors 
+			preventing them from being deliverable to a higher-layer protocol."
+		::= { tosIfEntry 18 }
+
+	-- inbound II
+
+	ifInDiscardsRate OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The ratio of inbound discarded packets vs total packets in a certain time.
+			(value*100)"
+		::= { tosIfEntry 19 }
+
+	ifInErrorsRate OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The ratio of inbound error packets vs total packets in a certain time.
+			(value*100)"
+		::= { tosIfEntry 20 }
+
+	ifInSpeed OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The flow speed of inbound(bits/s)"
+		::= { tosIfEntry 21 }
+
+	-- nic driver statistics
+	-- outboud 
+	ifOutPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The total number of the packets transmitted."
+		::= { tosIfEntry 22 }
+
+	ifOutOctets OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The total number of octets transmitted."
+		::= { tosIfEntry 23 }
+
+	ifOutDiscards OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The number of outbound packets which were chosen to
+	                 be discarded even though no errors had been detected 
+			 to prevent their being transmitted."
+		::= { tosIfEntry 24 }
+
+	ifOutErrors OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The number of outbound packets that could not 
+			be transmitted because of errors."
+		::= { tosIfEntry 25 }
+
+	-- outbound II
+	ifOutDiscardsRate OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The ratio of outbound discarded packets vs total packets in a certain time.
+			(value*100)"
+		::= { tosIfEntry 26 }
+
+	ifOutErrorsRate OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The ratio of outbound error packets vs total packets in a certain time.
+			(value*100)"
+		::= { tosIfEntry 27 }
+
+	ifOutSpeed OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The flow speed of outbound(bits/s)"
+		::= { tosIfEntry 28 }
+
+	-- end driver statistics
+	ifBandInUse OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		        "The band in use.
+			(value*100)"
+		::= { tosIfEntry 29 }
+
+	-- tos protocol statistics	
+	ifRcvChkSumErr OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The number of packets received with error checksum."
+		::= { tosIfEntry 30 }
+	
+	ifRcvL3bCast OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The number of of the L3 broadcast packets received"
+		::= { tosIfEntry 31 }
+		
+	ifRcvOtherErrPkts	OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The number of the other error packets received."
+		::= { tosIfEntry 32 }
+	
+	ifRcvIpPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the ip packets received."
+		::= { tosIfEntry 33 }
+	
+	ifRcvIpBytes OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the ip bytes received."
+		::= { tosIfEntry 34 }
+		
+	ifRcvArpPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the arp packets received."
+		::= { tosIfEntry 35 }
+
+	ifRcvArpBytes OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the arp bytes received."
+		::= { tosIfEntry 36 }
+			
+	ifRcvUdpPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the udp packets received."
+		::= { tosIfEntry 37 }
+
+	ifRcvUdpBytes OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the udp bytes received."
+		::= { tosIfEntry 38 }
+			
+	ifRcvTcpPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the tcp packets received."
+		::= { tosIfEntry 39 }
+
+	ifRcvTcpBytes OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the tcp bytes received."
+		::= { tosIfEntry 40 }
+			
+	ifRcvIcmpPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the icmp packets received."
+		::= { tosIfEntry 41 }
+		
+	ifRcvIcmpBytes OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the icmp bytes received."
+		::= { tosIfEntry 42 }
+	
+	ifRcvL3mCast OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the third level broadcast and multicast packets received."
+		::= { tosIfEntry 43 }
+		
+	ifRcvL2bCastPkts	OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the L2 broadcast packets received."
+		::= { tosIfEntry 44 }
+	
+	ifRcvRejectPkts	OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of reject packets in received."
+		::= { tosIfEntry 45 }
+	
+	ifRcvIpoptionPkts	 OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the Ip option packets received."
+		::= { tosIfEntry 46 }
+		
+	ifRcvFragPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The total number of the packets denied and discarded."
+		::= { tosIfEntry 47 }
+
+	ifDropPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The number of the packets dropped."
+		::= { tosIfEntry 48 }
+	
+	ifColliPkts OBJECT-TYPE
+		SYNTAX     Counter32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+		         "The number of the packets collisioned."
+		::= { tosIfEntry 49 }
+	
+	--end interface 
+	
+END
+

@@ -1,0 +1,2822 @@
+USR-VHA-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE,
+	Integer32, IpAddress, Counter32, Gauge32, Unsigned32
+		FROM SNMPv2-SMI
+	RowStatus, DisplayString
+		FROM SNMPv2-TC
+	common,	UsrConfigStatus, Time1970, Time1900, UsrSecretDisplay, 
+    UsrRegID, UsrSpecialU32
+		FROM USR-DEFINITIONS-MIB;
+        usrVHA MODULE-IDENTITY
+        LAST-UPDATED "200212132025Z"
+        ORGANIZATION "CommWorks Corporation, a 3Com Company"
+        CONTACT-INFO "Customer Support"
+        DESCRIPTION  "The commWorks enterprise defined MIB objects for VHA"
+--      REVISION	"200211211758Z"
+--	    DESCRIPTION "added usrVHASoftBusyStatus - to enable/disable PDSN Soft Busy"
+--      REVISION	"200212132025Z"
+--	    DESCRIPTION "Changed range for usrVHARegTimer max value is now 65534" 
+--      REVISION    "200209201610Z"
+--      DESCRIPTION "Increase number of security associations from 100 to 512
+--                   for usrVHASecurSAIndex."
+--      REVISION    "200208231220Z"
+--      DESCRIPTION "
+--          Clarified usage and labels for usrVHAActiveSessionsTrapsEnabled,
+--          usrVHAFailedSessionsTrapsEnabled, usrVHASessionsTrapsEnabled,
+--          usrVHAPktThroughputTrapsEnabled, usrVHASecurRecentViolationIDLow,
+--          usrVHASecurRecentViolationIDHigh, usrVHASecurSharedSecretKey,
+--          usrVHARNNDynSPI, usrVHASecurSPI, usrVHASecurRecentViolationSPI."
+--      REVISION	"200208302001Z"
+--	    DESCRIPTION "Added usrVHASyncPPP - to enable disable sync ppp protocol"
+--      REVISION	"200208141611Z"
+--	    DESCRIPTION "Obsoleted usrVHATotalRPConnPPPLayerCmd" 
+--      REVISION	"200208021650Z"
+--	    DESCRIPTION "Added usrVHAFilterAccess,usrVHAInFilter & usrVHAOutFilter
+--                   These were moved here from usr_config.mib."
+--      REVISION	"200207131933Z"
+--	    DESCRIPTION "Add objects usrVHARNNDynInfo and usrVHARNNDynSPI"
+--      REVISION	"200207111933Z"
+--	    DESCRIPTION "Obsoleted usrVHAserviceOption7, usrVHAServiceOption15
+--                   usrVHAServiceOption[22-25] and usrVHAServiceOption33"
+--      REVISION	"200207110500Z"
+--	    DESCRIPTION "Obsoleted usrVHATotalIngressCount"
+--      REVISION	"200204110500Z"
+--	    DESCRIPTION "Add structured comments to TRAPs (NOTIFICATION-TYPE)"
+--      REVISION        "200203111736Z"
+--          DESCRIPTION "Add timing window size object for usrVHAConnConfig group"
+--      REVISION        "200203071330Z"
+--	    DESCRIPTION "obsoleted usrVHARegUpdateTransPPPLayerCmd"
+--      REVISION        "200202091430Z"
+--	    DESCRIPTION "Corrected SYNTAX as implemented"
+--	REVISION	"200112192300Z"
+--	    DESCRIPTION "PDSN 3.0 Feature 16/17 - 
+--			Feature 16: Session Capacity Planning PM Statistics
+--			Feature 17: PDSN Alarm Enhancements"
+--	REVISION	"200107182020Z"
+--	    DESCRIPTION "Converted from SMIv1 to SMIv2"
+        ::= { common 84 }
+	usrVHAConnConfig         OBJECT IDENTIFIER ::= { usrVHA 1 }
+	usrVHAConnStats          OBJECT IDENTIFIER ::= { usrVHA 2 }
+	usrVHARegReqStats        OBJECT IDENTIFIER ::= { usrVHA 3 }
+	usrVHARegUpdStats        OBJECT IDENTIFIER ::= { usrVHA 4 }
+	usrVHASecurConfig        OBJECT IDENTIFIER ::= { usrVHA 5 }
+	usrVHASecurViolStats     OBJECT IDENTIFIER ::= { usrVHA 6 }
+	usrVHAGREStats           OBJECT IDENTIFIER ::= { usrVHA 7 }
+	usrVHACfmConfig          OBJECT IDENTIFIER ::= { usrVHA 8 }
+	usrVHATraps              OBJECT IDENTIFIER ::= { usrVHA 9 }
+	usrVHAPM                 OBJECT IDENTIFIER ::= { usrVHA 10 }
+	usrVHAServiceOptionStats OBJECT IDENTIFIER ::= { usrVHA 11 }
+-- RP Connection Configuration Group
+	usrVHARegTimer OBJECT-TYPE
+		SYNTAX Integer32 (30..65534)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This is the A10 connection registration Lifetime
+			 timer.  The timer is started at the time of
+			 establishment of an A10 connection and updated
+			 during periodic re-registrations of the A10
+			 connection.  The A10 connection is cleared on expiry
+			 of this timer.  The default value of the timer is
+			 1800 seconds.  When this value is equal to 65535,
+			 then the timer has infinite lifetime.  If this value
+			 is equal to zero, then A10 connection has been
+			 released."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 1 }
+	usrVHARegUpdateTimer OBJECT-TYPE
+		SYNTAX Integer32 (1..15)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Number of seconds to wait for the Registration
+			 Acknowledge message from the PCF."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 2 }
+	usrVHARegUDPPort OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"UDP port number used by the RP interface to
+			 communicate with the PCF.  The default value
+			 for this parameter is 699."
+		DEFVAL	{ 699 }
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 3 }
+	usrVHAServiceOption7 OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Toggle for controlling Service Option 7 on the
+			 RP interface.
+			 Obsolete: This object is no longer used."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 4 }
+	usrVHAServiceOption15 OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Toggle for controlling Service Option 15 on the
+			 RP interface.
+			 Obsolete: This object is no longer used."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 5 }
+	usrVHAServiceOption22 OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Toggle for controlling Service Option 22 on the
+			 RP interface.
+			 Obsolete: This object is no longer used."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 6 }
+	usrVHAServiceOption23 OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Toggle for controlling Service Option 23 on the
+			 RP interface.
+			 Obsolete: This object is no longer used."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 7 }
+	usrVHAServiceOption24 OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Toggle for controlling Service Option 24 on the
+			 RP interface.
+			 Obsolete: This object is no longer used."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 8 }
+	usrVHAServiceOption25 OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Toggle for controlling Service Option 25 on the
+			 RP interface.
+			 Obsolete: This object is no longer used."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 9 }
+	usrVHAServiceOption33 OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS obsolete
+		DESCRIPTION
+			"Toggle for controlling Service Option 33 on the
+			 RP interface.
+			 Obsolete: This object is no longer used."
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 10 }
+	usrVHAMaxSessions OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Maximum number of active sessions that this PDSN is
+			 allowed to process on its RP interface port.
+             This value is MAX_SIMULTANEOUS_USERS + 1 and is
+             dependent on the component being built"
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 11 }
+	usrVHARegUpdateRetrans OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Number of times to retransmit the Registration
+			 Update message if the PCF does not send a
+			 Registration Acknowledge message or a Registration
+			 Request message (with accounting related information
+			 and Lifetime set to zero).
+			 The current implementation only supports the
+			 range 1..20"
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 12 }
+	usrVHAMonitorRP OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Toggle to enable or disable monitoring of
+			 raw data over RP Interface"
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 13 }
+	usrVHAPrintDataLimit OBJECT-TYPE
+		SYNTAX Integer32 (0..1500)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Number in bytes displayed by R-P Protocol monitor"
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 14 }
+	usrVHAResetStats OBJECT-TYPE
+		SYNTAX Integer32 (1..8)
+		MAX-ACCESS read-write
+		STATUS deprecated 	--  Reset all VHA stats
+		DESCRIPTION
+			"Resets VHA Statistics to zero.
+                         1: Resets all the statistics.
+                         2: Resets Connection statistics.
+                         3: Resets GRE statistics. 
+                         4: Resets Registration statistics. 
+                         5: Resets Registration Denied statistics. 
+                         6: Resets Update statistics. 
+                         7: Resets Update Denied statistics. 
+                         8: Resets Security Violations statistics.
+			**NOTE: this object is deprecated and replaced by
+			usrVHAStatsResetTime.  
+			Behaviour: setting usrVHAResetStats to any value 1..8
+			will result in the same behaviour as setting
+			usrVHAStatsResetTime to 0: All stats will be reset. 
+			" 
+	::= { usrVHAConnConfig 15 }
+	usrVHAZeroPadSecret OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This MIB Object is Deprecated"
+		DEFVAL	{ enabled }
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 16 }
+	usrVHAStatsResetTime OBJECT-TYPE
+                SYNTAX Time1970
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+              		"Reading:
+				Time the VHA statistics counters were last 
+			 	reset. The VHA statistics are valid from 
+				usrVHAStatsResetTime until present.
+	        		Resetting counters causes a discontinuity in 
+				the monotonically increasing value of counters.
+				Management stations that sample these counters
+				need also to sample this object so that they 
+				can know that a discontinuity occurred with 
+				respect to the previous sample.  Its value is
+				number of seconds since EPOCH.  EPOCH is 
+				seconds since 00:00:00 UTC, Jan 1, 1970.  
+		        Writing:
+		   	    Writing 0 causes update of usrVHAStatsResetTime
+				and the VHA counters to be reset to 0:
+					usrVHAConnStats group scalars  
+					usrVHARegReqStats group scalars
+					usrVHARegUpdStats group scalars
+					usrVHASecurViolStats group scalars
+			This object replaces usrVHAResetStats "
+	::= { usrVHAConnConfig 17 }
+	usrVHAGreFragmentSize OBJECT-TYPE
+		SYNTAX Integer32 (64..64000)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Fragment size used by GRE to fragment data pkts"
+		DEFVAL	{ 1450 }
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 18 }
+	usrVHAGreFragmentation OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The VHA module will use GRE fragmentation based on this
+			 flag and the GRE Fragment Size"
+		DEFVAL { disabled }
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 19 }
+	usrVHAEncodeIMSI OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"THis setting will determine if the Accounting 
+			 feature (IMSI Encoding) for Motorola is enabled"
+		DEFVAL	{ disabled }
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 20 }
+	usrVHAMotg160RP OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Toggle to enable or disable sending out DAI CVSE in RP_REG_REPLY"
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 21 }
+	 usrVHATimingWindowSize OBJECT-TYPE
+		 SYNTAX Integer32 (1..10)
+		 MAX-ACCESS read-write
+		 STATUS current
+		 DESCRIPTION
+		    "The configurable parameter ranged at 1-10 seconds would utilized to
+			 control the working timing window size for the call events flow regulation
+			 for non-turbo mode"
+		 DEFVAL  { 3 }
+		 --CONFIGURABLE
+	 ::= { usrVHAConnConfig 22 }
+	usrVHARNNDynInfo OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Allow a dynamic RNN key value to be used in
+                         place of the configured shared secret and SPI"
+		DEFVAL	{ disabled }
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 23 }
+	usrVHARNNDynSPI OBJECT-TYPE   
+		SYNTAX     UsrSpecialU32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The dynamic SPI value obtained from the FACN"
+	::= { usrVHAConnConfig 24 }
+    usrVHAFilterAccess OBJECT-TYPE
+        SYNTAX      INTEGER {
+                            off (0),
+                             on (1)
+                           }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                " This is for setting the filter access for all the
+                VHA interfaces."
+        --CONFIGURABLE
+    ::= { usrVHAConnConfig 25 }
+    usrVHAInFilter OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The name of the input filter for all VHA interfaces."
+        --CONFIGURABLE
+    ::= { usrVHAConnConfig 26 }
+    usrVHAOutFilter OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The name of the output filter for all VHA interfaces."
+        --CONFIGURABLE
+    ::= { usrVHAConnConfig 27 }
+	usrVHASyncPPP OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Determines whether or not the VHA module will support Sync PPP protocol (0x880B)"
+		DEFVAL { disabled }
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 28 }
+	usrVHASoftBusyStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Will put the PDSN VHA interface in the SoftBusy state (ENABLE)
+			 or get the VHA out of the SoftBusy state (DISABLE)"
+		DEFVAL	{ disabled }
+		--CONFIGURABLE
+	::= { usrVHAConnConfig 29 }
+-- RP Connection Statistics Group
+	usrVHATotalConnInits OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of A10/A11 connections initiated.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHAConnStats 1 }
+	usrVHATotalConnReleas OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+                "Number of A10/A11 connections released since the last counter reset.
+                 usrVHATotalConnReleas is the sum of the following values:
+                 [usrVHATotalConnReleas] = [usrVHATotalRPConnDeRegistered]
+                                         + [usrVHATotalConnExps]
+                                         + [usrVHATotalRPConnOther]
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHAConnStats 2 }
+	usrVHATotalConnExps OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of A10/A11 connections cleared due
+			 to expiry of Trp without receiving a periodic
+			 Registration Request with lifetime greater than
+			 zero.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHAConnStats 3 }
+	usrVHATotalIngressCount OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Ingress Filtering Caused Releases.
+			Counter epoch is indicated by usrVHAStatsResetTime.
+                         Obsolete: This object is not supported."
+	::= { usrVHAConnStats 4 }
+	usrVHAConnStatsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrVHAConnStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of all existings A10/A11 connections between
+			 PCF and PDSN."
+	::= { usrVHAConnStats 5 }
+	usrVHATotalRPConn OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total Number of RP connections
+			Obsolete: This was a value that went up and down.
+			A syntax of Counter32 is invalid for this behavior.
+			This object has been replaced by usrVHASessionsCurrent."
+	::= { usrVHAConnStats 6 }
+	usrVHATotalRPConnDeRegistered OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total Number of RP connections released,
+			 due to a valid deregistration request.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHAConnStats 7 }
+	usrVHATotalRPConnPPPLayerCmd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total Number of RP connections released,
+		 	 cause: PPP Layer Command
+			Counter epoch is indicated by usrVHAStatsResetTime.
+                         Obsolete: This object is not supported."
+	::= { usrVHAConnStats 8 }
+	usrVHATotalRPConnOther OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total Number of RP connections released,
+		 	 cause: other reasons"
+	::= { usrVHAConnStats 9 }
+	usrVHAIMSIStatsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrVHAIMSIStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of all existings calls with their IMSI values."
+	::= { usrVHAConnStats 10 }
+	usrVHAConnStatsEntry OBJECT-TYPE
+		SYNTAX UsrVHAConnStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the RP Connection Statistics Table.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+		INDEX { usrVHAConnSessionIndex }
+	::= { usrVHAConnStatsTable 1 }
+	UsrVHAConnStatsEntry ::= SEQUENCE {
+		usrVHAConnSessionIndex        Integer32,
+		usrVHAConnSessionID           Unsigned32,
+		usrVHAConnRNAddr              IpAddress,
+		usrVHAConnMNID                Integer32,
+		usrVHAConnIMSI                DisplayString,
+		usrVHAConnLifetimeGranted     Integer32,
+		usrVHAConnLifetimeRemaining   Integer32,
+		usrVHAConnGREPktsRcvd         Counter32,
+		usrVHAConnGREPktsTrans        Counter32,
+		usrVHAConnGREBytesRcvd        Counter32,
+		usrVHAConnGREBytesTrans       Counter32,
+		usrVHAConnSessionStatus       INTEGER,
+		usrVHAConnHomeAddr            IpAddress,
+		usrVHAUserName		      DisplayString,
+		usrVHACallType                INTEGER,
+		usrVHAPPPResetTime	      Time1900,
+		usrVHAPPPSetupTime            Time1900,
+		usrVHAPPPIdletimeRemaining    Integer32,
+		usrVHASessionDuration         Unsigned32,
+		usrVHAServiceOption           INTEGER
+	}
+	usrVHAConnSessionIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..4000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"PDSN's RP interface can support up to 4000 sessions.
+			 This value indicates the session number assigned
+			 to the connection by the PDSN."
+	::= { usrVHAConnStatsEntry 1 }
+	usrVHAConnSessionID OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This four octet value, along with the PCF-IP-
+			 Address and the PDSN-IP-Address, identifies
+			 the A10 connection on behalf of a packet data
+			 session.  This value is set to the MN-Proxy-Id
+			 assigned to a packet data session by the PCF.
+			 This Key value is also inserted in the Key field
+			 of every GRE frame containing user data sent over
+			 the A10/A11 connection."
+	::= { usrVHAConnStatsEntry 2 }
+	usrVHAConnRNAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This four octet value identifies the IP address of
+			 the PCF that terminates the A10 connection."
+	::= { usrVHAConnStatsEntry 3 }
+	usrVHAConnMNID OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This two octet field is used to differentiate
+			 multiple sessions at a mobile node.  MN Connection
+			 ID is determined by the PCF."
+	::= { usrVHAConnStatsEntry 4 }
+	usrVHAConnIMSI OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(10..15))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The International Mobile Subscriber Identifier."
+	::= { usrVHAConnStatsEntry 5 }
+	usrVHAConnLifetimeGranted OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of seconds granted before registration
+			 is considered expired.  A value of zero indicates
+			 a request for deregistration.  A value of 65535
+			 indicates infinity."
+	::= { usrVHAConnStatsEntry 6 }
+	usrVHAConnLifetimeRemaining OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of seconds remaining before registration
+			 is considered expired."
+	::= { usrVHAConnStatsEntry 7 }
+	usrVHAConnGREPktsRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of GRE encapsulated packets received
+			 from IP."
+	::= { usrVHAConnStatsEntry 8 }
+	usrVHAConnGREPktsTrans OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of GRE encapsulated packets delivered
+			 to IP for transmission."
+	::= { usrVHAConnStatsEntry 9 }
+	usrVHAConnGREBytesRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of GRE encapsulated bytes received
+			 from IP. The GRE header bytes are not counted."
+	::= { usrVHAConnStatsEntry 10 }
+	usrVHAConnGREBytesTrans OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of GRE encapsulated bytes delivered
+			 to IP for transmission. The GRE header bytes are
+                         not counted"
+	::= { usrVHAConnStatsEntry 11 }
+	usrVHAConnSessionStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			dormant(1),
+			active(2)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The RP session is considered active when an Airlink
+			 Record Identifier, inside the Vendor/Organization
+			 Specific Extension of the Registration Request,
+			 is set to RP ACTIVE START."
+	::= { usrVHAConnStatsEntry 12 }
+	usrVHAConnHomeAddr OBJECT-TYPE
+		SYNTAX IpAddress 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ipaddress associated with this connection"
+	::= { usrVHAConnStatsEntry 13 }
+	usrVHAUserName OBJECT-TYPE
+		SYNTAX DisplayString 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"User name associated with this connection"
+	::= { usrVHAConnStatsEntry 14 }
+	usrVHACallType OBJECT-TYPE
+		SYNTAX INTEGER {
+                       invalid(0),
+                       simpleIP(1),
+                       mobileIP(2),
+                       proxyIP(3)
+                       }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Call Type for this connection"
+	::= { usrVHAConnStatsEntry 15 }
+	usrVHAPPPResetTime OBJECT-TYPE
+		SYNTAX Time1900
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Time when the PPP was reset.
+                         This is NTP time, it will give number of seconds 
+                         since Jan 1, 1900."
+	::= { usrVHAConnStatsEntry 16 }
+	usrVHAPPPSetupTime OBJECT-TYPE
+		SYNTAX Time1900
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Time when the PPP was first established
+                         This is NTP time, it will give number of seconds 
+                         since Jan 1, 1900."
+	::= { usrVHAConnStatsEntry 17 }
+	usrVHAPPPIdletimeRemaining OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of seconds remaining before PPP session
+			 is considered expired."
+	::= { usrVHAConnStatsEntry 18 }
+	usrVHASessionDuration OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS  "Seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The duration in seconds of the current session."
+	::= { usrVHAConnStatsEntry 19 }
+	usrVHAServiceOption OBJECT-TYPE
+		SYNTAX INTEGER {
+			packetData(7),
+			packetData14-4kbps(15),
+			highSpeedPacketData-RS1fwd-RS1rev(22),
+			highSpeedPacketData-RS1fwd-RS2rev(23),
+			highSpeedPacketData-RS2fwd-RS1rev(24),
+			highSpeedPacketData-RS2fwd-RS2rev(25),
+			threeGHighSpeedPacketData(33),
+			oneXEVDO(59)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The value of service option recieved by PDSN over A11 interface."
+	::= { usrVHAConnStatsEntry 20 }
+	usrVHASessionsCurrent OBJECT-TYPE
+	    SYNTAX Gauge32
+	    UNITS "RP Sessions"
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"Current number of RP sessions (sum of active and dormant)"
+	    ::= { usrVHAConnStats 11 }
+	usrVHAActiveSessionsCurrent OBJECT-TYPE
+	    SYNTAX Gauge32
+	    UNITS "RP Sessions"
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"Current number of active RP sessions"
+	    ::= { usrVHAConnStats 12 }
+-- Access Network Identifiers Table definitions 
+	usrVHAAccessNetworkIdentifierTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrVHAAccessNetworkIdentifierEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of Access Network Identifiers(ANIDs) received by PDSN."
+	::= { usrVHAConnStats 13 }
+	usrVHAAccessNetworkIdentifierEntry OBJECT-TYPE
+		SYNTAX UsrVHAAccessNetworkIdentifierEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the VHA Access Network Identifier(ANID) Table."
+		INDEX { usrVHAAccessNetworkIdentifier }
+	::= { usrVHAAccessNetworkIdentifierTable 1 }
+	UsrVHAAccessNetworkIdentifierEntry ::= SEQUENCE {
+		usrVHAAccessNetworkIdentifier               OCTET STRING (SIZE(5)),
+		usrVHAAccessNetworkIpAddr                   IpAddress
+	}
+	usrVHAAccessNetworkIdentifier OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(5))
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Access Network Identifier(ANID) of the PCF received by PDSN over A11."
+	::= { usrVHAAccessNetworkIdentifierEntry 1 }
+	usrVHAAccessNetworkIpAddr OBJECT-TYPE
+		SYNTAX IpAddress 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ipaddress of the PCF that holds this ANID"
+	::= { usrVHAAccessNetworkIdentifierEntry 2 }
+-- RP Registration Request/Registration Reply Statistics Group
+	usrVHARegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests
+			 received.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 1 }
+	usrVHARegRepAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Replies accepted.
+			 The code information element inside the Registration
+			 Accept message is equal to zero.
+			Counter epoch is indicated by usrVHAStatsResetTime.
+                         Obsolete:
+			 This object has been replaced by usrVHARegReqAccept"
+	::= { usrVHARegReqStats 2 }
+	usrVHADeRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS deprecated
+		DESCRIPTION
+			"Total number of valid Registration Requests
+			 received with a Lifetime of zero (requests
+			 to deregister).
+                         Deprecated - This counter is replaced by
+                         usrVHADeRegReqAccept
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 3 }
+	usrVHADeRegRepAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Total number of Registration Replies accepted
+			 in response to a deregistration request.  The code
+			 information element inside the Registration Accept
+			 message is equal to zero.
+			Counter epoch is indicated by usrVHAStatsResetTime.
+                         Obsolete: 
+			 This object has been replaced by usrVHADeRegReqAccept"
+	::= { usrVHARegReqStats 4 }
+	usrVHARegDenUnspecified OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to an unspecified reason.  The code information
+			 element inside the Registration Accept message is
+			 equal to 128.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 5 }
+	usrVHARegDenAdmProhibited OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to an administrative decision.  The code information
+			 element inside the Registration Accept message is
+			 equal to 129.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 6 }
+	usrVHARegDenNoResources OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to insufficient resources.  The code information
+			 element inside the Registration Accept message is
+			 equal to 130.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 7 }
+	usrVHARegDenAuthFail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to mobile node's failed authentication.  The code
+			 information element inside the Registration Accept
+			 message is equal to 131.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 8 }
+	usrVHARegDenIDMismatch OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to an identification mismatch.  The code information
+			 element inside the Registration Accept message is
+			 equal to 133.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 9 }
+	usrVHARegDenPoorlyFormedReq OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to a poorly formed request.  The code information
+			 element inside the Registration Accept message is
+			 equal to 134.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 10 }
+	usrVHARegDenUnknownPDSNAddr OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to an unknown PDSN address.  The code information
+			 element inside the Registration Accept message is
+			 equal to 136.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 11 }
+	usrVHARegDenReverseTunnelUnavail OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to unavailability of requested reverse tunnel.
+			 The code information element inside the Registration
+			 Accept message is equal to 137.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 12 }
+	usrVHARegDenReverseTunnelRequired OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to 'T' bit not set.  This bit is part of the Flags
+			 information element inside the Registration Request
+			 message. The code information element inside the
+			 Registration Accept message is equal to 138.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 13 }
+	usrVHARegDenUnsupportedVendorID OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP Registration Requests denied due
+			 to an unrecognized Vendor ID field that is inside
+			 the Vendor/Organization Specific Extension
+			 information element.  The code information element
+			 inside the Registration Accept message is equal to
+			 141.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 14 }
+	usrVHARegReqDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests denied
+                usrVHARegReqDenied is the sum of these values:
+                [usrVHARegReqDenied] =  [usrVHARegReqInitDenied]
+                                      + [usrVHAReRegReqDenied]
+                                      + [usrVHADeRegReqDenied]
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 15 }
+	usrVHARegReqDiscard OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests from the PCF
+                         silently discarded without being processed by the PDSN
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 16 }
+	usrVHARegReqInitAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of Initial Registration Requests accepted
+                         from the PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 17 }
+	usrVHARegReqInitDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of Initial Registration Requests denied
+                         from the PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 18 }
+	usrVHAReRegReqAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of Re-Registration Requests accepted
+                         from the PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 19 }
+	usrVHAReRegReqDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of Re-Registration Requests denied
+                         from the PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 20 }
+	usrVHADeRegReqDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of De-Registration Requests denied
+                         from the PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 21 }
+	usrVHARegReqAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Requests accepted
+                         from the PCF.
+                         usrVHARegReqAccept is the sum of these values:
+                         [usrVHARegReqAccept] = [usrVHARegReqInitAccept]
+                                              + [usrVHAReRegReqAccept]
+                                              + [usrVHADeRegReqAccept]
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 22 }
+	usrVHADeRegReqAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of DeRegistration Requests accepted
+			 from the PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegReqStats 23 }
+-- RP Registration Update/Registration Acknowledge Statistics Group
+	usrVHARegUpdate OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid Registration Updates
+			 transmitted to PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 1 }
+	usrVHARegAcknowledge OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the PCF with status code of zero.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 2 }
+	usrVHARegAckUnspecified OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the PCF with status code of 128 (reason
+			 unspecified).
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 3 }
+	usrVHARegAckAdmProhibited OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the PCF with status code of 129 
+                         (administratively prohibited).
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 4 }
+	usrVHARegAckFailedAuth OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the PCF with status code of 131 
+                         (sending node - PDSN - failed authentication).
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 5 }
+	usrVHARegAckIDMismatch OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the PCF with status code of 133 
+                         (identification mismatch).
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 6 }
+	usrVHARegAckPoorlyFormed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from the PCF with status code of 134 
+                         (poorly formed Registration Update).
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 7 }
+	usrVHATotalRegUpdateDenied OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Updates denied by the RAN.
+                usrVHATotalRegUpdateDenied is the sum of these values:
+                [usrVHATotalRegUpdateDenied] = [usrVHARegAckUnspecified]
+                                             + [usrVHARegAckAdmProhibited]
+                                             + [usrVHARegAckFailedAuth]
+                                             + [usrVHARegAckIDMismatch]
+                                             + [usrVHARegAckPoorlyFormed]
+                                             + [usrVHARegAckDeniedOther]
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 8 }
+	usrVHATotalRegUpdateNotAck OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"usrVHATotalRegUpdateNotAck is incremented if
+                the expected registration acknowledge is
+                not received from the PCF within the time Tregupd.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 9 }
+	usrVHATotalRegUpdateInitTrans OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Initial Registration Updates transmitted
+                         to PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 10 }
+	usrVHATotalRegUpdateReTrans OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Updates re-transmitted
+                         to PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 11 }
+	usrVHARegUpdateDiscard OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Updates discarded
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 12 }
+	usrVHARegUpdateTransRPLifeExp OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of Registration Updates transmitted,
+			due to RP lifetime expiration
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 13 }
+	usrVHARegUpdateTransPPPLayerCmd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"Number of Registration Updates transmitted,
+			due to PPP layer command
+			Counter epoch is indicated by usrVHAStatsResetTime.
+                        OBSOLETE: This object is not supported."
+	::= { usrVHARegUpdStats 14 }
+	usrVHARegUpdateTransOther OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of Registration Updates transmitted,
+			due to other reasons
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 15 }
+	usrVHATotalRegAckRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements received
+                         from the PCF.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 16 }
+	usrVHARegAckDeniedOther OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Acknowledgements
+			 received from PCF with a status code that is currently
+                         not further speficied by the PDSN.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHARegUpdStats 17 }
+-- RP Security Configuration Group
+	usrVHASecurConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrVHASecurConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table for configuring mobility security
+			 associations between the Radio Node and the
+			 PDSN."
+		::= { usrVHASecurConfig 1 }
+	usrVHASecurConfigEntry OBJECT-TYPE
+		SYNTAX UsrVHASecurConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the PDSN Security Configuration Table."
+		INDEX { usrVHASecurSAIndex  }
+		::= { usrVHASecurConfigTable 1 }
+	UsrVHASecurConfigEntry ::= SEQUENCE {
+		usrVHASecurSAIndex           Integer32,
+		usrVHASecurRNAddr            IpAddress,
+		usrVHASecurSPI               UsrSpecialU32,
+		usrVHASecurSharedSecretKey   UsrSecretDisplay,
+		usrVHASecurTimeDrift         Integer32,
+		usrVHASecurStatus            RowStatus,
+       		usrVHASecurAuthFlag          INTEGER,
+		usrVHAZeroPadSecretEntry	 INTEGER
+	}
+	usrVHASecurSAIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..512)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RP interface can support up to 512 mobility
+			 security associations. - The range has been changed
+             from 1-100 to 1-512 for PDSN Rel 4.0"
+	::= { usrVHASecurConfigEntry 1 }
+	usrVHASecurRNAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The IP Address of the Radio Node with which
+			 this RP interface shares the mobility security
+			 association."
+		--CONFIGURABLE
+	::= { usrVHASecurConfigEntry 2 }
+	usrVHASecurSPI OBJECT-TYPE
+		SYNTAX UsrSpecialU32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The SPI is the 4-byte opaque index within the
+			 Mobility Security Association which selects the
+			 specific security parameters to be used to
+			 authenticate the Radio Node."
+		--CONFIGURABLE
+	::= { usrVHASecurConfigEntry 3 }
+	usrVHASecurSharedSecretKey OBJECT-TYPE
+		SYNTAX     UsrSecretDisplay
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The shared secret key for the security associations.
+			 Reading this object will always return zero length
+			 value for SNMP."
+		--CONFIGURABLE
+	::= { usrVHASecurConfigEntry 4 }
+	usrVHASecurTimeDrift OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The value represents how close the timestamp,
+			 contained in the Identification information element
+			 of the Registration Request or the Registration
+			 Acknowledge message, should be to the PDSN's time
+			 of day clock.  This time tolerance is used in
+			 conjunction with timestamp replay protection
+			 against replay attacks."
+		--CONFIGURABLE
+	::= { usrVHASecurConfigEntry 5 }
+	usrVHASecurStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This object is used to add, modify, and delete
+			 rows for the security association table."
+		--CONFIGURABLE
+	::= { usrVHASecurConfigEntry 6 }
+	usrVHASecurAuthFlag OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Toggle to enable or disable authentication of
+			 A11 messages over RP Interface"
+		DEFVAL	{ enabled }
+		--CONFIGURABLE
+	::= { usrVHASecurConfigEntry 7 }
+	usrVHAZeroPadSecretEntry OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This setting will determine whether
+			 to zero pad secrets of less than 16"
+		DEFVAL	{ enabled }
+		--CONFIGURABLE
+	::= { usrVHASecurConfigEntry 8 }
+-- RP Security Violations Statistics Group
+	usrVHASecurTotalViolations OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP security violations encountered
+			 by this PDSN.
+                usrVHASecurTotalViolations is the sum of these values:
+                [usrVHASecurTotalViolations] = [usrVHASecurMissingMSA]
+                                             + [usrVHASecurBadAuthenticator]
+                                             + [usrVHASecurBadSPI]
+                                             + [usrVHASecurMissingMHAuthExt]
+                                             + [usrVHASecurMissingRUAuthExt]
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHASecurViolStats 1 }
+	usrVHASecurMissingMSA OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP security violations due to missing
+			 or improper Mobility Security Association (MSA)
+			 between the PCF and the PDSN.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHASecurViolStats 2 }
+	usrVHASecurBadAuthenticator OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP security violations due to bad
+			 Authenticator field.  This field is part of either
+			 Mobile-Home Authentication Extension information
+			 element or the Registration Update Authentication
+			 Extension information element.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHASecurViolStats 3 }
+	usrVHASecurBadIdentification OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS deprecated
+		DESCRIPTION
+			"Total number of security violations due to bad
+			 Identification information element.  This eight
+			 octet element is used by the PCF and the PDSN for
+			 matching the Registration Requests with Registration
+			 Replies and Registration Updates with Registration
+			 Acknowledge messages.  It also protects against the
+			 replay attacks (section 5.6, RFC 2002).
+                         Counter epoch is indicated by usrVHAStatsResetTime.
+			 Deprecated:
+			 This object is a duplicate of usrVHARegDenIDMismatch."
+	::= { usrVHASecurViolStats 4 }
+	usrVHASecurBadSPI OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP security violations due to bad
+			 SPI field.  This field is part of either
+			 Mobile-Home Authentication Extension information
+			 element or the Registration Update Authentication
+			 Extension information element.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHASecurViolStats 5 }
+	usrVHASecurMissingMHAuthExt OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP security violations due to missing
+			 Mobile-Home Authentication Extension inside the
+			 Registration Request message.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHASecurViolStats 6 }
+	usrVHASecurMissingRUAuthExt OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of RP security violations due to missing
+			 Registration Update Authentication Extension inside
+			 the Registration Acknowledge message.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHASecurViolStats 7 }
+	usrVHASecurViolationTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrVHASecurViolationEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table containing information about security
+			 violations."
+	::= { usrVHASecurViolStats 8 }
+	usrVHASecurViolationEntry OBJECT-TYPE
+		SYNTAX UsrVHASecurViolationEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information about a particular security violation."
+		INDEX { usrVHASecurViolatorTableIndex }
+	::= { usrVHASecurViolationTable 1 }
+	UsrVHASecurViolationEntry ::= SEQUENCE {
+		usrVHASecurViolatorTableIndex     Integer32,
+		usrVHASecurViolatorAddress        IpAddress,
+		usrVHASecurViolationCounter       Counter32,
+		usrVHASecurRecentViolationSPI     UsrSpecialU32,
+		usrVHASecurRecentViolationTime    Time1900,
+		usrVHASecurRecentViolationIDLow   UsrRegID,
+		usrVHASecurRecentViolationIDHigh  UsrRegID,
+		usrVHASecurRecentViolationReason  INTEGER
+	}
+	usrVHASecurViolatorTableIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"PDSN can store up to 100 entries for a particular
+			 security violation based on the violator's IP
+			 address."
+	::= { usrVHASecurViolationEntry 1 }
+	usrVHASecurViolatorAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Violator's IP address.  This address may not
+			 be in the Mobility Security Association table."
+	::= { usrVHASecurViolationEntry 2 }
+	usrVHASecurViolationCounter OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of security violations coming from the
+			 this violator's IP address."
+	::= { usrVHASecurViolationEntry 3 }
+	usrVHASecurRecentViolationSPI OBJECT-TYPE
+		SYNTAX UsrSpecialU32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SPI of the most recent security violation coming
+			 from this IP address.  If the security violation is
+			 due to an identification mismatch, then this is the
+			 SPI from the Mobile-Home Authentication Extension.
+			 If the security violation is due to an invalid
+			 authenticator, then this is the SPI from the
+			 offending authentication extension.  In all other
+			 cases, it should be set to zero."
+	::= { usrVHASecurViolationEntry 4 }
+	usrVHASecurRecentViolationTime OBJECT-TYPE
+		SYNTAX Time1900
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Time of the most recent security violation coming
+			 from this IP address.
+                         This is NTP time, it will give number of seconds 
+                         since Jan 1, 1900."
+	::= { usrVHASecurViolationEntry 5 }
+	usrVHASecurRecentViolationIDLow OBJECT-TYPE
+		SYNTAX     UsrRegID 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Low-order 32 bits of identification used in
+			 Registration Request or Registration Acknowledge
+			 of the most recent security violation coming
+			 from this IP address."
+	::= { usrVHASecurViolationEntry 6 }
+	usrVHASecurRecentViolationIDHigh OBJECT-TYPE
+		SYNTAX     UsrRegID
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"High-order 32 bits of identification used in
+			 Registration Request or Registration Acknowledge
+			 of the most recent security violation coming
+			 from this IP address."
+	::= { usrVHASecurViolationEntry 7 }
+	usrVHASecurRecentViolationReason OBJECT-TYPE
+		SYNTAX INTEGER {
+			noMobilitySecurityAssociation(1),
+			badAuthenticator(2),
+			badIdentifier(3),
+			badSPI(4),
+			missingSecurityExtension(5),
+			other(6)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Reason for the most recent security violation coming
+			 from this IP address."
+	::= { usrVHASecurViolationEntry 8 }
+-- RP Connection Total GRE Statistics Group
+	usrVHATotalGREPktsRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of GRE encapsulated packets received
+			 from IP.
+ 			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHAGREStats 1 }
+	usrVHATotalGREPktsTrans OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of GRE encapsulated packets delivered
+			 to IP for transmission.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHAGREStats 2 }
+	usrVHATotalGREBytesRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+                        "Total number of GRE encapsulated bytes received
+                         from IP. The GRE header bytes are not counted.
+                         Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHAGREStats 3 }
+	usrVHATotalGREBytesTrans OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of GRE encapsulated bytes delivered
+			 to IP for transmission. The GRE header bytes are 
+                         not counted.
+			Counter epoch is indicated by usrVHAStatsResetTime."
+	::= { usrVHAGREStats 4 }
+-- RP CFM Configuration Group
+	usrVHAConfigFileName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(1..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The name of the configuration file for VHA.  If
+			 this value is empty, then the default file name
+			 is @file://VHAProcess.cfg."
+	::= { usrVHACfmConfig 1 }
+	usrVHACfmStatus OBJECT-TYPE
+		SYNTAX UsrConfigStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The Configuration File Manager Flag for
+			 saving VHA configurable parameters."
+	::= { usrVHACfmConfig 2 }
+-- Performance Monitoring (PM) objects
+	usrVHASessionsPM       OBJECT IDENTIFIER ::= { usrVHAPM 1 }
+	usrVHAActiveSessionsPM OBJECT IDENTIFIER ::= { usrVHAPM 2 }
+	usrVHAFailedSessionsPM OBJECT IDENTIFIER ::= { usrVHAPM 3 }
+	usrVHAPktThroughputPM  OBJECT IDENTIFIER ::= { usrVHAPM 4 }
+    -- RP Sessions (Active + Dormant) PM Alarm objects
+	usrVHASessionsCriticalAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The critical alarm threshold for usrVHASessionsCurrent gauge.
+		The value of this object will be automatically set to the 
+		lesser of usrVHAMaxSessions or the internal VHA Max session
+		limit, whichever is less.
+		IF usrVHASessionsAlarmState is not 'critical' and the current
+		gauge value is equal or greater than this threshold, 
+		THEN usrVHASessionsAlarmState will change to 'critical'.
+		See usrVHASessionsAlarmState for TRAP generation details."
+	    DEFVAL    { 4000 }
+	    ::= { usrVHASessionsPM 1 }
+	usrVHASessionsMajorAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHASessionsCurrent gauge.
+		The allowed range of this object is 0 to usrVHAMaxSessions.
+		The object is also constrained to be less than or equal to
+		usrVHASessionsCriticalAlarmThresh.
+		If usrVHAMaxSessions is reduced below the value of this object,
+		this object will automatically reduced so that this constraint
+		holds.  Value of 0 disables this threshold.
+		IF this object is set to a non-zero value equal or 
+		less than the current value of usrVHASessionsClearAlarmThresh,
+ 		THEN usrVHASessionsClearAlarmThresh will be automatically
+		reduced to a valid value.
+		This value is set indirectly by setting
+		usrVHASessionsMajorAlarmThreshPct
+		Changing threshold values causes the alarm state to be 
+		re-evaluated.
+		IF usrVHASessionsAlarmState is 'clear' and the
+		current gauge value is equal or greater than this
+		threshold, and the current gauge value is less than non-zero
+		usrVHASessionsCriticalAlarmThresh, and the threshold is not 0,
+		THEN usrVHASessionsAlarmState will change to 'major'.
+		See usrVHASessionsAlarmState for TRAP generation details."
+	    ::= { usrVHASessionsPM 2 }
+	usrVHASessionsClearAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The alarm clear threshold for usrVHASessionsCurrent gauge.
+		The allowed range of this object is 0 to usrVHAMaxSessions.
+		This object must also be less than non-zero
+		usrVHASessionsMajorAlarmThresh and 
+		usrVHASessionsCricalAlarmThresh.
+		IF usrVHASessionsMajorAlarmThresh is non zero, 
+		THEN object must be less than usrVHASessionsMajorAlarmThresh.
+		This value is set indirectly by setting
+		usrVHASessionsClearAlarmThreshPct
+		Changing the threshold value causes the alarm state to be 
+		re-evaluated.
+		IF usrVHASessionsAlarmState is not 'clear' and the
+		current gauge value is equal or less than this threshold,
+		THEN usrVHASessionsAlarmState will change to 'clear'.
+		See usrVHASessionsAlarmState for TRAP generation details."
+	    ::= { usrVHASessionsPM 3 }
+	usrVHASessionsMajorAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHASessionsCurrent gauge
+		expressed as a percentage of usrVHAMaxSessions. 
+		The allowed range of this object is 0 to 100.
+		Writing this object causes usrVHASessionsMajorAlarmThresh to
+		be re-calculated.
+		Writing usrVHASessionsMajorAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHASessionsMajorAlarmThresh for effects of changing
+		threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 80 }
+            --CONFIGURABLE 
+	    ::= { usrVHASessionsPM 4 }
+	usrVHASessionsClearAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The clear alarm threshold for usrVHASessionsCurrent gauge
+		expressed as a percentage of usrVHAMaxSessions. 
+		The allowed range of this object is 0 to 100.
+		Writing this object causes usrVHASessionsClearAlarmThresh to
+		be re-calculated.
+		Writing usrVHASessionsClearAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHASessionsClearAlarmThresh for effects of changing
+		threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 70 }
+            --CONFIGURABLE 
+	    ::= { usrVHASessionsPM 5 }
+	usrVHASessionsTrapsEnabled OBJECT-TYPE
+            SYNTAX     INTEGER {
+                            enabled(1),
+                            disabled(2)
+                            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object controls trap generation when 
+            usrVHASessionAlarmState changes.  
+		   	See usrVHASessionsAlarmState for alarm details."
+            DEFVAL    { disabled }
+            --CONFIGURABLE 
+	    ::= { usrVHASessionsPM 6 }
+	usrVHASessionsAlarmState OBJECT-TYPE
+            SYNTAX INTEGER {
+			clear(0),
+			major(1),
+			critical(2)
+			}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Alarm state is maintained by PDSN by comparing 
+		usrVHASessionsCurrent 
+		with critical, major, and clear alarm thresholds.
+		IF alarm state changes to critical, AND
+		    usrVHASessionsTrapsEnabled is true
+		THEN usrVHASessionsCriticalAlarm TRAP will be sent.
+                IF alarm state changes to major, AND
+		    usrVHASessionsTrapsEnabled is true
+		THEN usrVHASessionsMajorAlarm TRAP will be sent.
+                IF alarm state changes to clear, AND
+		    usrVHASessionsTrapsEnabled is true
+		THEN usrVHASessionsCriticalAlarm TRAP will be sent.
+		IF alarm state changes,
+		THEN usrVHASessionsAlarmTime is updated with the
+		current time regardless of usrVHASessionsTrapsEnabled
+		and usrVHASessionsAlarmChanges is incremented.
+		This allows alarm state and time information to be retrieved
+		by SNMP management stations that don't support SNMP traps or
+		when traps are intentionally disabled to reduce trap 
+		processing load on the SNMP management station.
+		Writing a 'clear' value will force the alarm state to
+		go to 'clear'.  This will count as a state change and
+		cause a trap if the state was  'major' or 'critical'.  
+		This step conceptually occurs before comparing the
+		alarm thresholds.  If major or critical thresholds are
+		exceeded, the appropriate state change and trap occur.
+		This means that writing 'clear' may cause 0, 1, or 2
+		alarm state changes and traps. "
+	    ::= { usrVHASessionsPM 7 }
+	usrVHASessionsAlarmTime OBJECT-TYPE
+            SYNTAX Time1970
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+	    	"The time of the last usrVHASessionsAlarmState state change.  
+		If the state has never changed, this value will be zero."
+	    ::= { usrVHASessionsPM 8 }
+	usrVHASessionsAlarmChanges OBJECT-TYPE
+	    SYNTAX Counter32
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    	"Count of usrVHASessionsAlarmState changes."
+	    ::= { usrVHASessionsPM 9 }
+	usrVHAActiveSessionsCriticalAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The critical alarm threshold for usrVHAActiveSessionsCurrent 
+		gauge.
+		The allowed range of this object is 0 to usrVHAMaxSessions.
+		If usrVHAMaxSessions is reduced below the value of this object,
+		this object will automatically reduced so that this constraint
+		holds.  Object value of 0 disables this alarm and threshold..
+		IF this object is set to a non-zero value equal or less than
+		the current value of usrVHAActiveSessionsMajorAlarmThresh,
+ 		THEN usrVHAActiveSessionsMajorAlarmThresh will be automatically
+		reduced to a valid value.
+		IF this object is set to a non-zero value equal or less than
+		the current value of usrVHAActiveSessionsClearAlarmThresh,
+ 		THEN usrVHAActiveSessionsClearAlarmThresh will be automatically
+		reduced to a valid value.
+		This value is set indirectly by setting
+		usrVHAActiveSessionsCriticalAlarmThreshPct
+		Changing threshold values causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAActiveSessionsAlarmState is not 'critical' and 
+		the current gauge value is equal or greater than this
+		critical threshold, and this critical threshold is non-zero,
+		THEN usrVHAActiveSessionsAlarmState will change to 
+		'critical'.
+		See usrVHAActiveSessionsAlarmState for TRAP generation details.
+		"
+	    ::= { usrVHAActiveSessionsPM 1 }
+    -- RP Active Sessions PM Alarm objects
+	usrVHAActiveSessionsMajorAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHAActiveSessionsCurrent 
+		gauge.
+		The allowed range of this object is 0 to usrVHAMaxSessions.
+		The object is also constrained to be less than or equal to
+		usrVHAActiveSessionsCriticalAlarmThresh.
+		If usrVHAMaxSessions is reduced below the value of this object,
+		this object will automatically reduced so that this constraint
+		holds.  Value of 0 disables this threshold.
+		IF this object is set to a non-zero value equal or 
+		less than the current value of 
+		usrVHAActiveSessionsClearAlarmThresh,
+ 		THEN usrVHAActiveSessionsClearAlarmThresh will be automatically
+		reduced to a valid value.
+		This value is set indirectly by setting
+		usrVHAActiveSessionsMajorAlarmThreshPct
+		Changing threshold values causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAActiveSessionsAlarmState is 'clear' and the current 
+		gauge value is equal or greater than this threshold, and the 
+		current gauge value is less than non-zero
+		usrVHAActiveSessionsCriticalAlarmThresh, and the threshold is 
+		not zero,
+		THEN usrVHAActiveSessionsAlarmState will change to 'major'.
+		See usrVHAActiveSessionsAlarmState for TRAP generation details.
+		"
+	    ::= { usrVHAActiveSessionsPM 2 }
+	usrVHAActiveSessionsClearAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The alarm clear threshold for usrVHAActiveSessionsCurrent 
+		gauge.
+		The allowed range of this object is 0 to usrVHAMaxSessions.
+		This object must also be less than non-zero
+		usrVHAActiveSessionsMajorAlarmThresh and non-zero 
+		usrVHAActiveSessionsCricalAlarmThresh.
+		This value is set indirectly by setting
+		usrVHAActiveSessionsClearAlarmThreshPct
+		Changing the threshold value causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAActiveSessionsAlarmState is not 'clear' and 
+		the current gauge value is equal or less than this threshold,
+		THEN usrVHAActiveSessionsCriticalAlarmState will change to 
+		'clear'.
+		See usrVHAActiveSessionsAlarmState for trap generation details.
+		"
+	    ::= { usrVHAActiveSessionsPM 3 }
+	usrVHAActiveSessionsCriticalAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHAActiveSessionsCurrent
+		gauge expressed as a percentage of usrVHAMaxSessions. 
+		The allowed range of this object is 0 to 100.
+		Writing this object causes 
+		usrVHAActiveSessionsMajorAlarmThresh to be re-calculated.
+		Writing usrVHAActiveSessionsMajorAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHAActiveSessionsMajorAlarmThresh for effects of
+		changing threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 100 }
+            --CONFIGURABLE 
+	    ::= { usrVHAActiveSessionsPM 4 }
+	usrVHAActiveSessionsMajorAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHAActiveSessionsCurrent
+		gauge expressed as a percentage of usrVHAMaxSessions. 
+		The allowed range of this object is 0 to 100.
+		Writing this object causes 
+		usrVHAActiveSessionsMajorAlarmThresh to be re-calculated.
+		Writing usrVHAActiveSessionsMajorAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHAActiveSessionsMajorAlarmThresh for effects of
+		changing threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 80 }
+            --CONFIGURABLE 
+	    ::= { usrVHAActiveSessionsPM 5 }
+	usrVHAActiveSessionsClearAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The clear alarm threshold for usrVHAActiveSessionsCurrent 
+		gauge expressed as a percentage of usrVHAMaxSessions. 
+		The allowed range of this object is 0 to 100.
+		Writing this object causes 
+		usrVHAActiveSessionsClearAlarmThresh to be re-calculated.
+		Writing usrVHAActiveSessionsClearAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHAActiveSessionsClearAlarmThresh for effects of
+		changing threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 70 }
+            --CONFIGURABLE 
+	    ::= { usrVHAActiveSessionsPM 6 }
+	usrVHAActiveSessionsTrapsEnabled OBJECT-TYPE
+            SYNTAX     INTEGER {
+                            enabled(1),
+                            disabled(2)
+                            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object controls trap generation when 
+            usrVHASActiveSessionsAlarmState changes.  
+		    See usrVHAActiveSessionsAlarmState for alarm details."
+            DEFVAL    { disabled }
+            --CONFIGURABLE 
+	    ::= { usrVHAActiveSessionsPM 7 }
+	usrVHAActiveSessionsAlarmState OBJECT-TYPE
+            SYNTAX INTEGER {
+			clear(0),
+			major(1),
+			critical(2)
+			}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Alarm state is maintained by PDSN by comparing 
+		usrVHAActiveSessionsCurrent  
+		with critical, major, and clear alarm thresholds.
+		IF alarm state changes to critical, AND
+		    usrVHAActiveSessionsTrapsEnabled is true
+		THEN usrVHAActiveSessionsCriticalAlarm TRAP will be sent.
+                IF alarm state changes to major, AND
+		    usrVHAActiveSessionsTrapsEnabled is true
+		THEN usrVHAActiveSessionsMajorAlarm TRAP will be sent.
+                IF alarm state changes to clear, AND
+		    usrVHAActiveSessionsTrapsEnabled is true
+		THEN usrVHAActiveSessionsCriticalAlarm TRAP will be sent.
+		IF alarm state changes,
+		THEN usrVHAActiveSessionsAlarmTime is updated with 
+		the current time regardless of usrVHAActiveSessionsTrapsEnabled
+		and usrVHAActiveSessionsAlarmChanges is incremented.
+		This allows alarm state and time information to be retrieved
+		by SNMP management stations that don't support SNMP traps or
+		when traps are intentionally disabled to reduce trap 
+		processing load on the SNMP management station.
+		Writing a 'clear' value will force the alarm state to
+		go to 'clear'.  This will count as a state change and
+		cause a trap if the state was  'major' or 'critical'.  
+		This step conceptually occurs before comparing the
+		alarm thresholds.  If major or critical thresholds are
+		exceeded, the appropriate state change and trap occur.
+		This means that writing 'clear' may cause 0, 1, or 2
+		alarm state changes and traps. "
+	    ::= { usrVHAActiveSessionsPM 8 }
+	usrVHAActiveSessionsAlarmTime OBJECT-TYPE
+            SYNTAX Time1970
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+	    	"Time last usrVHAActiveSessionsAlarmState state change.  
+		If the state has never changed, this value will be zero."
+	    ::= { usrVHAActiveSessionsPM 9 }
+	usrVHAActiveSessionsAlarmChanges OBJECT-TYPE
+	    SYNTAX Counter32
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    	"Count of usrVHAActiveSessionsAlarmState changes."
+	    ::= { usrVHAActiveSessionsPM 10 }
+    -- RP Failed Sessions PM Alarm objects
+	usrVHAFailedSessionsCriticalAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The critical alarm threshold for usrVHAFailedSessionsValue 
+		gauge.
+		Object value of 0 disables this alarm and threshold.
+		IF this object is set to a non-zero value equal or less than
+		the current value of usrVHAFailedSessionsMajorAlarmThresh,
+ 		THEN usrVHAFailedSessionsMajorAlarmThresh will be automatically
+		reduced to a valid value.
+		IF this object is set to a non-zero value equal or less than
+		the current value of usrVHAFailedSessionsClearAlarmThresh,
+ 		THEN usrVHAFailedSessionsClearAlarmThresh will be automatically
+		reduced to a valid value.
+		Agent is allowed to either reject a SET which violates
+		these constraints, or adjust the object value such that the
+		constraints hold.
+		Changing threshold values causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAFailedSessionsAlarmState is not 'critical' and 
+		the current gauge value is equal or greater than this
+		critical threshold, and this critical threshold is non-zero,
+		THEN usrVHAFailedSessionsAlarmState will change to 
+		'critical'.
+		See usrVHAFailedSessionsAlarmState for TRAP generation details.
+		"
+	    DEFVAL    { 1000 }
+            --CONFIGURABLE 
+	    ::= { usrVHAFailedSessionsPM 1 }
+	usrVHAFailedSessionsMajorAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHAFailedSessionsValue 
+		gauge.
+		Value of 0 disables this threshold.
+		IF this object is set to a non-zero value equal or less than 
+		the current value of usrVHAFailedSessionsClearAlarmThresh,
+ 		THEN usrVHAFailedSessionsClearAlarmThresh will be automatically
+		reduced to a valid value.
+		This value is set indirectly by setting
+		usrVHAFailedSessionsMajorAlarmThreshPct
+		Changing threshold values causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAFailedSessionsAlarmState is 'clear' and the current 
+		gauge value is equal or greater than this threshold, and the 
+		current gauge value is less than non-zero
+		usrVHAFailedSessionsCriticalAlarmThresh, and the threshold is 
+		not zero,
+		THEN usrVHAFailedSessionsAlarmState will change to 'major'.
+		See usrVHAFailedSessionsAlarmState for TRAP generation details.
+		"
+	    ::= { usrVHAFailedSessionsPM 2 }
+	usrVHAFailedSessionsClearAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32
+	    UNITS  "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The alarm clear threshold for usrVHAFailedSessionsValue 
+		gauge.
+		This object must be less than
+		usrVHAFailedSessionsMajorAlarmThresh (if non-zero) 
+		usrVHAFailedSessionsCricalAlarmThresh (if non-zero)..
+		This value is set indirectly by setting
+		usrVHAFailedSessionsClearAlarmThreshPct
+		Changing the threshold value causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAFailedSessionsAlarmState is not 'clear' and 
+		the current gauge value is equal or less than this threshold,
+		THEN usrVHAFailedSessionsCriticalAlarmState will change to 
+		'clear'.
+		See usrVHAFailedSessionsAlarmState for trap generation details.
+		"
+	    ::= { usrVHAFailedSessionsPM 3 }
+	usrVHAFailedSessionsMajorAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHAFailedSessionsValue
+		gauge expressed as a percentage of
+		usrVHAFailedSessionsCriticalAlarmThesh.
+		The allowed range of this object is 0 to 100.
+		Writing this object causes 
+		usrVHAFailedSessionsMajorAlarmThresh to be re-calculated.
+		Writing usrVHAFailedSessionsMajorAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHAFailedSessionsMajorAlarmThresh for effects of
+		changing threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 80 }
+            --CONFIGURABLE 
+	    ::= { usrVHAFailedSessionsPM 4 }
+	usrVHAFailedSessionsClearAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The clear alarm threshold for usrVHAFailedSessionsValue
+		gauge expressed as a percentage of
+		usrVHAFailedSessionsCriticalAlarmThesh.
+		The allowed range of this object is 0 to 100.
+		Writing this object causes
+		usrVHAFailedSessionsClearAlarmThresh to be re-calculated.
+		Writing usrVHAFailedSessionsClearAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHAFailedSessionsClearAlarmThresh for effects of
+		changing threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 70 }
+            --CONFIGURABLE 
+	    ::= { usrVHAFailedSessionsPM 5 }
+	usrVHAFailedSessionsTrapsEnabled OBJECT-TYPE
+            SYNTAX     INTEGER {
+                            enabled(1),
+                            disabled(2)
+                            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object controls trap generation when 
+            usrVHAFailedSessionsAlarmState changes.  
+		    See usrVHAFailedSessionsAlarmState for alarm details."
+            DEFVAL    { disabled }
+            --CONFIGURABLE 
+	    ::= { usrVHAFailedSessionsPM 6 }
+	usrVHAFailedSessionsInterval OBJECT-TYPE
+            SYNTAX Unsigned32
+	    UNITS "Seconds"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The interval in seconds over which the RP Failed Sessions
+		(RP Sessions that failed to establish)
+		are sampled (measured) to determine a packet throughput by
+ 		making a delta between a previous sample and a new sample.
+		The delta is stored in usrVHAFailedSessionsValue and 
+		thresholds are checked.
+		Value of zero disables RP Failed Sessions alarms and
+		forces alarm state to 'clear'."
+            DEFVAL    { 120 }
+            --CONFIGURABLE 
+	    ::= { usrVHAFailedSessionsPM 7 }
+	usrVHAFailedSessionsAlarmState OBJECT-TYPE
+            SYNTAX INTEGER {
+			clear(0),
+			major(1),
+			critical(2)
+			}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Alarm state is maintained by PDSN by comparing 
+		usrVHAFailedSessionsValue  
+		with critical, major, and clear alarm thresholds.
+		IF alarm state changes to critical, AND
+		    usrVHAFailedSessionsTrapsEnabled is true
+		THEN usrVHAFailedSessionsCriticalAlarm TRAP will be sent.
+                IF alarm state changes to major, AND
+		    usrVHAFailedSessionsTrapsEnabled is true
+		THEN usrVHAFailedSessionsMajorAlarm TRAP will be sent.
+                IF alarm state changes to clear, AND
+		    usrVHAFailedSessionsTrapsEnabled is true
+		THEN usrVHAFailedSessionsCriticalAlarm TRAP will be sent.
+		IF alarm state changes,
+		THEN usrVHAFailedSessionsAlarmTime is updated with 
+		the current time regardless of usrVHAFailedSessionsTrapsEnabled
+		and usrVHAFailedSessionsAlarmChanges is incremented.
+		This allows alarm state and time information to be retrieved
+		by SNMP management stations that don't support SNMP traps or
+		when traps are intentionally disabled to reduce trap 
+		processing load on the SNMP management station.
+		Writing a 'clear' value will force the alarm state to
+		go to 'clear'.  This will count as a state change and
+		cause a trap if the state was  'major' or 'critical'.  
+		This step conceptually occurs before comparing the
+		alarm thresholds.  If major or critical thresholds are
+		exceeded, the appropriate state change and trap occur.
+		This means that writing 'clear' may cause 0, 1, or 2
+		alarm state changes and traps. "
+	    ::= { usrVHAFailedSessionsPM 8 }
+	usrVHAFailedSessionsAlarmTime OBJECT-TYPE
+            SYNTAX Time1970
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+	    	"Time of last usrVHAFailedSessionsAlarmState state change.
+		If the state has never changed, this value will be zero."
+	    ::= { usrVHAFailedSessionsPM 9 }
+	usrVHAFailedSessionsAlarmChanges OBJECT-TYPE
+	    SYNTAX Counter32
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    	"Count of usrVHAFailedSessionsAlarmState changes."
+	    ::= { usrVHAFailedSessionsPM 10 }
+	usrVHAFailedSessionsValue OBJECT-TYPE
+            SYNTAX Gauge32
+	    UNITS "RP Sessions"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+	    	"The value of the statistic during the last measurement
+		interval.  usrVHARegReqDenied is sampled at the start and at
+		the end of a measurement interval.  This MIB object represents
+		the delta value between these two samples.  The interval
+		MIB object is usrVHAFailedSessionsInterval.
+		The value of this MIB object is the value that is 
+		compared with the 3 thresholds for alarm generation.
+		The value during the current measurement period is not made
+		available until the measurement period is completed and will
+		remain available until the next period completes."
+	    ::= { usrVHAFailedSessionsPM 11 }
+    -- RP Packet Throughput PM Alarm objects
+	usrVHAPktThroughputCriticalAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Packets"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The critical alarm threshold for usrVHAPktThroughputValue 
+		gauge.
+		Object value of 0 disables this alarm and threshold.
+		IF this object is set to a non-zero value equal or less than
+		the current value of usrVHAPktThroughputMajorAlarmThresh,
+ 		THEN usrVHAPktThroughputMajorAlarmThresh will be automatically
+		reduced to a valid value.
+		IF this object is set to a non-zero value equal or less than
+		the current value of usrVHAPktThroughputClearAlarmThresh,
+ 		THEN usrVHAPktThroughputClearAlarmThresh will be automatically
+		reduced to a valid value.
+		Agent is allowed to either reject a SET which violates
+		these constraints, or adjust the object value such that the
+		constraints hold.
+		Changing threshold values causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAPktThroughputAlarmState is not 'critical' and 
+		the current gauge value is equal or greater than this
+		critical threshold, and this critical threshold is non-zero,
+		THEN usrVHAPktThroughputAlarmState will change to 
+		'critical'.
+		See usrVHAPktThroughputAlarmState for TRAP generation details.
+		"
+	    DEFVAL    { 40000 }
+            --CONFIGURABLE 
+	    ::= { usrVHAPktThroughputPM 1 }
+	usrVHAPktThroughputMajorAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32 
+	    UNITS  "RP Packets"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHAPktThroughputValue 
+		gauge.
+		Value of 0 disables this threshold.
+		IF this object is set to a non-zero value equal or less than 
+		the current value of usrVHAPktThroughputClearAlarmThresh,
+ 		THEN usrVHAPktThroughputClearAlarmThresh will be automatically
+		reduced to a valid value.
+		This value is set indirectly by setting
+		usrVHAPktThroughputMajorAlarmThreshPct
+		Changing threshold values causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAPktThroughputAlarmState is 'clear' and the current 
+		gauge value is equal or greater than this threshold, and the 
+		current gauge value is less than non-zero
+		usrVHAPktThroughputCriticalAlarmThresh, and the threshold is 
+		not zero,
+		THEN usrVHAPktThroughputAlarmState will change to 'major'.
+		See usrVHAPktThroughputAlarmState for TRAP generation details.
+		"
+	    ::= { usrVHAPktThroughputPM 2 }
+	usrVHAPktThroughputClearAlarmThresh OBJECT-TYPE
+            SYNTAX Unsigned32
+	    UNITS  "RP Packets"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"The alarm clear threshold for usrVHAPktThroughputValue 
+		gauge.
+		This object must be less than
+		usrVHAPktThroughputMajorAlarmThresh (if non-zero) 
+		usrVHAPktThroughputCricalAlarmThresh (if non-zero)..
+		This value is set indirectly by setting
+		usrVHAPktThroughputMajorAlarmThreshPct.
+		Changing the threshold value causes the alarm state to be 
+		re-evaluated.
+		IF usrVHAPktThroughputAlarmState is not 'clear' and 
+		the current gauge value is equal or less than this threshold,
+		THEN usrVHAPktThroughputCriticalAlarmState will change to 
+		'clear'.
+		See usrVHAPktThroughputAlarmState for trap generation details.
+		"
+	    ::= { usrVHAPktThroughputPM 3 }
+	usrVHAPktThroughputMajorAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The major alarm threshold for usrVHAPktThroughputValue gauge
+		expressed as a percentage of
+		usrVHAPktThroughputCriticalAlarmThesh.
+		The allowed range of this object is 0 to 100.
+		Writing this object causes usrVHAPktThroughputMajorAlarmThresh
+		to be re-calculated.
+		Writing usrVHAPktThroughputMajorAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHAPktThroughputMajorAlarmThresh for effects of changing
+		threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 80 }
+            --CONFIGURABLE 
+	    ::= { usrVHAPktThroughputPM 4 }
+	usrVHAPktThroughputClearAlarmThreshPct OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+	    UNITS  "Percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The clear alarm threshold for usrVHAPktThroughputValue gauge
+		expressed as a percentage of
+		usrVHAPktThroughputCriticalAlarmThesh.
+		The allowed range of this object is 0 to 100.
+		Writing this object causes usrVHAPktThroughputClearAlarmThresh
+		to be re-calculated.
+		Writing usrVHAPktThroughputClearAlarmThresh causes this object
+		to be re-calculated.
+		See usrVHAPktThroughputClearAlarmThresh for effects of changing
+		threshold value such as causing the alarm state to be
+		re-evaluated."
+	    DEFVAL    { 70 }
+            --CONFIGURABLE 
+	    ::= { usrVHAPktThroughputPM 5 }
+	usrVHAPktThroughputTrapsEnabled OBJECT-TYPE
+            SYNTAX     INTEGER {
+                            enabled(1),
+                            disabled(2)
+                            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object controls trap generation when 
+            usrVHASActiveSessionsAlarmState changes.  
+            See usrVHAPktThroughputAlarmState for alarm details."
+            DEFVAL    { disabled }
+            --CONFIGURABLE 
+	    ::= { usrVHAPktThroughputPM 6 }
+	usrVHAPktThroughputInterval OBJECT-TYPE
+            SYNTAX Unsigned32
+	    UNITS "Seconds"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The interval in seconds over which the RP packet counters
+		are sampled (measured) to determine a packet throughput by
+		making a delta between a previous sample and a new sample.
+		The delta is stored in usrVHAPktThroughputValue and 
+		thresholds are checked.
+		Value of zero disables RP Packet Throughput alarms and 
+		forces alarm state to 'clear'."
+            DEFVAL    { 10 }
+            --CONFIGURABLE 
+	    ::= { usrVHAPktThroughputPM 7 }
+	usrVHAPktThroughputAlarmState OBJECT-TYPE
+            SYNTAX INTEGER {
+			clear(0),
+			major(1),
+			critical(2)
+			}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Alarm state is maintained by PDSN by comparing 
+		usrVHAPktThroughputValue  
+		with critical, major, and clear alarm thresholds.
+		IF alarm state changes to critical, AND
+		    usrVHAPktThroughputTrapsEnabled is true
+		THEN usrVHAPktThroughputCriticalAlarm TRAP will be sent.
+                IF alarm state changes to major, AND
+		    usrVHAPktThroughputTrapsEnabled is true
+		THEN usrVHAPktThroughputMajorAlarm TRAP will be sent.
+                IF alarm state changes to clear, AND
+		    usrVHAPktThroughputTrapsEnabled is true
+		THEN usrVHAPktThroughputCriticalAlarm TRAP will be sent.
+		IF alarm state changes,
+		THEN usrVHAPktThroughputAlarmTime is updated with 
+		the current time regardless of usrVHAPktThroughputTrapsEnabled
+		and usrVHAPktThroughputAlarmChanges is incremented.
+		This allows alarm state and time information to be retrieved
+		by SNMP management stations that don't support SNMP traps or
+		when traps are intentionally disabled to reduce trap 
+		processing load on the SNMP management station.
+		Writing a 'clear' value will force the alarm state to
+		go to 'clear'.  This will count as a state change and
+		cause a trap if the state was  'major' or 'critical'.  
+		This step conceptually occurs before comparing the
+		alarm thresholds.  If major or critical thresholds are
+		exceeded, the appropriate state change and trap occur.
+		This means that writing 'clear' may cause 0, 1, or 2
+		alarm state changes and traps. "
+	    ::= { usrVHAPktThroughputPM 8 }
+	usrVHAPktThroughputAlarmTime OBJECT-TYPE
+            SYNTAX Time1970
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+	    	"Time of last usrVHAPktThroughputAlarmState state change.
+		If the state has never changed, this value will be zero."
+	    ::= { usrVHAPktThroughputPM 9 }
+	usrVHAPktThroughputAlarmChanges OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+	    	"Count of usrVHAPktThroughputAlarmState changes."
+	    ::= { usrVHAPktThroughputPM 10 }
+	usrVHAPktCounts OBJECT-TYPE
+	    SYNTAX Counter32
+	    UNITS  "Packets"
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"Count of RP Packets sent and received.  This is the sum of 
+		usrVHATotalCREPktsRcvd     - A10 Packets received
+		usrVHATotalGREPktsTrans    - A10 Packets sent
+		usrVHARegReqRcvd	   - A11 Packets received (1 of 3)
+		usrVHARegAcknowledge	   - A11 Packets received (2 of 3)
+		usrVHATotalRegUpdateDenied - A11 Packets received (3 of 3)
+		usrVHARegReqAccept	   - A11 Packets sent (1 of 3)
+		usrVHARegReqDenied	   - A11 Packets sent (2 of 3)
+		usrVHARegUpdate		   - A11 Packets sent (3 of 3)"
+	    ::= { usrVHAPktThroughputPM 11 }		
+	usrVHAPktThroughputValue OBJECT-TYPE
+            SYNTAX Gauge32
+	    UNITS "RP Packets"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+	    	"The value of the statistic during the last measurement
+		interval.  usrVHAPktCounts is sampled at the start and at
+		the end of a measurement interval.  This MIB object represents
+		the delta value between these two samples.  The interval
+		MIB object is usrVHAPktThroughputInterval.
+		The value of this MIB object is the value that is 
+		compared with the 3 thresholds for alarm generation.
+		The value during the current measurement period is not made
+		available until the measurement period is completed ahd will
+		remain available until the next period completes."
+	    ::= { usrVHAPktThroughputPM 12 }
+-- RP Events Group
+        usrVHATrapsv2 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The events for VHA traps"
+        ::= { usrVHATraps 0 }
+	usrVHARegistrationRequestAuthFailure NOTIFICATION-TYPE
+		OBJECTS {    
+			usrVHASecurViolatorAddress,
+			usrVHASecurRecentViolationSPI,
+			usrVHASecurRecentViolationIDLow,
+			usrVHASecurRecentViolationIDHigh,
+			usrVHASecurRecentViolationReason
+		}
+                STATUS current
+		DESCRIPTION
+			"This trap is generated when authentication fails
+			 on the Registration Request message."
+	    --#TYPE	"R-P Interface Authentication Failure Event"
+	    --#SUMMARY	"R-P Registration Req failure from %d reason %d"
+	    --#ARGUMENTS { 0 4 }
+	    --#SEVERITY MAJOR
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "configurationOrCustomizationError"
+        ::= { usrVHATrapsv2 1 }
+	usrVHARegistrationAcknowledgeAuthFailure NOTIFICATION-TYPE
+		OBJECTS {    
+			usrVHASecurViolatorAddress,
+			usrVHASecurRecentViolationSPI,
+			usrVHASecurRecentViolationIDLow,
+			usrVHASecurRecentViolationIDHigh,
+			usrVHASecurRecentViolationReason
+		}
+                STATUS current
+		DESCRIPTION
+			"This trap is generated when authentication fails on
+			 the Registration Acknowledge message."
+	    --#TYPE	"R-P Interface Authentication Failure Event"
+	    --#SUMMARY	"R-P Registration Ack failure from %d reason %d"
+	    --#ARGUMENTS { 0 4 }
+	    --#SEVERITY MAJOR
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "configurationOrCustomizationError"
+        ::= { usrVHATrapsv2 2 }
+	usrVHAServiceOptionStatsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UsrVHAServiceOptionStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of R-P Registration request stats based on Service Option"
+	::= { usrVHAServiceOptionStats 1 }
+	usrVHAServiceOptionStatsEntry OBJECT-TYPE
+		SYNTAX UsrVHAServiceOptionStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the VHA Service Option Stats Table."
+		INDEX { usrVHAServiceOptionStatsTableIndex }
+	::= { usrVHAServiceOptionStatsTable 1 }
+	UsrVHAServiceOptionStatsEntry ::= SEQUENCE {
+		usrVHAServiceOptionStatsTableIndex     Integer32,
+		usrVHAServiceOptionRegReqRcvd          Counter32,
+		usrVHAServiceOptionRegRepAccept        Counter32,
+		usrVHAServiceOptionDeRegReqRcvd        Counter32,
+		usrVHAServiceOptionDeRegRepAccept      Counter32
+	}
+	usrVHAServiceOptionStatsTableIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The value of Service Option recived over A11 interface by PDSN."
+	::= { usrVHAServiceOptionStatsEntry 1 }
+	usrVHAServiceOptionRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid Registration Requests
+			 received for the Service Option."
+	::= { usrVHAServiceOptionStatsEntry 2 }
+	usrVHAServiceOptionRegRepAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Replies accepted
+			 with code information element inside the Registration
+			 Accept message equal to zero for this service option."
+	::= { usrVHAServiceOptionStatsEntry 3 }
+	usrVHAServiceOptionDeRegReqRcvd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of valid Registration Requests
+			 received with a Lifetime of zero (requests
+			 to deregister) for this service option."
+	::= { usrVHAServiceOptionStatsEntry 4 }
+	usrVHAServiceOptionDeRegRepAccept OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total number of Registration Replies accepted
+			 in response to a deregistration request with code
+			 information element inside the Registration Accept
+			 message equal to zero for this service option."
+	::= { usrVHAServiceOptionStatsEntry 5 }
+	usrVHASessionsCriticalAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+		 	usrVHASessionsCurrent,
+			usrVHASessionsCriticalAlarmThresh 
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHASessionsAlarmsState goes to 'critical' and
+		usrVHASessionsAlarmsEnabled is 'true'
+		This alarm occurs when the sum of active and dormant RP session
+		reaches or exceeds the critical threshold."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Total Sessions %d reached critical threshold of %d"
+	    --#ARGUMENTS { 0 1 }
+	    --#SEVERITY CRITICAL
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "resourceAtOrNearingCapacity""
+	    ::= { usrVHATrapsv2 3 }
+	usrVHASessionsMajorAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+		 	usrVHASessionsCurrent,
+			usrVHASessionsMajorAlarmThresh 
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHASessionsAlarmsState goes to 'major' and
+		usrVHASessionsAlarmsEnabled is 'true'
+		This alarm occurs when the sum of active and dormant RP session
+		reaches or exceeds the major threshold while state is 'clear'
+		but does not reach or exceed the critical threshold."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Total Sessions %d reached major threshold of %d"
+	    --#ARGUMENTS { 0 1 }
+	    --#SEVERITY MAJOR
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "resourceAtOrNearingCapacity""
+	    ::= { usrVHATrapsv2 4 }
+	usrVHASessionsClearAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHASessionsCurrent,
+			usrVHASessionsClearAlarmThresh
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHASessionsAlarmsState goes to 'clear' and
+		usrVHASessionsAlarmsEnabled is 'true'
+		This alarm occurs when the sum of active and dormant RP session
+		falls to or below the 'clear' threshold after a 'major' or 
+		'critical' alarm has been declared."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Total Sessions %d reached clear threshold of %d"
+	    --#ARGUMENTS { 0 1 }
+	    --#SEVERITY CLEARED
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "thresholdCrossed"
+	    ::= { usrVHATrapsv2 5 }
+	usrVHAActiveSessionsCriticalAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAActiveSessionsCurrent,
+			usrVHAActiveSessionsCriticalAlarmThresh
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAActiveSessionsAlarmsState goes to 'critical' and
+		usrVHAActiveSessionsAlarmsEnabled is 'true'
+		This alarm occurs when the number of active RP session
+		reaches or exceeds the critical threshold."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Active Sessions %d reached critical threshold of %d"
+	    --#ARGUMENTS { 0 1 }
+	    --#SEVERITY CRITICAL
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "resourceAtOrNearingCapacity""
+	    ::= { usrVHATrapsv2 6 }
+	usrVHAActiveSessionsMajorAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAActiveSessionsCurrent,
+			usrVHAActiveSessionsMajorAlarmThresh
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAActiveSessionsAlarmsState goes to 'major' and
+		usrVHAActiveSessionsAlarmsEnabled is 'true'
+		This alarm occurs when the number of active RP session
+		reaches or exceeds the major threshold while state is 'clear'
+		but does not reach or exceed the critical threshold."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Active Sessions %d reached major threshold of %d"
+	    --#ARGUMENTS { 0 1 }
+	    --#SEVERITY MAJOR
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "resourceAtOrNearingCapacity""
+	    ::= { usrVHATrapsv2 7 }
+	usrVHAActiveSessionsClearAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAActiveSessionsCurrent,
+			usrVHAActiveSessionsClearAlarmThresh
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAActiveSessionsAlarmsState goes to 'clear' and
+		usrVHAActiveSessionsAlarmsEnabled is 'true'
+		This alarm occurs when the number of active RP session
+		falls to or below the 'clear' threshold after a 'major' or 
+		'critical' alarm has been declared."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Active Sessions %d reached clear threshold of %d"
+	    --#ARGUMENTS { 0 1 }
+	    --#SEVERITY CLEARED
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "thresholdCrossed"
+	    ::= { usrVHATrapsv2 8 }
+	usrVHAFailedSessionsCriticalAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAFailedSessionsValue,
+			usrVHAFailedSessionsCriticalAlarmThresh,
+			usrVHAFailedSessionsInterval
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAFailedSessionsAlarmsState goes to 'clear' and
+		usrVHAFailedSessionsAlarmsEnabled is 'true'
+		This alarm occurs when the RP Failed Sessions as measured
+		number of RP Reg Req Denied in the last measurement interval
+		falls to or below the 'clear' threshold after a 'major' or 
+		'critical' alarm has been declared."
+	    --#TYPE	"R-P Interface Call Processing Alarm"
+	    --#SUMMARY	"R-P Failed Sessions per %d secs %d reached critical threshold of %d"
+	    --#ARGUMENTS { 2 0 1 }
+	    --#SEVERITY CRITICAL
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "callEstablishmentError"
+	    ::= { usrVHATrapsv2 9 }
+	usrVHAFailedSessionsMajorAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAFailedSessionsValue,
+			usrVHAFailedSessionsMajorAlarmThresh,
+			usrVHAFailedSessionsInterval
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAFailedSessionsAlarmsState goes to 'major' and
+		usrVHAFailedSessionsAlarmsEnabled is 'true'
+		This alarm occurs when the RP Failed Sessions as measured
+		number of RP Reg Req Denied in the last measurement interval
+		reaches or exceeds the major threshold while state is 'clear'
+		but does not reach or exceed the critical threshold."
+	    --#TYPE	"R-P Interface Call Processing Alarm"
+	    --#SUMMARY	"R-P Failed Sessions per %d secs %d reached major threshold of %d"
+	    --#ARGUMENTS { 2 0 1 }
+	    --#SEVERITY MAJOR
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "callEstablishmentError"
+	    ::= { usrVHATrapsv2 10 }
+	usrVHAFailedSessionsClearAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAFailedSessionsValue,
+			usrVHAFailedSessionsClearAlarmThresh,
+			usrVHAFailedSessionsInterval
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAFailedSessionsAlarmsState goes to 'major' and
+		usrVHAFailedSessionsAlarmsEnabled is 'true'
+		This alarm occurs when the RP Failed Sessions as measured
+		number of RP Reg Req Denied in the last measurement interval
+		falls to or below the 'clear' threshold after a 'major' or 
+		'critical' alarm has been declared."
+	    --#TYPE	"R-P Interface Call Processing Alarm"
+	    --#SUMMARY	"R-P Failed Sessions per %d secs %d reached clear threshold of %d"
+	    --#ARGUMENTS { 2 0 1 }
+	    --#SEVERITY CLEARED
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "thresholdCrossed"
+	    ::= { usrVHATrapsv2 11 }
+	usrVHAPktThroughputCriticalAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAPktThroughputValue,
+			usrVHAPktThroughputCriticalAlarmThresh,
+			usrVHAPktThroughputInterval
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAPktThroughputAlarmsState goes to 'clear' and
+		usrVHAPktThroughputAlarmsEnabled is 'true'
+		This alarm occurs when the RP Packet Throughput as measured
+		number of RP packets sent or received in last interval
+		falls to or below the 'clear' threshold after a 'major' or 
+		'critical' alarm has been declared."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Packet Throughput per %d secs %d reached critical threshold of %d"
+	    --#ARGUMENTS { 2 0 1 }
+	    --#SEVERITY CRITICAL
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "resourceAtOrNearingCapacity""
+	    ::= { usrVHATrapsv2 12 }
+	usrVHAPktThroughputMajorAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAPktThroughputValue,
+			usrVHAPktThroughputMajorAlarmThresh,
+			usrVHAPktThroughputInterval
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAPktThroughputAlarmsState goes to 'major' and
+		usrVHAPktThroughputAlarmsEnabled is 'true'
+		This alarm occurs when the RP Packet Throughput as measured
+		number of RP packets sent or received in last interval
+		reaches or exceeds the major threshold while state is 'clear'
+		but does not reach or exceed the critical threshold."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Packet Throughput per %d secs %d reached major threshold of %d"
+	    --#ARGUMENTS { 2 0 1 }
+	    --#SEVERITY MAJOR
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "resourceAtOrNearingCapacity""
+	    ::= { usrVHATrapsv2 13 }
+	usrVHAPktThroughputClearAlarm NOTIFICATION-TYPE
+	    OBJECTS {
+			usrVHAPktThroughputValue,
+			usrVHAPktThroughputClearAlarmThresh,
+			usrVHAPktThroughputInterval
+		    }
+	    STATUS current
+	    DESCRIPTION
+		"The SNMP trap that is generated when 
+		usrVHAPktThroughputAlarmsState goes to 'clear' and
+		usrVHAPktThroughputAlarmsEnabled is 'true'
+		This alarm occurs when the RP Packet Throughput as measured
+		number of RP packets sent or received in last interval
+		falls to or below the 'clear' threshold after a 'major' or 
+		'critical' alarm has been declared."
+	    --#TYPE	"R-P Interface Capacity Alarm"
+	    --#SUMMARY	"R-P Packet Throughput per %d secs %d reached clear threshold of %d"
+	    --#ARGUMENTS { 2 0 1 }
+	    --#SEVERITY CLEARED
+	    --#STATE	OPERATIONAL
+	    --#PROBABLECAUSE "thresholdCrossed"
+	    ::= { usrVHATrapsv2 14 }
+-- Table to correlate IMSI in Encoded/Decoded ASCII format
+	usrVHAIMSIStatsEntry OBJECT-TYPE
+		SYNTAX UsrVHAIMSIStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the IMSI Association Table."
+		INDEX { usrVHAIMSISessionIndex }
+	::= { usrVHAIMSIStatsTable 1 }
+	UsrVHAIMSIStatsEntry ::= SEQUENCE {
+		usrVHAIMSISessionIndex         Integer32,
+		usrVHAIMSIDecodedASCII         DisplayString,
+		usrVHAIMSIEncodedASCII         DisplayString
+	}
+	usrVHAIMSISessionIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..4000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"PDSN's RP interface can support up to 4000 sessions.
+			 This value indicates the session number assigned
+			 to the connection by the PDSN."
+	::= { usrVHAIMSIStatsEntry 1 }
+	usrVHAIMSIDecodedASCII OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(10..15))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The International Mobile Subscriber Identifier in
+			 Decoded ASCII format."
+	::= { usrVHAIMSIStatsEntry 2 }
+	usrVHAIMSIEncodedASCII OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(7))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The International Mobile Subscriber Identifier in 
+			 Encoded ASCII format."
+	::= { usrVHAIMSIStatsEntry 3 }
+END

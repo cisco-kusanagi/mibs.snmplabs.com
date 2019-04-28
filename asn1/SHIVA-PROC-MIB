@@ -1,0 +1,194 @@
+--
+-- 	Copyright 1997  Shiva Corporation
+--
+
+--
+--	Shiva systems process MIB
+--
+--	This MIB was added in ShivOS release 5.0
+--
+
+SHIVA-PROC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	Counter, TimeTicks
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	DisplayString
+		FROM RFC1213-MIB
+	process
+    		FROM SHIVA-MIB;
+
+    procMaximum OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of processes allowed."
+	::= { process 1 }
+
+    procCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of processes active.  This is the number of
+		entries in procTable."
+	::= { process 2 }
+
+    procCreated OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of processes created."
+	::= { process 3 }
+
+    procCreatesFailed OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of process creations that failed."
+	::= { process 4 }
+
+    procExited OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of processes that exited normally."
+	::= { process 5 }
+
+    procKilled OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of processes terminated with kill signal."
+	::= { process 6 }
+
+-- Table of all active processes, indexed by process id
+
+    procTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF ProcessEntry
+	ACCESS  not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of current process in the box."
+	::= { process 7 }
+
+    processEntry OBJECT-TYPE
+	SYNTAX	ProcessEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Characteristics of an active process."
+	INDEX { processID }
+	::= { procTable 1 }
+
+    ProcessEntry ::= SEQUENCE {
+	processID		INTEGER,
+	processName		DisplayString,
+	processState		INTEGER,
+	processPriority		INTEGER,
+	processStackStart	INTEGER,
+	processStackEnd		INTEGER,
+	processStackUsed	INTEGER,
+	processStackLength	INTEGER,
+	processSemaphore	INTEGER,
+	processRuntime  	TimeTicks
+    }
+
+    processID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The unique number identifying this process."
+	::= { processEntry 1 }
+
+    processName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the process associated with the process ID."
+	::= { processEntry 2 }
+
+    processState OBJECT-TYPE
+	SYNTAX	INTEGER {
+		current(1),	-- process is currently running
+		ready(3),	-- process is on the ready queue
+		recv(4),	-- process is waiting for a message
+		sleep(5),	-- process is sleeping
+		susp(6),	-- process is suspended
+		wait(7),	-- process is on a semaphore queue
+		rtim(8)		-- process is timing a receive
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The process state for this process."
+	::= { processEntry 3 }
+
+    processPriority OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The process priority for this process.
+		A higher number means a higher priority."
+	::= { processEntry 4 }
+
+    processStackStart OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Lowest address of the process stack."
+	::= { processEntry 5 }
+
+    processStackEnd OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The highest address of the process stack."
+	::= { processEntry 6 }
+
+    processStackUsed OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of bytes of stack the process is using."
+	::= { processEntry 7 }
+
+    processStackLength OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of bytes of stack available to the process."
+	::= { processEntry 8 }
+
+    processSemaphore OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Semaphore number that the process is waiting on.  
+		 Blank if none."
+	::= { processEntry 9 }
+
+    processRuntime OBJECT-TYPE
+	SYNTAX	TimeTicks
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Process runtime."
+	::= { processEntry 10 }
+
+END

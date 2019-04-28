@@ -1,0 +1,688 @@
+-- extracted from draft-ietf-disman-conditionmib-01.txt
+-- at Thu Nov 22 06:07:18 2001
+
+Condition-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+          FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DateAndTime, TruthValue
+          FROM SNMPv2-TC
+    SnmpAdminString
+          FROM SNMP-FRAMEWORK-MIB
+    IANAItuProbableCause
+          FROM ALARM-MIB 	
+    MODULE-COMPLIANCE, OBJECT-GROUP
+          FROM SNMPv2-CONF
+
+
+condMIB MODULE-IDENTITY
+    LAST-UPDATED "200111150000Z"  -- November 15, 2001
+    ORGANIZATION "IETF Distributed Management Working Group"
+    CONTACT-INFO
+                        "WG-email:   disman@dorothy.bmc.com  
+           Subscribe:   disman-request@dorothy.bmc.com  
+                        In message body: 
+                        subscribe disman your_email_address  
+           Archive:     ftp://amethyst.bmc.com/pub/disman/archives 
+            
+           Chair:      Randy Presuhn  
+                       BMC Software 
+           EMail:      rpresuhn@bmc.com 
+           Phone:      +1-301-854-6889 
+    
+           Authors:    Anni Huynh
+			     a_n_huynh@yahoo.com
+
+                       David T. Perkins 
+                       dperkins@dsperkins.com
+   
+                       Mark A. Stewart
+                       mstewart1@nc.rr.com
+ 
+                       Kam Lam
+                       hklam@lucent.com
+ 
+         DESCRIPTION
+                  "The MIB module defines MIB objects and notifications that 
+        provide mechanisms to monitor abnormal conditions currently active and
+        the history of abnormal conditions being set and cleared on a managed   
+        system."
+    REVISION  "200111150000Z"	
+    DESCRIPTION
+       "The initial revision"
+    ::= { mib-2 yy }
+
+------------------
+-- MIB Objects
+------------------
+condMIBObjects   OBJECT IDENTIFIER ::= { conMIB 1 }
+
+condActive    OBJECT IDENTIFIER ::= { condMIBObjects 1 }
+condRetired   OBJECT IDENTIFIER ::= { condMIBObjects 2 }
+condStanding  OBJECT IDENTIFIER ::= { condMIBObjects 3 }
+condNotice    OBJECT IDENTIFIER ::= { condMIBObjects 4 }
+ 
+--------------
+-- Event 
+--------------
+condEvents OBJECT IDENTIFIER ::= { condMIB 2 }
+condEventsV2 OBJECT IDENTIFIER ::= { condEvents 0 }
+
+----------------------
+-- Textual Convention
+----------------------
+ConditionIndex ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "The unique identifier of a condition and/or condition
+     notice within a table."
+  SYNTAX  Unsigned32
+
+ConditionLocation ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "A text field describing the physical or logical location at
+    which a condition occurred.
+
+    The fields <node>,<Rack>,<shelf>,<slot>,<port> would be concatenated
+    into the physical location identifier with some delimiter."
+  SYNTAX SnmpAdminString
+
+ConditionSeverity ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "The perceived severity level of a condition."
+  REFERENCE
+    "Recommendation X.733 (02/92) - Information Technology -
+     Open Systems Interconnection - Systems Management:
+     Alarm Reporting Function"
+  SYNTAX  INTEGER {
+    cleared(1),
+    indeterminate(2),
+    warning(3),
+    minor(4),
+    major(5),
+    critical(6)
+    }
+
+ConditionCategory ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "The category of an abnormal condition."
+  REFERENCE
+    "Recommendation X.733 (02/92) - Information Technology -
+     Open Systems Interconnection - Systems Management:
+     Alarm Reporting Function"
+  SYNTAX  INTEGER {
+    communications(1),
+    qualityOfService(2),
+    processingError(3),
+    equipment(4),
+    environmental(5)
+    }
+
+ConditionType ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "The identity of the type of an abnormal condition or raised alarm"
+  SYNTAX  IANAItuProbableCause 
+
+---------------------------
+-- Active condition objects
+---------------------------
+
+condActiveMaxNumber OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The maximum number of active conditions the system will
+     store in condActiveTable.  This value is set high
+     enough that it cannot be exceeded by the system (i.e., the
+     system is not capable of generating more than this number
+     of simultaneous standing conditions)."
+  ::= { condActive 1 }
+
+condActiveTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF CondActiveEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of active conditions on the system. 
+
+     The table index is virtual and does not represent a physical location.  
+     As each new condition is generated, it is assigned a new identifier; 
+     old identifiers are not reused.
+
+     An entry in the table is removed when the condition it represents
+     is cleared.  Note that this means the identifiers of the standing 
+     conditions in the table cannot be assumed to be consecutive."
+  ::= { condActive 2 }
+
+condActiveEntry OBJECT-TYPE
+  SYNTAX  CondActiveEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains information about an active condition."
+  INDEX  { condActiveIndex }
+  ::= { condActiveTable 1 }
+
+CondActiveEntry ::=
+  SEQUENCE {
+    condActiveIndex               ConditionIndex,
+    condActiveLocation            ConditionLocation,
+    condActiveDateAndTime         DateAndTime,
+    condActiveCategory            ConditionCategory,
+    condActiveSeverity            ConditionSeverity,
+    condActiveProbableCause       ConditionType,
+    condActiveServiceAffecting    TruthValue,
+    condActiveText                SnmpAdminString
+    }
+
+condActiveIndex OBJECT-TYPE
+  SYNTAX  ConditionIndex
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "The unique identifier of the condition within this table."
+  ::= { condActiveEntry 1 }
+
+condActiveLocation OBJECT-TYPE
+  SYNTAX  ConditionLocation
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The device generated identifier indicating the location of the equipment 
+     that generated the condition (e.g. node.shelf.slot.port)."
+  ::= { condActiveEntry 2 }
+
+condActiveDateAndTime OBJECT-TYPE
+  SYNTAX  DateAndTime
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The date and time when the condition was generated."
+  ::= { condActiveEntry 3 }
+
+condActiveCategory OBJECT-TYPE
+  SYNTAX  ConditionCategory
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The category of the condition, as assigned by the device
+     that generated it."
+  ::= { condActiveEntry 4 }
+
+condActiveSeverity OBJECT-TYPE
+  SYNTAX  ConditionSeverity
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The perceived severity level of the condition, as assigned
+     by the device that generated the condition."
+  ::= { condActiveEntry 5 }
+
+condActiveProbableCause OBJECT-TYPE
+  SYNTAX  AlarmType
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A high level qualification of the cause of the condition."
+  ::= { condActiveEntry 6 }
+
+condActiveServiceAffecting OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "An indication of whether or not the condition is service
+     affecting."
+  ::= { condActiveEntry 7 }
+
+condActiveText OBJECT-TYPE
+  SYNTAX  SnmpAdminString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A text description of the condition."
+  ::= { condActiveEntry 8 }
+
+----------------------------
+-- Retired condition objects
+----------------------------
+
+condRetiredMaxNumber OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The maximum number of retired standing conditions the system will store in
+     condRetiredTable. This table provides a history of conditions
+     that have been cleared."
+  ::= { condRetired 1 } 
+    
+condRetiredLastIndex OBJECT-TYPE 
+       SYNTAX      Unsigned32 
+       MAX-ACCESS  read-only 
+       STATUS      current 
+       DESCRIPTION 
+          "The index of the youngest entry in the retired condition log 
+           table, or zero. The value of zero is used to indicate that no entry
+           exists in the retired condition log." 
+       ::= { condRetired 2 } 
+
+
+condRetiredTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF CondRetiredEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of retired standing conditions on the system. 
+     The table index is virtual and does not represent a physical location.  
+     As each new condition is generated, it is assigned a new identifier; 
+     old identifiers are not reused.
+     
+     Once the condRetiredTable contains the maximum number of entries,
+     the oldest entry would be deleted to make room for new entry."
+  ::= { condRetired 3 }
+
+condRetiredEntry OBJECT-TYPE
+  SYNTAX  CondRetiredEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains information about an retired condition."
+  INDEX  { condRetiredIndex }
+  ::= { condRetiredTable 1 }
+
+CondRetiredEntry ::=
+  SEQUENCE {
+    condRetiredIndex                  ConditionIndex,
+    condRetiredLocation               ConditionLocation,
+    condRetiredDateAndTimeGenerated   DateAndTime,
+    condRetiredDateAndTime            DateAndTime,
+    condRetiredCategory               ConditionCategory,
+    condRetiredSeverity               ConditionSeverity,
+    condRetiredProbableCause          ConditionType,    
+    condRetiredServiceAffecting       TruthValue,
+    condRetiredText                   SnmpAdminString,
+    condRetiredResolution             SnmpAdminString
+    }
+
+condRetiredIndex OBJECT-TYPE
+  SYNTAX  ConditionIndex
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "The unique identifier of the retired condition within this table."
+  ::= { condRetiredEntry 1 }
+
+condRetiredLocation OBJECT-TYPE
+  SYNTAX  SnmpAdminString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The device generated identifier indicating the location of the equipment
+     that generated the condition.  It is the same as condActiveLocation."
+  ::= { condRetiredEntry 2 }
+
+condRetiredDateAndTimeGenerated OBJECT-TYPE
+  SYNTAX DateAndTime
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION 
+    "The date and time when the condition was generated.  It is the same as 
+     condActiveDateAndTime."
+	::= { condRetiredEntry 3 }
+
+condRetiredDateAndTime OBJECT-TYPE
+  SYNTAX  DateAndTime
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The date and time when the condition was retired."
+  ::= { condRetiredEntry 4 }
+
+condRetiredCategory OBJECT-TYPE
+  SYNTAX  ConditionCategory
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The category of the condition, as assigned by the device
+     that generated it.  It is the same as condActiveCategory."
+  ::= { condRetiredEntry 5 }
+
+condRetiredSeverity OBJECT-TYPE
+  SYNTAX  ConditionSeverity
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The perceived severity level of the condition when it was active, as 
+     assigned by the device that generated the condition.  
+     It is the same as condActiveSeverity."
+  ::= { condRetiredEntry 6 }
+
+condRetiredProbableCause OBJECT-TYPE
+  SYNTAX  ConditionProbableCause
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A high level qualification of the cause of the condition when it 
+     was active.  It is the same as condActiveProbableCause."
+  ::= { condRetiredEntry 7 }
+
+condRetiredServiceAffecting OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "An indication of whether or not the condition was service
+     affecting when it was active.  It is the same as
+     condActiveServiceAffecting."
+  ::= { condRetiredEntry 8 }
+
+condRetiredText OBJECT-TYPE
+  SYNTAX  SnmpAdminString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A text description of the condition.  It is the same as condActiveText."
+  ::= { condRetiredEntry 9 }
+
+condRetiredResolution OBJECT-TYPE
+  SYNTAX SnmpAdminString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION 
+    "Free-form text containing resolution information."
+  ::= { condRetiredEntry 10 }
+
+
+---------------------------
+-- Transient objects
+---------------------------
+
+condTransientMaxNumber OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The maximum number of transient conditions the system will
+     store in condTransientTable."
+  ::= { condTransient 1 }
+
+condTransientLastIndex OBJECT-TYPE 
+       SYNTAX      Unsigned32 
+       MAX-ACCESS  read-only 
+       STATUS      current 
+       DESCRIPTION 
+          "The index of the youngest entry in the transient condition log 
+           table, or zero. The value of zero is used to indicate that no entry
+           exists in the transient condition log." 
+       ::= { condTransient 2 } 
+
+condTransientTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF CondTransientEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of conditions on the system. 
+     The table index is virtual and does not represent a physical location.  
+     As each new condition is generated, it is assigned a new identifier; 
+     old identifiers are not reused. Therefore, the identifiers of the transient
+     conditions in the table cannot be assumed to be consecutive.
+     When the table reaches the max number of entries, the oldest one is deleted
+     to make room for the new transient condition"
+  ::= { condtransient 3 }
+
+condTransientEntry OBJECT-TYPE
+  SYNTAX  CondTransientEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains information about an transient condition."
+  INDEX  { condTransientIndex }
+  ::= { condTransientTable 1 }
+
+CondTransientEntry ::=
+  SEQUENCE {
+    condTransientIndex               ConditionIndex,
+    condTransientLocation            ConditionLocation,
+    condTransientDateAndTime         DateAndTime,
+    condTransientCategory            ConditionCategory,
+    condTransientSeverity            ConditionSeverity,
+    condTransientProbableCause       ConditionType,
+    condTransientServiceAffecting    TruthValue,
+    condTransientText                SnmpAdminString
+    }
+
+condTransientIndex OBJECT-TYPE
+  SYNTAX  ConditionIndex
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "The unique identifier of the condition within this table."
+  ::= { condTransientEntry 1 }
+
+condTransientLocation OBJECT-TYPE
+  SYNTAX  ConditionLocation
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The device generated identifier indicating the location of the equipment 
+     that generated the condition (e.g. node.shelf.slot.port)."
+  ::= { condTransientEntry 2 }
+
+condTransientDateAndTime OBJECT-TYPE
+  SYNTAX  DateAndTime
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The date and time when the condition was generated."
+  ::= { condTransientEntry 3 }
+
+condTransientCategory OBJECT-TYPE
+  SYNTAX  ConditionCategory
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The category of the condition, as assigned by the device
+     that generated it."
+  ::= { condTransientEntry 4 }
+
+condTransientSeverity OBJECT-TYPE
+  SYNTAX  ConditionSeverity
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The perceived severity level of the condition, as assigned
+     by the device that generated the condition."
+  ::= { condTransientEntry 5 }
+
+condTransientProbableCause OBJECT-TYPE
+  SYNTAX  ConditionProbableCause
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A high level qualification of the cause of the condition."
+  ::= { condTransientEntry 6 }
+
+condTransientServiceAffecting OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "An indication of whether or not the condition is service
+     affecting."
+  ::= { condTransientEntry 7 }
+
+condTransientText OBJECT-TYPE
+  SYNTAX  SnmpAdminString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A text description of the condition."
+  ::= { condTransientEntry 8 }
+
+-----------------
+-- Notifications
+-----------------
+
+condNotificationSelection OBJECT-TYPE
+  SYNTAX  BITS {
+    cleared(0),
+    indeterminate(1),
+    warning(2),
+    minor(3),
+    major(4),
+    critical(5)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "This object controls the perceived condition severities for which
+     notifications are sent.  If a bit is set, a notification is sent for each
+     new condition with the corresponding perceived severity.
+     By default, all bits are set except indeterminate(1)."
+  ::= { condNotice 1 }
+
+condActiveEvent NOTIFICATION-TYPE
+  OBJECTS  {
+    condActiveIndex,
+    condActiveLocation,
+    condActiveDateAndTime,
+    condActiveCategory,
+    condActiveSeverity,
+    condActiveProbableCause,
+    condActiveServiceAffecting,
+    condActiveText
+    }
+  STATUS  current
+  DESCRIPTION
+    " To notify an active condition, this notification is sent for every 
+condition 
+      severity level that is enabled in condNotificationSelection.
+      The objects are the same as in the associated entry in the 
+      condActiveTable."
+  ::= { condEventsV2 1 }
+
+condRetiredEvent NOTIFICATION-TYPE
+  OBJECTS  {
+    condRetiredIndex,
+    condRetiredLocation,
+    condRetiredDateAndTimeGenerated,
+    condRetiredDateAndTime,
+    condRetiredCategory,
+    condRetiredSeverity,
+    condRetiredProbableCause,
+    condRetiredServiceAffecting,
+    condRetiredText,
+    condRetiredResolution          
+    }
+  STATUS  current
+  DESCRIPTION
+    " To notify that a condition is cleared, this notification is sent 
+      for every condition severity level that is enabled in 
+condNotificationSelection.
+      The objects are the same as in the associated entry in the
+      condRetiredTable."
+  ::= { condEventsV2 2 }
+
+
+--------------------------
+-- conformance information
+--------------------------
+ 
+   condConformance OBJECT IDENTIFIER ::= { condMIB 3 }
+
+   condCompliances OBJECT IDENTIFIER ::= { condConformance 1 }
+
+   condCompliance MODULE-COMPLIANCE
+         STATUS  current
+         DESCRIPTION
+             "The compliance statement for systems supporting
+             the Condition MIB."
+         MODULE -- this module
+             MANDATORY-GROUPS {
+              condActiveGroup,
+              condRetiredGroup
+             }
+      ::= { condCompliances 1 }
+
+   condGroups OBJECT IDENTIFIER ::= { condConformance 2 }	
+
+   condActiveGroup OBJECT-GROUP
+      OBJECTS {
+          condActiveMaxNumber,
+          condActiveIndex,
+          condActiveLocation,
+          condActiveDateAndTime,
+          condActiveCategory,
+          condActiveSeverity,
+          condActiveProbableCause,
+          condActiveServiceAffecting,
+          condActiveText
+         }
+       STATUS   current
+       DESCRIPTION
+            "Condition Active group."
+       ::= { condGroups 1}
+
+   condRetiredGroup OBJECT-GROUP
+           OBJECTS {
+              condRetiredMaxNumber,
+              condRetiredLastIndex,
+              condRetiredIndex,
+              condRetiredLocation,
+              condRetiredDateAndTimeGenerated,
+              condRetiredDateAndTime,
+              condRetiredCategory,
+              condRetiredSeverity,
+              condRetiredProbableCause,
+              condRetiredServiceAffecting,
+              condRetiredText,
+              condRetiredResolution	 	
+             }
+             STATUS   current
+             DESCRIPTION
+                  "Condition Retired group."
+             ::= { condGroups 2}
+
+       condTransientGroup  OBJECT-GROUP
+             OBJECTS  {
+                      condTransientMaxNumber,
+                      condTransientLastIndex,
+                      condTransientIndex,
+                      condTransientLocation,
+                      condTransientDateAndTime,
+                      condTransientCategory,
+                      condTransientSeverity,
+                      condTransientProbableCause,
+                      condTransientServiceAffecting,
+                      condTransientText
+                       }
+             STATUS   current
+             DESCRIPTION
+                  " Condition Transient group."
+             ::= { condGroups 3}
+
+       condNotificationSelectionGroup  OBJECT-GROUP
+             OBJECTS  {
+                      condNotificationSelection
+                       }
+             STATUS   current
+             DESCRIPTION
+                  "Notification Selection group."
+             ::= { condGroups 4}
+
+   condNotificationsGroup NOTIFICATION-GROUP
+      NOTIFICATIONS { condActiveEvent, condRetiredEvent }
+      STATUS        current
+      DESCRIPTION
+              "The collection of notifications."
+      ::= { condGroups 5 }
+
+END

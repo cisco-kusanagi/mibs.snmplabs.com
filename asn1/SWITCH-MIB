@@ -1,0 +1,1236 @@
+SWITCH-MIB --{ iso org(3) dod(6) internet(1) private(4) enterprises(1) 295 }
+
+
+
+-- Title:   Ethernet Switching Device Enterprise MIB Extension
+
+-- Version: 2.3
+
+
+
+DEFINITIONS ::= BEGIN
+
+
+
+IMPORTS
+
+    enterprises, Counter  FROM RFC1155-SMI
+
+    OBJECT-TYPE           FROM RFC-1212
+
+    DisplayString         FROM RFC1213-MIB
+
+    TRAP-TYPE             FROM RFC-1215;
+
+
+
+-- *******************************************************************
+
+-- Type Aliases
+
+-- *******************************************************************
+
+
+
+-- All representations of MAC addresses in this MIB Module use,
+
+-- as a textual convention (i.e., this convention does not affect
+
+-- their encoding), the following data types:
+
+
+
+MacAddress ::=
+
+    OCTET STRING (SIZE (6))    -- a 6 octet address in the "canonical"
+
+                               -- order defined by IEEE 802.1a, i.e.,
+
+                               -- as if it were transmitted least
+
+                               -- significant bit first.
+
+
+
+-- *******************************************************************
+
+-- High-level identifiers
+
+-- *******************************************************************
+
+
+
+vendor                  OBJECT IDENTIFIER ::= { enterprises 295 }
+
+
+
+ethernetSwitchingDevice OBJECT IDENTIFIER ::= { vendor 3 }
+
+
+
+deviceHardware          OBJECT IDENTIFIER ::= { ethernetSwitchingDevice 1 }
+
+deviceChassis           OBJECT IDENTIFIER ::= { deviceHardware 1 }
+
+devicePort              OBJECT IDENTIFIER ::= { deviceHardware 2 }
+
+ethernetPort            OBJECT IDENTIFIER ::= { devicePort 1 }
+
+waveBusPort             OBJECT IDENTIFIER ::= { devicePort 2 }
+
+fddiPort                OBJECT IDENTIFIER ::= { devicePort 3 }
+
+
+
+
+
+deviceSoftware          OBJECT IDENTIFIER ::= { ethernetSwitchingDevice 2 }
+
+deviceInfo              OBJECT IDENTIFIER ::= { deviceSoftware 1 }
+
+
+
+chassisTable OBJECT-TYPE
+
+    SYNTAX SEQUENCE OF ChassisEntry
+
+    ACCESS not-accessible
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Information about the unit."
+
+    ::= { deviceInfo 1 }
+
+
+
+chassisEntry OBJECT-TYPE
+
+    SYNTAX ChassisEntry
+
+    ACCESS not-accessible
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Identification information about the unit."
+
+    INDEX    { chassisIndex }
+
+    ::= { chassisTable 1 }
+
+
+
+ChassisEntry ::= SEQUENCE {
+
+    chassisProductCode
+
+        DisplayString,
+
+    chassisSerialNumber
+
+        DisplayString,
+
+    chassisPlaceOfManufacture
+
+        INTEGER,
+
+    chassisDateOfManufacture
+
+        DisplayString,
+
+    chassisMacAddress
+
+        MacAddress,
+
+    chassisCodeVersion
+
+        DisplayString,
+
+    chassisBpeEnabled
+
+        INTEGER,
+
+    chassisEraseSnmpConfigInfo
+
+        INTEGER,
+
+    chassisRestoreDot1dDefaults
+
+        INTEGER,
+
+    chassisPerformReset
+
+        INTEGER,
+
+    chassisIdentPressed
+
+        INTEGER,
+
+    chassisAgeFilterDatabase
+
+        INTEGER,
+
+    chassisClearStatistics
+
+        INTEGER,
+
+    chassisTcpKeepAlivesEnabled
+
+        INTEGER,
+
+    chassisTcpKeepAlivePeriod
+
+        INTEGER,
+
+    chassisIndex
+
+        INTEGER
+
+  }
+
+
+
+chassisProductCode OBJECT-TYPE
+
+    SYNTAX DisplayString
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "An ASCII string giving the product code of the unit."
+
+    ::= { chassisEntry 1 }
+
+
+
+chassisSerialNumber OBJECT-TYPE
+
+    SYNTAX DisplayString
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "An ASCII string giving the unit's serial number."
+
+    ::= { chassisEntry 2 }
+
+
+
+chassisPlaceOfManufacture OBJECT-TYPE
+
+    SYNTAX INTEGER { ottawa (1) }
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "A number identifying where the unit was built."
+
+    ::= { chassisEntry 3 }
+
+
+
+chassisDateOfManufacture OBJECT-TYPE
+
+    SYNTAX DisplayString
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "An ASCII string giving the date of manufacture of the unit."
+
+    ::= { chassisEntry 4 }
+
+
+
+chassisMacAddress OBJECT-TYPE
+
+    SYNTAX MacAddress
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The IEEE 802 MAC address of the unit."
+
+    ::= { chassisEntry 5 }
+
+
+
+chassisCodeVersion OBJECT-TYPE
+
+    SYNTAX DisplayString
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "An ASCII string giving the version number of the control software."
+
+    ::= { chassisEntry 6 }
+
+
+
+chassisBpeEnabled OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Setting this variable to TRUE (1) causes the bridge protocol engine
+
+     to perform the Spanning Tree Protocol as defined in IEEE802.1d.
+
+     Setting this variable to FALSE (0) causes the BPE to stop performing
+
+     the Spanning Tree Protocol.  The value of this variable when the
+
+     unit starts operating is 1."
+
+    ::= { chassisEntry 7 }
+
+
+
+chassisEraseSnmpConfigInfo OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Setting this variable to TRUE (1) causes the unit to erase its
+
+     SNMP configuration information both from memory and from permanent
+
+     store.  The unit the requests new configuration information using
+
+     the BOOTP protocol.  Setting this variable to any other value has
+
+     no effect.  This variable will always return 0 when read."
+
+    ::= { chassisEntry 8 }
+
+
+
+chassisRestoreDot1dDefaults OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Setting this variable to TRUE (1) causes the BPE to restore the
+
+     default spanning tree values given in the IEEE 802.1d specification.
+
+     This resets all writeable Bridge MIB variables in the dot1dStp group
+
+     of the Bridge MIB.  Setting the variable to any other value has no
+
+     effect.  This variable will always return 0 when read."
+
+    ::= { chassisEntry 9 }
+
+
+
+chassisPerformReset OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Setting this variable to TRUE (1) causes the unit to perform a
+
+    cold restart.  As a result of this action a coldRestart trap will
+
+    be sent.  Setting this variable to any other value has no effect.
+
+    This variable will always return 0 when read."
+
+    ::= { chassisEntry 10 }
+
+
+
+chassisIdentPressed OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This variable is TRUE (1) if the IDENTIFY button on the chassis has
+
+    been pressed since the variable was last read.
+
+    After this variable has been read it will be set to 0."
+
+    ::= { chassisEntry 11 }
+
+
+
+chassisAgeFilterDatabase OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Setting this variable to FALSE (0) causes the unit to stop aging
+
+    out entries from its filter database.  Setting this variable to
+
+    TRUE (1) causes the unit to age out filter database entries as
+
+    defined in IEEE 802.1D.  This variable is set to 0 whenever
+
+    the unit restarts."
+
+    ::= { chassisEntry 12 }
+
+
+
+chassisClearStatistics OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Setting this variable to TRUE (1) clears the traffic statistics
+
+    accumulators.  Setting this variable to any other value has no effect.
+
+    The variable always returns 0 when read."
+
+    ::= { chassisEntry 13 }
+
+
+
+
+
+chassisTcpKeepAlivesEnabled OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Setting this variable to TRUE (1) causes keep alive packets to be
+
+     transmitted on an idle TCP connection.  The period of the keep alive
+
+     packets is defined by the MIB variable chassisTcpKeepAlivePeriod.
+
+     Setting this variable to FALSE (0) stops keep alives from being
+
+     transmitted.  The default value of this variable is FALSE (0)."
+
+    ::= { chassisEntry 14 }
+
+
+
+
+
+chassisTcpKeepAlivePeriod OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This variable defines the time period in seconds between keep alive
+
+     packets transmitted on an idle TCP connection.  This value must be
+
+     equal to or greater than 30 seconds and less than or equal to 24
+
+     hours (86,400) seconds.  The MIB value tcpKeepAlivesEnabled must be
+
+     set TRUE (1) in order for the keep alive packets to be transmitted.
+
+     The default value of this variable is 2 hours (7,200) seconds."
+
+    ::= { chassisEntry 15 }
+
+
+
+
+
+chassisIndex OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This is a dummy variable which provides a meta-index for the
+
+    Chassis Information Table."
+
+    ::= { chassisEntry 100 }
+
+
+
+-- *******************************************************************
+
+-- Port Information
+
+-- *******************************************************************
+
+
+
+portTable OBJECT-TYPE
+
+    SYNTAX SEQUENCE OF PortEntry
+
+    ACCESS not-accessible
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Identification information about the ports."
+
+    ::= { deviceInfo 2 }
+
+
+
+portEntry OBJECT-TYPE
+
+    SYNTAX PortEntry
+
+    ACCESS not-accessible
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "Identification information about a particular port."
+
+    INDEX    { portIndex }
+
+    ::= { portTable 1 }
+
+
+
+PortEntry ::= SEQUENCE {
+
+    portIndex
+
+        INTEGER,
+
+    portProductCode
+
+        DisplayString,
+
+    portSerialNumber
+
+        DisplayString,
+
+    portPlaceOfManufacture
+
+        INTEGER,
+
+    portDateOfManufacture
+
+        DisplayString,
+
+    portState
+
+        DisplayString,
+
+    portHighSensitivity
+
+        INTEGER,
+
+    portRestoreFddiMibDefaults
+
+        INTEGER,
+
+    portTranslateAllEthertypes
+
+        INTEGER,
+
+    portTxFrames
+
+        Counter,
+
+    portRxFrames
+
+        Counter,
+
+    portFcsErrors
+
+        Counter,
+
+    portFilterDiscards
+
+        Counter,
+
+    portDelayExceededDiscards
+
+        Counter,
+
+    portMtuExceededDiscards
+
+        Counter,
+
+    portFddiTooLongNonIpFrames
+
+        Counter,
+
+    portConnected
+
+        INTEGER
+
+  }
+
+
+
+portIndex OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The number of the port to which the management information applies."
+
+    ::= { portEntry 1 }
+
+
+
+portProductCode OBJECT-TYPE
+
+    SYNTAX DisplayString
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "An ASCII string giving the product code of the card on which this
+
+    port is located."
+
+    ::= { portEntry 2 }
+
+
+
+portSerialNumber OBJECT-TYPE
+
+    SYNTAX DisplayString
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "An ASCII string giving the serial number of the card on which this
+
+    port is located."
+
+    ::= { portEntry 3 }
+
+
+
+portPlaceOfManufacture OBJECT-TYPE
+
+    SYNTAX INTEGER { ottawa (1) }
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "A number identifying where the card on which this port is located
+
+    was built."
+
+    ::= { portEntry 4 }
+
+
+
+portDateOfManufacture OBJECT-TYPE
+
+    SYNTAX DisplayString
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "An ASCII string giving the date of manufacture of the card on which
+
+    this port is located."
+
+    ::= { portEntry 5 }
+
+
+
+portState OBJECT-TYPE
+
+    SYNTAX DisplayString
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "An ASCII string giving the port's operational state."
+
+    ::= { portEntry 6 }
+
+
+
+portHighSensitivity OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This variable is only valid if the port is an Ethernet port.
+
+    If this variable is set to TRUE (1), the receiver of the Ethernet
+
+    NIC controlling the port is set to high sensitivity.  If the
+
+    variable is set to 0, the port is set to normal sensitivity.
+
+
+
+    If the ports on both ends of the 10BaseT link are set to high
+
+    sensitivity, the maximum permissable length of the link is
+
+    increased from 100 meters to 120 meters.
+
+
+
+    Caution: a high sensitivity receiver may be overdriven by
+
+    transmitters closer than 100 meters.
+
+
+
+    This variable is 0 when the unit is powered up for the first
+
+    time.  Changes to this variable are preserved across
+
+    system restarts."
+
+    ::= { portEntry 7 }
+
+
+
+portRestoreFddiMibDefaults OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This variable is ony valid if the port is an FDDI station.
+
+     Setting this variable to TRUE (1) causes the agent to restore
+
+     the default MIB values given in the ANSI X3T9.5/84-49 Rev 7.2
+
+     specification.  This resets all writable FDDI MIB variables.
+
+     Setting the variable to any other value has no effect.
+
+     This variable will always return 0 when read."
+
+    ::= { portEntry 8 }
+
+
+
+
+
+portTranslateAllEthertypes OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This variable is only valid if the port is an FDDI port.
+
+    If this variable is set to TRUE (1), the Bridge Tunnel Encapsulation
+
+    Protocol will be applied to frames containing any Ethertypes,  not
+
+    just the ones in the Selective Translation Table.
+
+    If this variable is set to FALSE (0), the protocol will only be applied
+
+    to Ethertypes in the translation table."
+
+    ::= { portEntry 9 }
+
+
+
+portTxFrames OBJECT-TYPE
+
+    SYNTAX Counter
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This counter is incremented by one for each frame transmitted
+
+    to the network segment attached to the port."
+
+    ::= { portEntry 10 }
+
+
+
+portRxFrames OBJECT-TYPE
+
+    SYNTAX Counter
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This counter is incremented by one for each valid frame received
+
+    from the network segment attached to the port."
+
+    ::= { portEntry 11 }
+
+
+
+portFcsErrors OBJECT-TYPE
+
+    SYNTAX Counter
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "This counter is incremented by one for each received frame which failed
+
+    its FCS check."
+
+    ::= { portEntry 12 }
+
+
+
+portFilterDiscards OBJECT-TYPE
+
+    SYNTAX Counter
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The number of frames received on this port which have been discarded
+
+    due to the filtering action of the port's bridge circuit."
+
+    ::= { portEntry 13 }
+
+
+
+portDelayExceededDiscards OBJECT-TYPE
+
+    SYNTAX Counter
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The number of frames discarded by this port due to excessive transit
+
+    delay through the unit.  It reports the same value as the object
+
+    dot1dBasePortDelayExceededDiscards in the Bridge MIB (RFC 1493)."
+
+    ::= { portEntry 14 }
+
+
+
+portMtuExceededDiscards OBJECT-TYPE
+
+    SYNTAX Counter
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The number of frames discarded by this port due to excessive size.
+
+    It is the same value reported in the object
+
+    dot1dBasePortMtuExceededDiscards in the Bridge MIB (RFC 1493)."
+
+    ::= { portEntry 15 }
+
+
+
+portFddiTooLongNonIpFrames OBJECT-TYPE
+
+    SYNTAX Counter
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The number of unfragmentable (non-IP) frames greater than ethernet
+
+    length (1514 bytes) discarded by this port.  This object is valid only
+
+    for FDDI ports."
+
+    ::= { portEntry 16 }
+
+
+
+portConnected OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The variable is TRUE (1) if the port is connected to a network
+
+    segment.  The variable is FALSE (0) if the port is not connected
+
+    to a network segment."
+
+    ::= { portEntry 17 }
+
+
+
+-- 802.1H Selective Translation Table
+
+-- Maximum 3 entries, valid only if the port is an FDDI port.
+
+
+
+sttTable OBJECT-TYPE
+
+    SYNTAX SEQUENCE OF SttEntry
+
+    ACCESS not-accessible
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The Selective Translation Table as defined in IEEE 802.1h."
+
+    ::= { deviceInfo 3 }
+
+
+
+sttEntry OBJECT-TYPE
+
+    SYNTAX SttEntry
+
+    ACCESS not-accessible
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "One entry in the Selective Translation Table."
+
+    INDEX    { sttPortIndex }
+
+    ::= { sttTable 1 }
+
+
+
+SttEntry ::= SEQUENCE {
+
+    sttPortIndex
+
+        INTEGER,
+
+    sttEthertype1
+
+        INTEGER,
+
+    sttEntryValid1
+
+        INTEGER,
+
+    sttEthertype2
+
+        INTEGER,
+
+    sttEntryValid2
+
+        INTEGER,
+
+    sttEthertype3
+
+        INTEGER,
+
+    sttEntryValid3
+
+        INTEGER
+
+  }
+
+
+
+sttPortIndex OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-only
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The table index - the port number on which the STT resides."
+
+    ::= { sttEntry 1 }
+
+
+
+sttEthertype1 OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The first Ethertype for which the Bridge Tunnel Encapsulation Protocol
+
+    should be used."
+
+    ::= { sttEntry 2 }
+
+
+
+sttEntryValid1 OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "If this variable is set to TRUE (1), the Bridge Tunnel Encapsulation
+
+    Protocol will be applied to frames containing the first Ethertype.
+
+    If this variable is set to FALSE (0), the protocol will not be applied
+
+    to the Ethertype."
+
+    ::= { sttEntry 3 }
+
+
+
+sttEthertype2 OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The second Ethertype for which the Bridge Tunnel Encapsulation Protocol
+
+    should be used."
+
+    ::= { sttEntry 4 }
+
+
+
+sttEntryValid2 OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "If this variable is set to TRUE (1), the Bridge Tunnel Encapsulation
+
+    Protocol will be applied to frames containing the second Ethertype.
+
+    If this variable is set to FALSE (0), the protocol will not be applied
+
+    to the Ethertype."
+
+    ::= { sttEntry 5 }
+
+
+
+sttEthertype3 OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "The third Ethertype for which the Bridge Tunnel Encapsulation Protocol
+
+    should be used."
+
+    ::= { sttEntry 6 }
+
+
+
+sttEntryValid3 OBJECT-TYPE
+
+    SYNTAX INTEGER
+
+    ACCESS read-write
+
+    STATUS mandatory
+
+    DESCRIPTION
+
+    "If this variable is set to TRUE (1), the Bridge Tunnel Encapsulation
+
+    Protocol will be applied to frames containing the third Ethertype.
+
+    If this variable is set to FALSE (0), the protocol will not be applied
+
+    to the Ethertype."
+
+    ::= { sttEntry 7 }
+
+
+
+
+
+-- *******************************************************************
+
+-- TRAPS
+
+-- *******************************************************************
+
+
+
+touched TRAP-TYPE
+
+    ENTERPRISE vendor
+
+    VARIABLES { chassisIdentPressed }
+
+    DESCRIPTION
+
+    "This trap is generated when the IDENTIFY button is pressed.
+
+
+
+    The agent throttles the generation of consecutive touched traps
+
+    so that there is at least a two second gap between them."
+
+    ::= 9
+
+
+
+END
+

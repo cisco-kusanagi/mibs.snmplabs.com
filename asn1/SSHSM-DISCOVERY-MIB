@@ -1,0 +1,282 @@
+-- extracted from draft-miao-isms-sshsm-discovery-00.txt
+-- at Thu Oct 20 06:36:53 2005
+
+   SSHSM-DISCOVERY-MIB DEFINITIONS ::= BEGIN 
+
+    
+   IMPORTS 
+
+       MODULE-IDENTITY, OBJECT-TYPE, 
+
+       OBJECT-IDENTITY, mib-2                FROM SNMPv2-SMI 
+
+       TEXTUAL-CONVENTION                    FROM SNMPv2-TC 
+
+       MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF 
+
+       SnmpSecurityModel                     FROM SNMP-FRAMEWORK-MIB; 
+
+    
+
+   sshsmdiscoveryMIB MODULE-IDENTITY 
+
+       LAST-UPDATED "200510100000Z" 
+
+       ORGANIZATION "ISMS Working Group" 
+
+       CONTACT-INFO "WG-EMail:   isms@lists.ietf.org 
+                     Subscribe:  isms-request@lists.ietf.org 
+
+    
+
+                     Chair: 
+
+                       Juergen Quittek 
+
+                       NEC Europe Ltd. 
+
+                       Network Laboratories 
+
+                       Kurfuersten-Anlage 36 
+
+                       69115 Heidelberg 
+
+                       Germany 
+
+                       +49 6221 90511-15 
+
+                        quittek@netlab.nec.de 
+
+    
+
+                     Co-editors: 
+
+                        Miao Fuyou 
+
+                        Huawei Technologies 
+
+                        No.3, Xinxi Rd 
+
+   Shangdi Information Industry Base 
+
+                        Haidian District, Beijing 
+
+                        P. R. China 
+
+                        +86 10 8288 2502 
+
+                        miaofy@huawei.com 
+
+                     " 
+
+   DESCRIPTION  "The Agent Discovery MIB of Secure Shell Security Model  
+   Copyright (C) The Internet Society (2005). This version of this MIB 
+   module is part of RFC XXXX; see the RFC itself for full legal notices. 
+
+        REVISION     "200509020000Z"         -- 10 October, 2005 
+
+        DESCRIPTION  "The initial version, published in RFC XXXX." 
+
+    
+
+          ::= { mib-2 xxxx } 
+
+    
+
+   sshsmdiscoveryObjects  OBJECT IDENTIFIER ::=  
+
+   { sshsmdiscoveryMIB 0 } 
+
+    
+
+   SshsmSupportFlag  ::= TEXTUAL-CONVENTION 
+
+        STATUS      current 
+
+        DESCRIPTION "The flag is defined to indicate whether SSH 
+   security model is available at the agent. The value is one of: 
+
+                     UNAVAILABLE - SSH transport is available for 
+   successive communication 
+
+                        Available   - SSH transport is available for 
+   successive communication 
+
+   " 
+
+        SYNTAX      INTERGER { UNAVAILABLE(0), 
+
+                               AVAILABLE(1) 
+
+                             } 
+
+    
+
+   SshsmHostKeyAlgorithm ::= TEXTUAL-CONVENTION 
+
+        STATUS    current 
+        DESCRIPTION  "It defines the public key algorithm for host 
+   authentication by SSH client. Following strings is defined in 
+   [SSHNUM]: 
+
+   ssh-dss 
+
+              ssh-rsa 
+
+              spki-sign-rsa 
+
+              spki-sign-dss 
+
+              pgp-sign-rsa 
+
+              pgp-sign-dss 
+
+             " 
+
+        SYNTAX OCTECT STRING 
+
+    
+
+   sshsmSupportFlag  OBJECT-TYPE 
+
+       SYNTAX     SshsmSupportFlag 
+
+       MAX-ACCESS read-only 
+
+       STATUS     current 
+
+       DESCRIPTION "The flag indicates availability of SSH transport for 
+   successive SNMP communication." 
+
+       ::= { sshsmdiscoveryObjects 0 } 
+
+    
+
+   sshsmTransportAddress OBJECT-TYPE 
+
+       SYNTAX     INTEGER (1..4294967296) 
+
+       MAX-ACCESS read-only 
+
+       STATUS     current 
+       DESCRIPTION "The value indicates to SSH client which transport 
+   address is available for SSH connection which transports SNMP when 
+   non-standard SSHSH port is not used" 
+
+       ::= { sshsmdiscoveryObject 1 } 
+
+    
+
+   sshsmHostKeyTable OBJECT-TYPE 
+
+      SYNTAX     SEQUENCE OF SshsmHostKeyEntry 
+
+      MAX-ACCESS not-accessible 
+
+      STATUS     Current 
+
+      DESCRIPTION 
+
+          "This table supports agent discovery when SSH security model 
+   is applied to SNMP. The table provides information to management 
+   application through UDP/USM agent discovery functions. The 
+   information is organized in a table because there may be multiple 
+   host keys for a device" 
+
+      ::= { sshsmdiscoveryObject 2 } 
+
+    
+
+   sshsmHostKeyEntry 
+
+      SYNTAX      SshsmHostKeyEntry 
+
+      MAX-ACCESS  not-accessible 
+
+      STATUS      current 
+
+      DESCRIPTION 
+
+                  "An entry in sshsmHostKeyTable, each entry represents 
+   a host key and information relevant to the host key." 
+
+      INDEX       { sshsmHostKeyFingerPrint } 
+
+      ::= { sshsmHostKeyTable 1 } 
+
+   sshsmHostKeyEntry ::= 
+
+      SEQUENCE 
+
+    { 
+
+      sshsmHostKeyFingerPrint OCTECT STRING (SIZE (16)) 
+
+    sshsmHostKey OCTECT STRING, 
+
+    sshsmHostKeyAlgorithm SshsmHostKeyAlgorithm, 
+
+      } 
+
+    
+
+   sshsmHostKeyFingerprint OBJECT-TYPE 
+
+      SYNTAX     OCTECT STRING (SIZE (16)) 
+
+      MAX-ACCESS read-only 
+
+      STATUS     current 
+
+      DESCRIPTION  
+
+                 "16 bytes Output of hash function with host key as 
+   input. The hash function is specified as SHA-1" 
+
+    
+
+   sshsmHostKey OBJECT-TYPE 
+
+      SYNTAX     OCTECT STRING 
+
+      MAX-ACCESS read-only 
+
+      STATUS     current 
+
+      DESCRIPTION  
+
+                 "The host key. The format of the key is defined in 
+   [SSHTRANS]" 
+
+    
+
+   sshsmHostKeyAlgorithm OBJECT-TYPE 
+      SYNTAX     SshsmHostKeyAlgorithm 
+
+      MAX-ACCESS read-only 
+
+      STATUS     current 
+
+      DESCRIPTION  
+
+                 "The public key algorithm relevant to the host key. 
+                  When there are multiple host key available, the 
+                  algorithm can be used as a distinguisher to choose 
+                  proper host key for server authentication" 
+
+    
+
+   END 
+
+-- 
+--    Copyright (C) The Internet Society (2005). 
+-- 
+--    This document is subject to the rights, licenses and restrictions 
+--    contained in BCP 78, and except as set forth therein, the authors 
+--    retain all their rights. 
+-- 
+-- Acknowledgment 
+-- 
+--    Funding for the RFC Editor function is currently provided by the 
+--    Internet Society. 
+

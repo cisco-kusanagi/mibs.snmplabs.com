@@ -1,0 +1,3403 @@
+
+
+----------------------------  LANNET 2.1 MIB --------------------
+LANNET-MIB DEFINITIONS ::= BEGIN
+
+-- Title:       LANNET's MIB
+-- Version:     2.1
+-- Date:        Dec. 8, 1992
+-- By:          Dan R. 
+-- Comments:    LANNET's agents support also standard mibs:
+--              - MIB-II  ( RFC1213-MIB )
+--              - dot5    ( RFC1231-MIB, updated by RFC1239 )
+
+-- THIS IS A PRELIMINARY VERSION, PRIOR TO COMMERCIAL RELEASE
+-- AND SUBJECT TO CHANGE WITHOUT NOTICE.
+
+-- Copyright 1992 LANNET Data Communications, Ltd.  
+-- All Rights Reserved.  
+
+-- Reproduction of this document is authorized on condition 
+-- that the foregoing copyright notice is included.
+
+-- This LANNET SNMP Management Information Base Specification
+-- (Specification) embodies LANNET's confidential and
+-- proprietary intellectual property.  LANNET retains all
+-- title and ownership in the Specification, including any 
+-- revisions.  
+
+-- It is LANNET's intent to encourage the widespread use of
+-- this Specification in connection with the management of
+-- LANNET products. LANNET grants vendors, end-users,
+-- and other interested parties a non-exclusive license to
+-- use this Specification in connection with the management
+-- of LANNET products.
+
+-- This Specification is supplied "as is," and LANNET makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+
+
+IMPORTS
+      NetworkAddress, IpAddress,
+      Counter, Gauge, TimeTicks,
+      enterprises
+    FROM RFC1155-SMI
+      DisplayString
+    FROM RFC1158-MIB
+      OBJECT-TYPE
+    FROM RFC1212;
+-- Some MIB Compilers need these two lines:
+--  enterprises  OBJECT IDENTIFIER ::= 
+--              { iso org(3) dod(6) internet(1) private(4) 1 }
+
+lannet  OBJECT IDENTIFIER ::= { enterprises 81 }
+
+-- Obsolete Groups
+
+-- lntStandard OBJECT IDENTIFIER ::= { lannet 1 }    standard lannet tree
+-- lntSpecific OBJECT IDENTIFIER ::= { lannet 2 }    Specific LANNET tree
+-- trSpecific OBJECT IDENTIFIER ::= { lannet 3 }     Specific Token Ring  Tree
+-- srlSpecific OBJECT IDENTIFIER ::= { lannet 4 }    Specific serial tree
+-- ltSpecific OBJECT IDENTIFIER ::= { lannet 5 }    Specific Local Talk tree
+-- lclSpecific OBJECT IDENTIFIER ::= { lannet 6 }    Specific Clock Modules tree
+
+-- ===========================================================================
+
+chassis    OBJECT IDENTIFIER ::= { lannet 7 } -- chassis group
+genGroup   OBJECT IDENTIFIER ::= { lannet 8 } -- gen group SNMP group
+genPort    OBJECT IDENTIFIER ::= { lannet 9 } -- gen port group
+genIntPort OBJECT IDENTIFIER ::= { lannet 10 } 
+                                            -- gen internal port group
+softRedundancy OBJECT IDENTIFIER ::= { lannet 11 } -- software redundancy group
+eth            OBJECT IDENTIFIER ::= { lannet 12 } -- ethernet group
+tok            OBJECT IDENTIFIER ::= { lannet 13 } -- token ring group
+ts             OBJECT IDENTIFIER ::= { lannet 14 } -- terminal server group 
+ltalk          OBJECT IDENTIFIER ::= { lannet 15 } -- Local Talk group 
+cl             OBJECT IDENTIFIER ::= { lannet 16 } -- clock group 
+lntOID         OBJECT IDENTIFIER ::= { lannet 17 } -- LANNET OIDs group
+
+
+------------------------------------------------------------------------------
+-- LANNET chassis group
+-- Implementation of this group is mandatory for all LANNET box agents.
+
+chHWType OBJECT-TYPE
+      SYNTAX  INTEGER {
+	let18(1),
+	let3(2),
+	let36(3),
+	let18Extended(4),
+        lert40(5),
+        let10(6),
+        fdx100(7),
+	unknown(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates type of enclosure in which the LANNET SNMP agent operates."
+      ::= { chassis 1 }   
+
+chNumberOfSlots OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)     
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of manageable slots in the chassis.
+      In LANNET implementation it describes the number of manageable slots
+      in the chassis (not all slots should be ocuppied)." 
+      ::= { chassis 2 }   
+
+chNumberOfEthernetBuses OBJECT-TYPE        
+      SYNTAX  INTEGER (0..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates the number of internal Ethernet buses provided by the box."
+      ::= { chassis 3 }   
+
+chNumberOfTRBuses OBJECT-TYPE     
+      SYNTAX  INTEGER (0..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates the number of internal Token Ring buses provided by the box."
+      ::= { chassis 4 }
+      
+chNumberOfFDDIBuses OBJECT-TYPE         
+      SYNTAX  INTEGER (0..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates the number of internal FDDI buses provided by the box."
+      ::= { chassis 5 }   
+
+chNumberOfLocalTalkBuses OBJECT-TYPE         
+      SYNTAX  INTEGER (0..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates the number of internal Local Talk buses provided by the box."
+      ::= { chassis 6 }   
+
+chReset OBJECT-TYPE
+      SYNTAX  INTEGER {  
+	on(1),
+	off(2)
+      }
+      ACCESS  read-write    
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting the value of this attribute to ON is interpreted as a reset
+      command for the whole chassis.
+      It initiates a complete reinitialisation of the chassis and of all
+      the devices incorporated inside the chassis." 
+      ::= { chassis 7 }
+
+chFullConfig OBJECT-TYPE   
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Full configuration message retrieved by LANNET management stations 
+      at periodic interrogation times. Coded in compact internal LANNET 
+      application format."
+      ::= { chassis 8 }
+
+------------------------------------------------------------------------------
+
+-- Agent Group - attributes of SNMP agents 
+ 
+chAg OBJECT IDENTIFIER            
+      ::= { chassis 9 } 
+
+------------------------------------------------------------------------------
+
+chGenAgTable OBJECT-TYPE 
+      SYNTAX  SEQUENCE OF ChGenAgEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of configuration attributes common to all SNMP agents in 
+      LANNET hubs."
+      ::= { chAg 1 } 
+
+chGenAgEntry OBJECT-TYPE
+      SYNTAX  ChGenAgEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing configuration attributes for a single
+      agent." 
+      INDEX  { chGenAgId }
+      ::= { chGenAgTable 1 }
+
+ChGenAgEntry  ::=
+      SEQUENCE  {
+        chGenAgId 
+          INTEGER,
+        chGenAgType
+          INTEGER,
+        chGenAgMgmtIfType
+          INTEGER,
+        chGenAgAddr
+          OCTET STRING,
+	chGenAgSpecificOID
+	  OBJECT IDENTIFIER
+      }
+                         
+chGenAgId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Agent index for identifying the agent.Takes the value of the slot
+      number where the agent card is inserted. For box agents the value
+      of chGenAgId is chNumberOfSlots+1."
+      ::= { chGenAgEntry 1 }
+
+chGenAgType OBJECT-TYPE
+      SYNTAX  INTEGER {
+         nma1-et(1),
+         nma1-et-e(2),
+         nma1-tr(3),
+         nma2-et(4),
+         nma2-tr(5),
+         nma2-fddi(6),
+	 ielb(7),
+	 itlb(8),
+	 lts16(9),
+         unknown(255) 
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Agent type."
+      ::= { chGenAgEntry 2 }
+
+chGenAgMgmtIfType OBJECT-TYPE
+      SYNTAX  INTEGER {
+	      none(1),
+	      regular1822(2),
+	      hdh1822(3),
+	      ddn-x25(4),
+	      rfc877-x25(5),
+	      ethernet-csmacd(6),
+	      iso88023-csmacd(7),
+	      iso88024-tokenBus(8),
+	      iso88025-tokenRing(9),
+	      iso88026-man(10),
+	      starLan(11),
+	      proteon-10MBit(12),
+	      proteon-80MBit(13),
+	      hyperchannel(14),
+	      fddi(15),
+	      lapb(16),
+	      sdlc(17),
+	      t1-carrier(18),
+	      cept(19),
+	      basicIsdn(20),
+	      primaryIsdn(21),
+	      propPointToPointSerial(22),    -- proprietary serial
+	      ppp(23),
+	      softwareLoopback(24),
+	      eon(25),                       -- CLNP over IP
+	      ethernet-3Mbit(26),
+	      nsip(27),                      -- XNS over IP
+	      slip(28),                      -- generic SLIP
+	      ip(255)
+      }
+      ACCESS  read-only 
+      STATUS  mandatory
+     DESCRIPTION
+     "This attribute describes one of the interfaces of agents existing on
+     LANNET modules and their type. Value 'none' defines the lack of  
+     an interface recognized by the management console.  Any other value
+     defines an interface whose type is recognized by the management console
+     and may be used as a management channel."
+      ::= { chGenAgEntry 3 }
+
+chGenAgAddr OBJECT-TYPE
+      SYNTAX  OCTET STRING ( SIZE (0..15)) 
+      ACCESS  read-only                   
+      STATUS  mandatory
+     DESCRIPTION
+     "This attribute defines an unique address by which the agent may be 
+     addressed by the management console. The address format should be 
+     consistent with the type defined by chGenAgMgmtIfType." 
+      ::= { chGenAgEntry 4 }
+
+chGenAgSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { chGenAgEntry 5 }
+
+------------------------------------------------------------------------------
+
+chLntAgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF ChLntAgEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of configuration attributes of LANNET SNMP box agents in 
+      LANNET hubs."
+      ::= { chAg 2 }
+      
+chLntAgEntry OBJECT-TYPE
+      SYNTAX  ChLntAgEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing configuration attributes for a single
+      agent." 
+      INDEX  { chLntAgId }
+      ::= { chLntAgTable 1 }
+
+ChLntAgEntry  ::=
+      SEQUENCE  {
+        chLntAgId
+          INTEGER,
+        chLntAgSLIPAddress
+          IpAddress,
+        chLntAgSWVersion
+          OCTET STRING,
+        chLntAgKernelVersion
+          OCTET STRING,
+        chLntAgCoprocSWVersion
+          OCTET STRING,
+        chLntAgSWFault
+          OCTET STRING,
+        chLntAgMgmtBusSelection
+          INTEGER,
+        chLntAgCoprocCommStatus
+          INTEGER,
+        chLntAgCommDebugMode
+          INTEGER,
+	chLntAgConfigChangeTraps
+	  INTEGER,
+	chLntAgFaultTraps
+	  INTEGER,
+	chLntAgTrafficThreshTraps
+	  INTEGER,
+	chLntAgGroupEnrollDeenrollTraps
+	  INTEGER,
+	chLntAgSoftFaultTraps
+	  INTEGER,
+	chLntAgHubEnrollTraps
+	  INTEGER,
+	chLntAgTempThreshTraps
+	  INTEGER,
+	chLntAgSpecificOID
+	  OBJECT IDENTIFIER,
+	chLntAgLastAddrConfig
+	  OCTET STRING,
+	chLntAgSecAddrConfig
+	  OCTET STRING,
+        chLntAgSoftwareStatus
+          INTEGER,
+        chLntAgConfigurationSymbol
+          OCTET STRING,
+        chLntAgIntTemp
+          INTEGER,
+        chLntAgBootVersion
+          OCTET STRING
+      }
+                         
+chLntAgId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Agent index for identifying the agent. Identical to the index in 
+      chGenAgTable for the described agent."
+      ::= { chLntAgEntry 1 }
+
+chLntAgSLIPAddress OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "IP address of the SLIP channel of the agent"
+      ::= { chLntAgEntry 2 }
+
+chLntAgSWVersion OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ASCII string for description and display of the agent software version."
+      ::= { chLntAgEntry 3 }
+
+chLntAgKernelVersion OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ASCII string for description and display of the agent operating system
+      (kernel) version."
+      ::= { chLntAgEntry 4 }
+
+chLntAgCoprocSWVersion OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ASCII string describing the software version of the agent's coprocessor."
+      ::= { chLntAgEntry 5 }
+
+chLntAgSWFault OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "System fault emitted by agent software. It covers faults detected
+      by the agent operating system and drivers. EnterpriseSpecific traps 
+      mechanism is used for transfering these traps to the management 
+      system."
+      ::= { chLntAgEntry 6 }
+
+chLntAgMgmtBusSelection OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the number of the bus on which management data
+      are reported."
+      ::= { chLntAgEntry 7 }
+
+chLntAgCoprocCommStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+              ok(1),
+              commProblems(2),
+              timeout(3)
+         }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the status of the communication between the
+      agent and its coprocessor."
+      ::= { chLntAgEntry 8 }
+
+chLntAgCommDebugMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+              on(1),
+              off(2)
+         }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the agent mode in which communication problem
+      traps are sent to managers (value 'on') or are not sent to managers
+      (value 'off')."
+      ::= { chLntAgEntry 9 }
+
+chLntAgConfigChangeTraps OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"The value of this attributes determines whether or not the agent
+	sends Configuration Change traps to the manager."
+	::= {chLntAgEntry 10 }
+
+chLntAgFaultTraps OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"The value of this attributes determines whether or not the agent
+	sends Fault traps to the manager."
+	::= {chLntAgEntry 11 }
+
+chLntAgTrafficThreshTraps OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"The value of this attributes determines whether or not the agent
+	sends Traffic Threshold traps to the manager."
+	::= {chLntAgEntry 12 }
+
+chLntAgGroupEnrollDeenrollTraps OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"The value of this attributes determines whether or not the agent
+	sends Group Enrollment and Group Deenrollment traps to the manager."
+	::= {chLntAgEntry 13 }
+
+chLntAgSoftFaultTraps OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"The value of this attributes determines whether or not the agent
+	sends Software Fault traps to the manager."
+	::= {chLntAgEntry 14 }
+
+chLntAgHubEnrollTraps OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"The value of this attributes determines whether or not the agent
+	sends periodic Hub Enrollment traps to the manager."
+	::= {chLntAgEntry 15 }
+
+chLntAgTempThreshTraps OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"The value of this attributes determines whether or not the agent
+	sends Temperature Threshold traps to the manager."
+	::= {chLntAgEntry 16 }
+
+chLntAgSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { chLntAgEntry 17 }
+
+chLntAgLastAddrConfig OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Configuration attribute describing the last physical address detected 
+       at each port. Coded in internal LANNET application format. "
+      ::= { chLntAgEntry 18 }
+      
+chLntAgSecAddrConfig OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only 
+      STATUS  mandatory
+      DESCRIPTION
+      "Configuration attribute describing the configuration of the secure 
+       addresses. Coded in internal LANNET application format. "
+      ::= { chLntAgEntry 19 }
+
+chLntAgSoftwareStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        unLoadable(1),
+        loaded(2),
+        downLoading(3)
+      }     
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Describes configuration of the firmware on this agent.
+      unLoadable(1) - is returned by agents which do not support the Software
+      Download feature;
+      loaded(2) - is returned by agents with loaded software;
+      downLoading(3) - when the attribute is set to this value by manager,
+      it triggers the Software Download procedure. When procedure finished,
+      agent software will restablish value loaded(2)." 
+      ::= { chLntAgEntry 20 }
+
+chLntAgConfigurationSymbol OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE(1))
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Defines the Configuration Symbol attached to any hardware module
+      manufactured by LANNET. One single character A..Z defines the CS
+      version. For older modules which did not support this option on
+      SNMP character '*' will be returned."
+      ::= { chLntAgEntry 21 }
+
+chLntAgIntTemp OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Internal temperature measured by the temperature sensor placed on the
+      agent card. Expressed in Celsius degrees."
+      ::= { chLntAgEntry 22 }
+
+chLntAgBootVersion OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ASCII string for description and display of the agent boot software
+      version."
+      ::= { chLntAgEntry 23 }
+
+------------------------------------------------------------------------------
+
+-- Managers group
+-- includes attributes which define the manager stations for the agent software
+-- while internally organized as a table, only one row (its own) is visible
+-- for each manager, so, externally, from SNMP point of view it is not
+-- represented as a table.
+
+chMgr OBJECT IDENTIFIER
+      ::= { chassis 10 } 
+
+chMgrTrapRepStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2)	
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Value 'on' indicates that SNMP agent should send SNMP traps (traffic ex-
+      cluded) to the manager."
+      ::= { chMgr 1 }
+
+chMgrContPerfRep OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2)		
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Value 'on' indicates that the SNMP agent should send traffic SNMP traps
+      to the manager."
+      ::= { chMgr 2 }
+
+chMgrMngmtState OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute to be set by manager in order to instruct the agent 
+      to enter into a management session with the console. 
+      Setting this value to 'on' has the effect of performing 
+      an 'I am your manager' action upon the agent."
+      ::= { chMgr 3 }
+
+------------------------------------------------------------------------------
+
+-- chassis Hardware group
+
+chHW OBJECT IDENTIFIER
+      ::= { chassis 11 } 
+
+------------------------------------------------------------------------------
+
+chHWPSUTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF ChHWPSUEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of configuration attributes for Power Supply Units.
+      This table can be retrieved only from agents equipped with adequate
+      hardware."
+      ::= { chHW 1 } 
+
+chHWPSUEntry OBJECT-TYPE
+      SYNTAX  ChHWPSUEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing configuration attributes for a single
+      Power Supply Unit." 
+      INDEX  { chHWPSUId }
+      ::= { chHWPSUTable 1 }
+
+ChHWPSUEntry  ::=
+      SEQUENCE  {
+        chHWPSUId
+          INTEGER,
+        chHWPSUActivityStatus
+          INTEGER,
+        chHWPSULocation
+          INTEGER,
+        chHWPSUVoltage
+          INTEGER
+      }
+                         
+chHWPSUId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "PSU index for identifying the PSU."
+      ::= { chHWPSUEntry 1 }
+      
+chHWPSUActivityStatus OBJECT-TYPE
+     SYNTAX  INTEGER {
+	notActive(1),
+	dormant(2),
+	active(3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute defines the status of the PSU in what concerns 
+      supplying power to the chassis. 
+      NotActive - indicates a disabled or defective PSU which cannot supply 
+      power to the chassis.
+      Dormant - indicates a functional PSU which is installed for backup 
+      purposes and can at any moment supply power to the devices in the
+      chassis.
+      Active - indicates that the PSU supplies power to the chassis."
+       ::= { chHWPSUEntry 2 }
+      
+chHWPSULocation OBJECT-TYPE
+     SYNTAX  INTEGER {
+	other(1),
+	internal(2),
+	external(3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Describes the location (internal or external) of the PSU."
+      ::= { chHWPSUEntry 3 }
+      
+chHWPSUVoltage OBJECT-TYPE
+      SYNTAX  INTEGER 
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates voltage of PSU expressed in miliVolts."
+      ::= { chHWPSUEntry 4 }
+      
+------------------------------------------------------------------------------
+
+chHWIntTempWarning OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        exceeded(2)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Fault condition indicating that the temperature measured by one of the
+      sensors internal to the box exceeded chHWIntTempThresh."
+      ::= { chHW 2 }
+      
+chHWIntTempThresh OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Internal enclosure temperature threshold value, expressed in 
+      degrees Celsius.  When exceeded, a trap is sent to the 
+      management console. "
+      ::= { chHW 3 }
+ 
+chHWPeakIntTemp OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Maximum internal temperature inside the chassis. It is the maximum 
+      of the temperature values detected by different temperature sensors
+      inside the box. "
+      ::= { chHW 4 }
+ 
+
+------------------------------------------------------------------------------
+
+-- Generic Group group
+-- mandatory for all managed LANNET modules (groups)
+
+genGroupTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF GenGroupEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of configuration attributes for managed LANNET modules.
+      Includes configuration data which are independent of the 
+      specific functionality of the module."
+      ::= { genGroup 1 }
+
+genGroupEntry OBJECT-TYPE
+      SYNTAX  GenGroupEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing data about a single group." 
+      INDEX  { genGroupId }
+      ::= { genGroupTable 1 }
+
+GenGroupEntry  ::=
+      SEQUENCE  {
+        genGroupId
+          INTEGER,
+        genGroupSWVersion
+          OCTET STRING,
+        genGroupKernelVersion
+          OCTET STRING,
+        genGroupType
+          INTEGER,
+        genGroupDescr
+          OCTET STRING,
+        genGroupNumberOfPorts
+          INTEGER,
+        genGroupNumberOfIntPorts
+          INTEGER,
+        genGroupReset
+          INTEGER,
+        genGroupAutoMan
+          INTEGER,
+        genGroupFullConfig
+          OCTET STRING,
+        genGroupRedun12
+          INTEGER,
+        genGroupRedun34
+          INTEGER,
+        genGroupRedun13-14
+          INTEGER,
+        genGroupStandAloneMode
+          INTEGER,
+        genGroupInterProcCommStatus
+          INTEGER,
+        genGroupCommStatus
+          INTEGER,
+        genGroupHWStatus
+          INTEGER,
+        genGroupSupplyVoltageFault
+          INTEGER,
+        genGroupIntTemp
+          INTEGER,
+	genGroupSpecificOID
+	  OBJECT IDENTIFIER,
+        genGroupConfigurationSymbol
+         OCTET STRING
+      }
+                         
+genGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the group inside the chassis for which this
+      entry contains information. Equals the number of the slot by which
+      the group is accessed. This value is never greater than chNumberOfSlots."
+      ::= { genGroupEntry 1 }
+      
+genGroupSWVersion OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ASCII string for description and display of the group software version."
+      ::= { genGroupEntry 2 }
+      
+genGroupKernelVersion OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ASCII string for description and display of the group kernel version."
+      ::= { genGroupEntry 3 }
+      
+genGroupType OBJECT-TYPE
+      SYNTAX  INTEGER {
+	  le10b(1),
+	  le10b-2(2),
+	  le10c(3),
+	  le10c-2(4),
+	  le15(5),
+	  le15-2(6),
+	  le20(7),
+	  le30x(8),
+	  le30x-2(9),
+	  le30xd(10),
+	  le40x(11),
+	  le40xt(12),
+	  ltr4-RJ45(13),
+	  ltr4-D9(14),
+          ltr4-D25(15),
+          ltr4-FO(16),
+          ltrio-RJ45(19),
+          ltrio-D9(20),
+          ltrio-D25(21),
+          ltrio-FO(22),
+          ltrio-Con1(23),
+	  ltrio-Con2(24),
+	  le10b-2r(25),
+          le10c-2r(26),
+          le80xt(27),
+          le140xt(28),
+          ielb(29),
+          ltrf4(30),
+          ltrf16(31),
+          lts16(32),
+          le20n(33),
+          ltr104-RJ45(34),
+          le20r(35),
+          llt8(36),
+          le20s(37),
+          le10b2n(38),
+          ltr104-D9(39),
+          ltr104-D25(40),
+          ltrt-RJ45(41),
+          ltrt-D9(42),
+          ltr104f(43),
+          itlb(44),
+          le140xtf(45),
+          le120r(46),
+          le120r-2(47),
+          le140xtc(48),
+          le110b(49),
+          le110bq(50),
+          lcl100(51),
+          le140xtq(52),
+          le20n-fb(53),
+          le20s-fb(54),
+          le140xtf-fb(55),
+          ltr104s(56),
+          lert40-AUI(57),
+          lert40-10BASET(58),
+          lfd104-mic(59),          
+          lfd104-stm(60),          
+          lfd104-stl(61),          
+          lfd104-stp(62),          
+          lfd104-utp(63),          
+          lfd102-mic(64),          
+          lfd102-stm(65),          
+          lfd102-sts(66),          
+          le140xtn(67),
+	  unknown(255)
+	}
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the type of LANNET Ethernet group."
+      ::= { genGroupEntry 4 }
+      
+genGroupDescr OBJECT-TYPE
+      SYNTAX  OCTET STRING  (SIZE (0..32))
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Descriptor of the group in ASCII (readable) format, mainly for use with
+      generic management applications."
+      ::= { genGroupEntry 5 }
+      
+genGroupNumberOfPorts OBJECT-TYPE
+      SYNTAX  INTEGER (0..255)    
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of ports in group. It is assumed that on each group the ports 
+      are assigned unique numbers in the range from 1 to genGroupNumberOfPorts.
+      They correspond to the number of ports on the module (FRU)"
+      ::= { genGroupEntry 6 }
+      
+genGroupNumberOfIntPorts OBJECT-TYPE
+      SYNTAX  INTEGER (0..255)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+      "Number of internal ports (ports connected to the chassis buses) on
+      the module."
+      ::= { genGroupEntry 7 }
+      
+genGroupReset OBJECT-TYPE
+      SYNTAX  INTEGER {  
+	on(1),
+	off(2)
+      }
+      ACCESS  read-write    
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting the value of this attribute to 'on' is interpreted as a software
+      RESET command. Sensor software is reinitialized and according to the 
+      sensor specifications, partial or total reset of the module hardware may
+      be performed."
+      ::= { genGroupEntry 8 }
+      
+genGroupAutoMan OBJECT-TYPE
+      SYNTAX  INTEGER {
+	auto(1),	  
+	man(2) 		 
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute reflects the status of the Auto/Manual switch which 
+      defines the working mode of LANNET sensors. In the MANUAL mode no set
+      operations may be performed on attributes related to the sensor. The  
+      sensor works according to configuration switches set by hardware and  
+      transmits all configuration information to the agent. In the AUTO mode,
+      hardware switches are overridden by set commands."
+      ::= { genGroupEntry 9 }
+      
+genGroupFullConfig OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the full configuration of a group in internal
+      LANNET application format."
+      ::= { genGroupEntry 10 }
+      
+genGroupRedun12 OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute defines a redundancy (backup) relationship 
+      between synchronous external ports 1 and 2 on a LANNET module." 
+      ::= { genGroupEntry 11 }
+      
+genGroupRedun34 OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute defines a redundancy (backup) relationship 
+      between synchronous external ports 3 and 4 on a LANNET module." 
+      ::= { genGroupEntry 12 }
+      
+genGroupRedun13-14 OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute defines a redundancy (backup) relationship 
+      between synchronous external ports 13 and 14 on a LANNET module." 
+      ::= { genGroupEntry 13 }
+      
+genGroupStandAloneMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+	}
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+      "Value ON of this attribute indicates the sensor's operation Stand Alone 
+      mode . Internal ports are disabled and the card functions in a local 
+      star configuration toward its external ports."
+      ::= { genGroupEntry 14 }
+      
+genGroupInterProcCommStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        commProblems(2),
+        noCommunication(3),
+	notSupported(255)
+      }
+      ACCESS  read-only                   
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute describes the status of the communication between the
+      microprocessor of the sensor and the microprocessor of the agent on cards
+      with embedded agents." 
+      ::= { genGroupEntry 15 }
+      
+genGroupCommStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        commProblems(2),
+	noCommunication(3),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute describes the communication status of the group with
+      the SNMP Agent as detected and reported by the agent."
+      ::= { genGroupEntry 16 }
+      
+genGroupHWStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        hardwareProblems(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute describes the status of the group hardware as detected
+      by the sensors software."
+      ::= { genGroupEntry 17 }
+      
+genGroupSupplyVoltageFault OBJECT-TYPE
+     SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+      "A value 'on' of this attribute informs of a 'voltage supply 
+      out-of-range' error condition on sensor equipped with 
+      hardware which checks this condition."
+      ::= { genGroupEntry 18 }
+
+genGroupIntTemp OBJECT-TYPE
+     SYNTAX  INTEGER 
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+     "Internal temperature of the enclosure as measured by the 
+     specific module instance."
+     ::= { genGroupEntry 19 }
+
+genGroupSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { genGroupEntry 20 }
+
+genGroupConfigurationSymbol OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE(1))
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Defines the Configuration Symbol attached to any hardware module
+      manufactured by LANNET. One single character A..Z defines the CS
+      version. For older modules which did not support this option on
+      SNMP character '*' will be returned."
+      ::= { genGroupEntry 21 }
+
+------------------------------------------------------------------------------
+
+-- Generic Port group
+-- mandatory for all managed LANNET ports
+
+
+genPortTable OBJECT-TYPE       
+      SYNTAX  SEQUENCE OF GenPortEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of configuration attributes for managed LANNET ports.
+      Includes configuration data which are independent of the 
+      specific functionality of the port."
+      ::= { genPort 1 } 
+
+genPortEntry OBJECT-TYPE
+      SYNTAX  GenPortEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing data about a single port." 
+      INDEX  { genPortGroupId, genPortId }
+      ::= { genPortTable 1 }
+
+GenPortEntry  ::=
+      SEQUENCE  {
+        genPortGroupId
+          INTEGER,
+        genPortId
+          INTEGER,
+        genPortFunctionality
+          INTEGER,
+        genPortType
+          INTEGER,
+        genPortDescr
+          OCTET STRING,
+        genPortActivityStatus
+          INTEGER,
+        genPortSecurityPolicy
+          OCTET STRING,
+        genPortSecureAddresses
+          OCTET STRING,
+        genPortIntPortConnection
+          INTEGER,
+	genPortAdminStatus
+	  INTEGER,
+	genPortSpecificOID
+	  OBJECT IDENTIFIER
+      }
+
+genPortGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the group inside the chassis for which this
+      entry contains information. Equals the number of the slot by which
+      the group containing the port is accessed. This value is never greater
+      than chNumberOfSlots."
+      ::= { genPortEntry 1 }
+      
+genPortId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the port inside the group for which this
+      entry contains information. It generally corresponds with the number
+      by which the port is identified and is marked on the module.
+      This value is never greater than genGroupNumberOfPorts of the group
+      to which the port belongs."
+      ::= { genPortEntry 2 }
+      
+genPortFunctionality OBJECT-TYPE
+      SYNTAX  INTEGER {  
+	private(1),
+	repeaterAUI(2),
+	repeaterThin(3),
+	repeater10BaseT(4),
+	tenBaseFSyncAct(5),
+	foirl(6),
+	xcvr(7),
+	lobe(8),
+	ri(9),
+	ro(10),
+        serial(11),
+        localTalk(12),
+	fddi(13),
+	clock(14),
+	genTokenRing(15),
+	dte(16)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Describes the functionality of the port according to international
+      standards."
+      ::= { genPortEntry 3 }
+      
+genPortType OBJECT-TYPE
+      SYNTAX  INTEGER {
+ 	le10bPort(1),
+ 	le10cPort(2),
+ 	le15Port(3),
+ 	le20Port(4),
+ 	le30xPort(5),
+ 	le30xdPort(6),
+ 	le40xPort(7),
+ 	le40xtPort(8),
+ 	lobeRJ45(9),             
+ 	lobeD9(10),
+        lobeD25(11),
+ 	lobeFO(12),
+        ri104D25(13),
+	ro104D25(14),
+      	riRJ45(15),
+ 	riD9(16),
+        riD25(17),
+        riFO(18),
+        ri104RJ45(19),
+ 	ri104D9(20),
+        roRJ45(21),
+        roD9(22),
+        roD25(23),
+	roFO(24),
+	ro104RJ45(25),
+        ro104D9(26),
+        le80xtPort(27),
+        le140xtPort(28),
+        ielb-AUIPort(29),
+        ielb-10btPort(30),
+        ltrf4Port(31),
+        ltrf16Port(32),
+        lts16Port(33),
+        llt8Port(34),
+        le20rPort(35),
+        itlbRoPort(36),
+        itlbRiPort(37),
+        itlbDTEPort(38),
+        starFO(39),
+        le10bnPort(40),
+        le120rPort(41),
+        le140xtf-foPort(42),
+        le140xtf-10btPort(43),
+        le140xtcPort(44),
+        le110bPort(45),
+        le110bqPort(46),
+        le140xtqPort(47),
+        lert40-AUIPort(48),
+        lert40-10btPort(49),
+        clock-int(50),
+        clock-ext(51),
+        ri104RJ45S(52),
+        r0104RJ45S(53),
+        lobe104RJ45S(54),
+	le20fbPort(55),
+	le140xtf-fofbPort(56),
+        fddi-micPort1(57),
+        fddi-micPort2(58),
+        fddi-micPort3(59),
+        fddi-stmPort1(60),
+        fddi-stmPort2(61),
+        fddi-stmPort3(62),
+        fddi-stlPort1(63),
+        fddi-stlPort2(64),
+        fddi-stlPort3(65),
+        fddi-stpPort1(66),
+        fddi-stpPort2(67),
+        fddi-stpPort3(68),
+        fddi-utpPort1(69),
+        fddi-utpPort2(70),
+        fddi-utpPort3(71),
+        fddi-stsPort1(72),
+        fddi-stsPort2(73),
+        fddi-stsPort3(74),
+        le140xtnPort(75),
+ 	unknownPort(255) 
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the type of LANNET port."
+      ::= { genPortEntry 4 }
+      
+genPortDescr OBJECT-TYPE
+      SYNTAX  OCTET STRING  (SIZE (0..32))
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Descriptor of the port in ASCII (readable) format, mainly for use with
+      generic management applications."
+      ::= { genPortEntry 5 }
+      
+genPortActivityStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+	notActive(1),
+	dormant(2),
+	active(3),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute defines the status of ports that may be part of 
+      a redundancy scheme. 
+      NotActive - indicates a disabled port which cannot transmit or receive 
+      packets even if included in a redundancy scheme.
+      Dormant - indicates an enabled port which does not transmit or receive 
+      packets, but because it is included in a redundancy scheme, it may at 
+      any moment become responsible packet transmission and reception.
+      Active - indicates that the port transmits and receives packets, serving 
+      as the main path in the redundant configuration."
+      ::= { genPortEntry 6 }
+      
+genPortSecurityPolicy OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Security policy (Trap Only or Trap and Close) assigned to this port.
+      The information is coded in internal LANNET format."
+      ::= { genPortEntry 7 }
+
+genPortSecureAddresses OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute defines the security information (physical addresses)
+      relevant for the entry. Coded in internal format, cryptographic 
+      methods may be used for privacy purposes."
+      ::= { genPortEntry 8 }
+      
+genPortIntPortConnection OBJECT-TYPE
+      SYNTAX  INTEGER (0..255)
+      ACCESS  read-only 
+      STATUS  mandatory
+      DESCRIPTION
+      "The value of this attribute defines the internal port to which the port
+      is connected. A value 0 of this attribute would indicate no internal
+      port connection (stand-alone mode). Any other positive value equals
+      the number of the internal port."
+      ::= { genPortEntry 9 }
+
+genPortAdminStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "A disabled port neither transmits nor receives. The port must be explici-
+      tenly enabled to restore operation. For token ring ports, this attribute
+      is read-only."
+      ::= { genPortEntry 10 }
+      
+genPortSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { genPortEntry 11 }
+
+      
+------------------------------------------------------------------------------
+
+-- Generic Internal Port group
+-- Implementation of this group is mandatory for all LANNET
+-- SNMP agents.
+
+genIntPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF GenIntPortEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of configuration attributes of LANNET internal ports.
+      Internal ports are physical and/or logical entities which 
+      transfer information and connect LANNET modules to the internal
+      networks (buses)."
+      ::= { genIntPort 1 } 
+
+genIntPortEntry OBJECT-TYPE
+      SYNTAX  GenIntPortEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing data about a single port." 
+      INDEX  { genIntPortGroupId, genIntPortId }
+      ::= { genIntPortTable 1 }
+
+GenIntPortEntry  ::=
+      SEQUENCE  {
+        genIntPortGroupId
+          INTEGER,
+        genIntPortId
+          INTEGER,
+        genIntPortAdminStatus
+          INTEGER,
+        genIntPortActivityStatus
+          INTEGER,
+        genIntPortBusConnNumber
+          INTEGER,
+        genIntPortBusConnType
+          INTEGER,
+	genIntPortSpecificOID
+	  OBJECT IDENTIFIER
+      }
+
+genIntPortGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the group inside the chassis for which this
+      entry contains information. Equals the number of the slot by which
+      the group containing the internal port is accessed. This value is 
+      never greater than chNumberOfSlots."
+      ::= { genIntPortEntry 1 }
+      
+genIntPortId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the port inside the group for which this
+      entry contains information. 
+      This value is never greater than genGroupNumberOfIntPorts
+      of the group to which the port belongs."
+      ::= { genIntPortEntry 2 }
+      
+genIntPortAdminStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Defines the capability of the internal port to transmit or receive data.
+      A disabled internal port neither transmits or receives. The port must be
+      explicitly enabled to restore operation." 
+      ::= { genIntPortEntry 3 }
+      
+genIntPortActivityStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+	notActive(1),
+	dormant(2),
+	active(3),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute defines the status of internal ports that may be part 
+      of a redundancy scheme. 
+      NotActive - indicates a disabled port which cannot transmit or receive 
+      packets even if included in a redundancy scheme.
+      Dormant - indicates an enabled port which does not transmit or receive 
+      packets, but because it is included in a redundancy scheme, it may at 
+      any moment become responsible for packet transmission and reception.
+      Active - indicates that the port transmits and receives packets, serving
+      as the main path in the redundant configuration."
+      ::= { genIntPortEntry 4 }
+      
+genIntPortBusConnNumber OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "The value of this attribute defines the bus to which the internal port
+      is connected."
+      ::= { genIntPortEntry 5 }
+      
+genIntPortBusConnType OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ethernet(1),
+        token-ring(2),
+        local-talk(3),
+        fddi(4),
+        other(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The value of this attribute defines the type of the bus to which
+      the internal port is connected."
+      ::= { genIntPortEntry 6 }
+      
+genIntPortSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { genIntPortEntry 7 }
+
+------------------------------------------------------------------------------
+
+-- Software Redundancy Group
+-- Implementation of this group is mandatory for all chassis LANNET
+-- SNMP agents.
+
+softRedundancyTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF SoftRedundancyEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of attributes which define software redundancy links 
+      defined by means of the LANNET chassis SNMP agents."
+      ::= { softRedundancy 1 } 
+
+softRedundancyEntry OBJECT-TYPE
+      SYNTAX  SoftRedundancyEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing data about a single 
+      software redundancy link." 
+      INDEX  { softRedundancyId }
+      ::= { softRedundancyTable 1 }
+
+SoftRedundancyEntry  ::=
+      SEQUENCE  {
+        softRedundancyId
+          INTEGER,
+        softRedundancyName
+          OCTET STRING,
+        softRedundancyGroupId1
+          INTEGER,
+        softRedundancyPortId1
+          INTEGER,
+        softRedundancyGroupId2
+          INTEGER,
+        softRedundancyPortId2
+          INTEGER,
+        softRedundancyStatus
+          INTEGER
+      }
+
+softRedundancyId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the software redundancy link which for 
+      which the current entry provides information."
+      ::= { softRedundancyEntry 1 }
+      
+softRedundancyName OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (15))
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Logical name of the software redundancy link"
+      ::= { softRedundancyEntry 2 }
+      
+softRedundancyGroupId1 OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the group to which the main port on the software redundancy
+      link belongs. This value is never greater than chNumberOfSlots."
+      ::= { softRedundancyEntry 3 }
+      
+softRedundancyPortId1 OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the main port on the software redundancy link."
+      ::= { softRedundancyEntry 4 }
+      
+softRedundancyGroupId2 OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the group to which the secondary port on the software redundancy
+      link belongs. This value is never greater than chNumberOfSlots."
+      ::= { softRedundancyEntry 5 }
+      
+softRedundancyPortId2 OBJECT-TYPE
+      SYNTAX  INTEGER (1..255) 
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the secondary port on the software redundancy link."
+      ::= { softRedundancyEntry 6 }
+      
+softRedundancyStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        valid(1),
+        createRequest(2),
+        underCreation(3),
+        invalid(4)
+      } 
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Status of the entry in the softRedundancy Table:
+         valid(1) indicates that row is busy with meaningful values;
+         createRequest(2) will be set by manager when creating a new row;
+         underCreation(3) indicates that agent accepts create command and
+            performs it;
+         invalid(4) indicates that no meaningful values are present in the 
+            row. Managers set this value in order to transmit a 'Delete 
+            row' command to agent."
+      ::= { softRedundancyEntry 7 }
+
+------------------------------------------------------------------------------
+
+-- Ethernet Agent group. The implementation of this group
+-- is mandatory for all LANNET chassis agent which use Ethernet as
+-- in-band management protocol.
+
+ethAg OBJECT IDENTIFIER
+      ::= { eth 1 } 
+
+------------------------------------------------------------------------------
+
+ethAgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF EthAgEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of attributes which define configuration characteristics
+      for LANNET chassis SNMP agents which use Ethernet as in-band 
+      management protocol."
+      ::= { ethAg 1 } 
+
+ethAgEntry OBJECT-TYPE
+      SYNTAX  EthAgEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing data about a single Ethernet
+      agent."
+      INDEX  { ethAgId }
+      ::= { ethAgTable 1 }
+
+EthAgEntry  ::=
+      SEQUENCE  {
+        ethAgId
+          INTEGER,
+        ethAgPerfBusSelection
+          INTEGER
+      }
+
+ethAgId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the Ethernet agent for which the current 
+      entry provides information."
+      ::= { ethAgEntry 1 }
+      
+ethAgPerfBusSelection OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the bus attached to the performance data collection 
+      hardware on those LANNET agent hardware implementations which support
+      configuration management on multi-Ethernet bus enclosures, but performan-
+      ce data collection on a single bus."
+      ::= { ethAgEntry 2 }
+      
+------------------------------------------------------------------------------
+
+-- Ethernet Group (module) group.
+-- Implementation of this group is mandatory for all SNMP Agents which
+-- manage the configuration of LANNET Ethernet modules.
+
+ethGroup OBJECT IDENTIFIER
+      ::= { eth 2 } 
+
+------------------------------------------------------------------------------
+
+ethGroupTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF EthGroupEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "Table of attributes which define configuration characteristics
+      for LANNET Ethernet modules."
+      ::= { ethGroup 1 }
+
+ethGroupEntry OBJECT-TYPE
+      SYNTAX  EthGroupEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "An entry in the table, containing data about a single Ethernet
+      module (group)."
+      INDEX  { ethGroupId }
+      ::= { ethGroupTable 1 }
+
+EthGroupEntry  ::=
+      SEQUENCE  {
+        ethGroupId
+          INTEGER,
+        ethGroupFIFO
+          INTEGER,
+        ethGroup10BTPlus
+          INTEGER,
+        ethGroupIntPortsRedundancy
+          INTEGER,
+        ethGroupBackboneMode
+          INTEGER,
+        ethGroupFOIRLPlusMode
+          INTEGER,
+        ethGroupWrongPortSelection
+          INTEGER,
+        ethGroupBackupBus
+          INTEGER,
+        ethGroupSingleBusMode
+          INTEGER,
+	ethGroupSpecificOID
+	  OBJECT IDENTIFIER
+      }
+
+ethGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the group inside the chassis for which this
+      entry contains information. Equals the number of the slot by which
+      the group is accessed. This value is never greater than chNumberOfSlots."
+      ::= { ethGroupEntry 1 }
+      
+ethGroupFIFO OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute describes an internal FIFO error sensed by 
+      the internal hardware mechanism of a LANNET repeater."
+      ::= { ethGroupEntry 2 }
+      
+ethGroup10BTPlus OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+      "Value ON of this attribute defines activation of the 10BaseTPlus
+      mode - a LANNET extension of the 10BaseT standard."
+      ::= { ethGroupEntry 3 }
+      
+ethGroupIntPortsRedundancy OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+      "Value ON of this attribute defines a redundancy (backup) relationship
+      between internal ports 1 and 2 on a LANNET module." 
+      ::= { ethGroupEntry 4 }
+      
+ethGroupBackboneMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+      "Value On of this attribute defines Backbone Mode of a sensor. Internal
+      ports are enabled and the information path goes straightly from external 
+      port to internal bus, via corresponding internal port."
+      ::= { ethGroupEntry 5 }
+      
+ethGroupFOIRLPlusMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+      "Value On of this attribute defines FOIRL of a sensor. When this attribute
+      has value ON, FOIRL Plus mode is enabled, while value OFF indicates stan-
+      dard FOIRL mode."
+      ::= { ethGroupEntry 6 }
+      
+ethGroupWrongPortSelection OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "A value ON of this attribute warns of incorrect selection of enabled
+      ports on sensors which impose restrictions on this configura-
+      tion (e.g. integrated local bridges.)"
+      ::= { ethGroupEntry 7 }
+      
+ethGroupBackupBus OBJECT-TYPE
+      SYNTAX  INTEGER (1..4) 
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Defines the common secondary bus for Ethernet groups with bus 
+      redundancy defined at port level."
+      ::= { ethGroupEntry 8 }
+      
+ethGroupSingleBusMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value 'on of this attribute defines bus-star mode for cards 
+      supporting this type of configuration."
+      ::= { ethGroupEntry 9 }
+
+ethGroupSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { ethGroupEntry 10 }
+      
+------------------------------------------------------------------------------
+
+ethPort OBJECT IDENTIFIER       
+      ::= { eth 3 } 
+
+------------------------------------------------------------------------------
+
+ethPortTable OBJECT-TYPE
+      SYNTAX	SEQUENCE OF EthPortEntry
+      ACCESS	not-accessible
+      STATUS 	mandatory
+      ::= { ethPort 1 } 
+
+ethPortEntry OBJECT-TYPE
+      SYNTAX	EthPortEntry
+      ACCESS	not-accessible
+      STATUS	mandatory
+      INDEX	{ ethPortGroupId, ethPortId }
+      ::= { ethPortTable 1 }
+
+EthPortEntry ::=
+   SEQUENCE {
+      ethPortGroupId INTEGER,
+      ethPortId INTEGER,
+      ethPortFunctionalStatus INTEGER,
+      ethPortManPart INTEGER,
+      ethPortJabber INTEGER,
+      ethPortNoAUILoop INTEGER,
+      ethPortMJLP INTEGER,
+      ethPortFIFO INTEGER,
+      ethPortAutoPartitionState INTEGER,
+      ethPortSQETest INTEGER,
+      ethPortLastSourceAddr OCTET STRING,
+      ethPortUserStatus INTEGER,
+      ethPortMainBusSelection INTEGER,
+      ethPortTraffic Counter,
+      ethPortFramesReceivedOK Counter,
+      ethPortRunts Counter,
+      ethPortPacketErrors Counter,
+      ethPortSpecificOID OBJECT IDENTIFIER
+   }
+
+ethPortGroupId OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Id of the group to which the port belongs."
+      ::= { ethPortEntry 1 }
+      
+ethPortId OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Unique Id of the port in the ethPortTable."
+      ::= { ethPortEntry 2 }
+      
+ethPortFunctionalStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        rld(2),            -- RxLinkDown
+        localJabber(3),
+        tld(4),            -- TxLinkDown
+        remoteJabber(5),
+        illSeq(6),
+        shortCirc(7),
+        partitionOrLocalJabber(8),
+	remoteFaultOrLockLost(9),
+        remoteFault(10),
+        lockLost(11),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The value of this attribute reflects the functional status of LANNET
+      synchronous ports. Note that it is not mandatory that all ports
+      support all the enumerated states. Here is the minimal set possible
+      states:
+      OK - fully functional port, transmitting and receiving packets.
+      RLD - receive link down condition on the port.
+      TLD - transmit link down condition on the port.
+      LocalJabber - fault condition indicating that the port emitted jabber.
+      RemoteJabber - fault condition indicating that remote jabber was sensed
+      at the port.
+      IllSeq - Fault condition indicating an illegal synchronization sequence
+      at the port.
+      ShortCircuit - short-circuit fault condition detected at the port.
+      PartitionOrLocalJabber -
+      RemoteFaultOrLockLoss -	"
+      ::= { ethPortEntry 3 }
+      
+ethPortManPart OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting the value of this attribute to ON activates the manual
+      partition mechanism at the port  level. Setting the value of this
+      attribute to OFF cancels the partition mechanism. The segment
+       may reconnect after the reception of 32 packets. Attribute vaild
+       for repeater modules from the LE-10 family."
+      ::= { ethPortEntry 4 }
+      
+ethPortJabber OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute reflects jabber transmitted to the port by
+      the hardware of a LANNET repeater or transceiver, as a result of
+      collisions detected on the port. Valid for all modules in the LE-10 and
+      LE-15 families."
+      ::= { ethPortEntry 5 }
+      
+ethPortNoAUILoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute indicates that a No AUI Loop fault condition
+      was detected on an AUI repeater port. Valid for LE-10C family of modu-
+      les."
+      ::= { ethPortEntry 6 }
+      
+ethPortMJLP OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute describes an internal MJLP (MAU Jabber
+      Lockup Protection) error sensed by the internal hardware mechanism
+      of a LANNET repeater.
+      Valid for LE140XTF."
+      ::= { ethPortEntry 7 }
+      
+ethPortFIFO OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute describes an internal FIFO error sensed by the
+      internal hardware mechanism of a LANNET repeater.  Valid for LE140XTF."
+      ::= { ethPortEntry 8 }
+      
+ethPortAutoPartitionState OBJECT-TYPE
+      SYNTAX  INTEGER {
+        autoPartition(1),
+        notAutoPartition(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The AutoPart condition indicates that the port is currently partitioned
+      by the auto-partition protection mechanism."
+      ::= { ethPortEntry 9 }
+      
+ethPortSQETest OBJECT-TYPE
+      SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Settable attribute which allows activation of SQE test for LANNET
+       integrated transceivers."
+      ::= { ethPortEntry 10 }
+      
+ethPortLastSourceAddr OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Ethernet source address of the last readable frame received by this
+      port."
+      ::= { ethPortEntry 11 }
+      
+ethPortUserStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        singleUser(1),
+        multiUser(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute defining the connection of a port to a single Ethernet source
+      or to a multi-source (segment or star)."
+      ::= { ethPortEntry 12 }
+      
+ethPortMainBusSelection OBJECT-TYPE
+      SYNTAX  INTEGER 
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "On cards with port-level redundancy, defines the main bus for each 
+      port instance as selected by user."
+      ::= { ethPortEntry 13 }
+      
+ethPortTraffic OBJECT-TYPE
+      SYNTAX  Counter
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Counter for the number of bits received on this port in frames with legal
+      length information."
+      ::= { ethPortEntry 14 }
+      
+ethPortFramesReceivedOK OBJECT-TYPE
+      SYNTAX  Counter
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "A representation of the total  number of frames of legal length that have
+      not been corrupted in transmission. These frames can be encoded and 
+      decoded by the commonly available MACs and provide a measure of the 
+      network bandwidth being used. The number does not include frames received 
+      with frame-too-long, FCS, alignment errors, frames lost due to internal 
+      MAC sublayer errors, runts or pygmys."
+      ::= { ethPortEntry 15 }
+      
+ethPortRunts OBJECT-TYPE
+      SYNTAX  Counter
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Counter for the number of collision fragments longer than a pygmy and
+      shorter than a legal packet, detected on this port."
+      ::= { ethPortEntry 16 }
+      
+ethPortPacketErrors OBJECT-TYPE
+      SYNTAX  Counter
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Counter for the number of frames with errors detected on the port by
+      the LANNET agent hardware. This generic port error comprises too long
+      packets, CRC and alignment errors."
+      ::= { ethPortEntry 17 }
+      
+ethPortSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { ethPortEntry 18 }
+------------------------------------------------------------------------------
+
+ethIntPort OBJECT IDENTIFIER
+      ::= { eth 4 } 
+
+------------------------------------------------------------------------------
+ethIntPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF EthIntPortEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= { ethIntPort 1 }
+
+ethIntPortEntry OBJECT-TYPE
+      SYNTAX	EthIntPortEntry
+      ACCESS	not-accessible
+      STATUS	mandatory
+      INDEX	{ ethIntPortGroupId, ethIntPortId }
+      ::= { ethIntPortTable 1 }
+
+EthIntPortEntry ::=
+      SEQUENCE {
+         ethIntPortGroupId 
+            INTEGER,
+         ethIntPortId
+            INTEGER,
+         ethIntPortPartition 
+            INTEGER,
+         ethIntPortJabber 
+            INTEGER,
+         ethIntPortBackedUp 
+            INTEGER
+      }
+
+ethIntPortGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the group to which the internal port belongs."
+      ::= { ethIntPortEntry 1 }
+      
+ethIntPortId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the internal port in the ethIntPortTable."
+      ::= { ethIntPortEntry 2 }
+      
+ethIntPortPartition OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+        notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This condition indicates that the internal port is currently partitioned
+      from the bus by the auto-partition protection mechanism."
+      ::= { ethIntPortEntry 3 }
+      
+ethIntPortJabber OBJECT-TYPE
+      SYNTAX  INTEGER {
+	on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute reflects jabber being transmitted to the bus 
+      by the hardware of a LANNET repeater, as a result of collisions detected 
+      on the internal bus of the enclosure. This situation is similar to MJLP
+      as defined by the Repeater Management standard."
+      ::= { ethIntPortEntry 4 }
+      
+ethIntPortBackedUp OBJECT-TYPE
+      SYNTAX INTEGER {
+        on(1),
+        off(2),
+        notSupported(255)
+      }
+      ACCESS   read-write
+      STATUS   mandatory
+      DESCRIPTION
+      "Indicates that internal port is part of a redundancy scheme."
+      ::= { ethIntPortEntry 5 }
+      
+------------------------------------------------------------------------------
+
+ethBus OBJECT IDENTIFIER
+      ::= { eth 5 } 
+
+------------------------------------------------------------------------------
+
+ethBusPerfTable OBJECT-TYPE       
+      SYNTAX  SEQUENCE OF EthBusPerfEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= { ethBus 1 }
+ 
+ethBusPerfEntry OBJECT-TYPE
+      SYNTAX    EthBusPerfEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { ethBusPerfAgId, ethBusPerfId }
+      ::= { ethBusPerfTable 1 }
+ 
+EthBusPerfEntry ::=
+      SEQUENCE {
+         ethBusPerfAgId
+            INTEGER,
+         ethBusPerfId
+            INTEGER,
+         ethBusTrafficBuffer
+            OCTET STRING,
+         ethBusTrafficThresh
+            INTEGER,
+         ethBusPeakTraffic
+            INTEGER,
+         ethBusTotalCollisions
+            Counter,
+         ethBusTotalPackets
+            Counter,
+         ethBusTotalErrors
+            Counter,
+         ethBusTraffic
+            INTEGER
+      }
+
+ethBusPerfAgId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the agent in the ethBusPerfTable."
+      ::= { ethBusPerfEntry 1 }
+      
+ethBusPerfId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the bus in the ethBusPerfTable."
+      ::= { ethBusPerfEntry 2 }
+      
+ethBusTrafficBuffer OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Record of traffic for the last second with a resolution of 100 msec. The
+       traffic is expressed in percents of the maximum Ethernet traffic and each
+      record contains 10 readings, in the range 1..20, expressed on a log(10)
+      scale ( value = 10*log10(percent) )."
+      ::= { ethBusPerfEntry 3 }
+      
+ethBusTrafficThresh OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Traffic threshold value. When exceeded, a trap is send to the management
+      console. Expressed in percents of the maximum Ethernet traffic, in the
+      range 1..20, expressed on a log(10) scale."
+      ::= { ethBusPerfEntry 4 }
+      
+ethBusPeakTraffic OBJECT-TYPE
+      SYNTAX  INTEGER                -- Values 1..20 (Log(10) scale)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Maximal traffic value since last reset of hub or relay. Expressed in per-
+      cents of the maximum Ethernet traffic, in the range 1..20,
+      expressed on log(10) scale."
+      ::= { ethBusPerfEntry 5 }
+      
+ethBusTotalCollisions OBJECT-TYPE
+      SYNTAX  Counter
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Counter incremented every time the hub enters a condition caused by
+      simultaneous transmission and detection of external activity on one or
+      more of its ports."
+      ::= { ethBusPerfEntry 6 }
+      
+ethBusTotalPackets OBJECT-TYPE
+      SYNTAX  Counter
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Counter for number of packets (good and errors) detected on the
+      Ethernet bus."
+      ::= { ethBusPerfEntry 7 }
+      
+ethBusTotalErrors OBJECT-TYPE
+      SYNTAX  Counter
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Counter for number of errors detected on the Ethernet bus. Does not
+      take into account the collisions."
+      ::= { ethBusPerfEntry 8 }
+
+ethBusTraffic OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Last traffic reading (sampling time =  100 msec). The
+      traffic is expressed in percents of the maximum Ethernet traffic
+      in the range 1..20, expressed on a log(10)
+      scale ( value = 10*log10(percent) )."
+      ::= { ethBusPerfEntry 9 }
+      
+      
+------------------------------------------------------------------------------
+
+ethBusClockTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF EthBusClockEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= { ethBus 2 }
+ 
+ethBusClockEntry OBJECT-TYPE
+      SYNTAX    EthBusClockEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { ethBusClockBusId, ethBusClockId }
+      ::= { ethBusClockTable 1 }
+ 
+EthBusClockEntry ::=
+      SEQUENCE {
+         ethBusClockBusId
+            INTEGER,
+         ethBusClockId
+            INTEGER,
+         ethBusClockTestResult
+            INTEGER
+      }
+
+ethBusClockBusId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the bus in the ethBusClockTable."
+      ::= { ethBusClockEntry 1 }
+      
+ethBusClockId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the clock in the ethBusClockTable."
+      ::= { ethBusClockEntry 2 }
+      
+ethBusClockTestResult OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        clockFailure(2),
+        busFailure(3),
+        notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Values clockFailure and busFailure define the faulty statuses for
+      clock tests. The test is performed by LCL100 module."
+      ::= { ethBusClockEntry 3 }
+      
+------------------------------------------------------------------------------
+
+tokRing OBJECT IDENTIFIER
+      ::= { tok 1 } 
+
+------------------------------------------------------------------------------
+
+tokRingTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF TokRingEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= { tokRing 1 }
+ 
+tokRingEntry OBJECT-TYPE
+      SYNTAX    TokRingEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { tokRingAgId, tokRingId }
+      ::= { tokRingTable 1 }
+ 
+TokRingEntry ::=
+      SEQUENCE {
+         tokRingAgId
+            INTEGER,
+         tokRingId
+            INTEGER,
+         tokRingLeftSlot
+            INTEGER,
+         tokRingRightSlot
+            INTEGER,
+         tokRingTrafficBuffer
+            OCTET STRING,
+         tokRingTrafficThresh
+            INTEGER,
+         tokRingPeakTraffic
+            INTEGER,
+         tokRingNumberOfStations
+            INTEGER,
+         tokRingConfiguration
+            OCTET STRING,
+         tokRingBeaconing
+            INTEGER,
+         tokRingBeaconingStation
+            OCTET STRING,
+         tokRingStationsMatch
+            INTEGER,
+         tokRingTraffic
+            INTEGER
+      }
+
+tokRingAgId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the agent to which the ring belongs in the tokRingTable."
+      ::= { tokRingEntry 1 }
+      
+tokRingId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the ring in the tokRingTable."
+      ::= { tokRingEntry 2 }
+      
+tokRingLeftSlot OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Slot number of the left-most slot of the ring."
+      ::= { tokRingEntry 3 }
+      
+tokRingRightSlot OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Slot number of the right-most slot of the ring."
+      ::= { tokRingEntry 4 }
+      
+tokRingTrafficBuffer OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Record of traffic for the last second with a resolution of 100 msec.
+      The traffic is expressed in percents of the maximum effective TR traffic
+      (token messages are excluded) and each record contains 10 readings,
+      in range 1..20 on log(10) scale."
+      ::= { tokRingEntry 5 }
+      
+tokRingTrafficThresh OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Traffic threshold value. When exceeded, a trap is send to the management
+      console. Expressed in percents of the maximum effective TR traffic
+      (token messages are excluded) in the range 1..20 on log(10) scale."
+      ::= { tokRingEntry 6 }
+      
+tokRingPeakTraffic OBJECT-TYPE
+      SYNTAX  INTEGER                -- Values 1..20 (Log(10) scale)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Maximal traffic value since last reset of agent. Expressed in percents
+      of the maximum effective TR traffic (token messages are excluded), in the
+      range 1..20 on log(10) scale."
+      ::= { tokRingEntry 7 }
+      
+tokRingNumberOfStations OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of Token Ring stations (controllers) detected on the ring. The
+      TR controller of the agent card is included in this count."
+      ::= { tokRingEntry 8 }
+      
+tokRingConfiguration OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Configuration attribute describing the list of physical addresses
+      detected on the Token Ring. Coded in internal LANNET application
+      format. "
+      ::= { tokRingEntry 9 }
+      
+tokRingBeaconing OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+        notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute indicates if a beaconing condition is currently
+      detected on the ring."
+      ::= { tokRingEntry 10 }
+      
+tokRingBeaconingStation OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The MAC address of the last station which was detected as sending
+      Beaconing MAC frames on the ring."
+      ::= { tokRingEntry 11 }
+      
+tokRingStationsMatch OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+        notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute indicates matching between the number of stations
+      detected on the ring between the current agent and the next agent
+      on Up Stream sense and the number of connected lobe ports.Used by
+      the port address correlation mechanism."
+      ::= { tokRingEntry 12 }
+      
+tokRingTraffic OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Last traffic reading (sampling time =  100 msec). The
+      traffic is expressed in percents of the maximum Ethernet traffic
+      in the range 1..20, expressed on a log(10)
+      scale ( value = 10*log10(percent) )."
+      ::= { tokRingEntry 13 }
+      
+------------------------------------------------------------------------------
+
+tokGroup OBJECT IDENTIFIER
+      ::= {tok 2}
+
+------------------------------------------------------------------------------
+
+tokGroupTable OBJECT-TYPE      
+      SYNTAX  SEQUENCE OF TokGroupEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= {tokGroup 1}
+ 
+tokGroupEntry OBJECT-TYPE
+      SYNTAX    TokGroupEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { tokGroupId }
+      ::= { tokGroupTable 1 }
+ 
+TokGroupEntry ::=
+      SEQUENCE {
+         tokGroupId
+            INTEGER,
+         tokGroupAutoRightLoop
+            INTEGER,
+         tokGroupAutoLeftLoop
+            INTEGER,
+         tokGroupManRightLoop
+            INTEGER,
+         tokGroupManLeftLoop
+            INTEGER,
+         tokGroupRightNeighbor
+            INTEGER,
+         tokGroupLeftNeighbor
+            INTEGER,
+         tokGroupIOMode
+            INTEGER,
+	 tokGroupBridgeMode
+	    INTEGER,
+         tokGroupManLinkLoop
+            INTEGER,
+         tokGroupManBusLoop
+            INTEGER,
+         tokGroupAutoLinkLoop
+            INTEGER,
+         tokGroupAutoBusLoop
+            INTEGER,
+	 tokGroupSpecificOID
+	    OBJECT IDENTIFIER
+      }
+
+tokGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of the slot in which the group is installed."
+      ::= { tokGroupEntry 1 }
+      
+tokGroupAutoRightLoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+        notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute signifies that a hardware loop was
+      automatically created on a Token Ring module which does not sense
+      the existence of another token ring group on the right hand side."
+      ::= { tokGroupEntry 2 }
+      
+tokGroupAutoLeftLoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+        notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute signifies that a hardware loop was
+      automatically created on a Token Ring module which does not sense
+      the existence of another token ring group on the left hand side."
+      ::= { tokGroupEntry 3 }
+      
+tokGroupManRightLoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting this attribute to ON signifies a command to the hardware
+      to create a loop on the Token Ring module which isolates the ring
+      from the right hand side."
+      ::= { tokGroupEntry 4 }
+      
+tokGroupManLeftLoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+	off(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting this attribute to ON signifies a command to the hardware
+      to create a loop on the Token Ring module which isolates the ring
+      from the left hand side."
+      ::= { tokGroupEntry 5 }
+      
+tokGroupRightNeighbor OBJECT-TYPE
+      SYNTAX  INTEGER {
+           exist(1),
+           notExist(2)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute defining the existence of a neighbor another token ring
+      group on the right hand side of the module."
+      ::= { tokGroupEntry 6 }
+      
+tokGroupLeftNeighbor OBJECT-TYPE
+      SYNTAX  INTEGER {
+           exist(1),
+           notExist(2)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute defining the existence of a neighbor another token ring
+      group on the left hand side of the module."
+      ::= { tokGroupEntry 7 }
+      
+tokGroupIOMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+                single(1),
+                dualRingIn(2),
+                dualRingOut(3),
+                illegalMode(4),
+                lobe(5),
+                intRepeater(6),
+                star(7),
+		notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute defining the I/O mode (single, dual-ring-in, dual-ring-out)
+      Lobe, Internal Repeater or Star) of a module from the the LTR-IO family."
+      ::= { tokGroupEntry 8 }
+      
+tokGroupBridgeMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+                modeA(1),
+                modeB(2),
+                modeC(3),
+		notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the operational mode of the bridge.
+       For ITLB the following modes are defined:
+       - Mode A: First channel connected to an external ring (RI,RO connectors)
+                 and second channel connected to an internal ring;
+       - Mode B: First channel connected to an external ring by a DTE connector
+                 and second channel connected to an internal ring;
+       - Mode C: First channel connected to an internal left ring and second
+                 channel connected to an internal right ring."
+      ::= { tokGroupEntry 9 }
+
+tokGroupManLinkLoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting the value of this attribute to ON instructs the
+      hardware of a LANNET Token Ring repeater module to close the loop in the
+      direction of the external connection."
+      ::= { tokGroupEntry 10 }
+      
+tokGroupManBusLoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting the value of this attribute to ON instructs the
+      hardware of a LANNET Token Ring repeater module to close the loop in the
+      direction of the internal bus."
+      ::= { tokGroupEntry 11 }
+      
+tokGroupAutoLinkLoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute signifies that a hardware loop has been auto-
+      matically closed by the hardwar of the LANNET Token Ring repeater
+      as a result of problems on the external link."
+      ::= { tokGroupEntry 12 }
+      
+tokGroupAutoBusLoop OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2),
+	notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute signifies that a hardware loop has been auto-
+      matically closed by the hardware of the LANNET Token Ring repeater
+      as a result of problems on the internal bus."
+      ::= { tokGroupEntry 13 }
+
+tokGroupSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { tokGroupEntry 14 }
+
+------------------------------------------------------------------------------
+
+tokGroupRingTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF TokGroupRingEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= { tokGroup 2 }
+ 
+tokGroupRingEntry OBJECT-TYPE
+      SYNTAX    TokGroupRingEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { tokGroupRingGroupId, tokGroupRingId }
+      ::= { tokGroupRingTable 1 }
+ 
+TokGroupRingEntry ::=
+      SEQUENCE {
+         tokGroupRingGroupId
+            INTEGER,
+         tokGroupRingId
+            INTEGER,
+         tokGroupRingSpeed
+            INTEGER,
+         tokGroupRingInserted
+            INTEGER
+      }
+
+tokGroupRingGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the group to which the ring belongs."
+      ::= { tokGroupRingEntry 1 }
+      
+tokGroupRingId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the ring."
+      ::= { tokGroupRingEntry 2 }
+      
+tokGroupRingSpeed OBJECT-TYPE
+      SYNTAX  INTEGER {
+                unknown(1),
+                oneMegabit(2),
+                fourMegabit(3),
+                sixteenMegabit(4)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute describing the bandwidth of the ring."
+      ::= { tokGroupRingEntry 3 }
+      
+tokGroupRingInserted OBJECT-TYPE
+      SYNTAX  INTEGER {
+                notInserted(1),
+                inserted(2)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates that the bridge interface has inserted itself into
+      the ring."
+      ::= { tokGroupRingEntry 4 }
+      
+------------------------------------------------------------------------------
+
+
+tokPort OBJECT IDENTIFIER
+      ::= {tok 3}
+
+------------------------------------------------------------------------------
+
+tokPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF TokPortEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= { tokPort 1 }
+ 
+tokPortEntry OBJECT-TYPE
+      SYNTAX    TokPortEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { tokPortGroupId, tokPortId }
+      ::= { tokPortTable 1 }
+ 
+TokPortEntry ::=
+      SEQUENCE {
+         tokPortGroupId
+            INTEGER,
+         tokPortId
+            INTEGER,
+         tokPortBypass
+            INTEGER,
+         tokPortConnected
+            INTEGER,
+         tokPortTCP
+            INTEGER,
+         tokPortCableFault
+            INTEGER,
+         tokPortFunctionalStatus
+            INTEGER,
+         tokPortLastSourceAddr
+	    OCTET STRING,
+	 tokPortSpecificOID
+	    OBJECT IDENTIFIER
+      }
+
+tokPortGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the group to which the token ring port belongs."
+      ::= { tokPortEntry 1 }
+      
+tokPortId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the port in the tokPortTable."
+      ::= { tokPortEntry 2 }
+      
+tokPortBypass OBJECT-TYPE
+      SYNTAX  INTEGER {
+          on(1),
+          off(2),
+	  notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting the value of this attribute to ON causes the by-
+      passing of the TokenRing LANNET port."
+      ::= { tokPortEntry 3 }
+      
+tokPortConnected OBJECT-TYPE
+      SYNTAX  INTEGER {
+          connected(1),
+          notConnected(2),
+	  notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Attribute which describes the connection status of a Token Ring port 
+      (inclusion of the Token Ring controller in the ring)."
+      ::= { tokPortEntry 4 }
+      
+tokPortTCP OBJECT-TYPE
+      SYNTAX  INTEGER {
+          on(1),
+          off(2),
+	  notSupported(255)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Setting the value of this attribute to ON causes the activation of the
+      cable-fault detection mechanism."
+      ::= { tokPortEntry 5 }
+      
+tokPortCableFault OBJECT-TYPE
+      SYNTAX  INTEGER {
+         on(1),
+         off(2),
+         notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Value ON of this attribute signifies the detection of a cable-fault on
+      this specific Token Ring port."
+      ::= { tokPortEntry 6 }
+      
+tokPortFunctionalStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        rld(2),            -- RxLinkDown
+        tld(4),            -- TxLinkDown
+        notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The value of this attribute reflects the functional status of LANNET
+      Token Ring ports. Note that it is not mandatory that a certain port
+      support all the enumerated states. Here is the lest of the possible
+      states:
+      OK - fully functional port, transmitting and receiving packets.
+      RLD - receive link down condition on the port.
+      TLD - transmit link down condition on the port."
+      ::= { tokPortEntry 7 }
+
+tokPortLastSourceAddr OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "MAC source address of the last readable frame received by this
+      port."
+      ::= { tokPortEntry 8 }
+
+tokPortSpecificOID OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"This attribute provides the OID of another group containing 
+	additional more specific information regarding this instance."
+	::= { tokPortEntry 9 }
+
+------------------------------------------------------------------------------
+
+tsGroup OBJECT IDENTIFIER      
+      ::= {ts 1}
+
+------------------------------------------------------------------------------
+
+tsGroupTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF TsGroupEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= {tsGroup 1}
+ 
+tsGroupEntry OBJECT-TYPE
+      SYNTAX    TsGroupEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { tsGroupId }
+      ::= { tsGroupTable 1 }
+ 
+TsGroupEntry ::=
+      SEQUENCE {
+         tsGroupId
+            INTEGER,
+         tsGroupLATStatus
+            INTEGER,
+         tsGroupOperationMode
+            INTEGER
+      }
+
+tsGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of the slot in which the group is installed."
+      ::= { tsGroupEntry 1 }
+      
+tsGroupLATStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2)
+        }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+      "Value ON of this attribute means that LAT protocol is Enabled on the
+      LANNET Ethernet module."
+      ::= { tsGroupEntry 2 }
+      
+tsGroupOperationMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+              diagnostics(1),
+              diagnosticsFailure(2),
+              loading(3),
+              loadingFailure(4),
+              operational(5)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute describes the operation mode of the module in a
+      multiprocessor configuration sensor, as reported by interprocessors
+      communication."
+      ::= { tsGroupEntry 3 }
+      
+------------------------------------------------------------------------------
+
+ltalkPort OBJECT IDENTIFIER
+      ::= {ltalk 1}
+
+------------------------------------------------------------------------------
+
+ltalkPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF LtalkPortEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= {ltalkPort 1}
+ 
+ltalkPortEntry OBJECT-TYPE
+      SYNTAX    LtalkPortEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { ltalkPortGroupId, ltalkPortId }
+      ::= { ltalkPortTable 1 }
+ 
+LtalkPortEntry ::=
+      SEQUENCE {
+         ltalkPortGroupId
+            INTEGER,
+         ltalkPortId
+            INTEGER,
+         ltalkPortTest
+            INTEGER,
+         ltalkPortTestResult
+            INTEGER,
+         ltalkPortJam
+            INTEGER
+      }
+
+ltalkPortGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of the group to which the port belongs."
+      ::= { ltalkPortEntry 1 }
+      
+ltalkPortId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the port in the ltalkPortTable."
+      ::= { ltalkPortEntry 2 }
+      
+ltalkPortTest OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "A value ON of this attribute indicates that a port test should be
+      performed upon the port defined by the attribute instance."
+      ::= { ltalkPortEntry 3 }
+      
+ltalkPortTestResult OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        faulty(2)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates the result of a port test performed on this port."
+      ::= { ltalkPortEntry 4 }
+      
+ltalkPortJam OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "An ON value of this attribute indicates a Jam error on the specific
+      port."
+      ::= { ltalkPortEntry 5 }
+      
+------------------------------------------------------------------------------
+
+clGroup OBJECT IDENTIFIER      
+      ::= {cl 1}
+
+------------------------------------------------------------------------------
+
+clGroupTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF ClGroupEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= {clGroup 1}
+ 
+clGroupEntry OBJECT-TYPE
+      SYNTAX    ClGroupEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { clGroupId }
+      ::= { clGroupTable 1 }
+ 
+ClGroupEntry ::=
+      SEQUENCE {
+         clGroupId
+            INTEGER,
+         clGroupClockRedundancy
+            INTEGER,
+         clGroupMainClock
+            INTEGER,
+         clGroupTestClocks
+            INTEGER
+      }
+
+clGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of the slot in which the group is installed."
+      ::= { clGroupEntry 1 }
+      
+clGroupClockRedundancy OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2)
+        }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+      "Value ON of this attribute defines a redundancy (backup) relationship
+      between the internal and external clocks on the LCL100 module."
+      ::= { clGroupEntry 2 }
+      
+clGroupMainClock OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Value of this attribute is an index into clPortTable, and defines the 
+      clock that should operate or a main clock in redundancy scheme.
+      Serves as 'Clock selection' switch on the card."
+      ::= { clGroupEntry 3 }
+      
+clGroupTestClocks OBJECT-TYPE
+      SYNTAX  INTEGER {
+        on(1),
+        off(2)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "A value ON of this attribute indicates that a test should be
+      performed on all clock ports."
+      ::= { clGroupEntry 4 }
+      
+------------------------------------------------------------------------------
+
+clPort OBJECT IDENTIFIER      
+      ::= {cl 2}
+
+------------------------------------------------------------------------------
+
+clPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF ClPortEntry
+      ACCESS  not-accessible
+      STATUS mandatory
+      ::= {clPort 1}
+ 
+clPortEntry OBJECT-TYPE
+      SYNTAX    ClPortEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      INDEX     { clPortGroupId, clPortId }
+      ::= { clPortTable 1 }
+ 
+ClPortEntry ::=
+      SEQUENCE {
+         clPortGroupId
+            INTEGER,
+         clPortId
+            INTEGER,
+         clPortFunctionalStatus
+            INTEGER
+      }
+
+clPortGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of the group to which the port belongs."
+      ::= { clPortEntry 1 }
+      
+clPortId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "ID of the port in the clPortTable."
+      ::= { clPortEntry 2 }
+      
+clPortFunctionalStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        faulty(2)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Indicates whether the clock is faulty or not."
+      ::= { clPortEntry 3 }
+      
+------------------------------------------------------------------------------
+
+lBoxOID  OBJECT IDENTIFIER      
+      ::= { lntOID 1 }
+      
+-- Implementation of this group is mandatory for all LANNET Hub Agents
+-- It defines OIDs which allow box identification.
+
+lUnknownBoxOID  OBJECT IDENTIFIER ::= { lBoxOID 1 }
+lLET18BoxOID  OBJECT IDENTIFIER ::= { lBoxOID 2 }
+lLET3BoxOID  OBJECT IDENTIFIER ::= { lBoxOID 3 }
+lLET36BoxOID  OBJECT IDENTIFIER ::= { lBoxOID 4 }
+lLET18EBoxOID  OBJECT IDENTIFIER ::= { lBoxOID 5 }
+lLERT40BoxOID  OBJECT IDENTIFIER ::= { lBoxOID 6 }
+lLET10BoxOID  OBJECT IDENTIFIER ::= { lBoxOID 7 }
+lFDX100BoxOID  OBJECT IDENTIFIER ::= { lBoxOID 8 }
+
+------------------------------------------------------------------------------
+
+
+END
+

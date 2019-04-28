@@ -1,0 +1,375 @@
+CLAB-ANI-NID-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    TimeTicks,
+    Counter64,
+    Integer32,
+    Unsigned32
+             FROM SNMPv2-SMI         -- RFC 2578
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+             FROM SNMPv2-CONF        -- RFC 2580
+    MacAddress,
+    RowStatus
+             FROM SNMPv2-TC          -- RFC 2579
+    SnmpAdminString
+             FROM SNMP-FRAMEWORK-MIB -- RFC 3411
+    DateAndTime,
+    TruthValue
+             FROM SNMPv2-TC          -- RFC 2579
+    InetPortNumber,
+    InetAddressType,
+    InetAddress,
+    InetAddressPrefixLength
+             FROM INET-ADDRESS-MIB   --  RFC 4001
+    clabCommonMibs
+             FROM CLAB-DEF-MIB;
+
+clabAniNidMib MODULE-IDENTITY
+
+    LAST-UPDATED  "201611290000Z" -- November 29, 2016
+    ORGANIZATION "Cable Television Laboratories, Inc."
+    CONTACT-INFO
+            "Broadband Network Services
+             Cable Television Laboratories, Inc.
+             858 Coal Creek Circle,
+             Louisville, CO 80027, USA
+             Phone: +1 303-661-9100
+             Email: mibs@cablelabs.com"
+     DESCRIPTION
+            "This MIB module contains the management
+             for Network Interface Devices (NIDs).
+             Copyright 2016 Cable Television Laboratories, Inc.
+             All rights reserved."
+     REVISION "201611290000Z" -- November 29, 2016
+     DESCRIPTION
+            "Initial Version released at same time as CL-SP-NID-I01."
+    ::= { clabCommonMibs 8 }
+
+
+-- Administrative assignments
+clabAniNidNotifications      OBJECT IDENTIFIER ::= { clabAniNidMib 0 }
+clabAniNidMibObjects         OBJECT IDENTIFIER ::= { clabAniNidMib 1 }
+clabAniNidMibConformance     OBJECT IDENTIFIER ::= { clabAniNidMib 99 }
+
+clabAniNidCfgObjects         OBJECT IDENTIFIER ::= { clabAniNidMibObjects 1 }
+clabAniNidStatusObjects      OBJECT IDENTIFIER ::= { clabAniNidMibObjects 2 }
+
+-- ---------------------------------------------------------------------
+-- NID Coonfiguration
+-- ---------------------------------------------------------------------
+   
+clabAniNidCfgID    OBJECT-TYPE
+    SYNTAX      SnmpAdminString    
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Human Readable Identifier - Assigned by install
+         technician."
+    ::= { clabAniNidCfgObjects 1 }
+
+clabAniNidCfgPtpMcastMac    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    forwardable(1),
+                    nonforwardable(2) 
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For transmitting PTP packets, either the forwardable multicast MAC 
+         address (01-1B-19-00-00-00) or the non-forwardable multicast MAC 
+         address (01-80-C2-00-00-0E) must be used as the destination MAC 
+         address. The MAC address in use is selected on a per-port basis
+         through the configuration. However, the non-forwardable multicast
+         MAC address (01-80-C2-00-00-0E) will be used if no destination MAC
+         is configured."
+    ::= { clabAniNidCfgObjects 2 }
+    
+clabAniNidCfgTelnetEnabled    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows enabling or disabling Telnet access
+         on the NID."
+    ::= { clabAniNidCfgObjects 3 }
+
+    
+clabAniNidCfgTftpEnabled    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows enabling or disabling TFTP access to/from the NID.
+         The default is false (disabled)"
+    ::= { clabAniNidCfgObjects 4 }
+    
+        
+-- ---------------------------------------------------------------------
+-- AAA Authentication and Server Information
+-- ---------------------------------------------------------------------
+
+clabAniNidCfgClientAuthStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     unknown(0),
+                     authenticated(1),
+                     authenticationFailed(2),
+                     noAvailableServers(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current authentication status of the NID authentication 
+         client with respect to the AAA server."
+    ::= { clabAniNidCfgObjects 5 }
+    
+clabAniNidCfgAuthServerServiceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     unknown(0),
+                     radius(1),
+                     tacacs(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication protocol.  Only one protocol may
+         be active on a NID."
+    ::= { clabAniNidCfgObjects 6 }
+
+clabAniNidCfgPrimaryServerIpAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AAA primary server IP Address Type"
+    ::= { clabAniNidCfgObjects 7 }
+    
+clabAniNidCfgPrimaryServerIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AAA primary server IP Address"
+    ::= { clabAniNidCfgObjects 8 }
+
+clabAniNidCfgPrimaryServerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AAA primary port number"
+    ::= { clabAniNidCfgObjects 9 }
+
+clabAniNidCfgSecondaryServerIpAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AAA Secondary server IP Address Type"
+    ::= { clabAniNidCfgObjects 10 }
+    
+clabAniNidCfgSecondaryServerIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AAA Secondary server IP Address"
+    ::= { clabAniNidCfgObjects 11 }
+    
+clabAniNidCfgSecondaryServerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AAA secondary port number"
+    ::= { clabAniNidCfgObjects 12 }   
+
+-- ---------------------------------------------------------------------
+-- NID Status and Configuration Reporting
+-- ---------------------------------------------------------------------    
+-- ---------------------------------------------------------------------
+-- NID Authentication History
+-- ---------------------------------------------------------------------
+    
+clabAniNidStatusAuthHistoryMaxTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the maximum number of rows.  If a new row is to be added
+         (i.e., a new session attempt)and the addition would cause
+         the table to exceed the maximam table size, the oldest entry
+         must be first deleted then the new authentication attempt row 
+         is appended to the table (i.e., added as the last row)."
+    ::= { clabAniNidStatusObjects 1 }
+     
+clabAniNidStatusAuthHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ClabAniNidStatusAuthHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table reports each authentication attempt and
+         result.   Radius and TACACS servers available to authentication
+         clients."
+    ::= { clabAniNidStatusObjects 2 }
+
+clabAniNidStatusAuthHistoryEntry OBJECT-TYPE
+    SYNTAX      ClabAniNidStatusAuthHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry per authentication attempt."
+    INDEX { clabAniNidStatusAuthHistoryInitiationTime }
+    ::= { clabAniNidStatusAuthHistoryTable 1 }
+    
+ClabAniNidStatusAuthHistoryEntry ::= SEQUENCE {
+    clabAniNidStatusAuthHistoryInitiationTime                TimeTicks,
+    clabAniNidStatusAuthHistoryResults                       INTEGER,
+    clabAniNidStatusAuthHistoryServer            			      INTEGER
+    }
+
+clabAniNidStatusAuthHistoryInitiationTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index value of the clabAniStatusNidHistoryServerTable."
+    ::= { clabAniNidStatusAuthHistoryEntry 1 }
+
+clabAniNidStatusAuthHistoryResults OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     unknown(0),
+                     success(1),
+                     failedRc1(2),
+                     failedRc2(3),
+                     failedRc3(4)
+                }   
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Attempted authentication outcome.  Failure reason
+         codes follow:
+         failed_rc1(2) - Unknown
+         failed_rc2(3) - Server Not Available
+         failed_rc3(4) - Unknown User
+        ."                                         
+    ::= { clabAniNidStatusAuthHistoryEntry 2 }
+
+clabAniNidStatusAuthHistoryServer OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     primary(0),
+                     secondary(1)
+                }   
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies whether primary or secondary server access
+         was attempted. If the primary server rejected the session 
+         or was not available, the NID should attempt accessing
+         the secondary server if defined."        
+    ::= { clabAniNidStatusAuthHistoryEntry 3 }
+            
+-- ---------------------------------------------------------------------
+-- Circuit Inventory Table
+-- ---------------------------------------------------------------------    
+clabAniNidStatusReportCircuitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ClabAniNidStatusReportCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table reports each circuit associated with this NID.  
+         This table and its contents are stored in non-volatile
+         memory."
+    ::= { clabAniNidStatusObjects 3 }
+
+clabAniNidStatusReportCircuitEntry OBJECT-TYPE
+    SYNTAX      ClabAniNidStatusReportCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry per circuit."
+    INDEX { clabAniNidStatusReportCircuitIndex }
+    ::= { clabAniNidStatusReportCircuitTable 1 }
+    
+ClabAniNidStatusReportCircuitEntry ::= SEQUENCE {
+    clabAniNidStatusReportCircuitIndex                Unsigned32,
+    clabAniNidStatusReportCircuitIdentifier           SnmpAdminString,
+    clabAniNidStatusReportCircuitTargetIdentifier     SnmpAdminString
+    } 
+
+clabAniNidStatusReportCircuitIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index value of the clabAniNidStatusCircuitReportTable."
+    ::= { clabAniNidStatusReportCircuitEntry 1 }
+    
+clabAniNidStatusReportCircuitIdentifier OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Service or circuit identifier"
+    ::= { clabAniNidStatusReportCircuitEntry 2 }
+
+clabAniNidStatusReportCircuitTargetIdentifier OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Target identifier (TID)"
+    ::= { clabAniNidStatusReportCircuitEntry 3 }
+    
+
+-- ---------------------------------------------------------------------
+-- Compliance Statements
+-- ---------------------------------------------------------------------
+
+clabAniNidMibCompliances     OBJECT IDENTIFIER ::= { clabAniNidMibConformance 1 }
+clabAniNidMibGroups          OBJECT IDENTIFIER ::= { clabAniNidMibConformance 2 }
+
+-- No Notifications are defined for this MIB
+
+clabAniNidCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+         "The compliance statement for the NID device."
+    MODULE -- this MODULE
+    MANDATORY-GROUPS {
+            clabAniNidGroup
+            }
+    ::= { clabAniNidMibCompliances 1 }
+
+clabAniNidGroup OBJECT-GROUP
+    OBJECTS {
+            clabAniNidCfgID,
+            clabAniNidCfgPtpMcastMac,
+            clabAniNidCfgTelnetEnabled,
+            clabAniNidCfgTftpEnabled,
+           --AAA Server Info 
+            clabAniNidCfgClientAuthStatus,           
+            clabAniNidCfgAuthServerServiceType,
+            clabAniNidCfgPrimaryServerIpAddressType,
+            clabAniNidCfgPrimaryServerIpAddress,
+            clabAniNidCfgPrimaryServerPort,
+            clabAniNidCfgSecondaryServerIpAddressType,
+            clabAniNidCfgSecondaryServerIpAddress,
+            clabAniNidCfgSecondaryServerPort,
+           -- NID History 
+            clabAniNidStatusAuthHistoryMaxTableSize,
+            clabAniNidStatusAuthHistoryResults,
+            clabAniNidStatusAuthHistoryServer,
+            clabAniNidStatusReportCircuitIndex,
+           --clabAniNidStatusReportCircuitReportTable 
+            clabAniNidStatusReportCircuitIdentifier,        
+            clabAniNidStatusReportCircuitTargetIdentifier  
+
+            }
+    STATUS      current
+    DESCRIPTION
+             "Objects implemented in the clabAniNidGroup."
+    ::= { clabAniNidMibGroups 1 }
+        
+END

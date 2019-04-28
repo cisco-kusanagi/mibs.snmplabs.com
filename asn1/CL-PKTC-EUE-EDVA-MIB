@@ -1,0 +1,672 @@
+CL-PKTC-EUE-EDVA-MIB DEFINITIONS ::= BEGIN 
+ 
+IMPORTS 
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    Integer32 
+                    FROM SNMPv2-SMI 
+    OBJECT-GROUP, 
+    MODULE-COMPLIANCE 
+                    FROM SNMPv2-CONF   
+    TruthValue 
+                    FROM SNMPv2-TC   
+    SnmpAdminString 
+                       FROM SNMP-FRAMEWORK-MIB 
+    InetAddress, 
+    InetAddressType 
+                    FROM INET-ADDRESS-MIB             
+    pktcEUESpecificMib
+                    FROM CLAB-DEF-MIB; 
+
+pktcEDVAMIB MODULE-IDENTITY 
+    LAST-UPDATED "200708230000Z"  -- TBD: Aug 23, 2007    
+    ORGANIZATION "Cable Television Laboratories, Inc." 
+    CONTACT-INFO 
+            "Sumanth Channabasappa
+             Cable Television Laboratories, Inc. 
+             858 Coal Creek Circle, 
+             Louisville, CO 80027, USA  
+             Phone: +1 303-661-9100
+             Email: sumanth@cablelabs.com
+        
+             Acknowledgements:
+             Thomas Clack, Broadcom - Primary author
+             John Berg, CableLabs
+             Satish Kumar, Texas Instruments
+             , and members of the PacketCable PACM Focus Team."
+     DESCRIPTION 
+            "This MIB module contains configuration MIB  
+             objects for the PacketCable E-DVA."
+     ::= { pktcEUESpecificMib 1 } 
+
+
+-- Administrative assignments      
+pktcEDVANotification      OBJECT IDENTIFIER ::= { pktcEDVAMIB 0 }  
+pktcEDVAObjects           OBJECT IDENTIFIER ::= { pktcEDVAMIB 1 }  
+pktcEDVAConformance       OBJECT IDENTIFIER ::= { pktcEDVAMIB 2 }  
+ 
+pktcEDVACompliances       OBJECT IDENTIFIER ::= { pktcEDVAConformance 1 }  
+pktcEDVAGroups            OBJECT IDENTIFIER ::= { pktcEDVAConformance 2 }  
+
+
+-- -------------------------------------------------------------------- 
+-- MIB Objects 
+-- -------------------------------------------------------------------- 
+pktcEDVAProfileIDs        OBJECT IDENTIFIER ::= { pktcEDVAObjects 2 } 
+pktcEDVAProfile           OBJECT IDENTIFIER ::= { pktcEDVAObjects 3 }  
+ 
+
+-- ---------------------------------------------------------------------                    
+--  eUE Profile Information
+-- ---------------------------------------------------------------------                    
+pktcEDVAProfileVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(0..6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This MIB Object represents the E-DVA Profile Version for this
+          MIB module. The eUE MUST set this MIB Object to a value of '1.0'."
+    ::= { pktcEDVAProfile 1 }
+
+-- ---------------------------------------------------------------------                     
+-- Pktc Line Number MIB Object 
+-- ---------------------------------------------------------------------                     
+pktcEDVALineNumber  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..31) 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        " This object MUST identify an endpoint or Line Number on an 
+          E-DVA.  A value of zero indicates that the E-DVA has 
+          no endpoints" 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVAProfileIDs 1 } 
+ 
+
+-- ----------------------------------------------------------------------------- 
+ -- E-DVA Network Disconnect Signaling Event 
+ -- Ref (PacketCable E-DVA Specification): Network Disconnect Signaling Event 
+ -- ----------------------------------------------------------------------------- 
+ pktcEDVANetDiscProfile  OBJECT IDENTIFIER ::= { pktcEDVAProfile 2 } 
+  
+ -- The Network Disconnect Signaling Event Table 
+ pktcEDVANetDiscTable OBJECT-TYPE 
+     SYNTAX      SEQUENCE OF PktcEDVANetDiscEntry 
+     MAX-ACCESS  not-accessible 
+     STATUS      current 
+     DESCRIPTION 
+         " This data table represents the Network Disconnect time 
+           for each line provided by the E-DVA." 
+     ::= { pktcEDVANetDiscProfile 1 }  
+      
+ pktcEDVANetDiscEntry OBJECT-TYPE 
+     SYNTAX      PktcEDVANetDiscEntry 
+     MAX-ACCESS  not-accessible 
+     STATUS      current 
+     DESCRIPTION 
+         " Each entry in this data table describes the Network Disconnect 
+           Time for the associated line." 
+     INDEX  { pktcEDVALineNumber } 
+     ::= { pktcEDVANetDiscTable 1 }  
+      
+ PktcEDVANetDiscEntry ::= 
+     SEQUENCE { 
+               pktcEDVANetDisc     Integer32  
+              } 
+
+pktcEDVANetDisc  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..2000) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the time in mSec that the E-DVA 
+          must remove DC bias when a call has been cleared by the network. 
+          
+          A value of zero (0) indicates that the E-DVA MUST NOT remove DC bias 
+          when a call disconnects.  The E-DVA MUST implement this element per  
+          the E-DVA specification."
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {1000} 
+    ::= { pktcEDVANetDiscEntry 1 } 
+ 
+ 
+ -- ---------------------------------------------------------------------                     
+ -- E-DVA Answer Supervision Event 
+ -- Ref (PacketCable E-DVA Specification): Answer Supervision Event 
+ -- ---------------------------------------------------------------------                     
+ pktcEDVAAnsSupProfile  OBJECT IDENTIFIER ::= { pktcEDVAProfile 3 } 
+  
+ -- The Answer Supervision Signal Event Table 
+ pktcEDVAAnsSupTable OBJECT-TYPE 
+     SYNTAX      SEQUENCE OF PktcEDVAAnsSupEntry 
+     MAX-ACCESS  not-accessible 
+     STATUS      current 
+     DESCRIPTION 
+         " This data table represents the Answer Supervision  
+           for each line provided by the E-DVA." 
+    ::= { pktcEDVAAnsSupProfile 1 }  
+
+pktcEDVAAnsSupEntry OBJECT-TYPE 
+    SYNTAX      PktcEDVAAnsSupEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        " Each entry in this data table describes the Answer Supervision 
+          for the associated line." 
+    INDEX  { pktcEDVALineNumber } 
+    ::= { pktcEDVAAnsSupTable 1 }  
+     
+PktcEDVAAnsSupEntry ::= 
+    SEQUENCE { 
+              pktcEDVAAnsSup          TruthValue 
+             } 
+                             
+pktcEDVAAnsSup  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the Answer Supervision state. 
+          Answer Supervision (also called battery reversal, reverse DC bias,  
+          or Reverse Loop Current Feed) is signaled when the distant end  
+          answers a call originated by the CPE. Typically this signal is  
+          used to notify electronic equipment such as PBXs which have a local  
+          billing system that a call has been answered. When provisioned to do  
+          so, the E-DVA may reverse DC bias when a call has been answered. 
+          
+          The default value for this object is 'false' indicating that  
+          Answer Supervision is disabled (off). 
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {false} 
+    ::= { pktcEDVAAnsSupEntry 1 } 
+  
+-- ---------------------------------------------------------------------                     
+-- E-DVA DTMF Relay Offer 
+-- Ref (PacketCable E-DVA Specification): DTMF Relay Offer 
+-- ---------------------------------------------------------------------                     
+pktcEDVADtmfProfile  OBJECT IDENTIFIER ::= { pktcEDVAProfile 4 } 
+    
+pktcEDVADtmfRelay  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This MIB Object represents the DTMF Relay status for the E-DVA.
+
+          The E-DVA must support the use of DTMF for both dialed digits  
+          and for the relay of digits as part of an established session.  
+          When dialing the DTMF, signaling MUST be collected at the E-DVA.  
+          The digits are gathered according to the digit map and all digits  
+          are sent in a single message.  
+          
+          If the value of this object is 'true' (on), the E-DVA must offer  
+          DTMF relay within SDP upon session origination. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {true} 
+    ::= { pktcEDVADtmfProfile 1 } 
+  
+-- ---------------------------------------------------------------------                     
+-- E-DVA Provisioned Loss Plan 
+-- Ref (PacketCable E-DVA Specification): Provisioned Loss Plan 
+-- ---------------------------------------------------------------------                     
+pktcEDVAPrLossProfile  OBJECT IDENTIFIER ::= { pktcEDVAProfile 5 } 
+ 
+-- The Provisioned Loss Plan Table 
+pktcEDVAPrLossTable OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF PktcEDVAPrLossEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        " The DVA supports two provisioned loss parameters, one for  
+          the D/A direction (towards the subscriber) and one for A/D  
+          direction (from the subscriber) direction.  This data table  
+          represents the loss for each line provided by the E-DVA." 
+    ::= { pktcEDVAPrLossProfile 1 }  
+     
+pktcEDVAPrLossEntry OBJECT-TYPE 
+    SYNTAX      PktcEDVAPrLossEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        " The DVA supports two provisioned loss parameters, one for  
+          the D/A direction (towards the subscriber) and one for A/D  
+          direction (from the subscriber) direction.  This data table  
+          represents the loss for each line provided by the E-DVA. 
+ 
+          Each entry in this data table describes the loss 
+          for the associated line." 
+    INDEX  { pktcEDVALineNumber } 
+    ::= { pktcEDVAPrLossTable 1 }  
+     
+PktcEDVAPrLossEntry ::= 
+    SEQUENCE { 
+              pktcEDVAPrLossDA           Integer32, 
+              pktcEDVAPrLossAD           Integer32 
+             } 
+
+pktcEDVAPrLossDA  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..12) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the provisioned loss parameter  
+          for the D/A direction (towards the subscriber) in dB. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {6} 
+    ::= { pktcEDVAPrLossEntry 1 } 
+  
+pktcEDVAPrLossAD  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..12) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the provisioned loss parameter  
+          for the A/D direction (from the subscriber)in dB. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {6} 
+    ::= { pktcEDVAPrLossEntry 2 }  
+
+-- ---------------------------------------------------------------------                     
+-- Network/E-DVA On Hook In/Out of Service 
+-- Ref (PacketCable E-DVA Specification): Network/E-DVA On Hook In/Out of 
+-- Service 
+-- ---------------------------------------------------------------------                     
+pktcEDVADCBiasProfile  OBJECT IDENTIFIER ::= { pktcEDVAProfile 6 } 
+ 
+-- The Network/E-DVA On Hook In/Out of Service Table
+pktcEDVADCBiasTable OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF PktcEDVADCBiasEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        " DCbias is the signaling method to indicate the Network/E-DVA  
+          in/out of service state. The Operator is able to provision to  
+          enable planned, scheduled service times to not be signaled as  
+          an out of service state pending a maximum duration element.  
+          This data table represents the On Hook In/Out of Service parameters  
+          each line provided by the E-DVA." 
+    ::= { pktcEDVADCBiasProfile 1 }  
+
+pktcEDVADCBiasEntry OBJECT-TYPE 
+    SYNTAX      PktcEDVADCBiasEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        " DCbias is the signaling method to indicate the Network/E-DVA  
+          in/out of service state. The Operator is able to provision to  
+          enable planned, scheduled service times to not be signaled as  
+          an out of service state pending a maximum duration element.  
+          This data table represents the On Hook In/Out of Service parameters  
+          each line provided by the E-DVA. 
+ 
+          Each entry in this data table describes the On Hook 
+          In/Out of Service parameters for the associated line." 
+    INDEX  { pktcEDVALineNumber } 
+    ::= { pktcEDVADCBiasTable 1 }  
+     
+PktcEDVADCBiasEntry ::= 
+    SEQUENCE { 
+              pktcEDVADCBiasSig          TruthValue, 
+              pktcEDVADCBiasMax          Integer32, 
+              pktcEDVADCBiasHold         Integer32, 
+              pktcEDVADCBiasEnable       Integer32 
+             } 
+
+pktcEDVADCBiasSig  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object enables/disables the DCbias management per  
+          provisioned values on a per telephony port basis.  
+          
+          A default value of '0'(false)indicates that DCbias must  
+          perform per provisioned elements. 
+          
+          A value of '1' (true) indicates that the DCbias is not  
+          controlled by the provisioned elements. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {false} 
+    ::= { pktcEDVADCBiasEntry 1 } 
+     
+pktcEDVADCBiasMax  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..2400) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the maximum period of time,  
+          in seconds, that a DCbias must be maintained following  
+          an E-DVA reboot requiring a 'In-Service' State re-establishment. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {1200} 
+    ::= { pktcEDVADCBiasEntry 2 } 
+
+pktcEDVADCBiasHold  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..1200) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the period of time, in seconds, 
+          that a DCbias must be maintained following an Out-of-Service  
+          State.  If the DCbiasHold duration expires, the DCbias must 
+          be removed from the telephony port.  
+          
+          If the Network/E-DVA succeeds to re-establish the 'In-Service'  
+          state during the DCbiasHold duration, the DCbiasHold must be  
+          cancelled resulting in the DCbias being maintained on the  
+          telephony port in support of normal telephony signaling  
+          requirements. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {600} 
+    ::= { pktcEDVADCBiasEntry 3 }   
+     
+pktcEDVADCBiasEnable  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..60) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the delay time period prior to  
+          reapplying DCbias on the E-DVA telephony port following the  
+          re-establishment of the 'In-Service' state following a DCbias  
+          removal. This avoids 'race' conditions between the Network/E-DVA  
+          transitions from inappropriately signaling to the end user  
+          security system. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL {5} 
+    ::= { pktcEDVADCBiasEntry 4 } 
+                           
+-- ---------------------------------------------------------------------                     
+-- MWI Signal Types 
+-- Ref (PacketCable  E-DVA Specification): MWI Signal Types 
+-- ---------------------------------------------------------------------    
+pktcEDVAMWISignalTypes  OBJECT IDENTIFIER ::= { pktcEDVAProfile 7 } 
+ 
+pktcEDVAMWIToneInd  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This is the MWI Tone Indicator. 
+ 
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVAMWISignalTypes 1 }  
+  
+pktcEDVAMWIAncInd  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This is the MWI Voice Announcement Indication. 
+ 
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVAMWISignalTypes 2 }  
+
+pktcEDVAMWIFSKInd  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This is the MWI FSK Indication. 
+ 
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVAMWISignalTypes 3 }  
+ 
+pktcEDVAMWIDTMFInd  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This is the MWI DTMF Indication. 
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVAMWISignalTypes 4 }  
+ 
+-- ---------------------------------------------------------------------                     
+-- E-DVA CODEC Provisioning 
+-- Ref (PacketCable E-DVA Specification): E-DVA CODEC Provisioning 
+-- ---------------------------------------------------------------------                     
+pktcEDVACodecProfile  OBJECT IDENTIFIER ::= { pktcEDVAProfile 8 } 
+    
+pktcEDVACodecG711Pkt  OBJECT-TYPE 
+    SYNTAX      Integer32 (10 | 20 |30) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the packetization period of a  
+          G.711 payload. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL  {20} 
+    ::= { pktcEDVACodecProfile 1 } 
+ 
+pktcEDVACodecT38  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies whether fax relay is enabled/disabled.  
+          A value of 'true' (ON) enables fax relay on the E-DVA. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL  {true} 
+    ::= { pktcEDVACodecProfile 2 }  
+     
+pktcEDVACodecV152  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies whether modem relay is enabled/disable. 
+          A value of 'true' (ON) enables modem relay on the E-DVA. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL  {true} 
+    ::= { pktcEDVACodecProfile 3 } 
+
+pktcEDVACodecPubRepAddrType  OBJECT-TYPE 
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the domain for the address  
+          specified in pktcEDVACodecPubRepAddr.  If the elment  
+          pktcEDVACodecPubRepAddr contains a valid IP address,  
+          this element MUST be either 'ipv4(1)' or 'ipv6(2)' per  
+          RFC3291. " 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVACodecProfile 4 }  
+ 
+pktcEDVACodecPubRepAddr  OBJECT-TYPE 
+    SYNTAX      InetAddress 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the network address that receives  
+          the call statistics report from the E-DVA. Publish reports must 
+          be sent at the end of each call if enabled. 
+          
+          This address is associated with the domain specified in  
+          pktcEDVACodecPubRepAddrType. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVACodecProfile 5 } 
+                                             
+pktcEDVACodecRTCPXR  OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies if extended reports for the sake of voice  
+          metrics are included within RTCP packets. A value of 'true' (ON)  
+          enables RTCP extended reports. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL  {true} 
+    ::= { pktcEDVACodecProfile 6 } 
+
+pktcEDVACodecRTCPRate  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..60) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies the interval at which RTCP packets are  
+          sent from the E-DVA. A value of zero for RTCP_RATE disables RTCP  
+          transmission. 
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL  {5} 
+    ::= { pktcEDVACodecProfile 7 } 
+                       
+-- ---------------------------------------------------------------------                     
+-- E-DVA Time Synchronization 
+-- Ref (PacketCable E-DVA Specification): E-DVA Time Synchronization 
+-- ---------------------------------------------------------------------                     
+pktcEDVATimeProfile  OBJECT IDENTIFIER ::= { pktcEDVAProfile 9 } 
+    
+pktcEDVATimeSync  OBJECT-TYPE 
+    SYNTAX      Integer32 (0..4320) 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This object specifies time synchronization interval. 
+          A PacketCable E-DVA must support a provisionable network time  
+          synchronization interval. The time synchronization interval range  
+          must be from 0 to 4320 hours (180 days) in increments of 1 hour.  
+          A provisioned value of '0' indicates the E-DVA must NOT execute  
+          network time resynchronization. The default network time  
+          synchronization interface is 48 hours.  
+          
+          The E-DVA MUST implement this element per the PacketCable Residential  
+          SIP Telephony E-DVA Specification." 
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    DEFVAL  {48} 
+    ::= { pktcEDVATimeProfile 1 }
+     
+-- ----------------------------------------------------------------------------- 
+-- Announcement Types
+-- ----------------------------------------------------------------------------- 
+pktcEDVAAnnounceProfile  OBJECT IDENTIFIER ::= { pktcEDVAProfile 10 } 
+
+pktcEDVAToneIdentifier  OBJECT-TYPE 
+    SYNTAX      OCTET STRING 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This MIB Object specifies the tone identifier for an E-DVA."
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVAAnnounceProfile 1 }
+     
+pktcEDVAAudioAnnounceId OBJECT-TYPE 
+    SYNTAX      OCTET STRING 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        " This MIB Object specifies the audio announcement identifier
+          for an E-DVA."
+    REFERENCE "PacketCable RST E-DVA Specification" 
+    ::= { pktcEDVAAnnounceProfile 2 }
+
+
+-- --------------------------------------------------------------------- 
+-- Conformance Information  
+-- --------------------------------------------------------------------- 
+pktcEDVAMIBCompliances  OBJECT IDENTIFIER ::= { pktcEDVAConformance 1 } 
+pktcEDVAMIBGroups       OBJECT IDENTIFIER ::= { pktcEDVAConformance 2 } 
+
+-- Compliance Statements 
+pktcEDVAMIBCompliance MODULE-COMPLIANCE 
+    STATUS      current 
+    DESCRIPTION 
+            "The compliance statement for implementations of the EDVA MIB." 
+    MODULE   -- this module 
+        MANDATORY-GROUPS { 
+                 pktcEDVAProfileGroup,
+                 pktcEDVAGroup 
+        } 
+    ::= { pktcEDVAMIBCompliances 1 }           
+ 
+pktcEDVAProfileGroup OBJECT-GROUP
+      OBJECTS { 
+         pktcEDVAProfileVersion
+      }
+      STATUS  current
+      DESCRIPTION
+            "The eUE RST Profile Group."
+      ::= { pktcEDVAMIBGroups 1}
+
+pktcEDVAGroup OBJECT-GROUP 
+      OBJECTS {             
+         pktcEDVANetDisc, 
+         pktcEDVAAnsSup, 
+         pktcEDVADtmfRelay, 
+         pktcEDVAPrLossDA, 
+         pktcEDVAPrLossAD, 
+         pktcEDVADCBiasSig, 
+         pktcEDVADCBiasMax, 
+         pktcEDVADCBiasHold, 
+         pktcEDVADCBiasEnable, 
+         pktcEDVAMWIToneInd, 
+         pktcEDVAMWIAncInd, 
+         pktcEDVAMWIFSKInd, 
+         pktcEDVAMWIDTMFInd, 
+         pktcEDVACodecG711Pkt, 
+         pktcEDVACodecT38, 
+         pktcEDVACodecV152, 
+         pktcEDVACodecPubRepAddrType, 
+         pktcEDVACodecPubRepAddr, 
+         pktcEDVACodecRTCPXR, 
+         pktcEDVACodecRTCPRate, 
+         pktcEDVATimeSync,
+         pktcEDVAToneIdentifier,
+         pktcEDVAAudioAnnounceId
+      } 
+      STATUS  current 
+      DESCRIPTION 
+            "The E-DVA Group." 
+      ::= { pktcEDVAMIBGroups 2} 
+       
+END 
+

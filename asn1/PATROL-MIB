@@ -1,0 +1,792 @@
+-- $Id: Patrol-MIB,v 1.24 1997/05/09 21:38:14 aliu Exp $
+--
+-- MIB: Patrol-MIB
+-- --------------------------------------------------------------
+-- Description: MIB for Patrol Agent/Console
+-- --------------------------------------------------------------
+-- Author        : Mark Sterin  ($Locker:  $)
+-- Creation date : Aug 17, 1994
+--
+-- Last check-in date: $Date: 1997/05/09 21:38:14 $
+--
+-- Copyright (c) 1994 BMC Software, Inc.
+-- --------------------------------------------------------------
+--
+--
+-- Patrol Agent managed objects to SNMP MIB variables mapping is very simple.
+-- All the information is presented in 5 tables:
+--
+--      objectsTable  - each row in the table describes one Patrol Agent Object,
+--              i.e. node in objects variables tree.
+--
+--      variablesTable  - each row describes one Patrol Agent Object Variable,
+--              i.e. leave in objects variables tree.
+--
+--      applicationsTable - each row describes one Patrol Agent application.
+--
+--      applInstTable - each row describes one Patrol Agent application 
+--              instance.
+--
+--      parametersTable - each row describes one Patrol Agent parameter. 
+--
+-- and a few service MIB variables:
+--
+--      objectsCwd      - parent node for objectsTable. Only the subnodes of
+--              objectsCwd will show in objectsTable, and only leaves of objects
+--              Cwd will show in variablesTable
+--
+--      agentExecuteCommand     - implements a kind of RPC, where patrolAgent is
+--            a (PSL) server for SNMP management station. Setting this variable
+--            will execute it's value as a (PSL) script in a specially created
+--            PSL process.
+--
+--
+-- Columns in objectsTable
+--      objectName              DisplayString  
+-- name of the object
+--      objectDescr             DisplayString 
+-- Description (For Future use) 
+--      objectRowStatus         PRowStatus     
+-- Row status for a new row  creation as defined in SNMP v2
+--
+-- Columns in variablesTable
+--              variableName    DisplayString
+                                -- variable name without leading path
+--              variableType    DisplayString
+                                -- a string identifying type of the variable
+--              variableValue   DisplayString   
+-- the variable's value  (and what did you think ? :-)
+--              variableDesr    DisplayString   
+-- FFU: variable help info
+--              variableRowStatus       PRowStatus
+-- Row status for a new row  creation as defined in SNMP v2
+--
+-- Columns in applicationsTable:
+--        applicationName          DisplayString         
+           -- Patrol Application's name
+--        applicationState         State
+           -- Application State 
+--        applWorstInst            DisplayString       
+           -- Worst Instance of the Application
+--        applMasterVersion         DisplayString
+           -- version number of the application 
+--        applMinorRevision         DisplayString
+           -- minor revision number of the application 
+--        applicationRowStatus     PRowStatus
+           -- row status for a new row creation as defined in SNMP v2.
+--
+-- Columns in applInstTable:
+--        applInstName        DisplayString
+           -- Patrol Application Instance name
+--        applInstRuleState   States
+           -- Patrol Application Instance state
+--        applInstStatus      States
+           -- Patrol Application Instance status is the worst of
+           -- rule state and its worst parameter's status
+--        applInstWorstParam  DisplayString
+           -- application instance worst parameter
+--        applInstCreateIcon  PBoolean
+           -- Create icon for Application instances.
+           -- Create icon in Patrol Console is at the Application level and it 
+           -- means create ContainerGadget when first instance is created
+--        applInstRowStatus   PRowStatus
+           -- row status for a new row creation as defined in SNMP v2.
+--
+-- Columns in parametersTable:
+--        parameterName        DisplayString
+           -- parameter's name 
+--        parameterState        States
+           -- parameter's state
+--        parameterCurrentTime TimeTicks
+           -- time stamp when current value was produced
+--        parameterCurrentValue DisplayString
+           -- parameters current value
+--        parameterPollingInt   INTEGER
+           -- parameter's polling interval
+--        parameterRetries      INTEGER
+           -- parameter's timeout  retries
+--        parameterOutputMode   OutputMode
+           -- parameter's Output mode
+--        parameterAutoScale    PBoolean
+           -- true(1): use automatic scale, false(0):use following YaxisMin and YaxisMax fields to draw scale
+--        parameterYaxisMin     INTEGER
+           -- Minimum value for drawing y-axis scale if parameterAutoScale is false(0)
+--        parameterYaxisMax     INTEGER
+           -- Miximum value for drawing y-axis scale if parameterAutoScale is false(0)
+--        parameterRowStatus   PRowStatus
+           -- row status for a new row creation as defined in SNMP v2.
+--
+--
+--      TRAPS.
+--      ------
+--
+--      Patrol Agent sends traps to registered management stations.
+--      Traps are sent in SNMP v1 format only.
+--      In order to register with patrol Agent for traps a
+--      management station should add a row to  piV1mTable (patrol interested V1
+--      managers).
+--      Row is added by sending instance of piV1mRowStatus for the desired
+--      ip/port/community with value CreateAndGo (4),
+--      and destroyed by setting it's value
+--      to Delete (6). piV1mTable contains the following columms:
+--              piV1mIp        IpAddress
+--              piV1mPort      INTEGER
+--              piV1mCommunity OCTET STRING (SIZE (0..127))
+--              piV1mRowStatus PRowStatus
+--
+-- Patrol Agent sends patrolTrapV1StateChanged to all interested managers when
+-- an application instance state chages. It sends patrolTrapV1Raised
+-- to all interested managers when a PSL snmp-trap-raise-std-trap() is called.
+--
+-- patrolV1TrapRaised
+              -- triggered manually with PSL function snmp-trap
+-- patrolV1TrapStateChanged
+              -- triggered when /*/state variable value is changed
+--
+-- A new object, patrolTrapText, is defined to carry text passed with the trap
+-- For patrolV1TrapRaised the value of patrolTrapText.0 is defined by the
+-- PSL program as the only parameter to snmp-trap-raise-std-trap() function
+-- For patrolV1TrapStateChanged the value of patrolTrapText.0 is a string 
+-- "PATROL-OBJECT-NAME NEW-STATUS" or
+-- "PATROL-OBJECT-NAME NEW-STATUS NEW-VALUE" for Patrol Parameters
+--
+
+        PATROL-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS 		
+
+		enterprises, TimeTicks
+            FROM RFC1155-SMI
+        OBJECT-TYPE
+			FROM RFC-1212
+        DisplayString
+            FROM RFC1213-MIB;		
+
+        bmc             OBJECT IDENTIFIER ::= { enterprises 1031 }
+
+
+        -- SNMP v2  patrolMIB define
+        -- patrolMIB MODULE-IDENTITY
+        --        LAST-UPDATED    "9303040000Z"
+        --        ORGANIZATION    "Patrol Development Group at BMC Software"
+	-- all the tokens should be shorter than 64 bytes (see snmplib/parse.h)
+        --        CONTACT-INFO
+        --                "       Mark Sterin
+        --
+        --
+        --                Tel: +1 713 918 1525
+        --                Fax: +1 713 918 1312
+        --
+        --                E-mail: msterin@bmc.com"
+        --
+        --         DESCRIPTION
+        --                 "The MIB module for Patrol managed entities"
+
+        patrolMIB OBJECT IDENTIFIER ::= { bmc 1 }
+
+        --
+        -- Agent subtree
+        --
+        -- This is the main subtree for Patrol MIB
+        -- All managed objects on Agent side will be in this subtree
+
+        patrolAgent      OBJECT IDENTIFIER ::= { patrolMIB 1 }
+
+        --
+        -- Console subtree 
+        --
+        -- Patrol Console (For Future Use)
+        patrolConsole    OBJECT IDENTIFIER ::= { patrolMIB 2 }
+
+        --
+        -- Groups in Patrol MIB , Agent/... view
+        --
+
+        patrolObjects          OBJECT IDENTIFIER ::= { patrolAgent 1 } 
+        patrolTraps            OBJECT IDENTIFIER ::= { patrolAgent 2 } 
+
+        --In SNMP RowStatus is not defined so here is RowStatus 
+        --In SNMP V2 remove following defintions.
+
+        PRowStatus ::= INTEGER {
+                          active(1),
+                          notInService(2),
+                          notReady(3),
+                          createAndGo(4),
+                          createAndWait(5),
+                          destroy(6)
+        }
+
+	-- parameterOutputMode is of type OutputMode
+	-- OutputMode is enumerated as follows
+
+        OutputMode ::= INTEGER {
+				  none(0),
+                          text(1),
+                          gauge(2),
+                          graph(3),
+                          console(4)
+        }
+
+	-- application and parameter state
+	-- refer XpwState
+
+        States ::=   INTEGER {
+                          ok(0),
+                          warn(1),
+                          alarm(2),
+                          offline(3),
+                          void(4)
+        }
+
+	-- fields like parameterAutoScale and applInstCreateIcon 
+	-- are Boolen type
+
+        PBoolean ::=   INTEGER {
+                          false(0),
+                          true(1)
+        }
+
+
+    -- A primitive support for rpc
+    -- setting this variable executes the given command
+
+    agentExecuteCommand OBJECT-TYPE
+        SYNTAX      DisplayString 
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION 
+            "Executes the PSL command sent in the same message"
+    ::= { patrolAgent 3 } 
+                
+
+    -- patrolObjects
+
+--    objectsMask OBJECT-TYPE
+--        SYNTAX      DisplayString
+--        ACCESS      read-write
+--        STATUS      obsolete
+--        DESCRIPTION
+--            "This is a regular expression (see UNIX regexp(5))
+--            to match with objectsTable.objectsEntry.objectName.
+--            If objectsMask is started from /, all objects are searched
+--            from top-level, otherwise - from objectsCwd node.
+--            Example: /.* means all object from the tree root
+--                     [^/]* means mandatory-level objects only"
+-- all first-level objects, i.e. /FILESYSTEM,
+--        DEFVAL {"[^/]*"}    
+-- /ORACLE , ...
+--                            
+--    ::= { patrolObjects 1 }
+
+    objectsCwd  OBJECT-TYPE
+        SYNTAX      DisplayString 
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Current node, used as a root for subtree to be examined"
+        DEFVAL {"/"}  -- We are styarting from the global root...
+    ::= { patrolObjects 2 } 
+
+    objectsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF ObjectsEntry
+        ACCESS          not-accessible
+        STATUS          deprecated
+        DESCRIPTION
+            "This table is used to get/set Patrol Agent Objects.
+            Patrol Agent Objects are nodes (and not leaves) of the 
+            information tree. Object represents a KM definition"
+    ::= { patrolObjects 3 }     
+
+
+    objectsEntry OBJECT-TYPE
+        SYNTAX  ObjectsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "An objectsEntry contains value and description (in future)
+            for a given PSL Agent's object"
+        INDEX   { 
+             objectName 
+        }
+    ::= { objectsTable 1 }
+
+    ObjectsEntry ::= SEQUENCE {
+        objectName      DisplayString,  -- name of the object, starting from "/"
+        objectDescr     DisplayString,  -- Description (if any)
+        objectRowStatus PRowStatus       -- Row status for a new row creation
+    } 
+
+    objectName OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "name of the mandatory object"
+    ::= { objectsEntry 1 }
+            
+    objectDescr OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "textual description of the mandatory object"
+    ::= { objectsEntry 3 }
+
+    objectRowStatus OBJECT-TYPE
+        SYNTAX          PRowStatus
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "row status as defined in SNMPv2 - for new row creation control"
+    ::= { objectsEntry 4 }
+
+
+    -- -------------
+    -- variables 
+    -- -------------
+
+    variablesTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF VariablesEntry
+        ACCESS      not-accessible
+        STATUS          deprecated
+        DESCRIPTION
+            "This table is used to get/set Patrol Agent Object variables.
+            Patrol Agent Object Variables are leaves (and not nodes) of the 
+            information tree."
+    ::= { patrolObjects 5 }     
+
+
+    variablesEntry OBJECT-TYPE
+        SYNTAX      VariablesEntry
+        ACCESS  not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "An variablesEntry contains value and description (in future)
+            for a given PSL Agent's object"
+        INDEX   { 
+             variableName 
+        }
+    ::= { variablesTable 1 }
+
+    VariablesEntry ::= SEQUENCE {
+        variableName    DisplayString,
+        variableType    DisplayString,
+        variableValue   DisplayString,
+        variableDesr    DisplayString,
+        variableRowStatus   PRowStatus
+    }       
+
+    variableName    OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "variable name, with path removed"
+    ::= { variablesEntry 2 } 
+
+    -- this type should be enumerated, synchronized with values
+    -- in symtab.h. Correspondent part in patrol-vars.c (int->string)
+    -- should be removed
+    variableType    OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "A string describing variable type. May be used
+            by a sophisticated management to open gauges/graphs/multi-media etc."
+    ::= { variablesEntry 3 } 
+
+    variableValue   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Current value of the variable"
+    ::= { variablesEntry 4 } 
+
+    variableDesr    OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "In the future (prefect) world this is the variable's text
+            description, a-ka dynamic help about this very variable"
+    ::= { variablesEntry 5 } 
+
+    variableRowStatus   OBJECT-TYPE
+        SYNTAX      PRowStatus
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Used for new row creation - according to snmpv2 row craation mechanism"
+    ::= { variablesEntry 6 } 
+
+    -- --------------
+    -- applications
+    -- --------------
+
+    applicationsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF ApplicationsEntry
+        ACCESS          not-accessible
+        STATUS          deprecated
+        DESCRIPTION
+            "This table is used to get/set Patrol monitored applications.
+            Patrol Agent Applications are nodes of the information tree."
+    ::= { patrolObjects 6 }
+
+
+     applicationsEntry OBJECT-TYPE
+        SYNTAX      ApplicationsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "An  applicationsEntry contains value and description (in future)
+            for a given PSL Agent's applications"
+        INDEX   {
+             applicationOid
+        }
+    ::= { applicationsTable 1 }
+
+
+    ApplicationsEntry ::= SEQUENCE {
+        applicationName          DisplayString,             --
+        applicationState         States,                    --
+--        applWorstInst            DisplayString,             --
+--        applMasterVersion        DisplayString,             --
+        applWorstInst            DisplayString,             --
+        applMasterVersion        INTEGER,                   --
+        applMinorRevision        INTEGER,                   --
+        applicationRowStatus     PRowStatus,	
+		applicationOid           INTEGER
+    }
+
+    applicationName    OBJECT-TYPE
+        SYNTAX         DisplayString
+        ACCESS         read-only
+        STATUS         mandatory
+        DESCRIPTION
+            "application name"
+    ::= { applicationsEntry 1 }
+
+    applicationState OBJECT-TYPE
+        SYNTAX      States
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Application State"
+    ::= { applicationsEntry 2 }
+
+    applWorstInst   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "application worst instance"
+    ::= { applicationsEntry 3 }
+
+
+    applMasterVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "version number of the application"
+    ::= { applicationsEntry 4 }
+
+    applMinorRevision OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "minor revision number of the application"
+    ::= { applicationsEntry 5 }
+
+    applicationRowStatus OBJECT-TYPE
+        SYNTAX      PRowStatus
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Used for new row creation according to snmpv2 row craation mechanism"
+    ::= { applicationsEntry 6 }
+
+    applicationOid      OBJECT-TYPE
+        SYNTAX          INTEGER (0..65535)
+--      ACCESS          not-accessible
+		ACCESS			read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "application  object id"
+    ::= { applicationsEntry 7 }
+
+
+    -- ----------------------------------
+    -- application Instance aka applInst
+    -- ----------------------------------
+
+    applInstTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF ApplInstEntry
+        ACCESS          not-accessible
+        STATUS          deprecated
+        DESCRIPTION
+            "This table is used to get/set Patrol monitored application Instance.
+            Patrol Agent application Instance are nodes of the information tree."
+    ::= { patrolObjects 7 }
+
+
+     applInstEntry OBJECT-TYPE
+        SYNTAX      ApplInstEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "An  applInstEntry contains value and description (in future)
+            for a given PSL Agent's applInst"
+        INDEX   {
+                applicationOid, applInstOid
+        }
+    ::= { applInstTable 1 }
+
+    ApplInstEntry ::= SEQUENCE {
+	applInstName        DisplayString, --
+	applInstRuleState   States,        --
+	applInstStatus      States,        --
+	applInstWorstParam  DisplayString,
+	applInstCreateIcon  PBoolean,
+	applInstRowStatus   PRowStatus,
+	applInstOid         INTEGER,
+	applInstPInstOid    INTEGER,
+	applInstPApplOid    INTEGER
+    }
+
+    applInstName    OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "application instance name"
+    ::= { applInstEntry 1 }
+
+    applInstRuleState   OBJECT-TYPE
+        SYNTAX      States
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "application instance state"
+    ::= { applInstEntry 2 }
+
+    applInstStatus  OBJECT-TYPE
+        SYNTAX      States
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "application instance status is the worst of rule state and its worst parameter's status"
+    ::= { applInstEntry 3 }
+
+    applInstWorstParam  OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "application instance worst parameter"
+    ::= { applInstEntry 4 }
+
+    applInstCreateIcon  OBJECT-TYPE
+        SYNTAX      PBoolean
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "True means create icons for Application instance(s).
+             False means not necessary to create icons for the instance(s)."
+    ::= { applInstEntry 5 }
+
+    applInstRowStatus OBJECT-TYPE
+        SYNTAX      PRowStatus
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Used for new row creation, according to snmpv2 row craation mechan ism" 
+    ::= { applInstEntry 6 }
+
+    applInstOid     OBJECT-TYPE
+        SYNTAX          INTEGER (0..65535)
+--      ACCESS          not-accessible
+		ACCESS			read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "application instance object id"
+    ::= { applInstEntry 7 }
+
+      applInstPInstOid         OBJECT-TYPE
+        SYNTAX          INTEGER (0..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "application instance's parent object id"
+    ::= { applInstEntry 8 }
+
+       applInstPApplOid         OBJECT-TYPE
+        SYNTAX          INTEGER (0..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "application instance's parent application object id"
+    ::= { applInstEntry 9 }
+
+
+    -- ----------------------------------
+    -- parameters
+    -- ----------------------------------
+
+    parametersTable OBJECT IDENTIFIER ::= { patrolObjects 8 }
+
+    -- parametersEntry OBJECT IDENTIFIER ::= { parametersTable 1}
+
+     parametersEntry OBJECT-TYPE
+        SYNTAX      ParametersEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "A parametersEntry contains value and description (in future)
+            for a given PSL Agent's applInst"
+        INDEX   { applicationOid, applInstOid, parameterObjId }
+    ::= { parametersTable 1 }
+
+    ParametersEntry ::= SEQUENCE {
+	parameterName        	DisplayString, --
+	parameterState   		States,        --
+	parameterCurrentTime    TimeTicks,        --
+	parameterCurrentValue   DisplayString,
+	parameterPollingInt	INTEGER,
+	parameterRetries		INTEGER,
+	parameterOutputMode     OutputMode,
+	parameterAutoScale    	PBoolean,
+	parameterYaxisMin		INTEGER,
+	parameterYaxisMax		INTEGER,
+	parameterRowStatus	PRowStatus,
+	parameterObjId		INTEGER,
+	parameterIntValue		INTEGER,
+	parameterActiveStat	PBoolean,
+	parameterRunningStat	PBoolean
+    }
+
+    parameterName   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "parameter name"
+    ::= { parametersEntry 1 }
+
+    parameterState  OBJECT-TYPE
+        SYNTAX      States
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "parameter's state"
+    ::= { parametersEntry 2 }
+
+    parameterCurrentTime     OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "time stamp when current value was produced"
+    ::= { parametersEntry 3 }
+
+    parameterCurrentValue  OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "parameter's current value"
+    ::= { parametersEntry 4 }
+
+    parameterPollingInt  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "parameter's polling interval"
+    ::= { parametersEntry 5 }
+
+    parameterRetries  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "parameter's timeout  retries"
+    ::= { parametersEntry 6 }
+
+    parameterOutputMode  OBJECT-TYPE
+        SYNTAX      OutputMode
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "parameter's Output mode"
+    ::= { parametersEntry 7 }
+
+    parameterAutoScale  OBJECT-TYPE
+        SYNTAX      PBoolean
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "true(1): use automatic scale; false(0):use following YaxisMin and YaxisMax fields to draw y-axis scale"
+    ::= { parametersEntry 8 }
+
+    parameterYaxisMin  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Minimum value for drawing y-axis scale if parameterAutoScale is false(0)"
+    ::= { parametersEntry 9 }
+
+    parameterYaxisMax  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Maximum value for drawing y-axis scale if parameterAutoScale is false(0)"
+    ::= { parametersEntry 10 }
+
+    parameterRowStatus OBJECT-TYPE
+        SYNTAX      PRowStatus
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Used for new row creation - according to snmpv2 row craation mechan
+ism"
+    ::= { parametersEntry 11 }
+
+    parameterObjId  OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+--      ACCESS      not-accessible
+		ACCESS		read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "parameter's object id"
+    ::= { parametersEntry 12 }
+
+
+    parameterIntValue OBJECT IDENTIFIER ::= { parametersEntry 13 }
+     
+    parameterActiveStat  OBJECT-TYPE
+        SYNTAX      PBoolean
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+        	"Boolean value of the parameter explaining whether
+		parameter was created as active"
+    ::= { parametersEntry 14 }
+
+    parameterRunningStat  OBJECT-TYPE
+        SYNTAX      PBoolean
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+        	"Boolean value indicating the parameter is either
+		running or suspended for the current instance"
+    ::= { parametersEntry 15 }
+								                                                 
+END
+

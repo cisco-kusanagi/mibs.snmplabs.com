@@ -1,0 +1,75 @@
+ELTEX-MES-eltBrgMulticast-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      Eltex MES Multicast Bridge Configuration
+-- Version:    1.0
+-- Date:       28-Nov-2012
+
+IMPORTS
+    InterfaceIndex                                       FROM IF-MIB
+    TruthValue,TEXTUAL-CONVENTION,
+    RowStatus                                            FROM SNMPv2-TC
+    VlanIndex,PortList                                   FROM Q-BRIDGE-MIB
+    MODULE-IDENTITY, OBJECT-TYPE                         FROM SNMPv2-SMI
+    rlIgmpMldSnoopVlanEntry                              FROM RADLAN-rlMacMulticast-MIB
+    eltMesMacMulticast                                   FROM ELTEX-MES
+    InetAddress                                          FROM INET-ADDRESS-MIB;
+
+-- mld
+eltMesMldSnoop  OBJECT IDENTIFIER ::= { eltMesMacMulticast 5 }
+--
+
+eltIgmpMldSnoopVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltIgmpMldSnoopVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists the per vlan parameters."
+    ::= { eltMesMldSnoop 5 }
+
+eltIgmpMldSnoopVlanEntry OBJECT-TYPE
+    SYNTAX      EltIgmpMldSnoopVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table augments existing RADLAN table rlIgmpMldSnoopVlanTable"
+    AUGMENTS { rlIgmpMldSnoopVlanEntry }
+    ::= { eltIgmpMldSnoopVlanTable 1 }
+
+EltIgmpMldSnoopVlanEntry ::= SEQUENCE {
+    eltIgmpMldSnoopVlanIsImmediateLeaveHostBased    TruthValue,
+    eltIgmpMldSnoopVlanCos                     INTEGER,
+    eltIgmpMldSnoopVlanReplaceSourceIp         InetAddress
+}
+
+eltIgmpMldSnoopVlanIsImmediateLeaveHostBased OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable host based immediate leave on this Vlan"
+    DEFVAL {false}
+    ::= { eltIgmpMldSnoopVlanEntry 1 }
+
+eltIgmpMldSnoopVlanCos OBJECT-TYPE
+    SYNTAX INTEGER (0..7 | 255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "CoS value (0-7)."
+    DEFVAL {255}
+    ::= { eltIgmpMldSnoopVlanEntry 2 }
+
+eltIgmpMldSnoopVlanReplaceSourceIp OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Before forwarding the report packet sent by the host, the source IP
+         address in the packet will be replaced by this IP address.
+         Default value of 0.0.0.0 means that the source IP address will not be
+         replaced."
+    ::= { eltIgmpMldSnoopVlanEntry 3 }
+
+
+
+END

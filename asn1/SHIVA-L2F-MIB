@@ -1,0 +1,985 @@
+-- 	shiva-l2f.asn
+
+--
+-- 	Copyright 1997 Shiva Corporation
+--
+
+--	MIB for parameters related to L2F protocol.
+
+SHIVA-L2F-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	Counter, TimeTicks, IpAddress
+		FROM RFC1155-SMI
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	l2f
+		FROM SHIVA-MIB;
+
+--  This MIB module uses the extended OBJECT-TYPE macro as
+--  defined in RFC 1212.
+
+--  This MIB monitors aspects of the system related to the L2F
+--  VPDN protocol.
+
+--  It is split into two major portions, one for the L2F Network
+--  Access Server (NAS), one for the L2F Home Gateway (HG).
+
+    -- L2F NAS
+    -- To be defined. 
+
+    l2fNetworkAccessServer OBJECT IDENTIFIER ::= { l2f 1 }
+
+    -- L2f Home Gateway
+
+    l2fHomeGateway OBJECT IDENTIFIER ::= { l2f 2 }
+
+    -- L2F Home Gateway configuration
+
+    l2fHGConf OBJECT IDENTIFIER ::= { l2fHomeGateway 1 }
+
+    l2fHGConfEnabled OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Whether L2F Home Gateway functionality is enabled
+  		on this system."
+	::= { l2fHGConf 1 }
+
+    l2fHGConfMaximumCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The maximum number of incoming L2F calls that may be
+		active on this Home Gateway at any one time.  Any attempt
+		to create a call in excess if this number will be
+		rejected."
+	::= { l2fHGConf 2 }
+
+    l2fHGConfUDPEnabled OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Whether L2F Home Gateway functionality is enabled
+		over the UDP protocol on port 1701 on this system."
+	::= { l2fHGConf 3 }
+
+    l2fHGConfNASDefined OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates the number of peer NASs which have been configured
+		on this Home Gateway. This value represents the number of
+		NAS entries in the configuration table (ie. number of
+		VPDNInterface sections)."
+	::= { l2fHGConf 4 }
+
+    l2fHGConfInactivityRetries OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates the number of times this Home Gateway will send
+		L2F_ECHO packets without receiving a response, that is,
+		an L2F_ECHO_REPLY from the NAS peer before determining 
+		the tunnel is no longer active."
+	::= { l2fHGConf 5 }
+
+    l2fHGConfInactivityRetryPeriod OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates the number seconds that must elapse since the
+		last NAS peer packet was received by this Home Gateway
+		before an L2F_ECHO packet is generated."
+	::= { l2fHGConf 6 }
+
+    -- This section is defered in this release.  This is a place holder
+    -- until FRAME RELAY support is available. This table will indicate 
+    -- values which augment the Frame Relay "circuit groups"
+    -- l2fHGConfFrameRelayTable OBJECT-TYPE
+    --	SYNTAX  SEQUENCE OF L2fHGConfFrameRelayEntry
+	-- ACCESS	not-accessible
+	-- STATUS	mandatory
+	-- DESCRIPTION
+	--	"Table augmenting Frame Relay 'circuit groups'."
+	-- ::= { l2fHGConf 7 }
+
+    -- The following table is indexed by NAS Name.  It shows those
+    -- VPDN peers which are of the type L2F.  It is reading back the
+    -- configuration from the VPDNInterface sections.
+    --
+    -- It is indexed by NAS name, and not by the VPDNInterface section
+    -- number, because NAS name in a section number can be changed
+    -- dynamically.  Since the next table (l2fHGStatPeer) has permanent
+    -- entries, and it is desireable to be able to reference back to this
+    -- table, the only predictable way to do that is by NAS name.
+    --
+    -- The NAS name pertains to the PeerName entry in a VPDNInterface
+    -- section. Note that this name may (but is not required to) match
+    -- the peer's DNS host name. In L2F, this name is used during
+    -- authentication when creating the peer tunnel.
+
+    l2fHGConfTunnelTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF L2fHGConfTunnelEntry
+	ACCESS  not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Table of configuration information for each
+		 incoming VPDN tunnel. The table is indexed by NAS name."
+	::= { l2fHGConf 8 }
+
+    l2fHGConfTunnelEntry  OBJECT-TYPE
+	SYNTAX	L2fHGConfTunnelEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Configuration information for a particular VPDN tunnel."
+	INDEX	{ l2fHGConfTunnelNASName }
+	::= { l2fHGConfTunnelTable 1 }
+
+    L2fHGConfTunnelEntry  ::= SEQUENCE {
+	l2fHGConfTunnelNASName		DisplayString,
+	l2fHGConfTunnelHGName		DisplayString,
+	l2fHGConfTunnelSectionNumber	INTEGER,
+	l2fHGConfTunnelEnabled		INTEGER
+    }
+
+    l2fHGConfTunnelNASName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of NAS that we are configured to receive L2F
+		tunnel connections from.  Although this name may match
+		the peer's DNS host name, it is not required to. This
+		name corresponds to the PeerName entry in the associated
+		VPDNInterface section."
+	::= { l2fHGConfTunnelEntry 1 }
+
+    l2fHGConfTunnelHGName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of Home Gateway registered on this tunnel."
+	::= { l2fHGConfTunnelEntry 2 }
+
+    l2fHGConfTunnelSectionNumber   OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"ID that identifies this tunnel in the configuration table."
+	::= { l2fHGConfTunnelEntry 3 }
+
+    l2fHGConfTunnelEnabled OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates if this VPDN tunnel is enabled or not."
+	::= { l2fHGConfTunnelEntry 4 }
+
+
+    -- L2F Home Gateway status and counters
+
+    l2fHGStat OBJECT IDENTIFIER ::= { l2fHomeGateway 2 }
+
+    l2fHGStatCurrentCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current number of incoming L2F client calls to this
+		Home Gateway.  Cannot ever be greater than
+		l2fHGConfMaximumCalls."
+	::= { l2fHGStat 1 }
+
+    l2fHGStatPeakCalls OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Peak number of incoming L2F client calls to this
+		Home Gateway.  Cannot ever be greater than
+		l2fHGConfMaximumCalls."
+	::= { l2fHGStat 2 }
+
+    l2fHGStatTotalCalls OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of incoming L2F client calls to this
+		Home Gateway over time."
+	::= { l2fHGStat 3 }
+
+    l2fHGStatCallsOverMax OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of incoming L2F client calls to this
+		Home Gateway that were rejected because they were
+		in excess of l2fHGConfMaximumCalls."
+	::= { l2fHGStat 4 }
+
+    l2fHGStatCallsResourceFailure OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of incoming L2F client calls to this
+		Home Gateway that were rejected because of
+		miscellaneous resource allocation failures."
+	::= { l2fHGStat 5 }
+
+    l2fHGStatCallsAuthFailed OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of incoming L2F client calls to this
+		Home Gateway that were rejected because of
+		authentication or permission failures for the user."
+	::= { l2fHGStat 6 }
+
+    l2fHGStatCurrentTunnels OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current number of incoming L2F Network Access
+		Server peer tunnels to this Home Gateway."
+	::= { l2fHGStat 7 }
+
+    l2fHGStatPeakTunnels OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Peak number of incoming L2F Network Access
+		Server peer tunnels to this Home Gateway at
+		any given time."
+	::= { l2fHGStat 8 }
+
+    l2fHGStatTotalTunnels OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of incoming L2F Network Access
+		Server peer tunnels to this Home Gateway."
+	::= { l2fHGStat 9 }
+
+    l2fHGStatTunnelNoName OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of incoming L2F Network Access Server
+		peer tunnels to this Home Gateway that were
+		rejected because the NAS name was unknown."
+	::= { l2fHGStat 10 }
+
+    l2fHGStatTunnelAuthFail OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of incoming L2F Network Access Server
+		peer tunnels to this Home Gateway that were
+		rejected because the NAS credentials could
+		not be authenticated."
+	::= { l2fHGStat 11 }
+
+    l2fHGStatTunnelResourceFailure OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of incoming L2F Network Access Server
+		peer tunnels to this Home Gateway that were
+		rejected because of a miscellaneous resource
+		allocation failure."
+	::= { l2fHGStat 12 }
+
+    -- This is the table of every L2F NAS that has ever
+    -- contacted this HG.  
+    -- 
+    -- This table is static, in that it only grows.  A row will
+    -- never be removed from this table, even if the NAS is not
+    -- presently connected.  This static nature is necessary to
+    -- have someplace permanent to count things like authentication
+    -- failures.
+    --
+    -- There is an ifEntry in ifTable (of ifType propVirtual)
+    -- for every row in this table, this ifEntry is permanent.
+    --
+    -- In the unusual case that there is more than one tunnel
+    -- from the same NAS, then the extra tunnels will have
+    -- transient ifEntry in the ifTable, which are not shown
+    -- in this table.
+
+    l2fHGPeerTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF L2fHGPeerEntry
+	ACCESS  not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"This is a table of every L2F NAS tunnel peer that has
+		ever contacted this Home Gateway.  This table is indexed
+		by the ifIndex of the 'primary' ifTable entry for the
+		tunnels for this peer.  This information will remain in
+		the system until the next system restart."
+	::= { l2fHGStat 13 }
+
+    l2fHGPeerEntry OBJECT-TYPE
+	SYNTAX  L2fHGPeerEntry
+	ACCESS	not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Status and counter information about this 
+		particular NAS tunnel peer."
+	INDEX	{ l2fHGPeerIfIndex }
+	::= { l2fHGPeerTable 1 }
+
+    L2fHGPeerEntry ::= SEQUENCE {
+	l2fHGPeerIfIndex			INTEGER,
+	l2fHGPeerEnabled			INTEGER,
+	l2fHGPeerNASName			DisplayString,
+	l2fHGPeerCurrentTunnels			INTEGER,
+	l2fHGPeerPeakTunnels			Counter,
+	l2fHGPeerTotalTunnels			Counter,
+	l2fHGPeerCurrentClients			INTEGER,
+	l2fHGPeerPeakClients			Counter,
+	l2fHGPeerTotalClients			Counter,
+	l2fHGPeerTunnelAuthFailed 		Counter,
+	l2fHGPeerTunnelMiscFailed		Counter,
+	l2fHGPeerTunnelKeepAliveFailed		Counter,
+	l2fHGPeerTunnelProtocolViolations	Counter,
+	l2fHGPeerTunnelLastCloseTime		TimeTicks
+    }
+
+    l2fHGPeerIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of the primary (permanent) 
+		ifTable entry for tunnels from this peer.
+		This value is used to access the NAS peer entry
+		in the l2fHGPeerTable."
+	::= { l2fHGPeerEntry 1 }
+
+    l2fHGPeerEnabled OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates if this particular NAS peer is configured
+		to create tunnels with this Home Gateway."
+	::= { l2fHGPeerEntry 2 }
+
+    l2fHGPeerNASName  OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of the peer NAS server.  The NAS name is also the
+		index into the l2fHGConfTunnelTable for this NAS peer."
+	::= { l2fHGPeerEntry 3 }
+
+    l2fHGPeerCurrentTunnels OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current number of incoming tunnels from this NAS."
+	::= { l2fHGPeerEntry 4 }
+
+    l2fHGPeerPeakTunnels OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The maximum number of incoming tunnels from this 
+		NAS peer at any one time."
+	::= { l2fHGPeerEntry 5 }
+
+    l2fHGPeerTotalTunnels OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of incoming tunnels that have been
+		created from this NAS. In this context, tunnels are
+		equivalent to the Client ID (CLID)."
+	::= { l2fHGPeerEntry 6 }
+
+    l2fHGPeerCurrentClients OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current number of clients that have established
+		a session on this tunnel."
+	::= { l2fHGPeerEntry 7 }
+
+    l2fHGPeerPeakClients OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The maximum number of clients which have established
+		a session on this tunnel at any one time."
+	::= { l2fHGPeerEntry 8 }
+
+    l2fHGPeerTotalClients OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The total number of clients that have established
+		a session on this tunnel since the tunnel was created."
+	::= { l2fHGPeerEntry 9 }
+
+    l2fHGPeerTunnelAuthFailed OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of tunnels rejected by this Home Gateway
+		because NAS secret incorrect."
+	::= { l2fHGPeerEntry 10 }
+
+    l2fHGPeerTunnelMiscFailed OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of tunnels that failed to open for other reasons."
+	::= { l2fHGPeerEntry 11 }
+
+    l2fHGPeerTunnelKeepAliveFailed OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of tunnels torn down by this Home Gateway
+		due to failure of keep-alive monitoring.  In the 
+		context of this variable, the keep-alive mechanism
+		is an exchange of L2F_ECHO (sent by the HG) and
+		L2F_ECHO_REPLY (sent by NAS) packets."
+	::= { l2fHGPeerEntry 12 }
+
+    l2fHGPeerTunnelProtocolViolations OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of tunnels torn down by the Home Gateway
+		due to protocol violations."
+	::= { l2fHGPeerEntry 13 }
+
+    l2fHGPeerTunnelLastCloseTime OBJECT-TYPE
+	SYNTAX	TimeTicks
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The value of sysUpTime at the time a tunnel from
+		this NAS peer last closed. This is only an interesting
+		number if l2fHGPeerCurrentTunnels is zero. It is
+		kept here because the ifEntry for the tunnels are
+		volatile, and go away when they close. Therefore, one
+		cannot determine this information by looking at
+		ifLastChange."
+	::= { l2fHGPeerEntry 14 }
+
+    -- Per active NAS table.  Table indexed by our CLID, with status
+    -- and counters on this connection to the NAS.
+    --
+    -- Rows in this table come and go as the tunnels open and close.
+    --
+    -- There is an ifEntry in ifTable (of ifType propVirtual) for
+    -- every row in this table. This ifEntry is permanent so long as
+    -- it is the only one from this NAS.  If the NAS does the unusual
+    -- thing of opening two or more tunnels, the first tunnel will
+    -- have a permanent ifEntry, the subsequent ones will have
+    -- transient ifEntry's.
+
+    l2fHGTunnelTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF L2fHGTunnelEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Table consisting of all of the currently active NAS
+		tunnels. This table augments the ifTable. Each row in
+		this table has a row in the ifTable of ifType
+		'propVirtual'. The table is indexed by l2fHGTunnelCLID.
+		Note that rows in this table come and go as the tunnels
+		open and close."
+	::= { l2fHGStat 14 }
+
+    l2fHGTunnelEntry OBJECT-TYPE
+	SYNTAX  L2fHGTunnelEntry
+	ACCESS  not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information concerning a particular active NAS tunnel."
+	INDEX	{ l2fHGTunnelCLID }
+	::= { l2fHGTunnelTable 1 }
+
+    L2fHGTunnelEntry ::= SEQUENCE {
+	l2fHGTunnelCLID				INTEGER,
+	l2fHGTunnelPeerCLID			INTEGER,
+	l2fHGTunnelHGName			DisplayString,
+	l2fHGTunnelNASName			DisplayString,
+	l2fHGTunnelReceiveChecksum		INTEGER,
+	l2fHGTunnelGenerateChecksum		INTEGER,
+	l2fHGTunnelIfIndex			INTEGER,
+	l2fHGTunnelPeerIndex			INTEGER,
+	l2fHGTunnelTransport			INTEGER,
+	l2fHGTunnelIpAddress			IpAddress,
+--	l2fHGTunnelFRInterface			INTEGER,
+--	l2fHGTunnelFRDlci			INTEGER,
+	l2fHGTunnelCurrentState			INTEGER,
+	l2fHGTunnelCurrentClients  		INTEGER,
+	l2fHGTunnelPeakClients			Counter,
+	l2fHGTunnelTotalClients			Counter,
+	l2fHGTunnelMaxLinkInactivity		INTEGER,
+	l2fHGTunnelCurrentLinkInactivity	INTEGER,
+	l2fHGTunnelSequenceErrors		Counter,
+	l2fHGTunnelEchoSent			Counter,
+	l2fHGTunnelEchoReceived			Counter,
+	l2fHGTunnelEchoReplySent		Counter,
+	l2fHGTunnelEchoReplyReceived		Counter
+    }
+
+    l2fHGTunnelCLID OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The local client identifier for this tunnel."
+	::= { l2fHGTunnelEntry 1 }
+    
+    l2fHGTunnelPeerCLID OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The NAS peer's client identifier for this tunnel."
+	::= { l2fHGTunnelEntry 2 }
+
+    l2fHGTunnelHGName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This Home Gateway's name."
+	::= { l2fHGTunnelEntry 3 }
+
+    l2fHGTunnelNASName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the NAS peer on this tunnel."
+	::= { l2fHGTunnelEntry 4 }
+
+    l2fHGTunnelReceiveChecksum OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates if the NAS peer will be generating
+		checksums for the L2F payload received by this
+		Home Gateway."
+	::= { l2fHGTunnelEntry 5 }
+
+    l2fHGTunnelGenerateChecksum OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates if this Home Gateway will be generating
+		checksums for the L2F payload sent to the NAS peer."
+	::= { l2fHGTunnelEntry 6 }
+    
+    l2fHGTunnelIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of this tunnel in the ifTable."
+	::= { l2fHGTunnelEntry 7 }
+
+    l2fHGTunnelPeerIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This is the index into the l2fHGPeerTable.  This index
+		should be identical to the value in l2fHGTunnelIfIndex.
+		However, if it is not, then this indicates that the
+		NAS peer (using the same NAS name) has created multiple 
+		tunnels to this Home Gateway."
+	::= { l2fHGTunnelEntry 8 }
+
+    l2fHGTunnelTransport OBJECT-TYPE
+	SYNTAX	INTEGER { unknown(1), udp(2), framerelay(3), x25(4) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The underlying transport interface which this
+		tunnel is communicating with the NAS peer."
+	::= { l2fHGTunnelEntry 9 }
+
+    l2fHGTunnelIpAddress OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IP address of the NAS peer. This value is non-zero
+		if this tunnel is operating over UDP. Refer to 
+		l2fHGTunnelTransport to determine which transport this
+		tunnel is communicating over."
+	::= { l2fHGTunnelEntry 10 }
+
+    -- The following Frame Relay specific entries have been commented
+    -- out until Frame Relay support is included.  These are included
+    -- here as place-holders for future functionality.
+    --
+    -- l2fHGTunnelFRInterface OBJECT-TYPE
+	--SYNTAX	INTEGER
+	--ACCESS	read-only
+	--STATUS	mandatory
+	--DESCRIPTION
+	--	"The Frame Relay interface identifier. This value is
+	--	non-zero if this tunnel is operating over Frame Relay.
+	--	Refer to l2fHGTunnelTransport to determine which transport
+	--	this tunnel is communicating over."
+	--::= { l2fHGTunnelEntry 11 }
+
+    -- l2fHGTunnelFRDlci OBJECT-TYPE
+	--SYNTAX	INTEGER
+	--ACCESS	read-only
+	--STATUS	mandatory
+	--DESCRIPTION
+	--	"The Frame Relay data link control identifier?"
+	--::= { l2fHGTunnelEntry 12 }
+
+    l2fHGTunnelCurrentState OBJECT-TYPE
+	SYNTAX  INTEGER { 
+		undefined(1),
+		start0(2), 
+		start1(3), 
+		open1(4), 
+		open2(5), 
+		close1(6)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current tunnel state. These are the primary states that
+		have been defined for the Home Gateway side in the L2F
+		internet draft."
+	::= { l2fHGTunnelEntry 13 }
+
+    l2fHGTunnelCurrentClients OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current number of clients accessing this tunnel."
+	::= { l2fHGTunnelEntry 14 }
+
+    l2fHGTunnelPeakClients OBJECT-TYPE
+	SYNTAX 	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Peak number of clients accessing this tunnel at
+		any given point in time."
+	::= { l2fHGTunnelEntry 15 }
+
+    l2fHGTunnelTotalClients OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of clients that have communicated over this
+		tunnel while the tunnel was active."
+	::= { l2fHGTunnelEntry 16 }
+
+    l2fHGTunnelMaxLinkInactivity OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The maximum amount of time that can elapse (in seconds)
+		since the last NAS peer packet was received before this 
+		Home Gateway will tear down the tunnel."
+	::= { l2fHGTunnelEntry 17 }
+
+    l2fHGTunnelCurrentLinkInactivity OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The  amount of time that has elapsed (in seconds)
+		since the last NAS peer packet was received. When the
+		Home Gateway has not heard from the NAS peer in a 
+		period of time, it will generate L2F_ECHO packets to
+		determine if the NAS is still alive.  Once the inactivity
+		reaches l2fHGTunnelMaxLinkInactivity, the Home Gateway
+		will tear down the link."
+	::= { l2fHGTunnelEntry 18 }
+
+    l2fHGTunnelSequenceErrors OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of L2F control packets that were received
+		on this tunnel, by this Home Gateway out of sequence."
+	::= { l2fHGTunnelEntry 19 }
+
+    l2fHGTunnelEchoSent OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of L2F_ECHO packets sent. This typically occurs
+		when this Home Gateway has not received any data from
+		the NAS peer over a period of time on this tunnel."
+	::= { l2fHGTunnelEntry 20 }
+
+    l2fHGTunnelEchoReceived OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of L2F_ECHO packets received. The NAS peer will
+		send this packet to determine if this Home Gateway is
+		still alive."
+	::= { l2fHGTunnelEntry 21 }
+
+    l2fHGTunnelEchoReplySent OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of L2F_ECHO_REPLY packets sent. The Home Gateway
+		sends this packets in response to the L2F_ECHO packet
+		sent by the NAS peer."
+	::= { l2fHGTunnelEntry 22 }
+
+    l2fHGTunnelEchoReplyReceived OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of L2F_ECHO_REPLY packets received. The NAS
+		peer sends this packet in response to the L2F_ECHO
+		packet sent by this Home Gateway."
+	::= { l2fHGTunnelEntry 23 }
+
+    -- Per client table. This table is indexed by the Client ID (CLID)
+    -- and the non-zero MID.  This table contains status and other
+    -- information relevant for each client operating over a tunnel.
+    --
+    -- There is a transient ifEntry in the ifTable (of ifType
+    -- propVirtual) for each client.
+
+
+    l2fHGClientTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF L2fHGClientEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"This table contains status information concerning the
+		clients' currently operating over tunnels connected to 
+		this Home Gateway.  This table is indexed by the
+		Client ID (CLID) and the non-zero MID.  This table
+		augments the ifTable.  Each row in this table has a
+		corresponding row in the ifTable of ifType 'propVirtual'."
+	::= { l2fHGStat 15 }
+
+    l2fHGClientEntry OBJECT-TYPE
+	SYNTAX	L2fHGClientEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Status information for a particular client operating
+		 over a tunnel connected to this Home Gateway."
+	INDEX	{ l2fHGClientCLID, l2fHGClientMID }
+	::= { l2fHGClientTable 1 }
+
+    L2fHGClientEntry ::= SEQUENCE {
+	l2fHGClientCLID			INTEGER,
+	l2fHGClientMID			INTEGER,
+	l2fHGClientPeerCLID		INTEGER,
+	l2fHGClientTunnelState		INTEGER,
+	l2fHGClientIfIndex		INTEGER,
+	l2fHGClientOpenName		DisplayString,
+	l2fHGClientReqLcp0		OCTET STRING,
+	l2fHGClientAckLcp1		OCTET STRING,
+	l2fHGClientAckLcp2		OCTET STRING,
+	l2fHGClientOpenType		INTEGER,
+	l2fHGClientSequenceEnabled	INTEGER,
+	l2fHGClientSequenceErrors	Counter
+    }
+
+    l2fHGClientCLID OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Local Client Identifier for the NAS tunnel
+		underlying this entry.  This is one of the 
+		two indexes used to access this entry in the
+		table."
+	::= { l2fHGClientEntry 1 }
+
+    l2fHGClientMID OBJECT-TYPE
+	SYNTAX	INTEGER (1..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The Multiplex ID which identifies a particular
+		connection within the tunnel. This is one of
+		the two indexes used to access this entry in
+		the table."
+	::= { l2fHGClientEntry 2 }
+
+    l2fHGClientPeerCLID OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Peer Client Identifier for the NAS tunnel
+		underlying this entry."
+	::= { l2fHGClientEntry 3 }
+
+    l2fHGClientTunnelState OBJECT-TYPE
+	SYNTAX	INTEGER { 
+		undefined(1),
+		start0(2), 
+		open1(3), 
+		close1(4), 
+		close2(5),
+		close3(6)
+	} 
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current client state. These are the primary states that
+		have been defined for the Home Gateway side in the L2F
+		internet draft."
+	::= { l2fHGClientEntry 4 }
+
+    l2fHGClientIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of the NAS peer tunnel (L2F client connection)
+		in the ifTable."
+	::= { l2fHGClientEntry 5 }
+
+    l2fHGClientOpenName OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name received from the client in the L2F_OPEN_NAME
+		option."
+	::= { l2fHGClientEntry 6 }
+
+    l2fHGClientReqLcp0 OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Specifies a copy of the initial LCP CONFIGURE-REQUEST
+		packet sent from the PPP client, as sent by the NAS to
+		the HG in the L2F_REQ_LCP0 option. This request may 
+		contain options that were negotiated away by the NAS. 
+		The information starts after the length	field in the LCP 
+		header, and contains LCP options only."
+	::= { l2fHGClientEntry 7 }
+
+    l2fHGClientAckLcp1 OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Specifies a copy of the closing LCP CONFIGURE-ACK
+		packet sent by the PPP client, as sent by the NAS to
+		the HG in the L2F_ACK_LCP1 option. The information
+		starts after the length field in the LCP header, and
+		contains LCP options only."
+	::= { l2fHGClientEntry 8 }
+
+    l2fHGClientAckLcp2 OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Specifies a copy of the closing LCP CONFIGURE-ACK
+		packet sent to the PPP client, as sent by the NAS to
+		the HG in the L2F_ACK_LCP2 option. The information
+		starts after the length field in the LCP header, and
+		contains LCP options only."
+	::= { l2fHGClientEntry 9 }
+
+    l2fHGClientOpenType OBJECT-TYPE
+	SYNTAX	INTEGER { 
+		slip-textual(1), 
+		ppp-chap(2), 
+		ppp-pap(3), 
+		ppp-none(4), 
+		slip-none(5) 
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Specifies the type of authentication the NAS
+		exchanged with the client in detecting the client's
+		claimed identification."
+	::= { l2fHGClientEntry 10 }
+
+    l2fHGClientSequenceEnabled OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates if sequenced packet delivery is enabled
+		for DATA packets. Sequenced packets allow the receiver
+		to determine if a packet is a duplicate or is out of 
+		order. Some PPP protocols assume that PPP will never
+		re-order packets, so enabling L2F data sequencing protects
+		against re-ordering between the NAS and HG network."
+	::= { l2fHGClientEntry 11 }
+
+    l2fHGClientSequenceErrors OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"If sequenced packet delivery is enabled for DATA 
+		packets (see l2fHGClientSequenceEnabled), this value
+		indicates how many packets were received out of 
+		sequence."
+	::= { l2fHGClientEntry 12 }
+
+END

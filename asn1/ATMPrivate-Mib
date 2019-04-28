@@ -1,0 +1,339 @@
+     ATMPrivate-Mib
+
+--FORCE-INCLUDE <mib.h>
+--FORCE-INCLUDE <snmpdefs.h>
+--FORCE-INCLUDE "mibhand.h"
+
+     DEFINITIONS  ::=  BEGIN
+
+IMPORTS
+     	OBJECT-TYPE, Counter32, Integer32	FROM  SNMPv2-SMI
+	--chrComAtmIf, chrComVpl, chrComVcl		FROM  Chromatis-MIB
+     	atmInterfaceConfEntry, 
+		atmVplEntry,atmVclEntry,
+     	atmVpCrossConnectEntry,
+     	atmVcCrossConnectEntry				FROM  ATM-MIB
+	
+	chrComIfAtm,chrComAtmVpl,chrComAtmVcl	FROM  Chromatis-MIB
+	AdminStatus, AtmIfType					FROM  ChrTyp-MIB
+	DateAndTime								FROM  RFC1903-MIB
+	TruthValue								FROM  SNMPv2-TC
+    TimeTicks, IpAddress					FROM  RFC1155-SMI
+    DisplayString							FROM  RFC1213-MIB;
+
+
+
+-- ATMInterface Private Configuration table
+
+chrComIfAtmTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ChrComAtmIfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The chromatis private ATM Interface Configuration Table"
+	::= { chrComIfAtm 1 }
+
+chrComIfAtmEntry		OBJECT-TYPE
+	SYNTAX		ChrComAtmIfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+          "Additional columns for the ATM Interface table entry."
+     AUGMENTS { atmInterfaceConfEntry }
+
+--DEFAULT  get-function-async   MNIL_GetRoutine
+--DEFAULT  set-function-async   MNIL_SetRoutine
+--DEFAULT  next-function-async  MNIL_NextRoutine
+--DEFAULT  test-function-async  MNIL_TestRoutine
+--DEFAULT  cookie  "chrComIfAtmTable"
+	::= { chrComIfAtmTable  1 }
+
+ChrComAtmIfEntry  ::=
+	SEQUENCE  {
+	chrComIfAtmMaxPM			Integer32		(0..65535),
+	chrComIfAtmCurrentPM		Integer32		(0..65535),
+	chrComIfAtmIfType			AtmIfType,
+	atmInterfaceMaxVpiForVccs	Integer32,
+	atmTCloopback				Integer32,
+	chrComIfAtmAlarmVector		Integer32,
+	chrComIfAtmAlarmSeverityIndex	Integer32		(0..65535)
+}
+
+chrComIfAtmMaxPM	OBJECT-TYPE
+	SYNTAX	Integer32	(0..65535)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+	"describes the network operator that selects VPLs and VCLs for which he wants PM 
+	 data collection, by setting PM Admin Status field of the VPL/VCL to UP. 
+	 This collection request might be rejected if the AtmIfCurrentPM exceeds AtmIfMaxPM."
+	::= { chrComIfAtmEntry  1 }
+
+chrComIfAtmCurrentPM	OBJECT-TYPE
+	SYNTAX	Integer32	(0..65535)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+	"describes the network operator that selects VPLs and VCLs for which he wants PM 
+	 data collection, by setting PM Admin Status field of the VPL/VCL to UP. 
+	 This collection request might be rejected if the AtmIfCurrentPM exceeds AtmIfMaxPM."
+	::= { chrComIfAtmEntry  2 }
+
+
+chrComIfAtmIfType	OBJECT-TYPE
+	SYNTAX	AtmIfType
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	"Specifies the type of ATM cell layer interface defined on the physical path 
+	 termination point modeled by this entry in the interface table.	
+	 For UNI and BICI interfaces segment end point is automatically configured all VPLs
+	 and VCLs that reside on the interface. 
+	 Default values For tribs is UNI and For OCM is NNI. " 
+	 ::= { chrComIfAtmEntry  3 }
+
+atmInterfaceMaxVpiForVccs	OBJECT-TYPE
+	SYNTAX		Integer32	(0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The maximum VPI that a VCC (PVCC or SVCC) within the interface can get. 
+	Greater values of VPI can be used only for VPCs."
+	::= { chrComIfAtmEntry  4 }
+
+
+atmTCloopback	OBJECT-TYPE
+	SYNTAX		Integer32	(0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"Loopback on the Utopia Interface."
+	::= { chrComIfAtmEntry  5 }
+
+
+
+chrComIfAtmAlarmVector	OBJECT-TYPE
+	SYNTAX		Integer32	(0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"describes the alarms related to the ATM Interface - represented by a Bit field."
+	::= { chrComIfAtmEntry  6 }
+
+chrComIfAtmAlarmSeverityIndex	OBJECT-TYPE
+	SYNTAX		Integer32	(0..65535)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	"An Index into into the alarm severity profile table, specifying the
+    severity assignment for Atm Interface reported alarms."
+	::= { chrComIfAtmEntry  7 }
+
+
+-- Private VPL Termination Point Configuration Table Extensions
+
+chrComAtmVplTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    ChrComAtmVplEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The Chromatis Private VPL Termination Point Configuration
+          table extensions.  This table augments the VPL
+          configuration table in RFC 2515."
+     ::= { chrComAtmVpl 1 }
+
+chrComAtmVplEntry OBJECT-TYPE
+     SYNTAX    ChrComAtmVplEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Additional columns for the VPL configuration table entry."
+     AUGMENTS { atmVplEntry }
+--DEFAULT  get-function-async   MNIL_GetRoutine
+--DEFAULT  set-function-async   MNIL_SetRoutine
+--DEFAULT  next-function-async  MNIL_NextRoutine
+--DEFAULT  test-function-async  MNIL_TestRoutine
+--DEFAULT  cookie  "chrComAtmVplTable"
+     ::= { chrComAtmVplTable 1 }
+
+ChrComAtmVplEntry ::= SEQUENCE {
+     	chrComAtmVplNimPt        	TruthValue,
+	chrComAtmVplPMAdminStatus	AdminStatus,	
+	chrComAtmVplVpiApsChannelId	INTEGER (0..4095),
+	chrComAtmVplVciApsChannelId	INTEGER (0..65535),
+	chrComAtmVplIfIndexVpPeerId	Integer32,
+	chrComAtmVpiPolicingMode	Integer32
+          }
+
+chrComAtmVplNimPt OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "Specifies whether the VPL termination point is monitored non-intrusively."
+     DEFVAL    { false }
+     ::= { chrComAtmVplEntry 1 }
+
+chrComAtmVplPMAdminStatus OBJECT-TYPE
+     SYNTAX			AdminStatus
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "Indication whether collection of Performance Monitoring (PM) data is enabled 
+	     at this the VCL TP. The total number of VPLs and VCLs for which PM is 
+	     collected is limited, therefore the SET(up)  SNMP request might be rejected 
+	     when the upper limit exceeds. AtmIfMaxPM and AtmIfCurrentPM fields of the ATM
+	     interface table reflect that limitation."
+     DEFVAL    { down }
+     ::= { chrComAtmVplEntry 2 }
+
+
+chrComAtmVplVpiApsChannelId OBJECT-TYPE
+     SYNTAX    INTEGER (0..4095)
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+		"Specifies the Vcl Vpi which is the APS channel of the protection group.  
+		 NULL value signifies that the VPL is stand-alone and does not belong 
+		 to any group."
+     ::= { chrComAtmVplEntry 3 }
+
+chrComAtmVplVciApsChannelId OBJECT-TYPE
+     SYNTAX     INTEGER (0..65535)
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+		"Specifies the Vcl Vci which is the APS channel of the protection group.  
+		 NULL value signifies that the VPL is stand-alone and does not belong 
+		 to any group."
+     ::= { chrComAtmVplEntry 4 }
+
+chrComAtmVplIfIndexVpPeerId OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+		"Specifies the Vpl IfIndex which is relevant only on sink node, 
+		 i.e. on the boundary of the protection domain. 
+		 In specified the ID of a Virtual VPL that represents the whole protection 
+		 peer. This V.VPL is the one that is cross connected. 
+		 NullPeerID signifies unprotected VPL.
+		 Default – NullVPPeerID (that specifies unprotected sink or an intermediate 
+		 node)NullPeerID is MAXINT (IfIndex, AtmVplVpi), i.e. all bits are 1."
+     ::= { chrComAtmVplEntry 5 }
+
+chrComAtmVpiPolicingMode OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+		"The Policing mode to be applied on the ingress VCL.
+		The policing is applied according to the parameters defined in the 
+		RX traffic descriptor indexed by AtmVcSlReceiveTrafficDescrIndex"
+     ::= { chrComAtmVplEntry 6 }
+
+-- Private VCL Termination Point Configuration Table Extensions
+
+chrComAtmVclTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    ChrComAtmVclEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The Chromatis Private VCL Termination Point Configuration
+          table extensions.  This table augments the VCL
+          configuration table in RFC 2515."
+     ::= { chrComAtmVcl 1 }
+
+chrComAtmVclEntry OBJECT-TYPE
+     SYNTAX    ChrComAtmVclEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Additional columns for the VCL configuration table entry."
+     AUGMENTS { atmVclEntry }
+--DEFAULT  get-function-async   MNIL_GetRoutine
+--DEFAULT  set-function-async   MNIL_SetRoutine
+--DEFAULT  next-function-async  MNIL_NextRoutine
+--DEFAULT  test-function-async  MNIL_TestRoutine
+--DEFAULT  cookie  "chrComAtmVclTable"
+     ::= { chrComAtmVclTable 1 }
+
+ChrComAtmVclEntry ::= SEQUENCE {
+    chrComAtmVclNimPt        	TruthValue,
+	chrComAtmVclPMAdminStatus	AdminStatus,
+	chrComAtmVclVpiApsChannelId	INTEGER (0..4095),
+	chrComAtmVclVciApsChannelId	INTEGER (0..65535),
+	chrComAtmVclIfIndexVcPeerId	Integer32,
+	chrComAtmVciPolicingMode	Integer32
+
+          }
+
+chrComAtmVclNimPt OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "Specifies whether the VPL termination point is monitored non-intrusively."
+     DEFVAL    { false }
+     ::= { chrComAtmVclEntry 1 }
+
+chrComAtmVclPMAdminStatus OBJECT-TYPE
+     SYNTAX			AdminStatus
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "Indication whether collection of Performance Monitoring (PM) data is enabled 
+	     at this the VCL TP. The total number of VPLs and VCLs for which PM is 
+	     collected is limited, therefore the SET(up)  SNMP request might be rejected 
+	     when the upper limit exceeds. AtmIfMaxPM and AtmIfCurrentPM fields of the ATM
+	     interface table reflect that limitation."
+     DEFVAL    { down }
+     ::= { chrComAtmVclEntry 2 }
+
+
+chrComAtmVclVpiApsChannelId OBJECT-TYPE
+     SYNTAX    INTEGER (0..4095)
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+		"Specifies the Vcl Vpi which is the APS channel of the protection group.  
+		 NULL value signifies that the VPL is stand-alone and does not belong 
+		 to any group."
+     ::= { chrComAtmVclEntry 3 }
+
+chrComAtmVclVciApsChannelId OBJECT-TYPE
+     SYNTAX     INTEGER (0..65535)
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+		"Specifies the Vcl Vci which is the APS channel of the protection group.  
+		 NULL value signifies that the VPL is stand-alone and does not belong 
+		 to any group."
+     ::= { chrComAtmVclEntry 4 }
+
+chrComAtmVclIfIndexVcPeerId OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+		"Specifies the Vcl IfIndex which is the Virtual VCL that represents the whole
+		 protectio peer. 
+		 This V.VCL is the one that is cross-connected. 
+		 NULL value signifies that the VCL is not protected.
+		 Default – NullVPPeerID (that specifies unprotected sink or an intermediate 
+		 node)NullPeerID is MAXINT (IfIndex, AtmVplVpi), i.e. all bits are 1"
+     ::= { chrComAtmVclEntry 5 }
+
+
+chrComAtmVciPolicingMode OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+		"The Policing mode to be applied on the ingress VCL.
+		The policing is applied according to the parameters defined in the 
+		RX traffic descriptor indexed by AtmVcSlReceiveTrafficDescrIndex"
+     ::= { chrComAtmVclEntry 6 }
+
+
+END

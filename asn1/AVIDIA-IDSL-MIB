@@ -1,0 +1,1167 @@
+AVIDIA-IDSL-MIB
+
+-- Avidia IDSL MIB Release 1.0
+-- Revision Date:  03/15/2000
+--
+-- Copyright 2000 PairGain Technologies, Inc.  All Rights
+-- Reserved.  Reproduction of this document is authorized on
+-- condition that the foregoing copyright notice is included.
+-- This PairGain SNMP Management Information Base Specification
+-- (Specification) embodies PairGain's confidential and
+-- proprietary intellectual property.  PairGain retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+--
+-- It is PairGain's intent to encourage the widespread use of
+-- this Specification in connection with the management of
+-- PairGain products. PairGain grants vendors, end-users,
+-- and other interested parties a non-exclusive license to
+-- use this Specification in connection with the management
+-- of PairGain products.
+--
+-- This Specification is supplied "AS IS," and PairGain makes
+-- no warranty, either expressed or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+--
+-- Revision History
+--------------------------------------------------------------
+-- Date            Ver     Programmer  Description
+--------------------------------------------------------------
+-- 03/15/2000      1.0     J. Concini  Initial Checkin
+-- 04/10/2000      1.1     J. Concini  Updated idslDiagCode values
+-- 04/14/2000      1.2     J. Concini  Added Av prefix, changed values
+
+
+DEFINITIONS ::= BEGIN
+
+-- SECTION 1: Top Level Definitions
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue, TimeStamp
+		FROM SNMPv2-TC
+    OBJECT-TYPE
+        FROM RFC-1212
+    pgainDSLAM
+        FROM PAIRGAIN-COMMON-HD-MIB
+    InterfaceIndex, ifIndex
+	    FROM IF-MIB
+    PerfCurrentCount, PerfIntervalCount, PerfTotalCount
+	    FROM PerfHist-TC-MIB;
+
+
+-- Module Identity IDSL (required for SNMP v2)
+avIdslMIB MODULE-IDENTITY
+    LAST-UPDATED    "0003150000Z"
+    ORGANIZATION    "PairGain Technologies Inc."
+        CONTACT-INFO    "
+                    14402 Franklin Avenue
+                    Tustin, CA  92780
+                    "
+    DESCRIPTION "The module defines the IDSL MIB "
+    ::= {products 15}
+
+-- Text Conventions for IDSL
+
+-- Alarm Status Type
+
+AvAlarmStatusType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents a Boolean value for alarm status."
+    SYNTAX       INTEGER { inactive(1), active(2) }
+
+-- IDSL Profile Index, used for Alarm and Line profiles.
+
+AvIdslProfileType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Index used to identify a row in an IDSL profile table."
+    SYNTAX       INTEGER (0..65535)
+
+
+avIdslMibObjects        OBJECT IDENTIFIER ::= { avIdslMIB 1 }
+
+    ----------------------------------------------------
+    -- IDSL Index Next Group
+    ----------------------------------------------------
+
+    avIdslLineConfProfileIndexNext OBJECT-TYPE
+        SYNTAX          INTEGER(0..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            " This object contains an appropriate value to
+            be used for avIdslLineConfProfileIndex when creating
+            entries in the avIdslLineConfProfileTable. The value
+            '0' indicates that no unassigned entries are
+            available. To obtain the avIdslLineConfProfileIndexNext
+            value for a new entry, the manager issues a
+            management protocol retrieval operation to obtain
+            the current value of this object.  After each
+            retrieval, the agent should modify the value to
+            the next unassigned index.
+            After a manager retrieves a value the agent will
+            determine through its local policy when this index
+            value will be made available for reuse."
+        ::= { avIdslMibObjects 1}
+
+    avIdslAlarmConfProfileIndexNext OBJECT-TYPE
+        SYNTAX          INTEGER(0..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            " This object contains an appropriate value to
+            be used for avIdslAlarmConfProfileIndex when creating
+            entries in the avIdslAlarmConfProfileTable. The value
+            '0' indicates that no unassigned entries are
+            available. To obtain the avIdslAlarmConfProfileIndexNext
+            value for a new entry, the manager issues a
+            management protocol retrieval operation to obtain
+            the current value of this object.  After each
+            retrieval, the agent should modify the value to
+            the next unassigned index.
+            After a manager retrieves a value the agent will
+            determine through its local policy when this index
+            value will be made available for reuse."
+        ::= { avIdslMibObjects 2}
+
+    ----------------------------------------------------
+    -- IDSL Line Configuration Profile Table
+    ----------------------------------------------------
+
+    avIdslLineConfProfileTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AvIdslLineConfProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains information associated with
+			IDSL line configuration.  One entry in this table
+			reflects a configuration profile that can be
+			referenced when configuring one or more	IDSL lines."
+        ::= { avIdslMibObjects 3}
+
+    avIdslLineConfProfileEntry    OBJECT-TYPE
+        SYNTAX          AvIdslLineConfProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        	"Each entry consists of a list of parameters that
+            represents the configuration of an IDSL port.  A
+            profile is created in one step with all necessary
+            parameter values and avIdslLineProfileRowStatus is set to
+            createAndGo.  This RowStatus object is also used
+            to delete profiles."
+        INDEX { avIdslLineConfProfileIndex}
+    ::= { avIdslLineConfProfileTable 1}
+
+    AvIdslLineConfProfileEntry ::=
+    	SEQUENCE {
+            avIdslLineConfProfileIndex                AvIdslProfileType,
+            avIdslLineConfProfileRowStatus            RowStatus,
+            avIdslLineRate                            INTEGER,
+            avIdslPMMode                              INTEGER,
+            avIdslSESThreshold                        INTEGER
+        }
+
+	avIdslLineConfProfileIndex    OBJECT-TYPE
+        SYNTAX          AvIdslProfileType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        	"This object is used to uniquely identify a row of this table"
+        ::= { avIdslLineConfProfileEntry 1}
+
+    avIdslLineConfProfileRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+        	"This object is used to create a new row or modify or
+            delete an existing row in this table."
+        ::= { avIdslLineConfProfileEntry 2 }
+
+	avIdslLineRate	OBJECT-TYPE
+        SYNTAX      INTEGER {
+            rate64kbps(1),
+			rate128kbps(2),
+			rate144kbps(3)
+		}
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The desired data rate for the IDSL line."
+        DEFVAL { rate144kbps }
+		::= { avIdslLineConfProfileEntry 3 }
+
+	avIdslPMMode	OBJECT-TYPE
+        SYNTAX      INTEGER {
+            path(1),
+			segmented(2)
+		}
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The Performance Monitoring Mode for the IDSL line.
+			Path mode treats multiple DLCI loops as a single segment.
+			Segmented mode monitors performance statistics for each
+			segment individually."
+        DEFVAL { path }
+		::= { avIdslLineConfProfileEntry 4 }
+
+	avIdslSESThreshold	OBJECT-TYPE
+        SYNTAX      INTEGER (1..15)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The number of block errors in secondes that must be met
+			or exceeded in order to count as a severely errored second."
+        DEFVAL { 3 }
+		::= { avIdslLineConfProfileEntry 5 }
+
+
+    ----------------------------------------------------
+    -- IDSL Alarm Configuration Profile Table
+    ----------------------------------------------------
+
+    avIdslAlarmConfProfileTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AvIdslAlarmConfProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains information associated with
+			the IDSL alarm configuration.  One entry in this
+			table reflects a configuration profile that can be
+			referenced when configuring	one or more IDSL lines."
+        ::= { avIdslMibObjects 4}
+
+    avIdslAlarmConfProfileEntry    OBJECT-TYPE
+        SYNTAX          AvIdslAlarmConfProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        	"Each entry consists of a list of parameters that
+            represents the alarm configuration for an IDSL port.
+			A profile is created in one step with all necessary
+            parameter values and avIdslAlarmProfileRowStatus is set to
+            createAndGo.  This RowStatus object is also used
+            to delete profiles."
+        INDEX { avIdslAlarmConfProfileIndex}
+    ::= { avIdslAlarmConfProfileTable 1}
+
+    AvIdslAlarmConfProfileEntry ::=
+    	SEQUENCE {
+            avIdslAlarmConfProfileIndex                AvIdslProfileType,
+            avIdslAlarmConfProfileRowStatus            RowStatus,
+            avIdslHourlyESThreshold                    INTEGER,
+            avIdslHourlySESThreshold                   INTEGER,
+            avIdslDailyESThreshold                     INTEGER,
+	    avIdslDailySESThreshold                    INTEGER
+            }
+
+	avIdslAlarmConfProfileIndex    OBJECT-TYPE
+        SYNTAX          AvIdslProfileType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        	"This object is used to uniquely identify a row in this table."
+        ::= { avIdslAlarmConfProfileEntry 1}
+
+    avIdslAlarmConfProfileRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+        	"This object is used to create a new row, or modify or
+            delete an existing row in this table."
+        ::= { avIdslAlarmConfProfileEntry 2 }
+
+	avIdslHourlyESThreshold	OBJECT-TYPE
+        SYNTAX      INTEGER (0..255)
+		UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The number of errored seconds in an hour that must be
+			met or exceeded in order to report EShourly alarms."
+        DEFVAL { 40 }
+		::= { avIdslAlarmConfProfileEntry 3 }
+
+	avIdslHourlySESThreshold	OBJECT-TYPE
+        SYNTAX      INTEGER (0..127)
+		UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The number of severely errored seconds in an hour that must be
+			met or exceeded in order to report SEShourly alarms."
+        DEFVAL { 10 }
+		::= { avIdslAlarmConfProfileEntry 4 }
+
+	avIdslDailyESThreshold	OBJECT-TYPE
+        SYNTAX      INTEGER (0..4095)
+		UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The number of errored seconds in a day that must be
+			met or exceeded in order to report ESdaily alarms."
+        DEFVAL { 100 }
+		::= { avIdslAlarmConfProfileEntry 5 }
+
+	avIdslDailySESThreshold	OBJECT-TYPE
+        SYNTAX      INTEGER (0..2047)
+		UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The number of severely errored seconds in a day that must be
+			met or exceeded in order to report SESdaily alarms."
+        DEFVAL { 25 }
+		::= { avIdslAlarmConfProfileEntry 6 }
+
+    ----------------------------------------------------
+    -- IDSL Card Configuration Table
+    ----------------------------------------------------
+
+
+    avIdslCardConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AvIdslCardConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The IDSL Card Configuration table."
+        ::= { avIdslMibObjects 5 }
+
+    avIdslCardConfigEntry OBJECT-TYPE
+        SYNTAX  AvIdslCardConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in the IDSL Configuration table."
+        INDEX   { avIdslCardSlotId }
+        ::= { avIdslCardConfigTable 1 }
+
+    AvIdslCardConfigEntry ::=
+        SEQUENCE {
+            avIdslCardSlotId                       INTEGER,
+            avIdslCardClockSource                  INTEGER
+        }
+
+	avIdslCardSlotId OBJECT-TYPE
+	    SYNTAX  INTEGER (1..64)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		    "The chassis slot number where the card is installed.
+			Value 1 represents the slot where the management card is
+			installed. The slot numbers for adjacent slots increment by 1."
+		::= { avIdslCardConfigEntry 1 }
+
+    avIdslCardClockSource OBJECT-TYPE
+        SYNTAX  INTEGER {
+                localTiming(1),
+                sysRefATiming(2),
+                sysRefBTiming(3)
+		}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The source of the Transmit Clock for the IDSL card.
+			The values mean:
+                localTiming
+				    indicates that the IDSL card's local clock source is used.
+                sysRefATiming
+				    indicates that the AVIDIA system reference clock on
+					channel A is used.
+                sysRefBTiming
+				    indicates that the AVIDIA system reference clock on
+			        channel B is used."
+        DEFVAL { localTiming }
+        ::= { avIdslCardConfigEntry 2 }
+
+
+    ----------------------------------------------------
+    -- IDSL Interface Configuration Table
+    ----------------------------------------------------
+
+    avIdslConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AvIdslConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The IDSL Configuration table."
+        ::= { avIdslMibObjects 6 }
+
+    avIdslConfigEntry OBJECT-TYPE
+        SYNTAX  AvIdslConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in the IDSL Configuration table."
+        INDEX   { ifIndex }
+        ::= { avIdslConfigTable 1 }
+
+    AvIdslConfigEntry ::=
+        SEQUENCE {
+            avIdslLineConfProfile                  AvIdslProfileType,
+            avIdslAlarmConfProfile                 AvIdslProfileType,
+            avIdslCircuitIdentifier                DisplayString
+        }
+
+	avIdslLineConfProfile    OBJECT-TYPE
+        SYNTAX          AvIdslProfileType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object identifies a row in the avIdslLineConfProfileTable
+            that describes the line configuration profile for this interface."
+        ::= { avIdslConfigEntry 1 }
+
+    avIdslAlarmConfProfile    OBJECT-TYPE
+        SYNTAX          AvIdslProfileType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object identifies a row in the avIdslAlarmConfProfileTable
+            that describes the alarm configuration profile for this interface."
+        ::= { avIdslConfigEntry 2 }
+
+    avIdslCircuitIdentifier OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This variable contains the transmission vendor's
+            circuit identifier, for the purpose of
+            facilitating troubleshooting."
+        ::= { avIdslConfigEntry 3 }
+
+
+
+    ----------------------------------------------------
+    -- IDSL Interface Alarm Status Table
+    ----------------------------------------------------
+
+    avIdslAlarmTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AvIdslAlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides the IDSL alarm indications."
+        ::= {avIdslMibObjects 7}
+
+    avIdslAlarmEntry  OBJECT-TYPE
+        SYNTAX      AvIdslAlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entries of the avIdsl alarm table "
+        INDEX       {ifIndex}
+        ::= {avIdslAlarmTable 1}
+
+    AvIdslAlarmEntry ::= SEQUENCE {
+        avIdslAlarmLOS                 AvAlarmStatusType,
+        avIdslAlarmESHourlyNet         AvAlarmStatusType,
+        avIdslAlarmSESHourlyNet        AvAlarmStatusType,
+        avIdslAlarmESHourlyCust        AvAlarmStatusType,
+        avIdslAlarmSESHourlyCust       AvAlarmStatusType,
+        avIdslAlarmESDailyNet          AvAlarmStatusType,
+        avIdslAlarmSESDailyNet         AvAlarmStatusType,
+        avIdslAlarmESDailyCust         AvAlarmStatusType,
+        avIdslAlarmSESDailyCust        AvAlarmStatusType,
+        avIdslAlarmLastChange          TimeStamp
+    }
+
+    avIdslAlarmLOS OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current loss of signal margin alarm status."
+        ::= {avIdslAlarmEntry 1}
+
+    avIdslAlarmESHourlyNet OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current hourly ES alert status in the network direction."
+        ::= {avIdslAlarmEntry 2}
+
+    avIdslAlarmSESHourlyNet OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current hourly SES alert status in the network direction."
+        ::= {avIdslAlarmEntry 3}
+
+    avIdslAlarmESHourlyCust OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current hourly ES alert status in the customer direction."
+        ::= {avIdslAlarmEntry 4}
+
+    avIdslAlarmSESHourlyCust OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current hourly SES alert status in the customer direction."
+        ::= {avIdslAlarmEntry 5}
+
+    avIdslAlarmESDailyNet OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current daily ES alert status in the network direction."
+        ::= {avIdslAlarmEntry 6}
+
+    avIdslAlarmSESDailyNet OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current daily SES alert status in the network direction."
+        ::= {avIdslAlarmEntry 7}
+
+    avIdslAlarmESDailyCust OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current daily ES alert status in the customer direction."
+        ::= {avIdslAlarmEntry 8}
+
+    avIdslAlarmSESDailyCust OBJECT-TYPE
+        SYNTAX      AvAlarmStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current daily SES alert status in the customer direction."
+        ::= {avIdslAlarmEntry 9}
+
+     avIdslAlarmLastChange OBJECT-TYPE
+          SYNTAX  TimeStamp
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The value of MIB II's sysUpTime object at the
+                 time this IDSL interface last reported a change
+                 in an alarm status.  If the current state was
+				 entered prior to the last re-initialization,
+                 then this object contains a zero value."
+          ::= { avIdslAlarmEntry 10 }
+
+
+    ----------------------------------------------------
+    -- IDSL Current Hour Performance Monitoring Table
+    ----------------------------------------------------
+
+    avIdslCurrHourTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AvIdslCurrHourEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides performance statistics for the
+			current hour interval."
+        ::= {avIdslMibObjects 8}
+
+    avIdslCurrHourEntry  OBJECT-TYPE
+        SYNTAX      AvIdslCurrHourEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entries of the avIdslCurrHourTable "
+        INDEX       {avIdslCurrHourIfIndex, avIdslCurrHourNodeId}
+        ::= {avIdslCurrHourTable 1}
+
+    AvIdslCurrHourEntry ::= SEQUENCE {
+	    avIdslCurrHourIfIndex          InterfaceIndex,
+		avIdslCurrHourNodeId           INTEGER,
+        avIdslCurrHourBENet            PerfCurrentCount,
+        avIdslCurrHourESNet            PerfCurrentCount,
+        avIdslCurrHourSESNet           PerfCurrentCount,
+        avIdslCurrHourBECust           PerfCurrentCount,
+        avIdslCurrHourESCust           PerfCurrentCount,
+        avIdslCurrHourSESCust          PerfCurrentCount
+    }
+
+     avIdslCurrHourIfIndex OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The interface index value (ifIndex) that
+				 uniquely identifies the IDSL interface
+				 to which this entry is applicable."
+          ::= { avIdslCurrHourEntry 1 }
+
+     avIdslCurrHourNodeId OBJECT-TYPE
+          SYNTAX  INTEGER (0..7)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The index value that uniquely identifies the
+                 IDSL node to which this entry is applicable."
+          ::= { avIdslCurrHourEntry 2 }
+
+     avIdslCurrHourBENet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Block Errors
+				 encountered in the network direction during the current
+				 hour interval."
+          ::= { avIdslCurrHourEntry 3 }
+
+     avIdslCurrHourESNet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Errored Seconds
+				 encountered in the network direction during the current
+				 hour interval."
+          ::= { avIdslCurrHourEntry 4 }
+
+     avIdslCurrHourSESNet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Severely Errored
+				 Seconds encountered in the network direction during the
+				 current hour interval."
+          ::= { avIdslCurrHourEntry 5 }
+
+     avIdslCurrHourBECust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Block Errors
+				 encountered in the customer direction during the current
+				 hour interval."
+          ::= { avIdslCurrHourEntry 6 }
+
+     avIdslCurrHourESCust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Errored Seconds
+				 encountered in the customer direction during the current
+				 hour interval."
+          ::= { avIdslCurrHourEntry 7 }
+
+     avIdslCurrHourSESCust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Severely Errored
+				 Seconds encountered in the customer direction during the
+				 current hour interval."
+          ::= { avIdslCurrHourEntry 8 }
+
+    ----------------------------------------------------
+    -- IDSL Current Day Performance Monitoring Table
+    ----------------------------------------------------
+
+    avIdslCurrDayTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AvIdslCurrDayEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides performance statistics for the
+			current day interval."
+        ::= {avIdslMibObjects 9}
+
+    avIdslCurrDayEntry  OBJECT-TYPE
+        SYNTAX      AvIdslCurrDayEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entries of the avIdslCurrDayTable."
+        INDEX       {avIdslCurrDayIfIndex, avIdslCurrDayNodeId}
+        ::= {avIdslCurrDayTable 1}
+
+    AvIdslCurrDayEntry ::= SEQUENCE {
+	    avIdslCurrDayIfIndex           InterfaceIndex,
+		avIdslCurrDayNodeId            INTEGER,
+        avIdslCurrDayESNet             PerfCurrentCount,
+        avIdslCurrDaySESNet            PerfCurrentCount,
+        avIdslCurrDayESCust            PerfCurrentCount,
+        avIdslCurrDaySESCust           PerfCurrentCount
+    }
+
+     avIdslCurrDayIfIndex OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The interface index value (ifIndex) that
+				 uniquely identifies the IDSL interface
+				 to which this entry is applicable."
+          ::= { avIdslCurrDayEntry 1 }
+
+     avIdslCurrDayNodeId OBJECT-TYPE
+          SYNTAX  INTEGER (0..7)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The index value that uniquely identifies the
+                 IDSL node to which this entry is applicable."
+          ::= { avIdslCurrDayEntry 2 }
+
+     avIdslCurrDayESNet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Errored Seconds
+				 encountered in the network direction during the current
+				 day interval."
+          ::= { avIdslCurrDayEntry 3 }
+
+     avIdslCurrDaySESNet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Severely Errored
+				 Seconds encountered in the network direction during the
+				 current day interval."
+          ::= { avIdslCurrDayEntry 4 }
+
+     avIdslCurrDayESCust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Errored Seconds
+				 encountered in the customer direction during the current
+				 day interval."
+          ::= { avIdslCurrDayEntry 5 }
+
+     avIdslCurrDaySESCust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Severely Errored Seconds
+				 encountered in the customer direction during the current day interval."
+          ::= { avIdslCurrDayEntry 6 }
+
+    ----------------------------------------------------
+    -- IDSL Interval Hour Performance Monitoring Table
+    ----------------------------------------------------
+
+    avIdslIntervalHourTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AvIdslIntervalHourEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides performance statistics for
+			previous hour intervals."
+        ::= {avIdslMibObjects 10}
+
+    avIdslIntervalHourEntry  OBJECT-TYPE
+        SYNTAX      AvIdslIntervalHourEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entries of the avIdslIntervalHourTable."
+        INDEX       {avIdslIntervalHourIfIndex,
+                     avIdslIntervalHourNodeId,
+                     avIdslIntervalHourNumber}
+        ::= {avIdslIntervalHourTable 1}
+
+    AvIdslIntervalHourEntry ::= SEQUENCE {
+	    avIdslIntervalHourIfIndex          InterfaceIndex,
+		avIdslIntervalHourNodeId           INTEGER,
+	    avIdslIntervalHourNumber           INTEGER,
+        avIdslIntervalHourBENet            PerfCurrentCount,
+        avIdslIntervalHourESNet            PerfCurrentCount,
+        avIdslIntervalHourSESNet           PerfCurrentCount,
+        avIdslIntervalHourBECust           PerfCurrentCount,
+        avIdslIntervalHourESCust           PerfCurrentCount,
+        avIdslIntervalHourSESCust          PerfCurrentCount
+    }
+
+     avIdslIntervalHourIfIndex OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The interface index value (ifIndex) that
+				 uniquely identifies the IDSL interface
+				 to which this entry is applicable."
+          ::= { avIdslIntervalHourEntry 1 }
+
+     avIdslIntervalHourNodeId OBJECT-TYPE
+          SYNTAX  INTEGER (0..7)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The index value that uniquely identifies the
+                 IDSL node to which this entry is applicable."
+          ::= { avIdslIntervalHourEntry 2 }
+
+     avIdslIntervalHourNumber OBJECT-TYPE
+          SYNTAX  INTEGER (1..8)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "A number between 1 and 8, where 1 is the most
+                 recently completed hour interval and 8 is
+                 the hour interval completed 7 hours
+                 prior to interval 1."
+          ::= { avIdslIntervalHourEntry 3 }
+
+     avIdslIntervalHourBENet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Block Errors
+				 encountered in the network direction during the specified hour interval."
+          ::= { avIdslIntervalHourEntry 4 }
+
+     avIdslIntervalHourESNet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Errored Seconds
+				 encountered in the network direction during the specified hour interval."
+          ::= { avIdslIntervalHourEntry 5 }
+
+     avIdslIntervalHourSESNet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Severely Errored Seconds
+				 encountered in the network direction during the specified hour interval."
+          ::= { avIdslIntervalHourEntry 6 }
+
+     avIdslIntervalHourBECust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Block Errors
+				 encountered in the customer direction during the specified hour interval."
+          ::= { avIdslIntervalHourEntry 7 }
+
+     avIdslIntervalHourESCust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Errored Seconds
+				 encountered in the customer direction during the specified hour interval."
+          ::= { avIdslIntervalHourEntry 8 }
+
+     avIdslIntervalHourSESCust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Severely Errored Seconds
+				 encountered in the customer direction during the specified hour interval."
+          ::= { avIdslIntervalHourEntry 9 }
+
+
+    ----------------------------------------------------
+    -- IDSL Interval Day Performance Monitoring Table
+    ----------------------------------------------------
+
+    avIdslIntervalDayTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AvIdslIntervalDayEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides performance statistics for the
+			previous day intervals."
+        ::= {avIdslMibObjects 11}
+
+    avIdslIntervalDayEntry  OBJECT-TYPE
+        SYNTAX      AvIdslIntervalDayEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entries of the avIdslIntervalDayTable."
+        INDEX       {avIdslIntervalDayIfIndex,
+                     avIdslIntervalDayNodeId,
+                     avIdslIntervalDayNumber}
+        ::= {avIdslIntervalDayTable 1}
+
+    AvIdslIntervalDayEntry ::= SEQUENCE {
+	    avIdslIntervalDayIfIndex       InterfaceIndex,
+		avIdslIntervalDayNodeId        INTEGER,
+		avIdslIntervalDayNumber        INTEGER,
+        avIdslIntervalDayESNet         PerfCurrentCount,
+        avIdslIntervalDaySESNet        PerfCurrentCount,
+        avIdslIntervalDayESCust        PerfCurrentCount,
+        avIdslIntervalDaySESCust       PerfCurrentCount
+    }
+
+     avIdslIntervalDayIfIndex OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The interface index value (ifIndex) that
+				 uniquely identifies the IDSL interface
+				 to which this entry is applicable."
+          ::= { avIdslIntervalDayEntry 1 }
+
+     avIdslIntervalDayNodeId OBJECT-TYPE
+          SYNTAX  INTEGER (0..7)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The index value that uniquely identifies the
+                 IDSL node to which this entry is applicable."
+          ::= { avIdslIntervalDayEntry 2 }
+
+     avIdslIntervalDayNumber OBJECT-TYPE
+          SYNTAX  INTEGER (1)
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "A number identifying the most
+                 recently completed day interval."
+          ::= { avIdslIntervalDayEntry 3 }
+
+     avIdslIntervalDayESNet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Errored Seconds
+				 encountered in the network direction during the specified day interval."
+          ::= { avIdslIntervalDayEntry 4 }
+
+     avIdslIntervalDaySESNet OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Severely Errored Seconds
+				 encountered in the network direction during the specified day interval."
+          ::= { avIdslIntervalDayEntry 5 }
+
+     avIdslIntervalDayESCust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Errored Seconds
+				 encountered in the customer direction during the specified day interval."
+          ::= { avIdslIntervalDayEntry 6 }
+
+     avIdslIntervalDaySESCust OBJECT-TYPE
+          SYNTAX  PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "The counter associated with the number of Severely Errored Seconds
+				 encountered in the customer direction during the specified day interval."
+          ::= { avIdslIntervalDayEntry 7 }
+
+
+    ----------------------------------------------------
+    -- IDSL Interface Status Table
+    ----------------------------------------------------
+
+    avIdslStatusTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AvIdslStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The IDSL Status table."
+        ::= { avIdslMibObjects 12 }
+
+    avIdslStatusEntry OBJECT-TYPE
+        SYNTAX  AvIdslStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in the IDSL Status table."
+        INDEX   { ifIndex }
+        ::= { avIdslStatusTable 1 }
+
+    AvIdslStatusEntry ::=
+        SEQUENCE {
+            avIdslUpState                          INTEGER,
+			avIdslSegments                         INTEGER (0..7),
+            avIdslDiagCode                         INTEGER,
+            avIdslDiagCodeNodeId                   INTEGER (0..7)
+        }
+
+    avIdslUpState OBJECT-TYPE
+        SYNTAX  INTEGER {
+		    avIdslUpStateUp(1),
+			avIdslUpStateSyncUp(2),
+			avIdslUpStateTraining(3),
+			avIdslUpStateAlerting(4),
+			avIdslUpStateDown(5)
+		}
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The state of the IDSL interface.
+			Defined states are:
+			    1 = The loop is up and active.
+				2 = The loop has synchronized with the first node.
+				3 = The loop is training the Digital Front End (DFE).
+				4 = The loop is waiting for a signal.
+				5 = The loop is down or disabled."
+        ::= { avIdslStatusEntry 1 }
+
+    avIdslSegments OBJECT-TYPE
+        SYNTAX  INTEGER (0..7)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of segments in the IDSL loop."
+        ::= { avIdslStatusEntry 2 }
+
+    avIdslDiagCode OBJECT-TYPE
+        SYNTAX  INTEGER (0..7)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This variable is used to invoke diagnostic
+            routines for IDSL testing.
+            Setting this variable causes the interface to
+            invoke the diagnostic(s) specified.  The value is
+			a bit map represented as a sum, therefore, it
+            can represent multiple diagnostics simultaneously.
+			Each bit is set to a value 1 to initiate the diagnostic, and
+            set to a value 0 to terminate the diagnostic.
+
+            The various bit position values are:
+                1:  Clear the Current and Interval Performance Statistics.
+
+                2:  Configure a loopback on this IDSL interface.
+                    Data is looped back in both directions.
+					avIdslDiagCodeNodeId specifies
+					the node on which to configure the loopback.
+
+                4:  Configure the IDSL interface to execute a corrupted CRC Test.
+					avIdslDiagCodeNodeId specifies
+					the node on which to generate the corrupted CRC."
+        ::= { avIdslStatusEntry 3 }
+
+    avIdslDiagCodeNodeId OBJECT-TYPE
+        SYNTAX  INTEGER (0..7)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The node ID of the element to which the avIdslDiagCode
+            configuration applies.  Only one node can be configured at a time,
+			setting a node clears diagnostics on all other nodes."
+        ::= { avIdslStatusEntry 4 }
+
+
+      -- IDSL TRAPS
+
+     avIdslTraps OBJECT IDENTIFIER ::= { avIdslMibObjects 13 }
+     avIdslLineTraps OBJECT IDENTIFIER ::= { avIdslTraps 0 }
+
+
+     avIdslLOSTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmLOS }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmLOS changes."
+                    ::= { avIdslLineTraps 1 }
+
+     avIdslESHourlyNetTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmESHourlyNet }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmESHourlyNet changes."
+                    ::= { avIdslLineTraps 2 }
+
+     avIdslSESHourlyNetTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmSESHourlyNet }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmSESHourlyNet changes."
+                    ::= { avIdslLineTraps 3 }
+
+     avIdslESHourlyCustTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmESHourlyCust }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmESHourlyCust changes."
+                    ::= { avIdslLineTraps 4 }
+
+     avIdslSESHourlyCustTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmSESHourlyCust }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmSESHourlyCust changes."
+                    ::= { avIdslLineTraps 5 }
+
+     avIdslESDailyNetTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmESDailyNet }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmESDailyNet changes."
+                    ::= { avIdslLineTraps 6 }
+
+     avIdslSESDailyNetTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmSESDailyNet }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmSESDailyNet changes."
+                    ::= { avIdslLineTraps 7 }
+
+     avIdslESDailyCustTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmESDailyCust }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmESDailyCust changes."
+                    ::= { avIdslLineTraps 8 }
+
+     avIdslSESDailyCustTrap NOTIFICATION-TYPE
+         OBJECTS { ifIndex,
+                   avIdslAlarmSESDailyCust }
+         STATUS  current
+         DESCRIPTION
+                 "This trap is sent when the value of an
+                 instance of avIdslAlarmSESDailyCust changes."
+                    ::= { avIdslLineTraps 9 }
+
+
+
+END

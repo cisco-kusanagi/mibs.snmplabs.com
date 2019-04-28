@@ -1,0 +1,1999 @@
+
+
+CMC-MIB DEFINITIONS ::= BEGIN
+
+--Title: Rockwell-CMC MIB
+--Date:  April 19, 1994
+--By:    Stephanie Price Marasciullo <price@cmc.com>
+
+IMPORTS
+	IpAddress, Counter, Gauge, enterprises
+		FROM RFC1155-SMI;
+
+-- Types for IPX
+
+NetNumber ::= OCTET STRING (SIZE(4))
+
+-- IpxAddress is "net(4).node(4+2).socket(2)"
+		  
+IpxAddress ::= OCTET STRING (SIZE(14))
+		  
+
+
+cmc        OBJECT IDENTIFIER ::= { enterprises 44 }
+cmc-prod   OBJECT IDENTIFIER ::= { cmc 1 }
+cmc-adapt  OBJECT IDENTIFIER ::= { cmc-prod 1 }
+cmc-system OBJECT IDENTIFIER ::= { cmc-prod 2 }
+cmc-soft   OBJECT IDENTIFIER ::= { cmc-prod 3 }
+
+cmc-mgmt   OBJECT IDENTIFIER ::= { cmc 2 }
+cmc-mib    OBJECT IDENTIFIER ::= { cmc-mgmt 1 }
+
+-- added to decode trap
+cmc-trapA  OBJECT IDENTIFIER ::= { cmc-mgmt 6}
+cmc-trapB  OBJECT IDENTIFIER ::= { cmc-trapA 6}
+cmc-trapC  OBJECT IDENTIFIER ::= { cmc-trapB 5}
+cmc-trapD  OBJECT IDENTIFIER ::= { cmc-trapC 3}
+cmc-trapE  OBJECT IDENTIFIER ::= { cmc-trapD 10}
+
+cmc-ip     OBJECT IDENTIFIER ::= { cmc-mib 4 }
+
+
+cmc-ipx                 OBJECT IDENTIFIER ::= { cmc-mib 5 }
+
+cmc-ipx-ipx             OBJECT IDENTIFIER ::= { cmc-ipx 1 }
+cmc-ipx-ipxSystem       OBJECT IDENTIFIER ::= { cmc-ipx-ipx 1 }
+cmc-ipx-ipxCircuit      OBJECT IDENTIFIER ::= { cmc-ipx-ipx 2 }
+cmc-ipx-ipxForwarding   OBJECT IDENTIFIER ::= { cmc-ipx-ipx 3 }
+cmc-ipx-ipxServices     OBJECT IDENTIFIER ::= { cmc-ipx-ipx 4 }
+
+cmc-ipx-filter			OBJECT IDENTIFIER ::= { cmc-ipx 2 }
+cmc-ipx-filt-packet		OBJECT IDENTIFIER ::= { cmc-ipx-filter 2 }
+cmc-ipx-filt-rip		OBJECT IDENTIFIER ::= { cmc-ipx-filter 4 }
+cmc-ipx-filt-sap		OBJECT IDENTIFIER ::= { cmc-ipx-filter 6 }
+
+
+
+
+-- the CMC IP group
+
+cmcIpInAdminDiscards OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of incoming datagrams dropped due to 
+        administrative prohibitions."
+    ::= { cmc-ip 1 }
+
+cmcIpOutAdminDiscards OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of outgoing datagrams dropped due to 
+        administrative prohibitions."
+    ::= { cmc-ip 3 }
+
+-- the CMC IP Filter Group
+    cmcIpFiltStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(1),    -- IP Filtering disabled
+        enabled(2)      -- IP Filtering enabled
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The status of IP Filtering."
+    ::= { cmc-ip 4 }
+
+    cmcIpFilterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CmcIpFiltEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of IP Filter table entries."
+    ::= { cmc-ip 5 }
+
+    cmcIpFiltEntry OBJECT-TYPE
+    SYNTAX CmcIpFiltEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "An IP Filter table entry containing objects
+        that describe datagram transmission/reception restrictions.
+        Creation of an IP Filter table entry requires the presence
+        of the cmcIpFiltName and cmcIpFiltMode objects along with 
+        at least one of the following objects:
+            cmcIpFiltSAddr 		
+            cmcIpFiltSPort
+            cmcIpFiltDAddr
+            cmcIpFiltDPort
+            cmcIpFiltProto
+            cmcIpFiltIfIndex"
+    INDEX { cmcIpFiltName }
+    ::= { cmcIpFilterTable 1 }
+
+    CmcIpFiltEntry ::=
+        SEQUENCE {
+            cmcIpFiltName
+                OCTET STRING,
+            cmcIpFiltPriority
+                INTEGER,
+            cmcIpFiltSAddr 		
+                IpAddress,
+            cmcIpFiltSMask
+                IpAddress,
+            cmcIpFiltSPort
+                INTEGER,
+            cmcIpFiltDAddr
+                IpAddress,
+            cmcIpFiltDMask
+                IpAddress,
+            cmcIpFiltDPort
+                INTEGER,
+            cmcIpFiltProto
+                INTEGER,
+            cmcIpFiltMode
+                INTEGER,
+            cmcIpFiltErrMsg
+                INTEGER,
+            cmcIpFiltType
+                INTEGER,
+            cmcIpFiltMoveOper
+                OCTET STRING,
+            cmcIpFiltUseCount
+                INTEGER,
+            cmcIpFiltDirection
+                INTEGER,
+            cmcIpFiltIfIndex
+                INTEGER
+        }
+
+    cmcIpFiltName  OBJECT-TYPE	 
+    SYNTAX	OCTET STRING
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Name of filter entry.  This is an ASCII string
+        up to 6 octets long."
+    ::= { cmcIpFiltEntry 1 }
+
+    cmcIpFiltPriority  OBJECT-TYPE	 
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+        "The priority of the entry.  The highest
+        priority entry (1) is searched first.  The
+        second highest priority entry (2) is searched
+        next, and so on."
+    ::= { cmcIpFiltEntry 2 }
+
+    cmcIpFiltSAddr  OBJECT-TYPE  
+    SYNTAX	IpAddress
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Source IP address for the filter entry"
+    ::= { cmcIpFiltEntry 3 }
+
+    cmcIpFiltSMask  OBJECT-TYPE  
+    SYNTAX	IpAddress
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Source IP mask for the filter entry."
+    ::= { cmcIpFiltEntry 4 }
+
+    cmcIpFiltSPort  OBJECT-TYPE  
+    SYNTAX	INTEGER
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Source port for the filter entry."
+    ::= { cmcIpFiltEntry 5 }
+
+    cmcIpFiltDAddr  OBJECT-TYPE  
+    SYNTAX	IpAddress
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Destination IP address for the filter entry."
+    ::= { cmcIpFiltEntry 6 }
+
+    cmcIpFiltDMask  OBJECT-TYPE  
+    SYNTAX	IpAddress
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Destination IP mask for the filter entry."
+    ::= { cmcIpFiltEntry 7 }
+
+    cmcIpFiltDPort  OBJECT-TYPE  
+    SYNTAX	INTEGER
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Destination port for the filter entry."
+    ::= { cmcIpFiltEntry 8 }
+
+    cmcIpFiltProto  OBJECT-TYPE  
+    SYNTAX	INTEGER
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Protocol to filter."
+    ::= { cmcIpFiltEntry 9 }
+
+    cmcIpFiltMode  OBJECT-TYPE  
+    SYNTAX	INTEGER {
+        allow(1),
+        deny(2),
+        nodial(3)
+    }
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Mode of the filter entry."
+    ::= { cmcIpFiltEntry 10 }
+
+    cmcIpFiltErrMsg  OBJECT-TYPE  
+    SYNTAX	INTEGER {
+        enable(1),
+        disable(2)
+    }
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Configuration object used to control the
+        transmission of ICMP error messages when datagrams
+	are administratively filtered."
+    ::= { cmcIpFiltEntry 11 }
+
+    cmcIpFiltType  OBJECT-TYPE  
+    SYNTAX	INTEGER {
+        local(1),	-- entered via User Interface
+        invalid(2),	-- invalidated entry
+        netmgmt(3)	-- set via a net man proto
+    }
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "The type of the IP Filter Table entry.
+        Setting this object to the value invalid(2)
+        has the effect of invalidating the corresponding
+        entry in the cmcIpFilterTable.  The invalid(2)
+	value is not supported for row creates.  The netmgt(3)
+	value is the default value for row creates."
+    ::= { cmcIpFiltEntry 12 }
+
+    cmcIpFiltMoveOper  OBJECT-TYPE  
+    SYNTAX	OCTET STRING
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "Configuration object used to move IP Filter table
+        entries (to obtain a different priority for the
+        entry).  Parameters are defined as:
+            Octet 0 describes the move operation
+                [1, 2] = [Before, After]
+                Octets 1 - 6 contain an existing IP Filter Entry name."
+    ::= { cmcIpFiltEntry 13 }
+
+    cmcIpFiltUseCount  OBJECT-TYPE  
+    SYNTAX	INTEGER
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION
+        "The number of times the IP Filter Table
+        entry has been referenced."
+    ::= { cmcIpFiltEntry 14 }
+
+    cmcIpFiltDirection OBJECT-TYPE
+    SYNTAX  INTEGER {
+        both(1),                -- both directions
+        incoming(2),            -- incoming packets
+        outgoing(3)             -- outgoing packets
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+    "The flow direction for the filter entry."
+    ::= { cmcIpFiltEntry 15 }
+
+    cmcIpFiltIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The interface index associated with the
+        filter entry.  This value is equivalent
+        to the ifIndex object."
+    ::= { cmcIpFiltEntry 16 }
+
+    cmcConnectionEstablished TRAP-TYPE
+    ENTERPRISE cmc-trapE
+    DESCRIPTION
+        "A cmcConnectionEstablished(1) trap is
+        generated when a wide area network connection
+        is established on a dynamic link.  The 
+        variable-binding contains the ifIndex 
+        value of the effected interface."
+
+	--#TYPE "cmcConnectionEstablished"
+	--#SUMMARY "Connection established on NetHopper dynamic port %d."
+	--#ARGUMENTS {0}
+	--#SEVERITY INFORMATIONAL
+	--#TIMEINDEX 2       
+	--#STATE  OPERATIONAL 
+
+    ::= 1
+
+    cmcConnectionTerminated TRAP-TYPE
+    ENTERPRISE cmc-trapE
+    DESCRIPTION
+        "A cmcConnectionTerminated(2) trap is
+         generated when a wide area network connection
+         is terminated on a dynamic link.  The 
+         variable-binding contains the ifIndex 
+         value of the effected interface."
+
+	--#TYPE "cmcConnectionTerminated"
+	--#SUMMARY "Connection terminated on NetHopper dynamic port %d."
+	--#ARGUMENTS {0}
+	--#SEVERITY INFORMATIONAL
+	--#TIMEINDEX 2       
+	--#STATE  OPERATIONAL 
+
+    ::= 2
+
+
+-- IPX System Group
+--	This group contains global information about
+--	each instance of IPX running on one system
+
+-- System Table
+--	This table contains one entry for each instance
+--	of IPX running on the system
+		
+	ipxSysTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF IPXSysEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"The IPX System table."
+	::= { cmc-ipx-ipxSystem 1 }
+
+	ipxSysEntry	OBJECT-TYPE
+	SYNTAX		IPXSysEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"Each entry corresponds to one instance of
+		IPX running on the system."
+	INDEX		{ ipxSysInstance }
+	::= { ipxSysTable 1 }
+
+	IPXSysEntry	::= 
+		SEQUENCE {
+			ipxSysInstance 
+				INTEGER,
+			ipxSysExistState
+				INTEGER,
+			ipxSysIntNetNumExists
+				INTEGER,
+			ipxSysIntNetNum
+				NetNumber,
+			ipxSysName
+				OCTET STRING,
+			ipxSysMaxPathSplits
+				INTEGER,
+			ipxSysMaxHops
+				INTEGER,
+			ipxSysVersionMajor
+				INTEGER,
+			ipxSysVersionMinor
+				INTEGER,
+			ipxSysInReceives
+				Counter,
+			ipxSysInTooManyHops
+				Counter,
+			ipxSysInHdrErrors
+				Counter,
+			ipxSysInUnknownSockets
+				Counter,
+			ipxSysInFiltered
+				Counter,
+			ipxSysInCompressDiscards
+				Counter,
+			ipxSysInDiscards
+				Counter,
+			ipxSysInDelivers
+				Counter,
+			ipxSysNETBIOSPackets
+				Counter,
+			ipxSysForwPackets
+				Counter,
+			ipxSysOutRequests
+				Counter,
+			ipxSysOutNoRoutes
+				Counter,
+			ipxSysOutFiltered
+				Counter,
+			ipxSysOutCompressDiscards
+				Counter,
+			ipxSysOutMalformedRequests
+				Counter,
+			ipxSysOutDiscards
+				Counter,
+			ipxSysOutPackets
+				Counter,
+			ipxSysCircCount
+				Counter,
+			ipxSysDestCount
+				Counter,
+			ipxSysServCount
+				Counter,
+			ipxSysResourceFailures
+				Counter,
+			ipxSysConfigSockets
+				Counter,
+			ipxSysMaxOpenSockets
+				Counter,
+			ipxSysOpenSocketFails
+				Counter
+		}
+
+	ipxSysInstance	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The unique identifier of the
+		instance of IPX to which this 
+		row corresponds. The value may
+		be written only when creating
+		a new entry in the table."
+	::= { ipxSysEntry 1 }
+
+	ipxSysExistState	OBJECT-TYPE
+	SYNTAX		INTEGER {
+		off(1),
+		on(2)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The validity of this entry in
+		the IPX system table. Setting
+		this field to off indicates that
+		this entry may be deleted from 
+		the system table at the IPX
+		implementation's discretion."
+	::= { ipxSysEntry 2 }
+
+	ipxSysIntNetNumExists OBJECT-TYPE
+	SYNTAX		INTEGER {
+		no(1),
+		yes(2)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Indicates whether this instance
+		of IPX has an internal network
+		number."
+	::= { ipxSysEntry 3 }
+
+	ipxSysIntNetNum	OBJECT-TYPE
+	SYNTAX		NetNumber
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The IPX internal network number
+		of this instance of IPX. This
+		value is undefined if the value of 
+		ipxSysIntNetNumExists is no."
+	::= { ipxSysEntry 4 }
+
+	ipxSysName		OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..48))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The readable name for this system."
+	::= { ipxSysEntry 5 }
+
+	ipxSysMaxPathSplits	OBJECT-TYPE
+	SYNTAX		INTEGER (1..32)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The maximum number of path with
+		equal routing metric value which
+		this instance of IPX may split
+		between when forwarding packets."
+	::= { ipxSysEntry 6 }
+
+	ipxSysMaxHops	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The maximum number of hops a
+		packet may take."
+	::= { ipxSysEntry 7 }
+
+	ipxSysVersionMajor	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The major version number of IPX
+		supported."
+	::= { ipxSysEntry 8 }
+
+	ipxSysVersionMinor	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The minor version number of IPX
+		supported."
+	::= { ipxSysEntry 9 }
+
+	ipxSysInReceives	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The total number of IPX packets
+		received, including those received
+		in error."
+	::= { ipxSysEntry 10 }
+
+	ipxSysInTooManyHops	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of IPX packets discarded 
+		due to exceeding the maximum hop
+		count."
+	::= { ipxSysEntry 11 }
+
+	ipxSysInHdrErrors	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of IPX packets discarded
+		due to errors in their headers, 
+		including any IPX packet with a
+		size less than the minimum of 30
+		bytes."
+	::= { ipxSysEntry 12 }
+
+	ipxSysInUnknownSockets	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of IPX packets discarded
+		because the destination socket was
+		not open."
+	::= { ipxSysEntry 13 }
+
+	ipxSysInFiltered	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of incoming IPX packets
+		discarded due to filtering."
+	::= { ipxSysEntry 14 }
+
+	ipxSysInCompressDiscards	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of incoming IPX packets
+		discarded due to decompression
+		errors."
+	::= { ipxSysEntry 15 }
+
+	ipxSysInDiscards	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of IPX packets received 
+		but discarded die to processing
+		decision."
+	::= { ipxSysEntry 16 }
+
+	ipxSysInDelivers	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The total number of IPX packets
+		delivered locally, including packets
+		from local applications."
+	::= { ipxSysEntry 17 }
+
+	ipxSysNETBIOSPackets	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"Number of NETBIOS packets."
+	::= { ipxSysEntry 18 }
+
+	ipxSysForwPackets	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of IPX packets
+		forwarded."
+	::= { ipxSysEntry 19 }
+
+	ipxSysOutRequests	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of IPX packets supplied
+		locally for transmission, not
+		including any packets counted in
+		ipxForwPackets."
+	::= { ipxSysEntry 20 }
+
+	ipxSysOutNoRoutes	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of outgoing IPX packets
+		discarded because no route was
+		found."
+	::= { ipxSysEntry 21 }
+
+	ipxSysOutFiltered	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of outgoing IPX packets
+		discarded due to filtering."
+	::= { ipxSysEntry 22 }
+
+	ipxSysOutCompressDiscards	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of outgoing IPX packets
+		discarded due to compression
+		errors."
+	::= { ipxSysEntry 23 }
+
+	ipxSysOutMalformedRequests	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of IPX packets supplied
+		locally contained errors in their
+		structure."
+	::= { ipxSysEntry 24 }
+
+	ipxSysOutDiscards	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of outgoing IPX packets
+		discarded due to processing
+		decision."
+	::= { ipxSysEntry 25 }
+
+	ipxSysOutPackets	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"The total number of IPX packets
+		transmitted."
+	::= { ipxSysEntry 26 }
+
+	ipxSysCircCount	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of circuits known to
+		this instance of IPX."
+	::= { ipxSysEntry 27 }
+
+	ipxSysDestCount	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION		
+		"The number of currently reachable
+		destinations known to this instance
+		of IPX."
+	::= { ipxSysEntry 28 }
+
+	ipxSysServCount	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of services known to
+		this instance of IPX."
+	::= { ipxSysEntry 29 }
+
+	ipxSysResourceFailures	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of times this instance
+		of IPX has been unable to obtain
+		needed resources (memory, etc.)."
+	::= { ipxSysEntry 30 }
+
+	ipxSysConfigSockets	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The configured maximum number of
+		sockets that may be opened at one
+		time."
+	::= { ipxSysEntry 31 }
+
+	ipxSysMaxOpenSockets	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The maximum number of IPX sockets
+		actually open at one time by this
+		system."
+	::= { ipxSysEntry 32 }
+
+	ipxSysOpenSocketFails	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of IPX soclet open
+		calls which failed."
+	::= { ipxSysEntry 33 }
+
+-- Circuit Group
+--	This group contains management information for
+--	each circuit known to this system.
+
+-- Circuit Table
+--	The Circuit table contains an entry for each
+--	circuit known to the system.
+
+	ipxCircTable	OBJECT-TYPE 
+	SYNTAX		SEQUENCE OF IPXCircEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"The Circuit Table."
+	::= { cmc-ipx-ipxCircuit 1 }
+
+	ipxCircEntry	OBJECT-TYPE
+	SYNTAX		IPXCircEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"Each entry corresponds to one
+		circuit known to the system."
+	INDEX {
+		ipxCircSysInstance,
+		ipxCircIndex
+	}
+	::= { ipxCircTable 1 }
+
+	IPXCircEntry
+		::= SEQUENCE {
+			ipxCircSysInstance
+				INTEGER,
+			ipxCircIndex
+				INTEGER,
+			ipxCircExistState
+				INTEGER,
+			ipxCircOperState
+				INTEGER,
+			ipxCircIfIndex
+				INTEGER,
+			ipxCircName
+				OCTET STRING,
+			ipxCircInfo
+				OCTET STRING,
+			ipxCircType
+				INTEGER,
+			ipxCircLocalMaxPacketSize
+				INTEGER,
+			ipxCircCompressState
+				INTEGER,
+			ipxCircCompressSlots
+				INTEGER,
+			ipxCircCompressedSent
+				Counter,
+			ipxCircUncompressedSent
+				Counter,
+			ipxCircMediaType
+				OCTET STRING,
+			ipxCircNetNumber
+				NetNumber,
+			ipxCircStateChanges
+				Counter,
+			ipxCircInitFails
+				Counter,
+			ipxCircDelay
+				INTEGER,
+			ipxCircThroughput
+				INTEGER
+		}
+
+	ipxCircSysInstance	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The unique identifier of the
+		instance of IPX to which this entry
+		corresponds. This value may be 
+		written only when creating a new
+		entry in the table."
+	::= { ipxCircEntry 1 }
+
+	ipxCircIndex	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The identifier of ths circuit, 
+		unique within the instance of IPX. 
+		This value may be written only
+		when creating a new table entry."
+	::= { ipxCircEntry 2 }
+
+	ipxCircExistState	OBJECT-TYPE
+	SYNTAX INTEGER {
+		off(1),
+		on(2)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The validity of this circuit 
+		entry. A circuit with this value
+		set to off may be deleted from the
+		table at the IPX implementation's
+		discretion."
+	::= { ipxCircEntry 3 }
+
+	ipxCircOperState	OBJECT-TYPE
+	SYNTAX INTEGER {
+		off(1),
+		on(2)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The operational state of the
+		circuit."
+	::= { ipxCircEntry 4 }
+
+	ipxCircIfIndex	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The value of IfIndex for the
+		interface used by this circuit. 
+		This value may be written only
+		when creating a new entry in the
+		table."
+	::= { ipxCircEntry 5 }
+
+	ipxCircName	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..20))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The readable name for the
+		circuit."
+	::= { ipxCircEntry 6 }
+
+	ipxCircInfo	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..20))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"Additional readable information for
+		the circuit. The content of this
+		field is implementation defined."
+	::= { ipxCircEntry 7 }
+
+	ipxCircType	OBJECT-TYPE
+	SYNTAX INTEGER {
+		other(1),
+		broadcast(2),
+		ptTopt(3),	
+		wanRIP(4),
+		unnumberedRIP(5),
+		dynamic(6),
+		wanWS(7)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The type of the circuit."
+	::= { ipxCircEntry 8 }
+
+	ipxCircLocalMaxPacketSize	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The maximum size (including 
+		header), in bytes, that the
+		system supports locally in this
+		circuit."
+	::= { ipxCircEntry 9 }
+
+	ipxCircCompressState	OBJECT-TYPE
+	SYNTAX INTEGER {
+		off(1),
+		on(2)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The compression state on the
+		circuit. This value may be written
+		only when creating a new entry in
+		the table."
+	::= { ipxCircEntry 10 }
+
+	ipxCircCompressSlots	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of compression slots
+		available on this circuit. This
+		value may be written only when
+		creating a new entry in the
+		table."
+	::= { ipxCircEntry 11 }
+
+	ipxCircCompressedSent	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of compressed packets 
+		sent."
+	::= { ipxCircEntry 12 }
+
+	ipxCircUncompressedSent	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of packets sent without
+		being compressed even though 
+		compression was turned on for this
+		circuit."
+	::= { ipxCircEntry 13 }
+
+	ipxCircMediaType	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(2))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The media type used on this
+		circuit."
+	::= { ipxCircEntry 14 }
+
+	ipxCircNetNumber	OBJECT-TYPE
+	SYNTAX		NetNumber
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The IPX network number to which
+		this circuit is bound."
+	::= { ipxCircEntry 15 }
+
+	ipxCircStateChanges	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of times the circuit
+		has changed state."
+	::= { ipxCircEntry 16 }
+
+	ipxCircInitFails	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of times that
+		initialization of this circuit
+		has failed."
+	::= { ipxCircEntry 17 }
+
+	ipxCircDelay	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The period of time, in
+		milliseconds, that it takes to
+		transmit one byte of data, 
+		excluding protocol headers, to a
+		destination on the other end of the
+		circuit, if the circuit is free of
+		other traffic."
+	::= { ipxCircEntry 18 }
+
+	ipxCircThroughput	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The amount of data, in bits per
+		second, that may flow through the
+		circuit if there is no other
+		traffic."
+	::= { ipxCircEntry 19 }
+
+
+-- Forwarding Group
+--	this group provides a representation of the
+--	forwarding database used by all instances of
+--	IPX on the system.
+
+-- Destination Table
+--	The Destination Table contains information about
+--	all known destinations.
+
+	ipxDestTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF IPXDestEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"The Destination Table contains
+		information about all known
+		destinations."
+	::= { cmc-ipx-ipxForwarding 1 }
+
+	ipxDestEntry	OBJECT-TYPE
+	SYNTAX		IPXDestEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"Each entry corresponds to one
+		destination."
+	INDEX {
+		ipxDestSysInstance,
+		ipxDestNetNum
+	}								 
+	::= { ipxDestTable 1 }
+
+	IPXDestEntry
+		::= SEQUENCE {
+			ipxDestSysInstance
+				INTEGER,
+			ipxDestNetNum
+				NetNumber,
+			ipxDestProtocol
+				INTEGER,
+			ipxDestCost
+				INTEGER,
+			ipxDestHopCount
+				INTEGER,
+			ipxDestNextHopCircIndex
+				INTEGER,
+			ipxDestNextHopNICAddress
+				OCTET STRING,
+			ipxDestNextHopNetNum
+				NetNumber,
+			ipxDestType
+				INTEGER
+		}
+
+	ipxDestSysInstance	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The unique identifier of the
+		instance of IPX to which this row
+		corresponds. This value may be
+		written only when creating a new
+		entry with ipxDestProtocol equal 
+		to static."
+	::= { ipxDestEntry 1 }
+
+	ipxDestNetNum	OBJECT-TYPE
+	SYNTAX		NetNumber
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The IPX network number of the
+		destination. This value may be
+		written only when creating a new
+		entry with ipxDestProtocol equal 
+		to static."
+	::= { ipxDestEntry 2 }
+
+	ipxDestProtocol	OBJECT-TYPE
+	SYNTAX INTEGER {
+		other(1),
+		local(2),
+		rip(3),
+		nlsp(4),
+		static(5)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The routing protocol from which
+		knowledge of this destination was
+		obtained. This value may be written
+		only when creating a new entry with
+		ipxDestProtocol equal to static."
+	::= { ipxDestEntry 3 }
+
+	ipxDestCost	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The cost to reach this destination. 
+		The meaning of the cost value is
+		dependent on the routing protocol
+		(i.e. Cost = delay in ticks for RIP,
+		Cost = total path default cost for
+		NLSP, etc.). This value may be
+		written only  when creating a new
+		entry with ipxDestProtocol equal to
+		static."
+	::= { ipxDestEntry 4 }
+
+	ipxDestHopCount	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The number of hops necessary to
+		reach the destination. This value
+		may be written only when creating
+		a new entry with ipxDestProtocol 
+		equal to static."
+	::= { ipxDestEntry 5 }
+
+	ipxDestNextHopCircIndex	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The unique identifier of the
+		circuit used to read the next hop. 
+		This value may be written only when
+		creating a new entry with
+		ipxDestProtocol equal to static."
+	::= { ipxDestEntry 6 }
+
+	ipxDestNextHopNICAddress	OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION		
+		"The NIC address of the next hop.
+		This value may be written only when
+		creating a new entry with 
+		ipxDestProtocol equal to static."
+	::= { ipxDestEntry 7 }
+
+	ipxDestNextHopNetNum	OBJECT-TYPE
+	SYNTAX		NetNumber
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The IPX network number of the next
+		hop. This value may be written only
+		when creating a new entry with 
+		ipxDestProtocol equal to static."  
+	::= { ipxDestEntry 8 }
+
+	ipxDestType	OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(1),
+		nlspLevel1Router(2),
+		router(4),	
+		network(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Indicates whether the destination
+		is a network of a  router."
+	::= { ipxDestEntry 9 }
+
+
+-- Services Group
+--	The Services group contains management information
+--	for all known services.
+
+-- Services Table
+--	This table contains the services information
+--	indexed by service name and type.
+
+	ipxServTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF IPXServEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"The table of services, indexed by
+		name and type."
+	::= { cmc-ipx-ipxServices 1 }
+
+	ipxServEntry	OBJECT-TYPE
+	SYNTAX		IPXServEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"Each entry corresponds to one
+		service."
+	INDEX		{
+		ipxServSysInstance,
+		ipxServName,
+		ipxServTypeValue
+	}					
+	::= { ipxServTable 1 }
+
+	IPXServEntry
+		::= SEQUENCE {
+			ipxServSysInstance
+				INTEGER,
+			ipxServName
+				OCTET STRING,
+			ipxServTypeValue
+				OCTET STRING,
+			ipxServType
+				INTEGER,
+			ipxServProtocol
+				INTEGER,
+			ipxServNetNum
+				NetNumber,
+			ipxServNode
+				OCTET STRING,
+			ipxServSocket
+				OCTET STRING
+		}
+
+	ipxServSysInstance	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The unique identifier of the
+		instance of IPX  to which this
+		entry corresponds. This value may
+		be written only when creating 
+		entries with the value of
+		ipxServProtocol equal to static."
+	::= { ipxServEntry 1 }
+
+	ipxServName	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(1..48))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The service name. This value may
+		be written only when creating 
+		entries with value of ipxServProtocol
+		equal to static."  
+	::= { ipxServEntry 2 }
+
+	ipxServTypeValue	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(2))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The service type's hexadecimal
+		value. This value may be written
+		only when creating entries with 
+		the value of ipxServProtocol equal 
+		to static."
+	::= { ipxServEntry 3 }
+
+	ipxServType	OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(1)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The service type. This value may
+		be written only when creating 
+		entries with the value of
+		ipxServProtocol equal to static."
+	::= { ipxServEntry 4 }
+
+	ipxServProtocol	OBJECT-TYPE
+	SYNTAX		INTEGER {
+		other(1),
+		local(2),
+		nlsp(4),
+		static(5),
+		sap(6)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The protocol from which knowledge
+		of this service was obtained. This
+		valuemay be written only when
+		creating entries with
+		ipxServProtocol equal to static."
+	::= { ipxServEntry 5 }
+
+	ipxServNetNum	OBJECT-TYPE
+	SYNTAX		NetNumber
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The IPX network number portion of
+		the IPX address of the service. 
+		This value may be written only when
+		creating  entries with the value of
+		ipxServProtocol equal to static."
+	::= { ipxServEntry 6 }
+
+	ipxServNode	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(6))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The node portion of the IPX
+		address. This value may be written 
+		only when creating entries with the 
+		value of ipxServProtocol equal to
+		static."
+	::= { ipxServEntry 7 }
+
+	ipxServSocket	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(2))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION
+		"The socket portion of the IPX
+		address of the service. This value 
+		may be written only when creating
+		entries with the value of
+		ipxServProtocol equal to static."
+	::= { ipxServEntry 8 }
+
+-- IPX Packet, RIP and SAP Filter Group
+
+-- the IPX PACKET Filter Group
+
+	cmcIpxFiltStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disabled(1),	-- IPX Filtering disabled
+		enabled(2)	-- IPX Filtering enabled
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The status of IPX Filtering."
+	::= { cmc-ipx-filter 1 }
+
+	cmcIpxFilterTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CmcIpxFiltEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"A list of IPX Filter table entries."
+	::= { cmc-ipx-filt-packet 1 }
+
+	cmcIpxFiltEntry OBJECT-TYPE
+	SYNTAX CmcIpxFiltEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"An IPX Filter table entry containing objects
+		that describe ipx packet transmission / 
+		reception restrictions.	Creation of an IPX
+		Filter table entry requires the presence of
+		the cmcIpxFiltName and cmcIpxFiltMode objects
+		along with at least one of the following
+		objects:
+			cmcIpxFiltSAddr 		
+			cmcIpxFiltDAddr
+			cmcIpxFiltPktType
+			cmcIpxFiltIfIndex"
+	INDEX { cmcIpxFiltName }
+	::= { cmcIpxFilterTable 1 }
+
+	CmcIpxFiltEntry ::=
+		SEQUENCE {
+			cmcIpxFiltName
+				OCTET STRING,
+			cmcIpxFiltSAddr 		
+				IpxAddress,
+			cmcIpxFiltDAddr
+				IpxAddress,
+			cmcIpxFiltPktType
+				INTEGER,
+			cmcIpxFiltMode
+				INTEGER,
+			cmcIpxFiltType
+				INTEGER,
+			cmcIpxFiltMoveOper
+				OCTET STRING,
+			cmcIpxFiltUseCount
+				INTEGER,
+			cmcIpxFiltDirection
+				INTEGER,
+			cmcIpxFiltIfIndex
+				INTEGER,
+			cmcIpxFiltPriority
+				INTEGER,
+			cmcIpxFiltState
+				INTEGER
+		}
+
+	cmcIpxFiltName  OBJECT-TYPE	 
+	SYNTAX	OCTET STRING
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of filter entry.  This is an ASCII
+		string up to 6 octets long. This object is
+		required in SET PDUs."
+	::= { cmcIpxFiltEntry 1 }
+
+	cmcIpxFiltSAddr  OBJECT-TYPE  
+	SYNTAX	IpxAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Source IPX address. This object is required 
+		in SET PDUs."
+	::= { cmcIpxFiltEntry 2 }
+
+	cmcIpxFiltDAddr  OBJECT-TYPE  
+	SYNTAX	IpxAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Destination IPX address. This object is 
+		required in SET PDUs."
+	::= { cmcIpxFiltEntry 3 }
+
+	cmcIpxFiltPktType  OBJECT-TYPE  
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Protocol to filter. This object is
+		required in SET PDUs."
+	::= { cmcIpxFiltEntry 4 }
+
+	cmcIpxFiltMode  OBJECT-TYPE  
+	SYNTAX	INTEGER {
+		allow(1),
+		deny(2),
+		nodial(3)
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Mode of the filter entry.  This object is
+		required in SET PDUs."
+	::= { cmcIpxFiltEntry 5 }
+
+	cmcIpxFiltType  OBJECT-TYPE  
+	SYNTAX	INTEGER {
+		local(1),	-- set via UI
+		invalid(2),	-- invalidated entry
+		netmgmt(3)	-- set via net mgmt
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of the IPX Filter Table entry.
+		Setting this object to the value invalid(2)
+		has the effect of invalidating the
+		corresponding entry in the cmcIpxFilterTable."
+	::= { cmcIpxFiltEntry 6 }
+
+	cmcIpxFiltMoveOper  OBJECT-TYPE  
+	SYNTAX	OCTET STRING
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Configuration object used to move IPX Filter
+		table entries.  Parameters are defined as:
+		Octet 0 describes the move operation
+				[1, 2] = [Before, After]
+		Octet 1 - 6 contain the IPX Filter Entry name."
+	::= { cmcIpxFiltEntry 7 }
+
+	cmcIpxFiltUseCount  OBJECT-TYPE  
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times the IPX Filter Table
+		entry has been referenced."
+	::= { cmcIpxFiltEntry 8 }
+
+	cmcIpxFiltDirection OBJECT-TYPE
+	SYNTAX  INTEGER {
+		both(1),		-- both directions
+		incoming(2),	-- incoming packets
+		outgoing(3)		-- outgoing packets
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The flow direction for the filter entry.
+		This object must be specified along with
+		an interface."
+	::= { cmcIpxFiltEntry 9 }
+
+	cmcIpxFiltIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The interface index associated with the
+		filter entry.  This value is equivalent
+		to the ifIndex object."
+	::= { cmcIpxFiltEntry 10 }
+
+	cmcIpxFiltPriority	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"The priority of the entry.  The
+		highest priority entry (1) is searched first.  
+		The second highest priority entry (2) is
+		searched next, and so on."
+	::= { cmcIpxFiltEntry 11 }
+
+	cmcIpxFiltState		OBJECT-TYPE
+	SYNTAX		INTEGER {
+		off(1),
+		on(2)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	
+		"The validity of this entry in
+		the IPX Packet Filter table. Setting
+		this field to off indicates that
+		this entry may be deleted from 
+		the table."
+	::= { cmcIpxFiltEntry 12 }
+
+
+-- the IPX RIP Filter Group
+
+	cmcIpxFiltRIPStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disabled(1),	-- disabled
+		enabled(2)	-- enabled
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The status of IPX RIP Filtering."
+	::= { cmc-ipx-filter 3 }
+
+	cmcIpxFilterRIPTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CmcIpxFiltRIPEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"A list of IPX Filter RIP table entries."
+	::= { cmc-ipx-filt-rip 1 }
+
+	cmcIpxFiltRIPEntry OBJECT-TYPE
+	SYNTAX CmcIpxFiltRIPEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"An IPX RIP Filter table entry containing 
+		objects that describe datagram transmission/
+		reception restrictions. Creation of an IPX
+		RIP Filter table entry requires the presence
+		of the cmcIpxFiltRIPName and
+		cmcIpxFiltRIPMode objects"
+	INDEX { cmcIpxFiltRIPName }
+	::= { cmcIpxFilterRIPTable 1 }
+
+	CmcIpxFiltRIPEntry ::=
+		SEQUENCE {
+			cmcIpxFiltRIPName
+				OCTET STRING,
+			cmcIpxFiltRIPNetworkNum 		
+				NetNumber,
+			cmcIpxFiltRIPMoveOper
+				OCTET STRING,
+			cmcIpxFiltRIPMode
+				INTEGER,
+			cmcIpxFiltRIPType
+				INTEGER,
+			cmcIpxFiltRIPUseCount
+				INTEGER,
+			cmcIpxFiltRIPDirection
+           		INTEGER,
+			cmcIpxFiltRIPQueryType
+           		INTEGER,
+			cmcIpxFiltRIPIfIndex
+   				INTEGER,
+			cmcIpxFiltRIPPriority
+				INTEGER,
+			cmcIpxFiltRIPState
+				INTEGER
+		}
+
+	cmcIpxFiltRIPName  OBJECT-TYPE	 
+	SYNTAX	OCTET STRING
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of RIP filter entry.  This is an ASCII
+		string up to 6 octets long.  This object is
+		required in SET PDUs."
+	::= { cmcIpxFiltRIPEntry 1 }
+
+	cmcIpxFiltRIPNetworkNum  OBJECT-TYPE  
+	SYNTAX	NetNumber
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Network address. This object is required 
+		in SET PDUs."
+	::= { cmcIpxFiltRIPEntry 2 }
+
+	cmcIpxFiltRIPMoveOper  OBJECT-TYPE  
+	SYNTAX	OCTET STRING
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Configuration object used to move IPX RIP
+		Filter table entries.  Parameters are 
+		defined as:
+			Octet 0 describes the move operation
+				[1, 2] = [Before, After]
+			Octet 1 - 6 contain the IPX RIP Filter name."
+	::= { cmcIpxFiltRIPEntry 3 }
+
+	cmcIpxFiltRIPMode  OBJECT-TYPE  
+	SYNTAX	INTEGER {
+		allow(1),
+		deny(2),
+		nodial(3)
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Mode of the filter entry.  This object is
+		required in SET PDUs."
+	::= { cmcIpxFiltRIPEntry 4 }
+
+	cmcIpxFiltRIPType  OBJECT-TYPE  
+	SYNTAX	INTEGER {
+		local(1),	-- entered via UI
+		invalid(2),	-- invalidated entry
+		netmgmt(3)	-- set via net manage
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of the IPX RIP Filter Table entry.
+		Setting this object to the value invalid(2)
+		has the effect of invalidating the 
+		corresponding entry in the 
+		cmcIpxFilterRIPTable."
+	::= { cmcIpxFiltRIPEntry 5 }
+
+	cmcIpxFiltRIPUseCount  OBJECT-TYPE  
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times the IPX RIP Filter Table
+		entry has been referenced."
+	::= { cmcIpxFiltRIPEntry 6 }
+
+	cmcIpxFiltRIPDirection OBJECT-TYPE
+	SYNTAX  INTEGER {
+		both(1),		-- both directions
+		incoming(2),	-- incoming packets
+		outgoing(3)		-- outgoing packets
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The flow direction for the filter entry.
+		This object must be specified along with
+		an interface."
+	::= { cmcIpxFiltRIPEntry 7 }
+
+	cmcIpxFiltRIPQueryType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		request(1),	-- request pkts only
+		response(2)	-- response pkts only
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of packet entry.
+		This object must be specified along with
+		an interface."
+	::= { cmcIpxFiltRIPEntry 8 }
+
+	cmcIpxFiltRIPIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The interface index associated with the
+		filter entry."
+	::= { cmcIpxFiltRIPEntry 9 }
+
+	cmcIpxFiltRIPPriority	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"The priority of the entry.  The
+		highest priority entry (1) is searched first.  
+		The second highest priority entry (2) is
+		searched next, and so on."
+	::= { cmcIpxFiltRIPEntry 10 }
+
+	cmcIpxFiltRIPState	OBJECT-TYPE
+	SYNTAX		INTEGER {
+		off(1),
+		on(2)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	
+		"The validity of this entry in
+		the IPX RIP Filter table. Setting
+		this field to off indicates that
+		this entry may be deleted from 
+		the table."
+	::= { cmcIpxFiltRIPEntry 11 }
+
+-- the IPX SAP Filter Group
+
+	cmcIpxFiltSAPStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disabled(1),
+		enabled(2)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The status of IPX SAP Filtering."
+	::= { cmc-ipx-filter 5 }
+
+	cmcIpxFilterSAPTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CmcIpxFiltSAPEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"A list of IPX Filter SAP table entries."
+	::= { cmc-ipx-filt-sap 1 }
+
+	cmcIpxFiltSAPEntry OBJECT-TYPE
+	SYNTAX CmcIpxFiltSAPEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"An IPX SAP Filter table entry containing
+		objects that describe datagram transmission/
+		reception restrictions. Creation of an IPX 
+		SAP Filter table entry requires the presence
+		of the cmcIpxFiltSAPName and 
+		cmcIpxFiltSAPMode objects"
+	INDEX { cmcIpxFiltSAPName }
+	::= { cmcIpxFilterSAPTable 1 }
+
+	CmcIpxFiltSAPEntry ::=
+		SEQUENCE {
+			cmcIpxFiltSAPName
+				OCTET STRING,
+			cmcIpxFiltSAPServerName
+				OCTET STRING,
+			cmcIpxFiltSAPServerType 		
+				INTEGER,
+			cmcIpxFiltSAPMoveOper
+				OCTET STRING,
+			cmcIpxFiltSAPMode
+				INTEGER,
+			cmcIpxFiltSAPType
+				INTEGER,
+			cmcIpxFiltSAPUseCount
+				INTEGER,
+			cmcIpxFiltSAPDirection
+           		INTEGER,
+			cmcIpxFiltSAPQueryType
+           		INTEGER,
+			cmcIpxFiltSAPIfIndex
+   				INTEGER,
+			cmcIpxFiltSAPPriority
+				INTEGER,
+			cmcIpxFiltSAPState
+				INTEGER
+		}
+
+	cmcIpxFiltSAPName  OBJECT-TYPE	 
+	SYNTAX	OCTET STRING
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of SAP filter entry.  This is an ASCII 
+		string up to 6 octets long.  This object is
+		required in SET PDUs."
+	::= { cmcIpxFiltSAPEntry 1 }
+
+	cmcIpxFiltSAPServerName  OBJECT-TYPE	 
+	SYNTAX	OCTET STRING
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of SAP server."
+	::= { cmcIpxFiltSAPEntry 2 }
+
+	cmcIpxFiltSAPServerType  OBJECT-TYPE  
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The types of servers to filter."
+	::= { cmcIpxFiltSAPEntry 3 }
+
+	cmcIpxFiltSAPMoveOper  OBJECT-TYPE  
+	SYNTAX	OCTET STRING
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Configuration object used to move IPX SAP
+		Filter table entries.  Parameters are
+		defined as:
+		Octet 0 describes the move operation
+			[1, 2] = [Before, After]
+		Octet 1 - 6 contain the IPX SAP Filter name."
+	::= { cmcIpxFiltSAPEntry 4 }
+
+	cmcIpxFiltSAPMode  OBJECT-TYPE  
+	SYNTAX	INTEGER {
+		allow(1),
+		deny(2),
+		nodial(3)
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Mode of the filter entry.  This object is
+		required in SET PDUs."
+	::= { cmcIpxFiltSAPEntry 5 }
+
+	cmcIpxFiltSAPType  OBJECT-TYPE  
+	SYNTAX	INTEGER {
+		local(1),	-- entered via UI
+		invalid(2),	-- invalidated entry
+		netmgmt(3)	-- set via a net manage
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of the IPX SAP Filter Table entry.
+		Setting this object to the value invalid(2)
+		has the effect of invalidating the 
+		corresponding entry in the
+		cmcIpxFilterSAPTable."
+	::= { cmcIpxFiltSAPEntry 6 }
+
+	cmcIpxFiltSAPUseCount  OBJECT-TYPE  
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times the IPX SAP Filter Table
+		entry has been referenced."
+	::= { cmcIpxFiltSAPEntry 7 }
+
+	cmcIpxFiltSAPDirection OBJECT-TYPE
+	SYNTAX  INTEGER {
+		both(1),		-- both directions
+		incoming(2),	-- incoming packets
+		outgoing(3)		-- outgoing packets
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The flow direction for the filter entry.
+		This object must be specified along with
+		an interface."
+	::= { cmcIpxFiltSAPEntry 8 }
+
+	cmcIpxFiltSAPQueryType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		request(1),	-- request pkts only
+		response(2)	-- response pkts only
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of packet entry.
+		This object must be specified along with
+		an interface."
+	::= { cmcIpxFiltSAPEntry 9 }
+
+	cmcIpxFiltSAPIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The interface index associated with the
+		filter entry."
+	::= { cmcIpxFiltSAPEntry 10 }
+
+	cmcIpxFiltSAPPriority	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"The priority of the entry.  The
+		highest priority entry (1) is searched first.  
+		The second highest priority entry (2) is
+		searched next, and so on."
+	::= { cmcIpxFiltSAPEntry 11 }
+
+	cmcIpxFiltSAPState	OBJECT-TYPE
+	SYNTAX		INTEGER {
+		off(1),
+		on(2)
+	}
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	
+		"The validity of this entry in
+		the IPX SAP Filter table. Setting
+		this field to off indicates that
+		this entry may be deleted from 
+		the table."
+	::= { cmcIpxFiltSAPEntry 12 }
+
+END
+

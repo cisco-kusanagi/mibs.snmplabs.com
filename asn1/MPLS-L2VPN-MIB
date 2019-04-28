@@ -1,0 +1,1075 @@
+-- extracted from draft-weilian-l2vpn-mib-01.txt
+-- at Sat Mar 11 06:11:02 2006
+
+   MPLS-L2VPN-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,NOTIFICATION-TYPE,
+    Integer32,Unsigned32,Counter32,Counter64,DisplayString,
+    InterfaceIndex
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION,RowStatus,TimeStamp,StorageType,TimeTicks,
+    TruthValue
+        FROM SNMPv2-TC
+
+    IpAddress
+        FROM RFC1155-SMI
+
+    mplsL2vpn
+        FROM ZXR10-SMI;
+
+    mplsL2vpnMIB MODULE-IDENTITY
+    LAST-UPDATED "200507260000Z"  -- July 26, 2005
+    ORGANIZATION "ZTE Corporation"
+    CONTACT-INFO
+        "ZTE Corporation,
+         No.68 Zijinghua Rd. Yuhuatai District, Nanjing, China. "
+        
+
+    DESCRIPTION
+        "Mpls L2vpn queries and configures MIB. "
+
+    REVISION "200507260000Z"  -- July 26, 2005
+    DESCRIPTION
+       ""
+    ::= { l2vpnStdMIB x }–To be assigned by IANA
+                         - The value of 1 requested.
+
+
+   --Top layer components of the MIB 
+    mplsL2vpnObjects         OBJECT IDENTIFIER ::= { mplsL2vpnMIB 0 }
+    mplsL2vpnPWObjects       OBJECT IDENTIFIER ::= { mplsL2vpnMIB 1 }
+    mplsL2vpnIfObjects       OBJECT IDENTIFIER ::= { mplsL2vpnMIB 2 }
+    mplsL2vpnNotifications   OBJECT IDENTIFIER ::= { mplsL2vpnMIB 3 }
+    mplsL2vpnVSIObjects      OBJECT IDENTIFIER ::= { mplsL2vpnMIB 4 }
+
+
+   --Mpls L2VPN instance table 
+
+    mplsL2vpnInstanceTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MplsL2vpnInstanceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table saves the Mpls L2VPN instance information created 
+        on PE. "
+        ::= { mplsL2vpnObjects 1 }
+
+    mplsL2vpnInstanceEntry  OBJECT-TYPE
+        SYNTAX  MplsL2vpnInstanceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Each line in the table represents an MPLS L2VPN instance with
+        mplsL2vpnInstanceIndex as index. New lines are created in the 
+        table when the operator creates MPLS L2VPN instance on PE by 
+        non SNMP or some kind of auto discovery mechanism. "
+        INDEX  { mplsL2vpnInstanceIndex }
+        ::= { mplsL2vpnInstanceTable 1 }
+
+    MplsL2vpnInstanceEntry ::=
+        SEQUENCE {
+            mplsL2vpnInstanceIndex              Unsigned32,
+            mplsL2vpnInstanceType	        INTEGER,
+            mplsL2vpnInstanceVCId	        Unsigned32,
+            mplsL2vpnInstanceVpnName		DisplayString,
+            mplsL2vpnInstancePwCounts		Unsigned32,
+            mplsL2vpnInstanceCreateTime	        TimeStamp,
+            mplsL2vpnInstanceStorageType	StorageType,
+            mplsL2vpnInstanceRowStatus		RowStatus
+            }
+
+    mplsL2vpnInstanceIndex  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+        "To indicate concept line index of MPLS L2VPN instance in the 
+          MPLS L2VPN instance emulation table. "
+        ::= { mplsL2vpnInstanceEntry 1 }
+
+    mplsL2vpnInstanceType  OBJECT-TYPE
+        SYNTAX  INTEGER   {
+                   vpws(1)
+                   vpls(2)
+                   ipls(3)
+                          }
+
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "MPLS L2VPN instance types, including VPLS, VPWS and IPLS. "
+        ::= { mplsL2vpnInstanceEntry 2}
+
+    mplsL2vpnInstanceVCId  OBJECT-TYPE
+        SYNTAX   Unsigned32 (1..4294967295)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "When creating MPLS L2VPN instance, a unique VCID value in the 
+         network needs to be specified. "
+        ::= { mplsL2vpnInstanceEntry 3}
+
+    mplsL2vpnInstanceVpnName  OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "When creating MPLS L2VPN instance, a name of local meaning can
+         be denominated with a length not longer than 32 characters. If 
+         no denomination is made, the field is empty. "
+         ::= { mplsL2vpnInstanceEntry 4 }
+
+    mplsL2vpnInstancePwCounts  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of PW under the MPLS L2VPN instance. "
+         ::= { mplsL2vpnInstanceEntry 5 }
+
+    mplsL2vpnInstanceCreateTime OBJECT-TYPE
+        SYNTAX   TimeStamp
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "System time when creating MPLS L2VPN instance. "
+         ::= { mplsL2vpnInstanceEntry 6 }
+
+    mplsL2vpnInstanceStorageType OBJECT-TYPE
+        SYNTAX   StorageType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Storage type of the object. "
+         ::= { mplsL2vpnInstanceEntry 7 }
+
+    mplsL2vpnInstanceRowStatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "used to create, modify and delete the line. When the object 
+         is active, any objects that can be read and written in the 
+         line can not be changed. The objects can be changed only when
+         they are not in service or not ready. "
+         ::= { mplsL2vpnInstanceEntry 8 }
+
+
+--MPLS L2VPN PW table 
+
+    mplsL2vpnPWTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MplsL2vpnPWEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table is used to configure, query and monitor the MPLS
+         L2VPN PW. "
+        ::= { mplsL2vpnPWObjects 1 }
+
+    mplsL2vpnPWEntry  OBJECT-TYPE
+        SYNTAX  MplsL2vpnPWEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Each line in the table represents a MPLS-based virtual PW 
+         connection spanning packet switching network, with 
+         mplsL2vpnPWIndex as index. New lines are created in the table
+         when the operator creates MPLS L2VPN instance on PE by non 
+         SNMP. "
+        INDEX  { mplsL2vpnPWIndex}
+        ::= { mplsL2vpnPWTable 1 }
+
+    MplsL2vpnPWEntry ::=
+        SEQUENCE {
+            mplsL2vpnPWIndex			    Unsigned32
+            mplsL2vpnOwnerIntanceIndex 		Unsigned32,
+            mplsL2vpnPWVcId				    Unsigned32,
+            mplsL2vpnPWType				    INTEGER,
+            mplsL2vpnPWInlabel				Unsigned32,
+            mplsL2vpnPWOutlabel				Unsigned32,
+            mplsL2vpnPWCbit				    TruthValue,
+            mplsL2vpnPWStatus			    INTEGER,
+            mplsL2vpnLocalGroupId		    Unsigned32,
+            mplsL2vpnLocalACType	  	    INTEGER,
+            mplsL2vpnLocalHubOrSpoke	    INTEGER,
+            mplsL2vpnLocalTunnelType		INTEGER,
+            mplsL2vpnPWLocalCbit			TruthValue,
+            mplsL2vpnPWLocalIfString	    DisplayString,
+            mplsL2vpnPWLocalRouterId		IpAddress,
+            mplsL2vpnPWLocalIfMtu			Unsigned32,
+            mplsL2vpnPWLocalIfVccv			INTEGER,
+	        mplsL2vpnRemoteGroupId		    Unsigned32,
+            mplsL2vpnACType			        INTEGER,
+            mplsL2vpnRemoteHubOrSpoke		INTEGER,
+            mplsL2vpnRemoteTunnelType	    INTEGER,
+            mplsL2vpnPWRemoteCbit			TruthValue,
+            mplsL2vpnPWRemoteIfString	    DisplayString,
+            mplsL2vpnPWRemoteRouterId		IpAddress,
+            mplsL2vpnPWRemoteIfMtu			Unsigned32
+            mplsL2vpnPWRemoteIfVccv			INTEGER,
+            mplsL2vpnPWCreateTime			TimeStamp,
+            mplsL2vpnPWUpTime				TimeTicks,
+            mplsL2vpnPWStorageType			StorageType,
+            mplsL2vpnPWRowStatus			RowStatus
+                  }
+
+    mplsL2vpnPWIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "used to indicate the concept line index of MPLS L2VPN PW in the
+         PW emulation table. "
+        ::= { mplsL2vpnPWEntry 1 }
+
+    mplsL2vpnOwnerIntanceIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "the index of MPLS L2VPN instance belonged to the PW in 
+          mplsL2vpnInstanceTable. "
+        ::= { mplsL2vpnPWEntry 2}
+
+    mplsL2vpnPWVcId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..4294967295)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The VCID value of the MPLS L2VPN instance of the PW. "
+        ::= { mplsL2vpnPWEntry 3 }
+
+    mplsL2vpnPWType OBJECT-TYPE
+        SYNTAX   INTEGER {
+               encap-FR-DLCI(1),
+               encap-ATM-AAL5(2),
+               encap-ATM-TRANSCELL(3),
+               encap-ETH-VLAN(4),
+               encap-ETH(5),
+               encap-HDLC(6),
+               encap-PPP(7),
+               encap-CEM(8),
+               encap-ATM-VCC(9),
+               encap-ATM-VPC(10)
+                          }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "PW type negotiated by both ends of PW signaling. "
+        ::= { mplsL2vpnPWEntry 4 }
+
+    mplsL2vpnPWInlabel OBJECT-TYPE
+        SYNTAX   Unsigned32(16..1048575)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "PW internal layer in label allocated locally, which is randomly
+         allocated by MPLS LDP within the valid range of labels. If the 
+         object value is not yet allocated, the object returned value
+         should be 0xFFFFFFFF. "
+         ::= { mplsL2vpnPWEntry 5}
+
+    mplsL2vpnPWOutlabel OBJECT-TYPE
+        SYNTAX   Unsigned32(16..1048575)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "PW internal layer out label allocated remotely, which is 
+         randomly allocated by MPLS LDP within the valid range of 
+         labels. If the object value is not yet allocated, the object
+         returned value should be 0xFFFFFFFF. "
+        ::= { mplsL2vpnPWEntry 6 }
+
+    mplsL2vpnPWCbit OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Whether the label messages are accompanied with control 
+         character sent to public network is decided by both PW ends 
+         through negotiation.  "
+        ::= { mplsL2vpnPWEntry 7 }
+
+    mplsL2vpnPWStatus OBJECT-TYPE
+        SYNTAX   INTEGER {
+                   established(1),
+                   establishing(2)
+                         }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        If the PW parameters pass the MPLS signaling negotiation, PW 
+        will be established, or it is still establishing. "
+        ::= { mplsL2vpnPWEntry 8 }
+
+    mplsL2vpnLocalGroupId  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "During the process of PW establishment, the Group ID shall be
+         filled in the PEER signaling protocol message sent to PW's 
+         peer end. "
+        ::= { mplsL2vpnPWEntry 9 }
+
+    mplsL2vpnLocalACType  OBJECT-TYPE
+        SYNTAX   OBJECT-TYPE
+        SYNTAX   INTEGER {
+               encap-FR-DLCI(1),
+               encap-ATM-AAL5(2),
+               encap-ATM-TRANSCELL(3),
+               encap-ETH-VLAN(4),
+               encap-ETH(5),
+               encap-HDLC(6),
+               encap-PPP(7),
+               encap-CEM(8),
+               encap-ATM-VCC(9),
+               encap-ATM-VPC(10)
+                         }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Local AC access type. "
+        ::= { mplsL2vpnPWEntry 10 }
+
+    mplsL2vpnLocalHubOrSpoke  OBJECT-TYPE
+        SYNTAX   INTEGER {
+               hub(1),
+               spoke(2)
+                         }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "PW types in hierarchical H-VPLS. "
+        ::= { mplsL2vpnPWEntry 11 }
+
+    mplsL2vpnLocalTunnelType  OBJECT-TYPE
+        SYNTAX   INTEGER {
+               rsvp-te(1),
+               mpls(2),
+               l2tp(3),
+               gre(4)
+                         }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Type of external tunnel of local PW. "
+        ::= { mplsL2vpnPWEntry 12 }
+
+    mplsL2vpnPWLocalCbit OBJECT-TYPE
+        SYNTAX   TruthValue t
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Activate Cbit control character locally or not. "
+        ::= { mplsL2vpnPWEntry 13}
+
+    mplsL2vpnPWLocalIfString  OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "it is a part of service configuration to associate each PW
+         with interface in ifTable or associate interfaces. The object
+         value is the interface name of local associated interface in
+         ifTable. "
+        ::= { mplsL2vpnPWEntry 14 }
+
+    mplsL2vpnPWLocalRouterId OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "When creating L2VPN PW, the both ends of PE identify with 
+         respective Router ID. The object is the local Router ID and
+         is an IPv4 address. "
+        ::= { mplsL2vpnPWEntry 15 }
+
+    mplsL2vpnPWLocalIfMtu OBJECT-TYPE
+        SYNTAX   Unsigned32(0..65535)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "MTU value supported by the local interface or sub-interface
+         associated by PW. "
+         ::= { mplsL2vpnPWEntry 16 }
+
+    mplsL2vpnRemoteGroupId  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "During the process of PW establishment, the value of Group ID 
+         field shall be filled in the PEER signaling protocol message 
+         sent to PW's peer end. "
+        ::= { mplsL2vpnPWEntry 17 }
+
+    mplsL2vpnRemoteACType  OBJECT-TYPE
+        SYNTAX   OBJECT-TYPE
+        SYNTAX   INTEGER {
+               encap-FR-DLCI(1),
+               encap-ATM-AAL5(2),
+               encap-ATM-TRANSCELL(3),
+               encap-ETH-VLAN(4),
+               encap-ETH(5),
+               encap-HDLC(6),
+               encap-PPP(7),
+               encap-CEM(8),
+               encap-ATM-VCC(9),
+               encap-ATM-VPC(10)
+                         }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Remote AC access type. "
+        ::= { mplsL2vpnPWEntry 18 }
+
+    mplsL2vpnRemoteHubOrSpoke  OBJECT-TYPE
+        SYNTAX   INTEGER {
+               hub(1),
+               spoke(2)
+                         }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "PW types in remote hierarchical H-VPLS. "
+        ::= { mplsL2vpnPWEntry 19 }
+
+    mplsL2vpnRemoteTunnelType  OBJECT-TYPE
+        SYNTAX   INTEGER {
+               rsvp-te(1),
+               mpls(2),
+               l2tp(3),
+               gre(4)
+                          }
+
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Type of external tunnel of remote PW. "
+        ::= { mplsL2vpnPWEntry 20 }
+
+    mplsL2vpnPWRemoteCbit OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Activate Cbit control character remotely or not. "
+        ::= { mplsL2vpnPWEntry 21}
+
+    mplsL2vpnPWRemoteIfString  OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "It is a part of service configuration to associate each PW with
+         interface in ifTable or associate interfaces. The object 
+         value is the interface name of remote associated interface in
+         ifTable."
+        ::= { mplsL2vpnPWEntry 22 }
+
+    mplsL2vpnPWRemoteRouterId OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "When creating L2VPN PW, the both ends of PE identify with 
+         respective Router ID. The object is the remote Router ID and 
+         is an IPv4 address."
+        ::= { mplsL2vpnPWEntry 23 }
+
+    mplsL2vpnPWRemoteIfMtu OBJECT-TYPE
+        SYNTAX   Unsigned32(0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "MTU value supported by the remote interface or sub-interface
+         associated by PW. "
+         ::= { mplsL2vpnPWEntry 24 }
+
+    mplsL2vpnPWCreateTime  OBJECT-TYPE
+        SYNTAX   TimeStamp
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "System time when PW is created. "
+         ::= { mplsL2vpnPWEntry 25 }
+
+    mplsL2vpnPWUpTime  OBJECT-TYPE
+        SYNTAX   TimeTicks
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The time for PW changes to be established. "
+         ::= { mplsL2vpnPWEntry 26 }
+
+    mplsL2vpnPWStorageType  OBJECT-TYPE
+        SYNTAX   StorageType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Storage type of the object. "
+         ::= { mplsL2vpnPWEntry 27 }
+
+    mplsL2vpnPWRowStatus  OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Used to create, modify and delete the line. When the object is
+         active, any objects that can be read and written in the line
+         can not be changed. The objects can be changed only when they 
+         are not in service or not ready. "
+         ::= { mplsL2vpnPWEntry 28 }
+
+--- MPLS L2VPN interface table 
+
+    mplsL2vpnIfTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MplsL2vpnIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table saves the interface information related to L2VPN 
+         service,  including the interface added to VPLS field and VPWS
+         service binding interface. "
+        ::= { mplsL2vpnIfObjects 1 }
+
+    mplsL2vpnIfEntry  OBJECT-TYPE
+        SYNTAX  MplsL2vpnIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Each line in the table represent an interface associated with
+         L2VPN service. A new line is created in the table when the 
+         L2VPN service is created by non SNMP mode and associated with 
+         local or virtual interface. "
+        INDEX  {mplsL2vpnIfIndex }
+        ::= { mplsL2vpnIfTable 1 }
+
+    MplsL2vpnIfEntry ::=
+        SEQUENCE {
+            mplsL2vpnIfIndex			InterfaceIndex,
+            mplsL2vpnIfString			DisplayString,
+            mplsL2vpnIfEncapType		INTEGER,
+            mplsL2vpnOwnerVpnIndex      Unsigned32,
+            mplsL2vpnIfOwnerVpnVcid		Unsigned32,
+            mplsL2vpnIfOwnerVpnType		INTEGER,
+            mplsL2vpnIfStorageType		StorageType,
+            mplsL2vpnIfRowStatus		RowStatus
+    }
+
+    mplsL2vpnIfIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+       "Index value of local or virtual interface associated with L2VPN
+        in ifTable. "
+        ::= { mplsL2vpnIfEntry 1 }
+
+    mplsL2vpnIfString  OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Interface name of local or virtual interface associated with 
+         L2VPN in ifTable. "
+        ::= { mplsL2vpnIfEntry 2 }
+
+    mplsL2vpnIfEncapType  OBJECT-TYPE
+        SYNTAX   INTEGER {
+               encap-FR-DLCI(1),
+               encap-ATM-AAL5(2),
+               encap-ATM-TRANSCELL(3),
+               encap-ETH-VLAN(4),
+               encap-ETH(5),
+               encap-HDLC(6),
+               encap-PPP(7),
+               encap-CEM(8),
+               encap-ATM-VCC(9),
+               encap-ATM-VPC(10)
+                          }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Encapsulation type of local or virtual interface associated 
+         with L2VPN in ifTable. "
+         ::= { mplsL2vpnIfEntry 3 }
+
+    mplsL2vpnOwnerVpnIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "index of L2VPN service instance associated with local or 
+         virtual interface in the MPLS L2VPN service instance table. "
+        ::= { mplsL2vpnIfEntry 4 }
+
+    mplsL2vpnIfOwnerVpnVcid  OBJECT-TYPE
+        SYNTAX   Unsigned32(1..4294967295)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "VCID value of L2VPN service instance associated with local or
+         virtual interface. "
+         ::= { mplsL2vpnIfEntry 5 }
+
+    mplsL2vpnIfOwnerVpnType  OBJECT-TYPE
+        SYNTAX   INTEGER {
+                   vpws(1),
+                   vpls(2),
+                   ipls(3)
+                          }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Type of L2VPN service associated with local or virtual 
+         interface. "
+         ::= { mplsL2vpnIfEntry 6}
+
+    mplsL2vpnIfStorageType  OBJECT-TYPE
+        SYNTAX   StorageType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Storage type of the object. "
+         ::= { mplsL2vpnIfEntry 7}
+
+    mplsL2vpnIfRowStatus  OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Used to create, modify and delete the line. When the object
+         is active, any objects that can be read and written in the 
+         line can not be changed. The objects can be changed only when
+         they are not in service or not ready. "
+         ::= { mplsL2vpnIfEntry 8 }
+
+--MPLS L2VPN VC traffic statistics table 
+
+    mplsL2vpnVcStatisTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MplsL2vpnVcStatisEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "VC traffic statistics means accumulative statistics of traffic
+         on a PW VC at one side of PSN. The statistics values are used 
+         for billing, load balancing and network performance analysis.
+         The table is indexed by mplsL2vpnPWIndex.  "
+        ::= { mplsL2vpnPWObjects 2}
+
+    mplsL2vpnVcStatisEntry   OBJECT-TYPE
+        SYNTAX  MplsL2vpnVcStatisEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "For each PW, the table item will be created. "
+        INDEX  { mplsL2vpnPWIndex }
+        ::= { mplsL2vpnVcStatisTable  1 }
+
+    MplsL2vpnVcStatisEntry ::=
+        SEQUENCE {
+            mplsL2vpnVcStatisRecvPkts		Counter64,
+            mplsL2vpnVcStatisRecvBytes	    Counter64,
+            mplsL2vpnVcStatisSndPkts		Counter64,
+            mplsL2vpnVcStatisSndBytes		Counter64
+                    }
+
+    mplsL2vpnVcStatisRecvPkts  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "number of data packets received at PSN side from a PW VC. "
+         ::= { mplsL2vpnVcStatisEntry 1}
+
+    mplsL2vpnVcStatisRecvBytes  OBJECT-TYPE
+        SYNTAX   Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "number of bytes received at PSN side from a PW VC. "
+         ::= { mplsL2vpnVcStatisEntry  2 }
+
+    mplsL2vpnVcStatisSndPkts  OBJECT-TYPE
+        SYNTAX   Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "number of data packets sent by a PW VC to PSN. "
+         ::= { mplsL2vpnVcStatisEntry  3}
+
+    mplsL2vpnVcStatisSndBytes  OBJECT-TYPE
+        SYNTAX   Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "number of bytes sent by a PW VC to PSN. "
+         ::= { mplsL2vpnVcStatisEntry  4}
+
+--MPLS L2VPN traffic statistics table 
+
+    mplsL2vpnStatisTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MplsL2vpnStatisEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "L2VPN traffic statistics means accumulative statistics of 
+         traffic on an L2VPN at one side of PSN. The statistics values
+         are used for billing, load balancing and network performance 
+         analysis. The table is indexed by mplsL2vpnIndex.  An L2VPN 
+         service may contain multiple PW VCs, so its traffic statistics
+         are the sum of all VCs traffic statistics of the L2VPN. "
+        ::= { mplsL2vpnObjects 2}
+
+    mplsL2vpnStatisEntry   OBJECT-TYPE
+        SYNTAX  MplsL2vpnStatisEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "For each L2VPN instance, the table item will be created. "
+        INDEX  { mplsL2vpnIndex }
+        ::= { mplsL2vpnStatisTable  1 }
+
+    MplsL2vpnStatisEntry ::=
+        SEQUENCE {
+            mplsL2vpnStatisRecvPkts	    Counter64,
+            mplsL2vpnStatisRecvBytes	Counter64,
+            mplsL2vpnStatisSndPkts	    Counter64,
+            mplsL2vpnStatisSndBytes	    Counter64
+                    }
+
+    mplsL2vpnStatisRecvPkts  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of data packets received at PSN side from an L2VPN. "
+         ::= { mplsL2vpnStatisEntry 1}
+
+    mplsL2vpnStatisRecvBytes  OBJECT-TYPE
+        SYNTAX   Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of bytes received at PSN side from an L2VPN. "
+         ::= { mplsL2vpnStatisEntry  2 }
+
+    mplsL2vpnStatisSndPkts  OBJECT-TYPE
+        SYNTAX   Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of data packets sent by an L2VPN to PSN. "
+         ::= { mplsL2vpnStatisEntry  3}
+
+    mplsL2vpnVcStatisSndBytes  OBJECT-TYPE
+        SYNTAX   Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of bytes sent by an L2VPN to PSN. "
+         ::= { mplsL2vpnStatisEntry  4}
+
+--MPLS L2VPN VSI 
+
+   mplsL2vpnVirtualSwitch OBJECT IDENTIFIER ::= { mplsL2vpnVSIObjects  1 }
+
+-- VPLS Virtual Switch Attributes Table
+    
+  mplsL2vpnVsiAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF mplsL2vpnVsiEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains a list of virtual switches present
+        in the local system."
+  ::= { mplsL2vpnVirtualSwitch 1 }
+
+  mplsL2vpnVsiEntry OBJECT-TYPE
+    SYNTAX        mplsL2vpnVsiEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing managment information
+        applicable to a particular virtual switch instance."
+    INDEX {mplsL2vpnVsiIndex }
+    ::= { mplsL2vpnVsiAttributesTable 1 }
+
+  mplsL2vpnVsiEntry ::= SEQUENCE {
+    mplsL2vpnVsiIndex          Unsigned32,
+    mplsL2vpnVsiId             OCTET STRING,
+    mplsL2vpnVsiAddress        MacAddress,
+    mplsL2vpnVsiNumPorts       INTEGER,
+    mplsL2vpnVsiStatus         INTEGER
+  }
+
+  mplsL2vpnVsiIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS     not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An arbitrary integer used to uniquely identify a particular
+        virtual switch within a VPLS instance present on the local
+        system."
+  ::= { mplsL2vpnVsiEntry 1 }
+
+  mplsL2vpnVsiId OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (8))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is an 8 octet integer identifier that uniquely
+        represents a virtual switch in a single VPLS service
+        provider. Used in the STP operation"
+  ::= { mplsL2vpnVsiEntry 2 }
+
+  mplsL2vpnVsiAddress OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The MAC address used by this virtual switch when it must be
+        referred to in a unique fashion."
+  ::= { mplsL2vpnVsiEntry 3 }
+
+  mplsL2vpnVsiNumPorts OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of virtual ports present in this virtual switch."
+  ::= { mplsL2vpnVsiEntry 4 }
+
+  mplsL2vpnVsiStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      up(1),
+                      down(2)
+                      }
+
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The operational state of the virtual switch."
+  ::= { mplsL2vpnVsiEntry 5 }
+
+  mplsL2vpnVirtualPort OBJECT IDENTIFIER ::= {  mplsL2vpnVSIObjects 2 }
+
+-- VPLS Virtual Port Attributes Table
+    
+  mplsL2vpnVpAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF MplsL2VpnVpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains a list of virtual ports present in
+        the local system."
+  ::= { mplsL2vpnVirtualPort 1 }
+
+  mplsL2vpnVpEntry OBJECT-TYPE
+    SYNTAX        MplsL2VpnVpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing managment information
+        applicable to a particular virtual port."
+    INDEX {mplsL2vpnVsiIndex, mplsL2vpnVpIndex }
+  ::= { mplsL2vpnVpAttributesTable 1 }
+
+  MplsL2VpnVpEntry ::= SEQUENCE {
+    mplsL2vpnVpIndex        Unsigned32,
+    mplsL2vpnVpInterface    InterfaceIndex,
+    mplsL2VpVpnId           VPNId
+  }
+
+  mplsL2vpnVpIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An arbitrary integer used to uniquely identify a particular
+        virtual port within a virtual switch present within a VPLS
+        instance."
+  ::= { MplsL2VpnVpEntry 1 }
+
+  mplsL2vpnVpInterface OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The ifIndex value that identifies the local interface
+        to which the virtual circuit of this virtual port is mapped
+        to."
+  ::= { MplsL2VpnVpEntry 2 }
+
+  mplsL2vpnVpVpnId       OBJECT-TYPE
+    SYNTAX        VPNId
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The VPN ID as specified in RFC 2685 to which this virtual
+        port is connected to."
+  ::= { MplsL2vpnVpEntry 3 }
+
+
+-- VPLS Virtual Port Statistics Table
+    
+  mplsL2vpnVpStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF MplsL2vpnVpStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains a list of virtual port statistics. This
+        table extends vplsVpAttributesTable"
+  ::= { mplsL2vpnVirtualPort 2 }
+
+  mplsL2vpnVpStatsEntry OBJECT-TYPE
+    SYNTAX        MplsL2vpnVpStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing managment information
+        applicable to a particular virtual port."
+    AUGMENTS { vplsVpEntry }
+  ::= { mplsL2vpnVpStatsTable 1 }
+
+  MplsL2vpnVpStatsEntry ::= SEQUENCE {
+    mplsL2vpnVpInBytes       Counter64,
+    mplsL2vpnVpOutBytes      Counter64,
+    mplsL2VpInDiscards       Counter32
+  }
+
+  mplsL2vpnVpInBytes OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total no of data bytes received from this virtual port."
+  ::= { MplsL2vpnVpStatsEntry 1 }
+
+  mplsL2vpnVpOutBytes OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total no of data bytes sent to this virtual port."
+  ::= { MplsL2vpnVpStatsEntry 2 }
+
+  mplsL2vpnVpInDiscards OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of valid packets received which were discarded."
+  ::= { MplsL2vpnVpStatsEntry 3 }
+
+
+-- MplsL2VPN Notifications
+    mplsL2vpnTrapLevel  OBJECT-TYPE
+        SYNTAX  INTEGER {
+               emergencies(1),
+               alerts(2),
+               critical(3),
+               errors(4),
+               warnings(5),
+               notifications(6),
+               informational(7),
+               debugging(8)
+            }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Alerting level of Trap pdu."
+         ::= { mplsL2vpnNotifications 1}
+
+ mplsL2vpnInterfaceTrap NOTIFICATION-TYPE
+     OBJECTS      { mplsL2vpnIfIndex,
+                    mplsL2vpnIfString,
+                    mplsL2vpnTrapLevel,
+                    mplsL2vpnInstanceVCId,
+                    mplsL2vpnPWRemoteRouterId,
+                    mplsL2vpnInstanceType
+                  }
+     STATUS       current
+     DESCRIPTION
+     When there is a PW become unavailable because of interface 
+     failure,this type of Trap pdu will be sent."
+     ::= { mplsL2vpnNotifications 2 }
+
+ mplsL2vpnProtocolTrap NOTIFICATION-TYPE
+     OBJECTS      { mplsL2vpnTrapLevel,
+                    mplsL2vpnInstanceVCId,
+                    mplsL2vpnPWRemoteRouterId,
+                    mplsL2vpnInstanceType
+                  }
+     STATUS       current
+     DESCRIPTION
+     When Protocol patameters negotiation fails during VC setup 
+     and there is a PW affected,this type of Trap pdu will be sent."
+     ::= { mplsL2vpnNotifications 3 }
+
+ mplsL2vpnExternalTunnelTrap NOTIFICATION-TYPE
+     OBJECTS      { mplsL2vpnTrapLevel,
+                    mplsL2vpnInstanceVCId,
+                    mplsL2vpnPWRemoteRouterId,
+                    mplsL2vpnInstanceType
+                  }
+     STATUS       current
+     DESCRIPTION
+     When there is a PW become unavailable because of external tunnel 
+     failure,this type of Trap pdu will be sent."
+     ::= { mplsL2vpnNotifications 4 }
+
+
+  mplsL2vpnNotificationsPrefix OBJECT IDENTIFIER ::= 
+  { mplsL2vpnNotifications 5 }
+
+  VirtualSwitchUp NOTIFICATION-TYPE
+    OBJECTS   { mplsL2vpnVsiId }
+    STATUS    current
+    DESCRIPTION
+        "This notification is generated when the specified
+        virtual switch is about to be initialized or change the
+        status from down to up."
+  ::= { mplsL2vpnNotificationsPrefix 1 }
+
+  VirtualSwitchDown NOTIFICATION-TYPE
+    OBJECTS   { mplsL2vpnVsiId }
+    STATUS    current
+    DESCRIPTION
+        "This notification is generated when the specified
+        virtual switch is about to go down."
+  ::= { mplsL2vpnNotificationsPrefix 2 }
+
+  mplsL2vpnVpnUp NOTIFICATION-TYPE
+    OBJECTS   { mplsL2vpnPWStatus }
+    STATUS    current
+    DESCRIPTION
+        "This notification is generated when the specified
+        vpn is about to go up."
+  ::= { mplsL2vpnNotificationsPrefix 3 }
+
+  mplsL2vpnVpnFail NOTIFICATION-TYPE
+    OBJECTS   { mplsL2vpnPWStatus }
+    STATUS    current
+    DESCRIPTION
+        "This notification is generated when the specified
+         vpn is about to go down."
+  ::= { mplsL2vpnNotificationsPrefix 4 }
+
+-- NOTE: this END was not present in draft-weilian-l2vpn-mib-01.txt,
+-- but this does appear to be the end of the MIB.
+-- (the next line is '7. Intellectual Property Statement ')
+
+END
+
+--     
+--    Copyright (C) The Internet Society (2006). 
+-- 
+--    This document is subject to the rights, licenses and restrictions 
+--    contained in BCP 78, and except as set forth therein, the authors 
+--    retain all their rights. 
+-- 
+

@@ -1,0 +1,422 @@
+-- extracted from draft-ietf-pwe3-satop-mib-03.txt
+-- at Tue Apr 12 06:24:19 2005
+
+   PW-SATOP-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE,
+       Unsigned32
+        FROM SNMPv2-SMI
+
+     MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+     RowStatus, StorageType
+        FROM SNMPv2-TC
+
+     pwStdMIB
+        FROM PW-TC-DRAFT04-MIB
+
+     PwVcTDMCfgIndex
+        FROM PW-TDM-MIB;
+
+
+   -- The SAToP MIB
+   pwVcSatopMIB MODULE-IDENTITY
+
+     LAST-UPDATED "200407180000Z"
+     ORGANIZATION "Pseudo-Wire Emulation Edge-to-Edge (PWE3)
+                   Working Group"
+     CONTACT-INFO
+         "        Orly Nicklass
+          Postal: RAD Data Communications
+                  24 Raoul Wallenberg St., Bldg C
+                  Tel Aviv 69719, Israel
+                  Email: orly_n@rad.com
+
+          The PWE3 Working Group (email distribution pwe3@ietf.org,
+          http://www.ietf.org/html.charters/pwe3-charter.html)
+          "
+
+     DESCRIPTION
+         "This MIB contains managed object definitions for
+          encapsulating TDM bit-streams (T1,E1, T3, E3) as
+          pseudo-wires  over packet-switching networks (PSN).
+          as in: Structure- Agnostic TDM over Packet [SATOP].
+
+          This MIB reports to the PW-STD-MIB as in: Zelig, D., Nadeau,
+          T. 'Pseudo Wire (PW) Management Information Base'. The
+          PW-STD-MIB contains structures and MIB associations generic
+          to Pseudo-Wire (PW) emulation. PW-specific
+          MIBs (such as this) contain config and stats for specific
+          PW types.
+
+          Copyright (C) The Internet Society (2004).  This version
+          of this MIB module is part of RFC yyyy;  see the RFC
+          itself for full legal notices.
+   -- RFC Ed.: replace yyyy with actual RFC number & remove this note
+          "
+     ::= { pwStdMIB x } --To be assigned by IANA
+                        -- we request to assign value 6
+
+   -- Tables, Scalars
+   pwVcSatopObjects       OBJECT IDENTIFIER
+                                ::= { pwVcSatopMIB 1 }
+   -- Notifications
+   pwVcSatopTraps         OBJECT IDENTIFIER
+                                ::= { pwVcSatopMIB 2 }
+
+   -- Conformance
+   pwVcSatopConformance   OBJECT IDENTIFIER
+                                ::= { pwVcSatopMIB 3 }
+
+   -- Obtain index for PW SAToP Configuration table entries
+
+   pwVcSatopCfgIndexNext OBJECT-TYPE
+     SYNTAX            PwVcTDMCfgIndex
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+         "This object contains the value to be used for
+          pwVcSatopCfgIndex when creating entries in the
+          pwVcSatopCfgTable. The value 0 indicates that no
+          unassigned entries are available.  To obtain the
+          value of pwVcSatopCfgIndex for a new entry in the
+          pwVcSatopCfgTable, the manager issues a management
+          protocol retrieval operation to obtain the current
+          value of pwVcSatopCfgIndex. After each retrieval
+          operation, the agent should modify the value to
+          reflect the next unassigned index.  After a manager
+          retrieves a value the agent will determine through
+          its local policy when this index value will be made
+          available for reuse."
+     ::= { pwVcSatopObjects 1 }
+
+   -- PW SAToP PW Configuration Table
+
+   pwVcSatopCfgTable   OBJECT-TYPE
+     SYNTAX                  SEQUENCE OF PwVcSatopCfgEntry
+     MAX-ACCESS              not-accessible
+     STATUS                  current
+     DESCRIPTION
+       "This table contains a set of parameters that may be
+        referenced by one or more SAToP PWs in pwVcTDMTable."
+     REFERENCE
+      "See [PWTDMMIB]"
+
+     ::= { pwVcSatopObjects 2 }
+
+   pwVcSatopCfgEntry   OBJECT-TYPE
+     SYNTAX            PwVcSatopCfgEntry
+     MAX-ACCESS        not-accessible
+     STATUS            current
+     DESCRIPTION
+          "These parameters define the characteristics of a
+           SAToP PW. They are grouped here to ease NMS burden.
+           Once an entry is created here it may be re-used
+           by many PWs."
+
+     INDEX  { pwVcSatopCfgIndex }
+        ::= { pwVcSatopCfgTable 1 }
+
+   PwVcSatopCfgEntry ::= SEQUENCE {
+        pwVcSatopCfgIndex                   PwVcTDMCfgIndex,
+        pwVcSatopCfgRowStatus               RowStatus,
+
+        pwVcSatopCfgConsecPktsLoss2Normal   Unsigned32,
+        pwVcSatopCfgConsecMissPktNorma2Loss Unsigned32,
+
+        pwVcSatopCfgPktReplacePolicy        INTEGER,
+        pwVcSatopCfgTDMDataSetUp2Synch      Unsigned32,
+        pwVcSatopCfgSetUp2SynchTimeOut      Unsigned32,
+        pwVcSatopCfgAlarmThreshold          Unsigned32,
+        pwVcSatopCfgClearAlarmThreshold     Unsigned32,
+        pwVcSatopCfgExcessivePktLossThreshold   Unsigned32,
+
+        pwVcSatopCfgMissingPktsToSes        Unsigned32,
+        pwVcSatopCfgTimestampMode           INTEGER,
+        pwVcSatopCfgStorageType             StorageType
+        }
+
+   pwVcSatopCfgIndex   OBJECT-TYPE
+     SYNTAX        PwVcTDMCfgIndex
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "Primary index inthis table"
+     ::= { pwVcSatopCfgEntry 1 }
+
+   pwVcSatopCfgRowStatus    OBJECT-TYPE
+     SYNTAX               RowStatus
+     MAX-ACCESS           read-create
+     STATUS               current
+     DESCRIPTION
+         "Object used for creating, modifying, and deleting
+          a row from this table."
+     ::= { pwVcSatopCfgEntry 2 }
+
+   -- The following counters work together to integrate
+   -- errors and the lack of errors on the SAToP PW. An error is
+   -- caused by a missing packet. Missing packet can be a result
+   -- of: packet loss in the network, (uncorrectable) packet out
+   -- of sequence, packet length error, jitter buffer overflow,
+   -- and jitter buffer underflow. The result is declaring whether
+   -- or not the SAToP PW is in Loss of Packet (LOPS) state.
+   --
+   pwVcSatopCfgConsecPktsLoss2Normal   OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "The number of consecutive packets with sequential
+          sequence numbers that are required to exit the
+          LOPS state."
+     REFERENCE
+         "See [SATOP]"
+     DEFVAL { 2 }
+     ::= { pwVcSatopCfgEntry 3 }
+
+   pwVcSatopCfgConsecMissPktNorma2Loss  OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         " The number of consecutive missing packets that are
+          required to enter the LOPS state."
+     REFERENCE
+         "See [SATOP]"
+     DEFVAL { 10 }
+     ::= { pwVcSatopCfgEntry 4 }
+
+   pwVcSatopCfgPktReplacePolicy OBJECT-TYPE
+     SYNTAX        INTEGER
+                         {
+                          allOnes (1),
+                          implementationSpecific(2)
+                         }
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "This is the value to be played when CE bound packets
+          have over/underflow the jitter buffer, or are missing
+          for any reason. This byte pattern is sent (played) on
+          the TDM line."
+     DEFVAL { 1 } -- Play all ones
+     ::= { pwVcSatopCfgEntry 5 }
+
+   pwVcSatopCfgTDMDataSetUp2Synch OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "The SAToP IWF is in an intermediate state until this
+          amount of TDM data bytes (usually half of the jitter
+          buffer) has been received in consecutive SAToP packets.
+          default value is set for E1 line."
+
+   DEFVAL {1400 }
+     ::= { pwVcSatopCfgEntry 6 }
+
+   pwVcSatopCfgSetUp2SynchTimeOut OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "The intermediate state timer is set to this value. The SAToP
+          IWF is in an intermediate state until
+          pwVcSatopCfgTDMDataSetUp2Synch amount of TDM data bytes
+          has been received in consecutive SAToP packets or until this
+          timer expires. The timer units are (millisec)"
+     DEFVAL { 5}
+     ::= { pwVcSatopCfgEntry 7 }
+
+   pwVcSatopCfgAlarmThreshold OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "Alarms are only reported when the defect state persists
+          for the length of time specified by this object.
+          The object's unit is millisec"
+     DEFVAL { 2500 }
+     ::= { pwVcSatopCfgEntry 8 }
+
+   pwVcSatopCfgClearAlarmThreshold OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "Alarm MUST be cleared after the corresponding defect is
+          undetected for the amount of time specified by this object.
+          The object's unit is millisec"
+     DEFVAL { 10000 }
+     ::= { pwVcSatopCfgEntry 9 }
+
+
+   pwVcSatopCfgExcessivePktLossThreshold OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "Excessive packet loss rate is detected by computing the
+          average packetloss rate over a pwVcSatopCfgAvePktLossTimeWindow
+          amount of time and comparing it with this threshold value. "
+     ::= { pwVcSatopCfgEntry 10 }
+
+   pwVcSatopCfgMissingPktsToSes OBJECT-TYPE
+     SYNTAX        Unsigned32
+     UNITS         "seconds"
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "Number of missing packets detected (consecutive or not)
+          within a 1 second window to cause a Severely Error
+          Second (SES) to be counted."
+     DEFVAL { 3 }
+     ::= { pwVcSatopCfgEntry 11 }
+
+   pwVcSatopCfgTimestampMode  OBJECT-TYPE
+     SYNTAX        INTEGER
+                    {
+                     notApplicable (1),
+                     absolute      (2),
+                     differential  (3)
+                    }
+
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "Timestamp generation MAY be used in one of the following
+          modes:
+          1. Absolute mode: the PSN-bound IWF sets timestamps
+            using the clock recovered from the incoming TDM attachment
+            circuit. As a consequence, the timestamps are closely
+            correlated with the sequence numbers. All SAToP implementations
+            that support usage of the RTP header MUST support this mode.
+          2. Differential mode: Both IWFs have access to a common high-
+            quality timing source, and this source is used for timestamp
+            generation. Support of this mode is OPTIONAL. "
+
+     ::= { pwVcSatopCfgEntry 12 }
+
+   pwVcSatopCfgStorageType  OBJECT-TYPE
+     SYNTAX            StorageType
+     MAX-ACCESS        read-create
+     STATUS            current
+     DESCRIPTION
+         "This variable indicates the storage type for this
+          row."
+     ::= { pwVcSatopCfgEntry 13 }
+
+   -- End of SAToP PW Configuration Parameter Table
+
+   -- Conformance Information
+   pwVcSatopGroups      OBJECT IDENTIFIER ::= { pwVcSatopConformance 1 }
+   pwVcSatopCompliances OBJECT IDENTIFIER ::= { pwVcSatopConformance 2 }
+
+
+   pwSatopModuleCompliance MODULE-COMPLIANCE
+      STATUS  current
+      DESCRIPTION
+              "The compliance statement for agent that support Structure-
+               Agnostic TDM over PSN."
+
+      MODULE  -- this module
+          MANDATORY-GROUPS {
+                             pwVcSatopCfgGroup
+                           }
+
+
+                     OBJECT pwVcSatopCfgConsecPktsLoss2Normal
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+
+                     OBJECT pwVcSatopCfgConsecMissPktNorma2Loss
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+                     OBJECT pwVcSatopCfgPktReplacePolicy
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+                     OBJECT pwVcSatopCfgTDMDataSetUp2Synch
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+                     OBJECT pwVcSatopCfgSetUp2SynchTimeOut
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+                     OBJECT pwVcSatopCfgExcessivePktLossThreshold
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+                     OBJECT pwVcSatopCfgMissingPktsToSes
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+                     OBJECT pwVcSatopCfgTimestampMode
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+
+      ::= { pwVcSatopCompliances 1 }
+
+   -- Units of conformance.
+
+
+   pwVcSatopCfgGroup OBJECT-GROUP
+     OBJECTS {
+        pwVcSatopCfgIndexNext,
+        pwVcSatopCfgRowStatus,
+
+        pwVcSatopCfgConsecPktsLoss2Normal,
+        pwVcSatopCfgConsecMissPktNorma2Loss,
+
+        pwVcSatopCfgPktReplacePolicy,
+        pwVcSatopCfgTDMDataSetUp2Synch,
+        pwVcSatopCfgSetUp2SynchTimeOut,
+        pwVcSatopCfgAlarmThreshold,
+        pwVcSatopCfgClearAlarmThreshold,
+        pwVcSatopCfgExcessivePktLossThreshold,
+
+        pwVcSatopCfgMissingPktsToSes,
+        pwVcSatopCfgTimestampMode,
+        pwVcSatopCfgStorageType
+     }
+     STATUS  current
+     DESCRIPTION
+            "Collection of detailed objects needed to
+             configure SAToP PWs."
+     ::= { pwVcSatopGroups 1 }
+
+   END
+
+-- 
+--    Copyright (C) The Internet Society (2005).  This document is subject
+--    to the rights, licenses and restrictions contained in BCP 78, and
+--    except as set forth therein, the authors retain all their rights.
+-- 
+-- 
+-- Acknowledgment
+-- 
+--    Funding for the RFC Editor function is currently provided by the
+--    Internet Society.
+

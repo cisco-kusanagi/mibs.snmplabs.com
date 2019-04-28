@@ -1,0 +1,152 @@
+PDN-INET-MIB DEFINITIONS ::= BEGIN
+
+-- Version :  1.1 APPROVED
+-- Enterprise Inet mib
+-- Copyright (C) 2000 Paradyne Corporation.
+
+-- Created by : Prakash Easwar
+
+-- CHANGE HISTORY
+--  05/10/00 Dragana Gough
+--  1) changed pdnInetIpSubnetMask to read-write
+--  04/27/00 Prakash Easwar
+--   1) removed pdnInetIpSubnetMask from the INDEX clause for
+--      pdnInetIpAddressTable
+ 
+IMPORTS
+OBJECT-TYPE
+  FROM RFC-1212
+TRAP-TYPE
+  FROM RFC-1215
+ifIndex
+  FROM RFC1213-MIB
+IpAddress
+  FROM RFC1155-SMI
+RowStatus
+  FROM SNMPv2-TC
+pdn-inet
+  FROM PDN-HEADER-MIB
+InetAddressType 
+  FROM PDN-TC
+;
+
+-- The pdn inet MIB. This MIB is written specifically to
+-- to configure ip information on the device
+
+pdnInetMIBObjects OBJECT IDENTIFIER ::= { pdn-inet 1 }
+pdnInetMIBTraps   OBJECT IDENTIFIER ::= { pdn-inet 2 }
+
+pdnInetTelnetServerPort OBJECT-TYPE
+  SYNTAX INTEGER (1..65535)
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+     "This object contains the telnet server (daemon) tcp
+      port number."
+  DEFVAL { 23 }
+::= { pdnInetMIBObjects 1 }
+
+pdnInetFtpServerControlPort OBJECT-TYPE
+  SYNTAX INTEGER (1..65535)
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+     "This object contains the ftp server control (daemon) tcp
+      port number."
+  DEFVAL { 21 }
+::= { pdnInetMIBObjects 2 }
+
+pdnInetFtpServerDataPort OBJECT-TYPE
+  SYNTAX INTEGER (1..65535)
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+     "This object contains the ftp server data connection tcp
+      port number."
+  DEFVAL { 20 }
+::= { pdnInetMIBObjects 3 }
+ 
+pdnInetIpAddressTableMaxIpSubnets OBJECT-TYPE
+  SYNTAX INTEGER
+  ACCESS read-only
+  STATUS mandatory
+  DESCRIPTION
+    "This object  indicates the maximum number of entries in
+     the pdnInetAddressTable"
+::= { pdnInetMIBObjects 4 }
+
+pdnInetIpAddressTableCurrentIpSubnets OBJECT-TYPE
+  SYNTAX INTEGER
+  ACCESS read-only
+  STATUS mandatory
+  DESCRIPTION
+    "This object  indicates the number of entries configured in
+     the pdnInetAddressTable"
+::= { pdnInetMIBObjects 5 }
+ 
+pdnInetIpAddressTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF PdnInetIpAddressTableEntry
+  ACCESS  not-accessible
+  STATUS  mandatory
+  DESCRIPTION
+    "This table used to configure ipaddresses for an interface
+     which support the internet (IP) protocol"
+::= { pdnInetMIBObjects 6 }
+ 
+pdnInetIpAddressTableEntry OBJECT-TYPE
+  SYNTAX  PdnInetIpAddressTableEntry
+  ACCESS  not-accessible
+  STATUS  mandatory
+  DESCRIPTION
+    "This object corresponds to an entry in the IP address table."
+  INDEX { ifIndex, pdnInetIpAddress }
+::= { pdnInetIpAddressTable 1 }
+
+PdnInetIpAddressTableEntry ::=
+  SEQUENCE
+  {
+    pdnInetIpAddress IpAddress,
+    pdnInetIpSubnetMask IpAddress,
+	pdnInetIpAddressType InetAddressType,
+	pdnInetIpRowStatus RowStatus
+  }
+ 
+pdnInetIpAddress OBJECT-TYPE
+  SYNTAX IpAddress
+  ACCESS read-only
+  STATUS mandatory
+  DESCRIPTION
+    "This object is used to configure an IP address for an interface"
+::= { pdnInetIpAddressTableEntry 1 }
+
+pdnInetIpSubnetMask OBJECT-TYPE
+  SYNTAX IpAddress
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+    "This object is used to configure an IP subnet mask for an interface.
+	  subnet mask should result in contiguous subnets"
+::= { pdnInetIpAddressTableEntry 2 }
+
+pdnInetIpAddressType OBJECT-TYPE
+  SYNTAX InetAddressType
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+    "This object is used to configure the address type for an interface
+	  an interface can have only one primary ip address and more than one
+	  secondary ip address. the primary ip address is essentially the
+	  router ID. The secondary ip address would result in the interface
+	  being multi-homed."
+::= { pdnInetIpAddressTableEntry 3 }
+
+pdnInetIpRowStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+    "This object is used to manage rows (add/delete/modify) in this table"
+::= { pdnInetIpAddressTableEntry 4 }
+
+END
+

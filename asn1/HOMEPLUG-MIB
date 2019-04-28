@@ -1,0 +1,625 @@
+--======================================================================
+-- AVISTO HOMEPLUG MIB 
+-- NOTICE OF PROPRIETARY INFORMATION
+-- Information contained herein is of a highly sensitive nature and is
+-- confidential and proprietary to Avisto S.A. It shall not be
+-- distributed, reproduced or disclosed orally or in written form, in whole or
+-- in part, to any party other than the direct recipients without the express
+-- written consent of Avisto S.A.
+--
+-- REVISION HISTORY:
+-- 07/10/03 Gilles Dupont (Avisto)
+--          Creation
+-- 
+--======================================================================
+
+HOMEPLUG-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, TimeTicks, Counter32	FROM SNMPv2-SMI
+    OBJECT-GROUP, NOTIFICATION-GROUP    	FROM SNMPv2-CONF 
+    avisto                              	FROM AVISTO-MIB;
+
+  homeplug MODULE-IDENTITY 
+    LAST-UPDATED "200309021107Z" 
+    ORGANIZATION "Avisto S.A" 
+    CONTACT-INFO 
+      "Scott Willy
+       C.I.C.A.
+       2229 route des Cretes
+       06560 Sophia Antipolis
+       France
+       Tel: +33 4 92 94 21 92
+       Fax: +33 4 92 94 21 94
+       E-mail: scott.willy@avisto.com"
+ 
+    DESCRIPTION 
+      "A MIB module to manage Homeplug Devices V1-03." 
+ 
+    REVISION "200310071107Z"
+    DESCRIPTION
+      "A MIB module to manage Homeplug Devices V1-03."
+
+    ::= { avisto 3 }
+
+  configuration OBJECT IDENTIFIER ::= { homeplug 1 } 
+        
+--======================================================================
+-- Configuration
+--======================================================================
+
+  managerAddr OBJECT-TYPE 
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+      "Ip address to which the traps are sent."
+    ::= { configuration 1 }
+
+  managerPort OBJECT-TYPE 
+    SYNTAX     INTEGER (0..65535)
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+      "Port to which the traps are sent."    
+    ::= { configuration 2 }
+  
+  trapCommunity OBJECT-TYPE 
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+      "The community used  when sending traps."    
+    ::= { configuration 3 }
+
+  pollingRate OBJECT-TYPE 
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+      "The periodicity of homeplug devices pollings (in hundredths of a second)."    
+    ::= { configuration 4 }
+
+  defaultUpperDataRateThreshold OBJECT-TYPE 
+    SYNTAX     INTEGER (0..1400)
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+      "The default upper data rate threshold taken into consideration to send
+       the traps based on data rate value [in hundredths of MHz]."    
+    ::= { configuration 5 }
+
+  defaultLowerDataRateThreshold OBJECT-TYPE 
+    SYNTAX     INTEGER (0..1400)
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+      "The default lower data rate threshold taken into consideration to send
+       the traps based on data rate value [in hundredths of MHz]."    
+    ::= { configuration 6 }
+
+  doCleanDeviceTable OBJECT-TYPE 
+    SYNTAX     INTEGER{ 
+                    off (0),
+                    on  (1) 
+                  }
+    MAX-ACCESS read-write
+    STATUS     current 
+    DESCRIPTION 
+      "Set to on(1) to clean the current device table.
+       The default value is off(0). If set to on(1), all devices with a 
+       off(0) status will be removed from device table before next polling.
+       After this cleaning, the value is then automatically re-set to its
+       default value: off(0)."    
+    ::= { configuration 7 }
+
+--======================================================================
+-- Device Password Table
+--======================================================================
+
+  devicePasswdTbl OBJECT-TYPE 
+    SYNTAX SEQUENCE OF DevicePasswdEntry
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION 
+      "Table of device passwords."  
+    ::= { homeplug 2 } 
+
+  devicePasswdEntry OBJECT-TYPE 
+    SYNTAX     DevicePasswdEntry 
+    MAX-ACCESS not-accessible 
+    STATUS     current 
+    DESCRIPTION 
+      "Information on each of the respective rows." 
+    INDEX { passwdID } 
+    ::= { devicePasswdTbl 1 }
+
+  DevicePasswdEntry ::=  
+    SEQUENCE {
+      passwdID    INTEGER,
+      passwd      OCTET STRING,
+      macAddr     OCTET STRING,
+      operStatus  INTEGER,
+      adminStatus INTEGER
+    }
+
+  passwdID OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The identifier for the device password."
+    ::= { devicePasswdEntry 1 }         
+                 
+  passwd OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "A device password."
+    ::= { devicePasswdEntry 2 }
+
+  macAddr OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "IEEE 802 MAC Address of the device."
+    ::= { devicePasswdEntry 3 }
+                
+  operStatus OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                 unconfirmed (0), 
+                 confirmed   (1)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "Password operational status. The default status is unconfirmed(0).
+       If a device with this password is detected then the operational 
+       status becomes confirmed(1)."
+    ::= { devicePasswdEntry 4 }
+      
+  adminStatus OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                 off (0),
+                 on  (1) 
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "Password desired administrative status. The default status is off(1). 
+       To activate a device password then the administrative status has to be 
+       set to on(1)."
+    ::= { devicePasswdEntry 5 }
+        
+--======================================================================
+-- Devices Table
+--======================================================================
+
+  deviceTbl OBJECT-TYPE 
+    SYNTAX SEQUENCE OF DeviceEntry
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION 
+      "Table of devices."  
+    ::= { homeplug 3 } 
+
+  deviceEntry OBJECT-TYPE 
+    SYNTAX     DeviceEntry
+    MAX-ACCESS not-accessible 
+    STATUS     current 
+    DESCRIPTION 
+      "Information on each of the respective rows" 
+    INDEX { devID } 
+    ::= { deviceTbl 1 }
+
+  DeviceEntry ::=  
+   SEQUENCE {
+     devID                         INTEGER,
+     lanAddress                    OCTET STRING,
+     macAddress                    OCTET STRING,
+     chipset                       OCTET STRING,
+     dataRate                      INTEGER,
+     upperDataRateThreshold        INTEGER,
+     lowerDataRateThreshold        INTEGER,
+     transmitACKCounter            Counter32,
+     transmitNACKCounter           Counter32,
+     transmitFAILCounter           Counter32,
+     transmitConnectionLossCounter Counter32,
+     transmitCollisionCounter      Counter32,
+     transmitCA3LatencyCounter     Counter32,
+     transmitCA2LatencyCounter     Counter32,
+     transmitCA1LatencyCounter     Counter32,
+     transmitCA0LatencyCounter     Counter32,
+     receiveCumulativeBytesPer40SymbolPacketCounter Counter32,
+     lastSeenDate                  Counter32,
+     deviceStatus                  INTEGER     
+   }
+            
+  devID OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "Device identifier."
+    ::= { deviceEntry 1 }
+  
+  lanAddress OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "Address of the device's LAN."
+     ::= { deviceEntry 2 }
+       
+  macAddress     OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "IEEE 802 MAC Address of the device."
+    ::= { deviceEntry 3 }
+       
+  chipset OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "Chipset type."
+    ::= { deviceEntry 4 }
+     
+  dataRate OBJECT-TYPE
+    SYNTAX     INTEGER (0..1400)
+    MAX-ACCESS read-only
+    STATUS     current  
+    DESCRIPTION
+      "The current transmit Data rate [in hundredths of MHz]."
+    ::= { deviceEntry 5 }
+
+  upperDataRateThreshold OBJECT-TYPE
+    SYNTAX     INTEGER (0..1400)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "The Data Rate threshold taken into consideration to send
+       the traps based on the data rate value [in hundredths of MHz]."
+    ::= { deviceEntry 6 }
+
+  lowerDataRateThreshold OBJECT-TYPE
+    SYNTAX     INTEGER (0..1400)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "The Data Rate threshold taken into consideration to send
+       the traps based on the data rate value [in hundredths of MHz]."
+    ::= { deviceEntry 7 }
+ 
+  transmitACKCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Transmit ACK Counter increments when an ACK is received
+       after transmitting a PHY frame with response expected."
+    ::= { deviceEntry 8 }
+
+  transmitNACKCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Transmit NACK Counter increments when an NACK is received
+       after transmitting a PHY frame with response expected."
+    ::= { deviceEntry 9 }
+
+  transmitFAILCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Transmit FAIL Counter increments when an FAIL is received
+       after transmitting a PHY frame with response expected."
+    ::= { deviceEntry 10 }
+ 
+  transmitConnectionLossCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Transmit Connection Loss Counter increments when the station
+       defers to another transmitting station with the same transmit priority
+       during the Contention Window."
+    ::= { deviceEntry 11 }
+ 
+  transmitCollisionCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current 
+    DESCRIPTION
+      "The Transmit Collision Counter increments when a Collision is 
+       inferred to have occured, after transmitting a PHY frame for which a
+       response is expected."
+    ::= { deviceEntry 12 }
+
+  transmitCA3LatencyCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Transmit CA3 Latency Counter contains the cumulative total
+       of number of milliseconds from receipt of a CA3 priority transmit request
+       to succesful transmit completion or transmit timeout. Subsequent Collisions
+       do not affect this metric."
+    ::= { deviceEntry 13 }
+
+  transmitCA2LatencyCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Transmit CA2 Latency Counter contains the cumulative total
+       of number of milliseconds from receipt of a CA2 priority transmit request
+       to succesful transmit completion or transmit timeout. Subsequent Collisions
+       do not affect this metric."
+    ::= { deviceEntry 14 }
+
+  transmitCA1LatencyCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Transmit CA1 Latency Counter contains the cumulative total
+       of number of milliseconds from receipt of a CA1 priority transmit request
+       to succesful transmit completion or transmit timeout. Subsequent Collisions
+       do not affect this metric."
+    ::= { deviceEntry 15 }
+  
+  transmitCA0LatencyCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Transmit CA0 Latency Counter contains the cumulative total
+       of number of milliseconds from receipt of a CA0 priority transmit request
+       to succesful transmit completion or transmit timeout. Subsequent Collisions
+       do not affect this metric."
+    ::= { deviceEntry 16 }
+
+  receiveCumulativeBytesPer40SymbolPacketCounter OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Receive Cumulative Bytes per 40-symbol Packet Counter contains
+       the cumulative total of number of bytes within a received 40-symbol packet
+       for each validly received PHY frame. The number of bytes is based on the 
+       tone map and modulation characteristics"
+    ::= { deviceEntry 17 }
+
+  lastSeenDate OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The Last seen date (in seconds). Number of seconds since the Epoch. 
+       Epoch: midnight, January 1, 1970 (Coordinated Universal Time or UTC or GMT)"
+    ::= { deviceEntry 18 }
+ 
+  deviceStatus OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                 down    (0), 
+                 up      (1),
+                 testing (2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "Device operational status. The default status is testing(0) that means that 
+       the next polling will determine if the device is up(1) or down(2).
+       If a device is detected, the status becomes up(1), if it is missing then
+       the status is down(2)."
+    ::= { deviceEntry 19 }
+
+--======================================================================
+-- LAN Table
+--======================================================================
+
+  lanTbl OBJECT-TYPE 
+    SYNTAX SEQUENCE OF LanEntry
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION 
+      "A table of the remote devices."  
+    ::= { homeplug 4 }
+
+  lanEntry OBJECT-TYPE 
+    SYNTAX     LanEntry
+    MAX-ACCESS not-accessible 
+    STATUS     current 
+    DESCRIPTION 
+      "Information on each of the respective rows." 
+    INDEX { lanID } 
+    ::= { lanTbl 1 }
+
+  LanEntry ::=  
+    SEQUENCE { 
+      lanID                 INTEGER,
+      localMacAddr          OCTET STRING,
+      netPassword           OCTET STRING,
+      transmitPriorityLevel INTEGER,
+      lanStatus             INTEGER
+    }
+   
+  lanID OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "LAN identifier."
+    ::= { lanEntry 1 }
+       
+  localMacAddr OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "IEEE 802 MAC Address of the LAN local device."
+    ::= { lanEntry 2 }
+       
+  netPassword OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "Network password."
+    ::= { lanEntry 3 }
+      
+  transmitPriorityLevel OBJECT-TYPE 
+    SYNTAX     INTEGER{ 
+                 ca0 (0), 
+                 ca1 (1),
+                 ca2 (2),
+                 ca3 (3),
+				unknown(4)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "Transmit Priority Level."
+    ::= { lanEntry 4 }
+	  
+  lanStatus OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                 down    (0), 
+                 up      (1),
+                 testing (2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "Lan operational status. The default status is testing(0) that means that 
+       the next polling will determine if the lan is up(1) or down(2).
+       If a lan is detected, the status becomes up(1), if it is missing then
+       the status is down(2)."
+    ::= { lanEntry 5 }
+        
+--======================================================================
+-- Homeplug Groups
+--======================================================================
+
+  homeplugGroups       OBJECT IDENTIFIER ::= { homeplug 5 } 
+  
+  homeplugComplianceGroups OBJECT IDENTIFIER ::= { homeplugGroups 1 } 
+  
+  configGrp OBJECT-GROUP
+    OBJECTS { managerAddr, managerPort, trapCommunity, pollingRate, defaultUpperDataRateThreshold, 
+              defaultLowerDataRateThreshold, doCleanDeviceTable }
+    STATUS  current
+    DESCRIPTION
+      "Configuration compliance group."
+  ::= { homeplugComplianceGroups 1 }
+       
+  devPasswdGrp OBJECT-GROUP
+    OBJECTS { passwdID, passwd, macAddr, operStatus, adminStatus }
+    STATUS  current
+    DESCRIPTION
+      "Device passwords compliance group."
+    ::= { homeplugComplianceGroups 2 }
+     
+  devicesGrp OBJECT-GROUP
+    OBJECTS { devID, lanAddress, macAddress, chipset, dataRate, upperDataRateThreshold, lowerDataRateThreshold,
+              transmitACKCounter, transmitNACKCounter, transmitFAILCounter,
+       	      transmitConnectionLossCounter, transmitCollisionCounter,
+       	      transmitCA3LatencyCounter,		transmitCA2LatencyCounter, 
+       	      transmitCA1LatencyCounter,		transmitCA0LatencyCounter,
+              receiveCumulativeBytesPer40SymbolPacketCounter, 
+              lastSeenDate, deviceStatus }
+    STATUS  current
+    DESCRIPTION
+      "Homeplug devices compliance group."
+    ::= { homeplugComplianceGroups 3 }
+     
+  lansGrp OBJECT-GROUP
+    OBJECTS { lanID, localMacAddr, netPassword, transmitPriorityLevel, lanStatus }
+    STATUS  current
+    DESCRIPTION
+      "Homeplug lans compliance group."
+    ::= { homeplugComplianceGroups 4 }
+
+--======================================================================
+-- Traps
+--======================================================================
+
+  traps OBJECT IDENTIFIER ::= { homeplug 6 }
+
+  newDevice NOTIFICATION-TYPE 
+    OBJECTS { lanAddress, macAddress } 
+    STATUS  current
+    DESCRIPTION 
+      "This trap is generated when a new homeplug device is detected into a LAN." 
+    ::= { traps 1}
+
+  missingDevice NOTIFICATION-TYPE 
+    OBJECTS { lanAddress, macAddress } 
+    STATUS  current
+    DESCRIPTION 
+      "This trap is generated when a previously detected homeplug device is not
+       anymore detected into a LAN." 
+    ::= { traps 2}
+  
+  newLan NOTIFICATION-TYPE 
+    OBJECTS { localMacAddr } 
+    STATUS  current
+    DESCRIPTION 
+      "This trap is generated when a homeplug device LAN is detected." 
+    ::= { traps 3}
+
+  missingLan NOTIFICATION-TYPE 
+    OBJECTS { localMacAddr } 
+    STATUS  current
+    DESCRIPTION 
+      "This trap is generated when a previously detected homeplug device LAN does not
+       exist anymore." 
+    ::= { traps 4}
+
+  dataRateDown NOTIFICATION-TYPE 
+    OBJECTS { lanAddress, macAddress, dataRate } 
+    STATUS  current
+    DESCRIPTION 
+      "This trap is generated when the data rate of an homeplug device becomes lower than lower data rate 
+       threshold limit." 
+    ::= { traps 5}
+ 
+  dataRateUp NOTIFICATION-TYPE 
+    OBJECTS { lanAddress, macAddress, dataRate } 
+    STATUS  current
+    DESCRIPTION 
+      "This trap is generated when the data rate of an homeplug device becomes higher than upper data rate 
+       threshold limit." 
+    ::= { traps 6}
+
+--======================================================================
+-- TrapGroup
+--======================================================================
+
+  homeplugTraps OBJECT IDENTIFIER ::= { homeplugGroups 2 } 
+
+  homeplugTrapGrp NOTIFICATION-GROUP 
+    NOTIFICATIONS { newDevice,
+                    missingDevice,
+					newLan,
+                    missingLan,
+                    dataRateDown,
+                    dataRateUp			
+                  }
+    STATUS        current
+    DESCRIPTION
+      ""
+    ::= { homeplugTraps 1 }
+
+--=========================   END OF DOCUMENT   ========================
+
+  END
+  

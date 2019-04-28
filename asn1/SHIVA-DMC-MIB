@@ -1,0 +1,218 @@
+-- 	$Id: shiva-dmc.asn,v 1.5 1996/05/02 11:32:08 jas Exp $
+--
+-- 	Copyright 1996 Shiva Corporation
+--
+
+--	Shiva Digital Modem Card (DMC) MIB.
+
+SHIVA-DMC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString, ifIndex
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212		-- Concise MIB Definitions
+	dmc
+		FROM SHIVA-MIB
+	TRAP-TYPE
+		FROM RFC-1215;
+
+
+--	This MIB includes variables specfic to the Shiva Digital
+--	Modem Card, and to the modems thereon.  It exists only on
+--	products using the DMC.  Moreover, since it is entirely
+--	tabular, if there are no DMC's installed in a system (they
+--	are optional) there will be no variables instantiated.
+
+
+--  DMC Card group.  Nothing here at present, just a placeholder.
+--  Might put CPU and memory utilization stats here someday?
+
+    dmCard OBJECT IDENTIFIER ::= { dmc 1 }
+
+
+--  DMC Modem group.  This is where data on the individual modems
+--  on the DMC cards is kept.
+
+--  Some small part of this is redundant to the IETF Modem-MIB,
+--  but only a little bit.  The Modem-MIB is large and complicated
+--  in comparison to the available benefit.
+
+    dmcModem OBJECT IDENTIFIER ::= { dmc 2 }
+
+    dmcModemTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF DmcModemEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Table for getting information on the individual
+		modems on a Digital Modem Card.  The index is
+		dmcModemIndex, which is the ifIndex value for the
+		particular modem.  Each Digital Modem Card has
+		12 modems on it."
+	::= { dmcModem 1 }
+
+    dmcModemEntry OBJECT-TYPE
+	SYNTAX	DmcModemEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in dmcModemTable."
+	INDEX	{ dmcModemIfIndex }
+        ::= { dmcModemTable 1 }
+
+    DmcModemEntry ::=
+    SEQUENCE {
+	dmcModemIfIndex		    INTEGER,
+	dmcModemCallNumber	    INTEGER,
+	dmcModemFirmRev		    DisplayString,
+	dmcModemDataPumpRev	    DisplayString,
+	dmcModemErrorCorrection	    INTEGER,
+	dmcModemDataCompression	    INTEGER,
+	dmcModemEQM		    INTEGER,
+	dmcModemReceiveLevel	    INTEGER
+    }
+
+    dmcModemIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The ifIndex of the entry in ifTable for this
+		particular modem on a DMC.  This is also the
+		index to the matching callActiveEntry in the
+		callActiveTable in the SHIVA-CALL-MIB."
+	::= { dmcModemEntry 1 }
+
+    dmcModemCallNumber OBJECT-TYPE
+	SYNTAX	INTEGER (1..256)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of the CallInterface that the call
+		on this modem is on, or 0 if there is no call.
+		This is the same as sessLineLine, the index
+		to sessLineTable in SHIVA-SESS-MIB."
+	::= { dmcModemEntry 2 }
+
+    dmcModemFirmRev OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Revision of the firmware running in this modem."
+	::= { dmcModemEntry 3 }
+
+    dmcModemDataPumpRev OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Revision of the datapump chip in this modem."
+	::= { dmcModemEntry 4 }
+
+    -- next object would be redundant to mdmECErrorControlUsed in Modem-MIB
+    dmcModemErrorCorrection OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),	-- Don't know
+		none(2),	-- None in use
+		lapm(3),	-- LAPM
+		mnp4(4),	-- MNP 4
+		mnp10(5)	-- MNP 10
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The error control protocol in use by the modem
+		for the current	call."
+	::= { dmcModemEntry 5 }
+
+    -- next object would be redundant to mdmDCCompressionTypeUsed in Modem-MIB
+    dmcModemDataCompression OBJECT-TYPE
+	SYNTAX	INTEGER {
+		unknown(1),	-- Don't know
+		none(2),	-- None in use
+		mnp5(3),	-- MNP 5
+		v42bis(4)	-- ITU-T V.42bis
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The data compression protocol in use by the modem
+		for the current call."
+	::= { dmcModemEntry 6 }
+
+    dmcModemEQM OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The instantaneous eye quality measurment (EQM) reported
+		by the modem for the current call.  The EQM is a measure
+		of the quality of the signal being received by the modem.
+		Lower values indicate a lower error rate, and are better.
+		Higher values will cause the modem to reduce the modulation
+		rate.  The absolute values are not comparable between
+		different modem protocols (V.32bis, V.34, etc.)."
+	::= { dmcModemEntry 7 }
+
+    dmcModemReceiveLevel OBJECT-TYPE
+	SYNTAX	INTEGER (-255..0)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The received signal strength at the modem.  The units
+		are dBm (decibels relative to one milliwatt).  Low values,
+		such as -50 dBm, indicate a weak signal, higher values
+		such as -10 dBm indicate a normal signal.  High values
+		such as 0 dBm indicate a signal that is too strong.
+		(This is the same measurement as the serialLineAGC in
+		the SHIVA-LINE-MIB, but the sign has been flipped to
+		be numerically correct.)"
+--	If this was in SNMPv2-SMI, we would say:
+--	UNITS	"dBm"
+	::= { dmcModemEntry 8 }
+
+    -- It would be a good thing to extend this table to include
+    -- counters of higher-level errors, like asynchronous HDLC
+    -- errors for PPP.  They are kept in pppLinkStatusBadFCSs in
+    -- PPP-LCP-MIB, but that is instantiated only for the duration
+    -- of a PPP connection.  Permanent counters are kept in ifInErrors
+    -- and ifOutErrors in the ifEntry in ifTable for this device, 
+    -- but those are aggregated.
+
+
+--  Traps group.  This group is used to define the ENTERPRISE value
+--  to be placed in traps relating the the DMC.
+
+    dmcTraps OBJECT IDENTIFIER ::= { dmc 3 }
+
+    dmcModemDownTrap TRAP-TYPE
+	ENTERPRISE
+		dmcTraps
+	VARIABLES {
+		ifIndex		-- The modem in question
+	}
+	DESCRIPTION
+		"This trap is generated when the system
+		determines that an individual modem on the
+		Digital Modem Card has gone down, and is failing
+		self-test."
+	::= 1
+
+    dmcModemUpTrap TRAP-TYPE
+	ENTERPRISE
+		dmcTraps
+	VARIABLES {
+		ifIndex		-- The modem in question
+	}
+	DESCRIPTION
+		"This trap is generated when the system
+		determines that an individual modem on the
+		Digital Modem Card that had previously failed
+		diagnostics is operational again.  It is not
+		generated when the modem comes up at system
+		startup; that would be too many traps at once!"
+	::= 2
+
+END

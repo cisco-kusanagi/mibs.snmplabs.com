@@ -1,0 +1,3287 @@
+ACE20-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS TimeSlots, radAtm, agnLed, agnIndication, alarmSeverity, alarmState FROM RAD-MIB
+	ifAlias FROM IF-MIB
+	OBJECT-TYPE, IpAddress FROM RFC1155-SMI
+	NOTIFICATION-TYPE, OBJECT-IDENTITY, Counter32, Integer32 FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, DisplayString, RowStatus, TimeStamp, MacAddress  FROM SNMPv2-TC
+	AtmTrafficDescrParamIndex FROM ATM-MIB
+	;
+
+	--Title:     RAD's ACE20 PRODUCT MIB
+--Version:   3.0
+--Date:      01/06/99
+--By:        Eyal Sadovsky & Isac Winter
+--File:      v:\doc\rdv\mib\ver506\atm\Ace20.txt
+--Last Update:    13-June-04 by Shay Harari
+-- IMPORTS
+--        OBJECT-TYPE , OBJECT-IDENTITY ,
+--        Integer32 , Counter32              FROM SNMPv2-SMI
+--        TimeStamp, 
+--        TEXTUAL-CONVENTION, DisplayString  FROM SNMPv2-TC
+--        ifIndex                            FROM SNMPv2-TC
+--        atmVclVpi, atmVclVci,
+--        AtmTrafficDescrParamIndex		   FROM ATM-MIB
+--        frPVCEndptDLCIIndex                FROM FRNETSERV-MIB;
+   --   TRAP-TYPE                          FROM RFC-1215
+   --     radAtm, agnLed, agnIndication      FROM RAD-GEN-MIB;
+   --RowStatus ::= TEXTUAL-CONVENTION
+   --    STATUS       current
+   --    DESCRIPTION
+   --    "."
+  --     SYNTAX  INTEGER {
+  --        active(1),
+--				  notInService(2),
+--				  notReady(3),
+--				  createAndGo(4),
+--				  createAndWait(5),
+--				  destroy(6)
+--                       }
+atmSu           OBJECT IDENTIFIER ::= { radAtm 4 } -- RAD ATM Service Unit
+atmSuSystem   OBJECT IDENTIFIER ::= { atmSu 1 }   -- agent system level configuration
+-- ***********************************************************************
+--   RAD System Software Group
+--
+--   This table contains software verions parameters.
+-- ***********************************************************************
+atmSuSystemSwOperStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+            disable (1) ,
+            enable  (2)
+      }
+      MAX-ACCESS  read-write
+      STATUS current
+      DESCRIPTION
+      "This value indicates if tftp-write operation (for downloading
+       software from an external host) is allowed by the agent. "
+      DEFVAL { enable }
+      ::= { atmSuSystem 1 }
+atmSuSystemSwSwitchVersionsCmd OBJECT-TYPE
+      SYNTAX INTEGER {
+           notActive (1) ,
+           active    (2)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "This command is used to switch beetween software versions stored
+        in the flash. setting this value to active will reset the agent
+        and re-activate it with the new version ( only if new version is valid).
+        on get-request this value will be always notActive. "
+      ::= { atmSuSystem 2 }
+-- *******************************************************
+-- agent Alarms definitions - two alarms table defined :
+-- 1. History Table which hold a buffer contains history events.
+-- 2. Mandatory Table hold information of all mandatory alarms
+--
+-- the following alarms ifIndex defined :
+-- 0. system alarms
+-- 1. physical DS1 alarms - T1/E1 layer
+-- 2. ATM alarms
+-- 5. ATM-DXI / Frame-Relay alarms
+-- *******************************
+atmSuSystemHistoryAlrTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AtmSuSystemHistoryAlrEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+      "buffer contain history buffer of agent alarms."
+      ::= { atmSuSystem 3 }
+atmSuSystemHistoryAlrEntry OBJECT-TYPE
+      SYNTAX AtmSuSystemHistoryAlrEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       " Agent alarm history list entry."
+      INDEX  { atmSuSystemHistoryAlrIndex }
+      ::= { atmSuSystemHistoryAlrTable 1}
+AtmSuSystemHistoryAlrEntry ::=
+      SEQUENCE {
+      atmSuSystemHistoryAlrIndex
+	     Integer32,
+      atmSuSystemHistoryAlrIfIndex
+	     Integer32,
+      atmSuSystemHistoryAlrDescription
+         DisplayString,
+      atmSuSystemHistoryAlrStatus
+	     INTEGER,
+      atmSuSystemHistoryAlrOccurrenceTime
+         DisplayString,
+	  atmSuSystemHistoryAlrVpi
+	  	 Integer32,
+	  atmSuSystemHistoryAlrVci
+	  	 Integer32
+      }
+atmSuSystemHistoryAlrIndex OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+      "A unique number to identify an entry in the history alarm table."
+      ::= { atmSuSystemHistoryAlrEntry 1 }
+atmSuSystemHistoryAlrIfIndex OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+      "This value indicates the port on which the alarms occured.
+       configuration(system) alarms have port index equal to 0. "
+      ::= { atmSuSystemHistoryAlrEntry 2 }
+atmSuSystemHistoryAlrDescription OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..255))
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+      "This attribute is a text description of the alarm.
+       The alarm descipion include alarm code and alarm text."
+     ::= { atmSuSystemHistoryAlrEntry 3 }
+atmSuSystemHistoryAlrStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+            on      (1),
+            off     (2),
+			event   (3)
+      }
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates the status of the alarm."
+      ::= { atmSuSystemHistoryAlrEntry 4 }
+atmSuSystemHistoryAlrOccurrenceTime OBJECT-TYPE
+      SYNTAX   DisplayString
+      MAX-ACCESS    read-only
+      STATUS   current
+      DESCRIPTION
+      "This value indicates the  date and time of the occurrence 
+       of the event that caused this alarm. 
+       Date and time format: YYYY-MM-DD, HH:MM:SS "
+      ::= { atmSuSystemHistoryAlrEntry 5 }
+atmSuSystemHistoryAlrVpi  OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+      "This value indicates the  ATM VPI of the connection
+       associated with the event that caused this alarm. 
+       When not applicable, value is 0"
+      ::= { atmSuSystemHistoryAlrEntry 6 }
+atmSuSystemHistoryAlrVci OBJECT-TYPE
+      SYNTAX        Integer32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+      "This value indicates the ATM VCI of the connection 
+       associated with with the event that caused this alarm. 
+       When not applicable, value is 0 "
+      ::= { atmSuSystemHistoryAlrEntry 7 }
+atmSuSystemClearHistoryAlrListCmd  OBJECT-TYPE
+      SYNTAX  INTEGER
+	      {
+    		off(1),
+	    	on (2)
+	      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "Setting this attribute to ON, enforce a  clear operation on
+       the agent history event buffer .
+       On reading, attribute will always get status 'off' ."
+      ::= { atmSuSystem 4 }
+atmSuSystemCurrentAlrTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AtmSuSystemCurrentAlrEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+      "table which contains all alarms Currently active ( status ON )
+       in the agent."
+      ::= { atmSuSystem 5 }
+atmSuSystemCurrentAlrEntry OBJECT-TYPE
+      SYNTAX AtmSuSystemCurrentAlrEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       " Agent alarm list entry."
+      INDEX  { atmSuSystemCurrentAlrIndex }
+      ::= { atmSuSystemCurrentAlrTable 1}
+AtmSuSystemCurrentAlrEntry ::=
+      SEQUENCE {
+     atmSuSystemCurrentAlrIndex
+	    Integer32,
+     atmSuSystemCurrentAlrIfIndex
+	    Integer32,
+     atmSuSystemCurrentAlrDescription
+        DisplayString
+      }
+atmSuSystemCurrentAlrIndex OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+      "A unique number to identify an entry in the Current alarms table."
+      ::= { atmSuSystemCurrentAlrEntry 1 }
+atmSuSystemCurrentAlrIfIndex OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+      "This value indicates the port on which the alarms occured.
+       configuration alarms have port index equal to 0. "
+      ::= { atmSuSystemCurrentAlrEntry 2 }
+atmSuSystemCurrentAlrDescription OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..255))
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+      "This attribute is a text description of the alarm.
+       The alarm descipion include alarm code and alarm text."
+     ::= { atmSuSystemCurrentAlrEntry 3 }
+-- *******************************************************
+--       Agent  Config  Managers  Group
+-- *******************************************************
+atmSuSystemILMICommunity OBJECT-TYPE
+      SYNTAX   DisplayString
+      MAX-ACCESS  read-write
+      STATUS   current
+      DESCRIPTION
+       "Community string for ILMI requests. 10 chars."
+      ::= { atmSuSystem 6 }
+atmSuSystemTrapMaxManagers OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The maximum number of managers that can be registered
+        for receiving traps and sending requests."
+      DEFVAL { 10 }
+      ::= { atmSuSystem 7 }
+-- *******************************************************
+--       Agent AAL1 / AAL2 selection
+-- *******************************************************
+ atmSuSystemAalSelection OBJECT-TYPE
+	  SYNTAX  INTEGER
+	  {
+	   notApplicable (1),
+	   aal2  (2),
+       aal1  (3)
+       }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "Select ATM adaptation layers AAL1 or AAL2
+       Applicable for LA-140"
+	  ::= { atmSuSystem 8 }
+-- *******************************************************
+--       Agent u-Law selection
+-- *******************************************************
+atmSuSystemCodingLaw OBJECT-TYPE
+	  SYNTAX  INTEGER
+	  {
+	   notApplicable (1),
+	   aLaw  (2),
+       uLaw  (3)
+       }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates the Method/Law for decoding/encoding the voice
+       information.
+       aLaw  (2) is the standard Law for E1 links.
+       uLaw  (3) is the standard Law for T1 links.
+       Coding law is applicable for all the ports in the system"
+	  ::= { atmSuSystem 9 }
+-- *******************************************************
+--       Agent ISDN selection
+-- *******************************************************
+atmSuSystemISDNDataLinkActivation OBJECT-TYPE
+	  SYNTAX  INTEGER
+	  {
+	   notApplicable (1),
+	   nonPermanent  (2),
+       permanent     (3)
+       }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates data link aactivation for all 
+       ISDN ports in the system.
+       nonPermanent (2) =  non permanent data link activation
+       permanent    (3) =  permanent data link activation"
+	  ::= { atmSuSystem 10 }
+-- *******************************************************
+--       Agent ATM Jitter Buffer
+-- *******************************************************
+atmSuSystemJitterBuffer OBJECT-TYPE
+	  SYNTAX  Integer32
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+        "The field is set in ms and sets the jitter buffer size. 
+         The jitter buffer adapts the size of the LA140 traffic 
+         to the cdv (cell  delay variation) of the ATM network."
+	  ::= { atmSuSystem 11 }
+-- *******************************************************
+--       Agent ATM mode of operation
+-- *******************************************************
+atmSuSystemOperMode OBJECT-TYPE
+	  SYNTAX  INTEGER
+	  {
+	   notApplicable (1),
+	   ima           (2),
+       miniDslam     (3)
+       }
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+        "The field indicates device mode of operation:
+         ima (2) = Inverse Multiplex ATM - ATM traffic is 
+		           distributed between links in IMA group.   
+         miniDSLAM (3) => each link serves as separate  
+                          ATM interface. "
+	  ::= { atmSuSystem 12 }
+atmSuSystemDSPGain OBJECT-TYPE
+ 	  SYNTAX  Integer32
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "This object indicates DSP Gain.
+       Range of possible values is -12....12.
+       For LA-110 suset of this range is supported. "
+	  ::= { atmSuSystem 13 }
+-- ****************************************************************
+-- ****************************************************************
+--                    agent ports definitions
+-- ****************************************************************
+-- ****************************************************************
+atmSuPort      OBJECT IDENTIFIER ::= { atmSu 2 } -- agent ports definitions
+-- ********************************
+--  global data port definitions
+-- ********************************
+--
+-- the following table uses parameters which define the physical data port
+-- and they are the same for FR and ATM-DXI interfaces
+--
+atmSuPortDataCnfgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmSuPortDataCnfgEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       " Data Port global configuration table.
+         this table include parametes which are common to the physical port
+         and not depend on whether the port interface is Frame-Relay or
+         ATM-DXI."
+      ::= { atmSuPort 1 }
+atmSuPortDataCnfgEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortDataCnfgEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+      "the entries at this table describes the configuration
+	   of the Data-Port."
+      INDEX { ifIndex }
+      ::= { atmSuPortDataCnfgTable 1}
+AtmSuPortDataCnfgEntry ::=
+      SEQUENCE {
+      atmSuPortDataApplication
+	          INTEGER,
+      atmSuPortDataRate
+	          INTEGER,
+      atmSuPortDataDCD
+	          INTEGER,
+      atmSuPortDataMode
+	          INTEGER,
+      atmSuPortDataCRC
+              INTEGER,
+      atmSuPortDataClock
+	          INTEGER,
+      atmSuPortDataMaxNoOfConns
+            Integer32,
+      atmSuPortDataConfNoOfConns
+            Integer32,
+      atmSuPortDataIdleCode
+            Integer32,
+	  atmSuPortDataInterfaceType
+	        INTEGER,
+	  atmSuPortDataClkPolarity
+			INTEGER,
+	  atmSuPortDataCtsStatus
+			INTEGER,
+	  atmSuPortDataRtsStatus
+			INTEGER
+        }
+atmSuPortDataApplication OBJECT-TYPE
+      SYNTAX  INTEGER
+	      {
+        frameRelay		(1),
+        atmDxi			(2),
+		bridgedEthernet (3),
+        smdsDxi         (4),  -- for future use
+        aal1Stream		(5),
+		routedEthernet	(6),
+		notApplicable (255)
+	      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates the protocol application which runs
+       above the physical port."
+      ::= { atmSuPortDataCnfgEntry 1 }
+atmSuPortDataRate OBJECT-TYPE
+      SYNTAX  INTEGER
+	      {
+        r64KBps      (1),
+        r128KBps     (2),
+        r192KBps     (3),
+        r256KBps     (4),
+        r320KBps     (5),
+        r384KBps     (6),
+        r448KBps     (7),
+        r512KBps     (8),
+        r576KBps     (9),
+        r640KBps     (10),
+        r704KBps     (11),
+        r768KBps     (12),
+        r832KBps     (13),
+        r896KBps     (14),
+        r960KBps     (15),
+        r1024KBps    (16),
+        r1088KBps    (17),
+        r1152KBps    (18),
+        r1216KBps    (19),
+        r1280KBps    (20),
+        r1344KBps    (21),
+        r1408KBps    (22),
+        r1472KBps    (23),
+        r1536KBps    (24),
+        r1544network (25), -- take the clock from the T1 network clock for ACE-20T/ACE-2T1
+        r1600KBps    (26),
+        r1664KBps    (27),
+        r1728KBps    (28),
+        r1792KBps    (29),
+        r1856KBps    (30),
+        r1920KBps    (31),
+        r1984KBps    (32),
+        r2048KBps    (33),
+        r2048network (34),  -- take the clock from the E1 network clock for ACE-20E/ACE-2E1
+		r8192KBps    (35),  -- for IMXi4
+		notApplicable (255)
+	      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates the operation rate of the port.
+       AmcdT1 / Ace-20T allowes rates up to 1536KBps ( options 1-12 ),
+       while AmcdE1 / Ace-20E allowes all options. "
+      ::= { atmSuPortDataCnfgEntry 2 }
+atmSuPortDataDCD OBJECT-TYPE
+      SYNTAX  INTEGER
+	         {
+             off (1),            -- RTS = Ignore ,DCD= Obey Remote Signal        
+             on  (2),            -- RTS = Obey   ,DCD= Obey Remote Signall
+	         obeyRtsDcdOn (3),   -- RTS = Obey   ,DCD= On
+	         obeyRtsDcdOff (4),  -- RTS = Obey   ,DCD= Off 
+	         ignoreRtsDcdOn (5), -- RTS = Ignore ,DCD= On
+	         ignoreRtsDcdOff (6), -- RTS = Ignore ,DCD= Off
+	         notApplicable (255)
+	         }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute define behavior of control signals DCD and RTS 
+       These signals may obey or ignore  signal from remote device. 
+       The terms 'I signal' and 'C signal' are used 
+       when physical data interface is  X.21 ; 
+	   RTS  = C signal, DCD = I signal" 
+      ::= { atmSuPortDataCnfgEntry 3 }
+atmSuPortDataMode OBJECT-TYPE
+      SYNTAX  INTEGER
+	      {
+            nrzi  (1),
+            nrz   (2),
+			notApplicable (255)
+	      }
+      MAX-ACCESS   read-only
+      STATUS  deprecated
+      DESCRIPTION
+      "This attribute indicates the port mode of sampling data physical. "
+      ::= { atmSuPortDataCnfgEntry 4 }
+atmSuPortDataCRC OBJECT-TYPE
+      SYNTAX  INTEGER
+	      {
+            cRC16  (1),
+            cRC32  (2),
+            noCRC  (3),
+			notApplicable (255)
+	      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates the type of CRC checking 
+      on receiving/transmiting frames. "
+      ::= { atmSuPortDataCnfgEntry 5 }
+atmSuPortDataClock OBJECT-TYPE
+      SYNTAX  INTEGER
+	      {
+            dce  (1),
+            edce (2), -- for future use
+            dte  (3),
+			notApplicable (255)
+	      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute indicates the clock using for synchronization 
+      for the data port. "
+      ::= { atmSuPortDataCnfgEntry 6 }
+atmSuPortDataMaxNoOfConns  OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+       " this object indicates the maximum number of cross-connect
+         connections allowed beetween the ATM port and the Data Port
+         identified by IfIndex. "
+      ::= { atmSuPortDataCnfgEntry 7 }
+atmSuPortDataConfNoOfConns  OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+       " this object indicates the configured number of cross-connect
+         connections exist beetween the ATM port and the Data Port
+         identified by IfIndex. "
+      ::= { atmSuPortDataCnfgEntry 8 }
+atmSuPortDataIdleCode  OBJECT-TYPE
+      SYNTAX  Integer32 (0..255)
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       " This attribute is applicable only for application aal1Stream.
+         It indicates the value to be transmitted whenever the port is idle. "
+      ::= { atmSuPortDataCnfgEntry 9 }
+atmSuPortDataInterfaceType OBJECT-TYPE
+    SYNTAX INTEGER 
+       {
+       notApplicable(1),
+       x21 (2),
+       v35 (3),
+	   v36 (4),
+	   rs530 (5)
+	   }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Configureable physical layer interface type"
+	::= {atmSuPortDataCnfgEntry 10 }
+atmSuPortDataClkPolarity   OBJECT-TYPE     
+	 SYNTAX  INTEGER
+       {
+       notApplicable   (1),
+       normal          (2),
+       inverted        (3)
+       }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "This object indicates the clock polarity.
+       For LA-110/140  this object will be applicable only for 
+       X.21/V.35/data port "
+      ::= {atmSuPortDataCnfgEntry 11}
+atmSuPortDataCtsStatus  OBJECT-TYPE
+     SYNTAX INTEGER 
+       {
+       notApplicable (1),
+       off           (2), --down
+       on            (3)
+       }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+    	"CTS status - the signal state received from ATM network  
+    	 (for the local DTE usage). 
+    	 LA110 receiving RTS down from remote DTE device
+    	  via ATM network, will change CTS signal state 
+    	  to down (off) toward local DTE device"	 
+     ::= { atmSuPortDataCnfgEntry 12 }
+atmSuPortDataRtsStatus  OBJECT-TYPE
+     SYNTAX INTEGER 
+       {
+       notApplicable (1),
+       off           (2), --down
+       on            (3)
+       }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+    	"RTS status - the signal state received from local DTE
+    	 (to be forwarded to ATM network).
+	     LA110 receiving RTS down from the local DTE device
+	     will transmit all '1' to ATM (in order to carry the 
+	     signaling to remote LA110), and forward it (RTS-down) 
+	     to far end through ATM cell (pointer field)."
+     ::= { atmSuPortDataCnfgEntry 13 }
+-- *************************************************************
+--    agent physical network definitions ( T1/E1 interface )
+-- *************************************************************
+atmSuPortDs1   OBJECT IDENTIFIER ::= { atmSuPort 2 } -- DS1 definitions
+--
+-- this table include expansion to the config table in rfc1406
+--
+atmSuPortDs1CnfgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmSuPortDs1CnfgEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       " This table include expansion configuration to the DS1 physical port."
+      ::= { atmSuPortDs1 1 }
+atmSuPortDs1CnfgEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortDs1CnfgEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+      "the entries at this table describes the configuration
+	   of the agent physical."
+      INDEX  { ifIndex }
+      ::= { atmSuPortDs1CnfgTable 1}
+AtmSuPortDs1CnfgEntry ::=
+      SEQUENCE {
+      atmSuPortDs1CnfgRxSensitivity
+	        INTEGER,
+      atmSuPortDs1CnfgLBO
+	        INTEGER,
+      atmSuPortDs1CnfgRestoreTime
+            INTEGER,
+      atmSuPortDs1CnfgInbandMng
+ 	        INTEGER,
+      atmSuPortDs1CnfgDedicatedTs 
+            Integer32
+      }
+atmSuPortDs1CnfgRxSensitivity OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+		s12dB      (1),	 -- for E1 Interface
+        s30dB      (2),	 -- for T1/E1 Interface
+        s36dB      (3),	 -- for T1 Interface
+		s15dB      (4),	 
+		s43dB      (5)
+	  }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute is the rx line sensetivity parameter used only for
+       T1/CSU and E1/LTU interfaces."
+      ::= { atmSuPortDs1CnfgEntry 1 }
+atmSuPortDs1CnfgLBO OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+        txGain0db(1),
+        txGain7dot5db  (2),	 --
+        txGain15db     (3),  -- for T1/CSU Interface
+        txGain22dot5db (4),  --
+        len0p133ft     (5),  --
+        len133p266ft   (6),  --
+        len266p399ft   (7),  --	for T1/DSU Interface
+        len399p533ft   (8),  --
+        len533p655ft   (9),  --
+        unbalanceE1    (10),	 -- for E1 Interface
+		balanceE1      (11)  --
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "This attribute is the line-Build-Out indicates sensitivity of the DS1 interface.
+       The user can define if the agent will be CSU or DSU (for T1 only) by choosing the
+       right option.
+       On E1 interface this is done by hardware, so this parameter cannot be written. "
+      ::= { atmSuPortDs1CnfgEntry 2 }
+atmSuPortDs1CnfgRestoreTime OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+        ccittE1               (1),
+        restoreT1secFast      (2),
+        restoreT10sec62411    (3)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "Determines the time passing from the disappearance of the loss of
+       synchronization condition (red alarm) to the restoration of normal
+       service. The options 1secFast(2) and 10sec62411(3) for E1 interfaces
+       are proprietary implementation of the T1 standard to the E1 interface."
+      ::= { atmSuPortDs1CnfgEntry 3 }
+atmSuPortDs1CnfgInbandMng OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       off         (2),
+       dedicatedTs (4),	-- RAD proprietary
+       --dedicatedPpp (5),
+       dedicatedFr (6)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "A unique number to identify type of 
+       inband management over the link.
+       For LA-104 and IMXi4, only one port may be used
+       for inband management "
+      ::= { atmSuPortDs1CnfgEntry 4 }
+atmSuPortDs1CnfgDedicatedTs OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "A unique number to identify Dedicated Time Slot  for inband management
+       of the T1/E1 port.
+       It is applicable only when atmSuPortDs1CnfgInbandMng 
+       selected is not off.
+       1..24 - Dedicated TS of T1
+       1..31 - Dedicated TS of E1
+       255   - notApplicable (for agents that do not support this 
+               feature)
+       Other values are invalid."
+	   ::= {atmSuPortDs1CnfgEntry 5}
+-- *********************************************************
+--          Protocol  DS1-CBR Port   Definitions
+-- *********************************************************
+-- this table include parameters in T1/E1 level which
+-- are relevant to cbr port	only.
+atmSuPortDs1CbrCnfgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmSuPortDs1CbrCnfgEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       " This table include expansion configuration to the DS1 physical port."
+      ::= { atmSuPortDs1 2 }
+atmSuPortDs1CbrCnfgEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortDs1CbrCnfgEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+      "the entries at this table describes the configuration
+	   of the agent physical."
+      INDEX  { ifIndex }
+      ::= { atmSuPortDs1CbrCnfgTable 1}
+AtmSuPortDs1CbrCnfgEntry ::=
+      SEQUENCE {
+      atmSuPortDs1CbrIdleCode
+            Integer32,
+      atmSuPortDs1CbrRxTimeSlots
+	 TimeSlots,
+      atmSuPortDs1CbrTxTimeSlots
+	 TimeSlots,
+      atmSuPortDs1CbrMaxNoOfConns
+            Integer32,
+      atmSuPortDs1CbrConfNoOfConns
+            Integer32,
+      atmSuPortDs1CbrSignallingSampleTime
+            INTEGER
+      }
+atmSuPortDs1CbrIdleCode OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      "An Idle code which sent on unused time-slots at CBR port ."
+      ::= { atmSuPortDs1CbrCnfgEntry 1 }
+atmSuPortDs1CbrRxTimeSlots   OBJECT-TYPE
+      SYNTAX TimeSlots 
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+"This value indicates the time-slots used by the port for receiving.
+        It uses 32 bits ( in 4 bytes octet string ) for E1 and low 24 bits for T1.
+        each bit represents a time slot for receiving :
+        time-slot 0  = bit 0 (LSB - most right bit in last byte),
+           ...
+           ...
+        time-slot 31 = bit 31 (MSB - most left bit in first byte ).
+        value '0' indicate unused time-slot and value '1' indicates used time-slot.
+        note : time-slots '0' and '16' are used for signalling in E1 interface. "
+      ::= { atmSuPortDs1CbrCnfgEntry 2 }
+atmSuPortDs1CbrTxTimeSlots   OBJECT-TYPE
+      SYNTAX TimeSlots 
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+      "This value indicates the time-slots used by the port for transmiting.
+        It uses 32 bits for E1 and low 24 bits for T1.
+        each bit represents a time slot for transmiting :
+        time-slot 0  = bit 0 (LSB - most right bit in last byte),
+           ...
+           ...
+        time-slot 31 = bit 31 (MSB - most left bit in first byte ).
+        value '0' indicate unused time-slot and value '1' indicates used time-slot.
+        note : time-slots '0' and '16' are used for signalling in E1 interface. "
+      ::= { atmSuPortDs1CbrCnfgEntry 3 }
+atmSuPortDs1CbrMaxNoOfConns  OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+       " this object indicates the maximum number of cross-connect
+         connections allowed beetween the ATM port and the CBR Port
+         identified by IfIndex. "
+      ::= { atmSuPortDs1CbrCnfgEntry 4 }
+atmSuPortDs1CbrConfNoOfConns  OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS  current
+      DESCRIPTION
+       " this object indicates the configured number of cross-connect
+         connections exist beetween the ATM port and the CBR Port
+         identified by IfIndex. "
+      ::= { atmSuPortDs1CbrCnfgEntry 5 }
+atmSuPortDs1CbrSignallingSampleTime  OBJECT-TYPE
+      SYNTAX  INTEGER {
+                msec100  (1),
+                msec200  (2),
+                msec500  (3),
+                msec1000 (4),
+                msec1500 (5),
+                msec2000 (6)
+	  }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       " determines how often the signalling of the DBCES connections are sampled
+		 and thier activity determined. "
+      DEFVAL { msec500 }
+      ::= { atmSuPortDs1CbrCnfgEntry 6 }
+-- *********************************************************
+--             Protocol   ATM    Definitions
+-- *********************************************************
+atmSuPortAtm     OBJECT IDENTIFIER ::= { atmSuPort 3 } -- ATM expansions to RFC1695
+atmSuPortAtmCnfgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmSuPortAtmCnfgEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "This table contains global configuration to the ATM port."
+      ::= { atmSuPortAtm 1 }
+atmSuPortAtmCnfgEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortAtmCnfgEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "This object contains information about agent ATM configuration."
+      INDEX   { ifIndex }
+      ::= { atmSuPortAtmCnfgTable 1 }
+AtmSuPortAtmCnfgEntry ::= SEQUENCE {
+      atmSuPortAtmCnfgIdleCellCLP
+             INTEGER,
+      atmSuPortAtmCnfgScramble
+             INTEGER,
+      atmSuPortAtmSNMPVpi
+             Integer32,
+      atmSuPortAtmSNMPVci
+             Integer32,
+      atmSuPortAtmSNMPStatus
+             INTEGER,
+      atmSuPortAtmILMIStatus
+             INTEGER,
+      atmSuPortAtmSNMPIp
+             IpAddress, 
+      atmSuPortAtmCnfgCDVOptimization
+             INTEGER,
+	  atmSuPortAtmCnfgShapingMode
+	         INTEGER,
+	  atmSuPortAtmSNMPTrafficDescrIndex
+		     AtmTrafficDescrParamIndex
+    }
+atmSuPortAtmCnfgIdleCellCLP OBJECT-TYPE
+      SYNTAX  INTEGER  {
+          clp0 (1) , --> ATM Forum
+          clp1 (2)   --> ITU
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+     "Determines the clp bit value for transmition
+      in empty time slots."
+      ::= { atmSuPortAtmCnfgEntry 1 }
+atmSuPortAtmCnfgScramble OBJECT-TYPE
+      SYNTAX  INTEGER  {
+          enable  (1) ,
+          disable (2)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+     "Determined by the standards if the cell will be scrambled or not."
+      ::= { atmSuPortAtmCnfgEntry 2 }
+atmSuPortAtmSNMPVpi  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "The Vcc Vpi for SNMP requests."
+      ::= { atmSuPortAtmCnfgEntry 3 }
+atmSuPortAtmSNMPVci  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "The Vcc Vci for SNMP requests."
+      ::= { atmSuPortAtmCnfgEntry 4 }
+atmSuPortAtmSNMPStatus  OBJECT-TYPE
+      SYNTAX INTEGER   {
+            active    (1) ,
+            notActive (2)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "value indicates if the SNMP Vcc is available for management."
+      ::= { atmSuPortAtmCnfgEntry 5 }
+atmSuPortAtmILMIStatus  OBJECT-TYPE
+      SYNTAX  INTEGER   {
+            active    (1) ,
+            notActive (2)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "Value indicates if agent should respond to ILMI requests from the
+        Atm switch or forward it.
+        note: when using Atm to Frame-Relay configuration this value should be
+              active to support ILMI.
+              when using Atm-AtmDxi configuration the ILMI requests should be
+              moved forward to the DTE or may be answered by the DCE. "
+      DEFVAL { active }
+      ::= { atmSuPortAtmCnfgEntry 6 }
+atmSuPortAtmSNMPIp OBJECT-TYPE
+      SYNTAX  IpAddress 
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+       "The interface IP address for SNMP requests."
+      ::= { atmSuPortAtmCnfgEntry 7 }
+atmSuPortAtmCnfgCDVOptimization  OBJECT-TYPE
+      SYNTAX INTEGER   {
+          notApplicable  (1),
+          disable        (2),
+          enable         (3)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "value indicates if optimization of CDV (Cell Delay Varation)
+         is enbabled."
+      ::= { atmSuPortAtmCnfgEntry 8 }
+atmSuPortAtmCnfgShapingMode	 OBJECT-TYPE
+      SYNTAX INTEGER   {
+          notApplicable  (1),
+          sw       (2),
+          hwNcits1 (3), -- HW Shaping, APC with NCITS = 1
+		  hwNcits2 (4)  -- HW Shaping, APC with NCITS = 2 
+		  }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "ATM Shaping mode.
+        Three possible values:
+         SW Shaping.                 
+         HW Shaping - APC with NCITS = 1.
+         HW Shaping - APC with NCITS = 2
+         The difference between the two hardware modes
+         is in the connection cell granularity 
+         and maximum bandwidth (BW):
+         * For NCITS=1, the granularity is of one cell
+           and the max. BW is the uplink BW, 
+         * For NCITS=2, the granularity is of every two cells   
+           and the max. BW is half of  the uplink BW."
+      ::= { atmSuPortAtmCnfgEntry 9 } 
+atmSuPortAtmSNMPTrafficDescrIndex  OBJECT-TYPE
+      SYNTAX       AtmTrafficDescrParamIndex
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+       "The value of this object identifies the row
+        in the atmTrafficDescrParamTable which
+        applies to the transmit direction of the VCL."
+       ::= { atmSuPortAtmCnfgEntry 10 }
+-- *************************************************************
+--  RAD private ATM Interface statistics table. The table adds
+--  more columns to the RFC1695 atmInterfaceConfTable
+-- *************************************************************
+atmSuPortAtmIfStatsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AtmSuPortAtmIfStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "The table contains additional statistics information about
+        the ATM interface."
+      ::= { atmSuPortAtm 2 }
+atmSuPortAtmIfStatsEntry OBJECT-TYPE
+      SYNTAX AtmSuPortAtmIfStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "An entry in the ATM Interface statistics table."
+      INDEX { ifIndex }
+      ::= { atmSuPortAtmIfStatsTable 1 }
+AtmSuPortAtmIfStatsEntry ::= SEQUENCE {
+      atmSuPortAtmRxClp0Cells
+           Counter32,
+      atmSuPortAtmRxClp1Cells
+           Counter32,
+     atmSuPortAtmRxEfciSetCells
+           Counter32,
+      atmSuPortAtmRxOamCells
+           Counter32,
+      atmSuPortAtmTxClp0Cells
+           Counter32,
+      atmSuPortAtmTxClp1Cells
+           Counter32,
+      atmSuPortAtmTxEfciSetCells
+           Counter32,
+      atmSuPortAtmTxOamCells
+           Counter32
+      }
+atmSuPortAtmRxClp0Cells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells received with correct
+        HECs and CLP=0 and not misrouted"
+      ::= { atmSuPortAtmIfStatsEntry 1 }
+atmSuPortAtmRxClp1Cells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells received with correct
+        HEC's and CLP=1 and not misrouted."
+      ::= { atmSuPortAtmIfStatsEntry 2 }
+atmSuPortAtmRxEfciSetCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells received with EFCI bit set by
+        the Agent"
+      ::= { atmSuPortAtmIfStatsEntry 3 }
+atmSuPortAtmRxOamCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of OAM cells received with correct HECs."
+::= { atmSuPortAtmIfStatsEntry 4 }
+atmSuPortAtmTxClp0Cells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells transmitted with CLP=0."
+      ::= { atmSuPortAtmIfStatsEntry 5 }
+atmSuPortAtmTxClp1Cells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells transmitted with CLP=1."
+      ::= { atmSuPortAtmIfStatsEntry 6 }
+atmSuPortAtmTxEfciSetCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells transmitted with EFCI bit set by
+        the Agent"
+      ::= { atmSuPortAtmIfStatsEntry 7 }
+atmSuPortAtmTxOamCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of transmitted OAM cells."
+      ::= { atmSuPortAtmIfStatsEntry 8 }
+-- **************************************************************
+--  RAD Vcl Statistics table. The table adds more columns to
+--  the RFC1695 atmVclTable
+-- **************************************************************
+atmSuPortAtmVclStatsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AtmSuPortAtmVclStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "The table contains additional information about
+        the ATM Vcl end points."
+      ::= { atmSuPortAtm 3 }
+atmSuPortAtmVclStatsEntry  OBJECT-TYPE
+      SYNTAX  AtmSuPortAtmVclStatsEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "An entry in the ATM Vcl statistics table."
+      INDEX  {ifIndex, atmVclVpi, atmVclVci }
+      ::= { atmSuPortAtmVclStatsTable 1 }
+AtmSuPortAtmVclStatsEntry ::= SEQUENCE {
+      atmSuPortAtmVclStatsRxCells
+                Counter32,
+      atmSuPortAtmVclStatsRxClp0Cells
+                Counter32,
+      atmSuPortAtmVclStatsRxClp1Cells
+                Counter32,
+      atmSuPortAtmVclStatsRxDiscardsCells
+                Counter32,
+      atmSuPortAtmVclStatsTxCells
+                Counter32,
+      atmSuPortAtmVclStatsTxClp0Cells
+                Counter32,
+      atmSuPortAtmVclStatsTxClp1Cells
+                Counter32,
+      atmSuPortAtmVclStatsRxTotalAISCells 
+                Counter32,
+      atmSuPortAtmVclStatsRxTotalCCCells  
+                Counter32,
+      atmSuPortAtmVclStatsTotalSuccLoopbacks 
+                Counter32,
+      atmSuPortAtmVclStatsTotalFailLoopbacks 
+                Counter32,
+      atmSuPortAtmVclStatsRxTotalRDICells  
+                Counter32,
+      atmSuPortAtmVclStatsTotalLOCSeconds
+                Counter32,
+      atmSuPortAtmVclStatsRxTotalLoopbackRequests 
+                Counter32,
+      atmSuPortAtmVclStatsTxTotalAISCells 
+                Counter32,
+      atmSuPortAtmVclStatsTxTotalCCCells 
+                Counter32,
+      atmSuPortAtmVclStatsTxTotalRDICells 
+                Counter32,
+      atmSuPortAtmVclStatsTxTotalLoopbackResponses 
+                Counter32,
+      atmSuPortAtmVclStatsTxTotalLoopbackRequests 
+                Counter32,
+      atmSuPortAtmVclStatsRxTotalLoopbackResponses 
+                Counter32
+      }
+atmSuPortAtmVclStatsRxCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The total number of cells received with
+        correct HEC's."
+      ::= { atmSuPortAtmVclStatsEntry 1 }
+atmSuPortAtmVclStatsRxClp0Cells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells received with correct
+        HEC's and CLP=0."
+      ::= { atmSuPortAtmVclStatsEntry 2 }
+atmSuPortAtmVclStatsRxClp1Cells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells received with correct
+        HEC's and CLP=1."
+      ::= { atmSuPortAtmVclStatsEntry 3 }
+atmSuPortAtmVclStatsRxDiscardsCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells, in ingress direction,
+        discarded due to policing violation."
+      ::= { atmSuPortAtmVclStatsEntry 4 }
+atmSuPortAtmVclStatsTxCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The total number of cells transmitted."
+      ::= { atmSuPortAtmVclStatsEntry 5 }
+atmSuPortAtmVclStatsTxClp0Cells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells transmitted with CLP=0."
+      ::= { atmSuPortAtmVclStatsEntry 6 }
+atmSuPortAtmVclStatsTxClp1Cells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The number of cells transmitted with CLP=1."
+      ::= { atmSuPortAtmVclStatsEntry 7 }
+atmSuPortAtmVclStatsRxTotalAISCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of AIS cells received on the VC."
+      ::= { atmSuPortAtmVclStatsEntry 8 }
+atmSuPortAtmVclStatsRxTotalCCCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of Continuity Check cells that were
+        received on the VC."
+      ::= { atmSuPortAtmVclStatsEntry 9 }
+atmSuPortAtmVclStatsTotalSuccLoopbacks   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of loopbacks that were requested by the ACE20
+        and for which there was a response (not supported)."
+      ::= { atmSuPortAtmVclStatsEntry 10 }
+atmSuPortAtmVclStatsTotalFailLoopbacks   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of loopbacks that were requested by the ACE20
+        and for which there was no response (not supported)."
+      ::= { atmSuPortAtmVclStatsEntry 11 }
+atmSuPortAtmVclStatsRxTotalRDICells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of RDI cells received on a VC."
+      ::= { atmSuPortAtmVclStatsEntry 12 }
+atmSuPortAtmVclStatsTotalLOCSeconds   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of seconds during which there was loss of 
+       continuity on the VC - no data and no continuity check cells 
+       were received on the VC whilst it was in 'sink' continuity 
+       check mode."
+      ::= { atmSuPortAtmVclStatsEntry 13 }
+atmSuPortAtmVclStatsRxTotalLoopbackRequests   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of loopback requests received by the ACE20 on a VC."
+      ::= { atmSuPortAtmVclStatsEntry 14 }
+atmSuPortAtmVclStatsTxTotalAISCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of AIS cells that were transmitted on a VC."
+      ::= { atmSuPortAtmVclStatsEntry 15 }
+atmSuPortAtmVclStatsTxTotalCCCells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of continuity check cells that were transmitted on
+        a VC (when there is no data cells and the connection is in
+        'source' continuity check mode)."
+      ::= { atmSuPortAtmVclStatsEntry 16 }
+atmSuPortAtmVclStatsTxTotalRDICells   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of RDI cells transmitted on a VC."
+      ::= { atmSuPortAtmVclStatsEntry 17 }
+atmSuPortAtmVclStatsTxTotalLoopbackResponses   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of loopback responses that were transmitted as a 
+        result of loopback requests received."
+      ::= { atmSuPortAtmVclStatsEntry 18 }
+atmSuPortAtmVclStatsTxTotalLoopbackRequests   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of loopback requests that were transmitted by the ACE20 on a VC."
+      ::= { atmSuPortAtmVclStatsEntry 19 }
+atmSuPortAtmVclStatsRxTotalLoopbackResponses   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "Total number of loopback responses that were received as a 
+        result of loopback transmitted by the ACE20."
+      ::= { atmSuPortAtmVclStatsEntry 20 }
+-- **************************************************************
+--  RAD AAL1 Vcc Statistics table. This table includes all AAL1
+--  connections which are not from CES/DBCES type.
+-- **************************************************************
+-- Use atmCESAAL1StatsTable instead atmAAL1StatsTable
+--atmAAL1StatsTable  OBJECT-TYPE
+--    SYNTAX         SEQUENCE OF atmAAL1StatsEntry
+--    MAX-ACCESS     not-accessible
+--    STATUS         current
+--    DESCRIPTION
+--     "This table contains AAL1 VCC performance parameters."
+--    ::= { atmSuPortAtm 4 }
+--
+--atmAAL1StatsEntry  OBJECT-TYPE
+--    SYNTAX         atmAAL1StatsEntry
+--    MAX-ACCESS     not-accessible
+--    STATUS         current
+--    DESCRIPTION
+--     "This list contains the AAL1 VCC performance parameters."
+--    INDEX  { ifIndex }
+--    ::= { atmAAL1StatsTable 1 }
+--
+--atmAAL1StatsEntry    ::= SEQUENCE  {
+--    atmVclVpi
+--        Integer32,
+--    atmVclVci
+--        Integer32,
+--    atmAAL1HdrErrors
+--        Counter32,
+--    atmAAL1SeqErrors
+--        Counter32
+--    }
+--
+--atmAAL1VclVpi    OBJECT-TYPE
+--    SYNTAX         Integer32
+--    MAX-ACCESS     read-only
+--    STATUS         current
+--    DESCRIPTION
+--     "The SNMP Vpi of this entry."
+--    ::= { atmAAL1StatsEntry 1 }
+--
+--atmAAL1VclVci    OBJECT-TYPE
+--    SYNTAX         Integer32
+--    MAX-ACCESS     read-only
+--    STATUS         current
+--    DESCRIPTION
+--     "The SNMP Vci of this entry."
+--    ::= { atmAAL1StatsEntry 2 }
+--
+--atmAAL1HdrErrors    OBJECT-TYPE
+--    SYNTAX         Counter32
+--    MAX-ACCESS     read-only
+--    STATUS         current
+--    DESCRIPTION
+--     "The count of the number of AAL1 header errors detected,
+--      including those corrected.  Header errors include correctable
+--      and uncorrectable CRC, plus bad parity."
+--    ::= { atmAAL1StatsEntry 3 }
+--
+--atmAAL1SeqErrors    OBJECT-TYPE
+--    SYNTAX         Counter32
+--    MAX-ACCESS     read-only
+--    STATUS         current
+--    DESCRIPTION
+--     "Number of AAL1 sequence violations which the AAL Convergence
+--      sublayer interprets as a misinserted cell, as defined by
+--      ITU-T I.363.1."
+--    ::= { atmAAL1StatsEntry 4 }
+-- **********************************************************
+-- **********************************************************
+--              Protocol   FR     Definitions
+-- **********************************************************
+-- **********************************************************
+atmSuPortFr     OBJECT IDENTIFIER ::= { atmSuPort 4 }
+-- **********************************************************
+--  the Frame Relay Logical Port Group
+-- **********************************************************
+atmSuPortFrLportTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF  AtmSuPortFrLportEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "The table Contains configuration parameters of the Frame-Relay
+        port and has expansion to  frLportTable in RFC1604 MIB."
+      ::= { atmSuPortFr 1 }
+atmSuPortFrLportEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortFrLportEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "An entry in the Frame Relay Logical Port
+        Information table."
+      INDEX   { ifIndex }
+      ::= { atmSuPortFrLportTable 1 }
+AtmSuPortFrLportEntry ::=
+      SEQUENCE {
+         atmSuPortFrLportSNMPDlci
+              Integer32,
+         atmSuPortFrLportSNMPStatus
+              INTEGER,
+         atmSuPortFrLportVCSigProtocol
+              INTEGER,
+         atmSuPortFrLportVCSigProcedure
+              INTEGER,
+         atmSuPortFrLportCLLM
+              INTEGER,
+         atmSuPortFrLportSNMPIp
+              IpAddress
+      }
+atmSuPortFrLportSNMPDlci  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "The SNMP Dlci of this entry."
+      ::= { atmSuPortFrLportEntry 1 }
+atmSuPortFrLportSNMPStatus  OBJECT-TYPE
+      SYNTAX INTEGER   {
+            active    (1) ,
+            notActive (2)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "value indicates if SNMP over FR is available for management."
+      ::= { atmSuPortFrLportEntry 2 }
+atmSuPortFrLportVCSigProtocol OBJECT-TYPE
+      SYNTAX  INTEGER {
+                none(1),
+                ccittQ933A(2),
+                ansiT1617D(3),
+                lmi(4)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "The value of this object identifies the Local
+        In-Channel Signaling Protocol that is used for
+        this frame relay UNI/NNI logical port."
+      DEFVAL { none }
+      ::= { atmSuPortFrLportEntry 3 }
+ atmSuPortFrLportVCSigProcedure  OBJECT-TYPE
+     SYNTAX  INTEGER {
+               notApplicable (1),
+               u2nnet(2),
+               u2nuser(3),
+               bidirect(4)
+             }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "The value of this object identifies the Local
+        In-Channel Signaling Procedure that is used for
+        this UNI/NNI logical port.  The UNI/NNI logical
+        port can be performing user-to-network
+        network-side and user-to-network user-side procedures
+        or bidirectional procedures.
+        this parameter gets value 'notApplicable when the VCSigProtocol is none"
+      ::= { atmSuPortFrLportEntry 4 }
+atmSuPortFrLportCLLM OBJECT-TYPE
+      SYNTAX  INTEGER {
+                active   (1),
+                notActive(2)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       " indicate if the configuration is supporting CLLM ( Consolidated Link
+         Layer Management ) ."
+      ::= { atmSuPortFrLportEntry 5 }
+atmSuPortFrLportSNMPIp OBJECT-TYPE
+      SYNTAX  IpAddress 
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+       "The interface IP address of this entry."
+      ::= { atmSuPortFrLportEntry 6 }
+-- ***************************************************************
+--  RAD Frame Relay Statistics table. The table add more
+--  columns to the RFC1604 frPVCEndptTable
+-- ***************************************************************
+atmSuPortFrPvcEndptTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF  AtmSuPortFrPvcEndptEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "The table contains additional information about
+        the Frame Relay end point."
+      ::= {  atmSuPortFr 2 }
+atmSuPortFrPvcEndptEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortFrPvcEndptEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "An entry for FR end-point statistics ( expansion to RFC 1604 )."
+      INDEX   { ifIndex, frPVCEndptDLCIIndex }
+      ::= { atmSuPortFrPvcEndptTable 1 }
+AtmSuPortFrPvcEndptEntry ::= SEQUENCE {
+      atmSuPortFrPvcEndptTxFECNs
+               Counter32,
+      atmSuPortFrPvcEndptTxBECNs
+               Counter32,
+      atmSuPortFrPvcEndptTxDEs
+               Counter32,
+      atmSuPortFrPvcEndptRxFECNs
+               Counter32,
+      atmSuPortFrPvcEndptRxBECNs
+               Counter32
+      }
+atmSuPortFrPvcEndptTxFECNs   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "number of frames transmited with FECN ( Forward Explicit
+        Congestion Notification )."
+      ::= { atmSuPortFrPvcEndptEntry 1 }
+atmSuPortFrPvcEndptTxBECNs   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "number of frames transmited with BECN ( Backward Explicit
+        Congestion Notification )."
+      ::= { atmSuPortFrPvcEndptEntry 2 }
+atmSuPortFrPvcEndptTxDEs   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "number of frames transmited with the DE ( Discarded Eligible ) bit set."
+      ::= { atmSuPortFrPvcEndptEntry 3 }
+atmSuPortFrPvcEndptRxFECNs    OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "number of frames received with FECN ( Forward Explicit
+        Congestion Notification )."
+      ::= { atmSuPortFrPvcEndptEntry 4 }
+atmSuPortFrPvcEndptRxBECNs   OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "number of frames received with BECN ( Backward Explicit
+        Congestion Notification )."
+      ::= { atmSuPortFrPvcEndptEntry 5 }
+-- ***************************************************************
+--          ATM-DXI Managment LMI Addresses
+-- ***************************************************************
+atmSuPortDxi  OBJECT IDENTIFIER ::= { atmSuPort 5 }   -- ATM-DXI definitions
+atmSuPortDxiConfTable OBJECT-TYPE
+      SYNTAX   SEQUENCE OF AtmSuPortDxiConfEntry
+      MAX-ACCESS   not-accessible
+      STATUS      current
+      DESCRIPTION
+       "This table contains ATM-DXI managment
+        address (DFA) ending at the local agent.
+        only LMI managment supported for ATM-DXI."
+      ::= { atmSuPortDxi 1 }
+atmSuPortDxiConfEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortDxiConfEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "This object contains information about agent Dxi interface."
+      INDEX   { ifIndex }
+      ::= { atmSuPortDxiConfTable 1 }
+AtmSuPortDxiConfEntry ::= SEQUENCE {
+      atmSuPortDxiPortMode
+             INTEGER,
+      atmSuPortDxiSigProtocol
+             INTEGER,
+      atmSuPortDxiSigDfa
+             Integer32
+      }
+atmSuPortDxiPortMode   OBJECT-TYPE
+      SYNTAX  INTEGER  {
+             mode1a  (1),
+             mode1b  (2),
+             mode2   (3)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "This object identifies the dxi mode being used by
+        the atm dxi port."
+      ::= { atmSuPortDxiConfEntry 1 }
+atmSuPortDxiSigProtocol  OBJECT-TYPE
+      SYNTAX INTEGER   {
+            none (1) ,
+            lmi  (2)
+      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "This value indicates if we using LMI signalling protocol
+        or not using any signalling ."
+      ::= { atmSuPortDxiConfEntry 2 }
+atmSuPortDxiSigDfa  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       "The Signalling Dfa address .
+        the default LMI Dfa defined for LMI by the AtmForum is 0."
+      DEFVAL { 0 }
+      ::= { atmSuPortDxiConfEntry 3 }
+--  **************************************************************
+atmSuPortCmdTable OBJECT-TYPE
+      SYNTAX   SEQUENCE OF AtmSuPortCmdEntry
+      MAX-ACCESS   not-accessible
+      STATUS      current
+      DESCRIPTION
+       "General commands to be done on agent's ports."
+      ::= { atmSuPort 6 }
+atmSuPortCmdEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortCmdEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "This object contains entry information."
+      INDEX   { ifIndex }
+      ::= { atmSuPortCmdTable 1 }
+AtmSuPortCmdEntry ::= SEQUENCE {
+      atmSuResetPortStatsCmd
+             INTEGER,
+      atmSuResetConnsStatsCmd
+             INTEGER
+      }
+atmSuResetPortStatsCmd OBJECT-TYPE
+      SYNTAX  INTEGER
+	      {
+    		off(1),
+	    	on (2)
+	      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+       " reset statistics of port."
+      ::= { atmSuPortCmdEntry 1 }
+atmSuResetConnsStatsCmd OBJECT-TYPE
+      SYNTAX  INTEGER
+	      {
+    		off(1),
+	    	on (2)
+	      }
+      MAX-ACCESS   read-write
+      STATUS  current
+      DESCRIPTION
+      " reset statistics of all cross connections attached to this port.
+             set-request is allowed only on the DATA Ports .
+         for get-request value is always 'off' "
+      ::= { atmSuPortCmdEntry 2 }
+-- **********************************************************
+-- **********************************************************
+--              Protocol   Ethernet   Definitions
+-- **********************************************************
+-- **********************************************************
+atmSuPortEther   OBJECT IDENTIFIER ::= { atmSuPort 7 }
+-- **********************************************************
+--  the Ethernet Port Group
+-- **********************************************************
+atmSuPortEtherTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF  AtmSuPortEtherEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "The table Contains configuration parameters of the Ethernet port."
+      ::= { atmSuPortEther 1 }
+atmSuPortEtherEntry OBJECT-TYPE
+      SYNTAX  AtmSuPortEtherEntry
+      MAX-ACCESS   not-accessible
+      STATUS  current
+      DESCRIPTION
+       "An entry in the Ethernet Port Information table."
+      INDEX   { ifIndex }
+      ::= { atmSuPortEtherTable 1 }
+AtmSuPortEtherEntry ::=
+      SEQUENCE {
+         atmSuPortEtherIP
+              IpAddress,
+         atmSuPortEtherMask
+              IpAddress,
+         atmSuPortEtherDefaultGateWayIp
+              IpAddress,
+		 atmSuPortEtherDefaultCrossConnectId
+              Integer32,
+		 atmSuPortEtherDefaultGatewayStatus
+              INTEGER,
+         atmSuPortEtherSNMPStatus
+              INTEGER,
+         atmSuPortEtherFragmentation
+              INTEGER,
+         atmSuPortEtherRIPMode
+              INTEGER,
+         atmSuPortEtherBridgingMode
+              INTEGER,
+         atmSuPortEtherARPTimeout
+              Integer32,
+		 atmSuPortEtherAgingTime
+              Integer32,
+		 atmSuPortEtherPppOEEnable
+		      INTEGER,
+		 atmSuPortEtherStatus
+		      INTEGER
+      }
+atmSuPortEtherIP OBJECT-TYPE
+     SYNTAX  IpAddress
+ 	 MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+      "The interface IP address for SNMP requests."
+     ::= { atmSuPortEtherEntry 1 }
+atmSuPortEtherMask OBJECT-TYPE
+     SYNTAX  IpAddress
+ 	 MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+      "The interface IP address mask for SNMP requests."
+     ::= { atmSuPortEtherEntry 2 }
+atmSuPortEtherDefaultGateWayIp OBJECT-TYPE
+     SYNTAX  IpAddress
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+      "The Ethernet bridge default gateway IP address."
+     ::= { atmSuPortEtherEntry 3 }
+atmSuPortEtherDefaultCrossConnectId OBJECT-TYPE
+     SYNTAX  Integer32
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+     "Default Cross Connect Id. "
+     ::= { atmSuPortEtherEntry 4 }
+atmSuPortEtherDefaultGatewayStatus OBJECT-TYPE
+     SYNTAX  INTEGER   {
+     active    (1) ,
+     notActive (2) ,
+     notApplicable (255)
+     }
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+     "Default Gateway Status."
+     ::= { atmSuPortEtherEntry 5 }
+atmSuPortEtherSNMPStatus  OBJECT-TYPE
+     SYNTAX INTEGER   {
+     active    (1) ,
+     notActive (2) ,
+     notApplicable (255)
+     }
+     MAX-ACCESS   read-write
+     STATUS  current
+     DESCRIPTION
+     "The value indicates if the SNMP of Ethernet bridge interface is available
+      for management."
+     ::= { atmSuPortEtherEntry 6 }
+atmSuPortEtherFragmentation OBJECT-TYPE
+     SYNTAX  INTEGER {
+     no			   (2),
+     yes		   (3),
+	 notApplicable (255)
+     }
+	 MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+     "Fragmentation. When application is not router value must be 'notApplicable'."
+     ::= { atmSuPortEtherEntry 7 }
+atmSuPortEtherRIPMode OBJECT-TYPE
+     SYNTAX  INTEGER {
+     rip1					   (1),
+     rip2					   (2),
+     rip1And2			       (3),
+     none					   (4),
+	 notApplicable           (255)
+     }
+	 MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+     "RIP Mode. When application is not router value must be 'notApplicable'."
+     ::= { atmSuPortEtherEntry 8 }
+atmSuPortEtherBridgingMode OBJECT-TYPE
+     SYNTAX  INTEGER {
+     accessOnly         (1),
+     accessAndSwitching (2),
+	 notApplicable    (255)
+     }
+ 	 MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+     "Bridging mode can be one of the following: 
+			ATM <> Ethernet - Bridging is between the Ethernet 
+			port and the ATM port (there is no bridging between VCs).
+			ATM <> Ethernet + ATM - Bridging is done both between 
+			the Ethernet port and the ATM port and also between VCs.
+			When application is router value must be 'notApplicable'."
+     ::= { atmSuPortEtherEntry 9 }
+atmSuPortEtherARPTimeout OBJECT-TYPE
+     SYNTAX  Integer32 (0..10)
+	 MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+     "ARP Timeout. When application is not router or when 
+     this object is not applicable, value must be 0."
+	 DEFVAL { 5 }
+     ::= { atmSuPortEtherEntry 10 }
+atmSuPortEtherAgingTime OBJECT-TYPE
+	 SYNTAX   Integer32 (0..1000000)
+	 MAX-ACCESS   read-write
+	 STATUS   current
+	 DESCRIPTION
+     "The timeout period in seconds for aging out stored information.
+      valid values are 10...1000000. The value of (0) has
+      the special meaning - not applicable. "
+     ::= { atmSuPortEtherEntry 11 }
+atmSuPortEtherPppOEEnable OBJECT-TYPE
+	 SYNTAX   INTEGER  {
+	 notApplicable (1),
+	 off           (2),
+	 on            (3)
+	 }
+	 MAX-ACCESS   read-write
+	 STATUS   current
+	 DESCRIPTION
+     "Enable or Disable transparent PPP over ethernet bridge.
+      When PPP over Ethernet is enabled, non PPP traffic is 
+      blocked by the bridge."
+     ::= { atmSuPortEtherEntry 12 }
+atmSuPortEtherStatus OBJECT-TYPE
+	 SYNTAX   INTEGER  {
+	 active     (1),
+	 createAndGo(4),
+	 destroy    (6)
+	 }
+	 MAX-ACCESS   read-write
+	 STATUS   current
+	 DESCRIPTION
+     "This object allows user to add/remove entries to/from this table.
+      It will be supported only by certain devices.
+      destroy - may not be possible for certain interfaces."
+     ::= { atmSuPortEtherEntry 13 }
+-- *************************************************************
+-- *************************************************************
+--            Cross-Connect connections definitions
+-- *************************************************************
+-- *************************************************************
+atmSuCrossConnect   OBJECT IDENTIFIER ::= { atmSu 3 } -- cross connect definitions
+-- *************************************************************
+--      RAD ATM to Frame Relay endpoints Connections group
+-- *************************************************************
+atmSuCrossConnectAtmFr   OBJECT IDENTIFIER ::= { atmSuCrossConnect 1 }
+--AtmSuCrossConnectAtmFrDescrIndex ::= TEXTUAL-CONVENTION
+--      STATUS     current
+--      DESCRIPTION
+--       "The value of this object identifies the row
+--        in the atmSuCrossConnectAtmFrDescrTable."
+--      SYNTAX     Integer32
+atmSuCrossConnectAtmFrDescriptor
+      OBJECT IDENTIFIER ::= { atmSuCrossConnectAtmFr 1 }
+-- *************************************************************
+--  RAD ATM to Frame Relay connection types group
+--  The group contains ATM to Frame Relay connection modes,
+--  defining the connection parameters.
+-- *************************************************************
+atmFrCrossConnectNetwork OBJECT IDENTIFIER ::= { atmSuCrossConnectAtmFrDescriptor  1 }
+     -- atmFrCrossConnectNetwork OBJECT-IDENTITY
+     -- STATUS     current
+     -- DESCRIPTION
+     --  "This connection descriptor is network connection mode.
+     --   The use of the parameter vector for this type:
+     --   Clp2De : ATM CLP to Frame Relay DE mapping mode.
+     --          The following values are allowed:
+     --     convSscs- The DE bit of the FR-SSCS PDU is copied Q.922
+     --               DE field.
+     --     conv- If one or more ATM cells belonging to a frame has
+     --           its CLP bit set, or the DE field
+     --           of the FR-SSCS PDU is set, then the DE bit
+     --           of the Q.922 core frame is set.
+     --   De2Clp: Frame Relay DE to ATM CLP mapping mode.
+--		        ( DE bit is always copied unchanged to the FR-SSCS PDU header ).
+  --            The following values are allowed:
+  --        conv   - The Q.922 DE bit is mapped to every CLP bit.
+  --        always0- CLP bit is always 0.
+  --        always1- CLP bit is always 1.
+  --      Fecn2Efci  : Not used
+  --      MappingMode: Not used
+  --     "
+  --    ::= { atmSuCrossConnectAtmFrDescriptor 1}
+ --     atmFrCrossConnectService OBJECT-IDENTITY
+ --     STATUS     current
+ --     DESCRIPTION
+ --      "This connection descriptor is service connection mode.
+ --       The use of the parameter vector for this type:
+--        Clp2De : ATM CLP to Frame Relay DE mapping mode.
+--               The following values are allowed:
+--          conv   - If one or more ATM cells belonging to a frame has
+--                   its CLP bit set, then the DE bit
+--                   of the Q.922 core frame is set.
+--          always0- The DE bit is always 0.
+--          always1- The DE bit is always 1.
+--        De2Clp : Frame Relay DE to ATM CLP mapping mode.
+--               The following values are allowed:
+--          conv   - The DE bit is mapped to every CLP bit.
+--          always0- CLP bit is always 0
+--          always1- CLP bit is always 1
+--        Fecn2Efci: Frame Relay FECN to ATM EFCI mapping mode.
+--                 The following values are allowed:
+--          conv   - The FECN bit is mapped to every EFCI bit.
+--          always0- EFCI bit is always 0.
+--        MappingMode: Upper Layer mapping mode.
+--            The following values are allowed:
+--          transparent - trasparent	mode
+--          translation - translation mode
+--        note : value 0 for parameter means that it is not supported .
+--        "
+-- ::= { atmSuCrossConnectAtmFrDescriptor 2 }
+atmFrCrossConnectService OBJECT IDENTIFIER ::= { atmSuCrossConnectAtmFrDescriptor 2 }
+-- *************************************************************
+--  RAD ATM to Frame Relay connection descriptor table.
+-- *************************************************************
+atmFrDescrTable    OBJECT-TYPE
+      SYNTAX      SEQUENCE OF AtmFrDescrEntry
+      MAX-ACCESS    not-accessible
+      STATUS       current
+      DESCRIPTION
+       "This table contains information on ATM to FR Connection
+        descriptor types, and their associated parameters."
+      ::= { atmSuCrossConnectAtmFr 2 }
+atmFrDescrEntry    OBJECT-TYPE
+      SYNTAX           AtmFrDescrEntry
+      MAX-ACCESS        not-accessible
+      STATUS           current
+      DESCRIPTION
+       "This list contains ATM to FR Connection descriptor
+        type, and its associated parameters."
+      INDEX  { atmFrDescrIndex }
+      ::= { atmFrDescrTable 1}
+AtmFrDescrEntry    ::= SEQUENCE  {
+      atmFrDescrIndex
+            Integer32, -- was AtmSuCrossConnectAtmFrDescrIndex,
+      atmFrDescrType
+            OBJECT IDENTIFIER,
+      atmFrDescrClp2De
+            INTEGER,
+      atmFrDescrDe2Clp
+            INTEGER,
+      atmFrDescrFecn2Efci
+            INTEGER,
+      atmFrDescrMappingMode
+            INTEGER,
+      atmFrDescrRowStatus
+            RowStatus
+      }
+atmFrDescrIndex  OBJECT-TYPE
+      SYNTAX  Integer32 -- was AtmSuCrossConnectAtmFrDescrIndex
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+       "This object is used to identify the row index of
+        the ATM to FR connection descriptor table."
+      ::= { atmFrDescrEntry 1 }
+atmFrDescrType  OBJECT-TYPE
+      SYNTAX  OBJECT IDENTIFIER
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+       "The value of this object identifies the type
+        of the ATM to FR Connection descriptor.
+        The type may indicate Network connection descriptor
+        or a Service connection descriptor with one or more
+        parameters.
+        These parameters are specified as a parameter
+        vector, in the corresponding instances of the
+        objects:
+                          atmFrDescrClp2De
+                          atmFrDescrDe2Clp
+                          atmFrDescrFecn2Efci
+                          atmFrDescrMappingMode."
+      ::= { atmFrDescrEntry 2 }
+atmFrDescrClp2De    OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+		convSscs (1),
+	    conv     (2),
+		always0  (3),
+		always1  (4)
+	  }
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+       "The first parameter of the ATM to FR Connection
+        descriptor used according to the value of atmFrDescrType."
+      DEFVAL { conv }
+      ::= { atmFrDescrEntry 3 }
+atmFrDescrDe2Clp    OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+	    conv     (1),
+		always0  (2),
+		always1  (3)
+	  }
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+       "The second parameter of the ATM to FR Connection
+        descriptor used according to the value of atmFrDescrType."
+      DEFVAL { conv }
+      ::= { atmFrDescrEntry 4 }
+atmFrDescrFecn2Efci    OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+	    conv     (1),
+		always0  (2)
+	  }
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+       "The third parameter of the ATM to FR Connection
+        descriptor used according to the value of atmFrDescrType."
+      DEFVAL { conv }
+      ::= { atmFrDescrEntry 5 }
+atmFrDescrMappingMode    OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+		transparent  (1),
+	    translation  (2)
+      }
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+       "The fourth parameter of the ATM to FR Connection
+        descriptor used according to the value of atmFrDescrType."
+      DEFVAL { translation }
+      ::= { atmFrDescrEntry 6 }
+atmFrDescrRowStatus       OBJECT-TYPE
+      SYNTAX  RowStatus
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+       "This object is used to create,
+        modify or delete a row in this table."
+      DEFVAL { active }
+      ::= { atmFrDescrEntry 7 }
+-- *************************************************************
+--  RAD ATM to Frame Relay connection table group
+-- *************************************************************
+--  RAD ATM to Frame Relay connection table.
+atmSuCrossConnectAtmFrIndexNext    OBJECT-TYPE
+     SYNTAX  Integer32 
+     MAX-ACCESS   read-only
+     STATUS  current
+     DESCRIPTION
+      "This object contains an appropriate value to
+       be used for atmFrCnfgCrossConnectIndex when creating
+       entries in the atmFrCnfgTable.  The value
+       0 indicates that no unassigned entries are
+       available. To obtain the atmFrCnfgCrossConnectIndex
+       value for a new entry, the manager issues a
+       management protocol retrieval operation to obtain
+       the mandatory value of this object.  After each
+       retrieval, the agent should modify the value to
+       the next unassigned index."
+    ::= { atmSuCrossConnectAtmFr 3 }
+atmFrCnfgTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AtmFrCnfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "This table defines virtual connections between ATM and
+        Frame Relay endpoints."
+      ::= { atmSuCrossConnectAtmFr 4 }
+atmFrCnfgEntry OBJECT-TYPE
+      SYNTAX  AtmFrCnfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "An entry defines virtual connection between ATM and
+        Frame Relay endpoint."
+      INDEX {
+              atmFrCnfgCrossConnectIndex,
+              atmFrCnfgAtmIfIndex,
+              atmFrCnfgAtmVpi,
+              atmFrCnfgAtmVci,
+              atmFrCnfgFrIfIndex,
+              atmFrCnfgDlci
+            }
+      ::= { atmFrCnfgTable 1 }
+AtmFrCnfgEntry ::= SEQUENCE {
+      atmFrCnfgCrossConnectIndex
+              Integer32,
+      atmFrCnfgAtmIfIndex
+              Integer32,
+      atmFrCnfgAtmVpi
+              Integer32,
+      atmFrCnfgAtmVci
+              Integer32,
+      atmFrCnfgFrIfIndex
+              Integer32,
+      atmFrCnfgDlci
+              Integer32,
+      atmFrCnfgAdminStatus
+              INTEGER,
+      atmFrCnfgOperStatus
+              INTEGER,
+      atmFrCnfgLastChange
+              TimeStamp,
+      atmFrCnfgMappingDescrIndex
+              Integer32, -- was AtmSuCrossConnectAtmFrDescrIndex,
+      atmFrCnfgSscsDlci
+              Integer32,
+      atmFrCnfgTrafficDescrIndex
+              AtmTrafficDescrParamIndex,
+      atmFrCnfgPriority
+              INTEGER,
+      atmFrCnfgRowStatus
+              RowStatus,
+	  atmFrCnfgAllocatedBuffers
+	          Integer32
+      }
+atmFrCnfgCrossConnectIndex OBJECT-TYPE
+     SYNTAX  Integer32 
+     MAX-ACCESS   read-only
+     STATUS  current
+     DESCRIPTION
+      "A unique value to identify this cross-connect."
+      ::= { atmFrCnfgEntry 1 }
+atmFrCnfgAtmIfIndex OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the ATM interface."
+      ::= { atmFrCnfgEntry 2 }
+atmFrCnfgAtmVpi   OBJECT-TYPE
+      SYNTAX Integer32  (1..4095)
+      MAX-ACCESS   read-only
+      STATUS current
+      DESCRIPTION
+       "The Vpi number of the ATM end point."
+      ::= { atmFrCnfgEntry 3 }
+atmFrCnfgAtmVci   OBJECT-TYPE
+      SYNTAX Integer32  (0..65535)
+      MAX-ACCESS   read-only
+      STATUS current
+      DESCRIPTION
+       "The Vci number of the ATM end point."
+      ::= { atmFrCnfgEntry 4 }
+atmFrCnfgFrIfIndex   OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS   read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the Frame Relay
+        interface."
+      ::= { atmFrCnfgEntry 5 }
+atmFrCnfgDlci   OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS   read-only
+      STATUS current
+      DESCRIPTION
+       "The DLCI number of the FR end point."
+      ::= { atmFrCnfgEntry 6 }
+atmFrCnfgAdminStatus   OBJECT-TYPE
+      SYNTAX INTEGER {
+             up(1),
+             down(2)
+      }
+      MAX-ACCESS  read-create
+      STATUS current
+      DESCRIPTION
+       "This object indicates the connection status requested by the user."
+      ::= { atmFrCnfgEntry 7 }
+atmFrCnfgOperStatus   OBJECT-TYPE
+      SYNTAX INTEGER {
+             up(1),
+             down(2)
+      }
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "This object indicates the Operational status of the connection."
+      ::= { atmFrCnfgEntry 8 }
+atmFrCnfgLastChange   OBJECT-TYPE
+      SYNTAX TimeStamp
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The value of sysUpTime at the time the ATM to FR
+        connection entered its mandatory operational state.
+        If the mandatory state was entered prior to the last
+        re-initialization of the local network management
+        subsystem, then this object contains a zero value."
+      ::= { atmFrCnfgEntry 9 }
+atmFrCnfgMappingDescrIndex    OBJECT-TYPE
+      SYNTAX     Integer32 -- was AtmSuCrossConnectAtmFrDescrIndex
+      MAX-ACCESS   read-create
+      STATUS   current
+      DESCRIPTION
+       "The value of this object identifies the row
+        in the atmFrDescrTable."
+      ::= { atmFrCnfgEntry 10 }
+atmFrCnfgSscsDlci   OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS   read-create
+      STATUS current
+      DESCRIPTION
+       "The DLCI number given to the SSCS Sub-layer for network interworking only
+       ( the default value is 'atmFrCnfgDlci' ).
+        for Service Interworking do not implement this variable."
+      ::= { atmFrCnfgEntry 11 }
+-- atmFrCnfgBitRate   OBJECT-TYPE
+--       SYNTAX INTEGER
+--	  {
+--	    ubr  (1) ,
+--		vbr  (2) ,
+--	    abr  (3)
+--	  }
+--       MAX-ACCESS   read-create
+--       STATUS current
+--       DESCRIPTION
+--        "The traffic bit rate mode for this connection.
+--         note :setting this value is allowed only to point2point connections.
+--               for many2one connections is being set by the
+--               atmFrCrossConnectMany2OneRootsTable and this field is equal
+--               to this setting."
+--       ::= { atmFrCnfgEntry 12 }
+atmFrCnfgTrafficDescrIndex  OBJECT-TYPE
+      SYNTAX             AtmTrafficDescrParamIndex
+      MAX-ACCESS          read-create
+      STATUS             current
+      DESCRIPTION
+       "The value of this object identifies the row
+        in the atmTrafficDescrParamTable which
+        applies to the transmit direction of the VCL.
+        note :setting this value is allowed only to point2point connections.
+              for many2one connections is being set by the
+              atmFrCrossConnectMany2OneRootsTable and this field is equal
+              to this setting."
+      ::= { atmFrCnfgEntry 12 }
+atmFrCnfgPriority   OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+	    highPriority   (1),
+	    mediumPriority (2),
+	    lowPriority    (3)
+      }
+      MAX-ACCESS  read-create
+      STATUS current
+      DESCRIPTION
+       "This object define the priority of connection.
+        The first parameter affects the transmition of cells in Conjested
+        network is the bitRate( Cbr has the highest priority and then Vbr,Ubr )
+        In connections with the same bitRate this object will define the priority."
+      ::= { atmFrCnfgEntry 13 }
+atmFrCnfgRowStatus   OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS  read-create
+      STATUS current
+      DESCRIPTION
+       "This object is used to create
+        a new row or modify or delete an
+        existing row in this table."
+      ::= { atmFrCnfgEntry 14 }
+atmFrCnfgAllocatedBuffers  OBJECT-TYPE
+      SYNTAX       Integer32 (10..217)
+      MAX-ACCESS   read-create
+      STATUS current
+      DESCRIPTION
+       "This object enables user to limit the amount of buffers 
+       used by the connection.
+       The limit set by this object will give 
+       the effect of a virtual buffer pool per connection. 
+       The user can allocate between 10 to 217 buffers 
+       to every connection. By default the limit is 50 buffers.
+       Sum of limits allocated to all connections 
+       must not exceed the total amount of available buffers. 
+       Whenever a connection exceeds it's buffer limit 
+       due to congestion or burst - traffic is discarded"
+	   DEFVAL { 50 }
+      ::= { atmFrCnfgEntry 15 }
+atmFrMaxMany2OneConnsPerVcc OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The Maximum Number of many2one cross-connect connections
+        allowed per Vcc ."
+      ::= { atmSuCrossConnectAtmFr 5 }
+-- *************************************************************
+--      RAD ATM to ATM-DXI endpoints Connections group
+-- *************************************************************
+atmSuCrossConnectAtmDxi   OBJECT IDENTIFIER ::= { atmSuCrossConnect 2 }
+atmSuCrossConnectAtmDxiIndexNext    OBJECT-TYPE
+     SYNTAX  Integer32 
+     MAX-ACCESS   read-only
+     STATUS  current
+     DESCRIPTION
+      "This object contains an appropriate value to
+       be used for atmDxiCnfgCrossConnectIndex when creating
+       entries in the atmDxiCnfgTable.  The value
+       0 indicates that no unassigned entries are
+       available. To obtain the atmDxiCnfgCrossConnectIndex
+       value for a new entry, the manager issues a
+       management protocol retrieval operation to obtain
+       the mandatory value of this object.  After each
+       retrieval, the agent should modify the value to
+       the next unassigned index."
+    ::= { atmSuCrossConnectAtmDxi 1 }
+atmDxiCnfgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmDxiCnfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "This table defines virtual connections between ATM and
+        ATM-DXI endpoints."
+      ::= { atmSuCrossConnectAtmDxi 2 }
+atmDxiCnfgEntry OBJECT-TYPE
+      SYNTAX  AtmDxiCnfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "An entry defines virtual connection between ATM and
+        ATM-DXI endpoint."
+      INDEX {
+              atmDxiCnfgCrossConnectIndex,
+              atmDxiCnfgAtmIfIndex,
+              atmDxiCnfgAtmVpi,
+              atmDxiCnfgAtmVci,
+              atmDxiCnfgDxiIfIndex,
+              atmDxiCnfgDfa
+            }
+      ::= { atmDxiCnfgTable 1 }
+AtmDxiCnfgEntry ::= SEQUENCE {
+         atmDxiCnfgCrossConnectIndex
+                  Integer32,
+         atmDxiCnfgAtmIfIndex
+                  Integer32,
+         atmDxiCnfgAtmVpi
+                  Integer32,
+         atmDxiCnfgAtmVci
+                  Integer32,
+         atmDxiCnfgDxiIfIndex
+                  Integer32,
+         atmDxiCnfgDfa
+                  Integer32,
+         atmDxiCnfgAdminStatus
+                  INTEGER,
+         atmDxiCnfgOperStatus
+                  INTEGER,
+         atmDxiCnfgLastChange
+                  TimeStamp,
+         atmDxiCnfgTrafficDescrIndex
+              AtmTrafficDescrParamIndex,
+         atmDxiCnfgPriority
+                  INTEGER,
+         atmDxiCnfgRowStatus
+                  RowStatus
+         }
+atmDxiCnfgCrossConnectIndex OBJECT-TYPE
+     SYNTAX  Integer32 
+     MAX-ACCESS   read-only
+     STATUS  current
+     DESCRIPTION
+      "A unique value to identify this cross-connect."
+      ::= { atmDxiCnfgEntry 1 }
+atmDxiCnfgAtmIfIndex OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the ATM interface."
+      ::= { atmDxiCnfgEntry 2 }
+atmDxiCnfgAtmVpi   OBJECT-TYPE
+      SYNTAX Integer32 (1..4095)
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The Vpi number of the ATM end point."
+      ::= { atmDxiCnfgEntry 3 }
+atmDxiCnfgAtmVci   OBJECT-TYPE
+      SYNTAX Integer32 (0..65535)
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The Vci number of the ATM end point."
+      ::= { atmDxiCnfgEntry 4 }
+atmDxiCnfgDxiIfIndex   OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the atm-dxi interface."
+      ::= { atmDxiCnfgEntry 5 }
+atmDxiCnfgDfa   OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The DFA number of the DXI end point."
+      ::= { atmDxiCnfgEntry 6 }
+atmDxiCnfgAdminStatus   OBJECT-TYPE
+      SYNTAX INTEGER {
+          up(1),
+          down(2)
+      }
+      MAX-ACCESS  read-create
+      STATUS current
+      DESCRIPTION
+       "The requested state of the ATM to DXI connection."
+      ::= { atmDxiCnfgEntry 7 }
+atmDxiCnfgOperStatus   OBJECT-TYPE
+      SYNTAX INTEGER {
+          up(1),
+          down(2)
+      }
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The real operational status of the ATM to DXI connection."
+      ::= { atmDxiCnfgEntry 8 }
+atmDxiCnfgLastChange   OBJECT-TYPE
+      SYNTAX TimeStamp
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The value of sysUpTime at the time the ATM to DXI
+        connection entered its mandatory operational state.
+        If the mandatory state was entered prior to the last
+        re-initialization of the local network management
+        subsystem, then this object contains a zero value.
+        Same value define both direction ( Atm2Dxi and Dxi2Atm )."
+      ::= { atmDxiCnfgEntry 9 }
+-- atmDxiCnfgBitRate   OBJECT-TYPE
+--       SYNTAX INTEGER
+--	  {
+--         ubr  (1) ,
+--         vbr  (2) ,
+--         abr  (3)
+--	  }
+--       MAX-ACCESS   read-create
+--       STATUS current
+--       DESCRIPTION
+--        "The traffic bit rate mode for this connection."
+--       ::= { atmDxiCnfgEntry 10 }
+atmDxiCnfgTrafficDescrIndex  OBJECT-TYPE
+      SYNTAX             AtmTrafficDescrParamIndex
+      MAX-ACCESS          read-create
+      STATUS             current
+      DESCRIPTION
+       "The value of this object identifies the row
+        in the atmTrafficDescrParamTable which
+        applies to the transmit direction of the VCL."
+      ::= { atmDxiCnfgEntry 10 }
+atmDxiCnfgPriority   OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+	    highPriority   (1),
+	    mediumPriority (2),
+	    lowPriority    (3)
+      }
+      MAX-ACCESS  read-create
+      STATUS current
+      DESCRIPTION
+       "This object define the priority of connection.
+        The first parameter affects the transmition of cells in Conjested
+        network is the bitRate( Cbr has the highest priority and then Vbr,Ubr )
+        In connections with the same bitRate this object will define the priority."
+      ::= { atmDxiCnfgEntry 11 }
+atmDxiCnfgRowStatus   OBJECT-TYPE
+      SYNTAX  RowStatus
+      MAX-ACCESS  read-create
+      STATUS current
+      DESCRIPTION
+       "This object is used to create a new row or
+        modify or delete an existing row in this table."
+      ::= { atmDxiCnfgEntry 12 }
+-- *************************************************************
+--      RAD ATM to CBR Connections group (excluded CES/DBCES
+--      connections which are handled in the CES table)
+-- *************************************************************
+atmSuAtmCbr   OBJECT IDENTIFIER ::= { atmSuCrossConnect 3 }
+atmCbrCnfgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmCbrCnfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "This table defines AAL1 virtual connections (not CES) 
+        between ATM port and DS1-CBR port."
+      ::= { atmSuAtmCbr 1 }
+atmCbrCnfgEntry OBJECT-TYPE
+      SYNTAX  AtmCbrCnfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "An entry defines virtual connection between ATM port and
+        DS1-CBR port."
+      INDEX {
+              atmCbrCnfgAtmIfIndex,
+              atmCbrCnfgAtmVpi,
+              atmCbrCnfgAtmVci,
+              atmCbrCnfgCbrIfIndex
+            }
+      ::= { atmCbrCnfgTable 1 }
+AtmCbrCnfgEntry ::= SEQUENCE {
+         atmCbrCnfgAtmIfIndex
+                  Integer32,
+         atmCbrCnfgAtmVpi
+                  Integer32,
+         atmCbrCnfgAtmVci
+                  Integer32,
+         atmCbrCnfgCbrIfIndex
+                  Integer32,
+         atmCbrCnfgAdminStatus
+                  INTEGER,
+         atmCbrCnfgOperStatus
+                  INTEGER,
+         atmCbrCnfgLastChange
+                  TimeStamp,
+         atmCbrCnfgAAL1Signalling
+                  INTEGER,
+         atmCbrCnfgRxTimeSlots
+ 	   TimeSlots,
+         atmCbrCnfgRxBytesPerCell
+                  Integer32,
+         atmCbrCnfgTxTimeSlots
+ 	    TimeSlots,
+         atmCbrCnfgTxBytesPerCell
+                  Integer32,
+ 	atmCbrCnfgParity
+	     INTEGER,
+	atmCbrCnfgRowStatus
+           RowStatus,
+    atmCbrCnfgService
+	      INTEGER
+         }
+atmCbrCnfgAtmIfIndex OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the ATM interface."
+      ::= { atmCbrCnfgEntry 1 }
+atmCbrCnfgAtmVpi   OBJECT-TYPE
+      SYNTAX Integer32 (1..4095)
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The Vpi number of the ATM end point."
+      ::= { atmCbrCnfgEntry 2 }
+atmCbrCnfgAtmVci   OBJECT-TYPE
+      SYNTAX Integer32 (0..65535)
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The Vci number of the ATM end point."
+      ::= { atmCbrCnfgEntry 3 }
+atmCbrCnfgCbrIfIndex OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the logical interface of DS0s bundle
+        or to ifIndex of one of the data ports."
+      ::= { atmCbrCnfgEntry 4 }
+atmCbrCnfgAdminStatus   OBJECT-TYPE
+      SYNTAX INTEGER {
+          up   (1),
+          down (2)
+      }
+      MAX-ACCESS  read-create
+      STATUS current
+      DESCRIPTION
+       "The requested status of the connection."
+      ::= { atmCbrCnfgEntry 5 }
+atmCbrCnfgOperStatus   OBJECT-TYPE
+      SYNTAX INTEGER {
+          up   (1),
+          down (2)
+      }
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The real operational status of the connection."
+      ::= { atmCbrCnfgEntry 6 }
+atmCbrCnfgLastChange   OBJECT-TYPE
+      SYNTAX TimeStamp
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The value of sysUpTime at the time the ATM to CBR
+        connection entered its mandatory operational state.
+        If the mandatory state was entered prior to the last
+        re-initialization of the local network management
+        subsystem, then this object contains a zero value.
+        Same value define both direction ( Atm2Cbr and Cbr2Atm )."
+      ::= { atmCbrCnfgEntry 7 }
+atmCbrCnfgAAL1Signalling OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+            off (1),
+            on  (2)
+      }
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+      "Not in use. Must be always 'off'."
+      ::= { atmCbrCnfgEntry 8 }
+atmCbrCnfgRxTimeSlots   OBJECT-TYPE
+      SYNTAX TimeSlots 
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+     "This value indicates the time-slots used by this connection for receiving.
+        It uses 32 bits for E1 and low 24 bits for T1.
+        each bit represents a time slot for receiving :
+        time-slot 0  = bit 0 (LSB - most right bit in last byte),
+           ...
+           ...
+        time-slot 31 = bit 31 (MSB - most left bit in first byte ).
+        value '0' indicate unused time-slot and value '1' indicates used time-slot.
+        On set-request the user indicates the time-slot he needs for requested ATM-Vcc
+        by putting '1' to the right bits.
+        note : time-slots '0' and '16' are used for signalling in E1 interface.
+        Currently not in use. Must be '0'."
+      ::= { atmCbrCnfgEntry 9 }
+atmCbrCnfgRxBytesPerCell   OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS read-create
+      STATUS current 
+      DESCRIPTION
+       "number of bytes to be receive in order per cell to low the delay. "
+      DEFVAL { 47 }
+      ::= { atmCbrCnfgEntry 10 }
+atmCbrCnfgTxTimeSlots   OBJECT-TYPE
+      SYNTAX TimeSlots 
+      MAX-ACCESS read-create
+      STATUS current 
+      DESCRIPTION
+     "This value indicates the time-slots used by this connection for receiving.
+        It uses 32 bits for E1 and low 24 bits for T1.
+        each bit represents a time slot for receiving :
+        time-slot 0  = bit 0 (LSB - most right bit in last byte),
+           ...
+           ...
+        time-slot 31 = bit 31 (MSB - most left bit in first byte ).
+        value '0' indicate unused time-slot and value '1' indicates used time-slot.
+        On set-request the user indicates the time-slot he needs for requested ATM-Vcc
+        by putting '1' to the right bits.
+        note : time-slots '0' and '16' are used for signalling in E1 interface.
+        Currently not in use. Must be '0'."
+      ::= { atmCbrCnfgEntry 11 }
+atmCbrCnfgTxBytesPerCell   OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS read-create
+      STATUS current 
+      DESCRIPTION
+       "number of bytes to be transmit in order per cell to low the delay. "
+      DEFVAL { 47 }
+      ::= { atmCbrCnfgEntry 12 }
+atmCbrCnfgParity OBJECT-TYPE
+      SYNTAX INTEGER 
+      {
+            off (1),
+            on  (2),
+            notApplicable (3)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+      " Controls the use of pointer parity when using 
+        the STRUCTURED or STRUCTURED WITH POINTER connection type. 
+		as defined by atmCbrCnfgService.
+	    ON  - Pointer parity bit generation at the transmit side, 
+	          and checking of parity bit for error detection at 
+	          the receiving side enabled. 
+	          Supported only for STRUCTURED or STRUCTURED WITH POINTER service.
+	    OFF -  Pointer parity generation and checking disabled. 
+	           Supported only for STRUCTURED or STRUCTURED WITH POINTER service.
+		N/A -  Not applicable. This is the only option 
+		       when selecting UNSTRUCTURED or STRUCTURED WITHOUT POINTER."
+      ::= { atmCbrCnfgEntry 13 }
+atmCbrCnfgRowStatus   OBJECT-TYPE
+      SYNTAX  RowStatus
+      MAX-ACCESS read-create
+      STATUS current 
+      DESCRIPTION
+       "This object is used to create a new row or
+        modify or delete an existing row in this table."
+      ::= { atmCbrCnfgEntry 14 }
+atmCbrCnfgService      OBJECT-TYPE
+    SYNTAX   INTEGER 
+    {
+    notApplicable                     (1),
+    unstructured                      (2),
+    structured                        (3), 
+    structuredWithPointer             (4), 
+    structuredWithoutPointer          (5),
+	structuredControlSignalsTransport (6)
+	    }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+    "Define if DSx service is structured or unstructured.
+     A structured(3) interface is some nx64Kbps. (n x DS0 = n Time Slots)
+     An unstructured (2) interface is  full DSx, x >0. 
+     (1.544Mbps, 2.048Mbps, 6.312Mbps, 44.736 Mbps, or 34.368 Mbps.)
+     This objects selects the connection type also 
+     for AAL1 Stream for Data port.
+     The available selections depend on the data rate
+     selected. 
+     For the 64 kbps rate:
+	 STRUCTURED WITH POINTER  = structure(4)
+	 Use of the structured service as defined in ATMF AF-VTOA-0078.000.
+     STRUCTURED WITHOUT POINTER : same as above, but without 
+     using a pointer (the resulting cell structure is similar
+     to that of the unstructured service cells).
+     Default: STRUCTURED WITH POINTER
+	 structuredControlSignalsTransport -Pointer is used to
+	 transfer Data Control Signals through ATM network.  
+     For other rates:
+     STRUCTURED : Use of structured service as defined in ATMF AF-VTOA-0078.000.
+     UNSTRUCTURED : Use of unstructured service as defined in
+      ATMF document AF-VTOA-0078.000." 
+    ::= { atmCbrCnfgEntry 15 }
+-- *************************************************************
+--      RAD ATM to CES ( Circuit-Emulation or DBCES data over DS1 )
+--      Connections group
+-- *************************************************************
+atmCESConfExtnsTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmCESConfExtnsEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "This table defines virtual connections between ATM port and
+        DS1-CBR port."
+      ::= { atmSuAtmCbr 2 }
+atmCESConfExtnsEntry OBJECT-TYPE
+      SYNTAX  AtmCESConfExtnsEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "An entry defines virtual connection between ATM port and
+        DS1-CBR port."
+--      AUGMENTS    { atmfCESConfEntry }
+      INDEX { atmfCESCbrIndex }
+      ::= { atmCESConfExtnsTable 1 }
+AtmCESConfExtnsEntry ::= SEQUENCE {
+      atmCESLastChange
+            TimeStamp,
+      atmCESRxBytesPerCell
+            Integer32,
+      atmCESTxBytesPerCell
+            Integer32,
+      atmCESAal1Type
+            INTEGER,
+      atmCESParity
+            INTEGER,
+      atmCESSigType
+            INTEGER,
+      atmCESSigABBits
+            OCTET STRING
+      }
+atmCESLastChange   OBJECT-TYPE
+      SYNTAX TimeStamp
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The value of sysUpTime at the time the ATM to CBR
+        connection entered its mandatory operational state.
+        If the mandatory state was entered prior to the last
+        re-initialization of the local network management
+        subsystem, then this object contains a zero value."
+      ::= { atmCESConfExtnsEntry 1 }
+atmCESRxBytesPerCell   OBJECT-TYPE
+      SYNTAX  Integer32  (1..47) 
+      MAX-ACCESS read-write
+      STATUS current 
+      DESCRIPTION
+       "Number of bytes to be received per cell, in order to decrease the delay. "
+      DEFVAL { 47 }
+      ::= { atmCESConfExtnsEntry 2 }
+atmCESTxBytesPerCell   OBJECT-TYPE
+      SYNTAX  Integer32  (1..47) 
+      MAX-ACCESS read-write
+      STATUS current 
+      DESCRIPTION
+       "Number of bytes to be transmitted per cell, in order to decrease the delay. "
+      DEFVAL { 47 }
+      ::= { atmCESConfExtnsEntry 3 }
+atmCESAal1Type   OBJECT-TYPE
+      SYNTAX INTEGER {
+          ces(1),
+          dbces(2),
+		  transparent(3)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Type of CBR connection: CES , DBCES or transparent ."
+      ::= { atmCESConfExtnsEntry 4 }
+atmCESParity   OBJECT-TYPE
+      SYNTAX INTEGER 
+      {
+            off (1),
+            on  (2)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      " Indicate if we'll add even parity to the pointer of the structure of CES."
+      ::= { atmCESConfExtnsEntry 5 }
+atmCESSigType   OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+            eAndmOrPlar    (1),
+            fxoLoopStart   (2),
+            fxsLoopStart   (3),
+            fxoGroundStart (4),
+            fxsGroundStart (5),
+            r2             (6),
+            other          (7)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "type of signalling for a DBCES connection.
+        Must be 'other' for CES connection."
+      ::= { atmCESConfExtnsEntry 6 }
+atmCESSigABBits   OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(1))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "This attribute is applicable only when value of atmCESSigType is other.
+        Represents the AB bits for Rx/Tx and their masks in this way:
+        bits 7..6: Tx AB bits value,
+        bits 5..4: Tx AB bits mask,
+        bits 3..2: Rx AB bits value,
+        bits 1..0: Rx AB bits mask.
+        All bits must be 0 for CES connection."
+      ::= { atmCESConfExtnsEntry 7 }
+-- *************************************************************
+--      RAD ATM to ETHERNET endpoints Connections group
+-- *************************************************************
+atmSuCrossConnectAtmEther   OBJECT IDENTIFIER ::= { atmSuCrossConnect 4 }
+atmSuCrossConnectAtmEtherIndexNext    OBJECT-TYPE
+     SYNTAX  Integer32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+      "This object contains an appropriate value to
+       be used for atmEtherCnfgCrossConnectIndex when creating
+       entries in the atmEtherCnfgTable.  The value
+       0 indicates that no unassigned entries are
+       available. To obtain the atmEtherCnfgCrossConnectIndex
+       value for a new entry, the manager issues a
+       management protocol retrieval operation to obtain
+       the current value of this object.  After each
+       retrieval, the agent should modify the value to
+       the next unassigned index."
+    ::= { atmSuCrossConnectAtmEther 1 }
+atmEtherCnfgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmEtherCnfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+       "This table defines virtual connections between ATM and
+        ATM-BridgedEthernet endpoints."
+      ::= { atmSuCrossConnectAtmEther 2 }
+atmEtherCnfgEntry OBJECT-TYPE
+      SYNTAX  AtmEtherCnfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+       "An entry defines virtual connection between ATM and
+        ATM-Ethernet endpoint."
+      INDEX {
+              atmEtherCnfgCrossConnectIndex,
+              atmEtherCnfgAtmIfIndex,
+              atmEtherCnfgAtmVpi,
+              atmEtherCnfgAtmVci,
+              atmEtherCnfgEtherIfIndex
+            }
+      ::= { atmEtherCnfgTable 1 }
+AtmEtherCnfgEntry ::= SEQUENCE {
+         atmEtherCnfgCrossConnectIndex
+                  Integer32,
+         atmEtherCnfgAtmIfIndex
+                  Integer32,
+         atmEtherCnfgAtmVpi
+                  Integer32,
+         atmEtherCnfgAtmVci
+                  Integer32,
+         atmEtherCnfgEtherIfIndex
+                  Integer32,
+         atmEtherCnfgMacAddr
+                  MacAddress,
+         atmEtherCnfgAdminStatus
+                  INTEGER,
+         atmEtherCnfgOperStatus
+                  INTEGER,
+         atmEtherCnfgLastChange
+                  TimeStamp,
+         atmEtherCnfgTrafficDescrIndex
+                  AtmTrafficDescrParamIndex,
+         atmEtherCnfgEncapsulationMode
+                  INTEGER,
+         atmEtherCnfgPriority
+                  INTEGER,
+         atmEtherCnfgRowStatus
+                  RowStatus,
+         atmEtherCnfgRouterIP
+		              IpAddress,
+         atmEtherCnfgRouterMask
+				          IpAddress,
+         atmEtherCnfgRouterFragmentation
+						      INTEGER,
+         atmEtherCnfgRouterRIPMode
+								  INTEGER,
+         atmEtherCnfgRouterMTU
+                  Integer32,
+         atmEtherCnfgPPPEncapsulation
+                  INTEGER,
+         atmEtherCnfgAllocatedBuffers
+                  Integer32 
+         }
+atmEtherCnfgCrossConnectIndex OBJECT-TYPE
+     SYNTAX  Integer32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+      "A unique value to identify this cross-connect."
+      ::= { atmEtherCnfgEntry 1 }
+atmEtherCnfgAtmIfIndex OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the ATM interface."
+      ::= { atmEtherCnfgEntry 2 }
+atmEtherCnfgAtmVpi   OBJECT-TYPE
+      SYNTAX Integer32 (1..4095)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "The Vpi number of the ATM end point."
+      ::= { atmEtherCnfgEntry 3 }
+atmEtherCnfgAtmVci   OBJECT-TYPE
+      SYNTAX Integer32 (0..65535)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "The Vci number of the ATM end point."
+      ::= { atmEtherCnfgEntry 4 }
+atmEtherCnfgEtherIfIndex   OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the atm-Ethernet interface."
+      ::= { atmEtherCnfgEntry 5 }
+atmEtherCnfgMacAddr   OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+       "The DFA number of the Ethernet end point."
+      ::= { atmEtherCnfgEntry 6 }
+atmEtherCnfgAdminStatus   OBJECT-TYPE
+      SYNTAX INTEGER {
+          up(1),
+          down(2)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+       "The requested state of the ATM to Ethernet connection."
+      ::= { atmEtherCnfgEntry 7 }
+atmEtherCnfgOperStatus   OBJECT-TYPE
+      SYNTAX INTEGER {
+          up(1),
+          down(2)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "The real operational status of the ATM to Ethernet connection."
+      ::= { atmEtherCnfgEntry 8 }
+atmEtherCnfgLastChange   OBJECT-TYPE
+      SYNTAX TimeStamp
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "The value of sysUpTime at the time the ATM to Ethernet
+        connection entered its current operational state.
+        If the current state was entered prior to the last
+        re-initialization of the local network management
+        subsystem, then this object contains a zero value.
+        Same value define both direction ( Atm2Ether and Ether2Atm )."
+      ::= { atmEtherCnfgEntry 9 }
+atmEtherCnfgTrafficDescrIndex  OBJECT-TYPE
+      SYNTAX         AtmTrafficDescrParamIndex
+      MAX-ACCESS         read-create
+      STATUS         current
+      DESCRIPTION
+       "The value of this object identifies the row
+        in the atmTrafficDescrParamTable which
+        applies to the transmit direction of the VCL."
+      ::= { atmEtherCnfgEntry 10 }
+atmEtherCnfgEncapsulationMode  OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+	    atmBridgedEther    (1),
+	    atmBridgedEtherCRC (2)
+      }
+      MAX-ACCESS read-create
+      STATUS deprecated
+      DESCRIPTION
+       "This object define the encapsulation type requested 
+        for the connection.
+        it indicates if we transfer the Ethernet frame to the 
+        atm side without the Crc32- AtmBridgedEther, 
+        or with it - AtmBridgedEther-CRC. "
+      DEFVAL { atmBridgedEther }
+      ::= { atmEtherCnfgEntry 11 }
+atmEtherCnfgPriority   OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+	    highPriority   (1),
+	    mediumPriority (2),
+	    lowPriority    (3)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+       "This object define the priority of connection.
+        The first parameter affects the transmition of cells in Conjested
+        network is the Service Category( Cbr has the highest priority and then Vbr,Ubr )
+        In connections with the same category this object will define the priority."
+      ::= { atmEtherCnfgEntry 12 }
+atmEtherCnfgRowStatus   OBJECT-TYPE
+      SYNTAX  RowStatus
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+       "This object is used to create a new row or
+        modify or delete an existing row in this table."
+      ::= { atmEtherCnfgEntry 13 }
+atmEtherCnfgRouterIP OBJECT-TYPE
+     SYNTAX  IpAddress
+ 		 MAX-ACCESS  read-create
+     STATUS  current
+     DESCRIPTION
+      "The interface IP address for SNMP requests."
+     ::= { atmEtherCnfgEntry 14 }
+atmEtherCnfgRouterMask OBJECT-TYPE
+     SYNTAX  IpAddress
+ 		 MAX-ACCESS  read-create
+     STATUS  current
+     DESCRIPTION
+      "The interface IP address mask for SNMP requests."
+     ::= { atmEtherCnfgEntry 15 }
+atmEtherCnfgRouterFragmentation OBJECT-TYPE
+     SYNTAX  INTEGER {
+             no							 (2),
+             yes						 (3),
+						 notApplicable (255)
+     }
+		 MAX-ACCESS  read-create
+     STATUS  current
+     DESCRIPTION
+     "Fragmentation. When application is not router value must be 'notApplicable'."
+     ::= { atmEtherCnfgEntry 16 }
+atmEtherCnfgRouterRIPMode OBJECT-TYPE
+     SYNTAX  INTEGER {
+             rip1					   (1),
+             rip2					   (2),
+             rip1And2			   (3),
+             none					   (4),
+						 notApplicable (255)
+     }
+		 MAX-ACCESS  read-create
+     STATUS  current
+     DESCRIPTION
+     "RIP Mode. When application is not router value must be 'notApplicable'."
+     ::= { atmEtherCnfgEntry 17 }
+atmEtherCnfgRouterMTU OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS read-create
+      STATUS deprecated
+      DESCRIPTION
+       " ."
+      ::= { atmEtherCnfgEntry 18 }
+atmEtherCnfgPPPEncapsulation   OBJECT-TYPE
+      SYNTAX  INTEGER
+	  {
+        notApplicable      (1),
+		none               (2),
+        rfc1483            (3),
+        pppVcMuxed	       (4),
+        pppLlcMuxed        (5)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+       "This object define the encapsulation type requested 
+        for the connection.
+        rfc1483        - Multiprotocol Encapsulation over 
+                         ATM Adaptation Layer 5 (no PPP)
+		PPP VC Muxed   - For VC Based Multiplexing,
+		the carried network interconnect protocol  is identified 
+		implicitly by the VC connecting the two ATM stations,
+        i.e.  each protocol must be carried over a separate VC.
+        There is  therefore no need to include explicit multiplexing 
+        information in the   Payload of the AAL5 CPCS-PDU. 
+        This results in minimal bandwidth and  processing overhead.
+		PPP LLC Muxed  - LLC  (Low layer compatibility) Encapsulation 
+		is needed when several protocols are carried over the same VC.
+		In order to allow the receiver 	to properly process the incoming 
+		AAL5 CPCS-PDU, the Payload 	Field must contain information necessary 
+		to identify the protocol of the routed or bridged PDU.  
+		In LLC Encapsulation this informationis encoded in an LLC header 
+		placed in front of the carried PDU."
+      DEFVAL { rfc1483 }
+      ::= { atmEtherCnfgEntry 19 }
+atmEtherCnfgAllocatedBuffers  OBJECT-TYPE
+      SYNTAX       Integer32 (10..217)
+      MAX-ACCESS   read-create
+      STATUS current
+      DESCRIPTION
+       "This object enables user to limit the amount of buffers 
+       used by the connection.
+       The limit set by this object will give 
+       the effect of a virtual buffer pool per connection. 
+       The user can allocate between 10 to 217 buffers 
+       to every connection. By default the limit is 50 buffers.
+       Sum of limits allocated to all connections 
+       must not exceed the total amount of available buffers. 
+       Whenever a connection exceeds it's buffer limit 
+       due to congestion or burst traffic is discarded"
+	   DEFVAL { 50 }
+      ::= { atmEtherCnfgEntry 20 }
+-- *************************************************************
+--      RAD ATM's index to User port's index Translation table
+-- *************************************************************
+atmSuCrossConnectTranslate   OBJECT IDENTIFIER ::= { atmSuCrossConnect 5 }
+atmTranslateTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AtmTranslateEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "This table translates the three of AtmIfIndex,AtmVpi,AtmVci
+        to ifIndex of the interface on the user port's side."
+      ::= { atmSuCrossConnectTranslate 1 }
+atmTranslateEntry OBJECT-TYPE
+      SYNTAX  AtmTranslateEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+       "An entry includes the User side interface's ifIndex of any virtual
+        connection along with the ATM connection indices."
+      INDEX { atmTranslateAtmIfIndex, atmTranslateAtmVpi, atmTranslateAtmVci }
+      ::= { atmTranslateTable 1 }
+AtmTranslateEntry ::= SEQUENCE {
+         atmTranslateAtmIfIndex
+                  Integer32,
+         atmTranslateAtmVpi
+                  Integer32,
+         atmTranslateAtmVci
+                  Integer32,
+         atmTranslateUserIfIndex
+                  Integer32
+         }
+atmTranslateAtmIfIndex OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the ATM interface."
+      ::= { atmTranslateEntry 1 }
+atmTranslateAtmVpi   OBJECT-TYPE
+      SYNTAX Integer32 (1..4095)
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The Vpi number of the ATM end point."
+      ::= { atmTranslateEntry 2 }
+atmTranslateAtmVci   OBJECT-TYPE
+      SYNTAX Integer32 (0..65535)
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The Vci number of the ATM end point."
+      ::= { atmTranslateEntry 3 }
+atmTranslateUserIfIndex   OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+       "The ifIndex associated to the user interface."
+      ::= { atmTranslateEntry 4 }
+-- *************************************************************
+-- *************************************************************
+--                            Traps
+-- *************************************************************
+-- *************************************************************
+--NOTIFICATIONS
+	radAtmEvents OBJECT-IDENTITY
+	    STATUS  current
+    	DESCRIPTION
+		"The events for RAD ATM."
+    	::= { radAtm 0 }
+    alarmTrap  NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+        "This trap is sent whenever an alarm
+          occurs in the agent."
+        ::= { radAtmEvents 1 }
+    statusChangeTrap  NOTIFICATION-TYPE
+        OBJECTS       { agnLed, agnIndication }
+        STATUS current
+        DESCRIPTION     
+        "This trap is sent whenever a led in the agent
+         change it's status."
+        ::= { radAtmEvents 2 }
+-- NO BUFFER TO NETWORK
+atmSuAgnNoBufferToNetwork NOTIFICATION-TYPE		
+      OBJECTS  {alarmSeverity}
+      STATUS  current
+      DESCRIPTION
+      "This trap usualy indicates timing problem;
+       incorrect selection of timing references 
+       between end users."	
+      ::= { radAtmEvents 3 }
+--   JITTER BUFFER OVERRUN 
+atmSuJitterBufferOverrun NOTIFICATION-TYPE		
+      OBJECTS  {alarmSeverity, ifAlias}
+      STATUS  current
+      DESCRIPTION
+      "This trap indicates that an overrun event
+       occurred in the ATM jitter buffer serving the
+       transmit to user direction of the 
+       user interface specified by ifAlias"	
+      ::= { radAtmEvents 4 }
+--   JITTER BUFFER UNDERRUN
+atmSuJitterBufferUnderrun NOTIFICATION-TYPE		
+      OBJECTS  {alarmSeverity, ifAlias}
+      STATUS  current
+      DESCRIPTION
+      "This trap indicates that an underrun event
+       occurred in the atm jitter buffer serving the
+       transmit to user direction of the
+       user interface specified by ifAlias."
+      ::= { radAtmEvents 5 }
+-- DATA LOCAL LOOP
+atmSuDataLocalLoopbackTrap NOTIFICATION-TYPE		
+      OBJECTS  {alarmSeverity, alarmState,ifAlias}
+      STATUS  current
+      DESCRIPTION
+      "This trap indicates that a local loopback
+       has been activated on the local data port."
+      ::= { radAtmEvents 6 }
+-- DATA REMOTE LOOP
+atmSuDataRemoteLoopbackTrap NOTIFICATION-TYPE		
+      OBJECTS  {alarmSeverity, alarmState,ifAlias}
+      STATUS  current
+      DESCRIPTION
+      "This trap indicates that a remote loopback
+       has been activated on the local data port."
+      ::= { radAtmEvents 7}
+END

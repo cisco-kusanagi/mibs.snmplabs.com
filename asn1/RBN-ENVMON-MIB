@@ -1,0 +1,240 @@
+-- *****************************************************************
+-- RBN-ENVMON-MIB	Environmental Monitor MIB
+--
+-- Copyright (c) 1999 RedBack Networks, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+RBN-ENVMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	NOTIFICATION-TYPE, Integer32, OBJECT-TYPE
+		FROM SNMPv2-SMI
+	DisplayString,
+	TruthValue
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	NOTIFICATION-GROUP, OBJECT-GROUP
+		FROM SNMPv2-CONF
+	rbnMgmt
+		FROM RBN-SMI;
+
+rbnEnvMonMIB MODULE-IDENTITY
+	LAST-UPDATED	"9901272300Z"
+	ORGANIZATION	"RedBack Networks, Inc."
+	CONTACT-INFO
+		"	RedBack Networks, Inc.
+
+		Postal:	1389 Moffett Park Drive
+			Sunnyvale, CA  94089-1134
+			USA
+
+		 Phone:	+1 408 548 3500
+		   Fax: +1 408 548 3599
+
+		E-mail:	mib-info@RedBackNetworks.com"
+	DESCRIPTION
+		"The MIB used to genericially manage Environmental
+		Monitor functionality on RedBack Networks devices."
+	::= { rbnMgmt 4 }
+
+rbnEnvMonMIBNotifications OBJECT IDENTIFIER
+	::= { rbnEnvMonMIB 0 }
+
+rbnEnvMonMIBObjects OBJECT IDENTIFIER
+	::= { rbnEnvMonMIB 1 }
+
+rbnEnvMonMIBConformance OBJECT IDENTIFIER
+	::= { rbnEnvMonMIB 2 }
+
+-- MIB Objects
+
+rbnFanStatusTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RbnFanStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per fan test point.
+		Note that there is not necessarily a one-to-one
+		relationship between fan test points and fan
+		assemblies; a single test point may be used to
+		monitor the status of multiple fans."
+	::= { rbnEnvMonMIBObjects 1 }
+
+rbnFanStatusEntry OBJECT-TYPE
+	SYNTAX	    RbnFanStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular fan test point"
+	INDEX	{ rbnFanIndex }
+	::= { rbnFanStatusTable 1 }
+
+RbnFanStatusEntry ::= SEQUENCE {
+	rbnFanIndex	Integer32,
+	rbnFanDescr	DisplayString,
+	rbnFanFail	TruthValue
+}
+
+rbnFanIndex OBJECT-TYPE
+	SYNTAX	    Integer32
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"The index of a fan test point."
+	::= { rbnFanStatusEntry 1 }
+
+rbnFanDescr OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of a fan test point.  If an instance of
+		this object is associated with a single fan assembly,
+		then the value of this object should be the same as the
+		name by which the assembly is normally referenced.  If
+		an instance is associated with multiple fan assemblies,
+		then the value of this object should contain the names
+		of all of the fan assemblies being monitored."
+	::= { rbnFanStatusEntry 2 }
+
+rbnFanFail OBJECT-TYPE
+	SYNTAX	    TruthValue
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of a fan test point.  If an instance of
+		this object has the value true, then a fan monitored
+		by the test point has failed.  If an instance of
+		this object has the value false, then the fan (or fans)
+		monitored by the test point are operational."
+	::= { rbnFanStatusEntry 3 }
+
+rbnPowerStatusTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RbnPowerStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per power test point.
+		Note that there is not necessarily a one-to-one
+		relationship between power test points and power
+		supply assemblies; a single test point may be used
+		to monitor the status of multiple power supplies."
+	::= { rbnEnvMonMIBObjects 2 }
+
+rbnPowerStatusEntry OBJECT-TYPE
+	SYNTAX	    RbnPowerStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular power test point"
+	INDEX	{ rbnPowerIndex }
+	::= { rbnPowerStatusTable 1 }
+
+RbnPowerStatusEntry ::= SEQUENCE {
+	rbnPowerIndex	Integer32,
+	rbnPowerDescr	DisplayString,
+	rbnPowerFail	TruthValue
+}
+
+rbnPowerIndex OBJECT-TYPE
+	SYNTAX	    Integer32
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"The index of a power test point."
+	::= { rbnPowerStatusEntry 1 }
+
+rbnPowerDescr OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of a power supply test point.  If an
+		instance of this object is associated with a single
+		power supply assembly, then the value of this object
+		should be the same as the name by which the assembly
+		is normally referenced.  If an instance is associated
+		with multiple power supply assemblies, then the value
+		of this object should contain the names of all of the
+		power supply assemblies being monitored."
+	::= { rbnPowerStatusEntry 2 }
+
+rbnPowerFail OBJECT-TYPE
+	SYNTAX	    TruthValue
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of a power test point.  If an instance of
+		this object has the value true, then a power supply
+		monitored by the test point has failed.  If an instance
+		of this object has the value false, then the power
+		supply (or supplies) monitored by the test point are
+		operational."
+	::= { rbnPowerStatusEntry 3 }
+
+-- Notifications
+
+rbnFanFailChange NOTIFICATION-TYPE
+	OBJECTS	    { rbnFanFail }
+	STATUS	    current
+	DESCRIPTION
+		"A rbnFanFailChange notification signifies
+		that the value of an instance of rbnFanFail
+		has changed."
+	::= { rbnEnvMonMIBNotifications 1 }
+
+rbnPowerFailChange NOTIFICATION-TYPE
+	OBJECTS	    { rbnPowerFail }
+	STATUS	    current
+	DESCRIPTION
+		"A rbnPowerFailChange notification signifies
+		that the value of an instance of rbnPowerFail
+		has changed"
+	::= { rbnEnvMonMIBNotifications 2 }
+
+-- Conformance Statements
+
+rbnEnvMonMIBGroups OBJECT IDENTIFIER
+	::= { rbnEnvMonMIBConformance 1 }
+
+rbnEnvMonMIBCompliances OBJECT IDENTIFIER
+	::= { rbnEnvMonMIBConformance 2 }
+
+rbnEnvMonMIBObjectGroup OBJECT-GROUP
+	OBJECTS	    {	rbnFanDescr, rbnFanFail,
+			rbnPowerDescr, rbnPowerFail
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of objects providing
+		environmental monitor information."
+	::= { rbnEnvMonMIBGroups 1 }
+
+rbnEnvMonMIBNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {	rbnFanFailChange,
+			rbnPowerFailChange
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of notifications providing
+		environmental monitor information."
+	::= { rbnEnvMonMIBGroups 2 }
+
+rbnEnvMonMIBCompliance MODULE-COMPLIANCE
+	STATUS	    current
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+	MODULE	    -- this module
+	GROUP	    rbnEnvMonMIBObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    rbnEnvMonMIBNotificationGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	::= { rbnEnvMonMIBCompliances 1 }
+END
