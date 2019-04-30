@@ -1,0 +1,52 @@
+#
+# PySNMP MIB module V-BRIDGE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/V-BRIDGE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:26:19 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection")
+dot1dBasePort, dot1dBridge = mibBuilder.importSymbols("BRIDGE-MIB", "dot1dBasePort", "dot1dBridge")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+iso, Integer32, NotificationType, IpAddress, Counter64, Unsigned32, MibIdentifier, TimeTicks, Gauge32, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Counter32, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "Integer32", "NotificationType", "IpAddress", "Counter64", "Unsigned32", "MibIdentifier", "TimeTicks", "Gauge32", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Counter32", "ModuleIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+vBridgeMIB = ModuleIdentity((1, 3, 6, 1, 2, 1, 17, 13))
+vBridgeMIB.setRevisions(('2001-07-13 00:00',))
+if mibBuilder.loadTexts: vBridgeMIB.setLastUpdated('200107130000Z')
+if mibBuilder.loadTexts: vBridgeMIB.setOrganization('IETF Bridge MIB Working Group')
+vBridgeMIBObjects = MibIdentifier((1, 3, 6, 1, 2, 1, 17, 13, 1))
+dot1vProtocol = MibIdentifier((1, 3, 6, 1, 2, 1, 17, 13, 1, 1))
+dot1vProtocolGroupTable = MibTable((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 1), )
+if mibBuilder.loadTexts: dot1vProtocolGroupTable.setStatus('current')
+dot1vProtocolGroupEntry = MibTableRow((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 1, 1), ).setIndexNames((0, "V-BRIDGE-MIB", "dot1vProtocolTemplateFrameType"), (0, "V-BRIDGE-MIB", "dot1vProtocolTemplateProtocolValue"))
+if mibBuilder.loadTexts: dot1vProtocolGroupEntry.setStatus('current')
+dot1vProtocolTemplateFrameType = MibTableColumn((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("ethernet", 1), ("rfc1042", 2), ("snap8021H", 3), ("snapOther", 4), ("llcOther", 5))))
+if mibBuilder.loadTexts: dot1vProtocolTemplateFrameType.setStatus('current')
+dot1vProtocolTemplateProtocolValue = MibTableColumn((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 1, 1, 2), OctetString().subtype(subtypeSpec=ConstraintsUnion(ValueSizeConstraint(2, 2), ValueSizeConstraint(5, 5), )))
+if mibBuilder.loadTexts: dot1vProtocolTemplateProtocolValue.setStatus('current')
+dot1vProtocolGroupId = MibTableColumn((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: dot1vProtocolGroupId.setStatus('current')
+dot1vProtocolPortTable = MibTable((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 2), )
+if mibBuilder.loadTexts: dot1vProtocolPortTable.setStatus('current')
+dot1vProtocolPortEntry = MibTableRow((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 2, 1), ).setIndexNames((0, "BRIDGE-MIB", "dot1dBasePort"), (0, "V-BRIDGE-MIB", "dot1vProtocolPortGroupId"))
+if mibBuilder.loadTexts: dot1vProtocolPortEntry.setStatus('current')
+dot1vProtocolPortGroupId = MibTableColumn((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2147483647)))
+if mibBuilder.loadTexts: dot1vProtocolPortGroupId.setStatus('current')
+dot1vProtocolPortGroupVid = MibTableColumn((1, 3, 6, 1, 2, 1, 17, 13, 1, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 4094))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: dot1vProtocolPortGroupVid.setStatus('current')
+vBridgeConformance = MibIdentifier((1, 3, 6, 1, 2, 1, 17, 13, 2))
+vBridgeGroups = MibIdentifier((1, 3, 6, 1, 2, 1, 17, 13, 2, 1))
+vBridgeCompliances = MibIdentifier((1, 3, 6, 1, 2, 1, 17, 13, 2, 2))
+vBridgeDeviceGroup = ObjectGroup((1, 3, 6, 1, 2, 1, 17, 13, 2, 1, 1)).setObjects(("V-BRIDGE-MIB", "dot1vProtocolGroupId"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    vBridgeDeviceGroup = vBridgeDeviceGroup.setStatus('current')
+vBridgePortGroup = ObjectGroup((1, 3, 6, 1, 2, 1, 17, 13, 2, 1, 2)).setObjects(("V-BRIDGE-MIB", "dot1vProtocolPortGroupVid"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    vBridgePortGroup = vBridgePortGroup.setStatus('current')
+vBridgeCompliance = ModuleCompliance((1, 3, 6, 1, 2, 1, 17, 13, 2, 2, 1)).setObjects(("V-BRIDGE-MIB", "vBridgeDeviceGroup"), ("V-BRIDGE-MIB", "vBridgePortGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    vBridgeCompliance = vBridgeCompliance.setStatus('current')
+mibBuilder.exportSymbols("V-BRIDGE-MIB", vBridgeConformance=vBridgeConformance, PYSNMP_MODULE_ID=vBridgeMIB, dot1vProtocolPortEntry=dot1vProtocolPortEntry, dot1vProtocolGroupId=dot1vProtocolGroupId, dot1vProtocolGroupTable=dot1vProtocolGroupTable, vBridgePortGroup=vBridgePortGroup, dot1vProtocolPortTable=dot1vProtocolPortTable, vBridgeCompliances=vBridgeCompliances, dot1vProtocolTemplateFrameType=dot1vProtocolTemplateFrameType, vBridgeCompliance=vBridgeCompliance, dot1vProtocol=dot1vProtocol, vBridgeDeviceGroup=vBridgeDeviceGroup, vBridgeMIB=vBridgeMIB, dot1vProtocolPortGroupVid=dot1vProtocolPortGroupVid, vBridgeGroups=vBridgeGroups, dot1vProtocolGroupEntry=dot1vProtocolGroupEntry, vBridgeMIBObjects=vBridgeMIBObjects, dot1vProtocolTemplateProtocolValue=dot1vProtocolTemplateProtocolValue, dot1vProtocolPortGroupId=dot1vProtocolPortGroupId)

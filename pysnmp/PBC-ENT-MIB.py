@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module PBC-ENT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PBC-ENT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:28:36 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+enterprises, iso, TimeTicks, Bits, Gauge32, Unsigned32, ModuleIdentity, Integer32, ObjectIdentity, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, NotificationType, MibIdentifier, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "enterprises", "iso", "TimeTicks", "Bits", "Gauge32", "Unsigned32", "ModuleIdentity", "Integer32", "ObjectIdentity", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "NotificationType", "MibIdentifier", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+pacificBroadband = ModuleIdentity((1, 3, 6, 1, 4, 1, 5987))
+pacificBroadband.setRevisions(('2002-10-08 12:38', '2002-09-25 17:30', '2002-09-23 18:47',))
+if mibBuilder.loadTexts: pacificBroadband.setLastUpdated('200109251842Z')
+if mibBuilder.loadTexts: pacificBroadband.setOrganization('Juniper Networks, Inc')
+pbcRegs = ObjectIdentity((1, 3, 6, 1, 4, 1, 5987, 1))
+if mibBuilder.loadTexts: pbcRegs.setStatus('current')
+pbcModuleRegs = ObjectIdentity((1, 3, 6, 1, 4, 1, 5987, 1, 1))
+if mibBuilder.loadTexts: pbcModuleRegs.setStatus('current')
+pbcManagement = ObjectIdentity((1, 3, 6, 1, 4, 1, 5987, 2))
+if mibBuilder.loadTexts: pbcManagement.setStatus('current')
+pbcProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 5987, 3))
+if mibBuilder.loadTexts: pbcProducts.setStatus('current')
+pbcCaps = ObjectIdentity((1, 3, 6, 1, 4, 1, 5987, 4))
+if mibBuilder.loadTexts: pbcCaps.setStatus('current')
+pbcReqs = ObjectIdentity((1, 3, 6, 1, 4, 1, 5987, 5))
+if mibBuilder.loadTexts: pbcReqs.setStatus('current')
+pbcExpr = ObjectIdentity((1, 3, 6, 1, 4, 1, 5987, 6))
+if mibBuilder.loadTexts: pbcExpr.setStatus('current')
+mibBuilder.exportSymbols("PBC-ENT-MIB", pbcReqs=pbcReqs, PYSNMP_MODULE_ID=pacificBroadband, pbcCaps=pbcCaps, pacificBroadband=pacificBroadband, pbcModuleRegs=pbcModuleRegs, pbcProducts=pbcProducts, pbcManagement=pbcManagement, pbcExpr=pbcExpr, pbcRegs=pbcRegs)

@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module TPLINK-COMMANDER-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TPLINK-COMMANDER-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:16:55 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, MibIdentifier, iso, IpAddress, ModuleIdentity, ObjectIdentity, Counter64, Bits, Integer32, Counter32, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "MibIdentifier", "iso", "IpAddress", "ModuleIdentity", "ObjectIdentity", "Counter64", "Bits", "Integer32", "Counter32", "Gauge32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+clusterManage, = mibBuilder.importSymbols("TPLINK-CLUSTER-MIB", "clusterManage")
+clusterConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2))
+commanderConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2, 4))
+clusterName = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 16))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: clusterName.setStatus('current')
+clusterHoldTime = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 255))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: clusterHoldTime.setStatus('current')
+clusterIntervalTime = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 255))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: clusterIntervalTime.setStatus('current')
+commanderClusterName = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2, 4, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 16))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: commanderClusterName.setStatus('current')
+clusterIp = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2, 4, 2), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: clusterIp.setStatus('current')
+clusterIpMask = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2, 4, 3), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: clusterIpMask.setStatus('current')
+clusterCommit = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 33, 1, 1, 3, 2, 4, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1))).clone(namedValues=NamedValues(("commit", 1)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: clusterCommit.setStatus('current')
+mibBuilder.exportSymbols("TPLINK-COMMANDER-MIB", commanderConfig=commanderConfig, clusterIntervalTime=clusterIntervalTime, clusterConfig=clusterConfig, clusterIp=clusterIp, clusterHoldTime=clusterHoldTime, clusterIpMask=clusterIpMask, clusterName=clusterName, clusterCommit=clusterCommit, commanderClusterName=commanderClusterName)

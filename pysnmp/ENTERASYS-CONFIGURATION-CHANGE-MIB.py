@@ -1,0 +1,57 @@
+#
+# PySNMP MIB module ENTERASYS-CONFIGURATION-CHANGE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ENTERASYS-CONFIGURATION-CHANGE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:48:48 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+etsysModules, = mibBuilder.importSymbols("ENTERASYS-MIB-NAMES", "etsysModules")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+TimeTicks, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, Counter32, Unsigned32, MibIdentifier, Bits, IpAddress, Gauge32, Counter64, iso, Integer32, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "Counter32", "Unsigned32", "MibIdentifier", "Bits", "IpAddress", "Gauge32", "Counter64", "iso", "Integer32", "ObjectIdentity")
+TextualConvention, DisplayString, DateAndTime = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "DateAndTime")
+etsysConfigurationChangeMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12))
+etsysConfigurationChangeMIB.setRevisions(('2001-11-26 16:44', '2001-08-08 00:00',))
+if mibBuilder.loadTexts: etsysConfigurationChangeMIB.setLastUpdated('200111261644Z')
+if mibBuilder.loadTexts: etsysConfigurationChangeMIB.setOrganization('Enterasys Networks')
+etsysConfigChangeNonVolatile = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 1))
+etsysConfigChangeVolatile = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 2))
+etsysConfigChangeFirmware = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 3))
+etsysConfigChangeNonVolatileCount = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 1, 1), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeNonVolatileCount.setStatus('current')
+etsysConfigChangeNonVolatileTime = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 1, 2), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeNonVolatileTime.setStatus('current')
+etsysConfigChangeNonVolatileMethod = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 1, 3), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeNonVolatileMethod.setStatus('current')
+etsysConfigChangeVolatileCount = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 2, 1), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeVolatileCount.setStatus('current')
+etsysConfigChangeVolatileTime = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 2, 2), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeVolatileTime.setStatus('current')
+etsysConfigChangeVolatileMethod = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 2, 3), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeVolatileMethod.setStatus('current')
+etsysConfigChangeFirmwareCount = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 3, 1), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeFirmwareCount.setStatus('current')
+etsysConfigChangeFirmwareTime = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 3, 2), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeFirmwareTime.setStatus('current')
+etsysConfigChangeFirmwareMethod = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 3, 3), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysConfigChangeFirmwareMethod.setStatus('current')
+etsysConfigChangeConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 4))
+etsysConfigChangeGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 4, 1))
+etsysConfigChangeCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 4, 2))
+etsysConfigChangeNonVolatileGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 4, 1, 1)).setObjects(("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeNonVolatileCount"), ("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeNonVolatileTime"), ("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeNonVolatileMethod"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysConfigChangeNonVolatileGroup = etsysConfigChangeNonVolatileGroup.setStatus('current')
+etsysConfigChangeVolatileGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 4, 1, 2)).setObjects(("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeVolatileCount"), ("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeVolatileTime"), ("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeVolatileMethod"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysConfigChangeVolatileGroup = etsysConfigChangeVolatileGroup.setStatus('current')
+etsysConfigChangeFirmwareGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 4, 1, 3)).setObjects(("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeFirmwareCount"), ("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeFirmwareTime"), ("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeFirmwareMethod"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysConfigChangeFirmwareGroup = etsysConfigChangeFirmwareGroup.setStatus('current')
+etsysConfigChangeCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5624, 1, 2, 12, 4, 2, 1)).setObjects(("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeNonVolatileGroup"), ("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeVolatileGroup"), ("ENTERASYS-CONFIGURATION-CHANGE-MIB", "etsysConfigChangeFirmwareGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysConfigChangeCompliance = etsysConfigChangeCompliance.setStatus('current')
+mibBuilder.exportSymbols("ENTERASYS-CONFIGURATION-CHANGE-MIB", etsysConfigChangeNonVolatile=etsysConfigChangeNonVolatile, etsysConfigChangeFirmwareMethod=etsysConfigChangeFirmwareMethod, etsysConfigChangeVolatileTime=etsysConfigChangeVolatileTime, etsysConfigChangeFirmwareGroup=etsysConfigChangeFirmwareGroup, etsysConfigChangeCompliances=etsysConfigChangeCompliances, etsysConfigChangeGroups=etsysConfigChangeGroups, etsysConfigurationChangeMIB=etsysConfigurationChangeMIB, etsysConfigChangeFirmware=etsysConfigChangeFirmware, etsysConfigChangeNonVolatileMethod=etsysConfigChangeNonVolatileMethod, etsysConfigChangeVolatileGroup=etsysConfigChangeVolatileGroup, etsysConfigChangeFirmwareTime=etsysConfigChangeFirmwareTime, etsysConfigChangeNonVolatileTime=etsysConfigChangeNonVolatileTime, etsysConfigChangeNonVolatileCount=etsysConfigChangeNonVolatileCount, PYSNMP_MODULE_ID=etsysConfigurationChangeMIB, etsysConfigChangeConformance=etsysConfigChangeConformance, etsysConfigChangeVolatileMethod=etsysConfigChangeVolatileMethod, etsysConfigChangeFirmwareCount=etsysConfigChangeFirmwareCount, etsysConfigChangeVolatileCount=etsysConfigChangeVolatileCount, etsysConfigChangeNonVolatileGroup=etsysConfigChangeNonVolatileGroup, etsysConfigChangeCompliance=etsysConfigChangeCompliance, etsysConfigChangeVolatile=etsysConfigChangeVolatile)

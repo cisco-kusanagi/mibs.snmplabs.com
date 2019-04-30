@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module XEDIA-PIM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/XEDIA-PIM-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:36:30 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Integer32, ObjectIdentity, Counter64, NotificationType, IpAddress, MibIdentifier, Counter32, Unsigned32, ModuleIdentity, iso, TimeTicks, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Integer32", "ObjectIdentity", "Counter64", "NotificationType", "IpAddress", "MibIdentifier", "Counter32", "Unsigned32", "ModuleIdentity", "iso", "TimeTicks", "Bits")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+xediaMibs, = mibBuilder.importSymbols("XEDIA-REG", "xediaMibs")
+xpimMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 838, 3, 31))
+if mibBuilder.loadTexts: xpimMIB.setLastUpdated('9904151600Z')
+if mibBuilder.loadTexts: xpimMIB.setOrganization('Xedia Corp.')
+xpimMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 31, 1))
+xpim = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 31, 1, 1))
+xpimVersion = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 31, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2)).clone(2)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xpimVersion.setStatus('current')
+xpimInterfaceTable = MibTable((1, 3, 6, 1, 4, 1, 838, 3, 31, 1, 1, 2), )
+if mibBuilder.loadTexts: xpimInterfaceTable.setStatus('current')
+xpimInterfaceEntry = MibTableRow((1, 3, 6, 1, 4, 1, 838, 3, 31, 1, 1, 2, 1), ).setIndexNames((0, "XEDIA-PIM-MIB", "xpimInterfaceIfIndex"))
+if mibBuilder.loadTexts: xpimInterfaceEntry.setStatus('current')
+xpimInterfaceIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 31, 1, 1, 2, 1, 1), Integer32())
+if mibBuilder.loadTexts: xpimInterfaceIfIndex.setStatus('current')
+xpimInterfaceAdminStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 31, 1, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xpimInterfaceAdminStatus.setStatus('current')
+mibBuilder.exportSymbols("XEDIA-PIM-MIB", xpimMIBObjects=xpimMIBObjects, xpimInterfaceIfIndex=xpimInterfaceIfIndex, xpimVersion=xpimVersion, PYSNMP_MODULE_ID=xpimMIB, xpim=xpim, xpimInterfaceAdminStatus=xpimInterfaceAdminStatus, xpimInterfaceEntry=xpimInterfaceEntry, xpimInterfaceTable=xpimInterfaceTable, xpimMIB=xpimMIB)

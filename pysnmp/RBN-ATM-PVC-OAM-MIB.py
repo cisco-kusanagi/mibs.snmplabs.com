@@ -1,0 +1,51 @@
+#
+# PySNMP MIB module RBN-ATM-PVC-OAM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RBN-ATM-PVC-OAM-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:44:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+rbnMgmt, = mibBuilder.importSymbols("RBN-SMI", "rbnMgmt")
+RbnSlot, RbnPort = mibBuilder.importSymbols("RBN-TC", "RbnSlot", "RbnPort")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+NotificationType, Unsigned32, Counter32, Counter64, TimeTicks, IpAddress, Bits, MibIdentifier, Integer32, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, ModuleIdentity, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Unsigned32", "Counter32", "Counter64", "TimeTicks", "IpAddress", "Bits", "MibIdentifier", "Integer32", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "ModuleIdentity", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+rbnAtmPvcOamMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 2352, 2, 19))
+rbnAtmPvcOamMib.setRevisions(('2002-11-13 00:00', '2002-02-05 00:00',))
+if mibBuilder.loadTexts: rbnAtmPvcOamMib.setLastUpdated('200211130000Z')
+if mibBuilder.loadTexts: rbnAtmPvcOamMib.setOrganization('Redback Networks, Inc.')
+rbnAtmPvcOamMibNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 19, 0))
+rbnAtmPvcOamMibObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 19, 1))
+rbnAtmPvcOamMibConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 19, 2))
+rbnAtmPvcOamStatusTable = MibTable((1, 3, 6, 1, 4, 1, 2352, 2, 19, 1, 1), )
+if mibBuilder.loadTexts: rbnAtmPvcOamStatusTable.setStatus('current')
+rbnAtmPvcOamStatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2352, 2, 19, 1, 1, 1), ).setIndexNames((0, "RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamStatusSlot"), (0, "RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamStatusPort"), (0, "RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamStatusVpi"), (0, "RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamStatusVci"))
+if mibBuilder.loadTexts: rbnAtmPvcOamStatusEntry.setStatus('current')
+rbnAtmPvcOamStatusSlot = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 19, 1, 1, 1, 1), RbnSlot())
+if mibBuilder.loadTexts: rbnAtmPvcOamStatusSlot.setStatus('current')
+rbnAtmPvcOamStatusPort = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 19, 1, 1, 1, 2), RbnPort())
+if mibBuilder.loadTexts: rbnAtmPvcOamStatusPort.setStatus('current')
+rbnAtmPvcOamStatusVpi = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 19, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 4095)))
+if mibBuilder.loadTexts: rbnAtmPvcOamStatusVpi.setStatus('current')
+rbnAtmPvcOamStatusVci = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 19, 1, 1, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535)))
+if mibBuilder.loadTexts: rbnAtmPvcOamStatusVci.setStatus('current')
+rbnAtmPvcOamStatusState = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 19, 1, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("noOam", 1), ("oamUp", 2), ("oamDownLoopback", 3), ("oamDownAis", 4), ("oamDownRdi", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnAtmPvcOamStatusState.setStatus('current')
+rbnAtmPvcOamStatusStateChange = NotificationType((1, 3, 6, 1, 4, 1, 2352, 2, 19, 0, 1)).setObjects(("RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamStatusState"))
+if mibBuilder.loadTexts: rbnAtmPvcOamStatusStateChange.setStatus('current')
+rbnAtmPvcOamCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 19, 2, 1))
+rbnAtmPvcOamGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 19, 2, 2))
+rbnAtmPvcOamCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2352, 2, 19, 2, 1, 1)).setObjects(("RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamGroup"), ("RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamNotifyGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnAtmPvcOamCompliance = rbnAtmPvcOamCompliance.setStatus('current')
+rbnAtmPvcOamGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2352, 2, 19, 2, 2, 1)).setObjects(("RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamStatusState"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnAtmPvcOamGroup = rbnAtmPvcOamGroup.setStatus('current')
+rbnAtmPvcOamNotifyGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 2352, 2, 19, 2, 2, 2)).setObjects(("RBN-ATM-PVC-OAM-MIB", "rbnAtmPvcOamStatusStateChange"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnAtmPvcOamNotifyGroup = rbnAtmPvcOamNotifyGroup.setStatus('current')
+mibBuilder.exportSymbols("RBN-ATM-PVC-OAM-MIB", rbnAtmPvcOamGroup=rbnAtmPvcOamGroup, rbnAtmPvcOamStatusTable=rbnAtmPvcOamStatusTable, rbnAtmPvcOamMibObjects=rbnAtmPvcOamMibObjects, rbnAtmPvcOamMib=rbnAtmPvcOamMib, rbnAtmPvcOamMibNotifications=rbnAtmPvcOamMibNotifications, PYSNMP_MODULE_ID=rbnAtmPvcOamMib, rbnAtmPvcOamStatusEntry=rbnAtmPvcOamStatusEntry, rbnAtmPvcOamStatusSlot=rbnAtmPvcOamStatusSlot, rbnAtmPvcOamStatusPort=rbnAtmPvcOamStatusPort, rbnAtmPvcOamStatusVpi=rbnAtmPvcOamStatusVpi, rbnAtmPvcOamStatusStateChange=rbnAtmPvcOamStatusStateChange, rbnAtmPvcOamCompliances=rbnAtmPvcOamCompliances, rbnAtmPvcOamGroups=rbnAtmPvcOamGroups, rbnAtmPvcOamNotifyGroup=rbnAtmPvcOamNotifyGroup, rbnAtmPvcOamStatusVci=rbnAtmPvcOamStatusVci, rbnAtmPvcOamStatusState=rbnAtmPvcOamStatusState, rbnAtmPvcOamCompliance=rbnAtmPvcOamCompliance, rbnAtmPvcOamMibConformance=rbnAtmPvcOamMibConformance)

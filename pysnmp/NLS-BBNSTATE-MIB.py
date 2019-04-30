@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module NLS-BBNSTATE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NLS-BBNSTATE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:11:37 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+bbnState, = mibBuilder.importSymbols("NLS-BBNIDENT-MIB", "bbnState")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, Gauge32, iso, ObjectIdentity, MibIdentifier, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, Unsigned32, ModuleIdentity, Bits, Counter64, TimeTicks, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Gauge32", "iso", "ObjectIdentity", "MibIdentifier", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "Unsigned32", "ModuleIdentity", "Bits", "Counter64", "TimeTicks", "Integer32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+unitAdministrativeState = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("locked", 1), ("unlocked", 2), ("shuttingDown", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: unitAdministrativeState.setStatus('mandatory')
+unitOperationalState = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: unitOperationalState.setStatus('mandatory')
+unitUsageState = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("idle", 1), ("active", 2), ("busy", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: unitUsageState.setStatus('mandatory')
+unitProceduralStatus = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("initializationRequired", 1), ("notInitialized", 2), ("initializing", 3), ("reporting", 4), ("terminating", 5), ("ready", 6)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: unitProceduralStatus.setStatus('mandatory')
+unitAlarmStatus = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9))).clone(namedValues=NamedValues(("ok", 1), ("undetermined", 2), ("warning", 3), ("minor", 4), ("major", 5), ("critical", 6), ("underRepair", 7), ("alarmOutstanding", 8), ("idle", 9)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: unitAlarmStatus.setStatus('mandatory')
+unitAvailabilityStatus = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))).clone(namedValues=NamedValues(("inTest", 1), ("failed", 2), ("powerOff", 3), ("offLine", 4), ("offDuty", 5), ("dependency", 6), ("degraded", 7), ("notInstalled", 8), ("logFull", 9), ("available", 10)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: unitAvailabilityStatus.setStatus('mandatory')
+unitControlStatus = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 7), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(32767, 1, 2, 3, 4))).clone(namedValues=NamedValues(("subjectToTest", 32767), ("partLocked", 1), ("reservedToTest", 2), ("suspended", 3), ("free", 4)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: unitControlStatus.setStatus('mandatory')
+unitStandbyStatus = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 8), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("hotStandby", 1), ("coldStandby", 2), ("providingService", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: unitStandbyStatus.setStatus('mandatory')
+unitUnknownStatus = MibScalar((1, 3, 6, 1, 4, 1, 1166, 5, 2, 9), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("true", 1), ("false", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: unitUnknownStatus.setStatus('mandatory')
+mibBuilder.exportSymbols("NLS-BBNSTATE-MIB", unitAvailabilityStatus=unitAvailabilityStatus, unitOperationalState=unitOperationalState, unitUsageState=unitUsageState, unitProceduralStatus=unitProceduralStatus, unitStandbyStatus=unitStandbyStatus, unitControlStatus=unitControlStatus, unitAdministrativeState=unitAdministrativeState, unitUnknownStatus=unitUnknownStatus, unitAlarmStatus=unitAlarmStatus)

@@ -1,0 +1,56 @@
+#
+# PySNMP MIB module ThreeParMIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ThreeParMIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:20:53 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup, AgentCapabilities = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "AgentCapabilities")
+iso, NotificationType, Bits, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, MibIdentifier, ObjectIdentity, Integer32, Unsigned32, Counter32, enterprises, IpAddress, Counter64, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "NotificationType", "Bits", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "MibIdentifier", "ObjectIdentity", "Integer32", "Unsigned32", "Counter32", "enterprises", "IpAddress", "Counter64", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+threepar = ModuleIdentity((1, 3, 6, 1, 4, 1, 12925))
+threepar.setRevisions(('2013-03-12 11:22', '2012-08-02 15:22', '2010-10-04 14:45', '2007-10-05 15:00', '2004-12-13 17:00', '2004-12-13 16:40', '2004-06-14 15:45', '2002-04-16 13:27',))
+if mibBuilder.loadTexts: threepar.setLastUpdated('201303121122Z')
+if mibBuilder.loadTexts: threepar.setOrganization('Organization : HP 3PAR')
+class ThreeparLongDisplayString(TextualConvention, OctetString):
+    status = 'current'
+
+inserv = ObjectIdentity((1, 3, 6, 1, 4, 1, 12925, 1))
+if mibBuilder.loadTexts: inserv.setStatus('current')
+inservAgentCaps = ObjectIdentity((1, 3, 6, 1, 4, 1, 12925, 1, 4))
+if mibBuilder.loadTexts: inservAgentCaps.setStatus('current')
+alertTable = MibTable((1, 3, 6, 1, 4, 1, 12925, 1, 7), )
+if mibBuilder.loadTexts: alertTable.setStatus('current')
+alertEntry = MibTableRow((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1), ).setIndexNames((0, "ThreeParMIB", "index"))
+if mibBuilder.loadTexts: alertEntry.setStatus('current')
+index = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: index.setStatus('current')
+severity = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("fatal", 0), ("critical", 1), ("major", 2), ("minor", 3), ("degraded", 4), ("info", 5), ("debug", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: severity.setStatus('current')
+timeOccurred = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 3), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: timeOccurred.setStatus('current')
+nodeID = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 4), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 31))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nodeID.setStatus('current')
+component = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 5), DisplayString().clone('1')).setMaxAccess("readonly")
+if mibBuilder.loadTexts: component.setStatus('current')
+details = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 6), ThreeparLongDisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 511))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: details.setStatus('current')
+id = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 7), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(1, 4294967295))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: id.setStatus('current')
+messageCode = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 8), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(65537, 4294967295))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: messageCode.setStatus('current')
+state = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 9), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("undefined", 0), ("new", 1), ("acknowledged", 2), ("fixed", 3), ("removed", 4), ("autofixed", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: state.setStatus('current')
+serialNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 12925, 1, 7, 1, 10), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: serialNumber.setStatus('current')
+alertNotify = NotificationType((1, 3, 6, 1, 4, 1, 12925, 1, 8)).setObjects(("ThreeParMIB", "component"), ("ThreeParMIB", "details"), ("ThreeParMIB", "nodeID"), ("ThreeParMIB", "severity"), ("ThreeParMIB", "timeOccurred"), ("ThreeParMIB", "id"), ("ThreeParMIB", "messageCode"), ("ThreeParMIB", "state"), ("ThreeParMIB", "serialNumber"))
+if mibBuilder.loadTexts: alertNotify.setStatus('current')
+inservAgentCapability = AgentCapabilities((1, 3, 6, 1, 4, 1, 12925, 1, 4, 1))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    inservAgentCapability = inservAgentCapability.setProductRelease('InServ Release 2.2')
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    inservAgentCapability = inservAgentCapability.setStatus('current')
+mibBuilder.exportSymbols("ThreeParMIB", severity=severity, alertEntry=alertEntry, serialNumber=serialNumber, inserv=inserv, threepar=threepar, alertNotify=alertNotify, inservAgentCapability=inservAgentCapability, nodeID=nodeID, ThreeparLongDisplayString=ThreeparLongDisplayString, messageCode=messageCode, alertTable=alertTable, state=state, timeOccurred=timeOccurred, component=component, id=id, index=index, PYSNMP_MODULE_ID=threepar, details=details, inservAgentCaps=inservAgentCaps)

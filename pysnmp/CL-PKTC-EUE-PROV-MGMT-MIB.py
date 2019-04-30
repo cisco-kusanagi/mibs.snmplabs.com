@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module CL-PKTC-EUE-PROV-MGMT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CL-PKTC-EUE-PROV-MGMT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:08:46 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint")
+pktcEUEMibs, = mibBuilder.importSymbols("CLAB-DEF-MIB", "pktcEUEMibs")
+InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddress")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+ModuleIdentity, Bits, Unsigned32, IpAddress, NotificationType, iso, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Gauge32, Integer32, MibIdentifier, Bits, Counter64, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Bits", "Unsigned32", "IpAddress", "NotificationType", "iso", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Gauge32", "Integer32", "MibIdentifier", "Bits", "Counter64", "Counter32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+pktcEUEProvMgmtMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4))
+if mibBuilder.loadTexts: pktcEUEProvMgmtMIB.setLastUpdated('200708220000Z')
+if mibBuilder.loadTexts: pktcEUEProvMgmtMIB.setOrganization('Cable Television Laboratories, Inc.')
+pktcEUEProvMgmtNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 0))
+pktcEUEProvMgmtObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1))
+pktcEUEProvMgmtConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 2))
+pktcEUEProvMgmtVersion = MibScalar((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1, 1), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 6))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: pktcEUEProvMgmtVersion.setStatus('current')
+pktcEUEDhcpv6ServerId1 = MibScalar((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 31))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: pktcEUEDhcpv6ServerId1.setStatus('current')
+pktcEUEDhcpv6ServerId2 = MibScalar((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1, 3), InetAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: pktcEUEDhcpv6ServerId2.setStatus('current')
+pktcEUEDhcpv6ServerAddressType = MibScalar((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1, 4), InetAddressType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: pktcEUEDhcpv6ServerAddressType.setStatus('current')
+pktcEUEDhcpv6ServerAddress = MibScalar((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1, 5), InetAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: pktcEUEDhcpv6ServerAddress.setStatus('current')
+pktcEUEDnsv6ServerAddressType = MibScalar((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1, 6), InetAddressType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: pktcEUEDnsv6ServerAddressType.setStatus('current')
+pktcEUEDnsv6ServerAddress1 = MibScalar((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1, 7), InetAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: pktcEUEDnsv6ServerAddress1.setStatus('current')
+pktcEUEDnsv6ServerAddress2 = MibScalar((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 1, 8), InetAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: pktcEUEDnsv6ServerAddress2.setStatus('current')
+pktcEUEProvMgmtCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 2, 1))
+pktcEUEProvMgmtGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 2, 2))
+pktcEUEProvMgmtCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 2, 1, 1)).setObjects(("PKTC-IETF-MTA-MIB", "pktcMtaGroup"), ("PKTC-IETF-MTA-MIB", "pktcMtaNotificationGroup"), ("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEProvMgmtGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    pktcEUEProvMgmtCompliance = pktcEUEProvMgmtCompliance.setStatus('current')
+pktcEUEProvMgmtGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 4491, 2, 2, 10, 4, 2, 2, 1)).setObjects(("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEProvMgmtVersion"), ("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEDhcpv6ServerId1"), ("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEDhcpv6ServerId2"), ("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEDhcpv6ServerAddressType"), ("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEDhcpv6ServerAddress"), ("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEDnsv6ServerAddressType"), ("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEDnsv6ServerAddress1"), ("CL-PKTC-EUE-PROV-MGMT-MIB", "pktcEUEDnsv6ServerAddress2"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    pktcEUEProvMgmtGroup = pktcEUEProvMgmtGroup.setStatus('current')
+mibBuilder.exportSymbols("CL-PKTC-EUE-PROV-MGMT-MIB", pktcEUEProvMgmtGroups=pktcEUEProvMgmtGroups, pktcEUEDnsv6ServerAddress1=pktcEUEDnsv6ServerAddress1, pktcEUEDnsv6ServerAddressType=pktcEUEDnsv6ServerAddressType, pktcEUEProvMgmtCompliances=pktcEUEProvMgmtCompliances, pktcEUEProvMgmtObjects=pktcEUEProvMgmtObjects, pktcEUEDhcpv6ServerId1=pktcEUEDhcpv6ServerId1, pktcEUEProvMgmtConformance=pktcEUEProvMgmtConformance, PYSNMP_MODULE_ID=pktcEUEProvMgmtMIB, pktcEUEDhcpv6ServerAddressType=pktcEUEDhcpv6ServerAddressType, pktcEUEDhcpv6ServerAddress=pktcEUEDhcpv6ServerAddress, pktcEUEProvMgmtNotifications=pktcEUEProvMgmtNotifications, pktcEUEDnsv6ServerAddress2=pktcEUEDnsv6ServerAddress2, pktcEUEProvMgmtGroup=pktcEUEProvMgmtGroup, pktcEUEProvMgmtMIB=pktcEUEProvMgmtMIB, pktcEUEProvMgmtVersion=pktcEUEProvMgmtVersion, pktcEUEDhcpv6ServerId2=pktcEUEDhcpv6ServerId2, pktcEUEProvMgmtCompliance=pktcEUEProvMgmtCompliance)

@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module NETSCREEN-VPN-IAS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NETSCREEN-VPN-IAS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:10:46 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint")
+netscreenVpn, = mibBuilder.importSymbols("NETSCREEN-SMI", "netscreenVpn")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, ModuleIdentity, iso, Counter64, Unsigned32, Bits, IpAddress, Integer32, Gauge32, TimeTicks, Counter32, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "ModuleIdentity", "iso", "Counter64", "Unsigned32", "Bits", "IpAddress", "Integer32", "Gauge32", "TimeTicks", "Counter32", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+nsVpnIas = MibIdentifier((1, 3, 6, 1, 4, 1, 3224, 4, 11))
+nsVpnIasTable = MibTable((1, 3, 6, 1, 4, 1, 3224, 4, 11, 1), )
+if mibBuilder.loadTexts: nsVpnIasTable.setStatus('mandatory')
+nsVpnIasEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3224, 4, 11, 1, 1), ).setIndexNames((0, "NETSCREEN-VPN-IAS-MIB", "nsVpnIasType"))
+if mibBuilder.loadTexts: nsVpnIasEntry.setStatus('mandatory')
+nsVpnIasType = MibTableColumn((1, 3, 6, 1, 4, 1, 3224, 4, 11, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("ipv4", 1), ("ipv6", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsVpnIasType.setStatus('mandatory')
+nsVpnIasTotal = MibTableColumn((1, 3, 6, 1, 4, 1, 3224, 4, 11, 1, 1, 2), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsVpnIasTotal.setStatus('mandatory')
+nsVpnIasSessTable = MibTable((1, 3, 6, 1, 4, 1, 3224, 4, 11, 2), )
+if mibBuilder.loadTexts: nsVpnIasSessTable.setStatus('mandatory')
+nsVpnIasSessEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3224, 4, 11, 2, 1), ).setIndexNames((0, "NETSCREEN-VPN-IAS-MIB", "nsVpnIasSessIndex"))
+if mibBuilder.loadTexts: nsVpnIasSessEntry.setStatus('mandatory')
+nsVpnIasSessIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 3224, 4, 11, 2, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsVpnIasSessIndex.setStatus('mandatory')
+nsVpnIasSessXauthUserName = MibTableColumn((1, 3, 6, 1, 4, 1, 3224, 4, 11, 2, 1, 2), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsVpnIasSessXauthUserName.setStatus('mandatory')
+mibBuilder.exportSymbols("NETSCREEN-VPN-IAS-MIB", nsVpnIasSessEntry=nsVpnIasSessEntry, nsVpnIasTotal=nsVpnIasTotal, nsVpnIasSessIndex=nsVpnIasSessIndex, nsVpnIasSessTable=nsVpnIasSessTable, nsVpnIas=nsVpnIas, nsVpnIasSessXauthUserName=nsVpnIasSessXauthUserName, nsVpnIasEntry=nsVpnIasEntry, nsVpnIasType=nsVpnIasType, nsVpnIasTable=nsVpnIasTable)

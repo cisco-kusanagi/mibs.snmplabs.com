@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module CXUTST-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CXUTST-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:18:02 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint")
+cxUTst, = mibBuilder.importSymbols("CXProduct-SMI", "cxUTst")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+TimeTicks, Integer32, Counter32, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Bits, Unsigned32, iso, Gauge32, IpAddress, ModuleIdentity, MibIdentifier, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Integer32", "Counter32", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Bits", "Unsigned32", "iso", "Gauge32", "IpAddress", "ModuleIdentity", "MibIdentifier", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+utstTable = MibTable((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10), )
+if mibBuilder.loadTexts: utstTable.setStatus('mandatory')
+utstEntry = MibTableRow((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10, 1), ).setIndexNames((0, "CXUTST-MIB", "utstSlotNumberIndex"))
+if mibBuilder.loadTexts: utstEntry.setStatus('mandatory')
+utstSlotNumberIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 6))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: utstSlotNumberIndex.setStatus('mandatory')
+utstIoRegTest = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10, 1, 20), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("failed", 1), ("passed", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: utstIoRegTest.setStatus('mandatory')
+utstIoLedsTest = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10, 1, 21), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("initializationFailed", 1), ("initializationPassed", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: utstIoLedsTest.setStatus('mandatory')
+utstImpRegTest = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10, 1, 22), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("initializationFailed", 1), ("failed", 2), ("passed", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: utstImpRegTest.setStatus('mandatory')
+utstImpComTestPollResult = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10, 1, 23), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("initializationFailed", 1), ("failed", 2), ("passed", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: utstImpComTestPollResult.setStatus('mandatory')
+utstUifRegTest = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10, 1, 24), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("initializationFailed", 1), ("failed", 2), ("passed", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: utstUifRegTest.setStatus('mandatory')
+utstUifComTestPollResult = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 40, 10, 1, 25), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("initializationFailed", 1), ("failed", 2), ("passed", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: utstUifComTestPollResult.setStatus('mandatory')
+mibBuilder.exportSymbols("CXUTST-MIB", utstIoRegTest=utstIoRegTest, utstImpComTestPollResult=utstImpComTestPollResult, utstSlotNumberIndex=utstSlotNumberIndex, utstIoLedsTest=utstIoLedsTest, utstEntry=utstEntry, utstTable=utstTable, utstImpRegTest=utstImpRegTest, utstUifRegTest=utstUifRegTest, utstUifComTestPollResult=utstUifComTestPollResult)

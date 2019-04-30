@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module INCOGNITO-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/INCOGNITO-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:42:01 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Bits, enterprises, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, ModuleIdentity, ObjectIdentity, Gauge32, Counter64, iso, IpAddress, NotificationType, MibIdentifier, Unsigned32, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "enterprises", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "ModuleIdentity", "ObjectIdentity", "Gauge32", "Counter64", "iso", "IpAddress", "NotificationType", "MibIdentifier", "Unsigned32", "Counter32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+incognito = ModuleIdentity((1, 3, 6, 1, 4, 1, 3606))
+if mibBuilder.loadTexts: incognito.setLastUpdated('200304151442Z')
+if mibBuilder.loadTexts: incognito.setOrganization('Incognito Software Inc.')
+incognitoSNMPObjects = ObjectIdentity((1, 3, 6, 1, 4, 1, 3606, 1))
+if mibBuilder.loadTexts: incognitoSNMPObjects.setStatus('obsolete')
+incognitoReg = ObjectIdentity((1, 3, 6, 1, 4, 1, 3606, 2))
+if mibBuilder.loadTexts: incognitoReg.setStatus('current')
+incognitoGeneric = ObjectIdentity((1, 3, 6, 1, 4, 1, 3606, 3))
+if mibBuilder.loadTexts: incognitoGeneric.setStatus('current')
+incognitoProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 3606, 4))
+if mibBuilder.loadTexts: incognitoProducts.setStatus('current')
+incognitoCaps = ObjectIdentity((1, 3, 6, 1, 4, 1, 3606, 5))
+if mibBuilder.loadTexts: incognitoCaps.setStatus('current')
+incognitoReqs = ObjectIdentity((1, 3, 6, 1, 4, 1, 3606, 6))
+if mibBuilder.loadTexts: incognitoReqs.setStatus('current')
+incognitoExpr = ObjectIdentity((1, 3, 6, 1, 4, 1, 3606, 7))
+if mibBuilder.loadTexts: incognitoExpr.setStatus('current')
+mibBuilder.exportSymbols("INCOGNITO-MIB", incognitoSNMPObjects=incognitoSNMPObjects, incognitoReqs=incognitoReqs, incognitoGeneric=incognitoGeneric, incognitoReg=incognitoReg, PYSNMP_MODULE_ID=incognito, incognitoProducts=incognitoProducts, incognitoCaps=incognitoCaps, incognito=incognito, incognitoExpr=incognitoExpr)

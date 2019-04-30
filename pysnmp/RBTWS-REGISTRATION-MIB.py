@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module RBTWS-REGISTRATION-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RBTWS-REGISTRATION-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:45:18 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint")
+rbtwsRegistration, = mibBuilder.importSymbols("RBTWS-ROOT-MIB", "rbtwsRegistration")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, IpAddress, ObjectIdentity, Unsigned32, Counter32, TimeTicks, Counter64, NotificationType, MibIdentifier, Integer32, iso, ModuleIdentity, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "IpAddress", "ObjectIdentity", "Unsigned32", "Counter32", "TimeTicks", "Counter64", "NotificationType", "MibIdentifier", "Integer32", "iso", "ModuleIdentity", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+rbtwsRegistrationMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 3))
+rbtwsRegistrationMib.setRevisions(('2006-05-22 00:08', '2005-01-01 00:00',))
+if mibBuilder.loadTexts: rbtwsRegistrationMib.setLastUpdated('200605301630Z')
+if mibBuilder.loadTexts: rbtwsRegistrationMib.setOrganization('Enterasys Networks')
+rbtwsChassisComponents = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 4))
+rbtwsChasCompPowerSupplies = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 4, 1))
+rbtwsChasCompFans = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 4, 2))
+rbtwsChasCompPowerSupply1 = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 4, 1, 1))
+rbtwsChasCompPowerSupply2 = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 4, 1, 2))
+rbtwsChasCompFan1 = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 4, 2, 1))
+rbtwsChasCompFan2 = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 4, 2, 2))
+rbtwsChasCompFan3 = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 4, 2, 3))
+rbtwsWirelessSwitch = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 1))
+rbtwsSwitch8100 = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 1, 1))
+rbtwsSwitch8200 = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 1, 2))
+rbtwsSwitch8400 = MibIdentifier((1, 3, 6, 1, 4, 1, 52, 4, 15, 1, 3, 1, 3))
+mibBuilder.exportSymbols("RBTWS-REGISTRATION-MIB", rbtwsChassisComponents=rbtwsChassisComponents, PYSNMP_MODULE_ID=rbtwsRegistrationMib, rbtwsChasCompFan2=rbtwsChasCompFan2, rbtwsRegistrationMib=rbtwsRegistrationMib, rbtwsSwitch8100=rbtwsSwitch8100, rbtwsChasCompFan3=rbtwsChasCompFan3, rbtwsSwitch8200=rbtwsSwitch8200, rbtwsSwitch8400=rbtwsSwitch8400, rbtwsChasCompPowerSupply1=rbtwsChasCompPowerSupply1, rbtwsChasCompPowerSupplies=rbtwsChasCompPowerSupplies, rbtwsWirelessSwitch=rbtwsWirelessSwitch, rbtwsChasCompFans=rbtwsChasCompFans, rbtwsChasCompFan1=rbtwsChasCompFan1, rbtwsChasCompPowerSupply2=rbtwsChasCompPowerSupply2)

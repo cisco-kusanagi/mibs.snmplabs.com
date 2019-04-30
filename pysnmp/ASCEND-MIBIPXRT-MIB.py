@@ -1,0 +1,47 @@
+#
+# PySNMP MIB module ASCEND-MIBIPXRT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ASCEND-MIBIPXRT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:11:35 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+configuration, = mibBuilder.importSymbols("ASCEND-MIB", "configuration")
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Gauge32, Integer32, ObjectIdentity, Counter32, Bits, iso, Counter64, Unsigned32, ModuleIdentity, IpAddress, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Gauge32", "Integer32", "ObjectIdentity", "Counter32", "Bits", "iso", "Counter64", "Unsigned32", "ModuleIdentity", "IpAddress", "NotificationType")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+class DisplayString(OctetString):
+    pass
+
+mibipxRouteProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 529, 23, 89))
+mibipxRouteProfileTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 89, 1), )
+if mibBuilder.loadTexts: mibipxRouteProfileTable.setStatus('mandatory')
+mibipxRouteProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1), ).setIndexNames((0, "ASCEND-MIBIPXRT-MIB", "ipxRouteProfile-Name"))
+if mibBuilder.loadTexts: mibipxRouteProfileEntry.setStatus('mandatory')
+ipxRouteProfile_Index = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 1), Integer32()).setLabel("ipxRouteProfile-Index").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_Index.setStatus('mandatory')
+ipxRouteProfile_Name = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 2), DisplayString()).setLabel("ipxRouteProfile-Name").setMaxAccess("readonly")
+if mibBuilder.loadTexts: ipxRouteProfile_Name.setStatus('mandatory')
+ipxRouteProfile_ServerType = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 3), DisplayString()).setLabel("ipxRouteProfile-ServerType").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_ServerType.setStatus('mandatory')
+ipxRouteProfile_DestNetwork = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 4), DisplayString()).setLabel("ipxRouteProfile-DestNetwork").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_DestNetwork.setStatus('mandatory')
+ipxRouteProfile_ServerNode = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 5), DisplayString()).setLabel("ipxRouteProfile-ServerNode").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_ServerNode.setStatus('mandatory')
+ipxRouteProfile_ServerSocket = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 6), DisplayString()).setLabel("ipxRouteProfile-ServerSocket").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_ServerSocket.setStatus('mandatory')
+ipxRouteProfile_Hops = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 7), Integer32()).setLabel("ipxRouteProfile-Hops").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_Hops.setStatus('mandatory')
+ipxRouteProfile_Ticks = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 8), Integer32()).setLabel("ipxRouteProfile-Ticks").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_Ticks.setStatus('mandatory')
+ipxRouteProfile_ProfileNumber = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 9), Integer32()).setLabel("ipxRouteProfile-ProfileNumber").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_ProfileNumber.setStatus('mandatory')
+ipxRouteProfile_ProfileName = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 10), DisplayString()).setLabel("ipxRouteProfile-ProfileName").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_ProfileName.setStatus('mandatory')
+ipxRouteProfile_ActiveRoute = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 11), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("ipxRouteProfile-ActiveRoute").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_ActiveRoute.setStatus('mandatory')
+ipxRouteProfile_Action_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 89, 1, 1, 12), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noAction", 1), ("createProfile", 2), ("deleteProfile", 3)))).setLabel("ipxRouteProfile-Action-o").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ipxRouteProfile_Action_o.setStatus('mandatory')
+mibBuilder.exportSymbols("ASCEND-MIBIPXRT-MIB", ipxRouteProfile_Ticks=ipxRouteProfile_Ticks, mibipxRouteProfile=mibipxRouteProfile, ipxRouteProfile_DestNetwork=ipxRouteProfile_DestNetwork, ipxRouteProfile_Action_o=ipxRouteProfile_Action_o, ipxRouteProfile_Index=ipxRouteProfile_Index, ipxRouteProfile_ProfileNumber=ipxRouteProfile_ProfileNumber, ipxRouteProfile_ActiveRoute=ipxRouteProfile_ActiveRoute, ipxRouteProfile_Hops=ipxRouteProfile_Hops, DisplayString=DisplayString, ipxRouteProfile_Name=ipxRouteProfile_Name, ipxRouteProfile_ProfileName=ipxRouteProfile_ProfileName, ipxRouteProfile_ServerSocket=ipxRouteProfile_ServerSocket, ipxRouteProfile_ServerType=ipxRouteProfile_ServerType, ipxRouteProfile_ServerNode=ipxRouteProfile_ServerNode, mibipxRouteProfileTable=mibipxRouteProfileTable, mibipxRouteProfileEntry=mibipxRouteProfileEntry)

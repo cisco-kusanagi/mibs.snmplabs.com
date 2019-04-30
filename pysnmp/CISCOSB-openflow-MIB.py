@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module CISCOSB-openflow-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCOSB-openflow-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:08:09 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint")
+switch001, = mibBuilder.importSymbols("CISCOSB-MIB", "switch001")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Unsigned32, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, MibIdentifier, Counter32, Bits, Integer32, Gauge32, NotificationType, ObjectIdentity, IpAddress, ModuleIdentity, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "MibIdentifier", "Counter32", "Bits", "Integer32", "Gauge32", "NotificationType", "ObjectIdentity", "IpAddress", "ModuleIdentity", "TimeTicks")
+DisplayString, DateAndTime, TruthValue, TimeStamp, RowStatus, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "DateAndTime", "TruthValue", "TimeStamp", "RowStatus", "TextualConvention")
+rlOpenFlow = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 319))
+rlOpenFlowSupported = MibScalar((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 319, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowSupported.setStatus('current')
+rlOpenFlowTcpPort = MibScalar((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 319, 2), Integer32().clone(6633)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowTcpPort.setStatus('current')
+rlOpenFlowServerIpAddr = MibScalar((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 319, 3), IpAddress().clone(hexValue="00000000")).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowServerIpAddr.setStatus('current')
+rlOpenFlowProtocolType = MibScalar((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 319, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("tcp", 0), ("tls", 1))).clone('tcp')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowProtocolType.setStatus('current')
+rlOpenFlowDefaultForwardAction = MibScalar((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 319, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("forward", 0), ("drop", 1), ("toController", 2))).clone('forward')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowDefaultForwardAction.setStatus('current')
+rlOpenFlowEnable = MibScalar((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 319, 6), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlOpenFlowEnable.setStatus('current')
+rlOpenFlowEnableAfterReset = MibScalar((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 319, 7), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowEnableAfterReset.setStatus('current')
+mibBuilder.exportSymbols("CISCOSB-openflow-MIB", rlOpenFlowProtocolType=rlOpenFlowProtocolType, rlOpenFlowServerIpAddr=rlOpenFlowServerIpAddr, rlOpenFlowSupported=rlOpenFlowSupported, rlOpenFlow=rlOpenFlow, rlOpenFlowEnable=rlOpenFlowEnable, rlOpenFlowDefaultForwardAction=rlOpenFlowDefaultForwardAction, rlOpenFlowEnableAfterReset=rlOpenFlowEnableAfterReset, rlOpenFlowTcpPort=rlOpenFlowTcpPort)

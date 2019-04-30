@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module VERTICAL-INTERFACES-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/VERTICAL-INTERFACES-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:27:03 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Gauge32, ObjectIdentity, MibIdentifier, iso, NotificationType, Unsigned32, IpAddress, Counter32, Bits, Integer32, Counter64, enterprises = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Gauge32", "ObjectIdentity", "MibIdentifier", "iso", "NotificationType", "Unsigned32", "IpAddress", "Counter32", "Bits", "Integer32", "Counter64", "enterprises")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+vertical = MibIdentifier((1, 3, 6, 1, 4, 1, 2338))
+vinterfaces = MibIdentifier((1, 3, 6, 1, 4, 1, 2338, 14))
+vifNumber = MibScalar((1, 3, 6, 1, 4, 1, 2338, 14, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2147483647))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: vifNumber.setStatus('mandatory')
+vifTable = MibTable((1, 3, 6, 1, 4, 1, 2338, 14, 2), )
+if mibBuilder.loadTexts: vifTable.setStatus('mandatory')
+vifEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2338, 14, 2, 1), ).setIndexNames((0, "VERTICAL-INTERFACES-MIB", "vifIndex"))
+if mibBuilder.loadTexts: vifEntry.setStatus('mandatory')
+vifIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2338, 14, 2, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: vifIndex.setStatus('mandatory')
+vifDescr = MibTableColumn((1, 3, 6, 1, 4, 1, 2338, 14, 2, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: vifDescr.setStatus('mandatory')
+vifType = MibTableColumn((1, 3, 6, 1, 4, 1, 2338, 14, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32))).clone(namedValues=NamedValues(("other", 1), ("regular1822", 2), ("hdh1822", 3), ("ddn-x25", 4), ("rfc877-x25", 5), ("ethernet-csmacd", 6), ("iso88023-csmacd", 7), ("iso88024-tokenBus", 8), ("iso88025-tokenRing", 9), ("iso88026-man", 10), ("starLan", 11), ("proteon-10Mbit", 12), ("proteon-80Mbit", 13), ("hyperchannel", 14), ("fddi", 15), ("lapb", 16), ("sdlc", 17), ("ds1", 18), ("e1", 19), ("basicISDN", 20), ("primaryISDN", 21), ("propPointToPointSerial", 22), ("ppp", 23), ("softwareLoopback", 24), ("eon", 25), ("ethernet-3Mbit", 26), ("nsip", 27), ("slip", 28), ("ultra", 29), ("ds3", 30), ("sip", 31), ("frame-relay", 32)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: vifType.setStatus('mandatory')
+vifOperStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 2338, 14, 2, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("up", 1), ("down", 2), ("testing", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: vifOperStatus.setStatus('mandatory')
+vifSpecific = MibTableColumn((1, 3, 6, 1, 4, 1, 2338, 14, 2, 1, 5), ObjectIdentifier()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: vifSpecific.setStatus('mandatory')
+mibBuilder.exportSymbols("VERTICAL-INTERFACES-MIB", vifSpecific=vifSpecific, vifIndex=vifIndex, vinterfaces=vinterfaces, vifEntry=vifEntry, vifDescr=vifDescr, vifNumber=vifNumber, vifTable=vifTable, vifType=vifType, vifOperStatus=vifOperStatus, vertical=vertical)

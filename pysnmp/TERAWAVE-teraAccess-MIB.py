@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module TERAWAVE-teraAccess-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TERAWAVE-teraAccess-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:08:25 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Integer32, MibIdentifier, Counter64, Unsigned32, NotificationType, Counter32, ModuleIdentity, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, TimeTicks, enterprises, IpAddress, iso, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "MibIdentifier", "Counter64", "Unsigned32", "NotificationType", "Counter32", "ModuleIdentity", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "TimeTicks", "enterprises", "IpAddress", "iso", "Bits")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+terawave = MibIdentifier((1, 3, 6, 1, 4, 1, 4513))
+teraAccess = MibIdentifier((1, 3, 6, 1, 4, 1, 4513, 24))
+teraUserProfilesTable = MibTable((1, 3, 6, 1, 4, 1, 4513, 24, 1), )
+if mibBuilder.loadTexts: teraUserProfilesTable.setStatus('mandatory')
+teraUserProfileClear = MibScalar((1, 3, 6, 1, 4, 1, 4513, 24, 1, 2), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: teraUserProfileClear.setStatus('mandatory')
+teraUserProfilesTableEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4513, 24, 1, 1), ).setIndexNames((0, "TERAWAVE-teraAccess-MIB", "teraUserProfileIndex"))
+if mibBuilder.loadTexts: teraUserProfilesTableEntry.setStatus('mandatory')
+teraUserProfileIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 4513, 24, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: teraUserProfileIndex.setStatus('mandatory')
+teraUserProfileName = MibTableColumn((1, 3, 6, 1, 4, 1, 4513, 24, 1, 1, 2), OctetString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: teraUserProfileName.setStatus('mandatory')
+teraUserProfilePassword = MibTableColumn((1, 3, 6, 1, 4, 1, 4513, 24, 1, 1, 3), OctetString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: teraUserProfilePassword.setStatus('mandatory')
+teraUserProfileAccessLevel = MibTableColumn((1, 3, 6, 1, 4, 1, 4513, 24, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("admin", 1), ("oper", 2), ("test", 3), ("view", 4)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: teraUserProfileAccessLevel.setStatus('mandatory')
+teraUserProfileStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4513, 24, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("ok", 1), ("delete", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: teraUserProfileStatus.setStatus('mandatory')
+mibBuilder.exportSymbols("TERAWAVE-teraAccess-MIB", teraUserProfileName=teraUserProfileName, terawave=terawave, teraUserProfileClear=teraUserProfileClear, teraUserProfilesTable=teraUserProfilesTable, teraUserProfileIndex=teraUserProfileIndex, teraUserProfileStatus=teraUserProfileStatus, teraUserProfilesTableEntry=teraUserProfilesTableEntry, teraUserProfileAccessLevel=teraUserProfileAccessLevel, teraAccess=teraAccess, teraUserProfilePassword=teraUserProfilePassword)

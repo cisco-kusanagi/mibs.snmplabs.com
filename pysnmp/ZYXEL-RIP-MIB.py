@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module ZYXEL-RIP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZYXEL-RIP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:45:35 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+EnabledStatus, = mibBuilder.importSymbols("P-BRIDGE-MIB", "EnabledStatus")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Bits, Counter64, iso, ModuleIdentity, ObjectIdentity, Integer32, Unsigned32, Gauge32, IpAddress, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, TimeTicks, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "Counter64", "iso", "ModuleIdentity", "ObjectIdentity", "Integer32", "Unsigned32", "Gauge32", "IpAddress", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "TimeTicks", "NotificationType")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+esMgmt, = mibBuilder.importSymbols("ZYXEL-ES-SMI", "esMgmt")
+zyRouteDomainIpMaskBits, zyRouteDomainIpAddress = mibBuilder.importSymbols("ZYXEL-IP-FORWARD-MIB", "zyRouteDomainIpMaskBits", "zyRouteDomainIpAddress")
+zyxelRip = ModuleIdentity((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 74))
+if mibBuilder.loadTexts: zyxelRip.setLastUpdated('201207010000Z')
+if mibBuilder.loadTexts: zyxelRip.setOrganization('Enterprise Solution ZyXEL')
+zyxelRipSetup = MibIdentifier((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 74, 1))
+zyRipState = MibScalar((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 74, 1, 1), EnabledStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyRipState.setStatus('current')
+zyRipDistance = MibScalar((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 74, 1, 2), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyRipDistance.setStatus('current')
+zyxelRipRouteDomainTable = MibTable((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 74, 1, 3), )
+if mibBuilder.loadTexts: zyxelRipRouteDomainTable.setStatus('current')
+zyxelRipRouteDomainEntry = MibTableRow((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 74, 1, 3, 1), ).setIndexNames((0, "ZYXEL-IP-FORWARD-MIB", "zyRouteDomainIpAddress"), (0, "ZYXEL-IP-FORWARD-MIB", "zyRouteDomainIpMaskBits"))
+if mibBuilder.loadTexts: zyxelRipRouteDomainEntry.setStatus('current')
+zyRipRouteDomainDirection = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 74, 1, 3, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3))).clone(namedValues=NamedValues(("none", 0), ("outgoing", 1), ("incoming", 2), ("both", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyRipRouteDomainDirection.setStatus('current')
+zyRipRouteDomainVersion = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 74, 1, 3, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("v1", 0), ("v2b", 1), ("v2m", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyRipRouteDomainVersion.setStatus('current')
+mibBuilder.exportSymbols("ZYXEL-RIP-MIB", zyxelRipSetup=zyxelRipSetup, zyxelRipRouteDomainEntry=zyxelRipRouteDomainEntry, zyxelRip=zyxelRip, zyRipRouteDomainVersion=zyRipRouteDomainVersion, PYSNMP_MODULE_ID=zyxelRip, zyRipRouteDomainDirection=zyRipRouteDomainDirection, zyxelRipRouteDomainTable=zyxelRipRouteDomainTable, zyRipState=zyRipState, zyRipDistance=zyRipDistance)

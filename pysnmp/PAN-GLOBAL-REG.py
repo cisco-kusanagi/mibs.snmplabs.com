@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module PAN-GLOBAL-REG (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PAN-GLOBAL-REG
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:27:41 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+enterprises, MibIdentifier, iso, Integer32, IpAddress, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, NotificationType, TimeTicks, ModuleIdentity, ObjectIdentity, Bits, Unsigned32, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "enterprises", "MibIdentifier", "iso", "Integer32", "IpAddress", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "NotificationType", "TimeTicks", "ModuleIdentity", "ObjectIdentity", "Bits", "Unsigned32", "Counter32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+panGlobalRegModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 25461, 1, 1, 1))
+panGlobalRegModule.setRevisions(('2011-02-09 16:10',))
+if mibBuilder.loadTexts: panGlobalRegModule.setLastUpdated('201106271040Z')
+if mibBuilder.loadTexts: panGlobalRegModule.setOrganization('Palo Alto Networks')
+panRoot = ObjectIdentity((1, 3, 6, 1, 4, 1, 25461))
+if mibBuilder.loadTexts: panRoot.setStatus('current')
+panReg = ObjectIdentity((1, 3, 6, 1, 4, 1, 25461, 1))
+if mibBuilder.loadTexts: panReg.setStatus('current')
+panModules = ObjectIdentity((1, 3, 6, 1, 4, 1, 25461, 1, 1))
+if mibBuilder.loadTexts: panModules.setStatus('current')
+panMibs = ObjectIdentity((1, 3, 6, 1, 4, 1, 25461, 2))
+if mibBuilder.loadTexts: panMibs.setStatus('current')
+panCommonMib = ObjectIdentity((1, 3, 6, 1, 4, 1, 25461, 2, 1))
+if mibBuilder.loadTexts: panCommonMib.setStatus('current')
+panSpecificMib = ObjectIdentity((1, 3, 6, 1, 4, 1, 25461, 2, 2))
+if mibBuilder.loadTexts: panSpecificMib.setStatus('current')
+panProductsMibs = ObjectIdentity((1, 3, 6, 1, 4, 1, 25461, 2, 3))
+if mibBuilder.loadTexts: panProductsMibs.setStatus('current')
+mibBuilder.exportSymbols("PAN-GLOBAL-REG", PYSNMP_MODULE_ID=panGlobalRegModule, panGlobalRegModule=panGlobalRegModule, panProductsMibs=panProductsMibs, panReg=panReg, panSpecificMib=panSpecificMib, panModules=panModules, panMibs=panMibs, panRoot=panRoot, panCommonMib=panCommonMib)

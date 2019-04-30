@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module A3COM-HUAWEI-GRE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/A3COM-HUAWEI-GRE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 16:50:22 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+h3cCommon, = mibBuilder.importSymbols("A3COM-HUAWEI-OID-MIB", "h3cCommon")
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Bits, Unsigned32, iso, Counter64, NotificationType, MibIdentifier, IpAddress, Gauge32, Integer32, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Counter32, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "Unsigned32", "iso", "Counter64", "NotificationType", "MibIdentifier", "IpAddress", "Gauge32", "Integer32", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Counter32", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+h3cGre = ModuleIdentity((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 54))
+h3cGre.setRevisions(('2005-06-04 00:00',))
+if mibBuilder.loadTexts: h3cGre.setLastUpdated('200506040000Z')
+if mibBuilder.loadTexts: h3cGre.setOrganization('Huawei 3Com Technologies Co., Ltd. ')
+h3cGreObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 54, 1))
+h3cGreTable = MibTable((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 54, 1, 1), )
+if mibBuilder.loadTexts: h3cGreTable.setStatus('current')
+h3cGreEntry = MibTableRow((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 54, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: h3cGreEntry.setStatus('current')
+h3cGreKeyValue = MibTableColumn((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 54, 1, 1, 1, 1), Unsigned32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: h3cGreKeyValue.setStatus('current')
+h3cGreKey = MibTableColumn((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 54, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: h3cGreKey.setStatus('current')
+h3cGreChecksum = MibTableColumn((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 54, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: h3cGreChecksum.setStatus('current')
+mibBuilder.exportSymbols("A3COM-HUAWEI-GRE-MIB", h3cGreKeyValue=h3cGreKeyValue, h3cGreKey=h3cGreKey, h3cGreTable=h3cGreTable, h3cGreObjects=h3cGreObjects, h3cGreChecksum=h3cGreChecksum, h3cGre=h3cGre, PYSNMP_MODULE_ID=h3cGre, h3cGreEntry=h3cGreEntry)

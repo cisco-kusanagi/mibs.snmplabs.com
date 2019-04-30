@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module APPIAN-PFOT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/APPIAN-PFOT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:07:57 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+acChassisRingId, acChassisCurrentTime = mibBuilder.importSymbols("APPIAN-CHASSIS-MIB", "acChassisRingId", "acChassisCurrentTime")
+AcPortNumber, AcNodeId, AcSlotNumber, acPport = mibBuilder.importSymbols("APPIAN-SMI-MIB", "AcPortNumber", "AcNodeId", "AcSlotNumber", "acPport")
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Integer32, Gauge32, Unsigned32, NotificationType, ModuleIdentity, Counter32, Counter64, MibIdentifier, Bits, iso, IpAddress, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "Gauge32", "Unsigned32", "NotificationType", "ModuleIdentity", "Counter32", "Counter64", "MibIdentifier", "Bits", "iso", "IpAddress", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+acPfot = ModuleIdentity((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7))
+acPfot.setRevisions(('1900-02-23 16:00',))
+if mibBuilder.loadTexts: acPfot.setLastUpdated('0002231600Z')
+if mibBuilder.loadTexts: acPfot.setOrganization('Appian Communications, Inc.')
+class AcPfotType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4))
+    namedValues = NamedValues(("not-present", 0), ("sfp-gbe-sx", 1), ("sfp-gbe-lx-sr", 2), ("sfp-gbe-lx-ir", 3), ("sfp-gbe-lx-lr", 4))
+
+acPfotTable = MibTable((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1), )
+if mibBuilder.loadTexts: acPfotTable.setStatus('current')
+acPfotEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1), ).setIndexNames((0, "APPIAN-PFOT-MIB", "acPfotNodeId"), (0, "APPIAN-PFOT-MIB", "acPfotSlot"), (0, "APPIAN-PFOT-MIB", "acPfotPort"))
+if mibBuilder.loadTexts: acPfotEntry.setStatus('current')
+acPfotNodeId = MibTableColumn((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1, 1), AcNodeId()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: acPfotNodeId.setStatus('current')
+acPfotSlot = MibTableColumn((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1, 2), AcSlotNumber()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: acPfotSlot.setStatus('current')
+acPfotPort = MibTableColumn((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1, 3), AcPortNumber()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: acPfotPort.setStatus('current')
+acPfotCfgType = MibTableColumn((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1, 4), AcPfotType().clone('not-present')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: acPfotCfgType.setStatus('current')
+acPfotType = MibTableColumn((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1, 5), AcPfotType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: acPfotType.setStatus('current')
+acPfotConnectorType = MibTableColumn((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3))).clone(namedValues=NamedValues(("none", 0), ("sc", 1), ("lc", 2), ("mtrj", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: acPfotConnectorType.setStatus('current')
+acPfotVendorName = MibTableColumn((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1, 7), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: acPfotVendorName.setStatus('current')
+acPfotVendorPartNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 1, 1, 8), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: acPfotVendorPartNumber.setStatus('current')
+acPfotTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 0))
+acPfotCfgErrorTrap = NotificationType((1, 3, 6, 1, 4, 1, 2785, 2, 3, 7, 0, 1)).setObjects(("APPIAN-CHASSIS-MIB", "acChassisCurrentTime"), ("APPIAN-CHASSIS-MIB", "acChassisRingId"), ("APPIAN-PFOT-MIB", "acPfotNodeId"), ("APPIAN-PFOT-MIB", "acPfotSlot"), ("APPIAN-PFOT-MIB", "acPfotPort"), ("APPIAN-PFOT-MIB", "acPfotCfgType"), ("APPIAN-PFOT-MIB", "acPfotType"))
+if mibBuilder.loadTexts: acPfotCfgErrorTrap.setStatus('current')
+mibBuilder.exportSymbols("APPIAN-PFOT-MIB", acPfotSlot=acPfotSlot, acPfotVendorName=acPfotVendorName, AcPfotType=AcPfotType, acPfotTraps=acPfotTraps, PYSNMP_MODULE_ID=acPfot, acPfotConnectorType=acPfotConnectorType, acPfotCfgType=acPfotCfgType, acPfotType=acPfotType, acPfotCfgErrorTrap=acPfotCfgErrorTrap, acPfotEntry=acPfotEntry, acPfotPort=acPfotPort, acPfotVendorPartNumber=acPfotVendorPartNumber, acPfot=acPfot, acPfotNodeId=acPfotNodeId, acPfotTable=acPfotTable)

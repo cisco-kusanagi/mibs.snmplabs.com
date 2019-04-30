@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module PSAX-TRAP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PSAX-TRAP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:33:39 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+timeOccurred, port, gwType, csType, gwID, csID, reason, percent, gwIP, comment, registrationStatus, moduleID, code = mibBuilder.importSymbols("AGGREGATED-EXT-MIB", "timeOccurred", "port", "gwType", "csType", "gwID", "csID", "reason", "percent", "gwIP", "comment", "registrationStatus", "moduleID", "code")
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+snmpModules, enterprises, ModuleIdentity, MibIdentifier, TimeTicks, Gauge32, NotificationType, IpAddress, Integer32, iso, ObjectIdentity, ObjectName, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, Unsigned32, Counter32, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "snmpModules", "enterprises", "ModuleIdentity", "MibIdentifier", "TimeTicks", "Gauge32", "NotificationType", "IpAddress", "Integer32", "iso", "ObjectIdentity", "ObjectName", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "Unsigned32", "Counter32", "Counter64")
+TestAndIncr, DisplayString, TruthValue, TimeStamp, TextualConvention, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TestAndIncr", "DisplayString", "TruthValue", "TimeStamp", "TextualConvention", "RowStatus")
+lucent = MibIdentifier((1, 3, 6, 1, 4, 1, 1751))
+products = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1))
+softSwitch = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1, 1198))
+psaxDeviceServer = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 6))
+psaxTraps = ModuleIdentity((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 6, 0))
+if mibBuilder.loadTexts: psaxTraps.setLastUpdated('240701')
+if mibBuilder.loadTexts: psaxTraps.setOrganization('Lucent Technologies')
+psaxCSConnectionStatus = NotificationType((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 6, 0, 0)).setObjects(("AGGREGATED-EXT-MIB", "timeOccurred"), ("AGGREGATED-EXT-MIB", "code"), ("AGGREGATED-EXT-MIB", "csID"), ("AGGREGATED-EXT-MIB", "csType"), ("AGGREGATED-EXT-MIB", "registrationStatus"), ("AGGREGATED-EXT-MIB", "reason"), ("AGGREGATED-EXT-MIB", "comment"))
+if mibBuilder.loadTexts: psaxCSConnectionStatus.setStatus('current')
+psaxGatewayUtilization = NotificationType((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 6, 0, 1)).setObjects(("AGGREGATED-EXT-MIB", "timeOccurred"), ("AGGREGATED-EXT-MIB", "code"), ("AGGREGATED-EXT-MIB", "gwID"), ("AGGREGATED-EXT-MIB", "moduleID"), ("AGGREGATED-EXT-MIB", "percent"), ("AGGREGATED-EXT-MIB", "comment"))
+if mibBuilder.loadTexts: psaxGatewayUtilization.setStatus('current')
+psaxDSError = NotificationType((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 6, 0, 2)).setObjects(("AGGREGATED-EXT-MIB", "timeOccurred"), ("AGGREGATED-EXT-MIB", "code"), ("AGGREGATED-EXT-MIB", "reason"), ("AGGREGATED-EXT-MIB", "comment"))
+if mibBuilder.loadTexts: psaxDSError.setStatus('current')
+psaxUnreachableGateway = NotificationType((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 6, 0, 3)).setObjects(("AGGREGATED-EXT-MIB", "timeOccurred"), ("AGGREGATED-EXT-MIB", "code"), ("AGGREGATED-EXT-MIB", "gwID"), ("AGGREGATED-EXT-MIB", "gwType"), ("AGGREGATED-EXT-MIB", "gwIP"), ("AGGREGATED-EXT-MIB", "port"), ("AGGREGATED-EXT-MIB", "comment"))
+if mibBuilder.loadTexts: psaxUnreachableGateway.setStatus('current')
+psaxCommandFailed = NotificationType((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 6, 0, 4)).setObjects(("AGGREGATED-EXT-MIB", "timeOccurred"), ("AGGREGATED-EXT-MIB", "code"), ("AGGREGATED-EXT-MIB", "reason"), ("AGGREGATED-EXT-MIB", "comment"))
+if mibBuilder.loadTexts: psaxCommandFailed.setStatus('current')
+mibBuilder.exportSymbols("PSAX-TRAP-MIB", softSwitch=softSwitch, psaxUnreachableGateway=psaxUnreachableGateway, PYSNMP_MODULE_ID=psaxTraps, products=products, psaxDSError=psaxDSError, psaxCSConnectionStatus=psaxCSConnectionStatus, lucent=lucent, psaxDeviceServer=psaxDeviceServer, psaxTraps=psaxTraps, psaxGatewayUtilization=psaxGatewayUtilization, psaxCommandFailed=psaxCommandFailed)

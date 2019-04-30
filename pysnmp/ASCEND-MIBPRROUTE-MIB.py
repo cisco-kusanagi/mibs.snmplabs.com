@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module ASCEND-MIBPRROUTE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ASCEND-MIBPRROUTE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:12:03 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+configuration, = mibBuilder.importSymbols("ASCEND-MIB", "configuration")
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, IpAddress, Integer32, TimeTicks, Counter32, Counter64, NotificationType, ModuleIdentity, MibIdentifier, ObjectIdentity, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "IpAddress", "Integer32", "TimeTicks", "Counter32", "Counter64", "NotificationType", "ModuleIdentity", "MibIdentifier", "ObjectIdentity", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "Unsigned32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+class DisplayString(OctetString):
+    pass
+
+mibprivateRouteTableProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 529, 23, 103))
+mibprivateRouteTableProfileTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 103, 1), )
+if mibBuilder.loadTexts: mibprivateRouteTableProfileTable.setStatus('mandatory')
+mibprivateRouteTableProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 103, 1, 1), ).setIndexNames((0, "ASCEND-MIBPRROUTE-MIB", "privateRouteTableProfile-Name"))
+if mibBuilder.loadTexts: mibprivateRouteTableProfileEntry.setStatus('mandatory')
+privateRouteTableProfile_Name = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 1, 1, 1), DisplayString()).setLabel("privateRouteTableProfile-Name").setMaxAccess("readonly")
+if mibBuilder.loadTexts: privateRouteTableProfile_Name.setStatus('mandatory')
+privateRouteTableProfile_Action_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noAction", 1), ("createProfile", 2), ("deleteProfile", 3)))).setLabel("privateRouteTableProfile-Action-o").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: privateRouteTableProfile_Action_o.setStatus('mandatory')
+mibprivateRouteTableProfile_RouteDescriptionListTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 103, 2), ).setLabel("mibprivateRouteTableProfile-RouteDescriptionListTable")
+if mibBuilder.loadTexts: mibprivateRouteTableProfile_RouteDescriptionListTable.setStatus('mandatory')
+mibprivateRouteTableProfile_RouteDescriptionListEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 103, 2, 1), ).setLabel("mibprivateRouteTableProfile-RouteDescriptionListEntry").setIndexNames((0, "ASCEND-MIBPRROUTE-MIB", "privateRouteTableProfile-RouteDescriptionList-Name"), (0, "ASCEND-MIBPRROUTE-MIB", "privateRouteTableProfile-RouteDescriptionList-Index-o"))
+if mibBuilder.loadTexts: mibprivateRouteTableProfile_RouteDescriptionListEntry.setStatus('mandatory')
+privateRouteTableProfile_RouteDescriptionList_Name = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 2, 1, 1), DisplayString()).setLabel("privateRouteTableProfile-RouteDescriptionList-Name").setMaxAccess("readonly")
+if mibBuilder.loadTexts: privateRouteTableProfile_RouteDescriptionList_Name.setStatus('mandatory')
+privateRouteTableProfile_RouteDescriptionList_Index_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 2, 1, 2), Integer32()).setLabel("privateRouteTableProfile-RouteDescriptionList-Index-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: privateRouteTableProfile_RouteDescriptionList_Index_o.setStatus('mandatory')
+privateRouteTableProfile_RouteDescriptionList_Enabled = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("privateRouteTableProfile-RouteDescriptionList-Enabled").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: privateRouteTableProfile_RouteDescriptionList_Enabled.setStatus('mandatory')
+privateRouteTableProfile_RouteDescriptionList_DestAddress = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 2, 1, 4), IpAddress()).setLabel("privateRouteTableProfile-RouteDescriptionList-DestAddress").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: privateRouteTableProfile_RouteDescriptionList_DestAddress.setStatus('mandatory')
+privateRouteTableProfile_RouteDescriptionList_Netmask = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 2, 1, 5), IpAddress()).setLabel("privateRouteTableProfile-RouteDescriptionList-Netmask").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: privateRouteTableProfile_RouteDescriptionList_Netmask.setStatus('mandatory')
+privateRouteTableProfile_RouteDescriptionList_GatewayAddress = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 2, 1, 6), IpAddress()).setLabel("privateRouteTableProfile-RouteDescriptionList-GatewayAddress").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: privateRouteTableProfile_RouteDescriptionList_GatewayAddress.setStatus('mandatory')
+privateRouteTableProfile_RouteDescriptionList_Metric = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 103, 2, 1, 7), Integer32()).setLabel("privateRouteTableProfile-RouteDescriptionList-Metric").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: privateRouteTableProfile_RouteDescriptionList_Metric.setStatus('mandatory')
+mibBuilder.exportSymbols("ASCEND-MIBPRROUTE-MIB", privateRouteTableProfile_RouteDescriptionList_Index_o=privateRouteTableProfile_RouteDescriptionList_Index_o, mibprivateRouteTableProfileTable=mibprivateRouteTableProfileTable, mibprivateRouteTableProfile_RouteDescriptionListTable=mibprivateRouteTableProfile_RouteDescriptionListTable, privateRouteTableProfile_RouteDescriptionList_Name=privateRouteTableProfile_RouteDescriptionList_Name, DisplayString=DisplayString, privateRouteTableProfile_RouteDescriptionList_GatewayAddress=privateRouteTableProfile_RouteDescriptionList_GatewayAddress, privateRouteTableProfile_RouteDescriptionList_Metric=privateRouteTableProfile_RouteDescriptionList_Metric, privateRouteTableProfile_Action_o=privateRouteTableProfile_Action_o, privateRouteTableProfile_RouteDescriptionList_Enabled=privateRouteTableProfile_RouteDescriptionList_Enabled, mibprivateRouteTableProfile_RouteDescriptionListEntry=mibprivateRouteTableProfile_RouteDescriptionListEntry, privateRouteTableProfile_RouteDescriptionList_DestAddress=privateRouteTableProfile_RouteDescriptionList_DestAddress, privateRouteTableProfile_RouteDescriptionList_Netmask=privateRouteTableProfile_RouteDescriptionList_Netmask, mibprivateRouteTableProfileEntry=mibprivateRouteTableProfileEntry, mibprivateRouteTableProfile=mibprivateRouteTableProfile, privateRouteTableProfile_Name=privateRouteTableProfile_Name)

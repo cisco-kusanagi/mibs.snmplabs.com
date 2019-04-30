@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module BW-WebServerFault (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BW-WebServerFault
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:25:08 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+timeStamp, subcomponent, common, severity, identifier, alarmName, component, problemText, systemName, faultFields, alarmState, recommendedActionsText = mibBuilder.importSymbols("BroadworksFault", "timeStamp", "subcomponent", "common", "severity", "identifier", "alarmName", "component", "problemText", "systemName", "faultFields", "alarmState", "recommendedActionsText")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+TimeTicks, Bits, iso, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Integer32, NotificationType, Gauge32, Unsigned32, MibIdentifier, ModuleIdentity, IpAddress, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Bits", "iso", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Integer32", "NotificationType", "Gauge32", "Unsigned32", "MibIdentifier", "ModuleIdentity", "IpAddress", "Counter64")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+systemFaults = ModuleIdentity((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1))
+systemFaults.setRevisions(('2000-09-19 14:31',))
+if mibBuilder.loadTexts: systemFaults.setLastUpdated('200201220000Z')
+if mibBuilder.loadTexts: systemFaults.setOrganization('Broadsoft, Inc')
+bwApplicationServerUnreachable = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2501)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwApplicationServerUnreachable.setStatus('current')
+bwNetworkServerUnreachable = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2502)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwNetworkServerUnreachable.setStatus('current')
+bwNetworkServerRequestError = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2503)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwNetworkServerRequestError.setStatus('current')
+bwCMSConnectivityDown = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2504)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwCMSConnectivityDown.setStatus('current')
+bwCMSConnectivityUp = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2505)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwCMSConnectivityUp.setStatus('current')
+bwCMSDatabaseMismatch = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2506)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwCMSDatabaseMismatch.setStatus('current')
+mibBuilder.exportSymbols("BW-WebServerFault", bwNetworkServerRequestError=bwNetworkServerRequestError, PYSNMP_MODULE_ID=systemFaults, bwCMSConnectivityUp=bwCMSConnectivityUp, bwNetworkServerUnreachable=bwNetworkServerUnreachable, systemFaults=systemFaults, bwApplicationServerUnreachable=bwApplicationServerUnreachable, bwCMSDatabaseMismatch=bwCMSDatabaseMismatch, bwCMSConnectivityDown=bwCMSConnectivityDown)

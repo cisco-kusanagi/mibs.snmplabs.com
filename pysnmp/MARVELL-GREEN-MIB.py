@@ -1,0 +1,61 @@
+#
+# PySNMP MIB module MARVELL-GREEN-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MARVELL-GREEN-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:59:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+PortList, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "PortList")
+rnd, = mibBuilder.importSymbols("RADLAN-MIB", "rnd")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Integer32, MibIdentifier, IpAddress, Counter64, Unsigned32, iso, TimeTicks, ObjectIdentity, ModuleIdentity, Counter32, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Integer32", "MibIdentifier", "IpAddress", "Counter64", "Unsigned32", "iso", "TimeTicks", "ObjectIdentity", "ModuleIdentity", "Counter32", "Bits")
+TextualConvention, TruthValue, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TruthValue", "DisplayString")
+rlGreenEth = ModuleIdentity((1, 3, 6, 1, 4, 1, 89, 134))
+rlGreenEth.setRevisions(('2008-08-15 00:00',))
+if mibBuilder.loadTexts: rlGreenEth.setLastUpdated('200808150000Z')
+if mibBuilder.loadTexts: rlGreenEth.setOrganization('MARVELL Semiconductor, Inc.')
+rlGreenEthEnergyDetectEnable = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlGreenEthEnergyDetectEnable.setStatus('current')
+rlGreenEthShortReachEnable = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlGreenEthShortReachEnable.setStatus('current')
+rlGreenEthCurrentEnergyConsumption = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 3), Unsigned32()).setUnits('mWatt').setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlGreenEthCurrentEnergyConsumption.setStatus('current')
+rlGreenEthCurrentMaxEnergyConsumption = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 4), Unsigned32()).setUnits('mWatt').setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlGreenEthCurrentMaxEnergyConsumption.setStatus('current')
+rlGreenEthCumulativePowerSaveMeter = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 5), Unsigned32()).setUnits('Watt*Hour').setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlGreenEthCumulativePowerSaveMeter.setStatus('current')
+rlGreenEthShortReachThreshold = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 6), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 70))).setUnits('meter').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlGreenEthShortReachThreshold.setStatus('current')
+rlGreenEthCumulativePowerSaveMeterReset = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 7), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlGreenEthCumulativePowerSaveMeterReset.setStatus('current')
+class RlGreenSavingType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("energyDetect", 1), ("shortReach", 2))
+
+class NonOperReasonType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8))
+    namedValues = NamedValues(("np", 1), ("lt", 2), ("lu", 3), ("ls", 4), ("ll", 5), ("er", 6), ("ld", 7), ("unknown", 8))
+
+rlGreenEthPortTable = MibTable((1, 3, 6, 1, 4, 1, 89, 134, 8), )
+if mibBuilder.loadTexts: rlGreenEthPortTable.setStatus('current')
+rlGreenEthPortEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 134, 8, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "MARVELL-GREEN-MIB", "rlGreenEthPortSavingTypeValue"))
+if mibBuilder.loadTexts: rlGreenEthPortEntry.setStatus('current')
+rlGreenEthPortSavingTypeValue = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 134, 8, 1, 1), RlGreenSavingType())
+if mibBuilder.loadTexts: rlGreenEthPortSavingTypeValue.setStatus('current')
+rlGreenEthPortAdminState = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 134, 8, 1, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlGreenEthPortAdminState.setStatus('current')
+rlGreenEthPortOperState = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 134, 8, 1, 3), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlGreenEthPortOperState.setStatus('current')
+rlGreenEthPortNonOperReason = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 134, 8, 1, 4), NonOperReasonType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlGreenEthPortNonOperReason.setStatus('current')
+rlGreenEthForceShortReachIfIndexList = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 9), PortList().clone(hexValue="")).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlGreenEthForceShortReachIfIndexList.setStatus('current')
+rlGreenEthMaskLedStatus = MibScalar((1, 3, 6, 1, 4, 1, 89, 134, 10), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("off", 0), ("on", 1))).clone('off')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlGreenEthMaskLedStatus.setStatus('current')
+mibBuilder.exportSymbols("MARVELL-GREEN-MIB", rlGreenEthCumulativePowerSaveMeterReset=rlGreenEthCumulativePowerSaveMeterReset, rlGreenEthShortReachEnable=rlGreenEthShortReachEnable, rlGreenEthForceShortReachIfIndexList=rlGreenEthForceShortReachIfIndexList, rlGreenEthCurrentEnergyConsumption=rlGreenEthCurrentEnergyConsumption, rlGreenEthMaskLedStatus=rlGreenEthMaskLedStatus, rlGreenEthCumulativePowerSaveMeter=rlGreenEthCumulativePowerSaveMeter, rlGreenEthPortSavingTypeValue=rlGreenEthPortSavingTypeValue, PYSNMP_MODULE_ID=rlGreenEth, rlGreenEthPortAdminState=rlGreenEthPortAdminState, rlGreenEthPortEntry=rlGreenEthPortEntry, rlGreenEthPortOperState=rlGreenEthPortOperState, rlGreenEthPortTable=rlGreenEthPortTable, rlGreenEthCurrentMaxEnergyConsumption=rlGreenEthCurrentMaxEnergyConsumption, RlGreenSavingType=RlGreenSavingType, rlGreenEthEnergyDetectEnable=rlGreenEthEnergyDetectEnable, rlGreenEth=rlGreenEth, NonOperReasonType=NonOperReasonType, rlGreenEthShortReachThreshold=rlGreenEthShortReachThreshold, rlGreenEthPortNonOperReason=rlGreenEthPortNonOperReason)

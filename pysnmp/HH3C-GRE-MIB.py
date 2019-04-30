@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module HH3C-GRE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HH3C-GRE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:14:21 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint")
+hh3cCommon, = mibBuilder.importSymbols("HH3C-OID-MIB", "hh3cCommon")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, TimeTicks, MibIdentifier, iso, Counter32, Unsigned32, Integer32, ObjectIdentity, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, IpAddress, Counter64, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "TimeTicks", "MibIdentifier", "iso", "Counter32", "Unsigned32", "Integer32", "ObjectIdentity", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "IpAddress", "Counter64", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hh3cGre = ModuleIdentity((1, 3, 6, 1, 4, 1, 25506, 2, 54))
+hh3cGre.setRevisions(('2005-06-04 00:00',))
+if mibBuilder.loadTexts: hh3cGre.setLastUpdated('200506040000Z')
+if mibBuilder.loadTexts: hh3cGre.setOrganization('Hangzhou H3C Tech. Co., Ltd.')
+hh3cGreObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1))
+hh3cGreTable = MibTable((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1), )
+if mibBuilder.loadTexts: hh3cGreTable.setStatus('current')
+hh3cGreEntry = MibTableRow((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: hh3cGreEntry.setStatus('current')
+hh3cGreKeyValue = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1, 1, 1), Unsigned32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cGreKeyValue.setStatus('current')
+hh3cGreKey = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cGreKey.setStatus('current')
+hh3cGreChecksum = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cGreChecksum.setStatus('current')
+mibBuilder.exportSymbols("HH3C-GRE-MIB", PYSNMP_MODULE_ID=hh3cGre, hh3cGre=hh3cGre, hh3cGreChecksum=hh3cGreChecksum, hh3cGreKeyValue=hh3cGreKeyValue, hh3cGreKey=hh3cGreKey, hh3cGreObjects=hh3cGreObjects, hh3cGreTable=hh3cGreTable, hh3cGreEntry=hh3cGreEntry)

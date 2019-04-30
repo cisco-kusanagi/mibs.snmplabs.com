@@ -1,0 +1,86 @@
+#
+# PySNMP MIB module RIVERSTONE-INVENTORY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RIVERSTONE-INVENTORY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:49:09 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint")
+entPhysicalIndex, = mibBuilder.importSymbols("ENTITY-MIB", "entPhysicalIndex")
+riverstoneMibs, = mibBuilder.importSymbols("RIVERSTONE-SMI-MIB", "riverstoneMibs")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, iso, MibIdentifier, Counter32, NotificationType, TimeTicks, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, Gauge32, Counter64, Unsigned32, Integer32, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "iso", "MibIdentifier", "Counter32", "NotificationType", "TimeTicks", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "Gauge32", "Counter64", "Unsigned32", "Integer32", "Bits")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+rsInventoryMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5567, 2, 40))
+rsInventoryMIB.setRevisions(('2001-08-22 00:00', '2001-06-19 00:00', '2001-06-11 00:00', '2001-06-01 00:00', '2001-05-22 00:00',))
+if mibBuilder.loadTexts: rsInventoryMIB.setLastUpdated('200108220000Z')
+if mibBuilder.loadTexts: rsInventoryMIB.setOrganization('Riverstone Networks, Inc')
+rsInventoryMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1))
+rsInventoryOther = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 1))
+rsInventoryUnknown = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 2))
+rsInventoryChassis = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 3))
+rsInventoryBackplane = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 4))
+rsInventoryPowerSupply = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 6))
+rsInventoryFan = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 7))
+rsInventorySensor = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 8))
+rsInventoryModule = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 9))
+rsInventoryPort = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 10))
+rsInventoryStack = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 11))
+class RSMemorySize(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 2147483647)
+
+class RSModuleServiceString(TextualConvention, OctetString):
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 255)
+
+rsInventoryChassisTable = MibTable((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 3, 1), )
+if mibBuilder.loadTexts: rsInventoryChassisTable.setStatus('current')
+rsInventoryChassisEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 3, 1, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: rsInventoryChassisEntry.setStatus('current')
+rsInventoryChassisId = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 3, 1, 1, 1), SnmpAdminString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsInventoryChassisId.setStatus('current')
+rsInventoryChassisAssetCLEI = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 3, 1, 1, 2), SnmpAdminString().subtype(subtypeSpec=ConstraintsUnion(ValueSizeConstraint(0, 0), ValueSizeConstraint(10, 10), ))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsInventoryChassisAssetCLEI.setStatus('current')
+rsInventoryPowerSupplyTable = MibTable((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 6, 1), )
+if mibBuilder.loadTexts: rsInventoryPowerSupplyTable.setStatus('current')
+rsInventoryPowerSupplyEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 6, 1, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: rsInventoryPowerSupplyEntry.setStatus('current')
+rsInventoryPowerSupplyAssetCLEI = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 6, 1, 1, 1), SnmpAdminString().subtype(subtypeSpec=ConstraintsUnion(ValueSizeConstraint(0, 0), ValueSizeConstraint(10, 10), ))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsInventoryPowerSupplyAssetCLEI.setStatus('current')
+rsInventoryFanTable = MibTable((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 7, 1), )
+if mibBuilder.loadTexts: rsInventoryFanTable.setStatus('current')
+rsInventoryFanEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 7, 1, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: rsInventoryFanEntry.setStatus('current')
+rsInventoryFanAssetCLEI = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 7, 1, 1, 1), SnmpAdminString().subtype(subtypeSpec=ConstraintsUnion(ValueSizeConstraint(0, 0), ValueSizeConstraint(10, 10), ))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsInventoryFanAssetCLEI.setStatus('current')
+rsInventoryModuleTable = MibTable((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 9, 1), )
+if mibBuilder.loadTexts: rsInventoryModuleTable.setStatus('current')
+rsInventoryModuleEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 9, 1, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: rsInventoryModuleEntry.setStatus('current')
+rsInventoryModuleMemorySize = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 9, 1, 1, 1), RSMemorySize()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsInventoryModuleMemorySize.setStatus('current')
+rsInventoryModuleServiceString = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 9, 1, 1, 2), RSModuleServiceString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsInventoryModuleServiceString.setStatus('current')
+rsInventoryModuleAssetCLEI = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 40, 1, 9, 1, 1, 3), SnmpAdminString().subtype(subtypeSpec=ConstraintsUnion(ValueSizeConstraint(0, 0), ValueSizeConstraint(10, 10), ))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsInventoryModuleAssetCLEI.setStatus('current')
+rsInventoryConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 3))
+rsInventoryCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 3, 1))
+rsInventoryGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 40, 3, 2))
+rsInventoryCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5567, 2, 40, 3, 1, 1)).setObjects(("RIVERSTONE-INVENTORY-MIB", "rsChassisGroup"), ("RIVERSTONE-INVENTORY-MIB", "rsModuleGroup"), ("RIVERSTONE-INVENTORY-MIB", "rsEnvGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsInventoryCompliance = rsInventoryCompliance.setStatus('current')
+rsChassisGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5567, 2, 40, 3, 2, 1)).setObjects(("RIVERSTONE-INVENTORY-MIB", "rsInventoryChassisId"), ("RIVERSTONE-INVENTORY-MIB", "rsInventoryChassisAssetCLEI"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsChassisGroup = rsChassisGroup.setStatus('current')
+rsModuleGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5567, 2, 40, 3, 2, 2)).setObjects(("RIVERSTONE-INVENTORY-MIB", "rsInventoryModuleMemorySize"), ("RIVERSTONE-INVENTORY-MIB", "rsInventoryModuleServiceString"), ("RIVERSTONE-INVENTORY-MIB", "rsInventoryModuleAssetCLEI"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsModuleGroup = rsModuleGroup.setStatus('current')
+rsEnvGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5567, 2, 40, 3, 2, 3)).setObjects(("RIVERSTONE-INVENTORY-MIB", "rsInventoryPowerSupplyAssetCLEI"), ("RIVERSTONE-INVENTORY-MIB", "rsInventoryFanAssetCLEI"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsEnvGroup = rsEnvGroup.setStatus('current')
+mibBuilder.exportSymbols("RIVERSTONE-INVENTORY-MIB", rsInventoryChassisAssetCLEI=rsInventoryChassisAssetCLEI, rsInventoryFanTable=rsInventoryFanTable, rsInventoryGroups=rsInventoryGroups, rsModuleGroup=rsModuleGroup, rsInventoryModuleTable=rsInventoryModuleTable, rsChassisGroup=rsChassisGroup, rsInventoryFanEntry=rsInventoryFanEntry, rsInventoryMIBObjects=rsInventoryMIBObjects, rsInventoryPort=rsInventoryPort, rsInventoryModuleEntry=rsInventoryModuleEntry, rsInventoryChassis=rsInventoryChassis, rsInventoryModuleMemorySize=rsInventoryModuleMemorySize, rsInventoryBackplane=rsInventoryBackplane, rsInventoryChassisId=rsInventoryChassisId, rsInventorySensor=rsInventorySensor, rsInventoryConformance=rsInventoryConformance, rsInventoryMIB=rsInventoryMIB, rsInventoryCompliances=rsInventoryCompliances, rsInventoryModuleServiceString=rsInventoryModuleServiceString, rsInventoryStack=rsInventoryStack, rsInventoryPowerSupplyAssetCLEI=rsInventoryPowerSupplyAssetCLEI, PYSNMP_MODULE_ID=rsInventoryMIB, rsInventoryPowerSupply=rsInventoryPowerSupply, rsInventoryModuleAssetCLEI=rsInventoryModuleAssetCLEI, rsInventoryPowerSupplyEntry=rsInventoryPowerSupplyEntry, rsInventoryModule=rsInventoryModule, rsInventoryChassisTable=rsInventoryChassisTable, RSMemorySize=RSMemorySize, rsInventoryCompliance=rsInventoryCompliance, rsInventoryChassisEntry=rsInventoryChassisEntry, rsInventoryFanAssetCLEI=rsInventoryFanAssetCLEI, rsInventoryPowerSupplyTable=rsInventoryPowerSupplyTable, RSModuleServiceString=RSModuleServiceString, rsInventoryFan=rsInventoryFan, rsInventoryUnknown=rsInventoryUnknown, rsEnvGroup=rsEnvGroup, rsInventoryOther=rsInventoryOther)

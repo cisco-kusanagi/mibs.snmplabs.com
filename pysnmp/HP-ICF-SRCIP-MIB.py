@@ -1,0 +1,46 @@
+#
+# PySNMP MIB module HP-ICF-SRCIP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-ICF-SRCIP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:22:56 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion")
+hpicfCommon, = mibBuilder.importSymbols("HP-ICF-OID", "hpicfCommon")
+InterfaceIndexOrZero, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndexOrZero")
+InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddress")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+iso, IpAddress, Bits, ModuleIdentity, NotificationType, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, ObjectIdentity, Integer32, TimeTicks, Counter32, MibIdentifier, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "IpAddress", "Bits", "ModuleIdentity", "NotificationType", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "ObjectIdentity", "Integer32", "TimeTicks", "Counter32", "MibIdentifier", "Gauge32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hpicfSrcIpMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13))
+hpicfSrcIpMIB.setRevisions(('2016-08-29 00:00', '2011-07-21 00:00', '2009-04-30 00:00', '2008-10-10 00:00',))
+if mibBuilder.loadTexts: hpicfSrcIpMIB.setLastUpdated('201608290000Z')
+if mibBuilder.loadTexts: hpicfSrcIpMIB.setOrganization('HP Networking')
+hpicfSrcIpConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 1))
+hpicfSrcIpAddrPolicyTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 1, 1), )
+if mibBuilder.loadTexts: hpicfSrcIpAddrPolicyTable.setStatus('current')
+hpicfSrcIpAddrPolicyEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 1, 1, 1), ).setIndexNames((0, "HP-ICF-SRCIP-MIB", "hpicfSrcIpAddressType"), (0, "HP-ICF-SRCIP-MIB", "hpicfSrcIpProtocolIndex"))
+if mibBuilder.loadTexts: hpicfSrcIpAddrPolicyEntry.setStatus('current')
+hpicfSrcIpAddressType = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 1, 1, 1, 1), InetAddressType())
+if mibBuilder.loadTexts: hpicfSrcIpAddressType.setStatus('current')
+hpicfSrcIpProtocolIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8))).clone(namedValues=NamedValues(("tacacs", 1), ("radius", 2), ("syslog", 3), ("telnet", 4), ("tftp", 5), ("sntp", 6), ("sflow", 7), ("tunnelednodeserver", 8))))
+if mibBuilder.loadTexts: hpicfSrcIpProtocolIndex.setStatus('current')
+hpicfSrcIpAddrPolicy = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("outgoingInterface", 1), ("configuredIpAddr", 2), ("configuredInterface", 3))).clone(1)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSrcIpAddrPolicy.setStatus('current')
+hpicfSrcIpAddrIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 1, 1, 1, 4), InterfaceIndexOrZero()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSrcIpAddrIfIndex.setStatus('current')
+hpicfSrcIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 1, 1, 1, 5), InetAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSrcIpAddress.setStatus('current')
+hpicfSrcIpConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 2))
+hpicfSrcIpGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 2, 1))
+hpicfSrcIpBaseGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 2, 1, 1)).setObjects(("HP-ICF-SRCIP-MIB", "hpicfSrcIpAddrPolicy"), ("HP-ICF-SRCIP-MIB", "hpicfSrcIpAddrIfIndex"), ("HP-ICF-SRCIP-MIB", "hpicfSrcIpAddress"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSrcIpBaseGroup = hpicfSrcIpBaseGroup.setStatus('current')
+hpicfSrcIpCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 2, 2))
+hpicfSrcIpCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 13, 2, 2, 1)).setObjects(("HP-ICF-SRCIP-MIB", "hpicfSrcIpBaseGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSrcIpCompliance = hpicfSrcIpCompliance.setStatus('current')
+mibBuilder.exportSymbols("HP-ICF-SRCIP-MIB", hpicfSrcIpMIB=hpicfSrcIpMIB, PYSNMP_MODULE_ID=hpicfSrcIpMIB, hpicfSrcIpAddrPolicyTable=hpicfSrcIpAddrPolicyTable, hpicfSrcIpConformance=hpicfSrcIpConformance, hpicfSrcIpCompliances=hpicfSrcIpCompliances, hpicfSrcIpCompliance=hpicfSrcIpCompliance, hpicfSrcIpAddrPolicy=hpicfSrcIpAddrPolicy, hpicfSrcIpAddress=hpicfSrcIpAddress, hpicfSrcIpConfig=hpicfSrcIpConfig, hpicfSrcIpBaseGroup=hpicfSrcIpBaseGroup, hpicfSrcIpProtocolIndex=hpicfSrcIpProtocolIndex, hpicfSrcIpAddrPolicyEntry=hpicfSrcIpAddrPolicyEntry, hpicfSrcIpGroups=hpicfSrcIpGroups, hpicfSrcIpAddrIfIndex=hpicfSrcIpAddrIfIndex, hpicfSrcIpAddressType=hpicfSrcIpAddressType)

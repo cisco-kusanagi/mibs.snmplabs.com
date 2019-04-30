@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module JUNIPER-JS-DNS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/JUNIPER-JS-DNS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:48:35 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion")
+jnxJsDnsRoot, = mibBuilder.importSymbols("JUNIPER-JS-SMI", "jnxJsDnsRoot")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, ModuleIdentity, TimeTicks, iso, Counter32, NotificationType, MibIdentifier, ObjectIdentity, IpAddress, Integer32, Bits, Gauge32, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "ModuleIdentity", "TimeTicks", "iso", "Counter32", "NotificationType", "MibIdentifier", "ObjectIdentity", "IpAddress", "Integer32", "Bits", "Gauge32", "Unsigned32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+jnxJsDns = ModuleIdentity((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1))
+if mibBuilder.loadTexts: jnxJsDns.setLastUpdated('200704141245Z')
+if mibBuilder.loadTexts: jnxJsDns.setOrganization('Juniper Networks, Inc.')
+jnxJsDnsProxyDataObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1, 1))
+jnxJsDNSProxyQueriesReceived = MibScalar((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1, 1, 1), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxJsDNSProxyQueriesReceived.setStatus('current')
+jnxJsDnsProxyResponsesSent = MibScalar((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1, 1, 2), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxJsDnsProxyResponsesSent.setStatus('current')
+jnxJsDnsProxyQueriesForwarded = MibScalar((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1, 1, 3), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxJsDnsProxyQueriesForwarded.setStatus('current')
+jnxJsDnsProxyNegativeResponses = MibScalar((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1, 1, 4), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxJsDnsProxyNegativeResponses.setStatus('current')
+jnxJsDnsProxyRetryRequests = MibScalar((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1, 1, 5), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxJsDnsProxyRetryRequests.setStatus('current')
+jnxJsDnsProxyPendingRequests = MibScalar((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1, 1, 6), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxJsDnsProxyPendingRequests.setStatus('current')
+jnxJsDnsProxyServerFailures = MibScalar((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10, 1, 1, 7), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxJsDnsProxyServerFailures.setStatus('current')
+mibBuilder.exportSymbols("JUNIPER-JS-DNS-MIB", jnxJsDnsProxyDataObjects=jnxJsDnsProxyDataObjects, PYSNMP_MODULE_ID=jnxJsDns, jnxJsDnsProxyResponsesSent=jnxJsDnsProxyResponsesSent, jnxJsDns=jnxJsDns, jnxJsDnsProxyServerFailures=jnxJsDnsProxyServerFailures, jnxJsDnsProxyRetryRequests=jnxJsDnsProxyRetryRequests, jnxJsDnsProxyPendingRequests=jnxJsDnsProxyPendingRequests, jnxJsDnsProxyNegativeResponses=jnxJsDnsProxyNegativeResponses, jnxJsDNSProxyQueriesReceived=jnxJsDNSProxyQueriesReceived, jnxJsDnsProxyQueriesForwarded=jnxJsDnsProxyQueriesForwarded)

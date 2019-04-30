@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module BCCUSTOM-OPR-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BCCUSTOM-OPR-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:19:38 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint")
+fcSwitch, = mibBuilder.importSymbols("Brocade-REG-MIB", "fcSwitch")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Integer32, TimeTicks, Bits, Counter32, IpAddress, iso, Counter64, Gauge32, NotificationType, MibIdentifier, ModuleIdentity, Unsigned32, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "TimeTicks", "Bits", "Counter32", "IpAddress", "iso", "Counter64", "Gauge32", "NotificationType", "MibIdentifier", "ModuleIdentity", "Unsigned32", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+bcCustomOperation = ModuleIdentity((1, 3, 6, 1, 4, 1, 1588, 2, 1, 1, 52))
+bcCustomOperation.setRevisions(('2011-12-19 10:30',))
+if mibBuilder.loadTexts: bcCustomOperation.setLastUpdated('200807291830Z')
+if mibBuilder.loadTexts: bcCustomOperation.setOrganization('Brocade Communications Systems, Inc.')
+hwinfospsaveCmd = ObjectIdentity((1, 3, 6, 1, 4, 1, 1588, 2, 1, 1, 52, 1))
+if mibBuilder.loadTexts: hwinfospsaveCmd.setStatus('current')
+hwinfospsaveSet = MibScalar((1, 3, 6, 1, 4, 1, 1588, 2, 1, 1, 52, 1, 1), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 1024))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwinfospsaveSet.setStatus('current')
+hwinfospsaveGet = MibScalar((1, 3, 6, 1, 4, 1, 1588, 2, 1, 1, 52, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3))).clone(namedValues=NamedValues(("success", 0), ("ftperror", 1), ("progressing", 2), ("systemerror", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwinfospsaveGet.setStatus('current')
+hwUpdateFilecmd = ObjectIdentity((1, 3, 6, 1, 4, 1, 1588, 2, 1, 1, 52, 2))
+if mibBuilder.loadTexts: hwUpdateFilecmd.setStatus('current')
+hwUpdateFile = MibScalar((1, 3, 6, 1, 4, 1, 1588, 2, 1, 1, 52, 2, 1), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 1024))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwUpdateFile.setStatus('current')
+hwUpdateFileInfo = MibScalar((1, 3, 6, 1, 4, 1, 1588, 2, 1, 1, 52, 2, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 1024))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwUpdateFileInfo.setStatus('current')
+hwSoftwareVersion = MibScalar((1, 3, 6, 1, 4, 1, 1588, 2, 1, 1, 52, 2, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwSoftwareVersion.setStatus('current')
+mibBuilder.exportSymbols("BCCUSTOM-OPR-MIB", bcCustomOperation=bcCustomOperation, PYSNMP_MODULE_ID=bcCustomOperation, hwinfospsaveSet=hwinfospsaveSet, hwUpdateFile=hwUpdateFile, hwUpdateFileInfo=hwUpdateFileInfo, hwinfospsaveGet=hwinfospsaveGet, hwinfospsaveCmd=hwinfospsaveCmd, hwSoftwareVersion=hwSoftwareVersion, hwUpdateFilecmd=hwUpdateFilecmd)

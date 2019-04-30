@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module TPT-MULTIDV-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TPT-MULTIDV-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:18:59 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Integer32, NotificationType, ObjectIdentity, IpAddress, ModuleIdentity, iso, Bits, Counter64, TimeTicks, Counter32, MibIdentifier, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Integer32", "NotificationType", "ObjectIdentity", "IpAddress", "ModuleIdentity", "iso", "Bits", "Counter64", "TimeTicks", "Counter32", "MibIdentifier", "Unsigned32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+policyDVObjs, = mibBuilder.importSymbols("TPT-POLICY-MIB", "policyDVObjs")
+tpt_multidv_objs = ModuleIdentity((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2)).setLabel("tpt-multidv-objs")
+tpt_multidv_objs.setRevisions(('2016-05-25 18:54',))
+if mibBuilder.loadTexts: tpt_multidv_objs.setLastUpdated('201605251854Z')
+if mibBuilder.loadTexts: tpt_multidv_objs.setOrganization('Trend Micro, Inc.')
+class DVIsActive(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1))
+    namedValues = NamedValues(("inactive", 0), ("active", 1))
+
+installedDVTable = MibTable((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 1), )
+if mibBuilder.loadTexts: installedDVTable.setStatus('current')
+installedDVEntry = MibTableRow((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 1, 1), ).setIndexNames((0, "TPT-MULTIDV-MIB", "installedDVIndex"))
+if mibBuilder.loadTexts: installedDVEntry.setStatus('current')
+installedDVIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 1, 1, 1), Unsigned32())
+if mibBuilder.loadTexts: installedDVIndex.setStatus('current')
+installedDVVersion = MibTableColumn((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 1, 1, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 31))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: installedDVVersion.setStatus('current')
+installedDVIsActive = MibTableColumn((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 1, 1, 3), DVIsActive()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: installedDVIsActive.setStatus('current')
+auxiliaryDVTable = MibTable((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 2), )
+if mibBuilder.loadTexts: auxiliaryDVTable.setStatus('current')
+auxiliaryDVEntry = MibTableRow((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 2, 1), ).setIndexNames((0, "TPT-MULTIDV-MIB", "auxiliaryDVIndex"))
+if mibBuilder.loadTexts: auxiliaryDVEntry.setStatus('current')
+auxiliaryDVIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 2, 1, 1), Unsigned32())
+if mibBuilder.loadTexts: auxiliaryDVIndex.setStatus('current')
+auxiliaryDVType = MibTableColumn((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 2, 1, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 49))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: auxiliaryDVType.setStatus('current')
+auxiliaryDVName = MibTableColumn((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 2, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: auxiliaryDVName.setStatus('current')
+auxiliaryDVVersion = MibTableColumn((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 2, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: auxiliaryDVVersion.setStatus('current')
+auxiliaryDVPackage = MibTableColumn((1, 3, 6, 1, 4, 1, 10734, 3, 3, 2, 1, 10, 2, 2, 1, 5), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 31))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: auxiliaryDVPackage.setStatus('current')
+mibBuilder.exportSymbols("TPT-MULTIDV-MIB", auxiliaryDVVersion=auxiliaryDVVersion, DVIsActive=DVIsActive, auxiliaryDVIndex=auxiliaryDVIndex, installedDVTable=installedDVTable, auxiliaryDVPackage=auxiliaryDVPackage, tpt_multidv_objs=tpt_multidv_objs, PYSNMP_MODULE_ID=tpt_multidv_objs, installedDVIsActive=installedDVIsActive, auxiliaryDVName=auxiliaryDVName, installedDVVersion=installedDVVersion, auxiliaryDVEntry=auxiliaryDVEntry, installedDVEntry=installedDVEntry, auxiliaryDVType=auxiliaryDVType, installedDVIndex=installedDVIndex, auxiliaryDVTable=auxiliaryDVTable)

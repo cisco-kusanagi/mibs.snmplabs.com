@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module INTEL-L3LINK-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/INTEL-L3LINK-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:43:13 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint")
+mib2ext, = mibBuilder.importSymbols("INTEL-GEN-MIB", "mib2ext")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, TimeTicks, Bits, Counter64, NotificationType, iso, ObjectIdentity, Unsigned32, Counter32, Gauge32, IpAddress, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "TimeTicks", "Bits", "Counter64", "NotificationType", "iso", "ObjectIdentity", "Unsigned32", "Counter32", "Gauge32", "IpAddress", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+l3Link = MibIdentifier((1, 3, 6, 1, 4, 1, 343, 6, 12))
+interface = MibIdentifier((1, 3, 6, 1, 4, 1, 343, 6, 12, 1))
+l3lkInterfaceTable = MibTable((1, 3, 6, 1, 4, 1, 343, 6, 12, 1, 1), )
+if mibBuilder.loadTexts: l3lkInterfaceTable.setStatus('mandatory')
+l3lkInterfaceEntry = MibTableRow((1, 3, 6, 1, 4, 1, 343, 6, 12, 1, 1, 1), ).setIndexNames((0, "INTEL-L3LINK-MIB", "l3lkInterfaceIfIndex"))
+if mibBuilder.loadTexts: l3lkInterfaceEntry.setStatus('mandatory')
+l3lkInterfaceIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 343, 6, 12, 1, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: l3lkInterfaceIfIndex.setStatus('mandatory')
+l3lkInterfaceVlanId = MibTableColumn((1, 3, 6, 1, 4, 1, 343, 6, 12, 1, 1, 1, 2), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: l3lkInterfaceVlanId.setStatus('mandatory')
+l3lkInterfaceStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 343, 6, 12, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: l3lkInterfaceStatus.setStatus('mandatory')
+l3lkInterfaceCreateObj = MibTableColumn((1, 3, 6, 1, 4, 1, 343, 6, 12, 1, 1, 1, 4), OctetString().subtype(subtypeSpec=ValueSizeConstraint(3, 3)).setFixedLength(3)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: l3lkInterfaceCreateObj.setStatus('mandatory')
+l3lkInterfaceDeleteObj = MibTableColumn((1, 3, 6, 1, 4, 1, 343, 6, 12, 1, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1))).clone(namedValues=NamedValues(("delete", 1)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: l3lkInterfaceDeleteObj.setStatus('mandatory')
+mibBuilder.exportSymbols("INTEL-L3LINK-MIB", interface=interface, l3lkInterfaceTable=l3lkInterfaceTable, l3lkInterfaceDeleteObj=l3lkInterfaceDeleteObj, l3lkInterfaceCreateObj=l3lkInterfaceCreateObj, l3lkInterfaceIfIndex=l3lkInterfaceIfIndex, l3lkInterfaceStatus=l3lkInterfaceStatus, l3lkInterfaceEntry=l3lkInterfaceEntry, l3Link=l3Link, l3lkInterfaceVlanId=l3lkInterfaceVlanId)

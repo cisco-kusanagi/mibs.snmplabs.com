@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module ZYXEL-IPV6-PATH-MTU-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZYXEL-IPV6-PATH-MTU-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:44:22 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint")
+InetAddress, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetAddressType")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, TimeTicks, IpAddress, Integer32, Counter32, Gauge32, iso, Bits, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, MibIdentifier, Unsigned32, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "TimeTicks", "IpAddress", "Integer32", "Counter32", "Gauge32", "iso", "Bits", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "MibIdentifier", "Unsigned32", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+esMgmt, = mibBuilder.importSymbols("ZYXEL-ES-SMI", "esMgmt")
+zyxelIpv6PathMtu = ModuleIdentity((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 36))
+if mibBuilder.loadTexts: zyxelIpv6PathMtu.setLastUpdated('201207010000Z')
+if mibBuilder.loadTexts: zyxelIpv6PathMtu.setOrganization('Enterprise Solution ZyXEL')
+zyxelPathMtuDiscoveryStatus = MibIdentifier((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 36, 1))
+zyxelPathMtuDiscoveryTable = MibTable((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 36, 1, 1), )
+if mibBuilder.loadTexts: zyxelPathMtuDiscoveryTable.setStatus('current')
+zyxelPathMtuDiscoveryEntry = MibTableRow((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 36, 1, 1, 1), ).setIndexNames((0, "ZYXEL-IPV6-PATH-MTU-MIB", "zyPathMtuDiscoveryDestinationIpAddressType"), (0, "ZYXEL-IPV6-PATH-MTU-MIB", "zyPathMtuDiscoveryDestinationIpAddress"))
+if mibBuilder.loadTexts: zyxelPathMtuDiscoveryEntry.setStatus('current')
+zyPathMtuDiscoveryDestinationIpAddressType = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 36, 1, 1, 1, 1), InetAddressType())
+if mibBuilder.loadTexts: zyPathMtuDiscoveryDestinationIpAddressType.setStatus('current')
+zyPathMtuDiscoveryDestinationIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 36, 1, 1, 1, 2), InetAddress())
+if mibBuilder.loadTexts: zyPathMtuDiscoveryDestinationIpAddress.setStatus('current')
+zyPathMtuDiscoveryMtu = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 36, 1, 1, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zyPathMtuDiscoveryMtu.setStatus('current')
+zyPathMtuDiscoveryExpiredTime = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 36, 1, 1, 1, 4), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zyPathMtuDiscoveryExpiredTime.setStatus('current')
+mibBuilder.exportSymbols("ZYXEL-IPV6-PATH-MTU-MIB", zyxelPathMtuDiscoveryEntry=zyxelPathMtuDiscoveryEntry, zyPathMtuDiscoveryExpiredTime=zyPathMtuDiscoveryExpiredTime, zyxelPathMtuDiscoveryStatus=zyxelPathMtuDiscoveryStatus, zyxelIpv6PathMtu=zyxelIpv6PathMtu, zyPathMtuDiscoveryDestinationIpAddressType=zyPathMtuDiscoveryDestinationIpAddressType, zyxelPathMtuDiscoveryTable=zyxelPathMtuDiscoveryTable, zyPathMtuDiscoveryMtu=zyPathMtuDiscoveryMtu, PYSNMP_MODULE_ID=zyxelIpv6PathMtu, zyPathMtuDiscoveryDestinationIpAddress=zyPathMtuDiscoveryDestinationIpAddress)

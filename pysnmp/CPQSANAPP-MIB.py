@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module CPQSANAPP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CPQSANAPP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:12:09 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+TimeTicks, Counter32, NotificationType, ModuleIdentity, Bits, enterprises, NotificationType, Counter64, Unsigned32, IpAddress, iso, Gauge32, ObjectIdentity, Integer32, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Counter32", "NotificationType", "ModuleIdentity", "Bits", "enterprises", "NotificationType", "Counter64", "Unsigned32", "IpAddress", "iso", "Gauge32", "ObjectIdentity", "Integer32", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+compaq = MibIdentifier((1, 3, 6, 1, 4, 1, 232))
+cpqSanAppliance = MibIdentifier((1, 3, 6, 1, 4, 1, 232, 151))
+resourceMonitor = MibIdentifier((1, 3, 6, 1, 4, 1, 232, 151, 11))
+swSystemName = MibScalar((1, 3, 6, 1, 4, 1, 232, 151, 11, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(255, 255)).setFixedLength(255)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: swSystemName.setStatus('mandatory')
+swSystemType = MibScalar((1, 3, 6, 1, 4, 1, 232, 151, 11, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("hsg80", 1), ("switch", 2), ("appliance", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: swSystemType.setStatus('mandatory')
+swEventName = MibScalar((1, 3, 6, 1, 4, 1, 232, 151, 11, 3), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(255, 255)).setFixedLength(255)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: swEventName.setStatus('mandatory')
+swFailure = MibScalar((1, 3, 6, 1, 4, 1, 232, 151, 11, 4), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(255, 255)).setFixedLength(255)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: swFailure.setStatus('mandatory')
+swSequence = MibScalar((1, 3, 6, 1, 4, 1, 232, 151, 11, 5), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: swSequence.setStatus('mandatory')
+swFailureTrap = NotificationType((1, 3, 6, 1, 4, 1, 232, 151, 11) + (0,1)).setObjects(("CPQSANAPP-MIB", "swSystemName"), ("CPQSANAPP-MIB", "swSystemType"), ("CPQSANAPP-MIB", "swEventName"), ("CPQSANAPP-MIB", "swFailure"), ("CPQSANAPP-MIB", "swSequence"))
+swWarningTrap = NotificationType((1, 3, 6, 1, 4, 1, 232, 151, 11) + (0,2)).setObjects(("CPQSANAPP-MIB", "swSystemName"), ("CPQSANAPP-MIB", "swSystemType"), ("CPQSANAPP-MIB", "swEventName"), ("CPQSANAPP-MIB", "swFailure"), ("CPQSANAPP-MIB", "swSequence"))
+swInformationTrap = NotificationType((1, 3, 6, 1, 4, 1, 232, 151, 11) + (0,4)).setObjects(("CPQSANAPP-MIB", "swSystemName"), ("CPQSANAPP-MIB", "swSystemType"), ("CPQSANAPP-MIB", "swEventName"), ("CPQSANAPP-MIB", "swFailure"), ("CPQSANAPP-MIB", "swSequence"))
+mibBuilder.exportSymbols("CPQSANAPP-MIB", compaq=compaq, swWarningTrap=swWarningTrap, swInformationTrap=swInformationTrap, swSequence=swSequence, swEventName=swEventName, swSystemName=swSystemName, swSystemType=swSystemType, resourceMonitor=resourceMonitor, swFailure=swFailure, cpqSanAppliance=cpqSanAppliance, swFailureTrap=swFailureTrap)

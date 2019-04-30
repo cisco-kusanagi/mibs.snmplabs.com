@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module NT-Reference-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NT-Reference-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:07:15 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+Unsigned32, ModuleIdentity, MibIdentifier, Bits, NotificationType, Counter32, Counter64, enterprises, ObjectIdentity, IpAddress, Gauge32, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "ModuleIdentity", "MibIdentifier", "Bits", "NotificationType", "Counter32", "Counter64", "enterprises", "ObjectIdentity", "IpAddress", "Gauge32", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "TimeTicks")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+nt = MibIdentifier((1, 3, 6, 1, 4, 1, 562))
+meridian = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3))
+experimental = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 0))
+modules = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 1))
+common = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 2))
+smp = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 3))
+cybele = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 4))
+mobility = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 5))
+callProcessing = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 6))
+iccm = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 7))
+ngen = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 8))
+amber = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 9))
+entityNaming = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 2, 0))
+networkID = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 2, 0, 0))
+cybeleNaming = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 2, 0, 1))
+ngenNaming = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 2, 0, 2))
+mailNaming = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 2, 0, 3))
+mobilityNmaing = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 3, 2, 0, 4))
+mibBuilder.exportSymbols("NT-Reference-MIB", smp=smp, meridian=meridian, common=common, callProcessing=callProcessing, nt=nt, entityNaming=entityNaming, amber=amber, cybele=cybele, networkID=networkID, iccm=iccm, mailNaming=mailNaming, mobility=mobility, ngen=ngen, cybeleNaming=cybeleNaming, mobilityNmaing=mobilityNmaing, modules=modules, experimental=experimental, ngenNaming=ngenNaming)

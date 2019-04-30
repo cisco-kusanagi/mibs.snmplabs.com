@@ -1,0 +1,80 @@
+#
+# PySNMP MIB module Unisphere-Data-IP-PROFILE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Unisphere-Data-IP-PROFILE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:24:20 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint")
+InterfaceIndexOrZero, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndexOrZero")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+Counter64, IpAddress, TimeTicks, Counter32, Integer32, ObjectIdentity, iso, NotificationType, MibIdentifier, ModuleIdentity, Gauge32, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "IpAddress", "TimeTicks", "Counter32", "Integer32", "ObjectIdentity", "iso", "NotificationType", "MibIdentifier", "ModuleIdentity", "Gauge32", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32")
+TextualConvention, DisplayString, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "RowStatus")
+usDataMibs, = mibBuilder.importSymbols("Unisphere-Data-MIBs", "usDataMibs")
+UsdSetMap, UsdEnable, UsdName = mibBuilder.importSymbols("Unisphere-Data-TC", "UsdSetMap", "UsdEnable", "UsdName")
+usdIpProfileMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26))
+usdIpProfileMIB.setRevisions(('2001-01-24 20:06', '2000-05-08 00:00', '1999-08-25 00:00',))
+if mibBuilder.loadTexts: usdIpProfileMIB.setLastUpdated('200101242006Z')
+if mibBuilder.loadTexts: usdIpProfileMIB.setOrganization('Unisphere Networks Inc.')
+usdIpProfileObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1))
+usdIpProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1))
+usdIpProfileTable = MibTable((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1), )
+if mibBuilder.loadTexts: usdIpProfileTable.setStatus('current')
+usdIpProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1), ).setIndexNames((0, "Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileId"))
+if mibBuilder.loadTexts: usdIpProfileEntry.setStatus('current')
+usdIpProfileId = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 1), Unsigned32())
+if mibBuilder.loadTexts: usdIpProfileId.setStatus('current')
+usdIpProfileRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 2), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileRowStatus.setStatus('deprecated')
+usdIpProfileRouterName = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 3), UsdName()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileRouterName.setStatus('current')
+usdIpProfileIpAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 4), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileIpAddr.setStatus('current')
+usdIpProfileIpMask = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 5), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileIpMask.setStatus('current')
+usdIpProfileDirectedBcastEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 6), UsdEnable().clone('disable')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileDirectedBcastEnable.setStatus('current')
+usdIpProfileIcmpRedirectEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 7), UsdEnable().clone('disable')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileIcmpRedirectEnable.setStatus('current')
+usdIpProfileAccessRoute = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 8), UsdEnable().clone('enable')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileAccessRoute.setStatus('current')
+usdIpProfileMtu = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 9), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(0, 0), ValueRangeConstraint(512, 10240), ))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileMtu.setStatus('current')
+usdIpProfileLoopbackIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 10), InterfaceIndexOrZero()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileLoopbackIfIndex.setStatus('obsolete')
+usdIpProfileLoopback = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 11), Integer32().subtype(subtypeSpec=ValueRangeConstraint(-1, 2147483647)).clone(-1)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileLoopback.setStatus('current')
+usdIpProfileSetMap = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 12), UsdSetMap()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileSetMap.setStatus('current')
+usdIpProfileSrcAddrValidEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 1, 1, 1, 1, 13), UsdEnable().clone('disable')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdIpProfileSrcAddrValidEnable.setStatus('current')
+usdIpProfileMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4))
+usdIpProfileMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 1))
+usdIpProfileMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 2))
+usdIpProfileCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 1, 1)).setObjects(("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdIpProfileCompliance = usdIpProfileCompliance.setStatus('obsolete')
+usdIpProfileCompliance1 = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 1, 2)).setObjects(("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileGroup1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdIpProfileCompliance1 = usdIpProfileCompliance1.setStatus('obsolete')
+usdIpProfileCompliance2 = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 1, 3)).setObjects(("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileGroup2"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdIpProfileCompliance2 = usdIpProfileCompliance2.setStatus('current')
+usdIpProfileGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 2, 1)).setObjects(("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileRowStatus"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileRouterName"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIpAddr"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIpMask"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileDirectedBcastEnable"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIcmpRedirectEnable"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileAccessRoute"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileMtu"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileLoopbackIfIndex"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdIpProfileGroup = usdIpProfileGroup.setStatus('obsolete')
+usdIpProfileGroup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 2, 2)).setObjects(("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileRowStatus"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileRouterName"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIpAddr"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIpMask"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileDirectedBcastEnable"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIcmpRedirectEnable"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileAccessRoute"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileMtu"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileLoopback"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdIpProfileGroup1 = usdIpProfileGroup1.setStatus('obsolete')
+usdIpProfileGroup2 = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 2, 3)).setObjects(("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileRouterName"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIpAddr"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIpMask"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileDirectedBcastEnable"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileIcmpRedirectEnable"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileAccessRoute"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileMtu"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileLoopback"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileSetMap"), ("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileSrcAddrValidEnable"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdIpProfileGroup2 = usdIpProfileGroup2.setStatus('current')
+usdIpProfileDeprecatedGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 26, 4, 2, 4)).setObjects(("Unisphere-Data-IP-PROFILE-MIB", "usdIpProfileRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdIpProfileDeprecatedGroup = usdIpProfileDeprecatedGroup.setStatus('deprecated')
+mibBuilder.exportSymbols("Unisphere-Data-IP-PROFILE-MIB", usdIpProfileGroup2=usdIpProfileGroup2, usdIpProfileObjects=usdIpProfileObjects, usdIpProfileGroup=usdIpProfileGroup, usdIpProfileId=usdIpProfileId, usdIpProfileLoopbackIfIndex=usdIpProfileLoopbackIfIndex, usdIpProfileIcmpRedirectEnable=usdIpProfileIcmpRedirectEnable, usdIpProfileSrcAddrValidEnable=usdIpProfileSrcAddrValidEnable, PYSNMP_MODULE_ID=usdIpProfileMIB, usdIpProfileSetMap=usdIpProfileSetMap, usdIpProfileMIBConformance=usdIpProfileMIBConformance, usdIpProfile=usdIpProfile, usdIpProfileRouterName=usdIpProfileRouterName, usdIpProfileCompliance1=usdIpProfileCompliance1, usdIpProfileIpMask=usdIpProfileIpMask, usdIpProfileEntry=usdIpProfileEntry, usdIpProfileDirectedBcastEnable=usdIpProfileDirectedBcastEnable, usdIpProfileDeprecatedGroup=usdIpProfileDeprecatedGroup, usdIpProfileCompliance=usdIpProfileCompliance, usdIpProfileMIB=usdIpProfileMIB, usdIpProfileRowStatus=usdIpProfileRowStatus, usdIpProfileMIBCompliances=usdIpProfileMIBCompliances, usdIpProfileIpAddr=usdIpProfileIpAddr, usdIpProfileAccessRoute=usdIpProfileAccessRoute, usdIpProfileMIBGroups=usdIpProfileMIBGroups, usdIpProfileMtu=usdIpProfileMtu, usdIpProfileLoopback=usdIpProfileLoopback, usdIpProfileTable=usdIpProfileTable, usdIpProfileCompliance2=usdIpProfileCompliance2, usdIpProfileGroup1=usdIpProfileGroup1)

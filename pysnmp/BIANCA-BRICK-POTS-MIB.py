@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module BIANCA-BRICK-POTS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BIANCA-BRICK-POTS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:21:28 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+TimeTicks, Integer32, Bits, iso, Unsigned32, ObjectIdentity, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, NotificationType, IpAddress, Counter64, Gauge32, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Integer32", "Bits", "iso", "Unsigned32", "ObjectIdentity", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "NotificationType", "IpAddress", "Counter64", "Gauge32", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+org = MibIdentifier((1, 3))
+dod = MibIdentifier((1, 3, 6))
+internet = MibIdentifier((1, 3, 6, 1))
+private = MibIdentifier((1, 3, 6, 1, 4))
+enterprises = MibIdentifier((1, 3, 6, 1, 4, 1))
+bintec = MibIdentifier((1, 3, 6, 1, 4, 1, 272))
+bibo = MibIdentifier((1, 3, 6, 1, 4, 1, 272, 4))
+pots = MibIdentifier((1, 3, 6, 1, 4, 1, 272, 4, 14))
+potsIfTable = MibTable((1, 3, 6, 1, 4, 1, 272, 4, 14, 1), )
+if mibBuilder.loadTexts: potsIfTable.setStatus('mandatory')
+potsIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 272, 4, 14, 1, 1), ).setIndexNames((0, "BIANCA-BRICK-POTS-MIB", "potsSlot"), (0, "BIANCA-BRICK-POTS-MIB", "potsUnit"))
+if mibBuilder.loadTexts: potsIfEntry.setStatus('mandatory')
+potsSlot = MibTableColumn((1, 3, 6, 1, 4, 1, 272, 4, 14, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 31))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: potsSlot.setStatus('mandatory')
+potsUnit = MibTableColumn((1, 3, 6, 1, 4, 1, 272, 4, 14, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 31))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: potsUnit.setStatus('mandatory')
+potsType = MibTableColumn((1, 3, 6, 1, 4, 1, 272, 4, 14, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("any", 1), ("fax", 2), ("telephony", 3), ("modem", 4), ("disable", 5)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: potsType.setStatus('mandatory')
+mibBuilder.exportSymbols("BIANCA-BRICK-POTS-MIB", pots=pots, enterprises=enterprises, potsUnit=potsUnit, private=private, bibo=bibo, bintec=bintec, potsType=potsType, potsIfEntry=potsIfEntry, potsSlot=potsSlot, internet=internet, dod=dod, org=org, potsIfTable=potsIfTable)

@@ -1,0 +1,73 @@
+#
+# PySNMP MIB module RIVERSTONE-QUEUE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RIVERSTONE-QUEUE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:49:17 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+riverstoneMibs, = mibBuilder.importSymbols("RIVERSTONE-SMI-MIB", "riverstoneMibs")
+RsDiscardPolicy, = mibBuilder.importSymbols("RIVERSTONE-TC-MIB", "RsDiscardPolicy")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+TimeTicks, Counter32, ObjectIdentity, NotificationType, Integer32, ModuleIdentity, Bits, Counter64, Gauge32, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, MibIdentifier, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Counter32", "ObjectIdentity", "NotificationType", "Integer32", "ModuleIdentity", "Bits", "Counter64", "Gauge32", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "MibIdentifier", "Unsigned32")
+TruthValue, TimeStamp, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "TimeStamp", "TextualConvention", "DisplayString")
+rsQueueMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5567, 2, 70))
+rsQueueMIB.setRevisions(('2002-06-12 00:00',))
+if mibBuilder.loadTexts: rsQueueMIB.setLastUpdated('200206120000Z')
+if mibBuilder.loadTexts: rsQueueMIB.setOrganization('Riverstone Networks, Inc')
+class IndexInteger(TextualConvention, Unsigned32):
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Unsigned32.subtypeSpec + ValueRangeConstraint(1, 4294967295)
+
+rsQueueMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1))
+rsQueuePropertiesTable = MibTable((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 1), )
+if mibBuilder.loadTexts: rsQueuePropertiesTable.setStatus('current')
+rsQueuePropertiesEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 1, 1), ).setIndexNames((0, "RIVERSTONE-QUEUE-MIB", "rsQueueId"))
+if mibBuilder.loadTexts: rsQueuePropertiesEntry.setStatus('current')
+rsQueueId = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 1, 1, 1), IndexInteger())
+if mibBuilder.loadTexts: rsQueueId.setStatus('current')
+rsQueueName = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 1, 1, 2), SnmpAdminString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueName.setStatus('current')
+rsQueueDescr = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 1, 1, 3), SnmpAdminString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueDescr.setStatus('current')
+rsQueueDiscardPolicy = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 1, 1, 4), RsDiscardPolicy()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueDiscardPolicy.setStatus('current')
+rsQueueMaxCapacity = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 1, 1, 6), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueMaxCapacity.setStatus('current')
+rsQueueStatsTable = MibTable((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2), )
+if mibBuilder.loadTexts: rsQueueStatsTable.setStatus('current')
+rsQueueStatsEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "RIVERSTONE-QUEUE-MIB", "rsQueueId"))
+if mibBuilder.loadTexts: rsQueueStatsEntry.setStatus('current')
+rsQueueStatsLastCapChange = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2, 1, 1), TimeStamp()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueStatsLastCapChange.setStatus('current')
+rsQueueStatsValid = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2, 1, 2), Bits().clone(namedValues=NamedValues(("validBytes", 0), ("validFrames", 1), ("validDiscards", 2), ("validHCBytes", 3), ("validHCFrames", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueStatsValid.setStatus('current')
+rsQueueBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2, 1, 101), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueBytes.setStatus('current')
+rsQueueFrames = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2, 1, 102), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueFrames.setStatus('current')
+rsQueueDiscards = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2, 1, 103), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueDiscards.setStatus('current')
+rsQueueHCBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2, 1, 201), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueHCBytes.setStatus('current')
+rsQueueHCFrames = MibTableColumn((1, 3, 6, 1, 4, 1, 5567, 2, 70, 1, 2, 1, 202), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsQueueHCFrames.setStatus('current')
+rsQueueConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 70, 2))
+rsQueueCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 70, 2, 1))
+rsQueueGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 70, 2, 2))
+rsQueueCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5567, 2, 70, 2, 1, 1)).setObjects(("RIVERSTONE-QUEUE-MIB", "rsQueuePropertiesGroup"), ("RIVERSTONE-QUEUE-MIB", "rsQueueStatsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsQueueCompliance = rsQueueCompliance.setStatus('current')
+rsQueuePropertiesGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5567, 2, 70, 2, 2, 1)).setObjects(("RIVERSTONE-QUEUE-MIB", "rsQueueName"), ("RIVERSTONE-QUEUE-MIB", "rsQueueDescr"), ("RIVERSTONE-QUEUE-MIB", "rsQueueDiscardPolicy"), ("RIVERSTONE-QUEUE-MIB", "rsQueueMaxCapacity"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsQueuePropertiesGroup = rsQueuePropertiesGroup.setStatus('current')
+rsQueueStatsGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5567, 2, 70, 2, 2, 2)).setObjects(("RIVERSTONE-QUEUE-MIB", "rsQueueStatsLastCapChange"), ("RIVERSTONE-QUEUE-MIB", "rsQueueStatsValid"), ("RIVERSTONE-QUEUE-MIB", "rsQueueBytes"), ("RIVERSTONE-QUEUE-MIB", "rsQueueFrames"), ("RIVERSTONE-QUEUE-MIB", "rsQueueDiscards"), ("RIVERSTONE-QUEUE-MIB", "rsQueueHCBytes"), ("RIVERSTONE-QUEUE-MIB", "rsQueueHCFrames"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsQueueStatsGroup = rsQueueStatsGroup.setStatus('current')
+mibBuilder.exportSymbols("RIVERSTONE-QUEUE-MIB", rsQueueStatsLastCapChange=rsQueueStatsLastCapChange, rsQueueHCBytes=rsQueueHCBytes, rsQueueDescr=rsQueueDescr, rsQueuePropertiesTable=rsQueuePropertiesTable, rsQueueBytes=rsQueueBytes, rsQueueConformance=rsQueueConformance, rsQueueFrames=rsQueueFrames, rsQueueCompliances=rsQueueCompliances, rsQueueHCFrames=rsQueueHCFrames, rsQueueCompliance=rsQueueCompliance, rsQueueName=rsQueueName, rsQueueStatsEntry=rsQueueStatsEntry, rsQueueGroups=rsQueueGroups, rsQueueStatsGroup=rsQueueStatsGroup, rsQueueMIB=rsQueueMIB, IndexInteger=IndexInteger, rsQueueId=rsQueueId, rsQueuePropertiesGroup=rsQueuePropertiesGroup, rsQueuePropertiesEntry=rsQueuePropertiesEntry, rsQueueMaxCapacity=rsQueueMaxCapacity, rsQueueStatsTable=rsQueueStatsTable, PYSNMP_MODULE_ID=rsQueueMIB, rsQueueDiscardPolicy=rsQueueDiscardPolicy, rsQueueDiscards=rsQueueDiscards, rsQueueMIBObjects=rsQueueMIBObjects, rsQueueStatsValid=rsQueueStatsValid)

@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module CNTHOTEXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CNTHOTEXT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:09:36 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+cnthotExt, = mibBuilder.importSymbols("APENT-MIB", "cnthotExt")
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint")
+apCntName, apCntOwner = mibBuilder.importSymbols("CNTEXT-MIB", "apCntName", "apCntOwner")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, Unsigned32, Counter64, Gauge32, TimeTicks, Bits, ObjectIdentity, IpAddress, MibIdentifier, iso, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "Unsigned32", "Counter64", "Gauge32", "TimeTicks", "Bits", "ObjectIdentity", "IpAddress", "MibIdentifier", "iso", "Integer32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+apCnthotExtMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 2467, 1, 35, 1))
+if mibBuilder.loadTexts: apCnthotExtMib.setLastUpdated('9710092000Z')
+if mibBuilder.loadTexts: apCnthotExtMib.setOrganization('ArrowPoint Communications Inc.')
+apCnthotTable = MibTable((1, 3, 6, 1, 4, 1, 2467, 1, 35, 2), )
+if mibBuilder.loadTexts: apCnthotTable.setStatus('current')
+apCnthotEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2467, 1, 35, 2, 1), ).setIndexNames((0, "CNTEXT-MIB", "apCntOwner"), (0, "CNTEXT-MIB", "apCntName"), (0, "CNTHOTEXT-MIB", "apCnthotIndex"))
+if mibBuilder.loadTexts: apCnthotEntry.setStatus('current')
+apCnthotIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2467, 1, 35, 2, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: apCnthotIndex.setStatus('current')
+apCnthotRate = MibTableColumn((1, 3, 6, 1, 4, 1, 2467, 1, 35, 2, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: apCnthotRate.setStatus('current')
+apCnthotUri = MibTableColumn((1, 3, 6, 1, 4, 1, 2467, 1, 35, 2, 1, 3), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: apCnthotUri.setStatus('current')
+apCnthotSize = MibTableColumn((1, 3, 6, 1, 4, 1, 2467, 1, 35, 2, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: apCnthotSize.setStatus('current')
+mibBuilder.exportSymbols("CNTHOTEXT-MIB", apCnthotEntry=apCnthotEntry, apCnthotSize=apCnthotSize, apCnthotRate=apCnthotRate, PYSNMP_MODULE_ID=apCnthotExtMib, apCnthotExtMib=apCnthotExtMib, apCnthotIndex=apCnthotIndex, apCnthotTable=apCnthotTable, apCnthotUri=apCnthotUri)

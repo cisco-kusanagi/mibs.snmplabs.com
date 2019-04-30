@@ -1,0 +1,63 @@
+#
+# PySNMP MIB module CISCO-TCP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-TCP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:57:36 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+Integer32, Counter64, IpAddress, MibIdentifier, NotificationType, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, TimeTicks, Counter32, Gauge32, Bits, iso, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "Counter64", "IpAddress", "MibIdentifier", "NotificationType", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "TimeTicks", "Counter32", "Gauge32", "Bits", "iso", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+tcpConnEntry, = mibBuilder.importSymbols("TCP-MIB", "tcpConnEntry")
+ciscoTcpMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 6))
+ciscoTcpMIB.setRevisions(('2001-11-12 00:00', '1996-12-03 00:00', '1994-07-21 00:00',))
+if mibBuilder.loadTexts: ciscoTcpMIB.setLastUpdated('200111120000Z')
+if mibBuilder.loadTexts: ciscoTcpMIB.setOrganization('Cisco Systems, Inc.')
+ciscoTcpMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 6, 1))
+ciscoTcpConnTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1), )
+if mibBuilder.loadTexts: ciscoTcpConnTable.setStatus('current')
+ciscoTcpConnEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1), )
+tcpConnEntry.registerAugmentions(("CISCO-TCP-MIB", "ciscoTcpConnEntry"))
+ciscoTcpConnEntry.setIndexNames(*tcpConnEntry.getIndexNames())
+if mibBuilder.loadTexts: ciscoTcpConnEntry.setStatus('current')
+ciscoTcpConnInBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 1), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnInBytes.setStatus('current')
+ciscoTcpConnOutBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 2), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnOutBytes.setStatus('current')
+ciscoTcpConnInPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 3), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnInPkts.setStatus('current')
+ciscoTcpConnOutPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 4), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnOutPkts.setStatus('current')
+ciscoTcpConnElapsed = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 5), TimeTicks()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnElapsed.setStatus('current')
+ciscoTcpConnSRTT = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 6), Integer32()).setUnits('milliseconds').setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnSRTT.setStatus('current')
+ciscoTcpConnRetransPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 7), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnRetransPkts.setStatus('current')
+ciscoTcpConnFastRetransPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 8), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnFastRetransPkts.setStatus('current')
+ciscoTcpConnRto = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 6, 1, 1, 1, 9), Integer32()).setUnits('milliseconds').setMaxAccess("readonly")
+if mibBuilder.loadTexts: ciscoTcpConnRto.setStatus('current')
+ciscoTcpMIBTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 6, 2))
+ciscoTcpMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 6, 3))
+ciscoTcpMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 6, 3, 1))
+ciscoTcpMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 6, 3, 2))
+ciscoTcpMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 6, 3, 1, 1)).setObjects(("CISCO-TCP-MIB", "ciscoTcpMIBGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoTcpMIBCompliance = ciscoTcpMIBCompliance.setStatus('deprecated')
+ciscoTcpMIBComplianceRev1 = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 6, 3, 1, 2)).setObjects(("CISCO-TCP-MIB", "ciscoTcpMIBGroupRev1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoTcpMIBComplianceRev1 = ciscoTcpMIBComplianceRev1.setStatus('current')
+ciscoTcpMIBGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 6, 3, 2, 1)).setObjects(("CISCO-TCP-MIB", "ciscoTcpConnInBytes"), ("CISCO-TCP-MIB", "ciscoTcpConnOutBytes"), ("CISCO-TCP-MIB", "ciscoTcpConnInPkts"), ("CISCO-TCP-MIB", "ciscoTcpConnOutPkts"), ("CISCO-TCP-MIB", "ciscoTcpConnElapsed"), ("CISCO-TCP-MIB", "ciscoTcpConnSRTT"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoTcpMIBGroup = ciscoTcpMIBGroup.setStatus('deprecated')
+ciscoTcpMIBGroupRev1 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 6, 3, 2, 2)).setObjects(("CISCO-TCP-MIB", "ciscoTcpConnInBytes"), ("CISCO-TCP-MIB", "ciscoTcpConnOutBytes"), ("CISCO-TCP-MIB", "ciscoTcpConnInPkts"), ("CISCO-TCP-MIB", "ciscoTcpConnOutPkts"), ("CISCO-TCP-MIB", "ciscoTcpConnElapsed"), ("CISCO-TCP-MIB", "ciscoTcpConnSRTT"), ("CISCO-TCP-MIB", "ciscoTcpConnRto"), ("CISCO-TCP-MIB", "ciscoTcpConnRetransPkts"), ("CISCO-TCP-MIB", "ciscoTcpConnFastRetransPkts"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoTcpMIBGroupRev1 = ciscoTcpMIBGroupRev1.setStatus('current')
+mibBuilder.exportSymbols("CISCO-TCP-MIB", ciscoTcpConnRetransPkts=ciscoTcpConnRetransPkts, ciscoTcpConnFastRetransPkts=ciscoTcpConnFastRetransPkts, ciscoTcpConnInBytes=ciscoTcpConnInBytes, ciscoTcpConnInPkts=ciscoTcpConnInPkts, ciscoTcpMIBConformance=ciscoTcpMIBConformance, ciscoTcpConnOutBytes=ciscoTcpConnOutBytes, ciscoTcpConnElapsed=ciscoTcpConnElapsed, ciscoTcpMIBObjects=ciscoTcpMIBObjects, ciscoTcpMIBCompliances=ciscoTcpMIBCompliances, ciscoTcpMIBCompliance=ciscoTcpMIBCompliance, ciscoTcpConnRto=ciscoTcpConnRto, PYSNMP_MODULE_ID=ciscoTcpMIB, ciscoTcpMIBTraps=ciscoTcpMIBTraps, ciscoTcpMIBGroups=ciscoTcpMIBGroups, ciscoTcpMIBComplianceRev1=ciscoTcpMIBComplianceRev1, ciscoTcpMIBGroupRev1=ciscoTcpMIBGroupRev1, ciscoTcpConnSRTT=ciscoTcpConnSRTT, ciscoTcpConnEntry=ciscoTcpConnEntry, ciscoTcpConnTable=ciscoTcpConnTable, ciscoTcpMIBGroup=ciscoTcpMIBGroup, ciscoTcpMIB=ciscoTcpMIB, ciscoTcpConnOutPkts=ciscoTcpConnOutPkts)

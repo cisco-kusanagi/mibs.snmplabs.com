@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module DIFFSERV-CONFIG-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DIFFSERV-CONFIG-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:32:01 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+IpAddress, Counter32, Counter64, mib_2, NotificationType, Integer32, ModuleIdentity, Unsigned32, iso, Gauge32, zeroDotZero, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Bits, TimeTicks, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "Counter32", "Counter64", "mib-2", "NotificationType", "Integer32", "ModuleIdentity", "Unsigned32", "iso", "Gauge32", "zeroDotZero", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Bits", "TimeTicks", "MibIdentifier")
+DateAndTime, RowPointer, DisplayString, TextualConvention, StorageType, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "DateAndTime", "RowPointer", "DisplayString", "TextualConvention", "StorageType", "RowStatus")
+diffServConfigMib = ModuleIdentity((1, 3, 6, 1, 2, 1, 108))
+diffServConfigMib.setRevisions(('2004-01-22 00:00',))
+if mibBuilder.loadTexts: diffServConfigMib.setLastUpdated('200401220000Z')
+if mibBuilder.loadTexts: diffServConfigMib.setOrganization('SNMPCONF WG')
+diffServConfigMIBObjects = MibIdentifier((1, 3, 6, 1, 2, 1, 108, 1))
+diffServConfigMIBConformance = MibIdentifier((1, 3, 6, 1, 2, 1, 108, 2))
+diffServConfigTable = MibTable((1, 3, 6, 1, 2, 1, 108, 1, 2), )
+if mibBuilder.loadTexts: diffServConfigTable.setStatus('current')
+diffServConfigEntry = MibTableRow((1, 3, 6, 1, 2, 1, 108, 1, 2, 1), ).setIndexNames((0, "DIFFSERV-CONFIG-MIB", "diffServConfigId"))
+if mibBuilder.loadTexts: diffServConfigEntry.setStatus('current')
+diffServConfigId = MibTableColumn((1, 3, 6, 1, 2, 1, 108, 1, 2, 1, 1), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 116)))
+if mibBuilder.loadTexts: diffServConfigId.setStatus('current')
+diffServConfigDescr = MibTableColumn((1, 3, 6, 1, 2, 1, 108, 1, 2, 1, 2), SnmpAdminString()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffServConfigDescr.setStatus('current')
+diffServConfigOwner = MibTableColumn((1, 3, 6, 1, 2, 1, 108, 1, 2, 1, 3), SnmpAdminString()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffServConfigOwner.setStatus('current')
+diffServConfigLastChange = MibTableColumn((1, 3, 6, 1, 2, 1, 108, 1, 2, 1, 4), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: diffServConfigLastChange.setStatus('current')
+diffServConfigStart = MibTableColumn((1, 3, 6, 1, 2, 1, 108, 1, 2, 1, 5), RowPointer().clone((0, 0))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffServConfigStart.setStatus('current')
+diffServConfigStorage = MibTableColumn((1, 3, 6, 1, 2, 1, 108, 1, 2, 1, 6), StorageType().clone('nonVolatile')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffServConfigStorage.setStatus('current')
+diffServConfigStatus = MibTableColumn((1, 3, 6, 1, 2, 1, 108, 1, 2, 1, 7), RowStatus().clone('notInService')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffServConfigStatus.setStatus('current')
+diffServConfigMIBCompliances = MibIdentifier((1, 3, 6, 1, 2, 1, 108, 2, 1))
+diffServConfigMIBGroups = MibIdentifier((1, 3, 6, 1, 2, 1, 108, 2, 2))
+diffServConfigMIBFullCompliance = ModuleCompliance((1, 3, 6, 1, 2, 1, 108, 2, 1, 1)).setObjects(("DIFFSERV-CONFIG-MIB", "diffServConfigMIBConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    diffServConfigMIBFullCompliance = diffServConfigMIBFullCompliance.setStatus('current')
+diffServConfigMIBConfigGroup = ObjectGroup((1, 3, 6, 1, 2, 1, 108, 2, 2, 1)).setObjects(("DIFFSERV-CONFIG-MIB", "diffServConfigDescr"), ("DIFFSERV-CONFIG-MIB", "diffServConfigOwner"), ("DIFFSERV-CONFIG-MIB", "diffServConfigLastChange"), ("DIFFSERV-CONFIG-MIB", "diffServConfigStart"), ("DIFFSERV-CONFIG-MIB", "diffServConfigStorage"), ("DIFFSERV-CONFIG-MIB", "diffServConfigStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    diffServConfigMIBConfigGroup = diffServConfigMIBConfigGroup.setStatus('current')
+mibBuilder.exportSymbols("DIFFSERV-CONFIG-MIB", diffServConfigMib=diffServConfigMib, diffServConfigOwner=diffServConfigOwner, diffServConfigLastChange=diffServConfigLastChange, diffServConfigMIBCompliances=diffServConfigMIBCompliances, diffServConfigMIBConfigGroup=diffServConfigMIBConfigGroup, diffServConfigMIBConformance=diffServConfigMIBConformance, diffServConfigEntry=diffServConfigEntry, diffServConfigStorage=diffServConfigStorage, diffServConfigStatus=diffServConfigStatus, diffServConfigMIBObjects=diffServConfigMIBObjects, diffServConfigId=diffServConfigId, diffServConfigDescr=diffServConfigDescr, diffServConfigMIBFullCompliance=diffServConfigMIBFullCompliance, PYSNMP_MODULE_ID=diffServConfigMib, diffServConfigMIBGroups=diffServConfigMIBGroups, diffServConfigTable=diffServConfigTable, diffServConfigStart=diffServConfigStart)

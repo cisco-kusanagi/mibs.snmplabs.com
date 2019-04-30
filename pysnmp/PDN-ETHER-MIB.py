@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module PDN-ETHER-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PDN-ETHER-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:29:49 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+pdn_ether, = mibBuilder.importSymbols("PDN-HEADER-MIB", "pdn-ether")
+SwitchState, ResetStates, ManagementType = mibBuilder.importSymbols("PDN-TC", "SwitchState", "ResetStates", "ManagementType")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+TimeTicks, Bits, ObjectIdentity, iso, Counter32, Gauge32, Unsigned32, MibIdentifier, Counter64, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Integer32, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Bits", "ObjectIdentity", "iso", "Counter32", "Gauge32", "Unsigned32", "MibIdentifier", "Counter64", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Integer32", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+pdnPortConfigMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 18, 1))
+pdnPortConfigMIBTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 18, 2))
+pdnPortConfigEthernet = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 18, 1, 1))
+pdnPortConfigEthernetTable = MibTable((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 18, 1, 1, 1), )
+if mibBuilder.loadTexts: pdnPortConfigEthernetTable.setStatus('mandatory')
+pdnPortConfigEthernetEntry = MibTableRow((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 18, 1, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: pdnPortConfigEthernetEntry.setStatus('mandatory')
+pdnPortConfigEthernetDuplexMode = MibTableColumn((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 18, 1, 1, 1, 1, 1), SwitchState().clone('disabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: pdnPortConfigEthernetDuplexMode.setStatus('mandatory')
+pdnPortConfigEthernetManageType = MibTableColumn((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 18, 1, 1, 1, 1, 2), ManagementType().clone('outband')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: pdnPortConfigEthernetManageType.setStatus('mandatory')
+pdnPortConfigEthernetResetState = MibTableColumn((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 18, 1, 1, 1, 1, 3), ResetStates().clone('noOp')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: pdnPortConfigEthernetResetState.setStatus('mandatory')
+mibBuilder.exportSymbols("PDN-ETHER-MIB", pdnPortConfigMIBObjects=pdnPortConfigMIBObjects, pdnPortConfigEthernetDuplexMode=pdnPortConfigEthernetDuplexMode, pdnPortConfigEthernetManageType=pdnPortConfigEthernetManageType, pdnPortConfigMIBTraps=pdnPortConfigMIBTraps, pdnPortConfigEthernetTable=pdnPortConfigEthernetTable, pdnPortConfigEthernet=pdnPortConfigEthernet, pdnPortConfigEthernetResetState=pdnPortConfigEthernetResetState, pdnPortConfigEthernetEntry=pdnPortConfigEthernetEntry)

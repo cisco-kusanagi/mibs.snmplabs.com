@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module TPLINK-HTTP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TPLINK-HTTP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:17:24 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+NotificationType, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, IpAddress, ModuleIdentity, Bits, Gauge32, Counter32, Integer32, Unsigned32, ObjectIdentity, TimeTicks, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "IpAddress", "ModuleIdentity", "Bits", "Gauge32", "Counter32", "Integer32", "Unsigned32", "ObjectIdentity", "TimeTicks", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+tplinkMgmt, = mibBuilder.importSymbols("TPLINK-MIB", "tplinkMgmt")
+tplinkHttp = ModuleIdentity((1, 3, 6, 1, 4, 1, 11863, 6, 51))
+tplinkHttp.setRevisions(('2015-01-21 10:30',))
+if mibBuilder.loadTexts: tplinkHttp.setLastUpdated('201501211030Z')
+if mibBuilder.loadTexts: tplinkHttp.setOrganization('TPLINK')
+tplinkHttpMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 51, 1))
+tplinkHttpMIBNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 51, 2))
+httpEnable = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 51, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("disable", 0), ("enable", 1)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: httpEnable.setStatus('current')
+httpSessionTimeOut = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 51, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(5, 30))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: httpSessionTimeOut.setStatus('current')
+httpUserLimitEnable = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 51, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("disable", 0), ("enable", 1)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: httpUserLimitEnable.setStatus('current')
+httpUserLimitMaxAdminNum = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 51, 1, 4), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: httpUserLimitMaxAdminNum.setStatus('current')
+httpUserLimitMaxGuestNum = MibScalar((1, 3, 6, 1, 4, 1, 11863, 6, 51, 1, 5), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: httpUserLimitMaxGuestNum.setStatus('current')
+mibBuilder.exportSymbols("TPLINK-HTTP-MIB", tplinkHttpMIBObjects=tplinkHttpMIBObjects, tplinkHttpMIBNotifications=tplinkHttpMIBNotifications, httpUserLimitEnable=httpUserLimitEnable, PYSNMP_MODULE_ID=tplinkHttp, httpUserLimitMaxAdminNum=httpUserLimitMaxAdminNum, httpUserLimitMaxGuestNum=httpUserLimitMaxGuestNum, httpEnable=httpEnable, httpSessionTimeOut=httpSessionTimeOut, tplinkHttp=tplinkHttp)

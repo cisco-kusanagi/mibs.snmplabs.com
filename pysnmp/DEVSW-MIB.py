@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module DEVSW-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DEVSW-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:26:44 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+device, = mibBuilder.importSymbols("ANIROOT-MIB", "device")
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, Gauge32, Integer32, MibIdentifier, Counter64, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, TimeTicks, ObjectIdentity, NotificationType, IpAddress, Bits, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Gauge32", "Integer32", "MibIdentifier", "Counter64", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "TimeTicks", "ObjectIdentity", "NotificationType", "IpAddress", "Bits", "Unsigned32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+aniDevSoftware = ModuleIdentity((1, 3, 6, 1, 4, 1, 4325, 2, 2))
+if mibBuilder.loadTexts: aniDevSoftware.setLastUpdated('0105091130Z')
+if mibBuilder.loadTexts: aniDevSoftware.setOrganization('Aperto Networks')
+aniDevSwConfigFile = MibScalar((1, 3, 6, 1, 4, 1, 4325, 2, 2, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 80))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniDevSwConfigFile.setStatus('current')
+aniDevSwSystemSoftwareFile = MibScalar((1, 3, 6, 1, 4, 1, 4325, 2, 2, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 80))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniDevSwSystemSoftwareFile.setStatus('current')
+aniDevSwWssSoftwareFile = MibScalar((1, 3, 6, 1, 4, 1, 4325, 2, 2, 3), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 80))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniDevSwWssSoftwareFile.setStatus('current')
+aniDevSwVersion = MibScalar((1, 3, 6, 1, 4, 1, 4325, 2, 2, 4), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 16))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniDevSwVersion.setStatus('current')
+aniDevSwBuild = MibScalar((1, 3, 6, 1, 4, 1, 4325, 2, 2, 5), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniDevSwBuild.setStatus('current')
+aniDevSwBuildDate = MibScalar((1, 3, 6, 1, 4, 1, 4325, 2, 2, 6), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 22))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniDevSwBuildDate.setStatus('current')
+mibBuilder.exportSymbols("DEVSW-MIB", aniDevSwBuildDate=aniDevSwBuildDate, PYSNMP_MODULE_ID=aniDevSoftware, aniDevSwVersion=aniDevSwVersion, aniDevSwConfigFile=aniDevSwConfigFile, aniDevSoftware=aniDevSoftware, aniDevSwSystemSoftwareFile=aniDevSwSystemSoftwareFile, aniDevSwWssSoftwareFile=aniDevSwWssSoftwareFile, aniDevSwBuild=aniDevSwBuild)

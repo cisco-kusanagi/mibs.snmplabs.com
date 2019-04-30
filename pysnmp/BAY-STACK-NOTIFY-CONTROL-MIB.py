@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module BAY-STACK-NOTIFY-CONTROL-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BAY-STACK-NOTIFY-CONTROL-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:19:17 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection")
+PortList, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "PortList")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ObjectIdentity, IpAddress, NotificationType, Gauge32, Counter32, Unsigned32, Integer32, Counter64, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, Bits, TimeTicks, iso = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "IpAddress", "NotificationType", "Gauge32", "Counter32", "Unsigned32", "Integer32", "Counter64", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "Bits", "TimeTicks", "iso")
+TruthValue, RowStatus, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "RowStatus", "TextualConvention", "DisplayString")
+bayStackMibs, = mibBuilder.importSymbols("SYNOPTICS-ROOT-MIB", "bayStackMibs")
+bayStackNotifyControlMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 45, 5, 31))
+bayStackNotifyControlMib.setRevisions(('2010-09-08 00:00', '2008-10-17 00:00',))
+if mibBuilder.loadTexts: bayStackNotifyControlMib.setLastUpdated('201009080000Z')
+if mibBuilder.loadTexts: bayStackNotifyControlMib.setOrganization('Avaya')
+bsncObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 45, 5, 31, 1))
+bsncNotifyControlTable = MibTable((1, 3, 6, 1, 4, 1, 45, 5, 31, 1, 1), )
+if mibBuilder.loadTexts: bsncNotifyControlTable.setStatus('current')
+bsncNotifyControlEntry = MibTableRow((1, 3, 6, 1, 4, 1, 45, 5, 31, 1, 1, 1), ).setIndexNames((0, "BAY-STACK-NOTIFY-CONTROL-MIB", "bsncNotifyControlType"))
+if mibBuilder.loadTexts: bsncNotifyControlEntry.setStatus('current')
+bsncNotifyControlType = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 31, 1, 1, 1, 1), ObjectIdentifier())
+if mibBuilder.loadTexts: bsncNotifyControlType.setStatus('current')
+bsncNotifyControlEnabled = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 31, 1, 1, 1, 2), TruthValue().clone('true')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: bsncNotifyControlEnabled.setStatus('current')
+bsncNotifyControlRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 31, 1, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: bsncNotifyControlRowStatus.setStatus('current')
+bsncNotifyControlPortListEnabled = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 31, 1, 1, 1, 4), PortList()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: bsncNotifyControlPortListEnabled.setStatus('current')
+mibBuilder.exportSymbols("BAY-STACK-NOTIFY-CONTROL-MIB", bsncNotifyControlTable=bsncNotifyControlTable, PYSNMP_MODULE_ID=bayStackNotifyControlMib, bsncNotifyControlPortListEnabled=bsncNotifyControlPortListEnabled, bayStackNotifyControlMib=bayStackNotifyControlMib, bsncNotifyControlRowStatus=bsncNotifyControlRowStatus, bsncObjects=bsncObjects, bsncNotifyControlType=bsncNotifyControlType, bsncNotifyControlEnabled=bsncNotifyControlEnabled, bsncNotifyControlEntry=bsncNotifyControlEntry)

@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module ASCEND-MIBIKESPD-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ASCEND-MIBIKESPD-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:11:20 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+configuration, = mibBuilder.importSymbols("ASCEND-MIB", "configuration")
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+TimeTicks, ObjectIdentity, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Gauge32, iso, Bits, NotificationType, ModuleIdentity, MibIdentifier, Counter32, IpAddress, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "ObjectIdentity", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Gauge32", "iso", "Bits", "NotificationType", "ModuleIdentity", "MibIdentifier", "Counter32", "IpAddress", "Integer32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+class DisplayString(OctetString):
+    pass
+
+mibmibProfIkeSpd = MibIdentifier((1, 3, 6, 1, 4, 1, 529, 23, 166))
+mibmibProfIkeSpdTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 166, 1), )
+if mibBuilder.loadTexts: mibmibProfIkeSpdTable.setStatus('mandatory')
+mibmibProfIkeSpdEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 166, 1, 1), ).setIndexNames((0, "ASCEND-MIBIKESPD-MIB", "mibProfIkeSpd-Index-o"))
+if mibBuilder.loadTexts: mibmibProfIkeSpdEntry.setStatus('mandatory')
+mibProfIkeSpd_Index_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 1, 1, 1), Integer32()).setLabel("mibProfIkeSpd-Index-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: mibProfIkeSpd_Index_o.setStatus('mandatory')
+mibProfIkeSpd_Action_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noAction", 1), ("createProfile", 2), ("deleteProfile", 3)))).setLabel("mibProfIkeSpd-Action-o").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: mibProfIkeSpd_Action_o.setStatus('mandatory')
+mibmibProfIkeSpd_IkePolicyTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 166, 2), ).setLabel("mibmibProfIkeSpd-IkePolicyTable")
+if mibBuilder.loadTexts: mibmibProfIkeSpd_IkePolicyTable.setStatus('mandatory')
+mibmibProfIkeSpd_IkePolicyEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 166, 2, 1), ).setLabel("mibmibProfIkeSpd-IkePolicyEntry").setIndexNames((0, "ASCEND-MIBIKESPD-MIB", "mibProfIkeSpd-IkePolicy-Index-o"), (0, "ASCEND-MIBIKESPD-MIB", "mibProfIkeSpd-IkePolicy-Index1-o"))
+if mibBuilder.loadTexts: mibmibProfIkeSpd_IkePolicyEntry.setStatus('mandatory')
+mibProfIkeSpd_IkePolicy_Index_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 2, 1, 1), Integer32()).setLabel("mibProfIkeSpd-IkePolicy-Index-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: mibProfIkeSpd_IkePolicy_Index_o.setStatus('mandatory')
+mibProfIkeSpd_IkePolicy_Index1_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 2, 1, 2), Integer32()).setLabel("mibProfIkeSpd-IkePolicy-Index1-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: mibProfIkeSpd_IkePolicy_Index1_o.setStatus('mandatory')
+mibProfIkeSpd_IkePolicy_ValidEntry = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("mibProfIkeSpd-IkePolicy-ValidEntry").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: mibProfIkeSpd_IkePolicy_ValidEntry.setStatus('mandatory')
+mibProfIkeSpd_IkePolicy_Address_IpAddress = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 2, 1, 4), IpAddress()).setLabel("mibProfIkeSpd-IkePolicy-Address-IpAddress").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: mibProfIkeSpd_IkePolicy_Address_IpAddress.setStatus('mandatory')
+mibProfIkeSpd_IkePolicy_Address_Netmask = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 2, 1, 5), IpAddress()).setLabel("mibProfIkeSpd-IkePolicy-Address-Netmask").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: mibProfIkeSpd_IkePolicy_Address_Netmask.setStatus('mandatory')
+mibProfIkeSpd_IkePolicy_IkeProposals = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 2, 1, 6), DisplayString()).setLabel("mibProfIkeSpd-IkePolicy-IkeProposals").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: mibProfIkeSpd_IkePolicy_IkeProposals.setStatus('mandatory')
+mibProfIkeSpd_IkePolicy_PresharedKey = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 166, 2, 1, 7), DisplayString()).setLabel("mibProfIkeSpd-IkePolicy-PresharedKey").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: mibProfIkeSpd_IkePolicy_PresharedKey.setStatus('mandatory')
+mibBuilder.exportSymbols("ASCEND-MIBIKESPD-MIB", mibProfIkeSpd_IkePolicy_Index_o=mibProfIkeSpd_IkePolicy_Index_o, mibmibProfIkeSpd=mibmibProfIkeSpd, mibProfIkeSpd_Index_o=mibProfIkeSpd_Index_o, mibmibProfIkeSpdEntry=mibmibProfIkeSpdEntry, mibmibProfIkeSpd_IkePolicyTable=mibmibProfIkeSpd_IkePolicyTable, mibProfIkeSpd_IkePolicy_ValidEntry=mibProfIkeSpd_IkePolicy_ValidEntry, mibProfIkeSpd_IkePolicy_IkeProposals=mibProfIkeSpd_IkePolicy_IkeProposals, mibmibProfIkeSpdTable=mibmibProfIkeSpdTable, mibProfIkeSpd_Action_o=mibProfIkeSpd_Action_o, mibProfIkeSpd_IkePolicy_Address_IpAddress=mibProfIkeSpd_IkePolicy_Address_IpAddress, mibProfIkeSpd_IkePolicy_Address_Netmask=mibProfIkeSpd_IkePolicy_Address_Netmask, mibmibProfIkeSpd_IkePolicyEntry=mibmibProfIkeSpd_IkePolicyEntry, mibProfIkeSpd_IkePolicy_PresharedKey=mibProfIkeSpd_IkePolicy_PresharedKey, mibProfIkeSpd_IkePolicy_Index1_o=mibProfIkeSpd_IkePolicy_Index1_o, DisplayString=DisplayString)

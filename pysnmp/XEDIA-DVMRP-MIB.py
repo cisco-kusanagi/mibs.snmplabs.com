@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module XEDIA-DVMRP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/XEDIA-DVMRP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:36:13 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, TimeTicks, iso, MibIdentifier, Counter64, ObjectIdentity, IpAddress, Bits, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, Counter32, Integer32, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "TimeTicks", "iso", "MibIdentifier", "Counter64", "ObjectIdentity", "IpAddress", "Bits", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "Counter32", "Integer32", "NotificationType")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+xediaMibs, = mibBuilder.importSymbols("XEDIA-REG", "xediaMibs")
+xdvmrpMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 838, 3, 32))
+if mibBuilder.loadTexts: xdvmrpMIB.setLastUpdated('9905151600Z')
+if mibBuilder.loadTexts: xdvmrpMIB.setOrganization('Xedia Corp.')
+xdvmrpMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 32, 1))
+xdvmrp = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 32, 1, 1))
+xdvmrpInterfaceTable = MibTable((1, 3, 6, 1, 4, 1, 838, 3, 32, 1, 1, 1), )
+if mibBuilder.loadTexts: xdvmrpInterfaceTable.setStatus('current')
+xdvmrpInterfaceEntry = MibTableRow((1, 3, 6, 1, 4, 1, 838, 3, 32, 1, 1, 1, 1), ).setIndexNames((0, "XEDIA-DVMRP-MIB", "xdvmrpInterfaceIfIndex"))
+if mibBuilder.loadTexts: xdvmrpInterfaceEntry.setStatus('current')
+xdvmrpInterfaceIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 32, 1, 1, 1, 1, 1), Integer32())
+if mibBuilder.loadTexts: xdvmrpInterfaceIfIndex.setStatus('current')
+xdvmrpInterfaceState = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 32, 1, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("up", 1), ("down", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xdvmrpInterfaceState.setStatus('current')
+xdvmrpInterfaceDefaultInformation = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 32, 1, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("disabled", 1), ("originate", 2), ("only", 3))).clone('disabled')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xdvmrpInterfaceDefaultInformation.setStatus('current')
+xdvmrpInterfaceUnicastTunnel = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 32, 1, 1, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('disabled')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xdvmrpInterfaceUnicastTunnel.setStatus('current')
+mibBuilder.exportSymbols("XEDIA-DVMRP-MIB", xdvmrpMIB=xdvmrpMIB, xdvmrpInterfaceEntry=xdvmrpInterfaceEntry, xdvmrpInterfaceUnicastTunnel=xdvmrpInterfaceUnicastTunnel, xdvmrpMIBObjects=xdvmrpMIBObjects, xdvmrpInterfaceDefaultInformation=xdvmrpInterfaceDefaultInformation, xdvmrpInterfaceState=xdvmrpInterfaceState, xdvmrpInterfaceTable=xdvmrpInterfaceTable, PYSNMP_MODULE_ID=xdvmrpMIB, xdvmrpInterfaceIfIndex=xdvmrpInterfaceIfIndex, xdvmrp=xdvmrp)

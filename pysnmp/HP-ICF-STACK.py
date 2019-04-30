@@ -1,0 +1,52 @@
+#
+# PySNMP MIB module HP-ICF-STACK (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-ICF-STACK
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:22:58 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint")
+entPhysicalIndex, = mibBuilder.importSymbols("ENTITY-MIB", "entPhysicalIndex")
+hpicfCommon, hpicfObjectModules = mibBuilder.importSymbols("HP-ICF-OID", "hpicfCommon", "hpicfObjectModules")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+MibIdentifier, Integer32, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Gauge32, Unsigned32, ModuleIdentity, ObjectIdentity, NotificationType, IpAddress, Counter32, Counter64, iso = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "Integer32", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Gauge32", "Unsigned32", "ModuleIdentity", "ObjectIdentity", "NotificationType", "IpAddress", "Counter32", "Counter64", "iso")
+DisplayString, TruthValue, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TruthValue", "TextualConvention")
+hpicfStackMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 10, 2, 6))
+hpicfStackMib.setRevisions(('2000-11-03 22:25', '1996-09-06 22:28',))
+if mibBuilder.loadTexts: hpicfStackMib.setLastUpdated('200011032225Z')
+if mibBuilder.loadTexts: hpicfStackMib.setOrganization('HP Networking')
+hpicfStack = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5))
+hpicfStackBoxTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 1), )
+if mibBuilder.loadTexts: hpicfStackBoxTable.setStatus('current')
+hpicfStackBoxEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 1, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: hpicfStackBoxEntry.setStatus('current')
+hpicfStackBoxId = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 1, 1, 1), OctetString().subtype(subtypeSpec=ValueSizeConstraint(5, 5)).setFixedLength(5)).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfStackBoxId.setStatus('current')
+hpicfStackBoxName = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 1, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 16))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfStackBoxName.setStatus('current')
+hpicfStackAgentTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 2), )
+if mibBuilder.loadTexts: hpicfStackAgentTable.setStatus('current')
+hpicfStackAgentEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 2, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: hpicfStackAgentEntry.setStatus('current')
+hpicfStackAgentBoxId = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 2, 1, 1), OctetString().subtype(subtypeSpec=ValueSizeConstraint(5, 5)).setFixedLength(5)).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfStackAgentBoxId.setStatus('current')
+hpicfStackActiveAgent = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 3), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfStackActiveAgent.setStatus('current')
+hpicfStackAgentForced = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 5, 4), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfStackAgentForced.setStatus('current')
+hpicfStackConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 10, 2, 6, 1))
+hpicfStackCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 10, 2, 6, 1, 1))
+hpicfStackGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 10, 2, 6, 1, 2))
+hpicfStackCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 10, 2, 6, 1, 1, 1)).setObjects(("HP-ICF-STACK", "hpicfStackBasicGroup"), ("HP-ICF-STACK", "hpicfStackMultiAgentGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfStackCompliance = hpicfStackCompliance.setStatus('current')
+hpicfStackBasicGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 10, 2, 6, 1, 2, 1)).setObjects(("HP-ICF-STACK", "hpicfStackBoxId"), ("HP-ICF-STACK", "hpicfStackBoxName"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfStackBasicGroup = hpicfStackBasicGroup.setStatus('current')
+hpicfStackMultiAgentGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 10, 2, 6, 1, 2, 2)).setObjects(("HP-ICF-STACK", "hpicfStackAgentBoxId"), ("HP-ICF-STACK", "hpicfStackActiveAgent"), ("HP-ICF-STACK", "hpicfStackAgentForced"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfStackMultiAgentGroup = hpicfStackMultiAgentGroup.setStatus('current')
+mibBuilder.exportSymbols("HP-ICF-STACK", hpicfStackActiveAgent=hpicfStackActiveAgent, hpicfStackBoxId=hpicfStackBoxId, hpicfStackAgentTable=hpicfStackAgentTable, hpicfStackAgentEntry=hpicfStackAgentEntry, hpicfStack=hpicfStack, hpicfStackMib=hpicfStackMib, hpicfStackCompliance=hpicfStackCompliance, hpicfStackMultiAgentGroup=hpicfStackMultiAgentGroup, hpicfStackBoxName=hpicfStackBoxName, hpicfStackAgentForced=hpicfStackAgentForced, hpicfStackCompliances=hpicfStackCompliances, hpicfStackBoxTable=hpicfStackBoxTable, hpicfStackBasicGroup=hpicfStackBasicGroup, hpicfStackAgentBoxId=hpicfStackAgentBoxId, PYSNMP_MODULE_ID=hpicfStackMib, hpicfStackGroups=hpicfStackGroups, hpicfStackConformance=hpicfStackConformance, hpicfStackBoxEntry=hpicfStackBoxEntry)

@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module HH3C-PROT-PRIORITY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HH3C-PROT-PRIORITY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:16:19 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection")
+hh3cCommon, = mibBuilder.importSymbols("HH3C-OID-MIB", "hh3cCommon")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, MibIdentifier, iso, Counter64, IpAddress, Integer32, ObjectIdentity, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Unsigned32, ModuleIdentity, Bits, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "MibIdentifier", "iso", "Counter64", "IpAddress", "Integer32", "ObjectIdentity", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Unsigned32", "ModuleIdentity", "Bits", "Counter32")
+RowStatus, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "TextualConvention", "DisplayString")
+hh3cProtocolPriority = ModuleIdentity((1, 3, 6, 1, 4, 1, 25506, 2, 37))
+hh3cProtocolPriority.setRevisions(('2005-01-17 16:33',))
+if mibBuilder.loadTexts: hh3cProtocolPriority.setLastUpdated('200501171633Z')
+if mibBuilder.loadTexts: hh3cProtocolPriority.setOrganization('Hangzhou H3C Tech. Co., Ltd.')
+hh3cProtocolPriorityObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 37, 1))
+hh3cPPri = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 37, 1, 1))
+hh3cProtocolPriorityTable = MibTable((1, 3, 6, 1, 4, 1, 25506, 2, 37, 1, 1, 1), )
+if mibBuilder.loadTexts: hh3cProtocolPriorityTable.setStatus('current')
+hh3cProtocolPriorityEntry = MibTableRow((1, 3, 6, 1, 4, 1, 25506, 2, 37, 1, 1, 1, 1), ).setIndexNames((0, "HH3C-PROT-PRIORITY-MIB", "hh3cPPriProtocolType"))
+if mibBuilder.loadTexts: hh3cProtocolPriorityEntry.setStatus('current')
+hh3cPPriProtocolType = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 37, 1, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("ospf", 1), ("telnet", 2), ("snmp", 3), ("icmp", 4), ("bgp", 5), ("ldp", 6))))
+if mibBuilder.loadTexts: hh3cPPriProtocolType.setStatus('current')
+hh3cPPriPriorityType = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 37, 1, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("ipPrecedence", 1), ("dscp", 2)))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hh3cPPriPriorityType.setStatus('current')
+hh3cPPriPriorityVlaue = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 37, 1, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 63))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hh3cPPriPriorityVlaue.setStatus('current')
+hh3cPPriRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 37, 1, 1, 1, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hh3cPPriRowStatus.setStatus('current')
+mibBuilder.exportSymbols("HH3C-PROT-PRIORITY-MIB", hh3cPPriPriorityVlaue=hh3cPPriPriorityVlaue, hh3cPPri=hh3cPPri, hh3cProtocolPriorityTable=hh3cProtocolPriorityTable, hh3cPPriRowStatus=hh3cPPriRowStatus, hh3cPPriPriorityType=hh3cPPriPriorityType, PYSNMP_MODULE_ID=hh3cProtocolPriority, hh3cPPriProtocolType=hh3cPPriProtocolType, hh3cProtocolPriorityEntry=hh3cProtocolPriorityEntry, hh3cProtocolPriority=hh3cProtocolPriority, hh3cProtocolPriorityObjects=hh3cProtocolPriorityObjects)

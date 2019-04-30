@@ -1,0 +1,62 @@
+#
+# PySNMP MIB module HP-CAR-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-SN-MIBS
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:23:53 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint")
+snCAR, = mibBuilder.importSymbols("HP-SN-SWITCH-GROUP-MIB", "snCAR")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+IpAddress, Integer32, Counter32, Counter64, Bits, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Gauge32, NotificationType, Unsigned32, ObjectIdentity, MibIdentifier, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "Integer32", "Counter32", "Counter64", "Bits", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Gauge32", "NotificationType", "Unsigned32", "ObjectIdentity", "MibIdentifier", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+snPortCARs = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1))
+class PacketSource(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1))
+    namedValues = NamedValues(("input", 0), ("output", 1))
+
+class RateLimitType(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(3, 2, 1))
+    namedValues = NamedValues(("all", 3), ("quickAcc", 2), ("standardAcc", 1))
+
+class RateLimitAction(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))
+    namedValues = NamedValues(("continue", 1), ("drop", 2), ("precedCont", 3), ("precedXmit", 4), ("xmit", 5))
+
+snPortCARTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1), )
+if mibBuilder.loadTexts: snPortCARTable.setStatus('mandatory')
+snPortCAREntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1), ).setIndexNames((0, "HP-CAR-MIB", "snPortCARifIndex"), (0, "HP-CAR-MIB", "snPortCARDirection"), (0, "HP-CAR-MIB", "snPortCARRowIndex"))
+if mibBuilder.loadTexts: snPortCAREntry.setStatus('mandatory')
+snPortCARifIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARifIndex.setStatus('mandatory')
+snPortCARDirection = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 2), PacketSource()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARDirection.setStatus('mandatory')
+snPortCARRowIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2147483647))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARRowIndex.setStatus('mandatory')
+snPortCARType = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 4), RateLimitType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARType.setStatus('mandatory')
+snPortCARAccIdx = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 5), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARAccIdx.setStatus('mandatory')
+snPortCARRate = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 6), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARRate.setStatus('mandatory')
+snPortCARLimit = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 7), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARLimit.setStatus('mandatory')
+snPortCARExtLimit = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 8), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARExtLimit.setStatus('mandatory')
+snPortCARConformAction = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 9), RateLimitAction()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARConformAction.setStatus('mandatory')
+snPortCARExceedAction = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 10), RateLimitAction()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARExceedAction.setStatus('mandatory')
+snPortCARStatSwitchedPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 11), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARStatSwitchedPkts.setStatus('mandatory')
+snPortCARStatSwitchedBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 12), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARStatSwitchedBytes.setStatus('mandatory')
+snPortCARStatFilteredPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 13), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARStatFilteredPkts.setStatus('mandatory')
+snPortCARStatFilteredBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 14), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARStatFilteredBytes.setStatus('mandatory')
+snPortCARStatCurBurst = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 1, 3, 16, 1, 1, 1, 15), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snPortCARStatCurBurst.setStatus('mandatory')
+mibBuilder.exportSymbols("HP-CAR-MIB", snPortCARDirection=snPortCARDirection, snPortCARExceedAction=snPortCARExceedAction, snPortCARRowIndex=snPortCARRowIndex, snPortCARTable=snPortCARTable, RateLimitAction=RateLimitAction, snPortCARConformAction=snPortCARConformAction, snPortCARType=snPortCARType, snPortCARAccIdx=snPortCARAccIdx, snPortCAREntry=snPortCAREntry, snPortCARLimit=snPortCARLimit, snPortCARifIndex=snPortCARifIndex, PacketSource=PacketSource, snPortCARStatSwitchedPkts=snPortCARStatSwitchedPkts, snPortCARRate=snPortCARRate, snPortCARs=snPortCARs, snPortCARStatSwitchedBytes=snPortCARStatSwitchedBytes, snPortCARExtLimit=snPortCARExtLimit, RateLimitType=RateLimitType, snPortCARStatCurBurst=snPortCARStatCurBurst, snPortCARStatFilteredPkts=snPortCARStatFilteredPkts, snPortCARStatFilteredBytes=snPortCARStatFilteredBytes)

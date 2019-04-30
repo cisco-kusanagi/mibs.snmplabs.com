@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module A3COM0039-GENERIC-BRIDGE (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/A3COM0039-GENERIC-BRIDGE
+# Produced by pysmi-0.3.4 at Mon Apr 29 16:54:04 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+bridgeMgmt, = mibBuilder.importSymbols("A3COM0004-GENERIC", "bridgeMgmt")
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibIdentifier, NotificationType, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, ModuleIdentity, Unsigned32, IpAddress, iso, Gauge32, TimeTicks, Bits, NotificationType, ObjectIdentity, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "NotificationType", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "ModuleIdentity", "Unsigned32", "IpAddress", "iso", "Gauge32", "TimeTicks", "Bits", "NotificationType", "ObjectIdentity", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+brControlPackage = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 10, 18, 1))
+brClearCounters = MibScalar((1, 3, 6, 1, 4, 1, 43, 10, 18, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no-action", 1), ("clear", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: brClearCounters.setStatus('mandatory')
+brSTAPMode = MibScalar((1, 3, 6, 1, 4, 1, 43, 10, 18, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("off", 1), ("on", 2), ("single", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: brSTAPMode.setStatus('mandatory')
+brLearnMode = MibScalar((1, 3, 6, 1, 4, 1, 43, 10, 18, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("off", 1), ("on", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: brLearnMode.setStatus('mandatory')
+brAgingMode = MibScalar((1, 3, 6, 1, 4, 1, 43, 10, 18, 1, 7), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("on", 1), ("off", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: brAgingMode.setStatus('mandatory')
+brMonitorPackage = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 10, 18, 2))
+brDataBase = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 10, 18, 4))
+brDummyPackage = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 10, 18, 5))
+brDatabaseType = MibScalar((1, 3, 6, 1, 4, 1, 43, 10, 18, 5, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("filtering", 1), ("permanent", 2), ("atmCam", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: brDatabaseType.setStatus('mandatory')
+brDatabaseLevel = MibScalar((1, 3, 6, 1, 4, 1, 43, 10, 18, 5, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(90, 100))).clone(namedValues=NamedValues(("ninetyPercent", 90), ("oneHundredPercent", 100)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: brDatabaseLevel.setStatus('mandatory')
+mibBuilder.exportSymbols("A3COM0039-GENERIC-BRIDGE", brMonitorPackage=brMonitorPackage, brSTAPMode=brSTAPMode, brDatabaseType=brDatabaseType, brLearnMode=brLearnMode, brClearCounters=brClearCounters, brAgingMode=brAgingMode, brControlPackage=brControlPackage, brDataBase=brDataBase, brDummyPackage=brDummyPackage, brDatabaseLevel=brDatabaseLevel)

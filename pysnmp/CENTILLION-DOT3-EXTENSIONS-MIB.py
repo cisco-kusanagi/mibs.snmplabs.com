@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module CENTILLION-DOT3-EXTENSIONS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CENTILLION-DOT3-EXTENSIONS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:30:10 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+extensions, = mibBuilder.importSymbols("CENTILLION-ROOT-MIB", "extensions")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Integer32, IpAddress, NotificationType, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, ModuleIdentity, iso, TimeTicks, Unsigned32, Counter64, Counter32, Gauge32, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "IpAddress", "NotificationType", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "ModuleIdentity", "iso", "TimeTicks", "Unsigned32", "Counter64", "Counter32", "Gauge32", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+cnDot3Extensions = MibIdentifier((1, 3, 6, 1, 4, 1, 930, 3, 4))
+cnDot3ExtnTable = MibTable((1, 3, 6, 1, 4, 1, 930, 3, 4, 1), )
+if mibBuilder.loadTexts: cnDot3ExtnTable.setStatus('mandatory')
+cnDot3ExtnEntry = MibTableRow((1, 3, 6, 1, 4, 1, 930, 3, 4, 1, 1), ).setIndexNames((0, "CENTILLION-DOT3-EXTENSIONS-MIB", "cnDot3ExtnIfIndex"))
+if mibBuilder.loadTexts: cnDot3ExtnEntry.setStatus('mandatory')
+cnDot3ExtnIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 4, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cnDot3ExtnIfIndex.setStatus('mandatory')
+cnDot3ExtnIfAdminSpeed = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 4, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("forced10", 1), ("forced100", 2), ("auto", 3), ("forced1000", 4)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cnDot3ExtnIfAdminSpeed.setStatus('mandatory')
+cnDot3ExtnIfOperSpeed = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 4, 1, 1, 3), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cnDot3ExtnIfOperSpeed.setStatus('mandatory')
+cnDot3ExtnIfAdminConnectionType = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 4, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("halfDuplex", 1), ("fullDuplex", 2), ("auto", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cnDot3ExtnIfAdminConnectionType.setStatus('mandatory')
+cnDot3ExtnIfOperConnectionType = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 4, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("halfDuplex", 1), ("fullDuplex", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cnDot3ExtnIfOperConnectionType.setStatus('mandatory')
+mibBuilder.exportSymbols("CENTILLION-DOT3-EXTENSIONS-MIB", cnDot3ExtnIfIndex=cnDot3ExtnIfIndex, cnDot3ExtnIfOperSpeed=cnDot3ExtnIfOperSpeed, cnDot3Extensions=cnDot3Extensions, cnDot3ExtnEntry=cnDot3ExtnEntry, cnDot3ExtnIfAdminConnectionType=cnDot3ExtnIfAdminConnectionType, cnDot3ExtnIfOperConnectionType=cnDot3ExtnIfOperConnectionType, cnDot3ExtnTable=cnDot3ExtnTable, cnDot3ExtnIfAdminSpeed=cnDot3ExtnIfAdminSpeed)

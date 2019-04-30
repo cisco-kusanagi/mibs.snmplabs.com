@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module RADLAN-RCLI-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RADLAN-RCLI-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:40:17 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint")
+rnd, = mibBuilder.importSymbols("RADLAN-MIB", "rnd")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+NotificationType, TimeTicks, MibIdentifier, Integer32, ModuleIdentity, iso, IpAddress, Counter64, Gauge32, Unsigned32, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "TimeTicks", "MibIdentifier", "Integer32", "ModuleIdentity", "iso", "IpAddress", "Counter64", "Gauge32", "Unsigned32", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+rlRCli = ModuleIdentity((1, 3, 6, 1, 4, 1, 89, 70))
+rlRCli.setRevisions(('2007-01-02 00:00',))
+if mibBuilder.loadTexts: rlRCli.setLastUpdated('200701020000Z')
+if mibBuilder.loadTexts: rlRCli.setOrganization('Radlan - a MARVELL company. Marvell Semiconductor, Inc.')
+rlRCliMibVersion = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlRCliMibVersion.setStatus('current')
+rlRCliUserPassword = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRCliUserPassword.setStatus('current')
+rlRCliEnablePassword = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRCliEnablePassword.setStatus('current')
+rlRCliConfigPassword = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 4), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRCliConfigPassword.setStatus('current')
+rlRCliTimer = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 5), Integer32().subtype(subtypeSpec=ValueRangeConstraint(5, 3600))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRCliTimer.setStatus('current')
+rlRcliFileAction = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("notUsedAfterReset", 1), ("usedAfterReset", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRcliFileAction.setStatus('current')
+mibBuilder.exportSymbols("RADLAN-RCLI-MIB", rlRCliUserPassword=rlRCliUserPassword, rlRCliTimer=rlRCliTimer, rlRCliEnablePassword=rlRCliEnablePassword, rlRCli=rlRCli, PYSNMP_MODULE_ID=rlRCli, rlRCliMibVersion=rlRCliMibVersion, rlRCliConfigPassword=rlRCliConfigPassword, rlRcliFileAction=rlRcliFileAction)

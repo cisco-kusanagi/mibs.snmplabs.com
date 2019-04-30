@@ -1,0 +1,293 @@
+#
+# PySNMP MIB module CISCO-MEDIA-GATEWAY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-MEDIA-GATEWAY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:32:46 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+CiscoPort, EntPhysicalIndexOrZero = mibBuilder.importSymbols("CISCO-TC", "CiscoPort", "EntPhysicalIndexOrZero")
+InterfaceIndexOrZero, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndexOrZero")
+InetAddressType, InetAddressPrefixLength, InetAddress, InetPortNumber = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddressPrefixLength", "InetAddress", "InetPortNumber")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+Counter32, ModuleIdentity, Unsigned32, Integer32, IpAddress, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, ObjectIdentity, iso, Bits, NotificationType, TimeTicks, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "ModuleIdentity", "Unsigned32", "Integer32", "IpAddress", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "ObjectIdentity", "iso", "Bits", "NotificationType", "TimeTicks", "Counter64")
+TextualConvention, RowStatus, TruthValue, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "RowStatus", "TruthValue", "DisplayString")
+ciscoMediaGatewayMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 324))
+ciscoMediaGatewayMIB.setRevisions(('2009-02-25 00:00', '2006-06-15 00:00', '2005-09-01 00:00', '2004-11-19 00:00', '2004-07-30 00:00', '2003-04-07 00:00',))
+if mibBuilder.loadTexts: ciscoMediaGatewayMIB.setLastUpdated('200902250000Z')
+if mibBuilder.loadTexts: ciscoMediaGatewayMIB.setOrganization('Cisco Systems, Inc.')
+ciscoMediaGatewayMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 324, 0))
+ciscoMediaGatewayMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 324, 1))
+cMediaGwConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1))
+cMediaGwStats = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 2))
+class CGwServiceState(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("inService", 1), ("forcedOutOfService", 2), ("gracefulOutOfService", 3))
+
+class CGwAdminState(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("inService", 1), ("forcedOutOfService", 2), ("gracefulOutOfService", 3))
+
+class GatewayLifNumber(TextualConvention, Unsigned32):
+    status = 'current'
+    subtypeSpec = Unsigned32.subtypeSpec + ValueRangeConstraint(1, 255)
+
+class CVoiceTonePlanIndex(TextualConvention, Unsigned32):
+    status = 'current'
+    subtypeSpec = Unsigned32.subtypeSpec + ValueRangeConstraint(1, 65535)
+
+class CVoiceTonePlanIndexOrZero(TextualConvention, Unsigned32):
+    status = 'current'
+    subtypeSpec = Unsigned32.subtypeSpec + ValueRangeConstraint(0, 65535)
+
+class CCallControlProfileIndex(TextualConvention, Unsigned32):
+    status = 'current'
+    subtypeSpec = Unsigned32.subtypeSpec + ValueRangeConstraint(1, 65535)
+
+class CCallControlProfileIndexOrZero(TextualConvention, Unsigned32):
+    status = 'current'
+    subtypeSpec = Unsigned32.subtypeSpec + ValueRangeConstraint(0, 65535)
+
+class CCallControlJitterDelayMode(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("adaptive", 1), ("fixed", 2))
+
+cMediaGwTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1), )
+if mibBuilder.loadTexts: cMediaGwTable.setStatus('current')
+cMediaGwEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1), ).setIndexNames((0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIndex"))
+if mibBuilder.loadTexts: cMediaGwEntry.setStatus('current')
+cmgwIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2147483647)))
+if mibBuilder.loadTexts: cmgwIndex.setStatus('current')
+cmgwDomainName = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 2), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwDomainName.setStatus('current')
+cmgwPhysicalIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 3), EntPhysicalIndexOrZero()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwPhysicalIndex.setStatus('current')
+cmgwServiceState = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 4), CGwServiceState()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwServiceState.setStatus('current')
+cmgwAdminState = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 5), CGwAdminState()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwAdminState.setStatus('current')
+cmgwGraceTime = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(-1, 65535)).clone(-1)).setUnits('seconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwGraceTime.setStatus('current')
+cmgwVtMappingMode = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 7), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("standard", 1), ("titan", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwVtMappingMode.setStatus('current')
+cmgwSrcFilterEnabled = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 8), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwSrcFilterEnabled.setStatus('current')
+cmgwLawInterceptEnabled = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 9), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwLawInterceptEnabled.setStatus('current')
+cmgwV23Enabled = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 1, 1, 10), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwV23Enabled.setStatus('current')
+cmgwSignalProtocolTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2), )
+if mibBuilder.loadTexts: cmgwSignalProtocolTable.setStatus('current')
+cmgwSignalProtocolEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2, 1), ).setIndexNames((0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIndex"), (0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolIndex"))
+if mibBuilder.loadTexts: cmgwSignalProtocolEntry.setStatus('current')
+cmgwSignalProtocolIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)))
+if mibBuilder.loadTexts: cmgwSignalProtocolIndex.setStatus('current')
+cmgwSignalProtocol = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("other", 1), ("mgcp", 2), ("h248", 3), ("tgcp", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwSignalProtocol.setStatus('current')
+cmgwSignalProtocolVersion = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2, 1, 3), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 16))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwSignalProtocolVersion.setStatus('current')
+cmgwSignalProtocolPort = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2, 1, 4), CiscoPort()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwSignalProtocolPort.setStatus('current')
+cmgwSignalMgcProtocolPort = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2, 1, 5), InetPortNumber()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwSignalMgcProtocolPort.setStatus('current')
+cmgwSignalProtocolPreference = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2, 1, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 255))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwSignalProtocolPreference.setStatus('current')
+cmgwSignalProtocolConfigVer = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 2, 1, 7), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 16))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cmgwSignalProtocolConfigVer.setStatus('current')
+cMediaGwIpConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3), )
+if mibBuilder.loadTexts: cMediaGwIpConfigTable.setStatus('current')
+cMediaGwIpConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1), ).setIndexNames((0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIndex"), (0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigIndex"))
+if mibBuilder.loadTexts: cMediaGwIpConfigEntry.setStatus('current')
+cmgwIpConfigIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 64)))
+if mibBuilder.loadTexts: cmgwIpConfigIndex.setStatus('current')
+cmgwIpConfigIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 2), InterfaceIndexOrZero()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigIfIndex.setStatus('current')
+cmgwIpConfigVpi = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(-1, 4095))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigVpi.setStatus('current')
+cmgwIpConfigVci = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(-1, 65535))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigVci.setStatus('current')
+cmgwIpConfigAddrType = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 5), InetAddressType().clone('ipv4')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigAddrType.setStatus('current')
+cmgwIpConfigAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 6), InetAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigAddress.setStatus('current')
+cmgwIpConfigSubnetMask = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 7), InetAddressPrefixLength()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigSubnetMask.setStatus('current')
+cmgwIpConfigDefaultGwIp = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 8), TruthValue().clone('false')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigDefaultGwIp.setStatus('current')
+cmgwIpConfigForRemoteMapping = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 9), TruthValue().clone('false')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigForRemoteMapping.setStatus('current')
+cmgwIpConfigRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 3, 1, 10), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwIpConfigRowStatus.setStatus('current')
+cMediaGwDomainNameConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 4), )
+if mibBuilder.loadTexts: cMediaGwDomainNameConfigTable.setStatus('current')
+cMediaGwDomainNameConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 4, 1), ).setIndexNames((0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIndex"), (0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwConfigDomainNameIndex"))
+if mibBuilder.loadTexts: cMediaGwDomainNameConfigEntry.setStatus('current')
+cmgwConfigDomainNameIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 4, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 128)))
+if mibBuilder.loadTexts: cmgwConfigDomainNameIndex.setStatus('current')
+cmgwConfigDomainNameEntity = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 4, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("gateway", 1), ("dnsServer", 2), ("mgc", 3)))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwConfigDomainNameEntity.setStatus('current')
+cmgwConfigDomainName = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 4, 1, 3), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwConfigDomainName.setStatus('current')
+cmgwConfigDomainNameRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 4, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwConfigDomainNameRowStatus.setStatus('current')
+cMediaGwDnsIpConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 5), )
+if mibBuilder.loadTexts: cMediaGwDnsIpConfigTable.setStatus('current')
+cMediaGwDnsIpConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 5, 1), ).setIndexNames((0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIndex"), (0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpIndex"))
+if mibBuilder.loadTexts: cMediaGwDnsIpConfigEntry.setStatus('current')
+cmgwDnsIpIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 5, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 6)))
+if mibBuilder.loadTexts: cmgwDnsIpIndex.setStatus('current')
+cmgwDnsDomainName = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 5, 1, 2), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwDnsDomainName.setStatus('current')
+cmgwDnsIpType = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 5, 1, 3), InetAddressType().clone('ipv4')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwDnsIpType.setStatus('current')
+cmgwDnsIp = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 5, 1, 4), InetAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwDnsIp.setStatus('current')
+cmgwDnsIpRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 5, 1, 5), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cmgwDnsIpRowStatus.setStatus('current')
+cmgwLifTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 6), )
+if mibBuilder.loadTexts: cmgwLifTable.setStatus('current')
+cmgwLifEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 6, 1), ).setIndexNames((0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIndex"), (0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwLifNumber"))
+if mibBuilder.loadTexts: cmgwLifEntry.setStatus('current')
+cmgwLifNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 6, 1, 1), GatewayLifNumber())
+if mibBuilder.loadTexts: cmgwLifNumber.setStatus('current')
+cmgwLifPvcCount = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 6, 1, 2), Gauge32().subtype(subtypeSpec=ValueRangeConstraint(0, 10000))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwLifPvcCount.setStatus('current')
+cmgwLifVoiceIfCount = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 6, 1, 3), Gauge32().subtype(subtypeSpec=ValueRangeConstraint(0, 1000))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwLifVoiceIfCount.setStatus('current')
+cMediaGwCallControlConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7), )
+if mibBuilder.loadTexts: cMediaGwCallControlConfigTable.setStatus('current')
+cMediaGwCallControlConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1), ).setIndexNames((0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIndex"))
+if mibBuilder.loadTexts: cMediaGwCallControlConfigEntry.setStatus('current')
+cMediaGwCcCfgControlTos = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 255)).clone(96)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgControlTos.setStatus('current')
+cMediaGwCcCfgBearerTos = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 2), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 255)).clone(160)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgBearerTos.setStatus('current')
+cMediaGwCcCfgNtePayload = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 3), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(96, 127)).clone(101)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgNtePayload.setStatus('current')
+cMediaGwCcCfgNsePayload = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 4), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(98, 117)).clone(100)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgNsePayload.setStatus('current')
+cMediaGwCcCfgNseRespTimer = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 5), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(250, 10000)).clone(1000)).setUnits('milliseconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgNseRespTimer.setStatus('current')
+cMediaGwCcCfgVbdJitterDelayMode = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 6), CCallControlJitterDelayMode().clone('fixed')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgVbdJitterDelayMode.setStatus('current')
+cMediaGwCcCfgVbdJitterMaxDelay = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 7), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(20, 135)).clone(135)).setUnits('milliseconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgVbdJitterMaxDelay.setStatus('current')
+cMediaGwCcCfgVbdJitterNomDelay = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 8), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(5, 135)).clone(70)).setUnits('milliseconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgVbdJitterNomDelay.setStatus('current')
+cMediaGwCcCfgVbdJitterMinDelay = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 9), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 135))).setUnits('milliseconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgVbdJitterMinDelay.setStatus('current')
+cMediaGwCcCfgDefaultTonePlanId = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 10), CVoiceTonePlanIndex().clone(1)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgDefaultTonePlanId.setStatus('current')
+cMediaGwCcCfgDescrInfoEnabled = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 11), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgDescrInfoEnabled.setStatus('current')
+cMediaGwCcCfgDsNamePrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 12), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64)).clone(hexValue="4453")).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgDsNamePrefix.setStatus('current')
+cMediaGwCcCfgRtpNamePrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 13), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64)).clone(hexValue="525450")).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgRtpNamePrefix.setStatus('current')
+cMediaGwCcCfgAal1SvcNamePrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 14), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64)).clone(hexValue="41414C312F535643")).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgAal1SvcNamePrefix.setStatus('current')
+cMediaGwCcCfgAal2SvcNamePrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 15), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64)).clone(hexValue="41414C322F535643")).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgAal2SvcNamePrefix.setStatus('current')
+cMediaGwCcCfgClusterEnabled = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 16), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("disabled", 1), ("enabled", 2), ("conditionalEnabled", 3))).clone('disabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgClusterEnabled.setStatus('current')
+cMediaGwCcCfgDefBearerTraffic = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 17), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("ipPvcAal5", 1), ("atmPvcAal2", 2), ("atmSvcAal2", 3), ("atmSvcAal1", 4))).clone('ipPvcAal5')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgDefBearerTraffic.setStatus('current')
+cMediaGwCcCfgDefRtpNamePrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 1, 7, 1, 18), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64)).clone(hexValue="544757525450")).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cMediaGwCcCfgDefRtpNamePrefix.setStatus('current')
+cMediaGwRscStatsTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 2, 1), )
+if mibBuilder.loadTexts: cMediaGwRscStatsTable.setStatus('current')
+cMediaGwRscStatsEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 2, 1, 1), ).setIndexNames((0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwIndex"), (0, "CISCO-MEDIA-GATEWAY-MIB", "cmgwRscStatsIndex"))
+if mibBuilder.loadTexts: cMediaGwRscStatsEntry.setStatus('current')
+cmgwRscStatsIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 2, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17))).clone(namedValues=NamedValues(("cpu", 1), ("staticmemory", 2), ("dynamicmemory", 3), ("sysmemory", 4), ("commbuffer", 5), ("msgq", 6), ("atmq", 7), ("svccongestion", 8), ("rsvpq", 9), ("dspq", 10), ("h248congestion", 11), ("callpersec", 12), ("smallipcbuffer", 13), ("mediumipcbuffer", 14), ("largeipcbuffer", 15), ("hugeipcbuffer", 16), ("mblkipcbuffer", 17))))
+if mibBuilder.loadTexts: cmgwRscStatsIndex.setStatus('current')
+cmgwRscMaximumUtilization = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 2, 1, 1, 2), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwRscMaximumUtilization.setStatus('current')
+cmgwRscMinimumUtilization = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 2, 1, 1, 3), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwRscMinimumUtilization.setStatus('current')
+cmgwRscAverageUtilization = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 2, 1, 1, 4), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwRscAverageUtilization.setStatus('current')
+cmgwRscSinceLastReset = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 324, 1, 2, 1, 1, 5), Unsigned32()).setUnits('seconds').setMaxAccess("readonly")
+if mibBuilder.loadTexts: cmgwRscSinceLastReset.setStatus('current')
+cMediaGwMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 324, 2))
+cMediaGwMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 1))
+cMediaGwMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2))
+cMediaGwMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 1, 1)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainNameGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwLifGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwCallControlGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwMIBCompliance = cMediaGwMIBCompliance.setStatus('deprecated')
+cMediaGwMIBComplianceRev1 = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 1, 2)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupRev1"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroupRev1"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainNameGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwLifGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwCallControlGroupRev1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwMIBComplianceRev1 = cMediaGwMIBComplianceRev1.setStatus('deprecated')
+cMediaGwMIBComplianceRev2 = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 1, 3)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupRev1"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroupRev2"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainNameGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwLifGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwCallControlGroupRev1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwMIBComplianceRev2 = cMediaGwMIBComplianceRev2.setStatus('deprecated')
+cMediaGwMIBComplianceRev3 = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 1, 4)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupRev1"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupExtra"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroupRev2"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroupRev3"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainNameGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwLifGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwCallControlGroupRev1"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwRscStatsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwMIBComplianceRev3 = cMediaGwMIBComplianceRev3.setStatus('current')
+cMediaGwMIBComplianceRev4 = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 1, 5)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupRev1"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupExtra"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroupRev2"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroupRev3"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainNameGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwLifGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwCallControlGroupRev2"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwRscStatsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwMIBComplianceRev4 = cMediaGwMIBComplianceRev4.setStatus('deprecated')
+cMediaGwMIBComplianceRev5 = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 1, 6)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupRev1"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupExtra"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwGroupRev2"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroupRev2"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolGroupRev3"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainNameGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwLifGroup"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwCallControlGroupRev2"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwRscStatsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwMIBComplianceRev5 = cMediaGwMIBComplianceRev5.setStatus('current')
+cMediaGwGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 1)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainName"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwPhysicalIndex"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwServiceState"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwAdminState"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwGraceTime"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwGroup = cMediaGwGroup.setStatus('deprecated')
+cmgwSignalProtocolGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 2)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocol"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolVersion"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolPort"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwSignalProtocolGroup = cmgwSignalProtocolGroup.setStatus('deprecated')
+cmgwDomainNameGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 3)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwConfigDomainNameEntity"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwConfigDomainName"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwConfigDomainNameRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwDomainNameGroup = cmgwDomainNameGroup.setStatus('current')
+cMediaGwIpGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 4)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigIfIndex"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigVpi"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigVci"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigAddrType"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigAddress"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigSubnetMask"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigDefaultGwIp"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigForRemoteMapping"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwIpConfigRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwIpGroup = cMediaGwIpGroup.setStatus('current')
+cmgwDnsIpGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 5)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsDomainName"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIp"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpType"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwDnsIpRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwDnsIpGroup = cmgwDnsIpGroup.setStatus('current')
+cmgwLifGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 6)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwLifPvcCount"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwLifVoiceIfCount"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwLifGroup = cmgwLifGroup.setStatus('current')
+cmgwCallControlGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 7)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgControlTos"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgBearerTos"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNtePayload"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNsePayload"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNseRespTimer"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterDelayMode"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterMaxDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterNomDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterMinDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDefaultTonePlanId"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDescrInfoEnabled"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDsNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgRtpNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgAal1SvcNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgAal2SvcNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgClusterEnabled"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwCallControlGroup = cmgwCallControlGroup.setStatus('deprecated')
+cMediaGwGroupRev1 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 8)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainName"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwPhysicalIndex"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwServiceState"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwAdminState"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwGraceTime"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwVtMappingMode"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwGroupRev1 = cMediaGwGroupRev1.setStatus('current')
+cmgwCallControlGroupRev1 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 9)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgControlTos"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgBearerTos"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNtePayload"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNsePayload"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNseRespTimer"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterDelayMode"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterMaxDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterNomDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterMinDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDefaultTonePlanId"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDescrInfoEnabled"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDsNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgRtpNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgAal1SvcNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgAal2SvcNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgClusterEnabled"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDefBearerTraffic"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwCallControlGroupRev1 = cmgwCallControlGroupRev1.setStatus('current')
+cmgwSignalProtocolGroupRev1 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 10)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocol"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolVersion"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolPort"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalMgcProtocolPort"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwSignalProtocolGroupRev1 = cmgwSignalProtocolGroupRev1.setStatus('deprecated')
+cmgwSignalProtocolGroupRev2 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 11)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocol"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolVersion"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolPort"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalMgcProtocolPort"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolPreference"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwSignalProtocolGroupRev2 = cmgwSignalProtocolGroupRev2.setStatus('current')
+cmgwSignalProtocolGroupRev3 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 12)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwSignalProtocolConfigVer"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwSignalProtocolGroupRev3 = cmgwSignalProtocolGroupRev3.setStatus('current')
+cMediaGwRscStatsGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 13)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwRscMaximumUtilization"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwRscMinimumUtilization"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwRscAverageUtilization"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwRscSinceLastReset"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwRscStatsGroup = cMediaGwRscStatsGroup.setStatus('current')
+cMediaGwGroupExtra = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 14)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwSrcFilterEnabled"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwLawInterceptEnabled"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwGroupExtra = cMediaGwGroupExtra.setStatus('current')
+cmgwCallControlGroupRev2 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 15)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgControlTos"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgBearerTos"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNtePayload"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNsePayload"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgNseRespTimer"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterDelayMode"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterMaxDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterNomDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgVbdJitterMinDelay"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDefaultTonePlanId"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDescrInfoEnabled"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDsNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgRtpNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgAal1SvcNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgAal2SvcNamePrefix"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgClusterEnabled"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDefBearerTraffic"), ("CISCO-MEDIA-GATEWAY-MIB", "cMediaGwCcCfgDefRtpNamePrefix"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmgwCallControlGroupRev2 = cmgwCallControlGroupRev2.setStatus('current')
+cMediaGwGroupRev2 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 324, 2, 2, 16)).setObjects(("CISCO-MEDIA-GATEWAY-MIB", "cmgwDomainName"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwPhysicalIndex"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwServiceState"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwAdminState"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwGraceTime"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwVtMappingMode"), ("CISCO-MEDIA-GATEWAY-MIB", "cmgwV23Enabled"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cMediaGwGroupRev2 = cMediaGwGroupRev2.setStatus('current')
+mibBuilder.exportSymbols("CISCO-MEDIA-GATEWAY-MIB", cMediaGwMIBComplianceRev5=cMediaGwMIBComplianceRev5, cmgwSrcFilterEnabled=cmgwSrcFilterEnabled, cmgwSignalProtocolPreference=cmgwSignalProtocolPreference, cmgwConfigDomainName=cmgwConfigDomainName, cmgwLifPvcCount=cmgwLifPvcCount, cmgwIpConfigAddress=cmgwIpConfigAddress, cmgwLifVoiceIfCount=cmgwLifVoiceIfCount, cmgwIpConfigForRemoteMapping=cmgwIpConfigForRemoteMapping, cmgwIpConfigIfIndex=cmgwIpConfigIfIndex, cMediaGwTable=cMediaGwTable, cMediaGwCcCfgVbdJitterMaxDelay=cMediaGwCcCfgVbdJitterMaxDelay, CVoiceTonePlanIndexOrZero=CVoiceTonePlanIndexOrZero, cmgwLifGroup=cmgwLifGroup, CCallControlProfileIndex=CCallControlProfileIndex, cMediaGwCcCfgDefaultTonePlanId=cMediaGwCcCfgDefaultTonePlanId, cMediaGwGroupRev2=cMediaGwGroupRev2, cmgwDnsIpType=cmgwDnsIpType, cMediaGwCcCfgBearerTos=cMediaGwCcCfgBearerTos, cMediaGwEntry=cMediaGwEntry, cmgwPhysicalIndex=cmgwPhysicalIndex, cMediaGwMIBComplianceRev1=cMediaGwMIBComplianceRev1, cMediaGwCcCfgNtePayload=cMediaGwCcCfgNtePayload, cMediaGwCcCfgDescrInfoEnabled=cMediaGwCcCfgDescrInfoEnabled, CCallControlJitterDelayMode=CCallControlJitterDelayMode, cmgwDnsDomainName=cmgwDnsDomainName, cMediaGwCcCfgControlTos=cMediaGwCcCfgControlTos, cmgwSignalMgcProtocolPort=cmgwSignalMgcProtocolPort, cmgwCallControlGroupRev2=cmgwCallControlGroupRev2, cmgwLifTable=cmgwLifTable, cmgwSignalProtocolIndex=cmgwSignalProtocolIndex, cMediaGwMIBComplianceRev3=cMediaGwMIBComplianceRev3, cmgwIpConfigVci=cmgwIpConfigVci, cMediaGwCcCfgRtpNamePrefix=cMediaGwCcCfgRtpNamePrefix, cmgwServiceState=cmgwServiceState, cMediaGwCcCfgNsePayload=cMediaGwCcCfgNsePayload, cmgwIpConfigSubnetMask=cmgwIpConfigSubnetMask, cmgwSignalProtocolVersion=cmgwSignalProtocolVersion, CCallControlProfileIndexOrZero=CCallControlProfileIndexOrZero, cMediaGwCallControlConfigEntry=cMediaGwCallControlConfigEntry, cMediaGwRscStatsGroup=cMediaGwRscStatsGroup, cmgwConfigDomainNameIndex=cmgwConfigDomainNameIndex, cmgwCallControlGroupRev1=cmgwCallControlGroupRev1, ciscoMediaGatewayMIBObjects=ciscoMediaGatewayMIBObjects, cmgwRscMinimumUtilization=cmgwRscMinimumUtilization, cMediaGwStats=cMediaGwStats, cmgwV23Enabled=cmgwV23Enabled, cMediaGwRscStatsTable=cMediaGwRscStatsTable, cmgwConfigDomainNameEntity=cmgwConfigDomainNameEntity, cMediaGwCcCfgDefRtpNamePrefix=cMediaGwCcCfgDefRtpNamePrefix, cmgwVtMappingMode=cmgwVtMappingMode, cMediaGwCcCfgDefBearerTraffic=cMediaGwCcCfgDefBearerTraffic, cmgwSignalProtocolGroupRev3=cmgwSignalProtocolGroupRev3, PYSNMP_MODULE_ID=ciscoMediaGatewayMIB, cmgwSignalProtocolPort=cmgwSignalProtocolPort, cmgwIpConfigDefaultGwIp=cmgwIpConfigDefaultGwIp, cMediaGwMIBGroups=cMediaGwMIBGroups, cMediaGwMIBCompliance=cMediaGwMIBCompliance, cMediaGwCcCfgAal1SvcNamePrefix=cMediaGwCcCfgAal1SvcNamePrefix, CGwAdminState=CGwAdminState, cMediaGwCcCfgVbdJitterMinDelay=cMediaGwCcCfgVbdJitterMinDelay, cMediaGwCcCfgDsNamePrefix=cMediaGwCcCfgDsNamePrefix, cMediaGwIpGroup=cMediaGwIpGroup, cMediaGwCcCfgVbdJitterNomDelay=cMediaGwCcCfgVbdJitterNomDelay, cmgwDomainName=cmgwDomainName, cmgwAdminState=cmgwAdminState, cMediaGwDnsIpConfigEntry=cMediaGwDnsIpConfigEntry, cmgwSignalProtocolGroup=cmgwSignalProtocolGroup, cMediaGwGroupRev1=cMediaGwGroupRev1, cmgwSignalProtocolGroupRev2=cmgwSignalProtocolGroupRev2, cMediaGwCcCfgNseRespTimer=cMediaGwCcCfgNseRespTimer, cmgwCallControlGroup=cmgwCallControlGroup, cMediaGwMIBConformance=cMediaGwMIBConformance, cmgwIpConfigVpi=cmgwIpConfigVpi, cmgwSignalProtocolTable=cmgwSignalProtocolTable, cMediaGwCcCfgAal2SvcNamePrefix=cMediaGwCcCfgAal2SvcNamePrefix, cMediaGwDnsIpConfigTable=cMediaGwDnsIpConfigTable, cmgwLifNumber=cmgwLifNumber, cMediaGwCcCfgVbdJitterDelayMode=cMediaGwCcCfgVbdJitterDelayMode, cmgwConfigDomainNameRowStatus=cmgwConfigDomainNameRowStatus, cmgwDnsIpRowStatus=cmgwDnsIpRowStatus, cMediaGwIpConfigEntry=cMediaGwIpConfigEntry, cMediaGwGroup=cMediaGwGroup, cmgwRscStatsIndex=cmgwRscStatsIndex, cmgwLifEntry=cmgwLifEntry, cmgwGraceTime=cmgwGraceTime, cmgwDnsIp=cmgwDnsIp, cMediaGwMIBComplianceRev4=cMediaGwMIBComplianceRev4, cMediaGwGroupExtra=cMediaGwGroupExtra, cMediaGwDomainNameConfigTable=cMediaGwDomainNameConfigTable, cmgwLawInterceptEnabled=cmgwLawInterceptEnabled, CGwServiceState=CGwServiceState, GatewayLifNumber=GatewayLifNumber, cmgwIpConfigRowStatus=cmgwIpConfigRowStatus, cmgwRscSinceLastReset=cmgwRscSinceLastReset, cMediaGwCcCfgClusterEnabled=cMediaGwCcCfgClusterEnabled, ciscoMediaGatewayMIBNotifs=ciscoMediaGatewayMIBNotifs, cmgwSignalProtocolGroupRev1=cmgwSignalProtocolGroupRev1, cmgwRscAverageUtilization=cmgwRscAverageUtilization, cmgwIpConfigIndex=cmgwIpConfigIndex, cmgwSignalProtocolConfigVer=cmgwSignalProtocolConfigVer, cmgwDnsIpGroup=cmgwDnsIpGroup, cmgwDomainNameGroup=cmgwDomainNameGroup, CVoiceTonePlanIndex=CVoiceTonePlanIndex, ciscoMediaGatewayMIB=ciscoMediaGatewayMIB, cmgwSignalProtocolEntry=cmgwSignalProtocolEntry, cMediaGwMIBComplianceRev2=cMediaGwMIBComplianceRev2, cmgwRscMaximumUtilization=cmgwRscMaximumUtilization, cMediaGwIpConfigTable=cMediaGwIpConfigTable, cMediaGwConfig=cMediaGwConfig, cmgwDnsIpIndex=cmgwDnsIpIndex, cMediaGwMIBCompliances=cMediaGwMIBCompliances, cmgwIpConfigAddrType=cmgwIpConfigAddrType, cMediaGwCallControlConfigTable=cMediaGwCallControlConfigTable, cMediaGwRscStatsEntry=cMediaGwRscStatsEntry, cmgwIndex=cmgwIndex, cMediaGwDomainNameConfigEntry=cMediaGwDomainNameConfigEntry, cmgwSignalProtocol=cmgwSignalProtocol)

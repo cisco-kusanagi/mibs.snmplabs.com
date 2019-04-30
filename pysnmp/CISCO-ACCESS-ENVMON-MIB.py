@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module CISCO-ACCESS-ENVMON-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-ACCESS-ENVMON-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:32:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+ciscoEnvMonVoltageState, ciscoEnvMonSupplyStatusEntry, ciscoEnvMonVoltageStatusDescr, ciscoEnvMonTemperatureState, ciscoEnvMonTemperatureStatusDescr = mibBuilder.importSymbols("CISCO-ENVMON-MIB", "ciscoEnvMonVoltageState", "ciscoEnvMonSupplyStatusEntry", "ciscoEnvMonVoltageStatusDescr", "ciscoEnvMonTemperatureState", "ciscoEnvMonTemperatureStatusDescr")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+Counter32, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, ObjectIdentity, Gauge32, Counter64, iso, TimeTicks, Unsigned32, NotificationType, MibIdentifier, Integer32, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "ObjectIdentity", "Gauge32", "Counter64", "iso", "TimeTicks", "Unsigned32", "NotificationType", "MibIdentifier", "Integer32", "IpAddress")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+ciscoAccessEnvMonMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 61))
+ciscoAccessEnvMonMIB.setRevisions(('1998-08-05 00:00',))
+if mibBuilder.loadTexts: ciscoAccessEnvMonMIB.setLastUpdated('9808050000Z')
+if mibBuilder.loadTexts: ciscoAccessEnvMonMIB.setOrganization('Cisco Systems, Inc.')
+caemObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 1))
+caemSupplyStatusTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 61, 1, 1), )
+if mibBuilder.loadTexts: caemSupplyStatusTable.setStatus('current')
+caemSupplyStatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 61, 1, 1, 1), )
+ciscoEnvMonSupplyStatusEntry.registerAugmentions(("CISCO-ACCESS-ENVMON-MIB", "caemSupplyStatusEntry"))
+caemSupplyStatusEntry.setIndexNames(*ciscoEnvMonSupplyStatusEntry.getIndexNames())
+if mibBuilder.loadTexts: caemSupplyStatusEntry.setStatus('current')
+caemSupplyFailedComponent = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 61, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7))).clone(namedValues=NamedValues(("none", 1), ("inputVoltage", 2), ("dcOutputVoltage", 3), ("thermal", 4), ("multiple", 5), ("fan", 6), ("overvoltage", 7)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: caemSupplyFailedComponent.setStatus('current')
+caemMIBNotificationPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 2))
+caemMIBNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 2, 0))
+caemTemperatureNotification = NotificationType((1, 3, 6, 1, 4, 1, 9, 9, 61, 2, 0, 1)).setObjects(("CISCO-ENVMON-MIB", "ciscoEnvMonTemperatureStatusDescr"), ("CISCO-ENVMON-MIB", "ciscoEnvMonTemperatureState"))
+if mibBuilder.loadTexts: caemTemperatureNotification.setStatus('current')
+caemVoltageNotification = NotificationType((1, 3, 6, 1, 4, 1, 9, 9, 61, 2, 0, 2)).setObjects(("CISCO-ENVMON-MIB", "ciscoEnvMonVoltageStatusDescr"), ("CISCO-ENVMON-MIB", "ciscoEnvMonVoltageState"))
+if mibBuilder.loadTexts: caemVoltageNotification.setStatus('current')
+caemConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 3))
+caemCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 3, 1))
+caemGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 3, 2))
+caemCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 61, 3, 1, 1)).setObjects(("CISCO-ACCESS-ENVMON-MIB", "caemGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    caemCompliance = caemCompliance.setStatus('current')
+caemGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 61, 3, 2, 1)).setObjects(("CISCO-ACCESS-ENVMON-MIB", "caemSupplyFailedComponent"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    caemGroup = caemGroup.setStatus('current')
+mibBuilder.exportSymbols("CISCO-ACCESS-ENVMON-MIB", caemSupplyStatusEntry=caemSupplyStatusEntry, caemSupplyFailedComponent=caemSupplyFailedComponent, caemTemperatureNotification=caemTemperatureNotification, ciscoAccessEnvMonMIB=ciscoAccessEnvMonMIB, caemVoltageNotification=caemVoltageNotification, caemGroup=caemGroup, PYSNMP_MODULE_ID=ciscoAccessEnvMonMIB, caemMIBNotificationPrefix=caemMIBNotificationPrefix, caemCompliances=caemCompliances, caemSupplyStatusTable=caemSupplyStatusTable, caemCompliance=caemCompliance, caemObjects=caemObjects, caemMIBNotifications=caemMIBNotifications, caemConformance=caemConformance, caemGroups=caemGroups)

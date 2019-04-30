@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module ANTIVIRUS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ANTIVIRUS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:07:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+naiTrapAlarmSourceDNSName, nai, naiTrapAgent, naiTrapGMTTime, naiTrapAgentVersion, naiTrapAlarmSourceAddress, naiTrapLocalTime, naiTrapDescription, naiTrapSeverity, naiTrapURL, naiTrapPseudoID = mibBuilder.importSymbols("NAI-MIB", "naiTrapAlarmSourceDNSName", "nai", "naiTrapAgent", "naiTrapGMTTime", "naiTrapAgentVersion", "naiTrapAlarmSourceAddress", "naiTrapLocalTime", "naiTrapDescription", "naiTrapSeverity", "naiTrapURL", "naiTrapPseudoID")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, MibIdentifier, Gauge32, Counter32, IpAddress, Unsigned32, NotificationType, NotificationType, TimeTicks, ObjectIdentity, iso, ModuleIdentity, Counter64, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "MibIdentifier", "Gauge32", "Counter32", "IpAddress", "Unsigned32", "NotificationType", "NotificationType", "TimeTicks", "ObjectIdentity", "iso", "ModuleIdentity", "Counter64", "Integer32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+naiAntiVirus = MibIdentifier((1, 3, 6, 1, 4, 1, 3401, 4))
+naiAntiVirusTrapAgentUser = MibScalar((1, 3, 6, 1, 4, 1, 3401, 4, 1), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: naiAntiVirusTrapAgentUser.setStatus('mandatory')
+naiAntiVirusTrapInfectedFile = MibScalar((1, 3, 6, 1, 4, 1, 3401, 4, 2), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: naiAntiVirusTrapInfectedFile.setStatus('mandatory')
+naiAntiVirusTrapVirusName = MibScalar((1, 3, 6, 1, 4, 1, 3401, 4, 3), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: naiAntiVirusTrapVirusName.setStatus('mandatory')
+naiAntiVirusTrapTaskName = MibScalar((1, 3, 6, 1, 4, 1, 3401, 4, 4), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: naiAntiVirusTrapTaskName.setStatus('mandatory')
+naiAntiVirusTrapStatus = MibScalar((1, 3, 6, 1, 4, 1, 3401, 4, 5), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: naiAntiVirusTrapStatus.setStatus('optional')
+naiAntiVirusTrapOS = MibScalar((1, 3, 6, 1, 4, 1, 3401, 4, 6), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: naiAntiVirusTrapOS.setStatus('mandatory')
+naiAntiVirusTrapEngineVersion = MibScalar((1, 3, 6, 1, 4, 1, 3401, 4, 7), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: naiAntiVirusTrapEngineVersion.setStatus('mandatory')
+naiAntiVirusTrapDATVersion = MibScalar((1, 3, 6, 1, 4, 1, 3401, 4, 8), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: naiAntiVirusTrapDATVersion.setStatus('mandatory')
+naiAntiVirusTrap = NotificationType((1, 3, 6, 1, 4, 1, 3401, 4) + (0,1)).setObjects(("NAI-MIB", "naiTrapAgent"), ("NAI-MIB", "naiTrapAgentVersion"), ("NAI-MIB", "naiTrapSeverity"), ("NAI-MIB", "naiTrapDescription"), ("NAI-MIB", "naiTrapAlarmSourceAddress"), ("NAI-MIB", "naiTrapAlarmSourceDNSName"), ("NAI-MIB", "naiTrapGMTTime"), ("NAI-MIB", "naiTrapLocalTime"), ("NAI-MIB", "naiTrapURL"), ("NAI-MIB", "naiTrapPseudoID"), ("ANTIVIRUS-MIB", "naiAntiVirusTrapAgentUser"), ("ANTIVIRUS-MIB", "naiAntiVirusTrapInfectedFile"), ("ANTIVIRUS-MIB", "naiAntiVirusTrapVirusName"), ("ANTIVIRUS-MIB", "naiAntiVirusTrapTaskName"), ("ANTIVIRUS-MIB", "naiAntiVirusTrapStatus"), ("ANTIVIRUS-MIB", "naiAntiVirusTrapOS"), ("ANTIVIRUS-MIB", "naiAntiVirusTrapEngineVersion"), ("ANTIVIRUS-MIB", "naiAntiVirusTrapDATVersion"))
+mibBuilder.exportSymbols("ANTIVIRUS-MIB", naiAntiVirusTrapEngineVersion=naiAntiVirusTrapEngineVersion, naiAntiVirusTrapAgentUser=naiAntiVirusTrapAgentUser, naiAntiVirusTrapVirusName=naiAntiVirusTrapVirusName, naiAntiVirusTrapTaskName=naiAntiVirusTrapTaskName, naiAntiVirusTrapStatus=naiAntiVirusTrapStatus, naiAntiVirusTrapOS=naiAntiVirusTrapOS, naiAntiVirusTrap=naiAntiVirusTrap, naiAntiVirusTrapInfectedFile=naiAntiVirusTrapInfectedFile, naiAntiVirus=naiAntiVirus, naiAntiVirusTrapDATVersion=naiAntiVirusTrapDATVersion)

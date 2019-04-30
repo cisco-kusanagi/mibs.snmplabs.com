@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module BDCOM-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BDCOM-SMI
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:19:46 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, iso, Integer32, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, enterprises, Gauge32, MibIdentifier, TimeTicks, ObjectIdentity, Unsigned32, IpAddress, Counter32, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "iso", "Integer32", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "enterprises", "Gauge32", "MibIdentifier", "TimeTicks", "ObjectIdentity", "Unsigned32", "IpAddress", "Counter32", "Bits")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+bdcom = ModuleIdentity((1, 3, 6, 1, 4, 1, 3320))
+if mibBuilder.loadTexts: bdcom.setLastUpdated('20000628Z')
+if mibBuilder.loadTexts: bdcom.setOrganization('BDCom, Inc.')
+bdcomProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 3320, 1))
+if mibBuilder.loadTexts: bdcomProducts.setStatus('current')
+bdlocal = ObjectIdentity((1, 3, 6, 1, 4, 1, 3320, 2))
+if mibBuilder.loadTexts: bdlocal.setStatus('current')
+bdtemporary = ObjectIdentity((1, 3, 6, 1, 4, 1, 3320, 3))
+if mibBuilder.loadTexts: bdtemporary.setStatus('current')
+bdMgmt = ObjectIdentity((1, 3, 6, 1, 4, 1, 3320, 9))
+if mibBuilder.loadTexts: bdMgmt.setStatus('current')
+bdcomModules = ObjectIdentity((1, 3, 6, 1, 4, 1, 3320, 12))
+if mibBuilder.loadTexts: bdcomModules.setStatus('current')
+bdcomPolicyAuto = ObjectIdentity((1, 3, 6, 1, 4, 1, 3320, 18))
+if mibBuilder.loadTexts: bdcomPolicyAuto.setStatus('current')
+bdcomPibToMib = ObjectIdentity((1, 3, 6, 1, 4, 1, 3320, 18, 2))
+if mibBuilder.loadTexts: bdcomPibToMib.setStatus('current')
+mibBuilder.exportSymbols("BDCOM-SMI", bdcomPibToMib=bdcomPibToMib, bdlocal=bdlocal, bdcomProducts=bdcomProducts, PYSNMP_MODULE_ID=bdcom, bdcom=bdcom, bdcomPolicyAuto=bdcomPolicyAuto, bdcomModules=bdcomModules, bdMgmt=bdMgmt, bdtemporary=bdtemporary)

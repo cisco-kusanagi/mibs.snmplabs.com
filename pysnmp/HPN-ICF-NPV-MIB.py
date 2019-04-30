@@ -1,0 +1,46 @@
+#
+# PySNMP MIB module HPN-ICF-NPV-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HPN-ICF-NPV-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:28:23 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+HpnicfFcVsanIndex, = mibBuilder.importSymbols("HPN-ICF-FC-TC-MIB", "HpnicfFcVsanIndex")
+hpnicfSan, hpnicfVsanIndex = mibBuilder.importSymbols("HPN-ICF-VSAN-MIB", "hpnicfSan", "hpnicfVsanIndex")
+InterfaceIndex, ifIndex = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex", "ifIndex")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, IpAddress, MibIdentifier, Gauge32, Bits, iso, Unsigned32, TimeTicks, Counter32, NotificationType, ObjectIdentity, ModuleIdentity, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "IpAddress", "MibIdentifier", "Gauge32", "Bits", "iso", "Unsigned32", "TimeTicks", "Counter32", "NotificationType", "ObjectIdentity", "ModuleIdentity", "Counter64")
+TimeStamp, RowStatus, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TimeStamp", "RowStatus", "TextualConvention", "DisplayString")
+hpnicfNpv = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6))
+hpnicfNpv.setRevisions(('2013-04-02 00:00',))
+if mibBuilder.loadTexts: hpnicfNpv.setLastUpdated('201304020000Z')
+if mibBuilder.loadTexts: hpnicfNpv.setOrganization('')
+class HpnicfNpvIfIndexList(TextualConvention, OctetString):
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(4, 65535)
+
+hpnicfNpvMibObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1))
+hpnicfNpvConfiguration = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1))
+hpnicfNpvGlobalObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 1))
+hpnicfNpvLoadbalanceVsan = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 1, 1), HpnicfFcVsanIndex()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpnicfNpvLoadbalanceVsan.setStatus('current')
+hpnicfNpvTrafficMapConfigTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 2), )
+if mibBuilder.loadTexts: hpnicfNpvTrafficMapConfigTable.setStatus('current')
+hpnicfNpvTrafficMapConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "HPN-ICF-VSAN-MIB", "hpnicfVsanIndex"))
+if mibBuilder.loadTexts: hpnicfNpvTrafficMapConfigEntry.setStatus('current')
+hpnicfNpvTrafficMapExternalIfIndexList = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 2, 1, 1), HpnicfNpvIfIndexList()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpnicfNpvTrafficMapExternalIfIndexList.setStatus('current')
+hpnicfNpvTrafficMapLastChange = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 2, 1, 2), TimeStamp()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfNpvTrafficMapLastChange.setStatus('current')
+hpnicfNpvTrafficMapRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 2, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpnicfNpvTrafficMapRowStatus.setStatus('current')
+hpnicfNpvServerIfTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 3), )
+if mibBuilder.loadTexts: hpnicfNpvServerIfTable.setStatus('current')
+hpnicfNpvServerIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 3, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "HPN-ICF-VSAN-MIB", "hpnicfVsanIndex"))
+if mibBuilder.loadTexts: hpnicfNpvServerIfEntry.setStatus('current')
+hpnicfNpvExternalIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 127, 6, 1, 1, 3, 1, 1), InterfaceIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfNpvExternalIfIndex.setStatus('current')
+mibBuilder.exportSymbols("HPN-ICF-NPV-MIB", hpnicfNpvGlobalObjects=hpnicfNpvGlobalObjects, hpnicfNpvLoadbalanceVsan=hpnicfNpvLoadbalanceVsan, hpnicfNpvTrafficMapConfigEntry=hpnicfNpvTrafficMapConfigEntry, hpnicfNpvTrafficMapExternalIfIndexList=hpnicfNpvTrafficMapExternalIfIndexList, hpnicfNpvTrafficMapRowStatus=hpnicfNpvTrafficMapRowStatus, hpnicfNpvMibObjects=hpnicfNpvMibObjects, hpnicfNpvTrafficMapLastChange=hpnicfNpvTrafficMapLastChange, HpnicfNpvIfIndexList=HpnicfNpvIfIndexList, hpnicfNpvServerIfTable=hpnicfNpvServerIfTable, hpnicfNpv=hpnicfNpv, hpnicfNpvConfiguration=hpnicfNpvConfiguration, hpnicfNpvTrafficMapConfigTable=hpnicfNpvTrafficMapConfigTable, hpnicfNpvExternalIfIndex=hpnicfNpvExternalIfIndex, hpnicfNpvServerIfEntry=hpnicfNpvServerIfEntry, PYSNMP_MODULE_ID=hpnicfNpv)

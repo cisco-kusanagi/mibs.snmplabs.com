@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module ZYXEL-PRIVATE-VLAN-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZYXEL-PRIVATE-VLAN-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:45:24 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, IpAddress, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, MibIdentifier, Counter64, NotificationType, ObjectIdentity, Counter32, Gauge32, iso, Integer32, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "IpAddress", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "MibIdentifier", "Counter64", "NotificationType", "ObjectIdentity", "Counter32", "Gauge32", "iso", "Integer32", "TimeTicks")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+esMgmt, = mibBuilder.importSymbols("ZYXEL-ES-SMI", "esMgmt")
+zyxelPrivateVlan = ModuleIdentity((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68))
+if mibBuilder.loadTexts: zyxelPrivateVlan.setLastUpdated('201207010000Z')
+if mibBuilder.loadTexts: zyxelPrivateVlan.setOrganization('Enterprise Solution ZyXEL')
+zyxelPrivateVlanSetup = MibIdentifier((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68, 1))
+zyxelPrivateVlanTable = MibTable((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68, 1, 1), )
+if mibBuilder.loadTexts: zyxelPrivateVlanTable.setStatus('current')
+zyxelPrivateVlanEntry = MibTableRow((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68, 1, 1, 1), ).setIndexNames((0, "ZYXEL-PRIVATE-VLAN-MIB", "zyPrivateVlanType"))
+if mibBuilder.loadTexts: zyxelPrivateVlanEntry.setStatus('current')
+zyPrivateVlanType = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3))).clone(namedValues=NamedValues(("normal", 0), ("primary", 1), ("isolated", 2), ("community", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyPrivateVlanType.setStatus('current')
+zyPrivateVlanAssociatedVlanMap1k = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68, 1, 1, 1, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyPrivateVlanAssociatedVlanMap1k.setStatus('current')
+zyPrivateVlanAssociatedVlanMap2k = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68, 1, 1, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyPrivateVlanAssociatedVlanMap2k.setStatus('current')
+zyPrivateVlanAssociatedVlanMap3k = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68, 1, 1, 1, 4), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyPrivateVlanAssociatedVlanMap3k.setStatus('current')
+zyPrivateVlanAssociatedVlanMap4k = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 68, 1, 1, 1, 5), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyPrivateVlanAssociatedVlanMap4k.setStatus('current')
+mibBuilder.exportSymbols("ZYXEL-PRIVATE-VLAN-MIB", zyxelPrivateVlanTable=zyxelPrivateVlanTable, zyxelPrivateVlanEntry=zyxelPrivateVlanEntry, zyPrivateVlanAssociatedVlanMap1k=zyPrivateVlanAssociatedVlanMap1k, zyPrivateVlanAssociatedVlanMap4k=zyPrivateVlanAssociatedVlanMap4k, PYSNMP_MODULE_ID=zyxelPrivateVlan, zyPrivateVlanAssociatedVlanMap2k=zyPrivateVlanAssociatedVlanMap2k, zyPrivateVlanType=zyPrivateVlanType, zyxelPrivateVlan=zyxelPrivateVlan, zyPrivateVlanAssociatedVlanMap3k=zyPrivateVlanAssociatedVlanMap3k, zyxelPrivateVlanSetup=zyxelPrivateVlanSetup)

@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module BAY-STACK-ERROR-MESSAGE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BAY-STACK-ERROR-MESSAGE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:18:37 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint")
+InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddress")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+IpAddress, Unsigned32, MibIdentifier, Bits, ModuleIdentity, Counter32, Gauge32, Counter64, ObjectIdentity, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, NotificationType, iso = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "Unsigned32", "MibIdentifier", "Bits", "ModuleIdentity", "Counter32", "Gauge32", "Counter64", "ObjectIdentity", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "NotificationType", "iso")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+bayStackMibs, = mibBuilder.importSymbols("SYNOPTICS-ROOT-MIB", "bayStackMibs")
+bayStackErrorMessageMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 45, 5, 19))
+bayStackErrorMessageMib.setRevisions(('2013-10-11 00:00', '2006-11-14 00:00',))
+if mibBuilder.loadTexts: bayStackErrorMessageMib.setLastUpdated('201310110000Z')
+if mibBuilder.loadTexts: bayStackErrorMessageMib.setOrganization('Nortel Networks')
+bsemObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 45, 5, 19, 1))
+bsemErrorMessageTable = MibTable((1, 3, 6, 1, 4, 1, 45, 5, 19, 1, 1), )
+if mibBuilder.loadTexts: bsemErrorMessageTable.setStatus('current')
+bsemErrorMessageEntry = MibTableRow((1, 3, 6, 1, 4, 1, 45, 5, 19, 1, 1, 1), ).setIndexNames((0, "BAY-STACK-ERROR-MESSAGE-MIB", "bsemErrorMessageAddressType"), (0, "BAY-STACK-ERROR-MESSAGE-MIB", "bsemErrorMessageAddress"), (0, "BAY-STACK-ERROR-MESSAGE-MIB", "bsemErrorMessageRequestId"))
+if mibBuilder.loadTexts: bsemErrorMessageEntry.setStatus('current')
+bsemErrorMessageAddressType = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 19, 1, 1, 1, 1), InetAddressType())
+if mibBuilder.loadTexts: bsemErrorMessageAddressType.setStatus('current')
+bsemErrorMessageAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 19, 1, 1, 1, 2), InetAddress())
+if mibBuilder.loadTexts: bsemErrorMessageAddress.setStatus('current')
+bsemErrorMessageRequestId = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 19, 1, 1, 1, 3), Unsigned32())
+if mibBuilder.loadTexts: bsemErrorMessageRequestId.setStatus('current')
+bsemErrorMessageString = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 19, 1, 1, 1, 4), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bsemErrorMessageString.setStatus('current')
+mibBuilder.exportSymbols("BAY-STACK-ERROR-MESSAGE-MIB", bsemErrorMessageRequestId=bsemErrorMessageRequestId, bsemErrorMessageString=bsemErrorMessageString, bsemErrorMessageTable=bsemErrorMessageTable, bsemErrorMessageAddressType=bsemErrorMessageAddressType, bayStackErrorMessageMib=bayStackErrorMessageMib, PYSNMP_MODULE_ID=bayStackErrorMessageMib, bsemErrorMessageEntry=bsemErrorMessageEntry, bsemObjects=bsemObjects, bsemErrorMessageAddress=bsemErrorMessageAddress)

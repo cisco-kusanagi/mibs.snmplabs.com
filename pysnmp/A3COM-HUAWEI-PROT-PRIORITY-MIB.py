@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module A3COM-HUAWEI-PROT-PRIORITY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/A3COM-HUAWEI-PROT-PRIORITY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 16:51:58 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+h3cCommon, = mibBuilder.importSymbols("A3COM-HUAWEI-OID-MIB", "h3cCommon")
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+iso, Counter32, Gauge32, MibIdentifier, Counter64, NotificationType, IpAddress, ModuleIdentity, Integer32, Bits, ObjectIdentity, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "Counter32", "Gauge32", "MibIdentifier", "Counter64", "NotificationType", "IpAddress", "ModuleIdentity", "Integer32", "Bits", "ObjectIdentity", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks")
+TextualConvention, DisplayString, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "RowStatus")
+h3cProtocolPriority = ModuleIdentity((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37))
+h3cProtocolPriority.setRevisions(('2005-01-17 16:33',))
+if mibBuilder.loadTexts: h3cProtocolPriority.setLastUpdated('200501171633Z')
+if mibBuilder.loadTexts: h3cProtocolPriority.setOrganization('Huawei 3Com Technologies Co., Ltd.')
+h3cProtocolPriorityObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37, 1))
+h3cPPri = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37, 1, 1))
+h3cProtocolPriorityTable = MibTable((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37, 1, 1, 1), )
+if mibBuilder.loadTexts: h3cProtocolPriorityTable.setStatus('current')
+h3cProtocolPriorityEntry = MibTableRow((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37, 1, 1, 1, 1), ).setIndexNames((0, "A3COM-HUAWEI-PROT-PRIORITY-MIB", "h3cPPriProtocolType"))
+if mibBuilder.loadTexts: h3cProtocolPriorityEntry.setStatus('current')
+h3cPPriProtocolType = MibTableColumn((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37, 1, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("ospf", 1), ("telnet", 2), ("snmp", 3), ("icmp", 4), ("bgp", 5), ("ldp", 6))))
+if mibBuilder.loadTexts: h3cPPriProtocolType.setStatus('current')
+h3cPPriPriorityType = MibTableColumn((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37, 1, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("ipPrecedence", 1), ("dscp", 2)))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: h3cPPriPriorityType.setStatus('current')
+h3cPPriPriorityVlaue = MibTableColumn((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37, 1, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 63))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: h3cPPriPriorityVlaue.setStatus('current')
+h3cPPriRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 37, 1, 1, 1, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: h3cPPriRowStatus.setStatus('current')
+mibBuilder.exportSymbols("A3COM-HUAWEI-PROT-PRIORITY-MIB", h3cPPriPriorityVlaue=h3cPPriPriorityVlaue, h3cPPriProtocolType=h3cPPriProtocolType, h3cProtocolPriorityEntry=h3cProtocolPriorityEntry, h3cProtocolPriority=h3cProtocolPriority, h3cPPri=h3cPPri, PYSNMP_MODULE_ID=h3cProtocolPriority, h3cProtocolPriorityObjects=h3cProtocolPriorityObjects, h3cPPriPriorityType=h3cPPriPriorityType, h3cProtocolPriorityTable=h3cProtocolPriorityTable, h3cPPriRowStatus=h3cPPriRowStatus)

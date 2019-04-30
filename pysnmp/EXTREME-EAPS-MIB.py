@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module EXTREME-EAPS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/EXTREME-BASE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:53:03 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection")
+extremeAgent, = mibBuilder.importSymbols("EXTREME-BASE-MIB", "extremeAgent")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Unsigned32, iso, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Bits, MibIdentifier, ModuleIdentity, Counter64, Counter32, NotificationType, Integer32, IpAddress, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "iso", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Bits", "MibIdentifier", "ModuleIdentity", "Counter64", "Counter32", "NotificationType", "Integer32", "IpAddress", "TimeTicks")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+extremeEaps = ModuleIdentity((1, 3, 6, 1, 4, 1, 1916, 1, 18))
+if mibBuilder.loadTexts: extremeEaps.setLastUpdated('0007240000Z')
+if mibBuilder.loadTexts: extremeEaps.setOrganization('Extreme Networks, Inc.')
+extremeEapsTable = MibTable((1, 3, 6, 1, 4, 1, 1916, 1, 18, 1), )
+if mibBuilder.loadTexts: extremeEapsTable.setStatus('current')
+extremeEapsEntry = MibTableRow((1, 3, 6, 1, 4, 1, 1916, 1, 18, 1, 1), ).setIndexNames((0, "EXTREME-EAPS-MIB", "extremeEapsName"))
+if mibBuilder.loadTexts: extremeEapsEntry.setStatus('current')
+extremeEapsName = MibTableColumn((1, 3, 6, 1, 4, 1, 1916, 1, 18, 1, 1, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: extremeEapsName.setStatus('current')
+extremeEapsMode = MibTableColumn((1, 3, 6, 1, 4, 1, 1916, 1, 18, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("invalid", 0), ("master", 1), ("transit", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: extremeEapsMode.setStatus('current')
+extremeEapsState = MibTableColumn((1, 3, 6, 1, 4, 1, 1916, 1, 18, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("idle", 0), ("complete", 1), ("failed", 2), ("linksup", 3), ("linkdown", 4), ("preforwarding", 5), ("init", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: extremeEapsState.setStatus('current')
+extremeEapsPrevState = MibScalar((1, 3, 6, 1, 4, 1, 1916, 1, 18, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("idle", 0), ("complete", 1), ("failed", 2), ("linksup", 3), ("linkdown", 4), ("preforwarding", 5), ("init", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: extremeEapsPrevState.setStatus('current')
+mibBuilder.exportSymbols("EXTREME-EAPS-MIB", extremeEapsTable=extremeEapsTable, extremeEapsEntry=extremeEapsEntry, extremeEapsMode=extremeEapsMode, PYSNMP_MODULE_ID=extremeEaps, extremeEapsPrevState=extremeEapsPrevState, extremeEapsName=extremeEapsName, extremeEaps=extremeEaps, extremeEapsState=extremeEapsState)

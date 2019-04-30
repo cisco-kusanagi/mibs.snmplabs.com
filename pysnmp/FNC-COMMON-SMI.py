@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module FNC-COMMON-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/FNC-COMMON-SMI
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:00:26 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, Integer32, Bits, iso, MibIdentifier, ObjectIdentity, enterprises, ModuleIdentity, TimeTicks, NotificationType, Counter64, IpAddress, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "Integer32", "Bits", "iso", "MibIdentifier", "ObjectIdentity", "enterprises", "ModuleIdentity", "TimeTicks", "NotificationType", "Counter64", "IpAddress", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+fnc = ModuleIdentity((1, 3, 6, 1, 4, 1, 3861))
+fnc.setRevisions(('2004-01-28 15:00', '2003-10-06 15:00', '2003-08-12 15:00',))
+if mibBuilder.loadTexts: fnc.setLastUpdated('200401281500Z')
+if mibBuilder.loadTexts: fnc.setOrganization('Fujitsu Network Communications')
+fncTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 0))
+fastlane = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 1))
+flash = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 2))
+flashBase = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 2, 1))
+stm = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 2, 1, 7))
+sonet = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 2, 1, 7, 1))
+flashwave = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 3))
+fwCommon = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 3, 1))
+fw4100 = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 3, 4100))
+fw4300 = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 3, 4300))
+fw4500 = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 3, 4500))
+fw7500 = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 3, 7500))
+fw4020 = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 3, 4020))
+netsmart = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4))
+mibBuilder.exportSymbols("FNC-COMMON-SMI", netsmart=netsmart, fnc=fnc, fw4500=fw4500, fastlane=fastlane, fw4020=fw4020, fwCommon=fwCommon, fncTraps=fncTraps, stm=stm, flashBase=flashBase, flash=flash, fw4100=fw4100, fw4300=fw4300, PYSNMP_MODULE_ID=fnc, sonet=sonet, fw7500=fw7500, flashwave=flashwave)

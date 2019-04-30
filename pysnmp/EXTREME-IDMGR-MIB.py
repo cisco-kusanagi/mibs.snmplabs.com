@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module EXTREME-IDMGR-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/EXTREME-IDMGR-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:54:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection")
+extremeAgent, = mibBuilder.importSymbols("EXTREME-BASE-MIB", "extremeAgent")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Unsigned32, NotificationType, Integer32, IpAddress, ModuleIdentity, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, MibIdentifier, Bits, TimeTicks, Counter64, ObjectIdentity, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "NotificationType", "Integer32", "IpAddress", "ModuleIdentity", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "MibIdentifier", "Bits", "TimeTicks", "Counter64", "ObjectIdentity", "Gauge32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+extremeIdMgr = ModuleIdentity((1, 3, 6, 1, 4, 1, 1916, 1, 36))
+if mibBuilder.loadTexts: extremeIdMgr.setLastUpdated('200906100000Z')
+if mibBuilder.loadTexts: extremeIdMgr.setOrganization('Extreme Networks, Inc.')
+extremeIdMgrTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 1916, 1, 36, 1))
+extremeIdMgrTrapPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 1916, 1, 36, 1, 0))
+extremeIdMgrMemLevelChange = NotificationType((1, 3, 6, 1, 4, 1, 1916, 1, 36, 1, 0, 1)).setObjects(("EXTREME-IDMGR-MIB", "extremeIdMgrTrapSeverity"), ("EXTREME-IDMGR-MIB", "extremeIdMgrMemUsageLevel"), ("EXTREME-IDMGR-MIB", "extremeIdMgrMemUsage"), ("EXTREME-IDMGR-MIB", "extremeIdMgrMemMaxSize"), ("EXTREME-IDMGR-MIB", "extremeIdMgrEffectiveStaleAgingTime"))
+if mibBuilder.loadTexts: extremeIdMgrMemLevelChange.setStatus('current')
+extremeIdMgrTrapSeverity = MibScalar((1, 3, 6, 1, 4, 1, 1916, 1, 36, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8))).clone(namedValues=NamedValues(("critical", 1), ("error", 2), ("warning", 3), ("notice", 4), ("info", 5), ("debug-summary", 6), ("debug-verbose", 7), ("debug-data", 8)))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: extremeIdMgrTrapSeverity.setStatus('current')
+extremeIdMgrMemUsageLevel = MibScalar((1, 3, 6, 1, 4, 1, 1916, 1, 36, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("normal", 1), ("high", 2), ("critical", 3), ("maximum", 4)))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: extremeIdMgrMemUsageLevel.setStatus('current')
+extremeIdMgrMemUsage = MibScalar((1, 3, 6, 1, 4, 1, 1916, 1, 36, 1, 3), Integer32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: extremeIdMgrMemUsage.setStatus('current')
+extremeIdMgrMemMaxSize = MibScalar((1, 3, 6, 1, 4, 1, 1916, 1, 36, 1, 4), Integer32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: extremeIdMgrMemMaxSize.setStatus('current')
+extremeIdMgrEffectiveStaleAgingTime = MibScalar((1, 3, 6, 1, 4, 1, 1916, 1, 36, 1, 5), Integer32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: extremeIdMgrEffectiveStaleAgingTime.setStatus('current')
+mibBuilder.exportSymbols("EXTREME-IDMGR-MIB", extremeIdMgrTrapSeverity=extremeIdMgrTrapSeverity, extremeIdMgrTraps=extremeIdMgrTraps, extremeIdMgrTrapPrefix=extremeIdMgrTrapPrefix, extremeIdMgrMemMaxSize=extremeIdMgrMemMaxSize, extremeIdMgrMemUsage=extremeIdMgrMemUsage, PYSNMP_MODULE_ID=extremeIdMgr, extremeIdMgrMemLevelChange=extremeIdMgrMemLevelChange, extremeIdMgrMemUsageLevel=extremeIdMgrMemUsageLevel, extremeIdMgr=extremeIdMgr, extremeIdMgrEffectiveStaleAgingTime=extremeIdMgrEffectiveStaleAgingTime)

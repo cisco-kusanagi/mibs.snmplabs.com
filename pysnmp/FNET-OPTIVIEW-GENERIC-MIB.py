@@ -1,0 +1,50 @@
+#
+# PySNMP MIB module FNET-OPTIVIEW-GENERIC-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/FNET-OPTIVIEW-GENERIC-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:00:29 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection")
+fnetOptiViewGeneric, = mibBuilder.importSymbols("FNET-GLOBAL-REG", "fnetOptiViewGeneric")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, MibIdentifier, Unsigned32, NotificationType, NotificationType, Counter64, IpAddress, TimeTicks, ObjectIdentity, iso, Counter32, Integer32, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "MibIdentifier", "Unsigned32", "NotificationType", "NotificationType", "Counter64", "IpAddress", "TimeTicks", "ObjectIdentity", "iso", "Counter32", "Integer32", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+class OvTrapSeverity(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))
+    namedValues = NamedValues(("inform", 1), ("warning", 2), ("minor", 3), ("major", 4), ("critical", 5))
+
+class OvTrapStatus(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("discovered", 1), ("resolved", 2))
+
+ovStdTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1))
+ovTrapAgentSysName = MibScalar((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255)))
+if mibBuilder.loadTexts: ovTrapAgentSysName.setStatus('mandatory')
+ovTrapSeverity = MibScalar((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1, 2), OvTrapSeverity())
+if mibBuilder.loadTexts: ovTrapSeverity.setStatus('mandatory')
+ovTrapStatus = MibScalar((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1, 3), OvTrapStatus())
+if mibBuilder.loadTexts: ovTrapStatus.setStatus('mandatory')
+ovTrapDescription = MibScalar((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1, 4), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255)))
+if mibBuilder.loadTexts: ovTrapDescription.setStatus('mandatory')
+ovTrapOffenderName = MibScalar((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1, 5), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255)))
+if mibBuilder.loadTexts: ovTrapOffenderName.setStatus('mandatory')
+ovTrapOffenderNetAddr = MibScalar((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1, 6), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255)))
+if mibBuilder.loadTexts: ovTrapOffenderNetAddr.setStatus('mandatory')
+ovTrapOffenderPhyAddr = MibScalar((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1, 7), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255)))
+if mibBuilder.loadTexts: ovTrapOffenderPhyAddr.setStatus('mandatory')
+ovTrapOffenderSubId = MibScalar((1, 3, 6, 1, 4, 1, 1226, 2, 1, 1, 8), Integer32())
+if mibBuilder.loadTexts: ovTrapOffenderSubId.setStatus('optional')
+ovProbDupIp = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,1)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderPhyAddr"))
+probBadMask = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,2)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+ovProbBadDefRouter = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,3)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+probLoneIp = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,4)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+probLoneNbDomain = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,5)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+probLoneIpxNet = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,6)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+probLoneIpxType = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,7)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+probKeyDevNoResp = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,8)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+probReboot = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,9)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+probRerunTest = NotificationType((1, 3, 6, 1, 4, 1, 1226, 2, 1) + (0,10)).setObjects(("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapAgentSysName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapSeverity"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapStatus"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapDescription"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderName"), ("FNET-OPTIVIEW-GENERIC-MIB", "ovTrapOffenderNetAddr"))
+mibBuilder.exportSymbols("FNET-OPTIVIEW-GENERIC-MIB", ovTrapStatus=ovTrapStatus, probLoneIpxType=probLoneIpxType, ovTrapOffenderSubId=ovTrapOffenderSubId, ovTrapOffenderNetAddr=ovTrapOffenderNetAddr, OvTrapStatus=OvTrapStatus, probRerunTest=probRerunTest, probBadMask=probBadMask, ovTrapSeverity=ovTrapSeverity, ovTrapAgentSysName=ovTrapAgentSysName, probReboot=probReboot, ovProbDupIp=ovProbDupIp, ovProbBadDefRouter=ovProbBadDefRouter, ovTrapOffenderPhyAddr=ovTrapOffenderPhyAddr, ovTrapOffenderName=ovTrapOffenderName, probLoneIpxNet=probLoneIpxNet, probLoneNbDomain=probLoneNbDomain, ovStdTraps=ovStdTraps, OvTrapSeverity=OvTrapSeverity, ovTrapDescription=ovTrapDescription, probKeyDevNoResp=probKeyDevNoResp, probLoneIp=probLoneIp)

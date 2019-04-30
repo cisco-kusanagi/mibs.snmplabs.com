@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module INTEL-IGMP-PRUNING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/INTEL-IGMP-PRUNING-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:43:04 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+mib2ext, = mibBuilder.importSymbols("INTEL-GEN-MIB", "mib2ext")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Counter32, IpAddress, ObjectIdentity, TimeTicks, MibIdentifier, Bits, NotificationType, Integer32, ModuleIdentity, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, iso, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "IpAddress", "ObjectIdentity", "TimeTicks", "MibIdentifier", "Bits", "NotificationType", "Integer32", "ModuleIdentity", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "iso", "Gauge32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+igmppru = MibIdentifier((1, 3, 6, 1, 4, 1, 343, 6, 35))
+conf = MibIdentifier((1, 3, 6, 1, 4, 1, 343, 6, 35, 1))
+confIgmpPruEnabled = MibScalar((1, 3, 6, 1, 4, 1, 343, 6, 35, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: confIgmpPruEnabled.setStatus('mandatory')
+confIgmpPruTimer = MibScalar((1, 3, 6, 1, 4, 1, 343, 6, 35, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 10000))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: confIgmpPruTimer.setStatus('mandatory')
+confIgmpPruPortTable = MibTable((1, 3, 6, 1, 4, 1, 343, 6, 35, 1, 3), )
+if mibBuilder.loadTexts: confIgmpPruPortTable.setStatus('mandatory')
+confIgmpPruPortEntry = MibTableRow((1, 3, 6, 1, 4, 1, 343, 6, 35, 1, 3, 1), ).setIndexNames((0, "INTEL-IGMP-PRUNING-MIB", "confIgmpPruPortIndex"))
+if mibBuilder.loadTexts: confIgmpPruPortEntry.setStatus('mandatory')
+confIgmpPruPortIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 343, 6, 35, 1, 3, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: confIgmpPruPortIndex.setStatus('mandatory')
+confIgmpPruPortEnabled = MibTableColumn((1, 3, 6, 1, 4, 1, 343, 6, 35, 1, 3, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: confIgmpPruPortEnabled.setStatus('mandatory')
+confIgmpPruAllowAsQuerier = MibScalar((1, 3, 6, 1, 4, 1, 343, 6, 35, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: confIgmpPruAllowAsQuerier.setStatus('mandatory')
+mibBuilder.exportSymbols("INTEL-IGMP-PRUNING-MIB", confIgmpPruEnabled=confIgmpPruEnabled, confIgmpPruPortEnabled=confIgmpPruPortEnabled, confIgmpPruAllowAsQuerier=confIgmpPruAllowAsQuerier, igmppru=igmppru, confIgmpPruPortIndex=confIgmpPruPortIndex, conf=conf, confIgmpPruPortEntry=confIgmpPruPortEntry, confIgmpPruPortTable=confIgmpPruPortTable, confIgmpPruTimer=confIgmpPruTimer)

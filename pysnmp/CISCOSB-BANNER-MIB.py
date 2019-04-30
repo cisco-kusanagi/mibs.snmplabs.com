@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module CISCOSB-BANNER-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCOSB-BANNER-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:05:44 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint")
+switch001, = mibBuilder.importSymbols("CISCOSB-MIB", "switch001")
+EnabledStatus, = mibBuilder.importSymbols("P-BRIDGE-MIB", "EnabledStatus")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Unsigned32, Counter64, Integer32, MibIdentifier, TimeTicks, ModuleIdentity, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, NotificationType, ObjectIdentity, IpAddress, Gauge32, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Counter64", "Integer32", "MibIdentifier", "TimeTicks", "ModuleIdentity", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "NotificationType", "ObjectIdentity", "IpAddress", "Gauge32", "Bits")
+TextualConvention, RowStatus, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "RowStatus", "DisplayString")
+rlBanner = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133))
+rlBanner.setRevisions(('2007-12-16 00:00',))
+if mibBuilder.loadTexts: rlBanner.setLastUpdated('200803160000Z')
+if mibBuilder.loadTexts: rlBanner.setOrganization('Cisco Small Business')
+class BannerMessageType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("rlBannerMOTD", 1), ("rlBannerLogin", 2), ("rlBannerExec", 3))
+
+rlBannerMessageTable = MibTable((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 1), )
+if mibBuilder.loadTexts: rlBannerMessageTable.setStatus('current')
+rlBannerMessageEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 1, 1), ).setIndexNames((0, "CISCOSB-BANNER-MIB", "rlBannerMessageType"), (0, "CISCOSB-BANNER-MIB", "rlBannerMessageIndex"))
+if mibBuilder.loadTexts: rlBannerMessageEntry.setStatus('current')
+rlBannerMessageType = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 1, 1, 1), BannerMessageType())
+if mibBuilder.loadTexts: rlBannerMessageType.setStatus('current')
+rlBannerMessageIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 13)))
+if mibBuilder.loadTexts: rlBannerMessageIndex.setStatus('current')
+rlBannerMessageText = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 1, 1, 3), SnmpAdminString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlBannerMessageText.setStatus('current')
+rlBannerManageTable = MibTable((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 2), )
+if mibBuilder.loadTexts: rlBannerManageTable.setStatus('current')
+rlBannerManageEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 2, 1), ).setIndexNames((0, "CISCOSB-BANNER-MIB", "rlBannerMessageType"))
+if mibBuilder.loadTexts: rlBannerManageEntry.setStatus('current')
+rlBannerManageSSH = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 2, 1, 1), EnabledStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlBannerManageSSH.setStatus('current')
+rlBannerManageTelnet = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 2, 1, 2), EnabledStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlBannerManageTelnet.setStatus('current')
+rlBannerManageConsole = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 2, 1, 3), EnabledStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlBannerManageConsole.setStatus('current')
+rlBannerMessageClear = MibScalar((1, 3, 6, 1, 4, 1, 9, 6, 1, 101, 133, 3), BannerMessageType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlBannerMessageClear.setStatus('current')
+mibBuilder.exportSymbols("CISCOSB-BANNER-MIB", rlBannerMessageTable=rlBannerMessageTable, PYSNMP_MODULE_ID=rlBanner, rlBannerMessageIndex=rlBannerMessageIndex, rlBannerManageEntry=rlBannerManageEntry, rlBannerMessageClear=rlBannerMessageClear, rlBannerManageTelnet=rlBannerManageTelnet, rlBanner=rlBanner, rlBannerMessageEntry=rlBannerMessageEntry, rlBannerMessageText=rlBannerMessageText, rlBannerManageTable=rlBannerManageTable, rlBannerManageSSH=rlBannerManageSSH, BannerMessageType=BannerMessageType, rlBannerMessageType=rlBannerMessageType, rlBannerManageConsole=rlBannerManageConsole)

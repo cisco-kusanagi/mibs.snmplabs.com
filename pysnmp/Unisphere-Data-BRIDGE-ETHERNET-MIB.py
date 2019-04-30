@@ -1,0 +1,50 @@
+#
+# PySNMP MIB module Unisphere-Data-BRIDGE-ETHERNET-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Unisphere-Data-BRIDGE-ETHERNET-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:23:19 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion")
+InterfaceIndexOrZero, InterfaceIndex = mibBuilder.importSymbols("IF-MIB", "InterfaceIndexOrZero", "InterfaceIndex")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+Integer32, NotificationType, MibIdentifier, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, ModuleIdentity, TimeTicks, Unsigned32, Counter64, ObjectIdentity, iso, Bits, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "NotificationType", "MibIdentifier", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "ModuleIdentity", "TimeTicks", "Unsigned32", "Counter64", "ObjectIdentity", "iso", "Bits", "Gauge32")
+RowStatus, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "DisplayString", "TextualConvention")
+usDataMibs, = mibBuilder.importSymbols("Unisphere-Data-MIBs", "usDataMibs")
+UsdNextIfIndex, = mibBuilder.importSymbols("Unisphere-Data-TC", "UsdNextIfIndex")
+usdBridgeEthernetMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31))
+usdBridgeEthernetMIB.setRevisions(('2000-09-26 14:43', '2000-03-27 23:45', '1999-12-10 18:30',))
+if mibBuilder.loadTexts: usdBridgeEthernetMIB.setLastUpdated('200009261443Z')
+if mibBuilder.loadTexts: usdBridgeEthernetMIB.setOrganization('Unisphere Networks, Inc.')
+usdBridgedEthernetObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1))
+usdBridgedEthernetIfLayer = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1))
+usdBridgedEthernetNextIfIndex = MibScalar((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 1), UsdNextIfIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usdBridgedEthernetNextIfIndex.setStatus('current')
+usdBridgedEthernetIfTable = MibTable((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2), )
+if mibBuilder.loadTexts: usdBridgedEthernetIfTable.setStatus('current')
+usdBridgedEthernetIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1), ).setIndexNames((0, "Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetIfIfIndex"))
+if mibBuilder.loadTexts: usdBridgedEthernetIfEntry.setStatus('current')
+usdBridgedEthernetIfIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 1), InterfaceIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usdBridgedEthernetIfIfIndex.setStatus('current')
+usdBridgedEthernetProxyArp = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("enableRestricted", 1), ("enableUnrestricted", 2), ("disable", 3))).clone('enableRestricted')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdBridgedEthernetProxyArp.setStatus('obsolete')
+usdBridgedEthernetIfLowerIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 3), InterfaceIndexOrZero()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdBridgedEthernetIfLowerIfIndex.setStatus('current')
+usdBridgedEthernetIfRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: usdBridgedEthernetIfRowStatus.setStatus('current')
+usdBridgeEthernetConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4))
+usdBridgeEthernetCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 1))
+usdBridgeEthernetGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 2))
+usdBridgedEthernetCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 1, 1)).setObjects(("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetGroup2"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdBridgedEthernetCompliance = usdBridgedEthernetCompliance.setStatus('current')
+usdBridgedEthernetGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 2, 1)).setObjects(("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetNextIfIndex"), ("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetIfIfIndex"), ("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetProxyArp"), ("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetIfLowerIfIndex"), ("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetIfRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdBridgedEthernetGroup = usdBridgedEthernetGroup.setStatus('obsolete')
+usdBridgedEthernetGroup2 = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 2, 2)).setObjects(("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetNextIfIndex"), ("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetIfIfIndex"), ("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetIfLowerIfIndex"), ("Unisphere-Data-BRIDGE-ETHERNET-MIB", "usdBridgedEthernetIfRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdBridgedEthernetGroup2 = usdBridgedEthernetGroup2.setStatus('current')
+mibBuilder.exportSymbols("Unisphere-Data-BRIDGE-ETHERNET-MIB", usdBridgeEthernetCompliances=usdBridgeEthernetCompliances, usdBridgedEthernetIfLowerIfIndex=usdBridgedEthernetIfLowerIfIndex, usdBridgeEthernetMIB=usdBridgeEthernetMIB, usdBridgedEthernetIfRowStatus=usdBridgedEthernetIfRowStatus, usdBridgedEthernetIfTable=usdBridgedEthernetIfTable, usdBridgeEthernetConformance=usdBridgeEthernetConformance, usdBridgeEthernetGroups=usdBridgeEthernetGroups, PYSNMP_MODULE_ID=usdBridgeEthernetMIB, usdBridgedEthernetNextIfIndex=usdBridgedEthernetNextIfIndex, usdBridgedEthernetObjects=usdBridgedEthernetObjects, usdBridgedEthernetIfIfIndex=usdBridgedEthernetIfIfIndex, usdBridgedEthernetGroup=usdBridgedEthernetGroup, usdBridgedEthernetGroup2=usdBridgedEthernetGroup2, usdBridgedEthernetIfLayer=usdBridgedEthernetIfLayer, usdBridgedEthernetProxyArp=usdBridgedEthernetProxyArp, usdBridgedEthernetIfEntry=usdBridgedEthernetIfEntry, usdBridgedEthernetCompliance=usdBridgedEthernetCompliance)

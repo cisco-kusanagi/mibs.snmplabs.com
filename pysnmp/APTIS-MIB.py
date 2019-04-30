@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module APTIS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/APTIS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:08:39 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Bits, ModuleIdentity, Counter32, TimeTicks, Gauge32, Unsigned32, NotificationType, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, ObjectIdentity, MibIdentifier, Integer32, Counter64, enterprises = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "ModuleIdentity", "Counter32", "TimeTicks", "Gauge32", "Unsigned32", "NotificationType", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "ObjectIdentity", "MibIdentifier", "Integer32", "Counter64", "enterprises")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+aptisRootModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 2637, 1, 1, 1))
+if mibBuilder.loadTexts: aptisRootModule.setLastUpdated('0004140000Z')
+if mibBuilder.loadTexts: aptisRootModule.setOrganization('Nortel Networks')
+class Boolean(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1))
+    namedValues = NamedValues(("false", 0), ("true", 1))
+
+aptis = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637))
+if mibBuilder.loadTexts: aptis.setStatus('current')
+aptis_reg = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 1)).setLabel("aptis-reg")
+if mibBuilder.loadTexts: aptis_reg.setStatus('current')
+aptis_generic = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 2)).setLabel("aptis-generic")
+if mibBuilder.loadTexts: aptis_generic.setStatus('current')
+aptis_products = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 3)).setLabel("aptis-products")
+if mibBuilder.loadTexts: aptis_products.setStatus('current')
+aptis_config = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 2, 1)).setLabel("aptis-config")
+if mibBuilder.loadTexts: aptis_config.setStatus('current')
+aptis_monitoring = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 2, 2)).setLabel("aptis-monitoring")
+if mibBuilder.loadTexts: aptis_monitoring.setStatus('current')
+aptis_actions = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 2, 3)).setLabel("aptis-actions")
+if mibBuilder.loadTexts: aptis_actions.setStatus('current')
+aptis_exp = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 2, 4)).setLabel("aptis-exp")
+if mibBuilder.loadTexts: aptis_exp.setStatus('current')
+aptis_traps = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 2, 5)).setLabel("aptis-traps")
+if mibBuilder.loadTexts: aptis_traps.setStatus('current')
+config_sync = ObjectIdentity((1, 3, 6, 1, 4, 1, 2637, 2, 4, 2)).setLabel("config-sync")
+if mibBuilder.loadTexts: config_sync.setStatus('current')
+prevGenNum = MibScalar((1, 3, 6, 1, 4, 1, 2637, 2, 4, 2, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: prevGenNum.setStatus('current')
+deltaCount = MibScalar((1, 3, 6, 1, 4, 1, 2637, 2, 4, 2, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: deltaCount.setStatus('current')
+currentGenNum = MibScalar((1, 3, 6, 1, 4, 1, 2637, 2, 4, 2, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: currentGenNum.setStatus('current')
+mibBuilder.exportSymbols("APTIS-MIB", aptis_monitoring=aptis_monitoring, aptis=aptis, prevGenNum=prevGenNum, aptis_config=aptis_config, currentGenNum=currentGenNum, aptis_reg=aptis_reg, aptis_products=aptis_products, Boolean=Boolean, aptisRootModule=aptisRootModule, aptis_generic=aptis_generic, aptis_actions=aptis_actions, aptis_exp=aptis_exp, deltaCount=deltaCount, PYSNMP_MODULE_ID=aptisRootModule, aptis_traps=aptis_traps, config_sync=config_sync)

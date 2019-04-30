@@ -1,0 +1,46 @@
+#
+# PySNMP MIB module ENTERASYS-NETFLOW-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ENTERASYS-NETFLOW-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:49:51 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+etsysModules, = mibBuilder.importSymbols("ENTERASYS-MIB-NAMES", "etsysModules")
+InterfaceIndex, ifIndex = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex", "ifIndex")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+Counter64, iso, ModuleIdentity, MibIdentifier, Bits, Gauge32, IpAddress, Counter32, Integer32, ObjectIdentity, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "iso", "ModuleIdentity", "MibIdentifier", "Bits", "Gauge32", "IpAddress", "Counter32", "Integer32", "ObjectIdentity", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "TimeTicks")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+etsysNetflowMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61))
+etsysNetflowMIB.setRevisions(('2007-02-07 19:49', '2006-03-22 21:36',))
+if mibBuilder.loadTexts: etsysNetflowMIB.setLastUpdated('200702071949Z')
+if mibBuilder.loadTexts: etsysNetflowMIB.setOrganization('Enterasys Networks, Inc.')
+etsysNetflowObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1))
+etsysNetflowInterfaceMap = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1, 1))
+etsysNetflowExportIntfMapTable = MibTable((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1, 1, 1), )
+if mibBuilder.loadTexts: etsysNetflowExportIntfMapTable.setStatus('current')
+etsysNetflowExportIntfMapEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1, 1, 1, 1), ).setIndexNames((0, "ENTERASYS-NETFLOW-MIB", "etsysNetflowExportIntf"))
+if mibBuilder.loadTexts: etsysNetflowExportIntfMapEntry.setStatus('current')
+etsysNetflowExportIntf = MibTableColumn((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)))
+if mibBuilder.loadTexts: etsysNetflowExportIntf.setStatus('current')
+etsysNetflowIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1, 1, 1, 1, 2), InterfaceIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysNetflowIfIndex.setStatus('current')
+etsysNetflowIfIndexMapTable = MibTable((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1, 1, 2), )
+if mibBuilder.loadTexts: etsysNetflowIfIndexMapTable.setStatus('current')
+etsysNetflowIfIndexMapEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1, 1, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: etsysNetflowIfIndexMapEntry.setStatus('current')
+etsysNetflowExportInterface = MibTableColumn((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 1, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysNetflowExportInterface.setStatus('current')
+etsysNetflowConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 2))
+etsysNetflowGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 2, 1))
+etsysNetflowCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 2, 2))
+etsysNetflowIntfMapGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 2, 1, 1)).setObjects(("ENTERASYS-NETFLOW-MIB", "etsysNetflowExportIntf"), ("ENTERASYS-NETFLOW-MIB", "etsysNetflowIfIndex"), ("ENTERASYS-NETFLOW-MIB", "etsysNetflowExportInterface"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysNetflowIntfMapGroup = etsysNetflowIntfMapGroup.setStatus('current')
+etsysNetflowIntfMapCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5624, 1, 2, 61, 2, 2, 1)).setObjects(("ENTERASYS-NETFLOW-MIB", "etsysNetflowIntfMapGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysNetflowIntfMapCompliance = etsysNetflowIntfMapCompliance.setStatus('current')
+mibBuilder.exportSymbols("ENTERASYS-NETFLOW-MIB", etsysNetflowIfIndex=etsysNetflowIfIndex, etsysNetflowIntfMapGroup=etsysNetflowIntfMapGroup, etsysNetflowIntfMapCompliance=etsysNetflowIntfMapCompliance, etsysNetflowIfIndexMapTable=etsysNetflowIfIndexMapTable, etsysNetflowExportInterface=etsysNetflowExportInterface, etsysNetflowCompliances=etsysNetflowCompliances, etsysNetflowGroups=etsysNetflowGroups, etsysNetflowInterfaceMap=etsysNetflowInterfaceMap, etsysNetflowExportIntf=etsysNetflowExportIntf, etsysNetflowExportIntfMapTable=etsysNetflowExportIntfMapTable, etsysNetflowExportIntfMapEntry=etsysNetflowExportIntfMapEntry, PYSNMP_MODULE_ID=etsysNetflowMIB, etsysNetflowConformance=etsysNetflowConformance, etsysNetflowMIB=etsysNetflowMIB, etsysNetflowObjects=etsysNetflowObjects, etsysNetflowIfIndexMapEntry=etsysNetflowIfIndexMapEntry)

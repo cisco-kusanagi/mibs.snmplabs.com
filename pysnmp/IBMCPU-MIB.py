@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module IBMCPU-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/IBMCPU-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:39:56 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, Counter32, IpAddress, iso, MibIdentifier, enterprises, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Gauge32, NotificationType, Counter64, ObjectIdentity, Bits, Integer32, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Counter32", "IpAddress", "iso", "MibIdentifier", "enterprises", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Gauge32", "NotificationType", "Counter64", "ObjectIdentity", "Bits", "Integer32", "Unsigned32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ibm = MibIdentifier((1, 3, 6, 1, 4, 1, 2))
+ibmProd = MibIdentifier((1, 3, 6, 1, 4, 1, 2, 6))
+ibm6611 = MibIdentifier((1, 3, 6, 1, 4, 1, 2, 6, 2))
+ibmsystem = MibIdentifier((1, 3, 6, 1, 4, 1, 2, 6, 2, 4))
+netView6000SubAgent = MibIdentifier((1, 3, 6, 1, 4, 1, 2, 6, 4))
+nv6saComputerSystem = MibIdentifier((1, 3, 6, 1, 4, 1, 2, 6, 4, 5))
+nv6saComputerSystemLoad = MibScalar((1, 3, 6, 1, 4, 1, 2, 6, 4, 5, 1), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nv6saComputerSystemLoad.setStatus('mandatory')
+ibmMainProcessorLoadTable = MibTable((1, 3, 6, 1, 4, 1, 2, 6, 2, 4, 1), )
+if mibBuilder.loadTexts: ibmMainProcessorLoadTable.setStatus('mandatory')
+ibmMainProcessorLoadEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2, 6, 2, 4, 1, 1), ).setIndexNames((0, "IBMCPU-MIB", "ibmMainProcessorLoadIndex"))
+if mibBuilder.loadTexts: ibmMainProcessorLoadEntry.setStatus('mandatory')
+ibmMainProcessorLoadIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2, 6, 2, 4, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 60))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ibmMainProcessorLoadIndex.setStatus('mandatory')
+ibmMainProcessorLoad = MibTableColumn((1, 3, 6, 1, 4, 1, 2, 6, 2, 4, 1, 1, 2), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ibmMainProcessorLoad.setStatus('mandatory')
+mibBuilder.exportSymbols("IBMCPU-MIB", ibmMainProcessorLoad=ibmMainProcessorLoad, nv6saComputerSystem=nv6saComputerSystem, nv6saComputerSystemLoad=nv6saComputerSystemLoad, ibmMainProcessorLoadTable=ibmMainProcessorLoadTable, ibmProd=ibmProd, ibm=ibm, ibmMainProcessorLoadEntry=ibmMainProcessorLoadEntry, ibmMainProcessorLoadIndex=ibmMainProcessorLoadIndex, ibmsystem=ibmsystem, ibm6611=ibm6611, netView6000SubAgent=netView6000SubAgent)

@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module DNMSALARM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DNMSALARM-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:36:23 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+dynaCommGeneral, = mibBuilder.importSymbols("DYNATECHCOMMUNICATIONS-MIB", "dynaCommGeneral")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, Integer32, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, IpAddress, ModuleIdentity, NotificationType, MibIdentifier, Unsigned32, Bits, TimeTicks, Counter32, Gauge32, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Integer32", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "IpAddress", "ModuleIdentity", "NotificationType", "MibIdentifier", "Unsigned32", "Bits", "TimeTicks", "Counter32", "Gauge32", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+dnmsAlarm = MibIdentifier((1, 3, 6, 1, 4, 1, 384, 2, 1))
+dnmsAlarmEnable = MibScalar((1, 3, 6, 1, 4, 1, 384, 2, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dnmsAlarmEnable.setStatus('mandatory')
+dnmsAlarmTable = MibTable((1, 3, 6, 1, 4, 1, 384, 2, 1, 2), )
+if mibBuilder.loadTexts: dnmsAlarmTable.setStatus('mandatory')
+dnmsAlarmEntry = MibTableRow((1, 3, 6, 1, 4, 1, 384, 2, 1, 2, 1), )
+if mibBuilder.loadTexts: dnmsAlarmEntry.setStatus('mandatory')
+dnmsAlarmEntryIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 384, 2, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33))).clone(namedValues=NamedValues(("x25-lev1-dn", 1), ("x25-lev1-up", 2), ("x25-lev2-dn", 3), ("x25-lev2-up", 4), ("x25-lev3-dn", 5), ("x25-lev3-up", 6), ("fcs-err", 7), ("cdrlost", 8), ("almlost", 9), ("stalost", 10), ("dev-up", 11), ("dev-dn", 12), ("psufail", 13), ("card-primem", 14), ("card-secmem", 15), ("card-primstr", 16), ("card-secmstr", 17), ("card-linecrd", 18), ("x28-portX28", 19), ("x28-portPkt", 20), ("x28-inact", 21), ("dllinit", 22), ("dllok", 23), ("dllfail", 24), ("fr-nt1time", 25), ("fr-nt2imte", 26), ("fr-nn4count", 27), ("fr-invmsg", 28), ("tpad-nak-ex", 29), ("tpad-slowPoll", 30), ("tpad-normPoll", 31), ("tpad-CD-down", 32), ("tpad-CD-up", 33)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: dnmsAlarmEntryIndex.setStatus('mandatory')
+dnmsAlarmEntryEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 384, 2, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dnmsAlarmEntryEnable.setStatus('mandatory')
+dnmsAlarmEntryDescr = MibTableColumn((1, 3, 6, 1, 4, 1, 384, 2, 1, 2, 1, 3), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: dnmsAlarmEntryDescr.setStatus('mandatory')
+dnmsAlarmTrap = NotificationType((1, 3, 6, 1, 4, 1, 384, 2, 1) + (0,1)).setObjects(("IF-MIB", "ifIndex"), ("DNMSALARM-MIB", "dnmsAlarmEntryIndex"), ("DNMSALARM-MIB", "dnmsAlarmEntryDescr"))
+mibBuilder.exportSymbols("DNMSALARM-MIB", dnmsAlarmTable=dnmsAlarmTable, dnmsAlarmEntryDescr=dnmsAlarmEntryDescr, dnmsAlarmTrap=dnmsAlarmTrap, dnmsAlarm=dnmsAlarm, dnmsAlarmEntryIndex=dnmsAlarmEntryIndex, dnmsAlarmEntry=dnmsAlarmEntry, dnmsAlarmEntryEnable=dnmsAlarmEntryEnable, dnmsAlarmEnable=dnmsAlarmEnable)

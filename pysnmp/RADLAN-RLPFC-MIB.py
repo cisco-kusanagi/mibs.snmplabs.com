@@ -1,0 +1,46 @@
+#
+# PySNMP MIB module RADLAN-RLPFC-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RADLAN-RLPFC-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:40:21 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+rnd, = mibBuilder.importSymbols("RADLAN-MIB", "rnd")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Integer32, iso, Counter64, ObjectIdentity, Bits, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, Counter32, IpAddress, Gauge32, NotificationType, MibIdentifier, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "iso", "Counter64", "ObjectIdentity", "Bits", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "Counter32", "IpAddress", "Gauge32", "NotificationType", "MibIdentifier", "ModuleIdentity")
+TextualConvention, DisplayString, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "TruthValue")
+rlPfcMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 89, 148))
+rlPfcMib.setRevisions(('2010-04-18 00:00',))
+if mibBuilder.loadTexts: rlPfcMib.setLastUpdated('201004180000Z')
+if mibBuilder.loadTexts: rlPfcMib.setOrganization('Radlan Computer Communications Ltd.')
+class RlPfcPriority(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 7)
+
+rlPfcGlobalEnable = MibScalar((1, 3, 6, 1, 4, 1, 89, 148, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlPfcGlobalEnable.setStatus('current')
+rlPfcPortTable = MibTable((1, 3, 6, 1, 4, 1, 89, 148, 2), )
+if mibBuilder.loadTexts: rlPfcPortTable.setStatus('current')
+rlPfcPortEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 148, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: rlPfcPortEntry.setStatus('current')
+rlPfcPortEnableAdmin = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 148, 2, 1, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlPfcPortEnableAdmin.setStatus('current')
+rlPfcPortEnableOper = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 148, 2, 1, 2), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlPfcPortEnableOper.setStatus('current')
+rlPfcPriorityTable = MibTable((1, 3, 6, 1, 4, 1, 89, 148, 3), )
+if mibBuilder.loadTexts: rlPfcPriorityTable.setStatus('current')
+rlPfcPriorityEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 148, 3, 1), ).setIndexNames((0, "RADLAN-RLPFC-MIB", "rlPfcPriority"))
+if mibBuilder.loadTexts: rlPfcPriorityEntry.setStatus('current')
+rlPfcPriority = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 148, 3, 1, 1), RlPfcPriority())
+if mibBuilder.loadTexts: rlPfcPriority.setStatus('current')
+rlPfcPriorityEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 148, 3, 1, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlPfcPriorityEnable.setStatus('current')
+rlPfcPriorityEnableOperStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 148, 3, 1, 3), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlPfcPriorityEnableOperStatus.setStatus('current')
+rlPfcPriorityEnableOperStatusReason = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 148, 3, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("ok", 1), ("pfcGlobalDis", 2), ("pfcPriorityAdminDis", 3), ("queue0", 4), ("sharedQueue", 5), ("notSameQueue", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlPfcPriorityEnableOperStatusReason.setStatus('current')
+mibBuilder.exportSymbols("RADLAN-RLPFC-MIB", rlPfcPriorityEnableOperStatusReason=rlPfcPriorityEnableOperStatusReason, rlPfcMib=rlPfcMib, rlPfcPriorityEnable=rlPfcPriorityEnable, rlPfcPortEnableOper=rlPfcPortEnableOper, rlPfcPortTable=rlPfcPortTable, rlPfcPriorityEntry=rlPfcPriorityEntry, rlPfcPriority=rlPfcPriority, rlPfcPriorityEnableOperStatus=rlPfcPriorityEnableOperStatus, rlPfcGlobalEnable=rlPfcGlobalEnable, rlPfcPriorityTable=rlPfcPriorityTable, RlPfcPriority=RlPfcPriority, PYSNMP_MODULE_ID=rlPfcMib, rlPfcPortEntry=rlPfcPortEntry, rlPfcPortEnableAdmin=rlPfcPortEnableAdmin)
