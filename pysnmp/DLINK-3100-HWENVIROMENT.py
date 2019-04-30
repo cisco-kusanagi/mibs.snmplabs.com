@@ -1,0 +1,47 @@
+#
+# PySNMP MIB module DLINK-3100-HWENVIROMENT (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DLINK-3100-HWENVIROMENT
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:33:30 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection")
+rnd, = mibBuilder.importSymbols("DLINK-3100-MIB", "rnd")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, NotificationType, Integer32, MibIdentifier, Bits, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, ObjectIdentity, IpAddress, Counter32, Counter64, Gauge32, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "NotificationType", "Integer32", "MibIdentifier", "Bits", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "ObjectIdentity", "IpAddress", "Counter32", "Counter64", "Gauge32", "Unsigned32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+rlEnv = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83))
+rlEnv.setRevisions(('2003-09-21 00:00',))
+if mibBuilder.loadTexts: rlEnv.setLastUpdated('200309210000Z')
+if mibBuilder.loadTexts: rlEnv.setOrganization('Dlink, Inc.')
+class RlEnvMonState(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))
+    namedValues = NamedValues(("normal", 1), ("warning", 2), ("critical", 3), ("shutdown", 4), ("notPresent", 5), ("notFunctioning", 6))
+
+rlEnvPhysicalDescription = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1))
+rlEnvMonFanStatusTable = MibTable((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 1), )
+if mibBuilder.loadTexts: rlEnvMonFanStatusTable.setStatus('current')
+rlEnvMonFanStatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 1, 1), ).setIndexNames((0, "DLINK-3100-HWENVIROMENT", "rlEnvMonFanStatusIndex"))
+if mibBuilder.loadTexts: rlEnvMonFanStatusEntry.setStatus('current')
+rlEnvMonFanStatusIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 1, 1, 1), Integer32())
+if mibBuilder.loadTexts: rlEnvMonFanStatusIndex.setStatus('current')
+rlEnvMonFanStatusDescr = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 1, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlEnvMonFanStatusDescr.setStatus('current')
+rlEnvMonFanState = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 1, 1, 3), RlEnvMonState()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlEnvMonFanState.setStatus('current')
+rlEnvMonSupplyStatusTable = MibTable((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 2), )
+if mibBuilder.loadTexts: rlEnvMonSupplyStatusTable.setStatus('current')
+rlEnvMonSupplyStatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 2, 1), ).setIndexNames((0, "DLINK-3100-HWENVIROMENT", "rlEnvMonSupplyStatusIndex"))
+if mibBuilder.loadTexts: rlEnvMonSupplyStatusEntry.setStatus('current')
+rlEnvMonSupplyStatusIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)))
+if mibBuilder.loadTexts: rlEnvMonSupplyStatusIndex.setStatus('current')
+rlEnvMonSupplyStatusDescr = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 2, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlEnvMonSupplyStatusDescr.setStatus('current')
+rlEnvMonSupplyState = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 2, 1, 3), RlEnvMonState()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlEnvMonSupplyState.setStatus('current')
+rlEnvMonSupplySource = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 83, 1, 2, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("unknown", 1), ("ac", 2), ("dc", 3), ("externalPowerSupply", 4), ("internalRedundant", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlEnvMonSupplySource.setStatus('current')
+mibBuilder.exportSymbols("DLINK-3100-HWENVIROMENT", rlEnvMonFanState=rlEnvMonFanState, rlEnvMonSupplyState=rlEnvMonSupplyState, rlEnv=rlEnv, rlEnvMonSupplySource=rlEnvMonSupplySource, RlEnvMonState=RlEnvMonState, rlEnvMonSupplyStatusDescr=rlEnvMonSupplyStatusDescr, PYSNMP_MODULE_ID=rlEnv, rlEnvMonFanStatusIndex=rlEnvMonFanStatusIndex, rlEnvMonSupplyStatusEntry=rlEnvMonSupplyStatusEntry, rlEnvMonSupplyStatusTable=rlEnvMonSupplyStatusTable, rlEnvPhysicalDescription=rlEnvPhysicalDescription, rlEnvMonSupplyStatusIndex=rlEnvMonSupplyStatusIndex, rlEnvMonFanStatusTable=rlEnvMonFanStatusTable, rlEnvMonFanStatusDescr=rlEnvMonFanStatusDescr, rlEnvMonFanStatusEntry=rlEnvMonFanStatusEntry)

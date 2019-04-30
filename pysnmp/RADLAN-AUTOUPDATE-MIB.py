@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module RADLAN-AUTOUPDATE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RADLAN-AUTOUPDATE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:36:45 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+rnd, = mibBuilder.importSymbols("RADLAN-MIB", "rnd")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, Counter32, ObjectIdentity, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, Unsigned32, IpAddress, TimeTicks, MibIdentifier, ModuleIdentity, Counter64, iso, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "Counter32", "ObjectIdentity", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "Unsigned32", "IpAddress", "TimeTicks", "MibIdentifier", "ModuleIdentity", "Counter64", "iso", "NotificationType")
+TruthValue, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "TextualConvention", "DisplayString")
+rlAutoUpdate = ModuleIdentity((1, 3, 6, 1, 4, 1, 89, 123))
+if mibBuilder.loadTexts: rlAutoUpdate.setLastUpdated('2007010600Z')
+if mibBuilder.loadTexts: rlAutoUpdate.setOrganization('Radlan Computer Communications Ltd.')
+rlAutoUpdateEnable = MibScalar((1, 3, 6, 1, 4, 1, 89, 123, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateEnable.setStatus('current')
+rlAutoUpdateFilesBoot = MibScalar((1, 3, 6, 1, 4, 1, 89, 123, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateFilesBoot.setStatus('current')
+rlAutoUpdateFilesImage = MibScalar((1, 3, 6, 1, 4, 1, 89, 123, 3), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateFilesImage.setStatus('current')
+rlAutoUpdateFilesConf = MibScalar((1, 3, 6, 1, 4, 1, 89, 123, 4), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateFilesConf.setStatus('current')
+rlAutoUpdateCopyEnable = MibScalar((1, 3, 6, 1, 4, 1, 89, 123, 5), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateCopyEnable.setStatus('current')
+rlAutoUpdatePreserveIP = MibScalar((1, 3, 6, 1, 4, 1, 89, 123, 6), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdatePreserveIP.setStatus('current')
+mibBuilder.exportSymbols("RADLAN-AUTOUPDATE-MIB", PYSNMP_MODULE_ID=rlAutoUpdate, rlAutoUpdateFilesBoot=rlAutoUpdateFilesBoot, rlAutoUpdateFilesConf=rlAutoUpdateFilesConf, rlAutoUpdateEnable=rlAutoUpdateEnable, rlAutoUpdateFilesImage=rlAutoUpdateFilesImage, rlAutoUpdatePreserveIP=rlAutoUpdatePreserveIP, rlAutoUpdateCopyEnable=rlAutoUpdateCopyEnable, rlAutoUpdate=rlAutoUpdate)

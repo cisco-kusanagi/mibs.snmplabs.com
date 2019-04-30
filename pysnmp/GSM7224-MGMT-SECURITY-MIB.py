@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module GSM7224-MGMT-SECURITY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/GSM7224-MGMT-SECURITY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:06:33 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint")
+gsm7224, = mibBuilder.importSymbols("GSM7224-REF-MIB", "gsm7224")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, Unsigned32, TimeTicks, ModuleIdentity, Counter64, Gauge32, MibIdentifier, iso, Bits, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, NotificationType, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "Unsigned32", "TimeTicks", "ModuleIdentity", "Counter64", "Gauge32", "MibIdentifier", "iso", "Bits", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "NotificationType", "IpAddress")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+gsm7224MgmtSecurity = ModuleIdentity((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11))
+gsm7224MgmtSecurity.setRevisions(('2003-11-21 00:00',))
+if mibBuilder.loadTexts: gsm7224MgmtSecurity.setLastUpdated('200311210000Z')
+if mibBuilder.loadTexts: gsm7224MgmtSecurity.setOrganization('Netgear')
+agentSSLConfigGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11, 1))
+agentSSLAdminMode = MibScalar((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: agentSSLAdminMode.setStatus('current')
+agentSSLSecurePort = MibScalar((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: agentSSLSecurePort.setStatus('current')
+agentSSLProtocolLevel = MibScalar((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("ssl30", 1), ("tls10", 2), ("both", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: agentSSLProtocolLevel.setStatus('current')
+agentSSHConfigGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11, 2))
+agentSSHAdminMode = MibScalar((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11, 2, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: agentSSHAdminMode.setStatus('current')
+agentSSHProtocolLevel = MibScalar((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11, 2, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("ssh10", 1), ("ssh20", 2), ("both", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: agentSSHProtocolLevel.setStatus('current')
+agentSSHSessionsCount = MibScalar((1, 3, 6, 1, 4, 1, 4526, 1, 8, 11, 2, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: agentSSHSessionsCount.setStatus('current')
+mibBuilder.exportSymbols("GSM7224-MGMT-SECURITY-MIB", agentSSHConfigGroup=agentSSHConfigGroup, agentSSLConfigGroup=agentSSLConfigGroup, PYSNMP_MODULE_ID=gsm7224MgmtSecurity, agentSSLAdminMode=agentSSLAdminMode, agentSSLSecurePort=agentSSLSecurePort, agentSSHSessionsCount=agentSSHSessionsCount, agentSSHAdminMode=agentSSHAdminMode, gsm7224MgmtSecurity=gsm7224MgmtSecurity, agentSSLProtocolLevel=agentSSLProtocolLevel, agentSSHProtocolLevel=agentSSHProtocolLevel)

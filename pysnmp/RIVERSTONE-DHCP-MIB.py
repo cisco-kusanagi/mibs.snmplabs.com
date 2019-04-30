@@ -1,0 +1,66 @@
+#
+# PySNMP MIB module RIVERSTONE-DHCP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RIVERSTONE-DHCP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:49:05 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint")
+InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddress")
+riverstoneMibs, = mibBuilder.importSymbols("RIVERSTONE-SMI-MIB", "riverstoneMibs")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, ObjectIdentity, ModuleIdentity, iso, Counter64, Unsigned32, Integer32, NotificationType, IpAddress, Bits, TimeTicks, Gauge32, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "ObjectIdentity", "ModuleIdentity", "iso", "Counter64", "Unsigned32", "Integer32", "NotificationType", "IpAddress", "Bits", "TimeTicks", "Gauge32", "Counter32")
+DisplayString, TextualConvention, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention", "TruthValue")
+rsDhcpMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5567, 2, 50))
+rsDhcpMIB.setRevisions(('2002-09-10 00:00',))
+if mibBuilder.loadTexts: rsDhcpMIB.setLastUpdated('200209100000Z')
+if mibBuilder.loadTexts: rsDhcpMIB.setOrganization('Riverstone Networks Inc.')
+class RsErrorCode(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8))
+    namedValues = NamedValues(("noStatus", 1), ("timeout", 2), ("networkError", 3), ("noSpace", 4), ("invalidConfig", 5), ("commandCompleted", 6), ("internalError", 7), ("tftpServerError", 8))
+
+rsDhcpNotifications = ObjectIdentity((1, 3, 6, 1, 4, 1, 5567, 2, 50, 0))
+if mibBuilder.loadTexts: rsDhcpNotifications.setStatus('current')
+rsDhcpLeaseFileGroup = ObjectIdentity((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5))
+if mibBuilder.loadTexts: rsDhcpLeaseFileGroup.setStatus('current')
+rsDhcpConfigGroup = ObjectIdentity((1, 3, 6, 1, 4, 1, 5567, 2, 50, 10))
+if mibBuilder.loadTexts: rsDhcpConfigGroup.setStatus('current')
+rsDhcpStatisticsGroup = ObjectIdentity((1, 3, 6, 1, 4, 1, 5567, 2, 50, 15))
+if mibBuilder.loadTexts: rsDhcpStatisticsGroup.setStatus('current')
+rsDhcpLeaseFileTransferOp = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noop", 1), ("sendLeaseFileToAgent", 2), ("receiveLeaseFileFromAgent", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsDhcpLeaseFileTransferOp.setStatus('current')
+rsDhcpLeaseFileManagerAddressType = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5, 2), InetAddressType().clone('ipv4')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsDhcpLeaseFileManagerAddressType.setStatus('current')
+rsDhcpLeaseFileManagerAddress = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5, 3), InetAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsDhcpLeaseFileManagerAddress.setStatus('current')
+rsDhcpLeaseFileFileName = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5, 4), DisplayString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsDhcpLeaseFileFileName.setStatus('current')
+rsDhcpLeaseFileActivateTransfer = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5, 5), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsDhcpLeaseFileActivateTransfer.setStatus('current')
+rsDhcpLeaseFileTransferStatus = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("idle", 1), ("sending", 2), ("receiving", 3), ("transferComplete", 4), ("error", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsDhcpLeaseFileTransferStatus.setStatus('current')
+rsDhcpLeaseFileLastError = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5, 7), RsErrorCode()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsDhcpLeaseFileLastError.setStatus('current')
+rsDhcpLeaseFileLastErrorReason = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 5, 8), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsDhcpLeaseFileLastErrorReason.setStatus('current')
+rsDhcpMaxClientsAllowed = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 15, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsDhcpMaxClientsAllowed.setStatus('current')
+rsDhcpNumberOfClients = MibScalar((1, 3, 6, 1, 4, 1, 5567, 2, 50, 15, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rsDhcpNumberOfClients.setStatus('current')
+rsDhcpConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 50, 3))
+rsDhcpCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 50, 3, 1))
+rsDhcpGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 5567, 2, 50, 3, 2))
+rsDhcpCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5567, 2, 50, 3, 1, 1)).setObjects(("RIVERSTONE-DHCP-MIB", "rsDhcpGroup1"), ("RIVERSTONE-DHCP-MIB", "rsDhcpGroup2"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsDhcpCompliance = rsDhcpCompliance.setStatus('current')
+rsDhcpGroup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 5567, 2, 50, 3, 2, 1)).setObjects(("RIVERSTONE-DHCP-MIB", "rsDhcpLeaseFileTransferOp"), ("RIVERSTONE-DHCP-MIB", "rsDhcpLeaseFileManagerAddressType"), ("RIVERSTONE-DHCP-MIB", "rsDhcpLeaseFileManagerAddress"), ("RIVERSTONE-DHCP-MIB", "rsDhcpLeaseFileFileName"), ("RIVERSTONE-DHCP-MIB", "rsDhcpLeaseFileActivateTransfer"), ("RIVERSTONE-DHCP-MIB", "rsDhcpLeaseFileTransferStatus"), ("RIVERSTONE-DHCP-MIB", "rsDhcpLeaseFileLastError"), ("RIVERSTONE-DHCP-MIB", "rsDhcpLeaseFileLastErrorReason"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsDhcpGroup1 = rsDhcpGroup1.setStatus('current')
+rsDhcpGroup2 = ObjectGroup((1, 3, 6, 1, 4, 1, 5567, 2, 50, 3, 2, 2)).setObjects(("RIVERSTONE-DHCP-MIB", "rsDhcpMaxClientsAllowed"), ("RIVERSTONE-DHCP-MIB", "rsDhcpNumberOfClients"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsDhcpGroup2 = rsDhcpGroup2.setStatus('current')
+mibBuilder.exportSymbols("RIVERSTONE-DHCP-MIB", rsDhcpGroup2=rsDhcpGroup2, rsDhcpConfigGroup=rsDhcpConfigGroup, rsDhcpLeaseFileFileName=rsDhcpLeaseFileFileName, rsDhcpMIB=rsDhcpMIB, rsDhcpCompliance=rsDhcpCompliance, rsDhcpGroup1=rsDhcpGroup1, rsDhcpMaxClientsAllowed=rsDhcpMaxClientsAllowed, PYSNMP_MODULE_ID=rsDhcpMIB, rsDhcpNumberOfClients=rsDhcpNumberOfClients, rsDhcpLeaseFileActivateTransfer=rsDhcpLeaseFileActivateTransfer, rsDhcpStatisticsGroup=rsDhcpStatisticsGroup, rsDhcpNotifications=rsDhcpNotifications, rsDhcpLeaseFileTransferOp=rsDhcpLeaseFileTransferOp, RsErrorCode=RsErrorCode, rsDhcpLeaseFileLastError=rsDhcpLeaseFileLastError, rsDhcpLeaseFileManagerAddressType=rsDhcpLeaseFileManagerAddressType, rsDhcpLeaseFileManagerAddress=rsDhcpLeaseFileManagerAddress, rsDhcpLeaseFileLastErrorReason=rsDhcpLeaseFileLastErrorReason, rsDhcpGroups=rsDhcpGroups, rsDhcpLeaseFileGroup=rsDhcpLeaseFileGroup, rsDhcpCompliances=rsDhcpCompliances, rsDhcpLeaseFileTransferStatus=rsDhcpLeaseFileTransferStatus, rsDhcpConformance=rsDhcpConformance)

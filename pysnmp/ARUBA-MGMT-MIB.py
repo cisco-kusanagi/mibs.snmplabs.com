@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module ARUBA-MGMT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ARUBA-MGMT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:09:48 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+arubaMgmt, = mibBuilder.importSymbols("ARUBA-MIB", "arubaMgmt")
+ArubaEnableValue, = mibBuilder.importSymbols("ARUBA-TC", "ArubaEnableValue")
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+iso, IpAddress, MibIdentifier, Integer32, Counter32, snmpModules, ObjectIdentity, Unsigned32, NotificationType, Bits, ModuleIdentity, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Counter64, ObjectName = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "IpAddress", "MibIdentifier", "Integer32", "Counter32", "snmpModules", "ObjectIdentity", "Unsigned32", "NotificationType", "Bits", "ModuleIdentity", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Counter64", "ObjectName")
+DisplayString, TimeStamp, TextualConvention, TruthValue, PhysAddress, TestAndIncr = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TimeStamp", "TextualConvention", "TruthValue", "PhysAddress", "TestAndIncr")
+arubaMgmtExtensions = ModuleIdentity((1, 3, 6, 1, 4, 1, 14823, 3, 3))
+if mibBuilder.loadTexts: arubaMgmtExtensions.setLastUpdated('0804160206Z')
+if mibBuilder.loadTexts: arubaMgmtExtensions.setOrganization('Aruba Wireless Networks')
+arubaMgmtGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 14823, 3, 3, 1))
+arubaGetTable = MibScalar((1, 3, 6, 1, 4, 1, 14823, 3, 3, 1, 1), ObjectIdentifier())
+if mibBuilder.loadTexts: arubaGetTable.setStatus('current')
+arubaNumberOfRows = MibScalar((1, 3, 6, 1, 4, 1, 14823, 3, 3, 1, 2), Integer32())
+if mibBuilder.loadTexts: arubaNumberOfRows.setStatus('current')
+arubaRowInstance = MibScalar((1, 3, 6, 1, 4, 1, 14823, 3, 3, 1, 3), ObjectIdentifier())
+if mibBuilder.loadTexts: arubaRowInstance.setStatus('current')
+arubaGetTableStatus = MibScalar((1, 3, 6, 1, 4, 1, 14823, 3, 3, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("endTable", 1), ("moreTable", 2), ("retrieveError", 3), ("noAmpSupport", 4), ("invalidColumnID", 5), ("resourceAllocationFailure", 6))))
+if mibBuilder.loadTexts: arubaGetTableStatus.setStatus('current')
+arubaNumberOfColumns = MibScalar((1, 3, 6, 1, 4, 1, 14823, 3, 3, 1, 5), Integer32())
+if mibBuilder.loadTexts: arubaNumberOfColumns.setStatus('current')
+arubaSwitchAMPSupport = MibScalar((1, 3, 6, 1, 4, 1, 14823, 3, 3, 1, 6), ArubaEnableValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: arubaSwitchAMPSupport.setStatus('current')
+mibBuilder.exportSymbols("ARUBA-MGMT-MIB", arubaMgmtExtensions=arubaMgmtExtensions, arubaGetTable=arubaGetTable, arubaNumberOfColumns=arubaNumberOfColumns, arubaGetTableStatus=arubaGetTableStatus, PYSNMP_MODULE_ID=arubaMgmtExtensions, arubaNumberOfRows=arubaNumberOfRows, arubaMgmtGroup=arubaMgmtGroup, arubaSwitchAMPSupport=arubaSwitchAMPSupport, arubaRowInstance=arubaRowInstance)

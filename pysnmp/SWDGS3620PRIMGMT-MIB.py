@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module SWDGS3620PRIMGMT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SWDGS3620PRIMGMT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:29:12 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint")
+dlink_mgmt, dlink_products = mibBuilder.importSymbols("DLINK-ID-REC-MIB", "dlink-mgmt", "dlink-products")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Unsigned32, iso, MibIdentifier, Counter32, ObjectIdentity, IpAddress, ModuleIdentity, NotificationType, TimeTicks, Integer32, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Unsigned32", "iso", "MibIdentifier", "Counter32", "ObjectIdentity", "IpAddress", "ModuleIdentity", "NotificationType", "TimeTicks", "Integer32", "Bits")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+dlink_Dgs3620Prod = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 118)).setLabel("dlink-Dgs3620Prod")
+dlink_Dgs3620Prod_Dgs3620_28TC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 118, 1)).setLabel("dlink-Dgs3620Prod-Dgs3620-28TC")
+dlink_Dgs3620Prod_Dgs3620_28SC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 118, 2)).setLabel("dlink-Dgs3620Prod-Dgs3620-28SC")
+dlink_Dgs3620Prod_Dgs3620_28PC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 118, 3)).setLabel("dlink-Dgs3620Prod-Dgs3620-28PC")
+dlink_Dgs3620Prod_Dgs3620_52T = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 118, 4)).setLabel("dlink-Dgs3620Prod-Dgs3620-52T")
+dlink_Dgs3620Prod_Dgs3620_52P = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 118, 5)).setLabel("dlink-Dgs3620Prod-Dgs3620-52P")
+dlink_Dgs3620Prod_Dgs3620_28TC_DC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 118, 8)).setLabel("dlink-Dgs3620Prod-Dgs3620-28TC-DC")
+dlink_Dgs3620Prod_Dgs3620_28SC_DC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 118, 9)).setLabel("dlink-Dgs3620Prod-Dgs3620-28SC-DC")
+dlink_Dgs3620Proj = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 118)).setLabel("dlink-Dgs3620Proj")
+dlink_Dgs3620Proj_Dgs3620_28TC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 118, 1)).setLabel("dlink-Dgs3620Proj-Dgs3620-28TC")
+dlink_Dgs3620Proj_Dgs3620_28SC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 118, 2)).setLabel("dlink-Dgs3620Proj-Dgs3620-28SC")
+dlink_Dgs3620Proj_Dgs3620_28PC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 118, 3)).setLabel("dlink-Dgs3620Proj-Dgs3620-28PC")
+dlink_Dgs3620Proj_Dgs3620_52T = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 118, 4)).setLabel("dlink-Dgs3620Proj-Dgs3620-52T")
+dlink_Dgs3620Proj_Dgs3620_52P = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 118, 5)).setLabel("dlink-Dgs3620Proj-Dgs3620-52P")
+dlink_Dgs3620Proj_Dgs3620_28TC_DC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 118, 8)).setLabel("dlink-Dgs3620Proj-Dgs3620-28TC-DC")
+dlink_Dgs3620Proj_Dgs3620_28SC_DC = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 118, 9)).setLabel("dlink-Dgs3620Proj-Dgs3620-28SC-DC")
+mibBuilder.exportSymbols("SWDGS3620PRIMGMT-MIB", dlink_Dgs3620Proj_Dgs3620_28PC=dlink_Dgs3620Proj_Dgs3620_28PC, dlink_Dgs3620Prod_Dgs3620_28PC=dlink_Dgs3620Prod_Dgs3620_28PC, dlink_Dgs3620Prod_Dgs3620_28TC_DC=dlink_Dgs3620Prod_Dgs3620_28TC_DC, dlink_Dgs3620Proj_Dgs3620_28SC=dlink_Dgs3620Proj_Dgs3620_28SC, dlink_Dgs3620Prod_Dgs3620_28SC_DC=dlink_Dgs3620Prod_Dgs3620_28SC_DC, dlink_Dgs3620Proj_Dgs3620_28TC=dlink_Dgs3620Proj_Dgs3620_28TC, dlink_Dgs3620Proj_Dgs3620_28TC_DC=dlink_Dgs3620Proj_Dgs3620_28TC_DC, dlink_Dgs3620Proj_Dgs3620_52T=dlink_Dgs3620Proj_Dgs3620_52T, dlink_Dgs3620Prod_Dgs3620_52P=dlink_Dgs3620Prod_Dgs3620_52P, dlink_Dgs3620Prod_Dgs3620_28SC=dlink_Dgs3620Prod_Dgs3620_28SC, dlink_Dgs3620Prod_Dgs3620_52T=dlink_Dgs3620Prod_Dgs3620_52T, dlink_Dgs3620Proj_Dgs3620_28SC_DC=dlink_Dgs3620Proj_Dgs3620_28SC_DC, dlink_Dgs3620Prod_Dgs3620_28TC=dlink_Dgs3620Prod_Dgs3620_28TC, dlink_Dgs3620Prod=dlink_Dgs3620Prod, dlink_Dgs3620Proj=dlink_Dgs3620Proj, dlink_Dgs3620Proj_Dgs3620_52P=dlink_Dgs3620Proj_Dgs3620_52P)

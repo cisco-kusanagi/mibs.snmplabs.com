@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module HUAWEI-L2TP-EXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HUAWEI-L2TP-EXT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:33:49 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+hwDatacomm, = mibBuilder.importSymbols("HUAWEI-MIB", "hwDatacomm")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, NotificationType, iso, Unsigned32, Integer32, TimeTicks, IpAddress, Bits, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, ObjectIdentity, Counter32, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "NotificationType", "iso", "Unsigned32", "Integer32", "TimeTicks", "IpAddress", "Bits", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "ObjectIdentity", "Counter32", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hwL2TPExt = ModuleIdentity((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137))
+if mibBuilder.loadTexts: hwL2TPExt.setLastUpdated('200610301046Z')
+if mibBuilder.loadTexts: hwL2TPExt.setOrganization('Huawei Technologies Co., Ltd.')
+hwL2TPStatistic = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137, 1))
+hwL2TPSessionStatTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137, 1, 1), )
+if mibBuilder.loadTexts: hwL2TPSessionStatTable.setStatus('current')
+hwL2TPSessionStatEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137, 1, 1, 1), ).setIndexNames((0, "HUAWEI-L2TP-EXT-MIB", "hwL2TPSessionIndex"))
+if mibBuilder.loadTexts: hwL2TPSessionStatEntry.setStatus('current')
+hwL2TPSessionIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)))
+if mibBuilder.loadTexts: hwL2TPSessionIndex.setStatus('current')
+hwL2TPSessionStatUpPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137, 1, 1, 1, 2), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwL2TPSessionStatUpPkts.setStatus('current')
+hwL2TPSessionStatUpBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137, 1, 1, 1, 3), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwL2TPSessionStatUpBytes.setStatus('current')
+hwL2TPSessionStatDownPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137, 1, 1, 1, 4), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwL2TPSessionStatDownPkts.setStatus('current')
+hwL2TPSessionStatDownBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 137, 1, 1, 1, 5), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwL2TPSessionStatDownBytes.setStatus('current')
+mibBuilder.exportSymbols("HUAWEI-L2TP-EXT-MIB", hwL2TPSessionStatDownBytes=hwL2TPSessionStatDownBytes, hwL2TPSessionStatDownPkts=hwL2TPSessionStatDownPkts, hwL2TPSessionStatTable=hwL2TPSessionStatTable, hwL2TPSessionIndex=hwL2TPSessionIndex, hwL2TPSessionStatUpBytes=hwL2TPSessionStatUpBytes, PYSNMP_MODULE_ID=hwL2TPExt, hwL2TPExt=hwL2TPExt, hwL2TPStatistic=hwL2TPStatistic, hwL2TPSessionStatUpPkts=hwL2TPSessionStatUpPkts, hwL2TPSessionStatEntry=hwL2TPSessionStatEntry)

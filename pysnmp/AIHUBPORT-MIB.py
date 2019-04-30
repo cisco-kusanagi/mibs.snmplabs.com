@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module AIHUBPORT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/AIHUBPORT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:00:35 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+PositiveInteger, = mibBuilder.importSymbols("AISYSTEM-MIB", "PositiveInteger")
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+enterprises, Bits, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Integer32, NotificationType, iso, ObjectIdentity, Gauge32, IpAddress, MibIdentifier, Unsigned32, ModuleIdentity, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "enterprises", "Bits", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Integer32", "NotificationType", "iso", "ObjectIdentity", "Gauge32", "IpAddress", "MibIdentifier", "Unsigned32", "ModuleIdentity", "Counter32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+aii = MibIdentifier((1, 3, 6, 1, 4, 1, 539))
+aiSystemOID = MibIdentifier((1, 3, 6, 1, 4, 1, 539, 2))
+aiHubport = ModuleIdentity((1, 3, 6, 1, 4, 1, 539, 27))
+if mibBuilder.loadTexts: aiHubport.setLastUpdated('980803164411Z')
+if mibBuilder.loadTexts: aiHubport.setOrganization('Applied Innovation Incorporated')
+aiHubCnf = MibIdentifier((1, 3, 6, 1, 4, 1, 539, 27, 1))
+hubPortCnfTable = MibTable((1, 3, 6, 1, 4, 1, 539, 27, 1, 1), )
+if mibBuilder.loadTexts: hubPortCnfTable.setStatus('current')
+hubPortCnfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 539, 27, 1, 1, 1), ).setIndexNames((0, "AIHUBPORT-MIB", "hubPortIndex"))
+if mibBuilder.loadTexts: hubPortCnfEntry.setStatus('current')
+hubPortIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 539, 27, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1024))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hubPortIndex.setStatus('current')
+hubPortIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 539, 27, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1024))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hubPortIfIndex.setStatus('current')
+hubPortSpeedCtrl = MibTableColumn((1, 3, 6, 1, 4, 1, 539, 27, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 3))).clone(namedValues=NamedValues(("auto", 0), ("t10", 1), ("tx100", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hubPortSpeedCtrl.setStatus('current')
+mibBuilder.exportSymbols("AIHUBPORT-MIB", hubPortCnfEntry=hubPortCnfEntry, aiHubport=aiHubport, hubPortCnfTable=hubPortCnfTable, aiSystemOID=aiSystemOID, PYSNMP_MODULE_ID=aiHubport, hubPortSpeedCtrl=hubPortSpeedCtrl, hubPortIndex=hubPortIndex, hubPortIfIndex=hubPortIfIndex, aiHubCnf=aiHubCnf, aii=aii)

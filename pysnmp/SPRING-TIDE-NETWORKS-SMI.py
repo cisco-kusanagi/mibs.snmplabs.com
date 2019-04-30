@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module SPRING-TIDE-NETWORKS-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SPRING-TIDE-NETWORKS-SMI
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:02:36 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+iso, Integer32, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, enterprises, NotificationType, Unsigned32, IpAddress, ObjectIdentity, MibIdentifier, TimeTicks, Gauge32, Counter32, Bits, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "Integer32", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "enterprises", "NotificationType", "Unsigned32", "IpAddress", "ObjectIdentity", "MibIdentifier", "TimeTicks", "Gauge32", "Counter32", "Bits", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+springtidenet = ModuleIdentity((1, 3, 6, 1, 4, 1, 3551))
+if mibBuilder.loadTexts: springtidenet.setLastUpdated('0002160000Z')
+if mibBuilder.loadTexts: springtidenet.setOrganization('Spring Tide Networks, Inc.')
+stnProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 3551, 1))
+if mibBuilder.loadTexts: stnProducts.setStatus('current')
+stnSystems = ObjectIdentity((1, 3, 6, 1, 4, 1, 3551, 2))
+if mibBuilder.loadTexts: stnSystems.setStatus('current')
+stnExtensions = ObjectIdentity((1, 3, 6, 1, 4, 1, 3551, 3))
+if mibBuilder.loadTexts: stnExtensions.setStatus('current')
+stnTemporary = ObjectIdentity((1, 3, 6, 1, 4, 1, 3551, 4))
+if mibBuilder.loadTexts: stnTemporary.setStatus('current')
+stnMibModules = ObjectIdentity((1, 3, 6, 1, 4, 1, 3551, 5))
+if mibBuilder.loadTexts: stnMibModules.setStatus('current')
+stnConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 3551, 2, 99))
+stnNotificationPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 3551, 2, 100))
+stnNotification = MibIdentifier((1, 3, 6, 1, 4, 1, 3551, 2, 100, 0))
+stnTmpProtocols = MibIdentifier((1, 3, 6, 1, 4, 1, 3551, 4, 1))
+mibBuilder.exportSymbols("SPRING-TIDE-NETWORKS-SMI", springtidenet=springtidenet, stnNotificationPrefix=stnNotificationPrefix, stnTmpProtocols=stnTmpProtocols, stnMibModules=stnMibModules, stnProducts=stnProducts, PYSNMP_MODULE_ID=springtidenet, stnSystems=stnSystems, stnConfig=stnConfig, stnExtensions=stnExtensions, stnNotification=stnNotification, stnTemporary=stnTemporary)

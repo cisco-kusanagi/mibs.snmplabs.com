@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module MY-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MY-SMI
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:06:18 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+TimeTicks, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, ObjectIdentity, NotificationType, enterprises, IpAddress, ModuleIdentity, Unsigned32, MibIdentifier, iso, Bits, Gauge32, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "ObjectIdentity", "NotificationType", "enterprises", "IpAddress", "ModuleIdentity", "Unsigned32", "MibIdentifier", "iso", "Bits", "Gauge32", "Integer32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+my = MibIdentifier((1, 3, 6, 1, 4, 1, 171))
+products = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10))
+switchMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97))
+switchMib.setRevisions(('2002-03-19 00:00',))
+if mibBuilder.loadTexts: switchMib.setLastUpdated('200203190000Z')
+if mibBuilder.loadTexts: switchMib.setOrganization('D-Link Crop.')
+mySwitchProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 1))
+if mibBuilder.loadTexts: mySwitchProducts.setStatus('current')
+myMgmt = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 2))
+if mibBuilder.loadTexts: myMgmt.setStatus('current')
+myAgentCapability = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 3))
+if mibBuilder.loadTexts: myAgentCapability.setStatus('current')
+myModules = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 4))
+if mibBuilder.loadTexts: myModules.setStatus('current')
+myExperiment = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 5))
+if mibBuilder.loadTexts: myExperiment.setStatus('current')
+mibBuilder.exportSymbols("MY-SMI", myModules=myModules, my=my, switchMib=switchMib, PYSNMP_MODULE_ID=switchMib, myMgmt=myMgmt, myExperiment=myExperiment, mySwitchProducts=mySwitchProducts, myAgentCapability=myAgentCapability, products=products)

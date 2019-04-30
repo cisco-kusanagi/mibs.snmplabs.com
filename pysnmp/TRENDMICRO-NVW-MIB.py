@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module TRENDMICRO-NVW-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TRENDMICRO-NVW-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:20:11 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Bits, Counter64, Gauge32, ObjectIdentity, Counter32, NotificationType, IpAddress, iso, ModuleIdentity, Unsigned32, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "Counter64", "Gauge32", "ObjectIdentity", "Counter32", "NotificationType", "IpAddress", "iso", "ModuleIdentity", "Unsigned32", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Integer32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+tmNVW, = mibBuilder.importSymbols("TRENDMICRO-SMI", "tmNVW")
+nvwScanCurrConn = MibScalar((1, 3, 6, 1, 4, 1, 6101, 2500, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nvwScanCurrConn.setStatus('mandatory')
+nvwScanCurrMem = MibScalar((1, 3, 6, 1, 4, 1, 6101, 2500, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nvwScanCurrMem.setStatus('mandatory')
+nvwPolicyCurrConn = MibScalar((1, 3, 6, 1, 4, 1, 6101, 2500, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nvwPolicyCurrConn.setStatus('mandatory')
+nvwTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 6101, 2500, 251))
+oppOn = NotificationType((1, 3, 6, 1, 4, 1, 6101, 2500, 251, 1))
+if mibBuilder.loadTexts: oppOn.setStatus('current')
+oppOff = NotificationType((1, 3, 6, 1, 4, 1, 6101, 2500, 251, 2))
+if mibBuilder.loadTexts: oppOff.setStatus('current')
+bootFactory = NotificationType((1, 3, 6, 1, 4, 1, 6101, 2500, 251, 3))
+if mibBuilder.loadTexts: bootFactory.setStatus('current')
+bootPrevious = NotificationType((1, 3, 6, 1, 4, 1, 6101, 2500, 251, 4))
+if mibBuilder.loadTexts: bootPrevious.setStatus('current')
+haFailover = NotificationType((1, 3, 6, 1, 4, 1, 6101, 2500, 251, 5))
+if mibBuilder.loadTexts: haFailover.setStatus('current')
+mibBuilder.exportSymbols("TRENDMICRO-NVW-MIB", nvwPolicyCurrConn=nvwPolicyCurrConn, nvwScanCurrMem=nvwScanCurrMem, oppOn=oppOn, bootFactory=bootFactory, nvwTraps=nvwTraps, oppOff=oppOff, bootPrevious=bootPrevious, nvwScanCurrConn=nvwScanCurrConn, haFailover=haFailover)

@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module NBS-NTP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NBS-NTP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:07:29 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint")
+nbsCmmcNtpGrp, = mibBuilder.importSymbols("NBS-CMMC-MIB", "nbsCmmcNtpGrp")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, ModuleIdentity, Gauge32, MibIdentifier, Integer32, Counter64, TimeTicks, IpAddress, iso, NotificationType, Counter32, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "ModuleIdentity", "Gauge32", "MibIdentifier", "Integer32", "Counter64", "TimeTicks", "IpAddress", "iso", "NotificationType", "Counter32", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+nbsNtpMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 629, 200, 9, 1))
+if mibBuilder.loadTexts: nbsNtpMib.setLastUpdated('200711210000Z')
+if mibBuilder.loadTexts: nbsNtpMib.setOrganization('NBS')
+nbsNtpEnable = MibScalar((1, 3, 6, 1, 4, 1, 629, 200, 9, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("notSupported", 1), ("no", 2), ("yes", 3))).clone('no')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: nbsNtpEnable.setStatus('current')
+nbsNtpServerTableSize = MibScalar((1, 3, 6, 1, 4, 1, 629, 200, 9, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nbsNtpServerTableSize.setStatus('current')
+nbsNtpServerTable = MibTable((1, 3, 6, 1, 4, 1, 629, 200, 9, 1, 3), )
+if mibBuilder.loadTexts: nbsNtpServerTable.setStatus('current')
+nbsNtpServerEntry = MibTableRow((1, 3, 6, 1, 4, 1, 629, 200, 9, 1, 3, 1), ).setIndexNames((0, "NBS-NTP-MIB", "nbsNtpServerIpAddr"))
+if mibBuilder.loadTexts: nbsNtpServerEntry.setStatus('current')
+nbsNtpServerIpAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 629, 200, 9, 1, 3, 1, 1), IpAddress())
+if mibBuilder.loadTexts: nbsNtpServerIpAddr.setStatus('current')
+nbsNtpServerStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 629, 200, 9, 1, 3, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("invalid", 1), ("active", 2))).clone('invalid')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: nbsNtpServerStatus.setStatus('current')
+mibBuilder.exportSymbols("NBS-NTP-MIB", nbsNtpServerStatus=nbsNtpServerStatus, nbsNtpServerEntry=nbsNtpServerEntry, PYSNMP_MODULE_ID=nbsNtpMib, nbsNtpServerTable=nbsNtpServerTable, nbsNtpEnable=nbsNtpEnable, nbsNtpMib=nbsNtpMib, nbsNtpServerTableSize=nbsNtpServerTableSize, nbsNtpServerIpAddr=nbsNtpServerIpAddr)

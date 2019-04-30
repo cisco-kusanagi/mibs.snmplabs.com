@@ -1,0 +1,50 @@
+#
+# PySNMP MIB module TPT-NGFW-USER-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TPT-NGFW-USER-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:19:08 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint")
+InetAddress, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetAddressType")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+NotificationType, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, MibIdentifier, Gauge32, Counter32, ModuleIdentity, TimeTicks, Unsigned32, ObjectIdentity, Counter64, Bits, iso = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "MibIdentifier", "Gauge32", "Counter32", "ModuleIdentity", "TimeTicks", "Unsigned32", "ObjectIdentity", "Counter64", "Bits", "iso")
+DateAndTime, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "DateAndTime", "TextualConvention", "DisplayString")
+tpt_ngfw_groups, tpt_ngfw_compls, tpt_ngfw_eventsV2, tptNgfwNotifySeverity, tpt_ngfw_objs, tpt_ngfw_params = mibBuilder.importSymbols("TPT-NGFW-REG-MIB", "tpt-ngfw-groups", "tpt-ngfw-compls", "tpt-ngfw-eventsV2", "tptNgfwNotifySeverity", "tpt-ngfw-objs", "tpt-ngfw-params")
+tptNgfwSystemSerial, = mibBuilder.importSymbols("TPT-NGFW-SYSTEM-INFO-MIB", "tptNgfwSystemSerial")
+tptNgfwPolicy = ModuleIdentity((1, 3, 6, 1, 4, 1, 10734, 3, 9, 2, 4))
+tptNgfwPolicy.setRevisions(('2016-05-25 18:54', '2013-04-03 12:00',))
+if mibBuilder.loadTexts: tptNgfwPolicy.setLastUpdated('201605251854Z')
+if mibBuilder.loadTexts: tptNgfwPolicy.setOrganization('Trend Micro, Inc.')
+tptNgfwUserAuthFailNotify = NotificationType((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 0, 18)).setObjects(("TPT-NGFW-SYSTEM-INFO-MIB", "tptNgfwSystemSerial"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthName"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthFailNotifyReason"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthSrcIpAddrType"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthSrcIpAddr"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthNotifySource"), ("TPT-NGFW-REG-MIB", "tptNgfwNotifySeverity"))
+if mibBuilder.loadTexts: tptNgfwUserAuthFailNotify.setStatus('current')
+tptNgfwUserAuthLockedAccountNotify = NotificationType((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 0, 19)).setObjects(("TPT-NGFW-SYSTEM-INFO-MIB", "tptNgfwSystemSerial"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthName"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthSrcIpAddrType"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthSrcIpAddr"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthLockedTime"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthNotifySource"), ("TPT-NGFW-REG-MIB", "tptNgfwNotifySeverity"))
+if mibBuilder.loadTexts: tptNgfwUserAuthLockedAccountNotify.setStatus('current')
+tptNgfwUserAuthLockedIpNotify = NotificationType((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 0, 20)).setObjects(("TPT-NGFW-SYSTEM-INFO-MIB", "tptNgfwSystemSerial"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthSrcIpAddrType"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthSrcIpAddr"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthLockedTime"), ("TPT-NGFW-REG-MIB", "tptNgfwNotifySeverity"))
+if mibBuilder.loadTexts: tptNgfwUserAuthLockedIpNotify.setStatus('current')
+tptNgfwUserAuthName = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 73), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 40))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwUserAuthName.setStatus('current')
+tptNgfwUserAuthFailNotifyReason = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 74), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 80))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwUserAuthFailNotifyReason.setStatus('current')
+tptNgfwUserAuthSrcIpAddrType = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 75), InetAddressType()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwUserAuthSrcIpAddrType.setStatus('current')
+tptNgfwUserAuthSrcIpAddr = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 76), InetAddress()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwUserAuthSrcIpAddr.setStatus('current')
+tptNgfwUserAuthNotifySource = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 77), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 40))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwUserAuthNotifySource.setStatus('current')
+tptNgfwUserAuthLockedTime = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 78), DateAndTime()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwUserAuthLockedTime.setStatus('current')
+tptNgfwUserGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 10734, 3, 9, 1, 1, 11)).setObjects(("TPT-NGFW-USER-MIB", "tptNgfwUserAuthName"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthFailNotifyReason"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthSrcIpAddrType"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthSrcIpAddr"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthNotifySource"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthLockedTime"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    tptNgfwUserGroup = tptNgfwUserGroup.setStatus('current')
+tptNgfwUserNotificationGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 10734, 3, 9, 1, 1, 12)).setObjects(("TPT-NGFW-USER-MIB", "tptNgfwUserAuthFailNotify"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthLockedAccountNotify"), ("TPT-NGFW-USER-MIB", "tptNgfwUserAuthLockedIpNotify"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    tptNgfwUserNotificationGroup = tptNgfwUserNotificationGroup.setStatus('current')
+tptNgfwUserCompl = ModuleCompliance((1, 3, 6, 1, 4, 1, 10734, 3, 9, 1, 2, 5)).setObjects(("TPT-NGFW-USER-MIB", "tptNgfwUserGroup"), ("TPT-NGFW-USER-MIB", "tptNgfwUserNotificationGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    tptNgfwUserCompl = tptNgfwUserCompl.setStatus('current')
+mibBuilder.exportSymbols("TPT-NGFW-USER-MIB", tptNgfwUserAuthSrcIpAddrType=tptNgfwUserAuthSrcIpAddrType, tptNgfwUserAuthFailNotifyReason=tptNgfwUserAuthFailNotifyReason, tptNgfwUserGroup=tptNgfwUserGroup, tptNgfwUserAuthLockedIpNotify=tptNgfwUserAuthLockedIpNotify, tptNgfwUserAuthFailNotify=tptNgfwUserAuthFailNotify, PYSNMP_MODULE_ID=tptNgfwPolicy, tptNgfwPolicy=tptNgfwPolicy, tptNgfwUserAuthLockedTime=tptNgfwUserAuthLockedTime, tptNgfwUserAuthLockedAccountNotify=tptNgfwUserAuthLockedAccountNotify, tptNgfwUserAuthName=tptNgfwUserAuthName, tptNgfwUserAuthSrcIpAddr=tptNgfwUserAuthSrcIpAddr, tptNgfwUserNotificationGroup=tptNgfwUserNotificationGroup, tptNgfwUserAuthNotifySource=tptNgfwUserAuthNotifySource, tptNgfwUserCompl=tptNgfwUserCompl)

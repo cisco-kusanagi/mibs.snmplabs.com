@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module ZYXEL-SYS-MEMORY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZYXEL-SYS-MEMORY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:45:49 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, Unsigned32, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, Integer32, IpAddress, ModuleIdentity, Gauge32, MibIdentifier, TimeTicks, Counter32, iso, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Unsigned32", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "Integer32", "IpAddress", "ModuleIdentity", "Gauge32", "MibIdentifier", "TimeTicks", "Counter32", "iso", "Counter64")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+esMgmt, = mibBuilder.importSymbols("ZYXEL-ES-SMI", "esMgmt")
+zyxelSysMemory = ModuleIdentity((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50))
+if mibBuilder.loadTexts: zyxelSysMemory.setLastUpdated('201207010000Z')
+if mibBuilder.loadTexts: zyxelSysMemory.setOrganization('Enterprise Solution ZyXEL')
+zyxelSysMemoryPoolStatus = MibIdentifier((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50, 1))
+zyxelSysMemoryPoolTable = MibTable((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50, 1, 1), )
+if mibBuilder.loadTexts: zyxelSysMemoryPoolTable.setStatus('current')
+zyxelSysMemoryPoolEntry = MibTableRow((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50, 1, 1, 1), ).setIndexNames((0, "ZYXEL-SYS-MEMORY-MIB", "zySysMemoryPoolId"))
+if mibBuilder.loadTexts: zyxelSysMemoryPoolEntry.setStatus('current')
+zySysMemoryPoolId = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50, 1, 1, 1, 1), Unsigned32())
+if mibBuilder.loadTexts: zySysMemoryPoolId.setStatus('current')
+zySysMemoryPoolName = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50, 1, 1, 1, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zySysMemoryPoolName.setStatus('current')
+zySysMemoryPoolTotalSize = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50, 1, 1, 1, 3), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zySysMemoryPoolTotalSize.setStatus('current')
+zySysMemoryPoolUsedSize = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50, 1, 1, 1, 4), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zySysMemoryPoolUsedSize.setStatus('current')
+zySysMemoryPoolUtilization = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 50, 1, 1, 1, 5), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 100))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zySysMemoryPoolUtilization.setStatus('current')
+mibBuilder.exportSymbols("ZYXEL-SYS-MEMORY-MIB", PYSNMP_MODULE_ID=zyxelSysMemory, zyxelSysMemoryPoolEntry=zyxelSysMemoryPoolEntry, zySysMemoryPoolId=zySysMemoryPoolId, zySysMemoryPoolName=zySysMemoryPoolName, zyxelSysMemoryPoolStatus=zyxelSysMemoryPoolStatus, zySysMemoryPoolUtilization=zySysMemoryPoolUtilization, zyxelSysMemoryPoolTable=zyxelSysMemoryPoolTable, zySysMemoryPoolUsedSize=zySysMemoryPoolUsedSize, zyxelSysMemory=zyxelSysMemory, zySysMemoryPoolTotalSize=zySysMemoryPoolTotalSize)

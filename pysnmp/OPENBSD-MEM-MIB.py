@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module OPENBSD-MEM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/OPENBSD-MEM-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:25:48 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint")
+ifNumber, ifIndex = mibBuilder.importSymbols("IF-MIB", "ifNumber", "ifIndex")
+openBSD, = mibBuilder.importSymbols("OPENBSD-BASE-MIB", "openBSD")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+MibIdentifier, iso, TimeTicks, Counter64, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, Integer32, Counter32, IpAddress, ObjectIdentity, NotificationType, Bits, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "iso", "TimeTicks", "Counter64", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "Integer32", "Counter32", "IpAddress", "ObjectIdentity", "NotificationType", "Bits", "Gauge32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+memMIBObjects = ModuleIdentity((1, 3, 6, 1, 4, 1, 30155, 5))
+memMIBObjects.setRevisions(('2012-02-09 00:00', '2008-12-23 00:00',))
+if mibBuilder.loadTexts: memMIBObjects.setLastUpdated('201202090000Z')
+if mibBuilder.loadTexts: memMIBObjects.setOrganization('OpenBSD')
+memMIBVersion = MibScalar((1, 3, 6, 1, 4, 1, 30155, 5, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: memMIBVersion.setStatus('current')
+memIfTable = MibTable((1, 3, 6, 1, 4, 1, 30155, 5, 2), )
+if mibBuilder.loadTexts: memIfTable.setStatus('current')
+memIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 30155, 5, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: memIfEntry.setStatus('current')
+memIfName = MibTableColumn((1, 3, 6, 1, 4, 1, 30155, 5, 2, 1, 1), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: memIfName.setStatus('current')
+memIfLiveLocks = MibTableColumn((1, 3, 6, 1, 4, 1, 30155, 5, 2, 1, 2), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: memIfLiveLocks.setStatus('current')
+mibBuilder.exportSymbols("OPENBSD-MEM-MIB", memIfTable=memIfTable, memMIBObjects=memMIBObjects, memMIBVersion=memMIBVersion, memIfEntry=memIfEntry, memIfLiveLocks=memIfLiveLocks, PYSNMP_MODULE_ID=memMIBObjects, memIfName=memIfName)

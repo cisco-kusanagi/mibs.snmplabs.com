@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module PAIRGAIN-DSLAM-TRAP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PAIRGAIN-DSLAM-TRAP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:27:31 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+pgainDSLAM, = mibBuilder.importSymbols("PAIRGAIN-COMMON-HD-MIB", "pgainDSLAM")
+pgDSLAMConfigChangeCnts, pgDSLAMConfigLastChange, pgDSLAMChassisFanStatus, pgDSLAMChassisPsStatus, pgDSLAMChassisTemperature = mibBuilder.importSymbols("PAIRGAIN-DSLAM-CHASSIS-MIB", "pgDSLAMConfigChangeCnts", "pgDSLAMConfigLastChange", "pgDSLAMChassisFanStatus", "pgDSLAMChassisPsStatus", "pgDSLAMChassisTemperature")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+snmp, = mibBuilder.importSymbols("SNMPv2-MIB", "snmp")
+Unsigned32, Gauge32, NotificationType, Bits, MibIdentifier, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, iso, Counter64, IpAddress, NotificationType, Counter32, ModuleIdentity, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Gauge32", "NotificationType", "Bits", "MibIdentifier", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "iso", "Counter64", "IpAddress", "NotificationType", "Counter32", "ModuleIdentity", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+coldStart = NotificationType((1, 3, 6, 1, 2, 1, 11) + (0,0))
+linkDown = NotificationType((1, 3, 6, 1, 2, 1, 11) + (0,2)).setObjects(("IF-MIB", "ifIndex"))
+linkUp = NotificationType((1, 3, 6, 1, 2, 1, 11) + (0,3)).setObjects(("IF-MIB", "ifIndex"))
+authenticationFailure = NotificationType((1, 3, 6, 1, 2, 1, 11) + (0,4))
+pgDSLAMchassisPowerSupplyFailure = NotificationType((1, 3, 6, 1, 4, 1, 927, 1, 9) + (0,0)).setObjects(("PAIRGAIN-DSLAM-CHASSIS-MIB", "pgDSLAMChassisPsStatus"))
+pgDSLAMchassisFanFailure = NotificationType((1, 3, 6, 1, 4, 1, 927, 1, 9) + (0,1)).setObjects(("PAIRGAIN-DSLAM-CHASSIS-MIB", "pgDSLAMChassisFanStatus"))
+pgDSLAMchassisConfigChange = NotificationType((1, 3, 6, 1, 4, 1, 927, 1, 9) + (0,2)).setObjects(("PAIRGAIN-DSLAM-CHASSIS-MIB", "pgDSLAMConfigChangeCnts"), ("PAIRGAIN-DSLAM-CHASSIS-MIB", "pgDSLAMConfigLastChange"))
+pgDSLAMchassisTemperatureThresholdExceeded = NotificationType((1, 3, 6, 1, 4, 1, 927, 1, 9) + (0,3))
+pgDSLAMHDSLESThresholdExceeded = NotificationType((1, 3, 6, 1, 4, 1, 927, 1, 9) + (0,4)).setObjects(("IF-MIB", "ifIndex"))
+pgDSLAMHDSLMarginThresholdExceeded = NotificationType((1, 3, 6, 1, 4, 1, 927, 1, 9) + (0,5)).setObjects(("IF-MIB", "ifIndex"))
+pgDSLAMHDSLPFO = NotificationType((1, 3, 6, 1, 4, 1, 927, 1, 9) + (0,6)).setObjects(("IF-MIB", "ifIndex"))
+pgDSLAMHDSLPFS = NotificationType((1, 3, 6, 1, 4, 1, 927, 1, 9) + (0,7)).setObjects(("IF-MIB", "ifIndex"))
+mibBuilder.exportSymbols("PAIRGAIN-DSLAM-TRAP-MIB", pgDSLAMchassisPowerSupplyFailure=pgDSLAMchassisPowerSupplyFailure, linkUp=linkUp, linkDown=linkDown, coldStart=coldStart, pgDSLAMHDSLMarginThresholdExceeded=pgDSLAMHDSLMarginThresholdExceeded, pgDSLAMHDSLESThresholdExceeded=pgDSLAMHDSLESThresholdExceeded, authenticationFailure=authenticationFailure, pgDSLAMHDSLPFO=pgDSLAMHDSLPFO, pgDSLAMHDSLPFS=pgDSLAMHDSLPFS, pgDSLAMchassisFanFailure=pgDSLAMchassisFanFailure, pgDSLAMchassisConfigChange=pgDSLAMchassisConfigChange, pgDSLAMchassisTemperatureThresholdExceeded=pgDSLAMchassisTemperatureThresholdExceeded)

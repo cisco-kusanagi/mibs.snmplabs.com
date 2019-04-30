@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module HUAWEI-8040IF-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HUAWEI-8040IF-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:30:39 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint")
+mlsr, = mibBuilder.importSymbols("HUAWEI-3COM-OID-MIB", "mlsr")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+Unsigned32, iso, Counter64, Bits, Counter32, TimeTicks, NotificationType, MibIdentifier, Integer32, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, ModuleIdentity, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "iso", "Counter64", "Bits", "Counter32", "TimeTicks", "NotificationType", "MibIdentifier", "Integer32", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "ModuleIdentity", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hw8040If = ModuleIdentity((1, 3, 6, 1, 4, 1, 2011, 2, 33, 7))
+if mibBuilder.loadTexts: hw8040If.setLastUpdated('200410110000Z')
+if mibBuilder.loadTexts: hw8040If.setOrganization('Huawei-3com Technologies co.,Ltd.')
+hw8040IfTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 2, 33, 7, 1), )
+if mibBuilder.loadTexts: hw8040IfTable.setStatus('current')
+hw8040IfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 2, 33, 7, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: hw8040IfEntry.setStatus('current')
+hw8040IfInPerSecBits = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 2, 33, 7, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hw8040IfInPerSecBits.setStatus('current')
+hw8040IfOutPerSecBits = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 2, 33, 7, 1, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hw8040IfOutPerSecBits.setStatus('current')
+hw8040CRCIfInputErr = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 2, 33, 7, 1, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hw8040CRCIfInputErr.setStatus('current')
+hw8040IfOutCollisions = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 2, 33, 7, 1, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hw8040IfOutCollisions.setStatus('current')
+hw8040IfDescCfg = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 2, 33, 7, 1, 1, 5), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 80))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hw8040IfDescCfg.setStatus('current')
+mibBuilder.exportSymbols("HUAWEI-8040IF-MIB", hw8040IfTable=hw8040IfTable, hw8040IfInPerSecBits=hw8040IfInPerSecBits, hw8040IfDescCfg=hw8040IfDescCfg, hw8040IfEntry=hw8040IfEntry, hw8040If=hw8040If, hw8040CRCIfInputErr=hw8040CRCIfInputErr, PYSNMP_MODULE_ID=hw8040If, hw8040IfOutCollisions=hw8040IfOutCollisions, hw8040IfOutPerSecBits=hw8040IfOutPerSecBits)

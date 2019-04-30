@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module CIENA-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CIENA-SMI
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:31:33 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, Counter64, ObjectIdentity, Bits, ModuleIdentity, IpAddress, enterprises, Gauge32, Integer32, TimeTicks, NotificationType, Unsigned32, iso, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "Counter64", "ObjectIdentity", "Bits", "ModuleIdentity", "IpAddress", "enterprises", "Gauge32", "Integer32", "TimeTicks", "NotificationType", "Unsigned32", "iso", "Counter32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ciena = ModuleIdentity((1, 3, 6, 1, 4, 1, 1271))
+ciena.setRevisions(('2013-04-22 00:00', '2012-12-26 00:00', '2010-09-27 23:17',))
+if mibBuilder.loadTexts: ciena.setLastUpdated('201304220000Z')
+if mibBuilder.loadTexts: ciena.setOrganization('Ciena, Inc')
+cienaCes = ObjectIdentity((1, 3, 6, 1, 4, 1, 1271, 2))
+if mibBuilder.loadTexts: cienaCes.setStatus('current')
+cienaCommon = ObjectIdentity((1, 3, 6, 1, 4, 1, 1271, 1))
+if mibBuilder.loadTexts: cienaCommon.setStatus('current')
+cienaProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 1271, 1, 2))
+if mibBuilder.loadTexts: cienaProducts.setStatus('current')
+cienaCesStatistics = ObjectIdentity((1, 3, 6, 1, 4, 1, 1271, 2, 3))
+if mibBuilder.loadTexts: cienaCesStatistics.setStatus('current')
+cienaCesNotifications = ObjectIdentity((1, 3, 6, 1, 4, 1, 1271, 2, 2))
+if mibBuilder.loadTexts: cienaCesNotifications.setStatus('current')
+cienaCesNotificationsControlModule = ObjectIdentity((1, 3, 6, 1, 4, 1, 1271, 2, 2, 1))
+if mibBuilder.loadTexts: cienaCesNotificationsControlModule.setStatus('current')
+cienaCesConfig = ObjectIdentity((1, 3, 6, 1, 4, 1, 1271, 2, 1))
+if mibBuilder.loadTexts: cienaCesConfig.setStatus('current')
+mibBuilder.exportSymbols("CIENA-SMI", PYSNMP_MODULE_ID=ciena, ciena=ciena, cienaCesStatistics=cienaCesStatistics, cienaCesNotifications=cienaCesNotifications, cienaCesNotificationsControlModule=cienaCesNotificationsControlModule, cienaCommon=cienaCommon, cienaCesConfig=cienaCesConfig, cienaProducts=cienaProducts, cienaCes=cienaCes)

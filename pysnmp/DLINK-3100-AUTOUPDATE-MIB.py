@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module DLINK-3100-AUTOUPDATE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DLINK-3100-AUTOUPDATE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:32:56 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+rnd, = mibBuilder.importSymbols("DLINK-3100-MIB", "rnd")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Bits, MibIdentifier, iso, NotificationType, Counter32, Gauge32, ObjectIdentity, Integer32, Counter64, IpAddress, Unsigned32, ModuleIdentity, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "MibIdentifier", "iso", "NotificationType", "Counter32", "Gauge32", "ObjectIdentity", "Integer32", "Counter64", "IpAddress", "Unsigned32", "ModuleIdentity", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+TruthValue, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "DisplayString", "TextualConvention")
+rlAutoUpdate = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 123))
+if mibBuilder.loadTexts: rlAutoUpdate.setLastUpdated('2007010600Z')
+if mibBuilder.loadTexts: rlAutoUpdate.setOrganization('Dlink, Inc.')
+rlAutoUpdateEnable = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 123, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateEnable.setStatus('current')
+rlAutoUpdateFilesBoot = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 123, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateFilesBoot.setStatus('current')
+rlAutoUpdateFilesImage = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 123, 3), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateFilesImage.setStatus('current')
+rlAutoUpdateFilesConf = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 123, 4), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateFilesConf.setStatus('current')
+rlAutoUpdateCopyEnable = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 123, 5), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdateCopyEnable.setStatus('current')
+rlAutoUpdatePreserveIP = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 123, 6), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlAutoUpdatePreserveIP.setStatus('current')
+mibBuilder.exportSymbols("DLINK-3100-AUTOUPDATE-MIB", PYSNMP_MODULE_ID=rlAutoUpdate, rlAutoUpdateCopyEnable=rlAutoUpdateCopyEnable, rlAutoUpdateEnable=rlAutoUpdateEnable, rlAutoUpdateFilesConf=rlAutoUpdateFilesConf, rlAutoUpdateFilesBoot=rlAutoUpdateFilesBoot, rlAutoUpdatePreserveIP=rlAutoUpdatePreserveIP, rlAutoUpdate=rlAutoUpdate, rlAutoUpdateFilesImage=rlAutoUpdateFilesImage)

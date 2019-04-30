@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module TPLINK-ETHERNETOAMLINKMONCFG-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TPLINK-ETHERNETOAMLINKMONCFG-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:17:15 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+IpAddress, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, TimeTicks, MibIdentifier, ModuleIdentity, Gauge32, Bits, Unsigned32, ObjectIdentity, NotificationType, Integer32, iso = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "TimeTicks", "MibIdentifier", "ModuleIdentity", "Gauge32", "Bits", "Unsigned32", "ObjectIdentity", "NotificationType", "Integer32", "iso")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ethernetOamLinkMonConfig, = mibBuilder.importSymbols("TPLINK-ETHERNETOAM-MIB", "ethernetOamLinkMonConfig")
+ethernetOamLinkMonCfgTable = MibTable((1, 3, 6, 1, 4, 1, 11863, 6, 60, 1, 2, 1), )
+if mibBuilder.loadTexts: ethernetOamLinkMonCfgTable.setStatus('current')
+ethernetOamLinkMonCfgEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11863, 6, 60, 1, 2, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "TPLINK-ETHERNETOAMLINKMONCFG-MIB", "ethernetOamLinkMonCfgEvent"))
+if mibBuilder.loadTexts: ethernetOamLinkMonCfgEntry.setStatus('current')
+ethernetOamLinkMonCfgPort = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 60, 1, 2, 1, 1, 1), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ethernetOamLinkMonCfgPort.setStatus('current')
+ethernetOamLinkMonCfgEvent = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 60, 1, 2, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("symbol-period", 1), ("frame", 2), ("frame-period", 3), ("frame-seconds", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ethernetOamLinkMonCfgEvent.setStatus('current')
+ethernetOamLinkMonCfgThreshold = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 60, 1, 2, 1, 1, 3), Unsigned32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ethernetOamLinkMonCfgThreshold.setStatus('current')
+ethernetOamLinkMonCfgWindow = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 60, 1, 2, 1, 1, 4), Unsigned32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ethernetOamLinkMonCfgWindow.setStatus('current')
+ethernetOamLinkMonCfgNotify = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 60, 1, 2, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("disable", 0), ("enable", 1)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ethernetOamLinkMonCfgNotify.setStatus('current')
+ethernetOamLinkMonCfgLAG = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 60, 1, 2, 1, 1, 6), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 10))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ethernetOamLinkMonCfgLAG.setStatus('current')
+mibBuilder.exportSymbols("TPLINK-ETHERNETOAMLINKMONCFG-MIB", ethernetOamLinkMonCfgThreshold=ethernetOamLinkMonCfgThreshold, ethernetOamLinkMonCfgEvent=ethernetOamLinkMonCfgEvent, ethernetOamLinkMonCfgPort=ethernetOamLinkMonCfgPort, ethernetOamLinkMonCfgNotify=ethernetOamLinkMonCfgNotify, ethernetOamLinkMonCfgLAG=ethernetOamLinkMonCfgLAG, ethernetOamLinkMonCfgEntry=ethernetOamLinkMonCfgEntry, ethernetOamLinkMonCfgTable=ethernetOamLinkMonCfgTable, ethernetOamLinkMonCfgWindow=ethernetOamLinkMonCfgWindow)

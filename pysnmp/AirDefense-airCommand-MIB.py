@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module AirDefense-airCommand-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/AirDefense-airCommand-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:17:07 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, Integer32, Counter32, IpAddress, MibIdentifier, ObjectIdentity, Unsigned32, NotificationType, enterprises, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, Counter64, Bits, TimeTicks, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "Integer32", "Counter32", "IpAddress", "MibIdentifier", "ObjectIdentity", "Unsigned32", "NotificationType", "enterprises", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "Counter64", "Bits", "TimeTicks", "iso")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+airDefense = MibIdentifier((1, 3, 6, 1, 4, 1, 13416))
+airDefenseProducts = MibIdentifier((1, 3, 6, 1, 4, 1, 13416, 1))
+airCommand = MibIdentifier((1, 3, 6, 1, 4, 1, 13416, 1, 1))
+airCommandEventTable = MibTable((1, 3, 6, 1, 4, 1, 13416, 1, 1, 1), ).setMaxAccess("readonly")
+if mibBuilder.loadTexts: airCommandEventTable.setStatus('current')
+airCommandEventEntry = MibTableRow((1, 3, 6, 1, 4, 1, 13416, 1, 1, 1, 1), ).setIndexNames((0, "AirDefense-airCommand-MIB", "airCommandEventId"))
+if mibBuilder.loadTexts: airCommandEventEntry.setStatus('current')
+airCommandEventId = MibTableColumn((1, 3, 6, 1, 4, 1, 13416, 1, 1, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: airCommandEventId.setStatus('current')
+airCommandEventPriority = MibTableColumn((1, 3, 6, 1, 4, 1, 13416, 1, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("critical", 1), ("major", 2), ("minor", 3), ("low", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: airCommandEventPriority.setStatus('current')
+airCommandEventDescriptor = MibTableColumn((1, 3, 6, 1, 4, 1, 13416, 1, 1, 1, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 1024))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: airCommandEventDescriptor.setStatus('current')
+airCommandEventCount = MibTableColumn((1, 3, 6, 1, 4, 1, 13416, 1, 1, 1, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: airCommandEventCount.setStatus('current')
+airCommandAlarm = NotificationType((1, 3, 6, 1, 4, 1, 13416, 1, 1, 2)).setObjects(("AirDefense-airCommand-MIB", "airCommandEventPriority"), ("AirDefense-airCommand-MIB", "airCommandEventDescriptor"), ("AirDefense-airCommand-MIB", "airCommandEventCount"))
+if mibBuilder.loadTexts: airCommandAlarm.setStatus('current')
+mibBuilder.exportSymbols("AirDefense-airCommand-MIB", airCommandEventDescriptor=airCommandEventDescriptor, airDefenseProducts=airDefenseProducts, airCommandEventTable=airCommandEventTable, airCommandAlarm=airCommandAlarm, airCommandEventEntry=airCommandEventEntry, airCommand=airCommand, airCommandEventCount=airCommandEventCount, airCommandEventId=airCommandEventId, airCommandEventPriority=airCommandEventPriority, airDefense=airDefense)

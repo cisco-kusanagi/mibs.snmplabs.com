@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module NMS-EPON-OLT-CHIP-INFO (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NMS-EPON-OLT-CHIP-INFO
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:11:54 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+nmsEPONGroup, = mibBuilder.importSymbols("NMS-SMI", "nmsEPONGroup")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, iso, IpAddress, Gauge32, ObjectIdentity, Bits, Integer32, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, NotificationType, TimeTicks, Counter32, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "iso", "IpAddress", "Gauge32", "ObjectIdentity", "Bits", "Integer32", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "NotificationType", "TimeTicks", "Counter32", "Counter64")
+TextualConvention, DisplayString, PhysAddress = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "PhysAddress")
+nmsEponOltChipInfo = MibIdentifier((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2))
+nmseponoltchipTable = MibTable((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2, 1), )
+if mibBuilder.loadTexts: nmseponoltchipTable.setStatus('mandatory')
+nmsEponOltChipEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2, 1, 1), ).setIndexNames((0, "NMS-EPON-OLT-CHIP-INFO", "oltChipIndex"))
+if mibBuilder.loadTexts: nmsEponOltChipEntry.setStatus('mandatory')
+oltChipIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oltChipIndex.setStatus('mandatory')
+oltChipSlotID = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2, 1, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oltChipSlotID.setStatus('mandatory')
+oltChipModuleID = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2, 1, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oltChipModuleID.setStatus('mandatory')
+oltChipDeviceID = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2, 1, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oltChipDeviceID.setStatus('mandatory')
+oltChipMACAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2, 1, 1, 5), PhysAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oltChipMACAddress.setStatus('mandatory')
+oltChipStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 2, 1, 1, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("wait_config", 1), ("operational", 2), ("shut_down", 3), ("timed_out", 4), ("downloading_image", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oltChipStatus.setStatus('mandatory')
+mibBuilder.exportSymbols("NMS-EPON-OLT-CHIP-INFO", oltChipIndex=oltChipIndex, oltChipStatus=oltChipStatus, oltChipDeviceID=oltChipDeviceID, oltChipMACAddress=oltChipMACAddress, nmseponoltchipTable=nmseponoltchipTable, oltChipSlotID=oltChipSlotID, oltChipModuleID=oltChipModuleID, nmsEponOltChipInfo=nmsEponOltChipInfo, nmsEponOltChipEntry=nmsEponOltChipEntry)

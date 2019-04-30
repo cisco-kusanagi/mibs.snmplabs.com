@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module BSUSUBASE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BSUSUBASE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:24:31 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+aniBsuSuGroup, = mibBuilder.importSymbols("ANIROOT-MIB", "aniBsuSuGroup")
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+aniBsuSuMacAddr, = mibBuilder.importSymbols("BSUSUINV-MIB", "aniBsuSuMacAddr")
+aniBsuWirelessPort, = mibBuilder.importSymbols("BSUWIRELESSIF-MIB", "aniBsuWirelessPort")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Counter32, TimeTicks, Unsigned32, MibIdentifier, ModuleIdentity, ObjectIdentity, NotificationType, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, Counter64, Gauge32, iso, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "TimeTicks", "Unsigned32", "MibIdentifier", "ModuleIdentity", "ObjectIdentity", "NotificationType", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "Counter64", "Gauge32", "iso", "IpAddress")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+aniBsuSuBase = ModuleIdentity((1, 3, 6, 1, 4, 1, 4325, 3, 7, 2))
+if mibBuilder.loadTexts: aniBsuSuBase.setLastUpdated('0105091130Z')
+if mibBuilder.loadTexts: aniBsuSuBase.setOrganization('Aperto Networks')
+aniBsuSuBaseTable = MibTable((1, 3, 6, 1, 4, 1, 4325, 3, 7, 2, 1), )
+if mibBuilder.loadTexts: aniBsuSuBaseTable.setStatus('current')
+aniBsuSuBaseEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4325, 3, 7, 2, 1, 1), ).setIndexNames((0, "BSUWIRELESSIF-MIB", "aniBsuWirelessPort"), (0, "BSUSUINV-MIB", "aniBsuSuMacAddr"))
+if mibBuilder.loadTexts: aniBsuSuBaseEntry.setStatus('current')
+aniBsuSuNetworkAccess = MibTableColumn((1, 3, 6, 1, 4, 1, 4325, 3, 7, 2, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2))).clone(1)).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniBsuSuNetworkAccess.setStatus('current')
+aniBsuSuMaxHostSupport = MibTableColumn((1, 3, 6, 1, 4, 1, 4325, 3, 7, 2, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 254))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniBsuSuMaxHostSupport.setStatus('current')
+aniBsuSuTargetFreq = MibTableColumn((1, 3, 6, 1, 4, 1, 4325, 3, 7, 2, 1, 1, 4), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniBsuSuTargetFreq.setStatus('current')
+aniBsuSuFrequencyTable = MibTableColumn((1, 3, 6, 1, 4, 1, 4325, 3, 7, 2, 1, 1, 5), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aniBsuSuFrequencyTable.setStatus('current')
+mibBuilder.exportSymbols("BSUSUBASE-MIB", aniBsuSuMaxHostSupport=aniBsuSuMaxHostSupport, aniBsuSuBaseTable=aniBsuSuBaseTable, aniBsuSuNetworkAccess=aniBsuSuNetworkAccess, PYSNMP_MODULE_ID=aniBsuSuBase, aniBsuSuTargetFreq=aniBsuSuTargetFreq, aniBsuSuBase=aniBsuSuBase, aniBsuSuBaseEntry=aniBsuSuBaseEntry, aniBsuSuFrequencyTable=aniBsuSuFrequencyTable)

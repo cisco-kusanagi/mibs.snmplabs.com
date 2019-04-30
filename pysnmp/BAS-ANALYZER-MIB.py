@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module BAS-ANALYZER-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BAS-ANALYZER-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:17:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+basAnalyzer, = mibBuilder.importSymbols("BAS-MIB", "basAnalyzer")
+InterfaceIndex, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, TimeTicks, ObjectIdentity, Integer32, Counter32, Counter64, iso, NotificationType, IpAddress, ModuleIdentity, Gauge32, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "TimeTicks", "ObjectIdentity", "Integer32", "Counter32", "Counter64", "iso", "NotificationType", "IpAddress", "ModuleIdentity", "Gauge32", "MibIdentifier")
+TruthValue, MacAddress, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "MacAddress", "TextualConvention", "DisplayString")
+basAnalyzerMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 3493, 2, 17, 1))
+if mibBuilder.loadTexts: basAnalyzerMib.setLastUpdated('9908190000Z')
+if mibBuilder.loadTexts: basAnalyzerMib.setOrganization('Broadband Access Systems')
+basAnalyzerTable = MibTable((1, 3, 6, 1, 4, 1, 3493, 2, 17, 1, 1), )
+if mibBuilder.loadTexts: basAnalyzerTable.setStatus('current')
+basAnalyzerEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3493, 2, 17, 1, 1, 1), ).setIndexNames((0, "BAS-ANALYZER-MIB", "basAnalyzerIndex"))
+if mibBuilder.loadTexts: basAnalyzerEntry.setStatus('current')
+basAnalyzerIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 3493, 2, 17, 1, 1, 1, 1), InterfaceIndex())
+if mibBuilder.loadTexts: basAnalyzerIndex.setStatus('current')
+basAnalyzerClient = MibTableColumn((1, 3, 6, 1, 4, 1, 3493, 2, 17, 1, 1, 1, 2), InterfaceIndex()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: basAnalyzerClient.setStatus('current')
+basAnalyzerAdminStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 3493, 2, 17, 1, 1, 1, 3), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: basAnalyzerAdminStatus.setStatus('current')
+basAnalyzerMacAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 3493, 2, 17, 1, 1, 1, 4), MacAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: basAnalyzerMacAddress.setStatus('current')
+basAnalyzerMacAddressMask = MibTableColumn((1, 3, 6, 1, 4, 1, 3493, 2, 17, 1, 1, 1, 5), MacAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: basAnalyzerMacAddressMask.setStatus('current')
+mibBuilder.exportSymbols("BAS-ANALYZER-MIB", basAnalyzerClient=basAnalyzerClient, basAnalyzerAdminStatus=basAnalyzerAdminStatus, basAnalyzerMacAddressMask=basAnalyzerMacAddressMask, basAnalyzerEntry=basAnalyzerEntry, basAnalyzerIndex=basAnalyzerIndex, PYSNMP_MODULE_ID=basAnalyzerMib, basAnalyzerTable=basAnalyzerTable, basAnalyzerMacAddress=basAnalyzerMacAddress, basAnalyzerMib=basAnalyzerMib)

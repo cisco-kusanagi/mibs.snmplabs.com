@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module HUAWEI-CPU-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HUAWEI-CPU-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:31:57 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint")
+hwFrameIndex, hwSlotIndex = mibBuilder.importSymbols("HUAWEI-DEVICE-MIB", "hwFrameIndex", "hwSlotIndex")
+huaweiUtility, = mibBuilder.importSymbols("HUAWEI-MIB", "huaweiUtility")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+Integer32, ModuleIdentity, Counter32, TimeTicks, MibIdentifier, NotificationType, IpAddress, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Gauge32, ObjectIdentity, iso, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "ModuleIdentity", "Counter32", "TimeTicks", "MibIdentifier", "NotificationType", "IpAddress", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Gauge32", "ObjectIdentity", "iso", "Unsigned32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+hwDev = ModuleIdentity((1, 3, 6, 1, 4, 1, 2011, 6, 3))
+if mibBuilder.loadTexts: hwDev.setLastUpdated('200406280900Z')
+if mibBuilder.loadTexts: hwDev.setOrganization('Fix-Net Dept, Huawei Technologies Co.,Ltd.')
+hwCpuDevTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 6, 3, 4), )
+if mibBuilder.loadTexts: hwCpuDevTable.setStatus('current')
+hwCpuDevEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 6, 3, 4, 1), ).setIndexNames((0, "HUAWEI-DEVICE-MIB", "hwFrameIndex"), (0, "HUAWEI-DEVICE-MIB", "hwSlotIndex"), (0, "HUAWEI-CPU-MIB", "hwCpuDevIndex"))
+if mibBuilder.loadTexts: hwCpuDevEntry.setStatus('current')
+hwCpuDevIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 6, 3, 4, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 255)))
+if mibBuilder.loadTexts: hwCpuDevIndex.setStatus('current')
+hwCpuDevDuty = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 6, 3, 4, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 100))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwCpuDevDuty.setStatus('current')
+hwAvgDuty1min = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 6, 3, 4, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 100))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwAvgDuty1min.setStatus('current')
+hwAvgDuty5min = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 6, 3, 4, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 100))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwAvgDuty5min.setStatus('current')
+mibBuilder.exportSymbols("HUAWEI-CPU-MIB", hwDev=hwDev, PYSNMP_MODULE_ID=hwDev, hwCpuDevEntry=hwCpuDevEntry, hwAvgDuty1min=hwAvgDuty1min, hwAvgDuty5min=hwAvgDuty5min, hwCpuDevTable=hwCpuDevTable, hwCpuDevDuty=hwCpuDevDuty, hwCpuDevIndex=hwCpuDevIndex)

@@ -1,0 +1,77 @@
+#
+# PySNMP MIB module CISCO-LWAPP-INTERFACE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-LWAPP-INTERFACE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:48:36 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+NotificationType, ObjectIdentity, Counter32, Integer32, Bits, TimeTicks, iso, Counter64, MibIdentifier, Unsigned32, ModuleIdentity, IpAddress, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "ObjectIdentity", "Counter32", "Integer32", "Bits", "TimeTicks", "iso", "Counter64", "MibIdentifier", "Unsigned32", "ModuleIdentity", "IpAddress", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention, RowStatus, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention", "RowStatus", "TruthValue")
+ciscoLwappInterfaceMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 686))
+ciscoLwappInterfaceMIB.setRevisions(('2012-05-30 00:00', '2010-08-22 00:00', '2009-01-09 00:00',))
+if mibBuilder.loadTexts: ciscoLwappInterfaceMIB.setLastUpdated('201205300000Z')
+if mibBuilder.loadTexts: ciscoLwappInterfaceMIB.setOrganization('Cisco Systems Inc.')
+ciscoLwappInterfaceMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 686, 0))
+ciscoLwappInterfaceMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 686, 1))
+ciscoLwappInterfaceMIBConform = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 686, 2))
+ciscoLwappInterfaceConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1))
+clInterfaceConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 1), )
+if mibBuilder.loadTexts: clInterfaceConfigTable.setStatus('current')
+clInterfaceConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 1, 1), ).setIndexNames((0, "CISCO-LWAPP-INTERFACE-MIB", "clInterfaceName"))
+if mibBuilder.loadTexts: clInterfaceConfigEntry.setStatus('current')
+clInterfaceName = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 1, 1, 1), OctetString().subtype(subtypeSpec=ValueSizeConstraint(1, 32)))
+if mibBuilder.loadTexts: clInterfaceName.setStatus('current')
+clInterfaceWired = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 1, 1, 2), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: clInterfaceWired.setStatus('current')
+clInterfaceQuarantineVlanId = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 1, 1, 3), Unsigned32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: clInterfaceQuarantineVlanId.setStatus('current')
+clInterfaceDhcpOpt82Enabled = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 1, 1, 4), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: clInterfaceDhcpOpt82Enabled.setStatus('current')
+clInterfaceGroupsConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 2), )
+if mibBuilder.loadTexts: clInterfaceGroupsConfigTable.setStatus('current')
+clInterfaceGroupsConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 2, 1), ).setIndexNames((0, "CISCO-LWAPP-INTERFACE-MIB", "clInterfaceGroupName"))
+if mibBuilder.loadTexts: clInterfaceGroupsConfigEntry.setStatus('current')
+clInterfaceGroupName = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 2, 1, 1), SnmpAdminString())
+if mibBuilder.loadTexts: clInterfaceGroupName.setStatus('current')
+clInterfaceGroupDescr = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 2, 1, 2), SnmpAdminString()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: clInterfaceGroupDescr.setStatus('current')
+clInterfaceGroupIsQuarantine = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 2, 1, 3), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: clInterfaceGroupIsQuarantine.setStatus('current')
+clInterfaceGroupRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 2, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: clInterfaceGroupRowStatus.setStatus('current')
+clInterfaceGroupsMappingTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 3), )
+if mibBuilder.loadTexts: clInterfaceGroupsMappingTable.setStatus('current')
+clInterfaceGroupsMappingEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 3, 1), ).setIndexNames((0, "CISCO-LWAPP-INTERFACE-MIB", "clInterfaceGroupName"), (0, "CISCO-LWAPP-INTERFACE-MIB", "clInterfaceName"))
+if mibBuilder.loadTexts: clInterfaceGroupsMappingEntry.setStatus('current')
+clInterfaceGroupMappingRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 686, 1, 1, 3, 1, 1), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: clInterfaceGroupMappingRowStatus.setStatus('current')
+ciscoLwappInterfaceMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 686, 2, 1))
+ciscoLwappInterfaceMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 686, 2, 2))
+ciscoLwappInterfaceMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 686, 2, 1, 1)).setObjects(("CISCO-LWAPP-INTERFACE-MIB", "ciscoLwappInterfaceConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoLwappInterfaceMIBCompliance = ciscoLwappInterfaceMIBCompliance.setStatus('deprecated')
+ciscoLwappInterfaceMIBComplianceRev01 = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 686, 2, 1, 2)).setObjects(("CISCO-LWAPP-INTERFACE-MIB", "ciscoLwappInterfaceConfigGroup"), ("CISCO-LWAPP-INTERFACE-MIB", "ciscoLwappInterfaceGroupConfigSup1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoLwappInterfaceMIBComplianceRev01 = ciscoLwappInterfaceMIBComplianceRev01.setStatus('deprecated')
+ciscoLwappInterfaceMIBComplianceRev02 = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 686, 2, 1, 3)).setObjects(("CISCO-LWAPP-INTERFACE-MIB", "ciscoLwappInterfaceConfigGroup"), ("CISCO-LWAPP-INTERFACE-MIB", "ciscoLwappInterfaceGroupConfigSup1"), ("CISCO-LWAPP-INTERFACE-MIB", "ciscoLwappInterfaceConfigGroupSup1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoLwappInterfaceMIBComplianceRev02 = ciscoLwappInterfaceMIBComplianceRev02.setStatus('current')
+ciscoLwappInterfaceConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 686, 2, 2, 1)).setObjects(("CISCO-LWAPP-INTERFACE-MIB", "clInterfaceWired"), ("CISCO-LWAPP-INTERFACE-MIB", "clInterfaceQuarantineVlanId"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoLwappInterfaceConfigGroup = ciscoLwappInterfaceConfigGroup.setStatus('current')
+ciscoLwappInterfaceGroupConfigSup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 686, 2, 2, 2)).setObjects(("CISCO-LWAPP-INTERFACE-MIB", "clInterfaceGroupDescr"), ("CISCO-LWAPP-INTERFACE-MIB", "clInterfaceGroupIsQuarantine"), ("CISCO-LWAPP-INTERFACE-MIB", "clInterfaceGroupRowStatus"), ("CISCO-LWAPP-INTERFACE-MIB", "clInterfaceGroupMappingRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoLwappInterfaceGroupConfigSup1 = ciscoLwappInterfaceGroupConfigSup1.setStatus('current')
+ciscoLwappInterfaceConfigGroupSup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 686, 2, 2, 3)).setObjects(("CISCO-LWAPP-INTERFACE-MIB", "clInterfaceDhcpOpt82Enabled"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoLwappInterfaceConfigGroupSup1 = ciscoLwappInterfaceConfigGroupSup1.setStatus('current')
+mibBuilder.exportSymbols("CISCO-LWAPP-INTERFACE-MIB", clInterfaceGroupMappingRowStatus=clInterfaceGroupMappingRowStatus, ciscoLwappInterfaceMIBCompliances=ciscoLwappInterfaceMIBCompliances, clInterfaceGroupIsQuarantine=clInterfaceGroupIsQuarantine, clInterfaceDhcpOpt82Enabled=clInterfaceDhcpOpt82Enabled, ciscoLwappInterfaceMIBComplianceRev01=ciscoLwappInterfaceMIBComplianceRev01, ciscoLwappInterfaceMIB=ciscoLwappInterfaceMIB, clInterfaceGroupsMappingEntry=clInterfaceGroupsMappingEntry, clInterfaceGroupRowStatus=clInterfaceGroupRowStatus, ciscoLwappInterfaceMIBObjects=ciscoLwappInterfaceMIBObjects, PYSNMP_MODULE_ID=ciscoLwappInterfaceMIB, ciscoLwappInterfaceMIBCompliance=ciscoLwappInterfaceMIBCompliance, ciscoLwappInterfaceMIBGroups=ciscoLwappInterfaceMIBGroups, clInterfaceGroupsConfigEntry=clInterfaceGroupsConfigEntry, ciscoLwappInterfaceMIBConform=ciscoLwappInterfaceMIBConform, clInterfaceGroupsMappingTable=clInterfaceGroupsMappingTable, clInterfaceWired=clInterfaceWired, ciscoLwappInterfaceConfigGroupSup1=ciscoLwappInterfaceConfigGroupSup1, clInterfaceConfigEntry=clInterfaceConfigEntry, clInterfaceName=clInterfaceName, clInterfaceGroupDescr=clInterfaceGroupDescr, ciscoLwappInterfaceGroupConfigSup1=ciscoLwappInterfaceGroupConfigSup1, clInterfaceGroupsConfigTable=clInterfaceGroupsConfigTable, clInterfaceQuarantineVlanId=clInterfaceQuarantineVlanId, ciscoLwappInterfaceConfig=ciscoLwappInterfaceConfig, ciscoLwappInterfaceConfigGroup=ciscoLwappInterfaceConfigGroup, clInterfaceGroupName=clInterfaceGroupName, clInterfaceConfigTable=clInterfaceConfigTable, ciscoLwappInterfaceMIBComplianceRev02=ciscoLwappInterfaceMIBComplianceRev02, ciscoLwappInterfaceMIBNotifs=ciscoLwappInterfaceMIBNotifs)

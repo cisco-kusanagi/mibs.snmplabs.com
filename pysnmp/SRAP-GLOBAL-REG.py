@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module SRAP-GLOBAL-REG (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SRAP-GLOBAL-REG
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:02:41 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+wlan_mib, = mibBuilder.importSymbols("A3Com-products-MIB", "wlan-mib")
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Unsigned32, ObjectIdentity, ModuleIdentity, NotificationType, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Integer32, TimeTicks, IpAddress, Counter32, iso, MibIdentifier, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "ObjectIdentity", "ModuleIdentity", "NotificationType", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Integer32", "TimeTicks", "IpAddress", "Counter32", "iso", "MibIdentifier", "Gauge32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+srAPGlobalRegModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 43, 35, 1, 1, 1))
+if mibBuilder.loadTexts: srAPGlobalRegModule.setLastUpdated('0105260000Z')
+if mibBuilder.loadTexts: srAPGlobalRegModule.setOrganization('3Com')
+srAP = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 1))
+ecb = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 2))
+deltaFlyer = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 3))
+idefix = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 4))
+addabbo = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 5))
+rollo = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 6))
+verazanno = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 7))
+rivet = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 8))
+srAPModules = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 1, 1))
+srAPSNMPGen = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 1, 2))
+srAPDot11Ext = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 1, 3))
+srAPCapabilities = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 1, 4))
+srAPReqs = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 1, 5))
+srAPExperimental = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 1, 6))
+srAPWCM = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 35, 1, 7))
+mibBuilder.exportSymbols("SRAP-GLOBAL-REG", addabbo=addabbo, srAPGlobalRegModule=srAPGlobalRegModule, rivet=rivet, srAPWCM=srAPWCM, idefix=idefix, verazanno=verazanno, PYSNMP_MODULE_ID=srAPGlobalRegModule, srAPCapabilities=srAPCapabilities, srAPSNMPGen=srAPSNMPGen, srAPDot11Ext=srAPDot11Ext, srAPReqs=srAPReqs, srAPModules=srAPModules, srAPExperimental=srAPExperimental, rollo=rollo, srAP=srAP, deltaFlyer=deltaFlyer, ecb=ecb)

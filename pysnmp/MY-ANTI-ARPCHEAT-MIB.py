@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module MY-ANTI-ARPCHEAT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MY-ANTI-ARPCHEAT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:06:24 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+myMgmt, = mibBuilder.importSymbols("MY-SMI", "myMgmt")
+IfIndex, = mibBuilder.importSymbols("MY-TC", "IfIndex")
+VlanId, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "VlanId")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+NotificationType, Counter32, Unsigned32, MibIdentifier, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, Counter64, iso, Gauge32, TimeTicks, IpAddress, ModuleIdentity, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Counter32", "Unsigned32", "MibIdentifier", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "Counter64", "iso", "Gauge32", "TimeTicks", "IpAddress", "ModuleIdentity", "ObjectIdentity")
+MacAddress, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "MacAddress", "TextualConvention", "DisplayString")
+myAntiArpcheatMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41))
+myAntiArpcheatMIB.setRevisions(('2007-01-29 00:00',))
+if mibBuilder.loadTexts: myAntiArpcheatMIB.setLastUpdated('200701290000Z')
+if mibBuilder.loadTexts: myAntiArpcheatMIB.setOrganization('D-Link Crop.')
+myAntiArpcheatMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1))
+myTrustedArpDelete = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1, 1), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: myTrustedArpDelete.setStatus('current')
+myTrustedArpTable = MibTable((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1, 2), )
+if mibBuilder.loadTexts: myTrustedArpTable.setStatus('current')
+myTrustedArpEntry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1, 2, 1), ).setIndexNames((0, "MY-ANTI-ARPCHEAT-MIB", "trustedArpIfIndex"), (0, "MY-ANTI-ARPCHEAT-MIB", "trustedArpIp"))
+if mibBuilder.loadTexts: myTrustedArpEntry.setStatus('current')
+trustedArpIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1, 2, 1, 1), IfIndex()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: trustedArpIfIndex.setStatus('current')
+trustedArpIp = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1, 2, 1, 2), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: trustedArpIp.setStatus('current')
+trustedArpMediaPhysAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1, 2, 1, 3), MacAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: trustedArpMediaPhysAddress.setStatus('current')
+trustedArpVlan = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1, 2, 1, 4), VlanId()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: trustedArpVlan.setStatus('current')
+trustedArpOperationType = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 1, 2, 1, 5), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: trustedArpOperationType.setStatus('current')
+myAntiArpcheatMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 2))
+myAntiArpcheatMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 2, 1))
+myAntiArpcheatMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 2, 2))
+myAntiArpcheatMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 2, 1, 1)).setObjects(("MY-ANTI-ARPCHEAT-MIB", "myAntiArpcheatMIBGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    myAntiArpcheatMIBCompliance = myAntiArpcheatMIBCompliance.setStatus('current')
+myAntiArpcheatMIBGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 171, 10, 97, 2, 41, 2, 2, 1)).setObjects(("MY-ANTI-ARPCHEAT-MIB", "myTrustedArpDelete"), ("MY-ANTI-ARPCHEAT-MIB", "trustedArpIfIndex"), ("MY-ANTI-ARPCHEAT-MIB", "trustedArpIp"), ("MY-ANTI-ARPCHEAT-MIB", "trustedArpMediaPhysAddress"), ("MY-ANTI-ARPCHEAT-MIB", "trustedArpVlan"), ("MY-ANTI-ARPCHEAT-MIB", "trustedArpOperationType"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    myAntiArpcheatMIBGroup = myAntiArpcheatMIBGroup.setStatus('current')
+mibBuilder.exportSymbols("MY-ANTI-ARPCHEAT-MIB", myAntiArpcheatMIBGroup=myAntiArpcheatMIBGroup, myTrustedArpTable=myTrustedArpTable, myAntiArpcheatMIB=myAntiArpcheatMIB, trustedArpIp=trustedArpIp, myAntiArpcheatMIBCompliance=myAntiArpcheatMIBCompliance, myAntiArpcheatMIBGroups=myAntiArpcheatMIBGroups, myTrustedArpDelete=myTrustedArpDelete, trustedArpVlan=trustedArpVlan, myAntiArpcheatMIBCompliances=myAntiArpcheatMIBCompliances, myTrustedArpEntry=myTrustedArpEntry, trustedArpIfIndex=trustedArpIfIndex, myAntiArpcheatMIBConformance=myAntiArpcheatMIBConformance, trustedArpOperationType=trustedArpOperationType, trustedArpMediaPhysAddress=trustedArpMediaPhysAddress, myAntiArpcheatMIBObjects=myAntiArpcheatMIBObjects, PYSNMP_MODULE_ID=myAntiArpcheatMIB)

@@ -1,0 +1,47 @@
+#
+# PySNMP MIB module AVICI-MEMORY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/AVICI-MEMORY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:16:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+aviciMibs, = mibBuilder.importSymbols("AVICI-SMI", "aviciMibs")
+aviciSysInventoryId, = mibBuilder.importSymbols("AVICI-SYSTEM-MIB", "aviciSysInventoryId")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+ModuleIdentity, Bits, Counter64, MibIdentifier, Gauge32, iso, TimeTicks, Unsigned32, IpAddress, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, NotificationType, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Bits", "Counter64", "MibIdentifier", "Gauge32", "iso", "TimeTicks", "Unsigned32", "IpAddress", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "NotificationType", "Integer32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+aviciMemoryMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2474, 1, 6))
+aviciMemoryMIB.setRevisions(('0009-07-12 15:00',))
+if mibBuilder.loadTexts: aviciMemoryMIB.setLastUpdated('000907121500Z')
+if mibBuilder.loadTexts: aviciMemoryMIB.setOrganization('Avici Systems Inc')
+aviciMemoryObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1))
+aviciPlatformMemoryTable = MibTable((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1, 1), )
+if mibBuilder.loadTexts: aviciPlatformMemoryTable.setStatus('current')
+aviciPlatformMemoryEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1, 1, 1), ).setIndexNames((0, "AVICI-SYSTEM-MIB", "aviciSysInventoryId"))
+if mibBuilder.loadTexts: aviciPlatformMemoryEntry.setStatus('current')
+aviciPlatformMemoryTotal = MibTableColumn((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1, 1, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aviciPlatformMemoryTotal.setStatus('current')
+aviciPlatformMemoryUsed = MibTableColumn((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1, 1, 1, 2), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aviciPlatformMemoryUsed.setStatus('current')
+aviciPlatformMemoryFree = MibTableColumn((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1, 1, 1, 3), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aviciPlatformMemoryFree.setStatus('current')
+aviciPlatformMemoryFreePages = MibTableColumn((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1, 1, 1, 4), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aviciPlatformMemoryFreePages.setStatus('current')
+aviciPlatformMemoryPageSize = MibTableColumn((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1, 1, 1, 5), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aviciPlatformMemoryPageSize.setStatus('current')
+aviciPlatformMemoryLargestFree = MibTableColumn((1, 3, 6, 1, 4, 1, 2474, 1, 6, 1, 1, 1, 6), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aviciPlatformMemoryLargestFree.setStatus('current')
+aviciMemoryMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2474, 1, 6, 2))
+aviciMemoryMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2474, 1, 6, 2, 1))
+aviciMemoryMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2474, 1, 6, 2, 2))
+aviciMemoryMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2474, 1, 6, 2, 1, 1)).setObjects(("AVICI-MEMORY-MIB", "aviciMemoryGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    aviciMemoryMIBCompliance = aviciMemoryMIBCompliance.setStatus('current')
+aviciMemoryGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2474, 1, 6, 2, 2, 1)).setObjects(("AVICI-MEMORY-MIB", "aviciPlatformMemoryTotal"), ("AVICI-MEMORY-MIB", "aviciPlatformMemoryUsed"), ("AVICI-MEMORY-MIB", "aviciPlatformMemoryFree"), ("AVICI-MEMORY-MIB", "aviciPlatformMemoryFreePages"), ("AVICI-MEMORY-MIB", "aviciPlatformMemoryPageSize"), ("AVICI-MEMORY-MIB", "aviciPlatformMemoryLargestFree"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    aviciMemoryGroup = aviciMemoryGroup.setStatus('current')
+mibBuilder.exportSymbols("AVICI-MEMORY-MIB", aviciPlatformMemoryFreePages=aviciPlatformMemoryFreePages, aviciMemoryGroup=aviciMemoryGroup, aviciMemoryMIB=aviciMemoryMIB, aviciPlatformMemoryUsed=aviciPlatformMemoryUsed, aviciPlatformMemoryTotal=aviciPlatformMemoryTotal, aviciMemoryMIBConformance=aviciMemoryMIBConformance, aviciMemoryMIBGroups=aviciMemoryMIBGroups, aviciPlatformMemoryEntry=aviciPlatformMemoryEntry, aviciPlatformMemoryFree=aviciPlatformMemoryFree, PYSNMP_MODULE_ID=aviciMemoryMIB, aviciPlatformMemoryLargestFree=aviciPlatformMemoryLargestFree, aviciMemoryMIBCompliances=aviciMemoryMIBCompliances, aviciPlatformMemoryTable=aviciPlatformMemoryTable, aviciPlatformMemoryPageSize=aviciPlatformMemoryPageSize, aviciMemoryObjects=aviciMemoryObjects, aviciMemoryMIBCompliance=aviciMemoryMIBCompliance)

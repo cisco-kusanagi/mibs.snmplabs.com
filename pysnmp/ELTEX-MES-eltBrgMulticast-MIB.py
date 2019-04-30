@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module ELTEX-MES-eltBrgMulticast-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ELTEX-MES-eltBrgMulticast-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:47:50 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint")
+eltMesMacMulticast, = mibBuilder.importSymbols("ELTEX-MES", "eltMesMacMulticast")
+InterfaceIndex, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex")
+InetAddress, = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress")
+PortList, VlanIndex = mibBuilder.importSymbols("Q-BRIDGE-MIB", "PortList", "VlanIndex")
+rlIgmpMldSnoopVlanEntry, = mibBuilder.importSymbols("RADLAN-rlMacMulticast-MIB", "rlIgmpMldSnoopVlanEntry")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Bits, Counter64, iso, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Integer32, Unsigned32, MibIdentifier, TimeTicks, ModuleIdentity, ObjectIdentity, Gauge32, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "Counter64", "iso", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Integer32", "Unsigned32", "MibIdentifier", "TimeTicks", "ModuleIdentity", "ObjectIdentity", "Gauge32", "Counter32")
+RowStatus, TextualConvention, DisplayString, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "TextualConvention", "DisplayString", "TruthValue")
+eltMesMldSnoop = MibIdentifier((1, 3, 6, 1, 4, 1, 35265, 1, 23, 55, 5))
+eltIgmpMldSnoopVlanTable = MibTable((1, 3, 6, 1, 4, 1, 35265, 1, 23, 55, 5, 5), )
+if mibBuilder.loadTexts: eltIgmpMldSnoopVlanTable.setStatus('current')
+eltIgmpMldSnoopVlanEntry = MibTableRow((1, 3, 6, 1, 4, 1, 35265, 1, 23, 55, 5, 5, 1), )
+rlIgmpMldSnoopVlanEntry.registerAugmentions(("ELTEX-MES-eltBrgMulticast-MIB", "eltIgmpMldSnoopVlanEntry"))
+eltIgmpMldSnoopVlanEntry.setIndexNames(*rlIgmpMldSnoopVlanEntry.getIndexNames())
+if mibBuilder.loadTexts: eltIgmpMldSnoopVlanEntry.setStatus('current')
+eltIgmpMldSnoopVlanIsImmediateLeaveHostBased = MibTableColumn((1, 3, 6, 1, 4, 1, 35265, 1, 23, 55, 5, 5, 1, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: eltIgmpMldSnoopVlanIsImmediateLeaveHostBased.setStatus('current')
+eltIgmpMldSnoopVlanCos = MibTableColumn((1, 3, 6, 1, 4, 1, 35265, 1, 23, 55, 5, 5, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(0, 7), ValueRangeConstraint(255, 255), )).clone(255)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: eltIgmpMldSnoopVlanCos.setStatus('current')
+eltIgmpMldSnoopVlanReplaceSourceIp = MibTableColumn((1, 3, 6, 1, 4, 1, 35265, 1, 23, 55, 5, 5, 1, 3), InetAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: eltIgmpMldSnoopVlanReplaceSourceIp.setStatus('current')
+mibBuilder.exportSymbols("ELTEX-MES-eltBrgMulticast-MIB", eltIgmpMldSnoopVlanCos=eltIgmpMldSnoopVlanCos, eltMesMldSnoop=eltMesMldSnoop, eltIgmpMldSnoopVlanReplaceSourceIp=eltIgmpMldSnoopVlanReplaceSourceIp, eltIgmpMldSnoopVlanEntry=eltIgmpMldSnoopVlanEntry, eltIgmpMldSnoopVlanIsImmediateLeaveHostBased=eltIgmpMldSnoopVlanIsImmediateLeaveHostBased, eltIgmpMldSnoopVlanTable=eltIgmpMldSnoopVlanTable)

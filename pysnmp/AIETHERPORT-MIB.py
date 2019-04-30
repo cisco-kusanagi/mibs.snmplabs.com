@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module AIETHERPORT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/AIETHERPORT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:00:33 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+PositiveInteger, = mibBuilder.importSymbols("AISYSTEM-MIB", "PositiveInteger")
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Bits, Unsigned32, TimeTicks, ObjectIdentity, MibIdentifier, IpAddress, Counter64, enterprises, Integer32, iso, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, Gauge32, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "Unsigned32", "TimeTicks", "ObjectIdentity", "MibIdentifier", "IpAddress", "Counter64", "enterprises", "Integer32", "iso", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "Gauge32", "Counter32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+aii = MibIdentifier((1, 3, 6, 1, 4, 1, 539))
+aiEtherport = ModuleIdentity((1, 3, 6, 1, 4, 1, 539, 31))
+if mibBuilder.loadTexts: aiEtherport.setLastUpdated('010207235959')
+if mibBuilder.loadTexts: aiEtherport.setOrganization('Applied Innovation Incorporated')
+aiEtherCnf = MibIdentifier((1, 3, 6, 1, 4, 1, 539, 31, 1))
+etherPortCnfTable = MibTable((1, 3, 6, 1, 4, 1, 539, 31, 1, 1), )
+if mibBuilder.loadTexts: etherPortCnfTable.setStatus('current')
+etherPortCnfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 539, 31, 1, 1, 1), ).setIndexNames((0, "AIETHERPORT-MIB", "etherPortIndex"))
+if mibBuilder.loadTexts: etherPortCnfEntry.setStatus('current')
+etherPortIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 539, 31, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1024))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etherPortIndex.setStatus('current')
+etherPortName = MibTableColumn((1, 3, 6, 1, 4, 1, 539, 31, 1, 1, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 30))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: etherPortName.setStatus('current')
+etherPortAdminStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 539, 31, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("up", 1), ("down", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etherPortAdminStatus.setStatus('current')
+etherPortSpeedCtrl = MibTableColumn((1, 3, 6, 1, 4, 1, 539, 31, 1, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("auto", 1), ("t10Half", 2), ("t10Full", 3), ("tx100Half", 4), ("tx100Full", 5)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: etherPortSpeedCtrl.setStatus('current')
+mibBuilder.exportSymbols("AIETHERPORT-MIB", aiEtherport=aiEtherport, etherPortCnfEntry=etherPortCnfEntry, etherPortIndex=etherPortIndex, etherPortSpeedCtrl=etherPortSpeedCtrl, PYSNMP_MODULE_ID=aiEtherport, etherPortCnfTable=etherPortCnfTable, etherPortName=etherPortName, etherPortAdminStatus=etherPortAdminStatus, aii=aii, aiEtherCnf=aiEtherCnf)

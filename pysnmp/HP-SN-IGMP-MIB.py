@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module HP-SN-IGMP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-SN-IGMP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:23:45 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint")
+snIgmp, = mibBuilder.importSymbols("HP-SN-ROOT-MIB", "snIgmp")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, Unsigned32, MibIdentifier, Gauge32, Integer32, iso, TimeTicks, Counter32, Bits, Counter64, ObjectIdentity, NotificationType, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Unsigned32", "MibIdentifier", "Gauge32", "Integer32", "iso", "TimeTicks", "Counter32", "Bits", "Counter64", "ObjectIdentity", "NotificationType", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+snIgmpMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1))
+snIgmpQueryInterval = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 3600)).clone(60)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: snIgmpQueryInterval.setStatus('mandatory')
+snIgmpGroupMembershipTime = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 7200)).clone(140)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: snIgmpGroupMembershipTime.setStatus('mandatory')
+snIgmpIfTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1, 3), )
+if mibBuilder.loadTexts: snIgmpIfTable.setStatus('mandatory')
+snIgmpIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1, 3, 1), ).setIndexNames((0, "HP-SN-IGMP-MIB", "snIgmpIfEntryIndex"))
+if mibBuilder.loadTexts: snIgmpIfEntry.setStatus('mandatory')
+snIgmpIfEntryIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1, 3, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snIgmpIfEntryIndex.setStatus('mandatory')
+snIgmpIfPortNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1, 3, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snIgmpIfPortNumber.setStatus('mandatory')
+snIgmpIfGroupAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1, 3, 1, 3), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snIgmpIfGroupAddress.setStatus('mandatory')
+snIgmpIfGroupAge = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 3, 7, 11, 12, 2, 6, 1, 3, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snIgmpIfGroupAge.setStatus('mandatory')
+mibBuilder.exportSymbols("HP-SN-IGMP-MIB", snIgmpIfGroupAddress=snIgmpIfGroupAddress, snIgmpIfPortNumber=snIgmpIfPortNumber, snIgmpMIBObjects=snIgmpMIBObjects, snIgmpQueryInterval=snIgmpQueryInterval, snIgmpIfTable=snIgmpIfTable, snIgmpGroupMembershipTime=snIgmpGroupMembershipTime, snIgmpIfEntry=snIgmpIfEntry, snIgmpIfGroupAge=snIgmpIfGroupAge, snIgmpIfEntryIndex=snIgmpIfEntryIndex)

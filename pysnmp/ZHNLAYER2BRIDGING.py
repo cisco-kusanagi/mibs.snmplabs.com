@@ -1,0 +1,198 @@
+#
+# PySNMP MIB module ZHNLAYER2BRIDGING (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZHNLAYER2BRIDGING
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:40:13 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+InterfaceIndex, InterfaceIndexOrZero, ifIndex = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex", "InterfaceIndexOrZero", "ifIndex")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+enterprises, IpAddress, ModuleIdentity, Gauge32, Counter64, Integer32, MibIdentifier, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, iso, Counter32, TimeTicks, NotificationType, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "enterprises", "IpAddress", "ModuleIdentity", "Gauge32", "Counter64", "Integer32", "MibIdentifier", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "iso", "Counter32", "TimeTicks", "NotificationType", "Bits")
+DisplayString, TruthValue, TextualConvention, MacAddress = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TruthValue", "TextualConvention", "MacAddress")
+zhoneWtn, = mibBuilder.importSymbols("Zhone", "zhoneWtn")
+ZhoneRowStatus, = mibBuilder.importSymbols("Zhone-TC", "ZhoneRowStatus")
+zhnLayer2Bridging = ModuleIdentity((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42))
+zhnLayer2Bridging.setRevisions(('2012-07-11 12:00', '2012-06-21 12:00', '2012-06-05 12:00', '2012-05-16 12:00', '2012-01-26 12:00', '2011-01-11 00:00', '2010-08-10 00:00', '2010-04-01 00:00',))
+if mibBuilder.loadTexts: zhnLayer2Bridging.setLastUpdated('201207111200Z')
+if mibBuilder.loadTexts: zhnLayer2Bridging.setOrganization('Zhone Technologies, Inc.')
+layer2BridgingObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1))
+class BridgeEntryStatusValues(TextualConvention, OctetString):
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 16)
+
+class VlanTypeValues(TextualConvention, OctetString):
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 16)
+
+class VlanSecureType(TextualConvention, OctetString):
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 16)
+
+class VlanIDType(TextualConvention, OctetString):
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 16)
+
+class BridgingIntfTypeValues(TextualConvention, OctetString):
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 32)
+
+class VlanTLSMode(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("sTag", 1), ("unknown", 2), ("normal", 3))
+
+class VlanTLSServiceTags(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))
+    namedValues = NamedValues(("none", 1), ("sTag8100", 2), ("sTag88A8", 3), ("sTag9100", 4), ("sTag9200", 5), ("sTag9300", 6))
+
+class VlanQOSMethods(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("layer2", 1), ("layer3", 2))
+
+maxBridgeEntries = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maxBridgeEntries.setStatus('current')
+maxFilterEntries = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 2), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maxFilterEntries.setStatus('current')
+maxMarkingEntries = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 3), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maxMarkingEntries.setStatus('current')
+bridgeNumberOfEntries = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 4), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bridgeNumberOfEntries.setStatus('current')
+filterNumberOfEntries = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 5), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: filterNumberOfEntries.setStatus('current')
+markingNumberOfEntries = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 6), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: markingNumberOfEntries.setStatus('current')
+availableInterfaceNumberOfEntries = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 7), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: availableInterfaceNumberOfEntries.setStatus('current')
+bridgeTable = MibTable((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8), )
+if mibBuilder.loadTexts: bridgeTable.setStatus('current')
+bridgeEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1), ).setIndexNames((0, "ZHNLAYER2BRIDGING", "bridgeKey"))
+if mibBuilder.loadTexts: bridgeEntry.setStatus('current')
+bridgeKey = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bridgeKey.setStatus('current')
+bridgeEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: bridgeEnable.setStatus('current')
+bridgeStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1, 3), BridgeEntryStatusValues()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bridgeStatus.setStatus('current')
+bridgeName = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1, 4), OctetString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: bridgeName.setStatus('current')
+vlanID = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1, 5), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 4096))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanID.setStatus('current')
+vlanType = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1, 6), VlanTypeValues()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanType.setStatus('current')
+secureVlan = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1, 7), VlanSecureType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: secureVlan.setStatus('current')
+bridgeTableRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 8, 1, 8), ZhoneRowStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: bridgeTableRowStatus.setStatus('current')
+filterBridgeTable = MibTable((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9), )
+if mibBuilder.loadTexts: filterBridgeTable.setStatus('current')
+filterBridgeEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1), ).setIndexNames((0, "ZHNLAYER2BRIDGING", "filterKey"), (0, "ZHNLAYER2BRIDGING", "filterBridgeReference"))
+if mibBuilder.loadTexts: filterBridgeEntry.setStatus('current')
+filterKey = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: filterKey.setStatus('current')
+filterEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: filterEnable.setStatus('current')
+zhnFilterStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1, 3), BridgeEntryStatusValues()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zhnFilterStatus.setStatus('current')
+filterBridgeReference = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1, 4), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: filterBridgeReference.setStatus('current')
+filterInterface = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1, 5), OctetString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: filterInterface.setStatus('current')
+sourceMACFromVendorClassIDFilter = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1, 6), OctetString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: sourceMACFromVendorClassIDFilter.setStatus('current')
+sourceMACFromVendorClassIDFilterExclude = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1, 7), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: sourceMACFromVendorClassIDFilterExclude.setStatus('current')
+bridgeFilterRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 9, 1, 8), ZhoneRowStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: bridgeFilterRowStatus.setStatus('current')
+markingTable = MibTable((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10), )
+if mibBuilder.loadTexts: markingTable.setStatus('current')
+markingEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1), ).setIndexNames((0, "ZHNLAYER2BRIDGING", "markingKey"), (0, "ZHNLAYER2BRIDGING", "markingBridgeReference"))
+if mibBuilder.loadTexts: markingEntry.setStatus('current')
+markingKey = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: markingKey.setStatus('current')
+markingEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: markingEnable.setStatus('current')
+markingStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 3), BridgeEntryStatusValues()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: markingStatus.setStatus('current')
+markingBridgeReference = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 4), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: markingBridgeReference.setStatus('current')
+markingInterface = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 5), OctetString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: markingInterface.setStatus('current')
+vlanIDUntag = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 6), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanIDUntag.setStatus('current')
+vlanIDMark = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 7), Integer32().subtype(subtypeSpec=ValueRangeConstraint(-1, 4095))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanIDMark.setStatus('current')
+ethernetPriorityMark = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 8), Integer32().subtype(subtypeSpec=ValueRangeConstraint(-1, 7))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ethernetPriorityMark.setStatus('current')
+ethernetPriorityOverride = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 9), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ethernetPriorityOverride.setStatus('current')
+vlanIDType = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 10), VlanIDType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: vlanIDType.setStatus('current')
+bridgeMarkingRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 10, 1, 11), ZhoneRowStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: bridgeMarkingRowStatus.setStatus('current')
+availableInterfaceTable = MibTable((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 11), )
+if mibBuilder.loadTexts: availableInterfaceTable.setStatus('current')
+availableInterfaceEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 11, 1), ).setIndexNames((0, "ZHNLAYER2BRIDGING", "availableInterfaceKey"))
+if mibBuilder.loadTexts: availableInterfaceEntry.setStatus('current')
+availableInterfaceKey = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 11, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: availableInterfaceKey.setStatus('current')
+interfaceType = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 11, 1, 2), BridgingIntfTypeValues()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: interfaceType.setStatus('current')
+interfaceReference = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 11, 1, 3), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: interfaceReference.setStatus('current')
+availableInterfaceRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 11, 1, 4), ZhoneRowStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: availableInterfaceRowStatus.setStatus('current')
+vlanPortMembershipTable = MibTable((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 12), )
+if mibBuilder.loadTexts: vlanPortMembershipTable.setStatus('current')
+vlanPortMembershipEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 12, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "ZHNLAYER2BRIDGING", "vlanPortVlanID"))
+if mibBuilder.loadTexts: vlanPortMembershipEntry.setStatus('current')
+vlanPort = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 12, 1, 1), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: vlanPort.setStatus('current')
+vlanPortVlanID = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 12, 1, 2), Unsigned32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanPortVlanID.setStatus('current')
+vlanPortMembershipType = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 12, 1, 3), VlanIDType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanPortMembershipType.setStatus('current')
+vlanPortMembershipAction = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 12, 1, 4), ZhoneRowStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanPortMembershipAction.setStatus('current')
+layer2BridgingGlobalObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 13))
+vlanTLSMode = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 13, 1), VlanTLSMode()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanTLSMode.setStatus('current')
+vlanServiceTagTPID = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 13, 2), VlanTLSServiceTags()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanServiceTagTPID.setStatus('current')
+vlanRouteAcrossVlans = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 13, 3), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanRouteAcrossVlans.setStatus('current')
+vlanQOSMethod = MibScalar((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 1, 13, 4), VlanQOSMethods()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: vlanQOSMethod.setStatus('current')
+zhnLayer2BridgeConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2))
+zhnLayer2BridgeGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 1))
+zhnLayer2BridgeCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 2))
+zhnLayer2BridgeCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 2, 1)).setObjects(("ZHNLAYER2BRIDGING", "zhnBridgeGroup"), ("ZHNLAYER2BRIDGING", "zhnBridgeTableGroup"), ("ZHNLAYER2BRIDGING", "zhnBridgeMarkingTableGroup"), ("ZHNLAYER2BRIDGING", "zhnBridgeAvailableInterfaceGroup"), ("ZHNLAYER2BRIDGING", "zhnPortMembershipGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    zhnLayer2BridgeCompliance = zhnLayer2BridgeCompliance.setStatus('current')
+zhnBridgeGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 1, 1)).setObjects(("ZHNLAYER2BRIDGING", "maxBridgeEntries"), ("ZHNLAYER2BRIDGING", "maxFilterEntries"), ("ZHNLAYER2BRIDGING", "maxMarkingEntries"), ("ZHNLAYER2BRIDGING", "bridgeNumberOfEntries"), ("ZHNLAYER2BRIDGING", "filterNumberOfEntries"), ("ZHNLAYER2BRIDGING", "markingNumberOfEntries"), ("ZHNLAYER2BRIDGING", "availableInterfaceNumberOfEntries"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    zhnBridgeGroup = zhnBridgeGroup.setStatus('current')
+zhnBridgeTableGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 1, 2)).setObjects(("ZHNLAYER2BRIDGING", "bridgeKey"), ("ZHNLAYER2BRIDGING", "bridgeEnable"), ("ZHNLAYER2BRIDGING", "bridgeStatus"), ("ZHNLAYER2BRIDGING", "bridgeName"), ("ZHNLAYER2BRIDGING", "vlanID"), ("ZHNLAYER2BRIDGING", "vlanType"), ("ZHNLAYER2BRIDGING", "secureVlan"), ("ZHNLAYER2BRIDGING", "bridgeTableRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    zhnBridgeTableGroup = zhnBridgeTableGroup.setStatus('current')
+zhnFilterGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 1, 3)).setObjects(("ZHNLAYER2BRIDGING", "filterKey"), ("ZHNLAYER2BRIDGING", "filterEnable"), ("ZHNLAYER2BRIDGING", "zhnFilterStatus"), ("ZHNLAYER2BRIDGING", "filterBridgeReference"), ("ZHNLAYER2BRIDGING", "filterInterface"), ("ZHNLAYER2BRIDGING", "sourceMACFromVendorClassIDFilter"), ("ZHNLAYER2BRIDGING", "sourceMACFromVendorClassIDFilterExclude"), ("ZHNLAYER2BRIDGING", "bridgeFilterRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    zhnFilterGroup = zhnFilterGroup.setStatus('current')
+zhnBridgeMarkingTableGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 1, 4)).setObjects(("ZHNLAYER2BRIDGING", "markingKey"), ("ZHNLAYER2BRIDGING", "markingEnable"), ("ZHNLAYER2BRIDGING", "markingStatus"), ("ZHNLAYER2BRIDGING", "markingBridgeReference"), ("ZHNLAYER2BRIDGING", "markingInterface"), ("ZHNLAYER2BRIDGING", "vlanIDUntag"), ("ZHNLAYER2BRIDGING", "vlanIDMark"), ("ZHNLAYER2BRIDGING", "ethernetPriorityMark"), ("ZHNLAYER2BRIDGING", "ethernetPriorityOverride"), ("ZHNLAYER2BRIDGING", "vlanIDType"), ("ZHNLAYER2BRIDGING", "bridgeMarkingRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    zhnBridgeMarkingTableGroup = zhnBridgeMarkingTableGroup.setStatus('current')
+zhnBridgeAvailableInterfaceGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 1, 5)).setObjects(("ZHNLAYER2BRIDGING", "availableInterfaceKey"), ("ZHNLAYER2BRIDGING", "interfaceType"), ("ZHNLAYER2BRIDGING", "interfaceReference"), ("ZHNLAYER2BRIDGING", "availableInterfaceRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    zhnBridgeAvailableInterfaceGroup = zhnBridgeAvailableInterfaceGroup.setStatus('current')
+zhnPortMembershipGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 1, 6)).setObjects(("ZHNLAYER2BRIDGING", "vlanPort"), ("ZHNLAYER2BRIDGING", "vlanPortVlanID"), ("ZHNLAYER2BRIDGING", "vlanPortMembershipType"), ("ZHNLAYER2BRIDGING", "vlanPortMembershipAction"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    zhnPortMembershipGroup = zhnPortMembershipGroup.setStatus('current')
+zhnVlanGlobalGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5504, 2, 5, 42, 2, 1, 7)).setObjects(("ZHNLAYER2BRIDGING", "vlanTLSMode"), ("ZHNLAYER2BRIDGING", "vlanServiceTagTPID"), ("ZHNLAYER2BRIDGING", "vlanRouteAcrossVlans"), ("ZHNLAYER2BRIDGING", "vlanQOSMethod"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    zhnVlanGlobalGroup = zhnVlanGlobalGroup.setStatus('current')
+mibBuilder.exportSymbols("ZHNLAYER2BRIDGING", BridgeEntryStatusValues=BridgeEntryStatusValues, zhnLayer2BridgeConformance=zhnLayer2BridgeConformance, markingEntry=markingEntry, zhnVlanGlobalGroup=zhnVlanGlobalGroup, VlanSecureType=VlanSecureType, vlanPortVlanID=vlanPortVlanID, bridgeStatus=bridgeStatus, zhnLayer2BridgeCompliance=zhnLayer2BridgeCompliance, maxMarkingEntries=maxMarkingEntries, filterNumberOfEntries=filterNumberOfEntries, sourceMACFromVendorClassIDFilter=sourceMACFromVendorClassIDFilter, markingStatus=markingStatus, markingKey=markingKey, markingBridgeReference=markingBridgeReference, bridgeNumberOfEntries=bridgeNumberOfEntries, secureVlan=secureVlan, VlanTLSMode=VlanTLSMode, vlanPortMembershipType=vlanPortMembershipType, availableInterfaceEntry=availableInterfaceEntry, zhnBridgeGroup=zhnBridgeGroup, maxBridgeEntries=maxBridgeEntries, VlanTLSServiceTags=VlanTLSServiceTags, bridgeFilterRowStatus=bridgeFilterRowStatus, vlanType=vlanType, ethernetPriorityMark=ethernetPriorityMark, bridgeTable=bridgeTable, bridgeEnable=bridgeEnable, filterInterface=filterInterface, vlanServiceTagTPID=vlanServiceTagTPID, bridgeKey=bridgeKey, filterBridgeTable=filterBridgeTable, interfaceType=interfaceType, vlanIDType=vlanIDType, zhnFilterStatus=zhnFilterStatus, vlanTLSMode=vlanTLSMode, zhnLayer2BridgeCompliances=zhnLayer2BridgeCompliances, markingInterface=markingInterface, vlanIDUntag=vlanIDUntag, bridgeEntry=bridgeEntry, bridgeMarkingRowStatus=bridgeMarkingRowStatus, zhnFilterGroup=zhnFilterGroup, filterEnable=filterEnable, maxFilterEntries=maxFilterEntries, zhnLayer2BridgeGroups=zhnLayer2BridgeGroups, sourceMACFromVendorClassIDFilterExclude=sourceMACFromVendorClassIDFilterExclude, layer2BridgingGlobalObjects=layer2BridgingGlobalObjects, vlanRouteAcrossVlans=vlanRouteAcrossVlans, bridgeName=bridgeName, BridgingIntfTypeValues=BridgingIntfTypeValues, vlanID=vlanID, vlanPortMembershipAction=vlanPortMembershipAction, availableInterfaceKey=availableInterfaceKey, vlanPortMembershipEntry=vlanPortMembershipEntry, zhnLayer2Bridging=zhnLayer2Bridging, filterBridgeEntry=filterBridgeEntry, VlanTypeValues=VlanTypeValues, markingTable=markingTable, filterKey=filterKey, zhnBridgeMarkingTableGroup=zhnBridgeMarkingTableGroup, availableInterfaceNumberOfEntries=availableInterfaceNumberOfEntries, markingNumberOfEntries=markingNumberOfEntries, markingEnable=markingEnable, PYSNMP_MODULE_ID=zhnLayer2Bridging, ethernetPriorityOverride=ethernetPriorityOverride, vlanPortMembershipTable=vlanPortMembershipTable, vlanPort=vlanPort, layer2BridgingObjects=layer2BridgingObjects, VlanIDType=VlanIDType, zhnBridgeAvailableInterfaceGroup=zhnBridgeAvailableInterfaceGroup, filterBridgeReference=filterBridgeReference, availableInterfaceRowStatus=availableInterfaceRowStatus, interfaceReference=interfaceReference, zhnBridgeTableGroup=zhnBridgeTableGroup, bridgeTableRowStatus=bridgeTableRowStatus, vlanQOSMethod=vlanQOSMethod, VlanQOSMethods=VlanQOSMethods, zhnPortMembershipGroup=zhnPortMembershipGroup, vlanIDMark=vlanIDMark, availableInterfaceTable=availableInterfaceTable)

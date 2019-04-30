@@ -1,0 +1,78 @@
+#
+# PySNMP MIB module ALTIGA-LBSSF-STATS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ALTIGA-LBSSF-STATS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:05:47 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+alLBSSFMibModule, = mibBuilder.importSymbols("ALTIGA-GLOBAL-REG", "alLBSSFMibModule")
+alStatsLBSSF, alLBSSFGroup = mibBuilder.importSymbols("ALTIGA-MIB", "alStatsLBSSF", "alLBSSFGroup")
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, Counter64, IpAddress, Counter32, TimeTicks, ObjectIdentity, Gauge32, Integer32, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, Unsigned32, Bits, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "Counter64", "IpAddress", "Counter32", "TimeTicks", "ObjectIdentity", "Gauge32", "Integer32", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "Unsigned32", "Bits", "ModuleIdentity")
+TruthValue, DisplayString, TextualConvention, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "DisplayString", "TextualConvention", "RowStatus")
+altigaLBSSFStatsMibModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 3076, 1, 1, 41, 2))
+altigaLBSSFStatsMibModule.setRevisions(('2002-09-05 13:00', '2002-07-10 00:00',))
+if mibBuilder.loadTexts: altigaLBSSFStatsMibModule.setLastUpdated('200209051300Z')
+if mibBuilder.loadTexts: altigaLBSSFStatsMibModule.setOrganization('Cisco Systems, Inc.')
+class DeviceType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 3, 4, 5, 6, 7, 8))
+    namedValues = NamedValues(("unknown", 1), ("vpn3005", 3), ("vpn3015", 4), ("vpn3030", 5), ("vpn3060", 6), ("vpn3080", 7), ("vpn3002", 8))
+
+class DeviceRole(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("virtualMaster", 1), ("slave", 2))
+
+alStatsLBSSFGlobal = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 1))
+alLBSSFRole = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 1, 1), DeviceRole()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFRole.setStatus('current')
+alLBSSFDeviceType = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 1, 2), DeviceType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFDeviceType.setStatus('current')
+alLBSSFActive = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 1, 3), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFActive.setStatus('current')
+alLBSSFNumberOfPeers = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 1, 4), Gauge32().subtype(subtypeSpec=ValueRangeConstraint(0, 25))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFNumberOfPeers.setStatus('current')
+alLBSSFLoad = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 1, 5), Gauge32().subtype(subtypeSpec=ValueRangeConstraint(0, 100))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFLoad.setStatus('current')
+alLBSSFPeerTable = MibTable((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2), )
+if mibBuilder.loadTexts: alLBSSFPeerTable.setStatus('current')
+alLBSSFPeerEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1), ).setIndexNames((0, "ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerPrivIpAddress"))
+if mibBuilder.loadTexts: alLBSSFPeerEntry.setStatus('current')
+alLBSSFPeerRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 1), RowStatus()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerRowStatus.setStatus('current')
+alLBSSFPeerPrivIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 2), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerPrivIpAddress.setStatus('current')
+alLBSSFPeerPubIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 3), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerPubIpAddress.setStatus('current')
+alLBSSFPeerMappedPubIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 4), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerMappedPubIpAddress.setStatus('current')
+alLBSSFPeerActive = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 5), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerActive.setStatus('current')
+alLBSSFPeerFaultZone = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 25))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerFaultZone.setStatus('current')
+alLBSSFPeerRole = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 7), DeviceRole()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerRole.setStatus('current')
+alLBSSFPeerDeviceType = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 8), DeviceType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerDeviceType.setStatus('current')
+alLBSSFPeerLoad = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 9), Gauge32().subtype(subtypeSpec=ValueRangeConstraint(0, 100))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerLoad.setStatus('current')
+alLBSSFPeerPriority = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 10), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 10))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerPriority.setStatus('current')
+alLBSSFPeerActiveSessions = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 11), Gauge32().subtype(subtypeSpec=ValueRangeConstraint(0, 100000))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerActiveSessions.setStatus('current')
+alLBSSFPeerJoinTime = MibTableColumn((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 36, 2, 1, 12), TimeTicks()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alLBSSFPeerJoinTime.setStatus('current')
+altigaLBSSFStatsMibConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 1, 1, 41, 2, 1))
+altigaLBSSFStatsMibCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 1, 1, 41, 2, 1, 1))
+altigaLBSSFStatsMibCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 3076, 1, 1, 41, 2, 1, 1, 1)).setObjects(("ALTIGA-LBSSF-STATS-MIB", "altigaStatsLBSSFGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    altigaLBSSFStatsMibCompliance = altigaLBSSFStatsMibCompliance.setStatus('current')
+altigaStatsLBSSFGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 3076, 2, 1, 1, 1, 36, 3)).setObjects(("ALTIGA-LBSSF-STATS-MIB", "alLBSSFRole"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFDeviceType"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFActive"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFNumberOfPeers"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFLoad"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerRowStatus"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerPrivIpAddress"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerPubIpAddress"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerMappedPubIpAddress"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerActive"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerFaultZone"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerRole"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerDeviceType"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerLoad"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerPriority"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerActiveSessions"), ("ALTIGA-LBSSF-STATS-MIB", "alLBSSFPeerJoinTime"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    altigaStatsLBSSFGroup = altigaStatsLBSSFGroup.setStatus('current')
+mibBuilder.exportSymbols("ALTIGA-LBSSF-STATS-MIB", alLBSSFDeviceType=alLBSSFDeviceType, alLBSSFPeerActive=alLBSSFPeerActive, PYSNMP_MODULE_ID=altigaLBSSFStatsMibModule, altigaLBSSFStatsMibCompliance=altigaLBSSFStatsMibCompliance, alLBSSFPeerRole=alLBSSFPeerRole, alLBSSFPeerActiveSessions=alLBSSFPeerActiveSessions, alLBSSFPeerDeviceType=alLBSSFPeerDeviceType, alLBSSFPeerFaultZone=alLBSSFPeerFaultZone, altigaLBSSFStatsMibModule=altigaLBSSFStatsMibModule, alLBSSFPeerRowStatus=alLBSSFPeerRowStatus, altigaStatsLBSSFGroup=altigaStatsLBSSFGroup, alLBSSFPeerPrivIpAddress=alLBSSFPeerPrivIpAddress, alLBSSFPeerPriority=alLBSSFPeerPriority, DeviceType=DeviceType, alLBSSFPeerEntry=alLBSSFPeerEntry, alLBSSFPeerJoinTime=alLBSSFPeerJoinTime, alStatsLBSSFGlobal=alStatsLBSSFGlobal, alLBSSFPeerLoad=alLBSSFPeerLoad, altigaLBSSFStatsMibCompliances=altigaLBSSFStatsMibCompliances, alLBSSFLoad=alLBSSFLoad, DeviceRole=DeviceRole, alLBSSFPeerMappedPubIpAddress=alLBSSFPeerMappedPubIpAddress, alLBSSFPeerTable=alLBSSFPeerTable, altigaLBSSFStatsMibConformance=altigaLBSSFStatsMibConformance, alLBSSFActive=alLBSSFActive, alLBSSFRole=alLBSSFRole, alLBSSFNumberOfPeers=alLBSSFNumberOfPeers, alLBSSFPeerPubIpAddress=alLBSSFPeerPubIpAddress)

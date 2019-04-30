@@ -1,0 +1,276 @@
+#
+# PySNMP MIB module HP-ICF-BRIDGE (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-ICF-BRIDGE
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:20:52 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint")
+dot1dBasePortEntry, = mibBuilder.importSymbols("BRIDGE-MIB", "dot1dBasePortEntry")
+VidList, = mibBuilder.importSymbols("HP-ICF-FTRCO", "VidList")
+hpSwitch, = mibBuilder.importSymbols("HP-ICF-OID", "hpSwitch")
+ConfigStatus, = mibBuilder.importSymbols("HP-ICF-TC", "ConfigStatus")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+dot1qVlanStaticEntry, VlanIndex, VlanId = mibBuilder.importSymbols("Q-BRIDGE-MIB", "dot1qVlanStaticEntry", "VlanIndex", "VlanId")
+portCopyEntry, = mibBuilder.importSymbols("SMON-MIB", "portCopyEntry")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+Gauge32, ObjectIdentity, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, ModuleIdentity, Counter32, Counter64, Bits, Integer32, iso, IpAddress, Unsigned32, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "ObjectIdentity", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "ModuleIdentity", "Counter32", "Counter64", "Bits", "Integer32", "iso", "IpAddress", "Unsigned32", "TimeTicks")
+TruthValue, DisplayString, TextualConvention, TimeStamp = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "DisplayString", "TextualConvention", "TimeStamp")
+hpicfBridge = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12))
+hpicfBridge.setRevisions(('2014-04-27 00:00', '2013-10-11 00:00', '2012-07-13 00:00', '2012-05-30 00:00', '2010-06-26 00:00', '2009-12-15 00:00', '2009-02-11 00:00', '2006-09-30 00:00', '2006-09-26 00:00', '2006-08-13 17:38', '2003-02-20 00:00', '2002-05-23 17:38', '2001-10-03 20:50', '2000-11-03 06:42',))
+if mibBuilder.loadTexts: hpicfBridge.setLastUpdated('201404270000Z')
+if mibBuilder.loadTexts: hpicfBridge.setOrganization('HP Networking')
+class BridgeId(TextualConvention, OctetString):
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(8, 8)
+    fixedLength = 8
+
+hpicfBridgeObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1))
+hpicfBridgeBase = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 1))
+hpicfBridgeMaxVlans = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 4094))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeMaxVlans.setStatus('current')
+hpicfBridgeVlanEnable = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeVlanEnable.setStatus('current')
+hpicfBridgePrimaryVlan = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 1, 3), VlanIndex()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgePrimaryVlan.setStatus('current')
+hpicfBridgeVlanConfigStatus = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 1, 4), ConfigStatus()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeVlanConfigStatus.setStatus('current')
+hpicfBridgeGvrp = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2))
+hpicfBridgeGvrpPortTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2, 1), )
+if mibBuilder.loadTexts: hpicfBridgeGvrpPortTable.setStatus('current')
+hpicfBridgeGvrpPortEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2, 1, 1), )
+dot1dBasePortEntry.registerAugmentions(("HP-ICF-BRIDGE", "hpicfBridgeGvrpPortEntry"))
+hpicfBridgeGvrpPortEntry.setIndexNames(*dot1dBasePortEntry.getIndexNames())
+if mibBuilder.loadTexts: hpicfBridgeGvrpPortEntry.setStatus('current')
+hpicfBridgeGvrpRestrictedVlanReg = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2, 1, 1, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeGvrpRestrictedVlanReg.setStatus('current')
+hpicfBridgeGvrpStateMachineTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2, 2), )
+if mibBuilder.loadTexts: hpicfBridgeGvrpStateMachineTable.setStatus('current')
+hpicfBridgeGvrpStateMachineEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2, 2, 1), ).setIndexNames((0, "HP-ICF-BRIDGE", "hpicfGenericVlanId"), (0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: hpicfBridgeGvrpStateMachineEntry.setStatus('current')
+hpicfGenericVlanId = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2, 2, 1, 1), VlanId())
+if mibBuilder.loadTexts: hpicfGenericVlanId.setStatus('current')
+hpicfApplicantStateMachine = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13))).clone(namedValues=NamedValues(("va", 0), ("aa", 1), ("qa", 2), ("la", 3), ("vp", 4), ("ap", 5), ("qp", 6), ("vo", 7), ("ao", 8), ("qo", 9), ("lo", 10), ("von", 11), ("aon", 12), ("qon", 13)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfApplicantStateMachine.setStatus('current')
+hpicfRegistarStateMachine = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 2, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17))).clone(namedValues=NamedValues(("inn", 0), ("lv", 1), ("l3", 2), ("l2", 3), ("l1", 4), ("mt", 5), ("inr", 6), ("lvr", 7), ("l3r", 8), ("l2r", 9), ("l1r", 10), ("mtr", 11), ("inf", 12), ("lvf", 13), ("l3f", 14), ("l2f", 15), ("l1f", 16), ("mtf", 17)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfRegistarStateMachine.setStatus('current')
+hpicfBridgeRstp = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4))
+hpicfBridgeRstpForceVersion = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 2, 3))).clone(namedValues=NamedValues(("stpCompatibility", 0), ("rstpOperation", 2), ("mstpOperation", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpForceVersion.setStatus('current')
+hpicfBridgeRstpConfigStatus = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 2), ConfigStatus()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeRstpConfigStatus.setStatus('current')
+hpicfBridgeRstpProtocolVersion = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 2, 3))).clone(namedValues=NamedValues(("ieee8021d", 0), ("ieee8021w", 2), ("ieee8021s", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpProtocolVersion.setStatus('current')
+hpicfBridgeRstpAdminStatus = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpAdminStatus.setStatus('current')
+hpicfBridgeRstpPortTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5), )
+if mibBuilder.loadTexts: hpicfBridgeRstpPortTable.setStatus('current')
+hpicfBridgeRstpPortEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1), ).setIndexNames((0, "HP-ICF-BRIDGE", "hpicfBridgeRstpPortIndex"))
+if mibBuilder.loadTexts: hpicfBridgeRstpPortEntry.setStatus('current')
+hpicfBridgeRstpPortIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeRstpPortIndex.setStatus('current')
+hpicfBridgeRstpAdminEdgePort = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpAdminEdgePort.setStatus('current')
+hpicfBridgeRstpOperEdgePort = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeRstpOperEdgePort.setStatus('current')
+hpicfBridgeRstpAdminPointToPointMac = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("forceTrue", 1), ("forceFalse", 2), ("auto", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpAdminPointToPointMac.setStatus('current')
+hpicfBridgeRstpOperPointToPointMac = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 5), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeRstpOperPointToPointMac.setStatus('current')
+hpicfBridgeRstpPortPathCost = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 200000000))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpPortPathCost.setStatus('current')
+hpicfBridgeRstpForceBpduMigrationCheck = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 7), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpForceBpduMigrationCheck.setStatus('current')
+hpicfBridgeRstpAutoEdgePort = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 8), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpAutoEdgePort.setStatus('current')
+hpicfBridgeRstpPortBpduFiltering = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 5, 1, 9), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeRstpPortBpduFiltering.setStatus('current')
+hpicfBridgeStpBpduThrottleConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 6))
+hpicfBridgeStpBpduThrottleStatus = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 6, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2))).clone('enable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeStpBpduThrottleStatus.setStatus('current')
+hpicfBridgeStpBpduThrottleValue = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 4, 6, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535)).clone(256)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeStpBpduThrottleValue.setStatus('current')
+class LoopProtectReceiverAction(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("disableTx", 1), ("noDisable", 2), ("disableTxRx", 3))
+
+hpicfBridgeLoopProtect = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5))
+hpicfBridgeLoopProtectNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 0))
+hpicfBridgeLoopProtectBase = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 1))
+hpicfBridgeLoopProtectPort = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2))
+hpicfBridgeLoopProtectInterval = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 10))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectInterval.setStatus('current')
+hpicfBridgeLoopProtectTrapLoopDetectEnable = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 1, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectTrapLoopDetectEnable.setStatus('current')
+hpicfBridgeLoopProtectEnableTimer = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectEnableTimer.setStatus('current')
+hpicfBridgeLoopProtectMode = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("port", 1), ("vlan", 2))).clone('port')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectMode.setStatus('current')
+hpicfBridgeLoopProtectVIDList = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 1, 5), VidList()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectVIDList.setStatus('current')
+hpicfBridgeLoopProtectPortTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2, 1), )
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectPortTable.setStatus('current')
+hpicfBridgeLoopProtectPortEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectPortEntry.setStatus('current')
+hpicfBridgeLoopProtectPortEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2, 1, 1, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectPortEnable.setStatus('current')
+hpicfBridgeLoopProtectPortLoopDetected = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2, 1, 1, 2), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectPortLoopDetected.setStatus('current')
+hpicfBridgeLoopProtectPortLastLoopTime = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2, 1, 1, 3), TimeStamp()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectPortLastLoopTime.setStatus('current')
+hpicfBridgeLoopProtectPortLoopCount = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2, 1, 1, 4), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectPortLoopCount.setStatus('current')
+hpicfBridgeLoopProtectPortReceiverAction = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2, 1, 1, 5), LoopProtectReceiverAction()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectPortReceiverAction.setStatus('current')
+hpicfBridgeLoopDetectedVlan = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 2, 1, 1, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfBridgeLoopDetectedVlan.setStatus('current')
+hpicfBridgeLoopProtectLoopDetectedNotification = NotificationType((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 0, 1)).setObjects(("IF-MIB", "ifIndex"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortLoopCount"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortReceiverAction"))
+if mibBuilder.loadTexts: hpicfBridgeLoopProtectLoopDetectedNotification.setStatus('current')
+hpicfBridgeVlanLoopProtectLoopDetectedNotification = NotificationType((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 5, 0, 2)).setObjects(("IF-MIB", "ifIndex"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortLoopCount"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortReceiverAction"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopDetectedVlan"))
+if mibBuilder.loadTexts: hpicfBridgeVlanLoopProtectLoopDetectedNotification.setStatus('current')
+hpicfBridgeMirrorSession = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 6))
+hpicfBridgeMirrorSessionBase = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 6, 1))
+hpicfBridgeMirrorSessionDestination = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 6, 2))
+hpicfBridgeMirrorSessionTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 6, 2, 1), )
+if mibBuilder.loadTexts: hpicfBridgeMirrorSessionTable.setStatus('current')
+hpicfBridgeMirrorSessionEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 6, 2, 1, 1), )
+portCopyEntry.registerAugmentions(("HP-ICF-BRIDGE", "hpicfBridgeMirrorSessionEntry"))
+hpicfBridgeMirrorSessionEntry.setIndexNames(*portCopyEntry.getIndexNames())
+if mibBuilder.loadTexts: hpicfBridgeMirrorSessionEntry.setStatus('current')
+hpicfBridgeMirrorSessionID = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 6, 2, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)).clone(1)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpicfBridgeMirrorSessionID.setStatus('current')
+hpicfBridgeDontTagWithVlan = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 6, 2, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone(2)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeDontTagWithVlan.setStatus('current')
+hpicfBridgeMirrorSessionType = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 6, 2, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("noMirror", 1), ("mirrorAddresses", 2), ("mirrorPolicies", 3), ("mirrorPorts", 4), ("mirrorVlan", 5))).clone(1)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeMirrorSessionType.setStatus('current')
+hpicfBridgeVoiceVlanConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 7))
+hpicfBridgeVoiceVlanConfigTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 7, 1), )
+if mibBuilder.loadTexts: hpicfBridgeVoiceVlanConfigTable.setStatus('current')
+hpicfBridgeVoiceVlanConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 7, 1, 1), )
+dot1qVlanStaticEntry.registerAugmentions(("HP-ICF-BRIDGE", "hpicfBridgeVoiceVlanConfigEntry"))
+hpicfBridgeVoiceVlanConfigEntry.setIndexNames(*dot1qVlanStaticEntry.getIndexNames())
+if mibBuilder.loadTexts: hpicfBridgeVoiceVlanConfigEntry.setStatus('current')
+hpicfBridgeVoiceVlanEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 7, 1, 1, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeVoiceVlanEnable.setStatus('current')
+hpicfBridgeJumboInterfaceConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 8))
+hpicfBridgeJumboInterfaceConfigTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 8, 1), )
+if mibBuilder.loadTexts: hpicfBridgeJumboInterfaceConfigTable.setStatus('current')
+hpicfBridgeJumboInterfaceConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 8, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: hpicfBridgeJumboInterfaceConfigEntry.setStatus('current')
+hpicfBridgeJumboInterfaceEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 8, 1, 1, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeJumboInterfaceEnable.setStatus('current')
+hpicfBridgeManagementInterfaceConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 9))
+hpicfBridgeManagementInterfaceConfigTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 9, 1), )
+if mibBuilder.loadTexts: hpicfBridgeManagementInterfaceConfigTable.setStatus('current')
+hpicfBridgeManagementInterfaceConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 9, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: hpicfBridgeManagementInterfaceConfigEntry.setStatus('current')
+hpicfBridgeManagementInterfaceEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 1, 9, 1, 1, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfBridgeManagementInterfaceEnable.setStatus('current')
+hpicfBridgeConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2))
+hpicfBridgeGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1))
+hpicfBridgeCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2))
+hpicfBridgeNotGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 3))
+hpicfBridgeVlanBaseGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 1)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeMaxVlans"), ("HP-ICF-BRIDGE", "hpicfBridgeVlanEnable"), ("HP-ICF-BRIDGE", "hpicfBridgePrimaryVlan"), ("HP-ICF-BRIDGE", "hpicfBridgeVlanConfigStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeVlanBaseGroup = hpicfBridgeVlanBaseGroup.setStatus('current')
+hpicfBridgeGvrpPortGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 2)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeGvrpRestrictedVlanReg"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeGvrpPortGroup = hpicfBridgeGvrpPortGroup.setStatus('deprecated')
+hpicfBridgeRstpBaseGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 3)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeRstpForceVersion"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpConfigStatus"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpProtocolVersion"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpAdminStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeRstpBaseGroup = hpicfBridgeRstpBaseGroup.setStatus('current')
+hpicfBridgeLoopProtectBaseGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 4)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectInterval"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectEnableTimer"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectTrapLoopDetectEnable"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortEnable"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortLoopDetected"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortLastLoopTime"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortLoopCount"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectPortReceiverAction"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeLoopProtectBaseGroup = hpicfBridgeLoopProtectBaseGroup.setStatus('current')
+hpicfBridgeVoiceVlanConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 7)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeVoiceVlanEnable"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeVoiceVlanConfigGroup = hpicfBridgeVoiceVlanConfigGroup.setStatus('current')
+hpicfBridgeJumboInterfaceConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 8)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeJumboInterfaceEnable"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeJumboInterfaceConfigGroup = hpicfBridgeJumboInterfaceConfigGroup.setStatus('current')
+hpicfBridgeManagementInterfaceConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 9)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeManagementInterfaceEnable"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeManagementInterfaceConfigGroup = hpicfBridgeManagementInterfaceConfigGroup.setStatus('current')
+hpicfBridgeLoopProtectVLANGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 10)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectMode"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectVIDList"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopDetectedVlan"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeLoopProtectVLANGroup = hpicfBridgeLoopProtectVLANGroup.setStatus('current')
+hpicfBridgeRstpPortEntryGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 11)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeRstpAdminEdgePort"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpOperEdgePort"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpAdminPointToPointMac"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpOperPointToPointMac"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpPortPathCost"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpForceBpduMigrationCheck"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpAutoEdgePort"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpPortBpduFiltering"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeRstpPortEntryGroup = hpicfBridgeRstpPortEntryGroup.setStatus('current')
+hpicfBridgeMirrorSessionEntryGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 12)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeDontTagWithVlan"), ("HP-ICF-BRIDGE", "hpicfBridgeMirrorSessionType"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeMirrorSessionEntryGroup = hpicfBridgeMirrorSessionEntryGroup.setStatus('current')
+hpicfBridgeRstpPortEntryGroup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 13)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeRstpPortIndex"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeRstpPortEntryGroup1 = hpicfBridgeRstpPortEntryGroup1.setStatus('current')
+hpicfBridgeGvrpPortGroup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 14)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeGvrpRestrictedVlanReg"), ("HP-ICF-BRIDGE", "hpicfApplicantStateMachine"), ("HP-ICF-BRIDGE", "hpicfRegistarStateMachine"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeGvrpPortGroup1 = hpicfBridgeGvrpPortGroup1.setStatus('current')
+hpicfBridgeStpBpduThrottleConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 15)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeStpBpduThrottleStatus"), ("HP-ICF-BRIDGE", "hpicfBridgeStpBpduThrottleValue"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeStpBpduThrottleConfigGroup = hpicfBridgeStpBpduThrottleConfigGroup.setStatus('current')
+hpicfBridgeLoopProtectNotGrp = NotificationGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 3, 1)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectLoopDetectedNotification"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeLoopProtectNotGrp = hpicfBridgeLoopProtectNotGrp.setStatus('current')
+hpicfBridgeVlanLoopProtectNotGrp = NotificationGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 3, 2)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeVlanLoopProtectLoopDetectedNotification"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeVlanLoopProtectNotGrp = hpicfBridgeVlanLoopProtectNotGrp.setStatus('current')
+hpicfBridgeMirrorSessionBaseGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 1, 5)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeMirrorSessionID"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeMirrorSessionBaseGroup = hpicfBridgeMirrorSessionBaseGroup.setStatus('current')
+hpicfBridgeCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 1)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeVlanBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeGvrpPortGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeCompliance = hpicfBridgeCompliance.setStatus('deprecated')
+hpicfBridgeComplianceRevTwo = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 2)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeVlanBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeGvrpPortGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpBaseGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeComplianceRevTwo = hpicfBridgeComplianceRevTwo.setStatus('deprecated')
+hpicfBridgeComplianceRevThree = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 3)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeVlanBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeGvrpPortGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpBaseGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeComplianceRevThree = hpicfBridgeComplianceRevThree.setStatus('deprecated')
+hpicfBridgeComplianceRevFour = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 4)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeVlanBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeGvrpPortGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeMirrorSessionBaseGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeComplianceRevFour = hpicfBridgeComplianceRevFour.setStatus('deprecated')
+hpicfBridgeLoopProtectCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 5)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectNotifications"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectNotifications"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeLoopProtectCompliance = hpicfBridgeLoopProtectCompliance.setStatus('current')
+hpicfBridgeVlanBaseConfigCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 6)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeVoiceVlanConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeVlanBaseConfigCompliance = hpicfBridgeVlanBaseConfigCompliance.setStatus('current')
+hpicfBridgeInterfaceConfigCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 7)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeJumboInterfaceConfigGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeManagementInterfaceConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeInterfaceConfigCompliance = hpicfBridgeInterfaceConfigCompliance.setStatus('current')
+hpicfBridgeVlanLoopProtConfigCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 8)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectVLANGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeVlanLoopProtectNotGrp"), ("HP-ICF-BRIDGE", "hpicfBridgeLoopProtectNotGrp"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeVlanLoopProtConfigCompliance = hpicfBridgeVlanLoopProtConfigCompliance.setStatus('current')
+hpicfBridgeRstpPortEntryCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 9)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeRstpPortEntryGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeRstpPortEntryCompliance = hpicfBridgeRstpPortEntryCompliance.setStatus('current')
+hpicfBridgeMirrorSessionEntryCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 10)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeMirrorSessionEntryGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeMirrorSessionEntryCompliance = hpicfBridgeMirrorSessionEntryCompliance.setStatus('current')
+hpicfBridgeRstpPortEntryCompliance1 = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 11)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeRstpPortEntryGroup1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeRstpPortEntryCompliance1 = hpicfBridgeRstpPortEntryCompliance1.setStatus('current')
+hpicfBridgeComplianceRevFour1 = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 12)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeVlanBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeGvrpPortGroup1"), ("HP-ICF-BRIDGE", "hpicfBridgeRstpBaseGroup"), ("HP-ICF-BRIDGE", "hpicfBridgeMirrorSessionBaseGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeComplianceRevFour1 = hpicfBridgeComplianceRevFour1.setStatus('current')
+hpicfBridgeStpBpduThrottleConfigCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 12, 2, 2, 13)).setObjects(("HP-ICF-BRIDGE", "hpicfBridgeStpBpduThrottleConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfBridgeStpBpduThrottleConfigCompliance = hpicfBridgeStpBpduThrottleConfigCompliance.setStatus('current')
+mibBuilder.exportSymbols("HP-ICF-BRIDGE", hpicfBridgeLoopProtectBaseGroup=hpicfBridgeLoopProtectBaseGroup, hpicfBridgeLoopProtect=hpicfBridgeLoopProtect, hpicfBridgeRstp=hpicfBridgeRstp, hpicfBridgeLoopProtectCompliance=hpicfBridgeLoopProtectCompliance, hpicfBridgeVlanBaseConfigCompliance=hpicfBridgeVlanBaseConfigCompliance, hpicfBridgeRstpBaseGroup=hpicfBridgeRstpBaseGroup, hpicfBridgeGvrpStateMachineEntry=hpicfBridgeGvrpStateMachineEntry, hpicfBridgeVlanLoopProtConfigCompliance=hpicfBridgeVlanLoopProtConfigCompliance, hpicfBridgeMirrorSessionEntryGroup=hpicfBridgeMirrorSessionEntryGroup, hpicfBridgeMaxVlans=hpicfBridgeMaxVlans, hpicfBridgeLoopProtectLoopDetectedNotification=hpicfBridgeLoopProtectLoopDetectedNotification, hpicfBridgeRstpPortEntryGroup=hpicfBridgeRstpPortEntryGroup, hpicfBridgeMirrorSessionEntryCompliance=hpicfBridgeMirrorSessionEntryCompliance, hpicfBridgeMirrorSessionBaseGroup=hpicfBridgeMirrorSessionBaseGroup, hpicfBridgeLoopProtectPortEnable=hpicfBridgeLoopProtectPortEnable, hpicfBridgeManagementInterfaceConfig=hpicfBridgeManagementInterfaceConfig, BridgeId=BridgeId, hpicfBridgeConformance=hpicfBridgeConformance, hpicfBridgeJumboInterfaceConfig=hpicfBridgeJumboInterfaceConfig, hpicfBridgeLoopProtectPortLastLoopTime=hpicfBridgeLoopProtectPortLastLoopTime, hpicfBridgeGvrpPortTable=hpicfBridgeGvrpPortTable, hpicfBridgeMirrorSessionType=hpicfBridgeMirrorSessionType, hpicfBridgeVlanBaseGroup=hpicfBridgeVlanBaseGroup, hpicfBridgeLoopProtectTrapLoopDetectEnable=hpicfBridgeLoopProtectTrapLoopDetectEnable, hpicfBridgeLoopProtectPortTable=hpicfBridgeLoopProtectPortTable, hpicfBridgeRstpPortPathCost=hpicfBridgeRstpPortPathCost, hpicfBridgeLoopProtectNotGrp=hpicfBridgeLoopProtectNotGrp, hpicfBridgeLoopProtectPortLoopCount=hpicfBridgeLoopProtectPortLoopCount, hpicfBridgeRstpAutoEdgePort=hpicfBridgeRstpAutoEdgePort, hpicfBridgeGvrpStateMachineTable=hpicfBridgeGvrpStateMachineTable, hpicfBridgeRstpAdminStatus=hpicfBridgeRstpAdminStatus, hpicfBridgeLoopProtectInterval=hpicfBridgeLoopProtectInterval, hpicfBridgeMirrorSessionDestination=hpicfBridgeMirrorSessionDestination, hpicfBridgeLoopProtectNotifications=hpicfBridgeLoopProtectNotifications, hpicfBridgeStpBpduThrottleConfigGroup=hpicfBridgeStpBpduThrottleConfigGroup, hpicfBridgeJumboInterfaceEnable=hpicfBridgeJumboInterfaceEnable, hpicfBridgeVlanEnable=hpicfBridgeVlanEnable, hpicfBridgeJumboInterfaceConfigEntry=hpicfBridgeJumboInterfaceConfigEntry, hpicfBridgeRstpPortTable=hpicfBridgeRstpPortTable, hpicfBridge=hpicfBridge, hpicfBridgeInterfaceConfigCompliance=hpicfBridgeInterfaceConfigCompliance, hpicfBridgeLoopProtectMode=hpicfBridgeLoopProtectMode, PYSNMP_MODULE_ID=hpicfBridge, hpicfBridgeGvrp=hpicfBridgeGvrp, hpicfBridgeRstpPortEntryCompliance=hpicfBridgeRstpPortEntryCompliance, hpicfBridgeManagementInterfaceConfigGroup=hpicfBridgeManagementInterfaceConfigGroup, hpicfBridgeVoiceVlanConfig=hpicfBridgeVoiceVlanConfig, hpicfBridgeManagementInterfaceEnable=hpicfBridgeManagementInterfaceEnable, hpicfBridgeManagementInterfaceConfigEntry=hpicfBridgeManagementInterfaceConfigEntry, hpicfBridgeCompliance=hpicfBridgeCompliance, hpicfBridgeMirrorSessionTable=hpicfBridgeMirrorSessionTable, hpicfBridgeLoopProtectVLANGroup=hpicfBridgeLoopProtectVLANGroup, hpicfBridgeManagementInterfaceConfigTable=hpicfBridgeManagementInterfaceConfigTable, LoopProtectReceiverAction=LoopProtectReceiverAction, hpicfBridgeMirrorSession=hpicfBridgeMirrorSession, hpicfBridgeStpBpduThrottleConfig=hpicfBridgeStpBpduThrottleConfig, hpicfBridgeRstpProtocolVersion=hpicfBridgeRstpProtocolVersion, hpicfBridgeVoiceVlanConfigEntry=hpicfBridgeVoiceVlanConfigEntry, hpicfGenericVlanId=hpicfGenericVlanId, hpicfBridgeVlanLoopProtectNotGrp=hpicfBridgeVlanLoopProtectNotGrp, hpicfBridgeJumboInterfaceConfigGroup=hpicfBridgeJumboInterfaceConfigGroup, hpicfBridgeLoopProtectPort=hpicfBridgeLoopProtectPort, hpicfBridgeRstpPortEntryCompliance1=hpicfBridgeRstpPortEntryCompliance1, hpicfBridgeGvrpRestrictedVlanReg=hpicfBridgeGvrpRestrictedVlanReg, hpicfBridgeJumboInterfaceConfigTable=hpicfBridgeJumboInterfaceConfigTable, hpicfBridgeMirrorSessionBase=hpicfBridgeMirrorSessionBase, hpicfBridgeDontTagWithVlan=hpicfBridgeDontTagWithVlan, hpicfBridgeVlanLoopProtectLoopDetectedNotification=hpicfBridgeVlanLoopProtectLoopDetectedNotification, hpicfBridgeCompliances=hpicfBridgeCompliances, hpicfBridgeRstpPortEntryGroup1=hpicfBridgeRstpPortEntryGroup1, hpicfBridgeMirrorSessionID=hpicfBridgeMirrorSessionID, hpicfBridgeVoiceVlanEnable=hpicfBridgeVoiceVlanEnable, hpicfBridgeLoopProtectPortLoopDetected=hpicfBridgeLoopProtectPortLoopDetected, hpicfBridgeRstpOperPointToPointMac=hpicfBridgeRstpOperPointToPointMac, hpicfBridgeBase=hpicfBridgeBase, hpicfBridgeMirrorSessionEntry=hpicfBridgeMirrorSessionEntry, hpicfBridgeRstpPortEntry=hpicfBridgeRstpPortEntry, hpicfBridgeComplianceRevFour1=hpicfBridgeComplianceRevFour1, hpicfBridgeGvrpPortEntry=hpicfBridgeGvrpPortEntry, hpicfBridgeLoopProtectVIDList=hpicfBridgeLoopProtectVIDList, hpicfBridgeLoopProtectEnableTimer=hpicfBridgeLoopProtectEnableTimer, hpicfBridgeRstpPortBpduFiltering=hpicfBridgeRstpPortBpduFiltering, hpicfBridgeRstpOperEdgePort=hpicfBridgeRstpOperEdgePort, hpicfBridgeComplianceRevTwo=hpicfBridgeComplianceRevTwo, hpicfBridgeComplianceRevThree=hpicfBridgeComplianceRevThree, hpicfApplicantStateMachine=hpicfApplicantStateMachine, hpicfBridgeVlanConfigStatus=hpicfBridgeVlanConfigStatus, hpicfBridgeStpBpduThrottleConfigCompliance=hpicfBridgeStpBpduThrottleConfigCompliance, hpicfBridgeLoopProtectPortReceiverAction=hpicfBridgeLoopProtectPortReceiverAction, hpicfBridgeNotGroups=hpicfBridgeNotGroups, hpicfBridgeComplianceRevFour=hpicfBridgeComplianceRevFour, hpicfBridgeVoiceVlanConfigGroup=hpicfBridgeVoiceVlanConfigGroup, hpicfBridgeRstpForceBpduMigrationCheck=hpicfBridgeRstpForceBpduMigrationCheck, hpicfBridgeRstpPortIndex=hpicfBridgeRstpPortIndex, hpicfBridgeLoopProtectBase=hpicfBridgeLoopProtectBase, hpicfBridgePrimaryVlan=hpicfBridgePrimaryVlan, hpicfBridgeObjects=hpicfBridgeObjects, hpicfBridgeRstpAdminEdgePort=hpicfBridgeRstpAdminEdgePort, hpicfBridgeGvrpPortGroup1=hpicfBridgeGvrpPortGroup1, hpicfBridgeLoopDetectedVlan=hpicfBridgeLoopDetectedVlan, hpicfRegistarStateMachine=hpicfRegistarStateMachine, hpicfBridgeStpBpduThrottleStatus=hpicfBridgeStpBpduThrottleStatus, hpicfBridgeVoiceVlanConfigTable=hpicfBridgeVoiceVlanConfigTable, hpicfBridgeLoopProtectPortEntry=hpicfBridgeLoopProtectPortEntry, hpicfBridgeRstpForceVersion=hpicfBridgeRstpForceVersion, hpicfBridgeRstpAdminPointToPointMac=hpicfBridgeRstpAdminPointToPointMac, hpicfBridgeRstpConfigStatus=hpicfBridgeRstpConfigStatus, hpicfBridgeGroups=hpicfBridgeGroups, hpicfBridgeGvrpPortGroup=hpicfBridgeGvrpPortGroup, hpicfBridgeStpBpduThrottleValue=hpicfBridgeStpBpduThrottleValue)

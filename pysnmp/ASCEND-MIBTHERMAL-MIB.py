@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module ASCEND-MIBTHERMAL-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ASCEND-MIBTHERMAL-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:12:40 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+configuration, = mibBuilder.importSymbols("ASCEND-MIB", "configuration")
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Unsigned32, Gauge32, MibIdentifier, Counter64, NotificationType, Bits, TimeTicks, Counter32, ModuleIdentity, iso, ObjectIdentity, IpAddress, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Gauge32", "MibIdentifier", "Counter64", "NotificationType", "Bits", "TimeTicks", "Counter32", "ModuleIdentity", "iso", "ObjectIdentity", "IpAddress", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+class DisplayString(OctetString):
+    pass
+
+mibthermalProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 529, 23, 129))
+mibthermalProfileTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 129, 1), )
+if mibBuilder.loadTexts: mibthermalProfileTable.setStatus('mandatory')
+mibthermalProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1), ).setIndexNames((0, "ASCEND-MIBTHERMAL-MIB", "thermalProfile-Index-o"))
+if mibBuilder.loadTexts: mibthermalProfileEntry.setStatus('mandatory')
+thermalProfile_Index_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 1), Integer32()).setLabel("thermalProfile-Index-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: thermalProfile_Index_o.setStatus('mandatory')
+thermalProfile_FantrayLownoiseRpm = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 2), Integer32()).setLabel("thermalProfile-FantrayLownoiseRpm").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_FantrayLownoiseRpm.setStatus('mandatory')
+thermalProfile_OperationMode = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("fullSpeedOnly", 1), ("lowNoiseSpeedOnly", 2), ("autoRegulation", 3)))).setLabel("thermalProfile-OperationMode").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_OperationMode.setStatus('mandatory')
+thermalProfile_LowTemperatureThreshold = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 4), Integer32()).setLabel("thermalProfile-LowTemperatureThreshold").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_LowTemperatureThreshold.setStatus('mandatory')
+thermalProfile_HighTemperatureThreshold = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 5), Integer32()).setLabel("thermalProfile-HighTemperatureThreshold").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_HighTemperatureThreshold.setStatus('mandatory')
+thermalProfile_AlarmTemperatureTrigger = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 6), Integer32()).setLabel("thermalProfile-AlarmTemperatureTrigger").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_AlarmTemperatureTrigger.setStatus('mandatory')
+thermalProfile_BottomLowTemperatureThreshold = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 8), Integer32()).setLabel("thermalProfile-BottomLowTemperatureThreshold").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_BottomLowTemperatureThreshold.setStatus('mandatory')
+thermalProfile_BottomHighTemperatureThreshold = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 9), Integer32()).setLabel("thermalProfile-BottomHighTemperatureThreshold").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_BottomHighTemperatureThreshold.setStatus('mandatory')
+thermalProfile_TopLowTemperatureThreshold = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 10), Integer32()).setLabel("thermalProfile-TopLowTemperatureThreshold").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_TopLowTemperatureThreshold.setStatus('mandatory')
+thermalProfile_TopHighTemperatureThreshold = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 11), Integer32()).setLabel("thermalProfile-TopHighTemperatureThreshold").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_TopHighTemperatureThreshold.setStatus('mandatory')
+thermalProfile_Action_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 129, 1, 1, 7), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noAction", 1), ("createProfile", 2), ("deleteProfile", 3)))).setLabel("thermalProfile-Action-o").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: thermalProfile_Action_o.setStatus('mandatory')
+mibBuilder.exportSymbols("ASCEND-MIBTHERMAL-MIB", thermalProfile_FantrayLownoiseRpm=thermalProfile_FantrayLownoiseRpm, thermalProfile_HighTemperatureThreshold=thermalProfile_HighTemperatureThreshold, DisplayString=DisplayString, thermalProfile_AlarmTemperatureTrigger=thermalProfile_AlarmTemperatureTrigger, thermalProfile_Action_o=thermalProfile_Action_o, mibthermalProfileEntry=mibthermalProfileEntry, thermalProfile_TopLowTemperatureThreshold=thermalProfile_TopLowTemperatureThreshold, mibthermalProfile=mibthermalProfile, thermalProfile_Index_o=thermalProfile_Index_o, mibthermalProfileTable=mibthermalProfileTable, thermalProfile_BottomLowTemperatureThreshold=thermalProfile_BottomLowTemperatureThreshold, thermalProfile_OperationMode=thermalProfile_OperationMode, thermalProfile_LowTemperatureThreshold=thermalProfile_LowTemperatureThreshold, thermalProfile_TopHighTemperatureThreshold=thermalProfile_TopHighTemperatureThreshold, thermalProfile_BottomHighTemperatureThreshold=thermalProfile_BottomHighTemperatureThreshold)

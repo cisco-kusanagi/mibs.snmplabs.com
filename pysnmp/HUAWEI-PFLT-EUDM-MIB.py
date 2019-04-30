@@ -1,0 +1,72 @@
+#
+# PySNMP MIB module HUAWEI-PFLT-EUDM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HUAWEI-PFLT-EUDM-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:35:57 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint")
+hwDatacomm, = mibBuilder.importSymbols("HUAWEI-MIB", "hwDatacomm")
+mplsVpnVrfName, = mibBuilder.importSymbols("MPLS-VPN-MIB", "mplsVpnVrfName")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+ModuleIdentity, Counter32, IpAddress, Unsigned32, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Bits, Gauge32, MibIdentifier, Integer32, TimeTicks, NotificationType, iso = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Counter32", "IpAddress", "Unsigned32", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Bits", "Gauge32", "MibIdentifier", "Integer32", "TimeTicks", "NotificationType", "iso")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+hwPFLTEudm = ModuleIdentity((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2))
+if mibBuilder.loadTexts: hwPFLTEudm.setLastUpdated('200304110900Z')
+if mibBuilder.loadTexts: hwPFLTEudm.setOrganization('Huawei Technologies co.,Ltd.')
+class AclAction(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("aclPermit", 1), ("aclDeny", 2))
+
+class AclType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("aclTypeNum", 1), ("aclTypeName", 2))
+
+hwPFLT = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12))
+hwPFltEudmCfgMibObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1))
+hwPFltEudmDefaultActionTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 1), )
+if mibBuilder.loadTexts: hwPFltEudmDefaultActionTable.setStatus('current')
+hwPFltEudmDefaultActionEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 1, 1), ).setIndexNames((0, "HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmDefaultActZoneID1"), (0, "HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmDefaultActZoneID2"))
+if mibBuilder.loadTexts: hwPFltEudmDefaultActionEntry.setStatus('current')
+hwPFltEudmDefaultActZoneID1 = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 16)))
+if mibBuilder.loadTexts: hwPFltEudmDefaultActZoneID1.setStatus('current')
+hwPFltEudmDefaultActZoneID2 = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 16)))
+if mibBuilder.loadTexts: hwPFltEudmDefaultActZoneID2.setStatus('current')
+hwPFltEudmDeaultActInbound = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 1, 1, 3), AclAction().clone('aclDeny')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwPFltEudmDeaultActInbound.setStatus('current')
+hwPFltEudmDeaultActOutbound = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 1, 1, 4), AclAction().clone('aclPermit')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwPFltEudmDeaultActOutbound.setStatus('current')
+hwPFltEudmPolicyApplyTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2), )
+if mibBuilder.loadTexts: hwPFltEudmPolicyApplyTable.setStatus('current')
+hwPFltEudmPolicyApplyEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1), ).setIndexNames((0, "MPLS-VPN-MIB", "mplsVpnVrfName"), (0, "HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmPolicyZoneID1"), (0, "HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmPolicyZoneID2"))
+if mibBuilder.loadTexts: hwPFltEudmPolicyApplyEntry.setStatus('current')
+hwPFltEudmPolicyZoneID1 = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 128)))
+if mibBuilder.loadTexts: hwPFltEudmPolicyZoneID1.setStatus('current')
+hwPFltEudmPolicyZoneID2 = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 128)))
+if mibBuilder.loadTexts: hwPFltEudmPolicyZoneID2.setStatus('current')
+hwPFltEudmPolicyInAclType = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1, 3), AclType().clone('aclTypeNum')).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwPFltEudmPolicyInAclType.setStatus('current')
+hwPFltEudmPolicyInAclNum = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(0, 0), ValueRangeConstraint(1000, 3999), ))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwPFltEudmPolicyInAclNum.setStatus('current')
+hwPFltEudmPolicyInAclName = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1, 5), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwPFltEudmPolicyInAclName.setStatus('current')
+hwPFltEudmPolicyOutAclType = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1, 6), AclType().clone('aclTypeNum')).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwPFltEudmPolicyOutAclType.setStatus('current')
+hwPFltEudmPolicyOutAclNum = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1, 7), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(0, 0), ValueRangeConstraint(1000, 3999), ))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwPFltEudmPolicyOutAclNum.setStatus('current')
+hwPFltEudmPolicyOutAclName = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 1, 2, 1, 8), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwPFltEudmPolicyOutAclName.setStatus('current')
+hwPFltEudmConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 2))
+hwPFltEudmCompliance = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 2, 1))
+hwPFltEudmMibGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 2, 2))
+hwPFltEudmDefaultActionGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 2, 2, 1)).setObjects(("HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmDeaultActInbound"), ("HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmDeaultActOutbound"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwPFltEudmDefaultActionGroup = hwPFltEudmDefaultActionGroup.setStatus('current')
+hwPFltEudmPolicyApplyGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2011, 5, 25, 12, 2, 2, 2, 2)).setObjects(("HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmPolicyInAclType"), ("HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmPolicyInAclNum"), ("HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmPolicyInAclName"), ("HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmPolicyOutAclType"), ("HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmPolicyOutAclNum"), ("HUAWEI-PFLT-EUDM-MIB", "hwPFltEudmPolicyOutAclName"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwPFltEudmPolicyApplyGroup = hwPFltEudmPolicyApplyGroup.setStatus('current')
+mibBuilder.exportSymbols("HUAWEI-PFLT-EUDM-MIB", hwPFLTEudm=hwPFLTEudm, hwPFltEudmDefaultActionGroup=hwPFltEudmDefaultActionGroup, hwPFltEudmPolicyApplyTable=hwPFltEudmPolicyApplyTable, hwPFltEudmPolicyInAclName=hwPFltEudmPolicyInAclName, AclAction=AclAction, hwPFltEudmPolicyZoneID2=hwPFltEudmPolicyZoneID2, hwPFltEudmPolicyApplyGroup=hwPFltEudmPolicyApplyGroup, hwPFltEudmCfgMibObjects=hwPFltEudmCfgMibObjects, hwPFltEudmConformance=hwPFltEudmConformance, hwPFltEudmDeaultActOutbound=hwPFltEudmDeaultActOutbound, hwPFltEudmDefaultActZoneID2=hwPFltEudmDefaultActZoneID2, hwPFltEudmPolicyInAclNum=hwPFltEudmPolicyInAclNum, hwPFltEudmPolicyOutAclName=hwPFltEudmPolicyOutAclName, hwPFltEudmDeaultActInbound=hwPFltEudmDeaultActInbound, hwPFltEudmPolicyApplyEntry=hwPFltEudmPolicyApplyEntry, hwPFltEudmMibGroups=hwPFltEudmMibGroups, hwPFLT=hwPFLT, hwPFltEudmPolicyOutAclNum=hwPFltEudmPolicyOutAclNum, AclType=AclType, hwPFltEudmPolicyZoneID1=hwPFltEudmPolicyZoneID1, hwPFltEudmPolicyOutAclType=hwPFltEudmPolicyOutAclType, hwPFltEudmCompliance=hwPFltEudmCompliance, hwPFltEudmDefaultActZoneID1=hwPFltEudmDefaultActZoneID1, PYSNMP_MODULE_ID=hwPFLTEudm, hwPFltEudmPolicyInAclType=hwPFltEudmPolicyInAclType, hwPFltEudmDefaultActionEntry=hwPFltEudmDefaultActionEntry, hwPFltEudmDefaultActionTable=hwPFltEudmDefaultActionTable)

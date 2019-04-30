@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module SONOMASYSTEMS-SONOMA-SLIP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SONOMASYSTEMS-SONOMA-SLIP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:01:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Unsigned32, Counter32, Counter64, ModuleIdentity, NotificationType, Integer32, TimeTicks, ObjectIdentity, iso, IpAddress, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Counter32", "Counter64", "ModuleIdentity", "NotificationType", "Integer32", "TimeTicks", "ObjectIdentity", "iso", "IpAddress", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+sonomaApplications, = mibBuilder.importSymbols("SONOMASYSTEMS-SONOMA-MIB", "sonomaApplications")
+slip = MibIdentifier((1, 3, 6, 1, 4, 1, 2926, 25, 8, 2))
+slipSpeed = MibScalar((1, 3, 6, 1, 4, 1, 2926, 25, 8, 2, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7))).clone(namedValues=NamedValues(("sp2400", 1), ("sp4800", 2), ("sp9600", 3), ("sp19200", 4), ("sp38400", 5), ("sp57600", 6), ("sp115200", 7))).clone('sp9600')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: slipSpeed.setStatus('mandatory')
+slipDataBits = MibScalar((1, 3, 6, 1, 4, 1, 2926, 25, 8, 2, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(3))).clone(namedValues=NamedValues(("db8", 3))).clone('db8')).setMaxAccess("readonly")
+if mibBuilder.loadTexts: slipDataBits.setStatus('mandatory')
+slipParity = MibScalar((1, 3, 6, 1, 4, 1, 2926, 25, 8, 2, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(3))).clone(namedValues=NamedValues(("none", 3))).clone('none')).setMaxAccess("readonly")
+if mibBuilder.loadTexts: slipParity.setStatus('mandatory')
+slipStopBits = MibScalar((1, 3, 6, 1, 4, 1, 2926, 25, 8, 2, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("sb1", 1), ("sb2", 2))).clone('sb1')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: slipStopBits.setStatus('mandatory')
+slipFlowControl = MibScalar((1, 3, 6, 1, 4, 1, 2926, 25, 8, 2, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(3))).clone(namedValues=NamedValues(("none", 3))).clone('none')).setMaxAccess("readonly")
+if mibBuilder.loadTexts: slipFlowControl.setStatus('mandatory')
+slipType = MibScalar((1, 3, 6, 1, 4, 1, 2926, 25, 8, 2, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("uncompressed", 1), ("compressed", 2))).clone('uncompressed')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: slipType.setStatus('mandatory')
+slipMtu = MibScalar((1, 3, 6, 1, 4, 1, 2926, 25, 8, 2, 7), Integer32().subtype(subtypeSpec=ValueRangeConstraint(64, 1518)).clone(1006)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: slipMtu.setStatus('mandatory')
+mibBuilder.exportSymbols("SONOMASYSTEMS-SONOMA-SLIP-MIB", slip=slip, slipSpeed=slipSpeed, slipParity=slipParity, slipStopBits=slipStopBits, slipDataBits=slipDataBits, slipFlowControl=slipFlowControl, slipMtu=slipMtu, slipType=slipType)

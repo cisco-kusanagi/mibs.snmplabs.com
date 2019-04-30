@@ -1,0 +1,66 @@
+#
+# PySNMP MIB module CISCO-INTERFACE-XCVR-MONITOR-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-INTERFACE-XCVR-MONITOR-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:44:45 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+ifName, = mibBuilder.importSymbols("IF-MIB", "ifName")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+iso, Counter64, Counter32, NotificationType, MibIdentifier, Bits, Integer32, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, ModuleIdentity, TimeTicks, ObjectIdentity, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "Counter64", "Counter32", "NotificationType", "MibIdentifier", "Bits", "Integer32", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "ModuleIdentity", "TimeTicks", "ObjectIdentity", "IpAddress")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+ciscoInterfaceXcvrMonitorMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 706))
+ciscoInterfaceXcvrMonitorMIB.setRevisions(('2009-10-09 00:00',))
+if mibBuilder.loadTexts: ciscoInterfaceXcvrMonitorMIB.setLastUpdated('200910090000Z')
+if mibBuilder.loadTexts: ciscoInterfaceXcvrMonitorMIB.setOrganization('Cisco Systems, Inc.')
+class CiscoInterfaceXcvrMonitorStatus(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))
+    namedValues = NamedValues(("highSet", 1), ("lowSet", 2), ("highClear", 3), ("lowClear", 4), ("normal", 5))
+
+ciscoInterfaceXcvrMonMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 706, 0))
+ciscoInterfaceXcvrMonMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 706, 1))
+ciscoInterfaceXcvrMonMIBConform = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 706, 2))
+cIfXcvrMonDigitalDiagTempAlarm = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 1), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagTempAlarm.setStatus('current')
+cIfXcvrMonDigitalDiagTempWarning = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 2), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagTempWarning.setStatus('current')
+cIfXcvrMonDigitalDiagVoltAlarm = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 3), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagVoltAlarm.setStatus('current')
+cIfXcvrMonDigitalDiagVoltWarning = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 4), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagVoltWarning.setStatus('current')
+cIfXcvrMonDigitalDiagCurrAlarm = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 5), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagCurrAlarm.setStatus('current')
+cIfXcvrMonDigitalDiagCurrWarning = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 6), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagCurrWarning.setStatus('current')
+cIfXcvrMonDigitalDiagRxPwrAlarm = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 7), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagRxPwrAlarm.setStatus('current')
+cIfXcvrMonDigitalDiagRxPwrWarning = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 8), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagRxPwrWarning.setStatus('current')
+cIfXcvrMonDigitalDiagTxPwrAlarm = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 9), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagTxPwrAlarm.setStatus('current')
+cIfXcvrMonDigitalDiagTxPwrWarning = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 10), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagTxPwrWarning.setStatus('current')
+cIfXcvrMonDigitalDiagTxFaultAlarm = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 11), CiscoInterfaceXcvrMonitorStatus()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: cIfXcvrMonDigitalDiagTxFaultAlarm.setStatus('current')
+cIfXcvrMonStatusChangeNotifEnable = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 706, 1, 12), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cIfXcvrMonStatusChangeNotifEnable.setStatus('current')
+cIfXcvrMonStatusChangeNotif = NotificationType((1, 3, 6, 1, 4, 1, 9, 9, 706, 0, 1)).setObjects(("IF-MIB", "ifName"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTempAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTempWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagVoltAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagVoltWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagCurrAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagCurrWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagRxPwrAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagRxPwrWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTxPwrAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTxPwrWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTxFaultAlarm"))
+if mibBuilder.loadTexts: cIfXcvrMonStatusChangeNotif.setStatus('current')
+ciscoInterfaceXcvrMonMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 706, 2, 1))
+ciscoInterfaceXcvrMonMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 706, 2, 2))
+cIfXcvrMonMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 706, 2, 1, 1)).setObjects(("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrDigitalDiagMonStatusGroup"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonStatusChangeNotifGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cIfXcvrMonMIBCompliance = cIfXcvrMonMIBCompliance.setStatus('current')
+cIfXcvrDigitalDiagMonStatusGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 706, 2, 2, 1)).setObjects(("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTempAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTempWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagVoltAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagVoltWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagCurrAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagCurrWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagRxPwrAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagRxPwrWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTxPwrAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTxPwrWarning"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonDigitalDiagTxFaultAlarm"), ("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonStatusChangeNotifEnable"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cIfXcvrDigitalDiagMonStatusGroup = cIfXcvrDigitalDiagMonStatusGroup.setStatus('current')
+cIfXcvrMonStatusChangeNotifGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 9, 9, 706, 2, 2, 2)).setObjects(("CISCO-INTERFACE-XCVR-MONITOR-MIB", "cIfXcvrMonStatusChangeNotif"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cIfXcvrMonStatusChangeNotifGroup = cIfXcvrMonStatusChangeNotifGroup.setStatus('current')
+mibBuilder.exportSymbols("CISCO-INTERFACE-XCVR-MONITOR-MIB", ciscoInterfaceXcvrMonMIBNotifs=ciscoInterfaceXcvrMonMIBNotifs, cIfXcvrMonStatusChangeNotif=cIfXcvrMonStatusChangeNotif, cIfXcvrDigitalDiagMonStatusGroup=cIfXcvrDigitalDiagMonStatusGroup, cIfXcvrMonDigitalDiagTxFaultAlarm=cIfXcvrMonDigitalDiagTxFaultAlarm, CiscoInterfaceXcvrMonitorStatus=CiscoInterfaceXcvrMonitorStatus, ciscoInterfaceXcvrMonMIBObjects=ciscoInterfaceXcvrMonMIBObjects, cIfXcvrMonDigitalDiagRxPwrWarning=cIfXcvrMonDigitalDiagRxPwrWarning, cIfXcvrMonDigitalDiagVoltWarning=cIfXcvrMonDigitalDiagVoltWarning, cIfXcvrMonDigitalDiagTempAlarm=cIfXcvrMonDigitalDiagTempAlarm, cIfXcvrMonDigitalDiagCurrAlarm=cIfXcvrMonDigitalDiagCurrAlarm, cIfXcvrMonStatusChangeNotifGroup=cIfXcvrMonStatusChangeNotifGroup, cIfXcvrMonMIBCompliance=cIfXcvrMonMIBCompliance, ciscoInterfaceXcvrMonMIBConform=ciscoInterfaceXcvrMonMIBConform, cIfXcvrMonDigitalDiagRxPwrAlarm=cIfXcvrMonDigitalDiagRxPwrAlarm, cIfXcvrMonDigitalDiagTxPwrAlarm=cIfXcvrMonDigitalDiagTxPwrAlarm, ciscoInterfaceXcvrMonitorMIB=ciscoInterfaceXcvrMonitorMIB, ciscoInterfaceXcvrMonMIBCompliances=ciscoInterfaceXcvrMonMIBCompliances, ciscoInterfaceXcvrMonMIBGroups=ciscoInterfaceXcvrMonMIBGroups, cIfXcvrMonDigitalDiagTxPwrWarning=cIfXcvrMonDigitalDiagTxPwrWarning, cIfXcvrMonStatusChangeNotifEnable=cIfXcvrMonStatusChangeNotifEnable, cIfXcvrMonDigitalDiagVoltAlarm=cIfXcvrMonDigitalDiagVoltAlarm, cIfXcvrMonDigitalDiagTempWarning=cIfXcvrMonDigitalDiagTempWarning, cIfXcvrMonDigitalDiagCurrWarning=cIfXcvrMonDigitalDiagCurrWarning, PYSNMP_MODULE_ID=ciscoInterfaceXcvrMonitorMIB)

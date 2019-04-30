@@ -1,0 +1,116 @@
+#
+# PySNMP MIB module SAVEPOWER-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SAVEPOWER-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:52:41 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+entPhysicalIndex, = mibBuilder.importSymbols("ENTITY-MIB", "entPhysicalIndex")
+hpSwitch, = mibBuilder.importSymbols("HP-ICF-OID", "hpSwitch")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+TimeTicks, Counter64, Counter32, ObjectIdentity, Unsigned32, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, Integer32, ModuleIdentity, Bits, NotificationType, IpAddress, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Counter64", "Counter32", "ObjectIdentity", "Unsigned32", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "Integer32", "ModuleIdentity", "Bits", "NotificationType", "IpAddress", "MibIdentifier")
+TruthValue, DisplayString, DateAndTime, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "DisplayString", "DateAndTime", "TextualConvention")
+hpicfSavepowerMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56))
+hpicfSavepowerMIB.setRevisions(('2010-08-12 00:00', '2008-10-17 14:30',))
+if mibBuilder.loadTexts: hpicfSavepowerMIB.setLastUpdated('201008120000Z')
+if mibBuilder.loadTexts: hpicfSavepowerMIB.setOrganization('HP Networking')
+hpicfSavepowerScalars = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 1))
+hpicfSavepowerLEDScalars = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 1, 3))
+class SavepowerBlockIndex(TextualConvention, Unsigned32):
+    status = 'current'
+    displayHint = 'd'
+
+class SavepowerControl(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("powerOn", 1), ("powerOff", 2))
+
+hpicfSavepowerMaxBlocks = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfSavepowerMaxBlocks.setStatus('current')
+hpicfSavepowerEnabledPorts = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 1, 2), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfSavepowerEnabledPorts.setStatus('current')
+hpicfSavePowerLEDOffAlarmStartTime = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 1, 3, 1), DateAndTime()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSavePowerLEDOffAlarmStartTime.setStatus('current')
+hpicfSavePowerLEDOffAlarmDuration = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 1, 3, 2), Unsigned32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSavePowerLEDOffAlarmDuration.setStatus('current')
+hpicfSavePowerLEDOffAlarmRecur = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 1, 3, 3), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSavePowerLEDOffAlarmRecur.setStatus('current')
+hpicfEntitySavepower = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2))
+hpicfSavepowerTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 1), )
+if mibBuilder.loadTexts: hpicfSavepowerTable.setStatus('current')
+hpicfSavepowerEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 1, 1), ).setIndexNames((0, "SAVEPOWER-MIB", "hpicfSavepowerBlockID"))
+if mibBuilder.loadTexts: hpicfSavepowerEntry.setStatus('current')
+hpicfSavepowerBlockID = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 1, 1, 1), SavepowerBlockIndex())
+if mibBuilder.loadTexts: hpicfSavepowerBlockID.setStatus('current')
+hpicfSavepowerControl = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 1, 1, 2), SavepowerControl()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSavepowerControl.setStatus('current')
+hpicfSavepowerBlockPorts = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 1, 1, 3), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfSavepowerBlockPorts.setStatus('current')
+hpicfSavepowerGreenFeaturesTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 2), )
+if mibBuilder.loadTexts: hpicfSavepowerGreenFeaturesTable.setStatus('current')
+hpicfSavepowerGreenFeaturesEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 2, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: hpicfSavepowerGreenFeaturesEntry.setStatus('current')
+hpicfSavepowerEntityPowerAdminStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 2, 1, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSavepowerEntityPowerAdminStatus.setStatus('current')
+hpicfSavepowerEntityPowerOperStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 2, 1, 2), SavepowerControl()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfSavepowerEntityPowerOperStatus.setStatus('current')
+hpicfSavepowerEntityLEDAdminStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 2, 1, 3), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSavepowerEntityLEDAdminStatus.setStatus('current')
+hpicfSavepowerEntityLEDOperStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 2, 1, 4), SavepowerControl()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfSavepowerEntityLEDOperStatus.setStatus('current')
+hpicfSavepowerPHYTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 3), )
+if mibBuilder.loadTexts: hpicfSavepowerPHYTable.setStatus('current')
+hpicfSavepowerPHYEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 3, 1), ).setIndexNames((0, "SAVEPOWER-MIB", "hpicfSavepowerSlotNum"), (0, "SAVEPOWER-MIB", "hpicfSavepowerPortNum"))
+if mibBuilder.loadTexts: hpicfSavepowerPHYEntry.setStatus('current')
+hpicfSavepowerSlotNum = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 3, 1, 1), Unsigned32())
+if mibBuilder.loadTexts: hpicfSavepowerSlotNum.setStatus('current')
+hpicfSavepowerPortNum = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 3, 1, 2), Unsigned32())
+if mibBuilder.loadTexts: hpicfSavepowerPortNum.setStatus('current')
+hpicfSavepowerPHYAdminStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 3, 1, 3), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSavepowerPHYAdminStatus.setStatus('current')
+hpicfSavepowerPHYOperStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 3, 1, 4), SavepowerControl()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfSavepowerPHYOperStatus.setStatus('current')
+hpicfSavepowerEntPHYTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 4), )
+if mibBuilder.loadTexts: hpicfSavepowerEntPHYTable.setStatus('current')
+hpicfSavepowerEntPHYEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 4, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: hpicfSavepowerEntPHYEntry.setStatus('current')
+hpicfSavepowerEntPHYAdminStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 4, 1, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfSavepowerEntPHYAdminStatus.setStatus('current')
+hpicfSavepowerEntPHYOperStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 2, 4, 1, 2), SavepowerControl()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfSavepowerEntPHYOperStatus.setStatus('current')
+hpicfSavepowerConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3))
+hpicfSavepowerCompliance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3, 1))
+hpicfSavepowerGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3, 2))
+hpicfSavepowerComplianceInfo = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3, 1, 1)).setObjects(("SAVEPOWER-MIB", "hpicfSavepowerScalarsGroup"), ("SAVEPOWER-MIB", "hpicfSavepowerLEDScalarsGroup"), ("SAVEPOWER-MIB", "hpicfSavepowerGreenFeaturesGroup"), ("SAVEPOWER-MIB", "hpicfSavepowerPHYGroup"), ("SAVEPOWER-MIB", "hpicfSavepowerGroup"), ("SAVEPOWER-MIB", "hpicfSavepowerGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSavepowerComplianceInfo = hpicfSavepowerComplianceInfo.setStatus('current')
+hpicfSavepowerScalarsGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3, 2, 1)).setObjects(("SAVEPOWER-MIB", "hpicfSavepowerMaxBlocks"), ("SAVEPOWER-MIB", "hpicfSavepowerEnabledPorts"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSavepowerScalarsGroup = hpicfSavepowerScalarsGroup.setStatus('current')
+hpicfSavepowerLEDScalarsGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3, 2, 2)).setObjects(("SAVEPOWER-MIB", "hpicfSavePowerLEDOffAlarmStartTime"), ("SAVEPOWER-MIB", "hpicfSavePowerLEDOffAlarmDuration"), ("SAVEPOWER-MIB", "hpicfSavePowerLEDOffAlarmRecur"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSavepowerLEDScalarsGroup = hpicfSavepowerLEDScalarsGroup.setStatus('current')
+hpicfSavepowerGreenFeaturesGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3, 2, 3)).setObjects(("SAVEPOWER-MIB", "hpicfSavepowerEntityPowerAdminStatus"), ("SAVEPOWER-MIB", "hpicfSavepowerEntityPowerOperStatus"), ("SAVEPOWER-MIB", "hpicfSavepowerEntityLEDAdminStatus"), ("SAVEPOWER-MIB", "hpicfSavepowerEntityLEDOperStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSavepowerGreenFeaturesGroup = hpicfSavepowerGreenFeaturesGroup.setStatus('current')
+hpicfSavepowerPHYGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3, 2, 4)).setObjects(("SAVEPOWER-MIB", "hpicfSavepowerPHYAdminStatus"), ("SAVEPOWER-MIB", "hpicfSavepowerPHYOperStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSavepowerPHYGroup = hpicfSavepowerPHYGroup.setStatus('current')
+hpicfSavepowerGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 3, 2, 5)).setObjects(("SAVEPOWER-MIB", "hpicfSavepowerControl"), ("SAVEPOWER-MIB", "hpicfSavepowerBlockPorts"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSavepowerGroup = hpicfSavepowerGroup.setStatus('current')
+hpicfPHYConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 4))
+hpicfPHYCompliance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 4, 1))
+hpicfPHYGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 4, 2))
+hpicfPHYComplianceInfo = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 4, 1, 1)).setObjects(("SAVEPOWER-MIB", "hpicfSavepowerEntPHYGroup"), ("SAVEPOWER-MIB", "hpicfPHYGroups"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfPHYComplianceInfo = hpicfPHYComplianceInfo.setStatus('current')
+hpicfSavepowerEntPHYGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 56, 4, 2, 1)).setObjects(("SAVEPOWER-MIB", "hpicfSavepowerEntPHYAdminStatus"), ("SAVEPOWER-MIB", "hpicfSavepowerEntPHYOperStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfSavepowerEntPHYGroup = hpicfSavepowerEntPHYGroup.setStatus('current')
+mibBuilder.exportSymbols("SAVEPOWER-MIB", hpicfPHYConformance=hpicfPHYConformance, hpicfSavepowerControl=hpicfSavepowerControl, hpicfSavepowerScalars=hpicfSavepowerScalars, hpicfSavepowerEntPHYGroup=hpicfSavepowerEntPHYGroup, SavepowerBlockIndex=SavepowerBlockIndex, hpicfSavepowerEntry=hpicfSavepowerEntry, hpicfSavepowerGroup=hpicfSavepowerGroup, hpicfPHYCompliance=hpicfPHYCompliance, hpicfPHYComplianceInfo=hpicfPHYComplianceInfo, hpicfSavepowerEntPHYEntry=hpicfSavepowerEntPHYEntry, hpicfSavepowerGreenFeaturesEntry=hpicfSavepowerGreenFeaturesEntry, hpicfSavepowerPHYTable=hpicfSavepowerPHYTable, hpicfSavepowerLEDScalarsGroup=hpicfSavepowerLEDScalarsGroup, hpicfSavepowerPHYEntry=hpicfSavepowerPHYEntry, hpicfSavePowerLEDOffAlarmStartTime=hpicfSavePowerLEDOffAlarmStartTime, hpicfSavepowerEntityPowerOperStatus=hpicfSavepowerEntityPowerOperStatus, hpicfSavepowerConformance=hpicfSavepowerConformance, hpicfSavePowerLEDOffAlarmDuration=hpicfSavePowerLEDOffAlarmDuration, hpicfSavepowerSlotNum=hpicfSavepowerSlotNum, hpicfSavepowerPortNum=hpicfSavepowerPortNum, hpicfSavepowerTable=hpicfSavepowerTable, hpicfSavepowerCompliance=hpicfSavepowerCompliance, SavepowerControl=SavepowerControl, hpicfSavepowerPHYAdminStatus=hpicfSavepowerPHYAdminStatus, hpicfSavepowerEntityPowerAdminStatus=hpicfSavepowerEntityPowerAdminStatus, hpicfSavepowerPHYGroup=hpicfSavepowerPHYGroup, hpicfSavepowerGreenFeaturesTable=hpicfSavepowerGreenFeaturesTable, hpicfSavepowerBlockID=hpicfSavepowerBlockID, hpicfSavepowerScalarsGroup=hpicfSavepowerScalarsGroup, hpicfSavepowerGreenFeaturesGroup=hpicfSavepowerGreenFeaturesGroup, hpicfSavePowerLEDOffAlarmRecur=hpicfSavePowerLEDOffAlarmRecur, hpicfSavepowerComplianceInfo=hpicfSavepowerComplianceInfo, hpicfSavepowerMIB=hpicfSavepowerMIB, hpicfSavepowerEnabledPorts=hpicfSavepowerEnabledPorts, hpicfPHYGroups=hpicfPHYGroups, hpicfSavepowerEntityLEDAdminStatus=hpicfSavepowerEntityLEDAdminStatus, hpicfSavepowerLEDScalars=hpicfSavepowerLEDScalars, hpicfSavepowerEntPHYAdminStatus=hpicfSavepowerEntPHYAdminStatus, hpicfSavepowerBlockPorts=hpicfSavepowerBlockPorts, hpicfSavepowerPHYOperStatus=hpicfSavepowerPHYOperStatus, hpicfSavepowerEntPHYTable=hpicfSavepowerEntPHYTable, hpicfSavepowerEntityLEDOperStatus=hpicfSavepowerEntityLEDOperStatus, PYSNMP_MODULE_ID=hpicfSavepowerMIB, hpicfSavepowerMaxBlocks=hpicfSavepowerMaxBlocks, hpicfEntitySavepower=hpicfEntitySavepower, hpicfSavepowerGroups=hpicfSavepowerGroups, hpicfSavepowerEntPHYOperStatus=hpicfSavepowerEntPHYOperStatus)

@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module CXBRI-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CXBRI-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:16:40 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+cxBri, = mibBuilder.importSymbols("CXProduct-SMI", "cxBri")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, iso, ObjectIdentity, Bits, Counter64, TimeTicks, NotificationType, ModuleIdentity, IpAddress, MibIdentifier, Unsigned32, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "iso", "ObjectIdentity", "Bits", "Counter64", "TimeTicks", "NotificationType", "ModuleIdentity", "IpAddress", "MibIdentifier", "Unsigned32", "Counter32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+briTable = MibTable((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10), )
+if mibBuilder.loadTexts: briTable.setStatus('mandatory')
+briEntry = MibTableRow((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10, 1), ).setIndexNames((0, "CXBRI-MIB", "briSlotNumberIndex"))
+if mibBuilder.loadTexts: briEntry.setStatus('mandatory')
+briSlotNumberIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 8))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: briSlotNumberIndex.setStatus('mandatory')
+briIoRegTest = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10, 1, 20), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("failed", 1), ("passed", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: briIoRegTest.setStatus('mandatory')
+briIoLedsTest = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10, 1, 21), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("initializationFailed", 1), ("initializationPassed", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: briIoLedsTest.setStatus('mandatory')
+briImpRegTest = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10, 1, 22), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("initializationFailed", 1), ("failed", 2), ("passed", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: briImpRegTest.setStatus('mandatory')
+briImpComTestPollResult = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10, 1, 23), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("initializationFailed", 1), ("failed", 2), ("passed", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: briImpComTestPollResult.setStatus('mandatory')
+briTxcvrRegTest = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10, 1, 24), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("initializationFailed", 1), ("failed", 2), ("passed", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: briTxcvrRegTest.setStatus('mandatory')
+briTxcvrComTestPollResult = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 8, 4, 10, 1, 25), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("initializationFailed", 1), ("failed", 2), ("passed", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: briTxcvrComTestPollResult.setStatus('mandatory')
+mibBuilder.exportSymbols("CXBRI-MIB", briSlotNumberIndex=briSlotNumberIndex, briImpComTestPollResult=briImpComTestPollResult, briImpRegTest=briImpRegTest, briTable=briTable, briEntry=briEntry, briTxcvrComTestPollResult=briTxcvrComTestPollResult, briIoLedsTest=briIoLedsTest, briTxcvrRegTest=briTxcvrRegTest, briIoRegTest=briIoRegTest)

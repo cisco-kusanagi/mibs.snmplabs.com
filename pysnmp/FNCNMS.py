@@ -1,0 +1,170 @@
+#
+# PySNMP MIB module FNCNMS (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/FNCNMS
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:00:27 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+netsmart, = mibBuilder.importSymbols("FNC-COMMON-SMI", "netsmart")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+system, = mibBuilder.importSymbols("SNMPv2-MIB", "system")
+TimeTicks, Bits, NotificationType, MibIdentifier, ObjectIdentity, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, Counter64, Gauge32, Unsigned32, ModuleIdentity, IpAddress, enterprises, iso = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Bits", "NotificationType", "MibIdentifier", "ObjectIdentity", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "Counter64", "Gauge32", "Unsigned32", "ModuleIdentity", "IpAddress", "enterprises", "iso")
+TextualConvention, DateAndTime, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DateAndTime", "DisplayString")
+netsmart1500 = ModuleIdentity((1, 3, 6, 1, 4, 1, 3861, 4, 1500))
+netsmart1500.setRevisions(('2012-02-06 16:00', '2011-06-16 16:00', '2003-08-02 16:00',))
+if mibBuilder.loadTexts: netsmart1500.setLastUpdated('201202061600Z')
+if mibBuilder.loadTexts: netsmart1500.setOrganization('Fujitsu Network Communications Inc.')
+nmsNEMgmtMIB = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1))
+nmsNEMgmt = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 1))
+nmsNEAlarm = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2))
+nmsNotificationTrapBase = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 0))
+class NMSSeverity(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))
+    namedValues = NamedValues(("cleared", 1), ("info", 2), ("minor", 3), ("major", 4), ("critical", 5))
+
+class NMSCondDirection(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("na", 1), ("transmit", 2), ("receive", 3))
+
+class NMSCondLocation(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("na", 1), ("nearEnd", 2), ("farEnd", 3))
+
+class NMSServiceEffect(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("na", 1), ("serviceAffecting", 2), ("nonServiceAffecting", 3))
+
+class NMSTrapSeqNumber(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 99999)
+
+class NMSMgdNE(DisplayString):
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(1, 20)
+
+class NMSNEConnState(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("connected", 1), ("notConnected", 2))
+
+nmsNETable = MibTable((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 1, 1), )
+if mibBuilder.loadTexts: nmsNETable.setStatus('current')
+nmsNEEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 1, 1, 1), ).setIndexNames((1, "FNCNMS", "neTID"))
+if mibBuilder.loadTexts: nmsNEEntry.setStatus('current')
+neTID = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 1, 1, 1, 1), NMSMgdNE()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neTID.setStatus('current')
+neType = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 1, 1, 1, 2), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neType.setStatus('current')
+neConnState = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 1, 1, 1, 3), NMSNEConnState()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neConnState.setStatus('current')
+nmsNEAlarmTable = MibTable((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1), )
+if mibBuilder.loadTexts: nmsNEAlarmTable.setStatus('current')
+nmsNEAlarmListEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1), ).setIndexNames((0, "FNCNMS", "alarmTID"), (0, "FNCNMS", "alarmIndex"))
+if mibBuilder.loadTexts: nmsNEAlarmListEntry.setStatus('current')
+alarmTID = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 1), NMSMgdNE()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmTID.setStatus('current')
+alarmIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 99999))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmIndex.setStatus('current')
+alarmEntityId = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 3), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmEntityId.setStatus('current')
+alarmEntityType = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 4), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmEntityType.setStatus('current')
+alarmSeverity = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 5), NMSSeverity()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmSeverity.setStatus('current')
+alarmCondType = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 6), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmCondType.setStatus('current')
+alarmServEffect = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 7), NMSServiceEffect()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmServEffect.setStatus('current')
+alarmLocation = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 8), NMSCondLocation()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmLocation.setStatus('current')
+alarmDirection = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 9), NMSCondDirection()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmDirection.setStatus('current')
+alarmDescription = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 10), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmDescription.setStatus('current')
+neAlarmTimeStamp = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 11), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neAlarmTimeStamp.setStatus('current')
+nmsAlarmTimeStamp = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 1, 1, 12), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nmsAlarmTimeStamp.setStatus('current')
+nmsLastMsgNumber = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 2), NMSTrapSeqNumber()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nmsLastMsgNumber.setStatus('current')
+nmsTrapHistoryTable = MibTable((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 3), )
+if mibBuilder.loadTexts: nmsTrapHistoryTable.setStatus('current')
+nmsTrapHistoryTableEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 3, 1), ).setIndexNames((0, "FNCNMS", "nmsTrapHistoryIndex"))
+if mibBuilder.loadTexts: nmsTrapHistoryTableEntry.setStatus('current')
+nmsTrapHistoryIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 3, 1, 1), NMSTrapSeqNumber()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nmsTrapHistoryIndex.setStatus('current')
+nmsTrapHistoryTID = MibTableColumn((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 3, 1, 2), NMSMgdNE()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nmsTrapHistoryTID.setStatus('current')
+nmsNotificationBase = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4))
+notifTID = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 1), NMSMgdNE()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: notifTID.setStatus('current')
+neEntityID = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 2), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neEntityID.setStatus('current')
+neEntityType = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 3), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neEntityType.setStatus('current')
+neSeverity = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 4), NMSSeverity()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neSeverity.setStatus('current')
+neCondType = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 5), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neCondType.setStatus('current')
+neServEffect = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 6), NMSServiceEffect()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neServEffect.setStatus('current')
+neLocation = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 7), NMSCondLocation()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neLocation.setStatus('current')
+neDirection = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 8), NMSCondDirection()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neDirection.setStatus('current')
+neCondDescription = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 9), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neCondDescription.setStatus('current')
+nmsNotifTimeStamp = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 10), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nmsNotifTimeStamp.setStatus('current')
+neNotifTimeStamp = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 11), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neNotifTimeStamp.setStatus('current')
+nmsTrapSeqNumber = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 12), NMSTrapSeqNumber()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nmsTrapSeqNumber.setStatus('current')
+nmsNEConnState = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 13), NMSNEConnState()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nmsNEConnState.setStatus('current')
+neOperation = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 14), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("created", 1), ("deleted", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: neOperation.setStatus('current')
+notifServer = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 15), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: notifServer.setStatus('current')
+nmsKeepAliveState = MibScalar((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 4, 16), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1))).clone(namedValues=NamedValues(("alive", 1)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nmsKeepAliveState.setStatus('current')
+nmsNEEvent = NotificationType((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 0, 1)).setObjects(("FNCNMS", "notifTID"), ("FNCNMS", "neEntityID"), ("FNCNMS", "neEntityType"), ("FNCNMS", "neSeverity"), ("FNCNMS", "neCondType"), ("FNCNMS", "neServEffect"), ("FNCNMS", "neLocation"), ("FNCNMS", "neDirection"), ("FNCNMS", "neCondDescription"), ("FNCNMS", "nmsNotifTimeStamp"), ("FNCNMS", "neNotifTimeStamp"), ("FNCNMS", "nmsTrapSeqNumber"))
+if mibBuilder.loadTexts: nmsNEEvent.setStatus('current')
+nmsNEStateChangeEvent = NotificationType((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 0, 2)).setObjects(("FNCNMS", "notifTID"), ("FNCNMS", "nmsNEConnState"), ("FNCNMS", "nmsTrapSeqNumber"))
+if mibBuilder.loadTexts: nmsNEStateChangeEvent.setStatus('current')
+nmsNEOperationEvent = NotificationType((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 0, 3)).setObjects(("FNCNMS", "notifTID"), ("FNCNMS", "neOperation"), ("FNCNMS", "nmsTrapSeqNumber"))
+if mibBuilder.loadTexts: nmsNEOperationEvent.setStatus('current')
+nmsKeepAliveEvent = NotificationType((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 2, 0, 4)).setObjects(("FNCNMS", "notifServer"), ("FNCNMS", "nmsKeepAliveState"))
+if mibBuilder.loadTexts: nmsKeepAliveEvent.setStatus('current')
+fncNMSMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3))
+fncNMSMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 1))
+fncNMSMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 2))
+fncNMSMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 1, 1)).setObjects(("SNMPv2-MIB", "system"), ("FNCNMS", "nmsNEMgmtGroup"), ("FNCNMS", "nmsNEAlarmGroup"), ("FNCNMS", "nmsNETrapGroup"), ("FNCNMS", "nmsNETrapObjects"), ("FNCNMS", "nmsServerTrapGroup"), ("FNCNMS", "nmsServerTrapObjects"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    fncNMSMIBCompliance = fncNMSMIBCompliance.setStatus('current')
+nmsNEMgmtGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 2, 1)).setObjects(("FNCNMS", "neTID"), ("FNCNMS", "neType"), ("FNCNMS", "neConnState"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    nmsNEMgmtGroup = nmsNEMgmtGroup.setStatus('current')
+nmsNEAlarmGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 2, 2)).setObjects(("FNCNMS", "alarmTID"), ("FNCNMS", "alarmIndex"), ("FNCNMS", "alarmEntityId"), ("FNCNMS", "alarmEntityType"), ("FNCNMS", "alarmSeverity"), ("FNCNMS", "alarmCondType"), ("FNCNMS", "alarmServEffect"), ("FNCNMS", "alarmLocation"), ("FNCNMS", "alarmDirection"), ("FNCNMS", "alarmDescription"), ("FNCNMS", "neAlarmTimeStamp"), ("FNCNMS", "nmsAlarmTimeStamp"), ("FNCNMS", "nmsLastMsgNumber"), ("FNCNMS", "nmsTrapHistoryIndex"), ("FNCNMS", "nmsTrapHistoryTID"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    nmsNEAlarmGroup = nmsNEAlarmGroup.setStatus('current')
+nmsNETrapGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 2, 3)).setObjects(("FNCNMS", "nmsNEEvent"), ("FNCNMS", "nmsNEStateChangeEvent"), ("FNCNMS", "nmsNEOperationEvent"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    nmsNETrapGroup = nmsNETrapGroup.setStatus('current')
+nmsNETrapObjects = ObjectGroup((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 2, 4)).setObjects(("FNCNMS", "notifTID"), ("FNCNMS", "neEntityID"), ("FNCNMS", "neEntityType"), ("FNCNMS", "neSeverity"), ("FNCNMS", "neCondType"), ("FNCNMS", "neServEffect"), ("FNCNMS", "neLocation"), ("FNCNMS", "neDirection"), ("FNCNMS", "neCondDescription"), ("FNCNMS", "nmsNotifTimeStamp"), ("FNCNMS", "neNotifTimeStamp"), ("FNCNMS", "nmsTrapSeqNumber"), ("FNCNMS", "nmsNEConnState"), ("FNCNMS", "neOperation"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    nmsNETrapObjects = nmsNETrapObjects.setStatus('current')
+nmsServerTrapGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 2, 5)).setObjects(("FNCNMS", "nmsKeepAliveEvent"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    nmsServerTrapGroup = nmsServerTrapGroup.setStatus('current')
+nmsServerTrapObjects = ObjectGroup((1, 3, 6, 1, 4, 1, 3861, 4, 1500, 1, 3, 2, 6)).setObjects(("FNCNMS", "notifServer"), ("FNCNMS", "nmsKeepAliveState"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    nmsServerTrapObjects = nmsServerTrapObjects.setStatus('current')
+mibBuilder.exportSymbols("FNCNMS", NMSSeverity=NMSSeverity, nmsNEAlarmTable=nmsNEAlarmTable, alarmDirection=alarmDirection, nmsNEAlarm=nmsNEAlarm, alarmSeverity=alarmSeverity, neAlarmTimeStamp=neAlarmTimeStamp, alarmTID=alarmTID, nmsNETable=nmsNETable, nmsLastMsgNumber=nmsLastMsgNumber, nmsNEOperationEvent=nmsNEOperationEvent, neSeverity=neSeverity, nmsNEMgmtGroup=nmsNEMgmtGroup, nmsNotificationTrapBase=nmsNotificationTrapBase, nmsTrapSeqNumber=nmsTrapSeqNumber, nmsNotifTimeStamp=nmsNotifTimeStamp, neEntityID=neEntityID, notifTID=notifTID, nmsNEConnState=nmsNEConnState, neNotifTimeStamp=neNotifTimeStamp, nmsNEMgmtMIB=nmsNEMgmtMIB, fncNMSMIBCompliance=fncNMSMIBCompliance, nmsNETrapObjects=nmsNETrapObjects, NMSServiceEffect=NMSServiceEffect, alarmLocation=alarmLocation, alarmDescription=alarmDescription, NMSTrapSeqNumber=NMSTrapSeqNumber, neCondType=neCondType, nmsServerTrapGroup=nmsServerTrapGroup, nmsTrapHistoryIndex=nmsTrapHistoryIndex, nmsTrapHistoryTableEntry=nmsTrapHistoryTableEntry, NMSMgdNE=NMSMgdNE, fncNMSMIBConformance=fncNMSMIBConformance, nmsAlarmTimeStamp=nmsAlarmTimeStamp, nmsNEMgmt=nmsNEMgmt, nmsNEAlarmListEntry=nmsNEAlarmListEntry, neTID=neTID, neLocation=neLocation, fncNMSMIBCompliances=fncNMSMIBCompliances, alarmIndex=alarmIndex, PYSNMP_MODULE_ID=netsmart1500, nmsNEEntry=nmsNEEntry, nmsNotificationBase=nmsNotificationBase, neConnState=neConnState, alarmCondType=alarmCondType, nmsServerTrapObjects=nmsServerTrapObjects, neCondDescription=neCondDescription, nmsKeepAliveEvent=nmsKeepAliveEvent, NMSCondLocation=NMSCondLocation, nmsTrapHistoryTID=nmsTrapHistoryTID, neEntityType=neEntityType, notifServer=notifServer, neDirection=neDirection, neType=neType, nmsTrapHistoryTable=nmsTrapHistoryTable, nmsNETrapGroup=nmsNETrapGroup, alarmServEffect=alarmServEffect, nmsNEEvent=nmsNEEvent, nmsKeepAliveState=nmsKeepAliveState, neOperation=neOperation, NMSCondDirection=NMSCondDirection, NMSNEConnState=NMSNEConnState, alarmEntityId=alarmEntityId, fncNMSMIBGroups=fncNMSMIBGroups, neServEffect=neServEffect, nmsNEAlarmGroup=nmsNEAlarmGroup, alarmEntityType=alarmEntityType, netsmart1500=netsmart1500, nmsNEStateChangeEvent=nmsNEStateChangeEvent)

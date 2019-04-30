@@ -1,0 +1,100 @@
+#
+# PySNMP MIB module HpicfHighAvailability-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HpicfHighAvailability-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:38:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint")
+PhysicalIndex, entPhysicalIndex = mibBuilder.importSymbols("ENTITY-MIB", "PhysicalIndex", "entPhysicalIndex")
+EntityStandbyStatus, = mibBuilder.importSymbols("ENTITY-STATE-MIB", "EntityStandbyStatus")
+hpicfCommon, = mibBuilder.importSymbols("HP-ICF-OID", "hpicfCommon")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+Counter32, NotificationType, IpAddress, Integer32, Counter64, MibIdentifier, Bits, Gauge32, ModuleIdentity, iso, TimeTicks, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "NotificationType", "IpAddress", "Integer32", "Counter64", "MibIdentifier", "Bits", "Gauge32", "ModuleIdentity", "iso", "TimeTicks", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+hpicfHighAvailability = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11))
+hpicfHighAvailability.setRevisions(('2017-01-05 00:00', '2012-05-15 00:00', '2009-10-18 00:00', '2009-09-06 00:00', '2009-08-21 00:00', '2006-09-05 00:00',))
+if mibBuilder.loadTexts: hpicfHighAvailability.setLastUpdated('201701050000Z')
+if mibBuilder.loadTexts: hpicfHighAvailability.setOrganization('HP Networking')
+hpicfHAConfigObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 1))
+hpicfHAStatusObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2))
+hpicfHAConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3))
+hpicfHARedundancyManagementModuleMode = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2), ("warmStandby", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfHARedundancyManagementModuleMode.setStatus('current')
+hpicfHAContinuousFwdingTime = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 1, 2), Unsigned32().clone(300)).setUnits('seconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfHAContinuousFwdingTime.setStatus('current')
+hpicfHAPreferredActiveManagement = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("none", 0), ("management-module1", 1), ("management-module2", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfHAPreferredActiveManagement.setStatus('current')
+hpicfHAMgmtRedundancyFailureReason = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7))).clone(namedValues=NamedValues(("noRedundantModule", 1), ("noFailure", 2), ("unknownReason", 3), ("mismatchOS", 4), ("failedSelftest", 5), ("communicationFailure", 6), ("redundancyDisable", 7)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAMgmtRedundancyFailureReason.setStatus('current')
+hpicfHAMgmtFailovers = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 2), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAMgmtFailovers.setStatus('current')
+hpicfHALastFailoverTime = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 3), TimeTicks()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHALastFailoverTime.setStatus('current')
+hpicfHAFailOverLogTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 4), )
+if mibBuilder.loadTexts: hpicfHAFailOverLogTable.setStatus('current')
+hpicfHAFailOverLogEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 4, 1), ).setIndexNames((0, "HpicfHighAvailability-MIB", "hpicfHAFailOverIndex"))
+if mibBuilder.loadTexts: hpicfHAFailOverLogEntry.setStatus('current')
+hpicfHAFailOverIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 4, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)))
+if mibBuilder.loadTexts: hpicfHAFailOverIndex.setStatus('current')
+hpicfHAFailOverMgmtModule = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 4, 1, 2), PhysicalIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAFailOverMgmtModule.setStatus('current')
+hpicfHAFailOverState = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 4, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("unknown", 1), ("active", 2), ("standby", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAFailOverState.setStatus('current')
+hpicfHAFailOverTime = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 4, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAFailOverTime.setStatus('current')
+hpicfHAFailOverReason = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 4, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("invalid", 0), ("switchoverReq", 1), ("buttonReq", 2), ("crashReq", 3), ("activeReset", 4), ("altReset", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAFailOverReason.setStatus('current')
+hpicfHAMgmtModuleTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 5), )
+if mibBuilder.loadTexts: hpicfHAMgmtModuleTable.setStatus('current')
+hpicfHAMgmtModuleEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 5, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: hpicfHAMgmtModuleEntry.setStatus('current')
+hpicfHAMgmtModuleState = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 5, 1, 1), EntityStandbyStatus()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAMgmtModuleState.setStatus('current')
+hpicfHAMgmtModuleCardUpSince = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 5, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAMgmtModuleCardUpSince.setStatus('current')
+hpicfHAMgmtModuleStateSince = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 5, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAMgmtModuleStateSince.setStatus('current')
+hpicfHAMgmtModuleRedundancyState = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 5, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("unavailable", 1), ("active", 2), ("disabled", 3), ("syncing", 4), ("warmStandby", 5), ("hitless", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAMgmtModuleRedundancyState.setStatus('current')
+hpicfHAMgmtModuleBackUpState = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 2, 5, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6, 7))).clone(namedValues=NamedValues(("failed", 0), ("unknown", 1), ("waiting", 2), ("realtimeBackupToSlave", 3), ("slaveIsAbsent", 4), ("batchBackup", 5), ("receivingRealtimeData", 6), ("offline", 7)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfHAMgmtModuleBackUpState.setStatus('current')
+hpicfHACompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 1))
+hpicfHAGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 2))
+hpicfHACompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 1, 1)).setObjects(("HpicfHighAvailability-MIB", "hpicfHAConfigGroup"), ("HpicfHighAvailability-MIB", "hpicfHAStatusGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHACompliance = hpicfHACompliance.setStatus('deprecated')
+hpicfHACompliance1 = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 1, 2)).setObjects(("HpicfHighAvailability-MIB", "hpicfHAFailOverGroup"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHACompliance1 = hpicfHACompliance1.setStatus('deprecated')
+hpicfHACompliance2 = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 1, 3)).setObjects(("HpicfHighAvailability-MIB", "hpicfHAFailOverGroup"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleGroup1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHACompliance2 = hpicfHACompliance2.setStatus('current')
+hpicfHACompliance3 = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 1, 4)).setObjects(("HpicfHighAvailability-MIB", "hpicfHAConfigGroup1"), ("HpicfHighAvailability-MIB", "hpicfHAStatusGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHACompliance3 = hpicfHACompliance3.setStatus('current')
+hpicfHAConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 2, 1)).setObjects(("HpicfHighAvailability-MIB", "hpicfHARedundancyManagementModuleMode"), ("HpicfHighAvailability-MIB", "hpicfHAContinuousFwdingTime"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHAConfigGroup = hpicfHAConfigGroup.setStatus('deprecated')
+hpicfHAStatusGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 2, 2)).setObjects(("HpicfHighAvailability-MIB", "hpicfHAMgmtRedundancyFailureReason"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtFailovers"), ("HpicfHighAvailability-MIB", "hpicfHALastFailoverTime"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHAStatusGroup = hpicfHAStatusGroup.setStatus('current')
+hpicfHAFailOverGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 2, 3)).setObjects(("HpicfHighAvailability-MIB", "hpicfHAFailOverMgmtModule"), ("HpicfHighAvailability-MIB", "hpicfHAFailOverState"), ("HpicfHighAvailability-MIB", "hpicfHAFailOverTime"), ("HpicfHighAvailability-MIB", "hpicfHAFailOverReason"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHAFailOverGroup = hpicfHAFailOverGroup.setStatus('current')
+hpicfHAMgmtModuleGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 2, 4)).setObjects(("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleState"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleCardUpSince"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleStateSince"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleRedundancyState"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHAMgmtModuleGroup = hpicfHAMgmtModuleGroup.setStatus('deprecated')
+hpicfHAMgmtModuleGroup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 2, 5)).setObjects(("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleState"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleCardUpSince"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleStateSince"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleRedundancyState"), ("HpicfHighAvailability-MIB", "hpicfHAMgmtModuleBackUpState"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHAMgmtModuleGroup1 = hpicfHAMgmtModuleGroup1.setStatus('current')
+hpicfHAConfigGroup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 11, 3, 2, 6)).setObjects(("HpicfHighAvailability-MIB", "hpicfHARedundancyManagementModuleMode"), ("HpicfHighAvailability-MIB", "hpicfHAContinuousFwdingTime"), ("HpicfHighAvailability-MIB", "hpicfHAPreferredActiveManagement"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfHAConfigGroup1 = hpicfHAConfigGroup1.setStatus('current')
+mibBuilder.exportSymbols("HpicfHighAvailability-MIB", hpicfHAMgmtModuleEntry=hpicfHAMgmtModuleEntry, hpicfHACompliance2=hpicfHACompliance2, hpicfHAMgmtModuleCardUpSince=hpicfHAMgmtModuleCardUpSince, hpicfHAFailOverTime=hpicfHAFailOverTime, hpicfHAMgmtFailovers=hpicfHAMgmtFailovers, hpicfHighAvailability=hpicfHighAvailability, hpicfHAFailOverMgmtModule=hpicfHAFailOverMgmtModule, hpicfHAConfigGroup1=hpicfHAConfigGroup1, hpicfHAFailOverGroup=hpicfHAFailOverGroup, hpicfHAFailOverLogTable=hpicfHAFailOverLogTable, hpicfHAFailOverReason=hpicfHAFailOverReason, hpicfHAMgmtModuleState=hpicfHAMgmtModuleState, hpicfHAStatusGroup=hpicfHAStatusGroup, hpicfHACompliance=hpicfHACompliance, hpicfHAPreferredActiveManagement=hpicfHAPreferredActiveManagement, hpicfHAMgmtModuleGroup1=hpicfHAMgmtModuleGroup1, hpicfHAMgmtRedundancyFailureReason=hpicfHAMgmtRedundancyFailureReason, hpicfHAStatusObjects=hpicfHAStatusObjects, hpicfHAFailOverIndex=hpicfHAFailOverIndex, hpicfHAConfigGroup=hpicfHAConfigGroup, hpicfHAConformance=hpicfHAConformance, hpicfHAMgmtModuleTable=hpicfHAMgmtModuleTable, hpicfHAMgmtModuleRedundancyState=hpicfHAMgmtModuleRedundancyState, hpicfHAMgmtModuleGroup=hpicfHAMgmtModuleGroup, hpicfHAFailOverLogEntry=hpicfHAFailOverLogEntry, hpicfHACompliance3=hpicfHACompliance3, hpicfHAGroups=hpicfHAGroups, hpicfHARedundancyManagementModuleMode=hpicfHARedundancyManagementModuleMode, PYSNMP_MODULE_ID=hpicfHighAvailability, hpicfHAMgmtModuleStateSince=hpicfHAMgmtModuleStateSince, hpicfHAFailOverState=hpicfHAFailOverState, hpicfHAMgmtModuleBackUpState=hpicfHAMgmtModuleBackUpState, hpicfHAConfigObjects=hpicfHAConfigObjects, hpicfHALastFailoverTime=hpicfHALastFailoverTime, hpicfHAContinuousFwdingTime=hpicfHAContinuousFwdingTime, hpicfHACompliance1=hpicfHACompliance1, hpicfHACompliances=hpicfHACompliances)

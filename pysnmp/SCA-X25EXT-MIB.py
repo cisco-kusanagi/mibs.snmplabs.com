@@ -1,0 +1,40 @@
+#
+# PySNMP MIB module SCA-X25EXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SCA-X25EXT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:53:02 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+scanet, = mibBuilder.importSymbols("SCANET-MIB", "scanet")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, IpAddress, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Counter32, MibIdentifier, iso, Integer32, Counter64, Bits, Unsigned32, NotificationType, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "IpAddress", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Counter32", "MibIdentifier", "iso", "Integer32", "Counter64", "Bits", "Unsigned32", "NotificationType", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+class IfIndexType(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(1, 2147483647)
+
+x25ext = MibIdentifier((1, 3, 6, 1, 4, 1, 208, 51))
+x25extCircuit = MibIdentifier((1, 3, 6, 1, 4, 1, 208, 51, 1))
+x25extCircuitTable = MibTable((1, 3, 6, 1, 4, 1, 208, 51, 1, 1), )
+if mibBuilder.loadTexts: x25extCircuitTable.setStatus('mandatory')
+x25extCircuitEntry = MibTableRow((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1), ).setIndexNames((0, "SCA-X25EXT-MIB", "x25extCircuitIndex"), (0, "SCA-X25EXT-MIB", "x25extCircuitChannel"))
+if mibBuilder.loadTexts: x25extCircuitEntry.setStatus('mandatory')
+x25extCircuitIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1, 1), IfIndexType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: x25extCircuitIndex.setStatus('mandatory')
+x25extCircuitChannel = MibTableColumn((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 4095))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: x25extCircuitChannel.setStatus('mandatory')
+x25extCircuitLogicalIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1, 3), IfIndexType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: x25extCircuitLogicalIndex.setStatus('mandatory')
+x25extCircuitPacketSize = MibTableColumn((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: x25extCircuitPacketSize.setStatus('mandatory')
+x25extCircuitWindowSize = MibTableColumn((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1, 5), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 127))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: x25extCircuitWindowSize.setStatus('mandatory')
+x25extCircuitTimeout = MibTableColumn((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1, 6), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: x25extCircuitTimeout.setStatus('mandatory')
+x25extCircuitOutResets = MibTableColumn((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1, 7), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: x25extCircuitOutResets.setStatus('mandatory')
+x25extCircuitOutFlowStuckResets = MibTableColumn((1, 3, 6, 1, 4, 1, 208, 51, 1, 1, 1, 8), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: x25extCircuitOutFlowStuckResets.setStatus('mandatory')
+mibBuilder.exportSymbols("SCA-X25EXT-MIB", x25extCircuitChannel=x25extCircuitChannel, x25extCircuitOutFlowStuckResets=x25extCircuitOutFlowStuckResets, x25extCircuitOutResets=x25extCircuitOutResets, x25extCircuitPacketSize=x25extCircuitPacketSize, x25extCircuitLogicalIndex=x25extCircuitLogicalIndex, x25extCircuit=x25extCircuit, x25extCircuitEntry=x25extCircuitEntry, x25extCircuitIndex=x25extCircuitIndex, x25extCircuitTimeout=x25extCircuitTimeout, IfIndexType=IfIndexType, x25ext=x25ext, x25extCircuitWindowSize=x25extCircuitWindowSize, x25extCircuitTable=x25extCircuitTable)

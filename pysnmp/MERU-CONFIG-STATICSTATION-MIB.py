@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module MERU-CONFIG-STATICSTATION-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MERU-CONFIG-STATICSTATION-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:01:15 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "SingleValueConstraint")
+Ipv6Address, = mibBuilder.importSymbols("IPV6-TC", "Ipv6Address")
+mwConfiguration, = mibBuilder.importSymbols("MERU-SMI", "mwConfiguration")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibIdentifier, enterprises, TimeTicks, Integer32, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, Counter64, Counter32, ObjectIdentity, iso, Bits, Gauge32, Unsigned32, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "enterprises", "TimeTicks", "Integer32", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "Counter64", "Counter32", "ObjectIdentity", "iso", "Bits", "Gauge32", "Unsigned32", "NotificationType")
+TimeStamp, TextualConvention, TruthValue, DateAndTime, RowStatus, MacAddress, TimeInterval, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TimeStamp", "TextualConvention", "TruthValue", "DateAndTime", "RowStatus", "MacAddress", "TimeInterval", "DisplayString")
+mwConfigStaticStation = ModuleIdentity((1, 3, 6, 1, 4, 1, 15983, 1, 1, 4, 16))
+if mibBuilder.loadTexts: mwConfigStaticStation.setLastUpdated('200506050000Z')
+if mibBuilder.loadTexts: mwConfigStaticStation.setOrganization('Meru Networks')
+mwStaticStationTable = MibTable((1, 3, 6, 1, 4, 1, 15983, 1, 1, 4, 16, 1), )
+if mibBuilder.loadTexts: mwStaticStationTable.setStatus('current')
+mwStaticStationEntry = MibTableRow((1, 3, 6, 1, 4, 1, 15983, 1, 1, 4, 16, 1, 1), ).setIndexNames((0, "MERU-CONFIG-STATICSTATION-MIB", "mwStaticStationTableIndex"))
+if mibBuilder.loadTexts: mwStaticStationEntry.setStatus('current')
+mwStaticStationTableIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 15983, 1, 1, 4, 16, 1, 1, 1), Integer32())
+if mibBuilder.loadTexts: mwStaticStationTableIndex.setStatus('current')
+mwStaticStationIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 15983, 1, 1, 4, 16, 1, 1, 2), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: mwStaticStationIpAddress.setStatus('current')
+mwStaticStationMacAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 15983, 1, 1, 4, 16, 1, 1, 3), MacAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: mwStaticStationMacAddress.setStatus('current')
+mwStaticStationRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 15983, 1, 1, 4, 16, 1, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: mwStaticStationRowStatus.setStatus('current')
+mibBuilder.exportSymbols("MERU-CONFIG-STATICSTATION-MIB", mwStaticStationEntry=mwStaticStationEntry, mwStaticStationTableIndex=mwStaticStationTableIndex, mwStaticStationRowStatus=mwStaticStationRowStatus, mwConfigStaticStation=mwConfigStaticStation, mwStaticStationMacAddress=mwStaticStationMacAddress, PYSNMP_MODULE_ID=mwConfigStaticStation, mwStaticStationTable=mwStaticStationTable, mwStaticStationIpAddress=mwStaticStationIpAddress)

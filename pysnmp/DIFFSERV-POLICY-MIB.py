@@ -1,0 +1,47 @@
+#
+# PySNMP MIB module DIFFSERV-POLICY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DIFFSERV-POLICY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:32:07 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+ModuleIdentity, Counter64, Bits, Gauge32, mib_2, MibIdentifier, NotificationType, Integer32, Counter32, IpAddress, Unsigned32, TimeTicks, iso, zeroDotZero, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Counter64", "Bits", "Gauge32", "mib-2", "MibIdentifier", "NotificationType", "Integer32", "Counter32", "IpAddress", "Unsigned32", "TimeTicks", "iso", "zeroDotZero", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity")
+DisplayString, RowPointer, DateAndTime, TestAndIncr, RowStatus, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "RowPointer", "DateAndTime", "TestAndIncr", "RowStatus", "TextualConvention")
+diffPolicyMib = ModuleIdentity((1, 3, 6, 1, 2, 1, 22222222))
+if mibBuilder.loadTexts: diffPolicyMib.setLastUpdated('200011130500Z')
+if mibBuilder.loadTexts: diffPolicyMib.setOrganization('SNMPCONF WG')
+diffPolicyMIBObjects = MibIdentifier((1, 3, 6, 1, 2, 1, 22222222, 1))
+diffPolicyMIBConformance = MibIdentifier((1, 3, 6, 1, 2, 1, 22222222, 2))
+diffPolicyDPCUnique = MibScalar((1, 3, 6, 1, 2, 1, 22222222, 1, 1), TestAndIncr()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: diffPolicyDPCUnique.setStatus('current')
+diffPolicyDPCTable = MibTable((1, 3, 6, 1, 2, 1, 22222222, 1, 2), )
+if mibBuilder.loadTexts: diffPolicyDPCTable.setStatus('current')
+diffPolicyDPCEntry = MibTableRow((1, 3, 6, 1, 2, 1, 22222222, 1, 2, 1), ).setIndexNames((0, "DIFFSERV-POLICY-MIB", "diffPolicyDPCId"))
+if mibBuilder.loadTexts: diffPolicyDPCEntry.setStatus('current')
+diffPolicyDPCId = MibTableColumn((1, 3, 6, 1, 2, 1, 22222222, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2147483647)))
+if mibBuilder.loadTexts: diffPolicyDPCId.setStatus('current')
+diffPolicyDPCDescr = MibTableColumn((1, 3, 6, 1, 2, 1, 22222222, 1, 2, 1, 2), SnmpAdminString()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffPolicyDPCDescr.setStatus('current')
+diffPolicyDPCOwner = MibTableColumn((1, 3, 6, 1, 2, 1, 22222222, 1, 2, 1, 3), SnmpAdminString()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffPolicyDPCOwner.setStatus('current')
+diffPolicyDPCLastChange = MibTableColumn((1, 3, 6, 1, 2, 1, 22222222, 1, 2, 1, 4), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: diffPolicyDPCLastChange.setStatus('current')
+diffPolicyDPCConfiguration = MibTableColumn((1, 3, 6, 1, 2, 1, 22222222, 1, 2, 1, 5), RowPointer().clone((0, 0))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffPolicyDPCConfiguration.setStatus('current')
+diffPolicyDPCStatus = MibTableColumn((1, 3, 6, 1, 2, 1, 22222222, 1, 2, 1, 11), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: diffPolicyDPCStatus.setStatus('current')
+diffPolicyMIBCompliances = MibIdentifier((1, 3, 6, 1, 2, 1, 22222222, 2, 1))
+diffPolicyMIBGroups = MibIdentifier((1, 3, 6, 1, 2, 1, 22222222, 2, 2))
+diffPolicyMIBFullCompliance = ModuleCompliance((1, 3, 6, 1, 2, 1, 22222222, 2, 1, 1)).setObjects(("DIFFSERV-POLICY-MIB", "diffPolicyMIBDPCGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    diffPolicyMIBFullCompliance = diffPolicyMIBFullCompliance.setStatus('current')
+diffPolicyMIBDPCGroup = ObjectGroup((1, 3, 6, 1, 2, 1, 22222222, 2, 2, 1)).setObjects(("DIFFSERV-POLICY-MIB", "diffPolicyDPCUnique"), ("DIFFSERV-POLICY-MIB", "diffPolicyDPCDescr"), ("DIFFSERV-POLICY-MIB", "diffPolicyDPCOwner"), ("DIFFSERV-POLICY-MIB", "diffPolicyDPCLastChange"), ("DIFFSERV-POLICY-MIB", "diffPolicyDPCConfiguration"), ("DIFFSERV-POLICY-MIB", "diffPolicyDPCStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    diffPolicyMIBDPCGroup = diffPolicyMIBDPCGroup.setStatus('current')
+mibBuilder.exportSymbols("DIFFSERV-POLICY-MIB", diffPolicyMib=diffPolicyMib, diffPolicyMIBFullCompliance=diffPolicyMIBFullCompliance, diffPolicyDPCUnique=diffPolicyDPCUnique, diffPolicyMIBObjects=diffPolicyMIBObjects, diffPolicyMIBGroups=diffPolicyMIBGroups, diffPolicyDPCDescr=diffPolicyDPCDescr, diffPolicyDPCEntry=diffPolicyDPCEntry, diffPolicyMIBDPCGroup=diffPolicyMIBDPCGroup, diffPolicyDPCId=diffPolicyDPCId, diffPolicyDPCOwner=diffPolicyDPCOwner, diffPolicyMIBCompliances=diffPolicyMIBCompliances, diffPolicyDPCTable=diffPolicyDPCTable, diffPolicyDPCConfiguration=diffPolicyDPCConfiguration, PYSNMP_MODULE_ID=diffPolicyMib, diffPolicyMIBConformance=diffPolicyMIBConformance, diffPolicyDPCStatus=diffPolicyDPCStatus, diffPolicyDPCLastChange=diffPolicyDPCLastChange)

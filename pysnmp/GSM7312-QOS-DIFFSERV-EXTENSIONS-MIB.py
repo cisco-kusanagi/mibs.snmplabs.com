@@ -1,0 +1,100 @@
+#
+# PySNMP MIB module GSM7312-QOS-DIFFSERV-EXTENSIONS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/GSM7312-QOS-DIFFSERV-EXTENSIONS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:06:43 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion")
+IndexIntegerNextFree, IfDirection, IndexInteger = mibBuilder.importSymbols("DIFFSERV-MIB", "IndexIntegerNextFree", "IfDirection", "IndexInteger")
+gsm7312QOS, = mibBuilder.importSymbols("GSM7312-QOS-MIB", "gsm7312QOS")
+InetPortNumber, = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetPortNumber")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Integer32, Counter32, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, TimeTicks, ObjectIdentity, Gauge32, iso, MibIdentifier, Bits, ModuleIdentity, Unsigned32, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "Counter32", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "TimeTicks", "ObjectIdentity", "Gauge32", "iso", "MibIdentifier", "Bits", "ModuleIdentity", "Unsigned32", "IpAddress")
+StorageType, MacAddress, TextualConvention, RowStatus, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "StorageType", "MacAddress", "TextualConvention", "RowStatus", "DisplayString")
+gsm7312QOSDiffServExtensions = ModuleIdentity((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3))
+gsm7312QOSDiffServExtensions.setRevisions(('2003-05-06 12:00',))
+if mibBuilder.loadTexts: gsm7312QOSDiffServExtensions.setLastUpdated('200305061200Z')
+if mibBuilder.loadTexts: gsm7312QOSDiffServExtensions.setOrganization('Netgear')
+class IpPrecedence(TextualConvention, Integer32):
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 7)
+
+class Cos(TextualConvention, Integer32):
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 7)
+
+class CosOrAny(TextualConvention, Integer32):
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(ValueRangeConstraint(-1, -1), ValueRangeConstraint(0, 7), )
+class VlanIdOrAny(TextualConvention, Integer32):
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(ValueRangeConstraint(-1, -1), ValueRangeConstraint(1, 4094), )
+agentDiffServMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1))
+agentDiffServClassifier = MibIdentifier((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1))
+agentDiffServAuxMfClfrNextFree = MibScalar((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 1), IndexIntegerNextFree()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrNextFree.setStatus('current')
+agentDiffServAuxMfClfrTable = MibTable((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2), )
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrTable.setStatus('current')
+agentDiffServAuxMfClfrEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1), ).setIndexNames((0, "GSM7312-QOS-DIFFSERV-EXTENSIONS-MIB", "agentDiffServAuxMfClfrId"))
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrEntry.setStatus('current')
+agentDiffServAuxMfClfrId = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 1), IndexInteger())
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrId.setStatus('current')
+agentDiffServAuxMfClfrDstAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 2), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrDstAddr.setStatus('current')
+agentDiffServAuxMfClfrDstMask = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 3), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrDstMask.setStatus('current')
+agentDiffServAuxMfClfrSrcAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 4), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrSrcAddr.setStatus('current')
+agentDiffServAuxMfClfrSrcMask = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 5), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrSrcMask.setStatus('current')
+agentDiffServAuxMfClfrProtocol = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 6), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 255)).clone(255)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrProtocol.setStatus('current')
+agentDiffServAuxMfClfrDstL4PortMin = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 7), InetPortNumber()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrDstL4PortMin.setStatus('current')
+agentDiffServAuxMfClfrDstL4PortMax = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 8), InetPortNumber().clone(65535)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrDstL4PortMax.setStatus('current')
+agentDiffServAuxMfClfrSrcL4PortMin = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 9), InetPortNumber()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrSrcL4PortMin.setStatus('current')
+agentDiffServAuxMfClfrSrcL4PortMax = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 10), InetPortNumber().clone(65535)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrSrcL4PortMax.setStatus('current')
+agentDiffServAuxMfClfrCos = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 11), CosOrAny().clone(-1)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrCos.setStatus('current')
+agentDiffServAuxMfClfrTos = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 12), OctetString().subtype(subtypeSpec=ValueSizeConstraint(1, 1)).setFixedLength(1)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrTos.setStatus('current')
+agentDiffServAuxMfClfrTosMask = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 13), OctetString().subtype(subtypeSpec=ValueSizeConstraint(1, 1)).setFixedLength(1)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrTosMask.setStatus('current')
+agentDiffServAuxMfClfrDstMac = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 14), MacAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrDstMac.setStatus('current')
+agentDiffServAuxMfClfrDstMacMask = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 15), MacAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrDstMacMask.setStatus('current')
+agentDiffServAuxMfClfrSrcMac = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 16), MacAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrSrcMac.setStatus('current')
+agentDiffServAuxMfClfrSrcMacMask = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 17), MacAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrSrcMacMask.setStatus('current')
+agentDiffServAuxMfClfrVlanId = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 18), VlanIdOrAny().clone(-1)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrVlanId.setStatus('current')
+agentDiffServAuxMfClfrStorage = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 19), StorageType().clone('nonVolatile')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrStorage.setStatus('current')
+agentDiffServAuxMfClfrStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 1, 2, 1, 20), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentDiffServAuxMfClfrStatus.setStatus('current')
+agentDiffServAction = MibIdentifier((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 2))
+agentDiffServIpPrecMarkActTable = MibTable((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 2, 4), )
+if mibBuilder.loadTexts: agentDiffServIpPrecMarkActTable.setStatus('current')
+agentDiffServIpPrecMarkActEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 2, 4, 1), ).setIndexNames((0, "GSM7312-QOS-DIFFSERV-EXTENSIONS-MIB", "agentDiffServIpPrecMarkActPrecedence"))
+if mibBuilder.loadTexts: agentDiffServIpPrecMarkActEntry.setStatus('current')
+agentDiffServIpPrecMarkActPrecedence = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 2, 4, 1, 1), IpPrecedence()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: agentDiffServIpPrecMarkActPrecedence.setStatus('current')
+agentDiffServCosMarkActTable = MibTable((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 2, 2), )
+if mibBuilder.loadTexts: agentDiffServCosMarkActTable.setStatus('current')
+agentDiffServCosMarkActEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 2, 2, 1), ).setIndexNames((0, "GSM7312-QOS-DIFFSERV-EXTENSIONS-MIB", "agentDiffServCosMarkActCos"))
+if mibBuilder.loadTexts: agentDiffServCosMarkActEntry.setStatus('current')
+agentDiffServCosMarkActCos = MibTableColumn((1, 3, 6, 1, 4, 1, 4526, 1, 6, 3, 3, 1, 2, 2, 1, 1), Cos()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: agentDiffServCosMarkActCos.setStatus('current')
+mibBuilder.exportSymbols("GSM7312-QOS-DIFFSERV-EXTENSIONS-MIB", agentDiffServAuxMfClfrSrcMacMask=agentDiffServAuxMfClfrSrcMacMask, gsm7312QOSDiffServExtensions=gsm7312QOSDiffServExtensions, agentDiffServAuxMfClfrSrcL4PortMin=agentDiffServAuxMfClfrSrcL4PortMin, agentDiffServAuxMfClfrSrcL4PortMax=agentDiffServAuxMfClfrSrcL4PortMax, agentDiffServAuxMfClfrId=agentDiffServAuxMfClfrId, agentDiffServCosMarkActCos=agentDiffServCosMarkActCos, agentDiffServAuxMfClfrSrcMask=agentDiffServAuxMfClfrSrcMask, VlanIdOrAny=VlanIdOrAny, agentDiffServAuxMfClfrNextFree=agentDiffServAuxMfClfrNextFree, agentDiffServAuxMfClfrDstAddr=agentDiffServAuxMfClfrDstAddr, agentDiffServIpPrecMarkActTable=agentDiffServIpPrecMarkActTable, agentDiffServAuxMfClfrTos=agentDiffServAuxMfClfrTos, agentDiffServAuxMfClfrDstMacMask=agentDiffServAuxMfClfrDstMacMask, agentDiffServCosMarkActTable=agentDiffServCosMarkActTable, agentDiffServMIBObjects=agentDiffServMIBObjects, agentDiffServAuxMfClfrCos=agentDiffServAuxMfClfrCos, agentDiffServAuxMfClfrProtocol=agentDiffServAuxMfClfrProtocol, IpPrecedence=IpPrecedence, agentDiffServAuxMfClfrVlanId=agentDiffServAuxMfClfrVlanId, agentDiffServAuxMfClfrDstMask=agentDiffServAuxMfClfrDstMask, agentDiffServAction=agentDiffServAction, agentDiffServIpPrecMarkActPrecedence=agentDiffServIpPrecMarkActPrecedence, agentDiffServAuxMfClfrSrcMac=agentDiffServAuxMfClfrSrcMac, agentDiffServAuxMfClfrStatus=agentDiffServAuxMfClfrStatus, agentDiffServAuxMfClfrTable=agentDiffServAuxMfClfrTable, agentDiffServAuxMfClfrTosMask=agentDiffServAuxMfClfrTosMask, agentDiffServAuxMfClfrEntry=agentDiffServAuxMfClfrEntry, Cos=Cos, CosOrAny=CosOrAny, agentDiffServAuxMfClfrDstL4PortMin=agentDiffServAuxMfClfrDstL4PortMin, agentDiffServAuxMfClfrDstL4PortMax=agentDiffServAuxMfClfrDstL4PortMax, agentDiffServIpPrecMarkActEntry=agentDiffServIpPrecMarkActEntry, agentDiffServClassifier=agentDiffServClassifier, PYSNMP_MODULE_ID=gsm7312QOSDiffServExtensions, agentDiffServAuxMfClfrStorage=agentDiffServAuxMfClfrStorage, agentDiffServCosMarkActEntry=agentDiffServCosMarkActEntry, agentDiffServAuxMfClfrDstMac=agentDiffServAuxMfClfrDstMac, agentDiffServAuxMfClfrSrcAddr=agentDiffServAuxMfClfrSrcAddr)

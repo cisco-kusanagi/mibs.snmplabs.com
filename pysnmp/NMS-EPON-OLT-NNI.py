@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module NMS-EPON-OLT-NNI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NMS-EPON-OLT-NNI
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:12:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint")
+nmsEPONGroup, = mibBuilder.importSymbols("NMS-SMI", "nmsEPONGroup")
+TimeTicks, = mibBuilder.importSymbols("RFC1213-MIB", "TimeTicks")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+TimeTicks, ModuleIdentity, Integer32, Bits, ObjectIdentity, NotificationType, MibIdentifier, iso, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Unsigned32, Counter32, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "ModuleIdentity", "Integer32", "Bits", "ObjectIdentity", "NotificationType", "MibIdentifier", "iso", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Unsigned32", "Counter32", "IpAddress")
+DisplayString, TextualConvention, PhysAddress = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention", "PhysAddress")
+nmsEponOltNni = MibIdentifier((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8))
+nmseponoltnniTable = MibTable((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8, 1), )
+if mibBuilder.loadTexts: nmseponoltnniTable.setStatus('mandatory')
+nmsEponOltNniEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8, 1, 1), ).setIndexNames((0, "NMS-EPON-OLT-NNI", "nniIfIndex"))
+if mibBuilder.loadTexts: nmsEponOltNniEntry.setStatus('mandatory')
+nniIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nniIfIndex.setStatus('mandatory')
+isRouter = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("no", 0), ("static", 1), ("dynamic", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: isRouter.setStatus('mandatory')
+mcstQuerierExpireTime = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8, 1, 1, 3), TimeTicks()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: mcstQuerierExpireTime.setStatus('mandatory')
+ifDuplix = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("auto", 0), ("full", 1), ("half", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ifDuplix.setStatus('mandatory')
+nniIfSpeed = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4))).clone(namedValues=NamedValues(("auto", 0), ("speed_10m", 1), ("speed_100m", 2), ("speed_1000m", 3), ("speed_10000m", 4)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: nniIfSpeed.setStatus('mandatory')
+nniIfFlowControl = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 8, 1, 1, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("disable", 0), ("enable", 1)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: nniIfFlowControl.setStatus('mandatory')
+mibBuilder.exportSymbols("NMS-EPON-OLT-NNI", ifDuplix=ifDuplix, nmseponoltnniTable=nmseponoltnniTable, nniIfIndex=nniIfIndex, nniIfFlowControl=nniIfFlowControl, nniIfSpeed=nniIfSpeed, nmsEponOltNniEntry=nmsEponOltNniEntry, mcstQuerierExpireTime=mcstQuerierExpireTime, isRouter=isRouter, nmsEponOltNni=nmsEponOltNni)

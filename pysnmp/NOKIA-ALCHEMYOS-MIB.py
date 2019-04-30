@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module NOKIA-ALCHEMYOS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NOKIA-ALCHEMYOS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:13:34 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+nokiaAlchemyOS, = mibBuilder.importSymbols("NOKIA-OID-REGISTRATION-MIB", "nokiaAlchemyOS")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, ModuleIdentity, MibIdentifier, TimeTicks, Counter32, Bits, NotificationType, iso, enterprises, Counter64, Unsigned32, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "ModuleIdentity", "MibIdentifier", "TimeTicks", "Counter32", "Bits", "NotificationType", "iso", "enterprises", "Counter64", "Unsigned32", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "Integer32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+alchemyOSProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 1))
+if mibBuilder.loadTexts: alchemyOSProducts.setStatus('current')
+alchemyOSMgmt = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 2))
+if mibBuilder.loadTexts: alchemyOSMgmt.setStatus('current')
+alchemyOSExperiment = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 3))
+if mibBuilder.loadTexts: alchemyOSExperiment.setStatus('current')
+alchemyOSAdmin = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 4))
+if mibBuilder.loadTexts: alchemyOSAdmin.setStatus('current')
+alchemyOSModules = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 5))
+if mibBuilder.loadTexts: alchemyOSModules.setStatus('current')
+alchemyOSTraps = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 6))
+if mibBuilder.loadTexts: alchemyOSTraps.setStatus('current')
+cryptoCluster = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 2, 1))
+if mibBuilder.loadTexts: cryptoCluster.setStatus('current')
+hardware = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 2, 2))
+if mibBuilder.loadTexts: hardware.setStatus('current')
+firewall = ObjectIdentity((1, 3, 6, 1, 4, 1, 94, 1, 45, 2, 3))
+if mibBuilder.loadTexts: firewall.setStatus('current')
+mibBuilder.exportSymbols("NOKIA-ALCHEMYOS-MIB", alchemyOSExperiment=alchemyOSExperiment, alchemyOSAdmin=alchemyOSAdmin, alchemyOSModules=alchemyOSModules, alchemyOSMgmt=alchemyOSMgmt, cryptoCluster=cryptoCluster, firewall=firewall, hardware=hardware, alchemyOSProducts=alchemyOSProducts, alchemyOSTraps=alchemyOSTraps)

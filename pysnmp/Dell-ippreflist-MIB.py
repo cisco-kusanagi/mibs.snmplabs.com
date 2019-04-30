@@ -1,0 +1,76 @@
+#
+# PySNMP MIB module Dell-ippreflist-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Dell-ippreflist-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:42:53 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+rnd, = mibBuilder.importSymbols("Dell-MIB", "rnd")
+InetVersion, InetZoneIndex, InetAddress, InetAddressType, InetAddressPrefixLength = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetVersion", "InetZoneIndex", "InetAddress", "InetAddressType", "InetAddressPrefixLength")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+IpAddress, ModuleIdentity, Gauge32, Unsigned32, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, Integer32, Counter64, MibIdentifier, iso, Counter32, NotificationType, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "ModuleIdentity", "Gauge32", "Unsigned32", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "Integer32", "Counter64", "MibIdentifier", "iso", "Counter32", "NotificationType", "ObjectIdentity")
+TextualConvention, TimeStamp, DateAndTime, DisplayString, RowStatus, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TimeStamp", "DateAndTime", "DisplayString", "RowStatus", "TruthValue")
+rlIpPrefList = MibIdentifier((1, 3, 6, 1, 4, 1, 89, 212))
+class RlIpPrefListEntryType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("rule", 1), ("description", 2))
+
+class RlIpPrefListActionType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("drop", 1), ("permit", 2))
+
+class RlIpPrefListType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("ipv4", 1), ("ipv6", 2))
+
+rlIpPrefListTable = MibTable((1, 3, 6, 1, 4, 1, 89, 212, 1), )
+if mibBuilder.loadTexts: rlIpPrefListTable.setStatus('current')
+rlIpPrefListEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 212, 1, 1), ).setIndexNames((0, "Dell-ippreflist-MIB", "rlIpPrefListType"), (0, "Dell-ippreflist-MIB", "rlIpPrefListName"), (0, "Dell-ippreflist-MIB", "rlIpPrefListEntryIndex"))
+if mibBuilder.loadTexts: rlIpPrefListEntry.setStatus('current')
+rlIpPrefListType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 1), RlIpPrefListType())
+if mibBuilder.loadTexts: rlIpPrefListType.setStatus('current')
+rlIpPrefListName = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 32)))
+if mibBuilder.loadTexts: rlIpPrefListName.setStatus('current')
+rlIpPrefListEntryIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 3), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(1, 4294967294)))
+if mibBuilder.loadTexts: rlIpPrefListEntryIndex.setStatus('current')
+rlIpPrefListEntryType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 4), RlIpPrefListEntryType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListEntryType.setStatus('current')
+rlIpPrefListInetAddrType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 5), InetAddressType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListInetAddrType.setStatus('current')
+rlIpPrefListInetAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 6), InetAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListInetAddr.setStatus('current')
+rlIpPrefListPrefixLength = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 7), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListPrefixLength.setStatus('current')
+rlIpPrefListAction = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 8), RlIpPrefListActionType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListAction.setStatus('current')
+rlIpPrefListGeLength = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 9), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListGeLength.setStatus('current')
+rlIpPrefListLeLength = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 10), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListLeLength.setStatus('current')
+rlIpPrefListDescription = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 11), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 80))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListDescription.setStatus('current')
+rlIpPrefListHitCount = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 12), Integer32())
+if mibBuilder.loadTexts: rlIpPrefListHitCount.setStatus('current')
+rlIpPrefListRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 1, 1, 13), RowStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlIpPrefListRowStatus.setStatus('current')
+rlIpPrefListInfoTable = MibTable((1, 3, 6, 1, 4, 1, 89, 212, 2), )
+if mibBuilder.loadTexts: rlIpPrefListInfoTable.setStatus('current')
+rlIpPrefListInfoEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 212, 2, 1), ).setIndexNames((0, "Dell-ippreflist-MIB", "rlIpPrefListInfoType"), (0, "Dell-ippreflist-MIB", "rlIpPrefListInfoName"))
+if mibBuilder.loadTexts: rlIpPrefListInfoEntry.setStatus('current')
+rlIpPrefListInfoType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 2, 1, 1), RlIpPrefListType())
+if mibBuilder.loadTexts: rlIpPrefListInfoType.setStatus('current')
+rlIpPrefListInfoName = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 2, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 32)))
+if mibBuilder.loadTexts: rlIpPrefListInfoName.setStatus('current')
+rlIpPrefListInfoEntriesNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 2, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlIpPrefListInfoEntriesNumber.setStatus('current')
+rlIpPrefListInfoRangeEntries = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 2, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlIpPrefListInfoRangeEntries.setStatus('current')
+rlIpPrefListInfoNextFreeIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 212, 2, 1, 5), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlIpPrefListInfoNextFreeIndex.setStatus('current')
+mibBuilder.exportSymbols("Dell-ippreflist-MIB", rlIpPrefListGeLength=rlIpPrefListGeLength, rlIpPrefListEntry=rlIpPrefListEntry, rlIpPrefListInetAddr=rlIpPrefListInetAddr, rlIpPrefListTable=rlIpPrefListTable, rlIpPrefListRowStatus=rlIpPrefListRowStatus, rlIpPrefListInfoEntry=rlIpPrefListInfoEntry, rlIpPrefListType=rlIpPrefListType, rlIpPrefListInfoRangeEntries=rlIpPrefListInfoRangeEntries, rlIpPrefListInetAddrType=rlIpPrefListInetAddrType, rlIpPrefListInfoTable=rlIpPrefListInfoTable, rlIpPrefListInfoNextFreeIndex=rlIpPrefListInfoNextFreeIndex, rlIpPrefList=rlIpPrefList, rlIpPrefListAction=rlIpPrefListAction, rlIpPrefListInfoEntriesNumber=rlIpPrefListInfoEntriesNumber, RlIpPrefListEntryType=RlIpPrefListEntryType, RlIpPrefListActionType=RlIpPrefListActionType, rlIpPrefListEntryIndex=rlIpPrefListEntryIndex, rlIpPrefListDescription=rlIpPrefListDescription, rlIpPrefListInfoName=rlIpPrefListInfoName, rlIpPrefListName=rlIpPrefListName, rlIpPrefListLeLength=rlIpPrefListLeLength, rlIpPrefListPrefixLength=rlIpPrefListPrefixLength, rlIpPrefListEntryType=rlIpPrefListEntryType, rlIpPrefListHitCount=rlIpPrefListHitCount, RlIpPrefListType=RlIpPrefListType, rlIpPrefListInfoType=rlIpPrefListInfoType)

@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module VERTICAL-EVENTLOG-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/VERTICAL-EVENTLOG-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:27:01 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, iso, ModuleIdentity, IpAddress, NotificationType, Counter64, Unsigned32, ObjectIdentity, TimeTicks, Bits, MibIdentifier, NotificationType, Counter32, enterprises = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "iso", "ModuleIdentity", "IpAddress", "NotificationType", "Counter64", "Unsigned32", "ObjectIdentity", "TimeTicks", "Bits", "MibIdentifier", "NotificationType", "Counter32", "enterprises")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+vertical = MibIdentifier((1, 3, 6, 1, 4, 1, 2338))
+eventLog = MibIdentifier((1, 3, 6, 1, 4, 1, 2338, 13))
+eventLogTrapInfoGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 2338, 13, 1))
+lastTrapLogType = MibScalar((1, 3, 6, 1, 4, 1, 2338, 13, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("system", 1), ("security", 2), ("application", 3), ("unknown", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: lastTrapLogType.setStatus('mandatory')
+lastTrapEventType = MibScalar((1, 3, 6, 1, 4, 1, 2338, 13, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("error", 1), ("warning", 2), ("information", 3), ("audit-success", 4), ("audit-fail", 5), ("unknown", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: lastTrapEventType.setStatus('mandatory')
+lastTrapInfoString = MibScalar((1, 3, 6, 1, 4, 1, 2338, 13, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 512))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: lastTrapInfoString.setStatus('mandatory')
+eventLog_FailedToStartSTD = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,53)).setLabel("eventLog-FailedToStartSTD").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+eventLog_FailedToStopSTD = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,54)).setLabel("eventLog-FailedToStopSTD").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+eventLog_CannotCreateUserTracePipe = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,55)).setLabel("eventLog-CannotCreateUserTracePipe").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+eventLog_CannotConnectUserTracePipe = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,56)).setLabel("eventLog-CannotConnectUserTracePipe").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+eventLog_VoiceMailDiskIsFull = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,57)).setLabel("eventLog-VoiceMailDiskIsFull").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+eventLog_SystemDiskIsFull = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,58)).setLabel("eventLog-SystemDiskIsFull").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+eventLog_SecurityError = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,59)).setLabel("eventLog-SecurityError").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+eventLog_SecuritySuccess = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,60)).setLabel("eventLog-SecuritySuccess").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+eventLog_GenericEventLogTrap = NotificationType((1, 3, 6, 1, 4, 1, 2338) + (0,61)).setLabel("eventLog-GenericEventLogTrap").setObjects(("VERTICAL-EVENTLOG-MIB", "lastTrapLogType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapEventType"), ("VERTICAL-EVENTLOG-MIB", "lastTrapInfoString"))
+mibBuilder.exportSymbols("VERTICAL-EVENTLOG-MIB", lastTrapInfoString=lastTrapInfoString, eventLogTrapInfoGroup=eventLogTrapInfoGroup, lastTrapLogType=lastTrapLogType, eventLog_GenericEventLogTrap=eventLog_GenericEventLogTrap, eventLog_VoiceMailDiskIsFull=eventLog_VoiceMailDiskIsFull, eventLog_SystemDiskIsFull=eventLog_SystemDiskIsFull, eventLog_SecurityError=eventLog_SecurityError, eventLog=eventLog, eventLog_CannotConnectUserTracePipe=eventLog_CannotConnectUserTracePipe, eventLog_SecuritySuccess=eventLog_SecuritySuccess, eventLog_CannotCreateUserTracePipe=eventLog_CannotCreateUserTracePipe, lastTrapEventType=lastTrapEventType, eventLog_FailedToStartSTD=eventLog_FailedToStartSTD, vertical=vertical, eventLog_FailedToStopSTD=eventLog_FailedToStopSTD)

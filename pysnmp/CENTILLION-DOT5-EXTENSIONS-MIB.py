@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module CENTILLION-DOT5-EXTENSIONS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CENTILLION-DOT5-EXTENSIONS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:30:11 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+EnableIndicator, extensions = mibBuilder.importSymbols("CENTILLION-ROOT-MIB", "EnableIndicator", "extensions")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+NotificationType, Integer32, Gauge32, IpAddress, iso, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, TimeTicks, Bits, Counter32, Counter64, Unsigned32, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Integer32", "Gauge32", "IpAddress", "iso", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "TimeTicks", "Bits", "Counter32", "Counter64", "Unsigned32", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+class TrPortConnType(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 16, 17, 18, 19, 20, 21, 22, 23, 24))
+    namedValues = NamedValues(("trPortDTR", 1), ("tr4PortStation", 2), ("trPortRiRoPhantom", 3), ("trPortRiRoNoPhantom", 4), ("trPortHub", 16), ("trPortStation", 17), ("trPortBay-Ro", 18), ("trPortBay-Ri", 19), ("trPortOther-Ro", 20), ("trPortOther-Ri", 21), ("trPortFdtr-hub", 22), ("trPortFdtr-station", 23), ("trPortAutoStationHub", 24))
+
+cnDot5Extensions = MibIdentifier((1, 3, 6, 1, 4, 1, 930, 3, 3))
+cnDot5ExtnTable = MibTable((1, 3, 6, 1, 4, 1, 930, 3, 3, 1), )
+if mibBuilder.loadTexts: cnDot5ExtnTable.setStatus('mandatory')
+cnDot5ExtnEntry = MibTableRow((1, 3, 6, 1, 4, 1, 930, 3, 3, 1, 1), ).setIndexNames((0, "CENTILLION-DOT5-EXTENSIONS-MIB", "cnDot5ExtnIfIndex"))
+if mibBuilder.loadTexts: cnDot5ExtnEntry.setStatus('mandatory')
+cnDot5ExtnIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 3, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cnDot5ExtnIfIndex.setStatus('mandatory')
+cnDot5ExtnPortConnType = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 3, 1, 1, 2), TrPortConnType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cnDot5ExtnPortConnType.setStatus('mandatory')
+cnDot5ExtnPortSpeedSense = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 3, 1, 1, 3), EnableIndicator()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cnDot5ExtnPortSpeedSense.setStatus('mandatory')
+cnDot5ExtnAdminRingSpeed = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 3, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8))).clone(namedValues=NamedValues(("autoDetect", 1), ("forceFourMegabit", 2), ("forceSixteenMegabit", 3), ("matchFourMegabit", 4), ("matchSixteenMegabit", 5), ("force32Megabit", 6), ("autoDetect16or32", 7), ("autoDetect4or16or32", 8)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cnDot5ExtnAdminRingSpeed.setStatus('mandatory')
+cnS5TrExtnTable = MibTable((1, 3, 6, 1, 4, 1, 930, 3, 3, 2), )
+if mibBuilder.loadTexts: cnS5TrExtnTable.setStatus('mandatory')
+cnS5TrExtnEntry = MibTableRow((1, 3, 6, 1, 4, 1, 930, 3, 3, 2, 1), ).setIndexNames((0, "CENTILLION-DOT5-EXTENSIONS-MIB", "cnS5TrExtnIfIndex"))
+if mibBuilder.loadTexts: cnS5TrExtnEntry.setStatus('mandatory')
+cnS5TrExtnIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 3, 2, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cnS5TrExtnIfIndex.setStatus('mandatory')
+cnS5TrExtnFrontPortConnect = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 3, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("other", 1), ("disable", 2), ("enable", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cnS5TrExtnFrontPortConnect.setStatus('mandatory')
+cnS5TrExtnOperBkplaneAtt = MibTableColumn((1, 3, 6, 1, 4, 1, 930, 3, 3, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("other", 1), ("notCapable", 2), ("capableAndAttached", 3), ("capableAndDetached", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cnS5TrExtnOperBkplaneAtt.setStatus('mandatory')
+mibBuilder.exportSymbols("CENTILLION-DOT5-EXTENSIONS-MIB", cnDot5ExtnEntry=cnDot5ExtnEntry, cnS5TrExtnOperBkplaneAtt=cnS5TrExtnOperBkplaneAtt, cnS5TrExtnTable=cnS5TrExtnTable, cnDot5ExtnIfIndex=cnDot5ExtnIfIndex, cnS5TrExtnIfIndex=cnS5TrExtnIfIndex, cnDot5ExtnTable=cnDot5ExtnTable, cnDot5ExtnPortSpeedSense=cnDot5ExtnPortSpeedSense, cnDot5ExtnPortConnType=cnDot5ExtnPortConnType, cnS5TrExtnFrontPortConnect=cnS5TrExtnFrontPortConnect, TrPortConnType=TrPortConnType, cnDot5ExtnAdminRingSpeed=cnDot5ExtnAdminRingSpeed, cnDot5Extensions=cnDot5Extensions, cnS5TrExtnEntry=cnS5TrExtnEntry)

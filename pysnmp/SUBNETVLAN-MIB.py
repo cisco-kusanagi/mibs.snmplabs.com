@@ -1,0 +1,66 @@
+#
+# PySNMP MIB module SUBNETVLAN-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SUBNETVLAN-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:04:13 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+dlink_common_mgmt, = mibBuilder.importSymbols("DLINK-ID-REC-MIB", "dlink-common-mgmt")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, IpAddress, Unsigned32, iso, Counter64, Gauge32, ObjectIdentity, MibIdentifier, ModuleIdentity, TimeTicks, NotificationType, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "IpAddress", "Unsigned32", "iso", "Counter64", "Gauge32", "ObjectIdentity", "MibIdentifier", "ModuleIdentity", "TimeTicks", "NotificationType", "Integer32")
+RowStatus, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "DisplayString", "TextualConvention")
+swSubnetVlanMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 12, 75))
+if mibBuilder.loadTexts: swSubnetVlanMIB.setLastUpdated('0812020000Z')
+if mibBuilder.loadTexts: swSubnetVlanMIB.setOrganization('D-Link Corp.')
+class VlanId(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(1, 4094)
+
+class Ipv6Address(TextualConvention, OctetString):
+    status = 'current'
+    displayHint = '2x:'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(16, 16)
+    fixedLength = 16
+
+swSubnetVlanCtrl = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 12, 75, 1))
+swSubnetVlanInfo = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 12, 75, 2))
+swSubnetVlanMgmt = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 12, 75, 3))
+swVlanPrecedenceTable = MibTable((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 1), )
+if mibBuilder.loadTexts: swVlanPrecedenceTable.setStatus('current')
+swVlanPrecedenceEntry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 1, 1), ).setIndexNames((0, "SUBNETVLAN-MIB", "swVlanPrecedencePortIndex"))
+if mibBuilder.loadTexts: swVlanPrecedenceEntry.setStatus('current')
+swVlanPrecedencePortIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: swVlanPrecedencePortIndex.setStatus('current')
+swVlanPrecedenceClassification = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("macBased", 1), ("subnetBased", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: swVlanPrecedenceClassification.setStatus('current')
+swSubnetVLANTable = MibTable((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 2), )
+if mibBuilder.loadTexts: swSubnetVLANTable.setStatus('current')
+swSubnetVLANEntry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 2, 1), ).setIndexNames((0, "SUBNETVLAN-MIB", "swSubnetVLANIPAddress"), (0, "SUBNETVLAN-MIB", "swSubnetVLANIPMask"))
+if mibBuilder.loadTexts: swSubnetVLANEntry.setStatus('current')
+swSubnetVLANIPAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 2, 1, 1), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: swSubnetVLANIPAddress.setStatus('current')
+swSubnetVLANIPMask = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 2, 1, 2), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: swSubnetVLANIPMask.setStatus('current')
+swSubnetVLANID = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 2, 1, 3), VlanId()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swSubnetVLANID.setStatus('current')
+swSubnetVLANPriority = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 2, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 7))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swSubnetVLANPriority.setStatus('current')
+swSubnetVLANRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 2, 1, 5), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swSubnetVLANRowStatus.setStatus('current')
+swSubnetVLANIPv6Table = MibTable((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 3), )
+if mibBuilder.loadTexts: swSubnetVLANIPv6Table.setStatus('current')
+swSubnetVLANIPv6Entry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 3, 1), ).setIndexNames((0, "SUBNETVLAN-MIB", "swSubnetVLANIPv6Address"), (0, "SUBNETVLAN-MIB", "swSubnetVLANIPv6PrefixLength"))
+if mibBuilder.loadTexts: swSubnetVLANIPv6Entry.setStatus('current')
+swSubnetVLANIPv6Address = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 3, 1, 1), Ipv6Address()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: swSubnetVLANIPv6Address.setStatus('current')
+swSubnetVLANIPv6PrefixLength = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 3, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: swSubnetVLANIPv6PrefixLength.setStatus('current')
+swSubnetVLANIPv6VID = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 3, 1, 3), VlanId()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swSubnetVLANIPv6VID.setStatus('current')
+swSubnetVLANIPv6Priority = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 3, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 7))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swSubnetVLANIPv6Priority.setStatus('current')
+swSubnetVLANIPv6RowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 75, 3, 3, 1, 5), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swSubnetVLANIPv6RowStatus.setStatus('current')
+mibBuilder.exportSymbols("SUBNETVLAN-MIB", swVlanPrecedenceTable=swVlanPrecedenceTable, swSubnetVLANPriority=swSubnetVLANPriority, swVlanPrecedenceClassification=swVlanPrecedenceClassification, Ipv6Address=Ipv6Address, swSubnetVLANIPMask=swSubnetVLANIPMask, swSubnetVLANIPAddress=swSubnetVLANIPAddress, swSubnetVLANIPv6Priority=swSubnetVLANIPv6Priority, swSubnetVLANIPv6Table=swSubnetVLANIPv6Table, swSubnetVLANIPv6PrefixLength=swSubnetVLANIPv6PrefixLength, swSubnetVLANTable=swSubnetVLANTable, swVlanPrecedenceEntry=swVlanPrecedenceEntry, swSubnetVLANIPv6Address=swSubnetVLANIPv6Address, VlanId=VlanId, swSubnetVlanMgmt=swSubnetVlanMgmt, swSubnetVLANIPv6VID=swSubnetVLANIPv6VID, swSubnetVlanInfo=swSubnetVlanInfo, PYSNMP_MODULE_ID=swSubnetVlanMIB, swSubnetVLANID=swSubnetVLANID, swSubnetVLANEntry=swSubnetVLANEntry, swVlanPrecedencePortIndex=swVlanPrecedencePortIndex, swSubnetVLANIPv6Entry=swSubnetVLANIPv6Entry, swSubnetVlanMIB=swSubnetVlanMIB, swSubnetVLANIPv6RowStatus=swSubnetVLANIPv6RowStatus, swSubnetVLANRowStatus=swSubnetVLANRowStatus, swSubnetVlanCtrl=swSubnetVlanCtrl)

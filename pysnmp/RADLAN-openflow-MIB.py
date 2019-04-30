@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module RADLAN-openflow-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RADLAN-openflow-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:42:18 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint")
+rnd, = mibBuilder.importSymbols("RADLAN-MIB", "rnd")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Unsigned32, Integer32, Counter64, NotificationType, iso, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Bits, MibIdentifier, IpAddress, Counter32, ModuleIdentity, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Integer32", "Counter64", "NotificationType", "iso", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Bits", "MibIdentifier", "IpAddress", "Counter32", "ModuleIdentity", "Gauge32")
+TruthValue, DateAndTime, DisplayString, TextualConvention, RowStatus, TimeStamp = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "DateAndTime", "DisplayString", "TextualConvention", "RowStatus", "TimeStamp")
+rlOpenFlow = MibIdentifier((1, 3, 6, 1, 4, 1, 89, 319))
+rlOpenFlowSupported = MibScalar((1, 3, 6, 1, 4, 1, 89, 319, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowSupported.setStatus('current')
+rlOpenFlowTcpPort = MibScalar((1, 3, 6, 1, 4, 1, 89, 319, 2), Integer32().clone(6633)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowTcpPort.setStatus('current')
+rlOpenFlowServerIpAddr = MibScalar((1, 3, 6, 1, 4, 1, 89, 319, 3), IpAddress().clone(hexValue="00000000")).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowServerIpAddr.setStatus('current')
+rlOpenFlowProtocolType = MibScalar((1, 3, 6, 1, 4, 1, 89, 319, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("tcp", 0), ("tls", 1))).clone('tcp')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowProtocolType.setStatus('current')
+rlOpenFlowDefaultForwardAction = MibScalar((1, 3, 6, 1, 4, 1, 89, 319, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("forward", 0), ("drop", 1), ("toController", 2))).clone('forward')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowDefaultForwardAction.setStatus('current')
+rlOpenFlowEnable = MibScalar((1, 3, 6, 1, 4, 1, 89, 319, 6), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlOpenFlowEnable.setStatus('current')
+rlOpenFlowEnableAfterReset = MibScalar((1, 3, 6, 1, 4, 1, 89, 319, 7), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlOpenFlowEnableAfterReset.setStatus('current')
+mibBuilder.exportSymbols("RADLAN-openflow-MIB", rlOpenFlowSupported=rlOpenFlowSupported, rlOpenFlowDefaultForwardAction=rlOpenFlowDefaultForwardAction, rlOpenFlowEnableAfterReset=rlOpenFlowEnableAfterReset, rlOpenFlowTcpPort=rlOpenFlowTcpPort, rlOpenFlowEnable=rlOpenFlowEnable, rlOpenFlowProtocolType=rlOpenFlowProtocolType, rlOpenFlowServerIpAddr=rlOpenFlowServerIpAddr, rlOpenFlow=rlOpenFlow)

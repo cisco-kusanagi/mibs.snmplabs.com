@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module JUNIPER-JS-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/JUNIPER-JS-SMI
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:47:57 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection")
+jnxJsMibRoot, = mibBuilder.importSymbols("JUNIPER-SMI", "jnxJsMibRoot")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, Counter32, NotificationType, iso, Bits, IpAddress, TimeTicks, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Integer32, Unsigned32, ModuleIdentity, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "Counter32", "NotificationType", "iso", "Bits", "IpAddress", "TimeTicks", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Integer32", "Unsigned32", "ModuleIdentity", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+jnxJsSecurity = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1))
+jnxJsIf = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 1))
+jnxJsAuth = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 2))
+jnxJsCertificates = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 3))
+jnxJsPolicies = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 4))
+jnxJsIPSecVpn = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 5))
+jnxJsNAT = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 7))
+jnxJsScreening = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 8))
+jnxJsDhcp = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 9))
+jnxJsDnsRoot = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 10))
+jnxJsIdpRoot = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 11))
+jnxJsSPUMonitoringRoot = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 12))
+jnxJsUTMRoot = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 13))
+jnxJsChassisCluster = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 14))
+jnxVoip = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 15))
+jnxJsPacketMirror = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 16))
+jnxLsysSecurityProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17))
+mibBuilder.exportSymbols("JUNIPER-JS-SMI", jnxJsAuth=jnxJsAuth, jnxJsPolicies=jnxJsPolicies, jnxJsUTMRoot=jnxJsUTMRoot, jnxJsIdpRoot=jnxJsIdpRoot, jnxJsSPUMonitoringRoot=jnxJsSPUMonitoringRoot, jnxJsCertificates=jnxJsCertificates, jnxVoip=jnxVoip, jnxJsScreening=jnxJsScreening, jnxJsPacketMirror=jnxJsPacketMirror, jnxJsNAT=jnxJsNAT, jnxJsIf=jnxJsIf, jnxJsSecurity=jnxJsSecurity, jnxJsDhcp=jnxJsDhcp, jnxJsChassisCluster=jnxJsChassisCluster, jnxJsDnsRoot=jnxJsDnsRoot, jnxLsysSecurityProfile=jnxLsysSecurityProfile, jnxJsIPSecVpn=jnxJsIPSecVpn)

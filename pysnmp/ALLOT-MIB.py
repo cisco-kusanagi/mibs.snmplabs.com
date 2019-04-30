@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module ALLOT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ALLOT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:04:59 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+NotificationType, IpAddress, enterprises, ObjectIdentity, ModuleIdentity, Bits, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Unsigned32, Counter32, MibIdentifier, Gauge32, TimeTicks, iso = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "IpAddress", "enterprises", "ObjectIdentity", "ModuleIdentity", "Bits", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Unsigned32", "Counter32", "MibIdentifier", "Gauge32", "TimeTicks", "iso")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+allotCom = ModuleIdentity((1, 3, 6, 1, 4, 1, 2603))
+if mibBuilder.loadTexts: allotCom.setLastUpdated('0103120000Z')
+if mibBuilder.loadTexts: allotCom.setOrganization('Allot Communications')
+netraps = MibIdentifier((1, 3, 6, 1, 4, 1, 2603, 2))
+nePrimaryActive = NotificationType((1, 3, 6, 1, 4, 1, 2603, 2, 11))
+if mibBuilder.loadTexts: nePrimaryActive.setStatus('current')
+nePrimaryBypass = NotificationType((1, 3, 6, 1, 4, 1, 2603, 2, 12))
+if mibBuilder.loadTexts: nePrimaryBypass.setStatus('current')
+neSecondaryActive = NotificationType((1, 3, 6, 1, 4, 1, 2603, 2, 13))
+if mibBuilder.loadTexts: neSecondaryActive.setStatus('current')
+neSecondaryStandBy = NotificationType((1, 3, 6, 1, 4, 1, 2603, 2, 14))
+if mibBuilder.loadTexts: neSecondaryStandBy.setStatus('current')
+neSecondaryBypass = NotificationType((1, 3, 6, 1, 4, 1, 2603, 2, 15))
+if mibBuilder.loadTexts: neSecondaryBypass.setStatus('current')
+collTableOverFlow = NotificationType((1, 3, 6, 1, 4, 1, 2603, 2, 21))
+if mibBuilder.loadTexts: collTableOverFlow.setStatus('current')
+mibBuilder.exportSymbols("ALLOT-MIB", neSecondaryBypass=neSecondaryBypass, PYSNMP_MODULE_ID=allotCom, collTableOverFlow=collTableOverFlow, nePrimaryBypass=nePrimaryBypass, netraps=netraps, nePrimaryActive=nePrimaryActive, neSecondaryStandBy=neSecondaryStandBy, allotCom=allotCom, neSecondaryActive=neSecondaryActive)

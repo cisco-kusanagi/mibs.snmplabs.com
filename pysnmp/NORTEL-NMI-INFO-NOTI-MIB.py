@@ -1,0 +1,35 @@
+#
+# PySNMP MIB module NORTEL-NMI-INFO-NOTI-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NORTEL-NMI-INFO-NOTI-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:14:15 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+nortelNMInotificationGroups, = mibBuilder.importSymbols("NORTEL-NMI-GROUPS-MIB", "nortelNMInotificationGroups")
+nortelNMInotifyNeName, nortelNMInotifyNeType, nortelNMInotifyNeOperState, nortelNMInotifyNeUnknownStatus, nortelNMInotificationsMIB, nortelNMInotifyNeAdminState, nortelNMIcurrentTxNotificationSequenceNum = mibBuilder.importSymbols("NORTEL-NMI-NOTIFICATIONS-MIB", "nortelNMInotifyNeName", "nortelNMInotifyNeType", "nortelNMInotifyNeOperState", "nortelNMInotifyNeUnknownStatus", "nortelNMInotificationsMIB", "nortelNMInotifyNeAdminState", "nortelNMIcurrentTxNotificationSequenceNum")
+NortelNMItimeStampDef, = mibBuilder.importSymbols("NORTEL-NMI-TC-MIB", "NortelNMItimeStampDef")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+TimeTicks, iso, ModuleIdentity, Gauge32, Integer32, IpAddress, MibIdentifier, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, Counter64, ObjectIdentity, Counter32, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "iso", "ModuleIdentity", "Gauge32", "Integer32", "IpAddress", "MibIdentifier", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "Counter64", "ObjectIdentity", "Counter32", "NotificationType")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+nortelNMIinfoNotiMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 562, 29, 1, 6, 5))
+if mibBuilder.loadTexts: nortelNMIinfoNotiMIB.setLastUpdated('9907190000Z')
+if mibBuilder.loadTexts: nortelNMIinfoNotiMIB.setOrganization('Nortel Networks')
+nortelNMIinfoNotiPrefix = ObjectIdentity((1, 3, 6, 1, 4, 1, 562, 29, 1, 6, 5, 0))
+if mibBuilder.loadTexts: nortelNMIinfoNotiPrefix.setStatus('current')
+nortelNMIinfoNotiVarbinds = ObjectIdentity((1, 3, 6, 1, 4, 1, 562, 29, 1, 6, 5, 1))
+if mibBuilder.loadTexts: nortelNMIinfoNotiVarbinds.setStatus('current')
+nortelNMInotifyLogComponentId = MibScalar((1, 3, 6, 1, 4, 1, 562, 29, 1, 6, 5, 1, 1), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: nortelNMInotifyLogComponentId.setStatus('current')
+nortelNMInotifyLogText = MibScalar((1, 3, 6, 1, 4, 1, 562, 29, 1, 6, 5, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 255))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: nortelNMInotifyLogText.setStatus('current')
+nortelNMInotifyLogTimeStamp = MibScalar((1, 3, 6, 1, 4, 1, 562, 29, 1, 6, 5, 1, 3), NortelNMItimeStampDef()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: nortelNMInotifyLogTimeStamp.setStatus('current')
+nortelNMIinfoNotification = NotificationType((1, 3, 6, 1, 4, 1, 562, 29, 1, 6, 5, 0, 301)).setObjects(("NORTEL-NMI-NOTIFICATIONS-MIB", "nortelNMIcurrentTxNotificationSequenceNum"), ("NORTEL-NMI-INFO-NOTI-MIB", "nortelNMInotifyLogComponentId"), ("NORTEL-NMI-INFO-NOTI-MIB", "nortelNMInotifyLogText"), ("NORTEL-NMI-INFO-NOTI-MIB", "nortelNMInotifyLogTimeStamp"))
+if mibBuilder.loadTexts: nortelNMIinfoNotification.setStatus('current')
+nortelNMIneLogNotificationsGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 562, 29, 1, 2, 1, 2, 5)).setObjects(("NORTEL-NMI-INFO-NOTI-MIB", "nortelNMIinfoNotification"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    nortelNMIneLogNotificationsGroup = nortelNMIneLogNotificationsGroup.setStatus('current')
+mibBuilder.exportSymbols("NORTEL-NMI-INFO-NOTI-MIB", PYSNMP_MODULE_ID=nortelNMIinfoNotiMIB, nortelNMIinfoNotiPrefix=nortelNMIinfoNotiPrefix, nortelNMIinfoNotiMIB=nortelNMIinfoNotiMIB, nortelNMInotifyLogTimeStamp=nortelNMInotifyLogTimeStamp, nortelNMIneLogNotificationsGroup=nortelNMIneLogNotificationsGroup, nortelNMIinfoNotification=nortelNMIinfoNotification, nortelNMInotifyLogComponentId=nortelNMInotifyLogComponentId, nortelNMIinfoNotiVarbinds=nortelNMIinfoNotiVarbinds, nortelNMInotifyLogText=nortelNMInotifyLogText)

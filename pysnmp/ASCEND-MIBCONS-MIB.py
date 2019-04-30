@@ -1,0 +1,47 @@
+#
+# PySNMP MIB module ASCEND-MIBCONS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ASCEND-MIBCONS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:10:55 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+configuration, = mibBuilder.importSymbols("ASCEND-MIB", "configuration")
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ObjectIdentity, Gauge32, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, MibIdentifier, Bits, IpAddress, Counter64, Counter32, Unsigned32, Integer32, NotificationType, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "Gauge32", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "MibIdentifier", "Bits", "IpAddress", "Counter64", "Counter32", "Unsigned32", "Integer32", "NotificationType", "TimeTicks")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+class DisplayString(OctetString):
+    pass
+
+mibserialInterfaceProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 529, 23, 69))
+mibserialInterfaceProfileTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 69, 1), )
+if mibBuilder.loadTexts: mibserialInterfaceProfileTable.setStatus('mandatory')
+mibserialInterfaceProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1), ).setIndexNames((0, "ASCEND-MIBCONS-MIB", "serialInterfaceProfile-Shelf-o"), (0, "ASCEND-MIBCONS-MIB", "serialInterfaceProfile-Slot-o"), (0, "ASCEND-MIBCONS-MIB", "serialInterfaceProfile-Item-o"))
+if mibBuilder.loadTexts: mibserialInterfaceProfileEntry.setStatus('mandatory')
+serialInterfaceProfile_Shelf_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 1), Integer32()).setLabel("serialInterfaceProfile-Shelf-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: serialInterfaceProfile_Shelf_o.setStatus('mandatory')
+serialInterfaceProfile_Slot_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 2), Integer32()).setLabel("serialInterfaceProfile-Slot-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: serialInterfaceProfile_Slot_o.setStatus('mandatory')
+serialInterfaceProfile_Item_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 3), Integer32()).setLabel("serialInterfaceProfile-Item-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: serialInterfaceProfile_Item_o.setStatus('mandatory')
+serialInterfaceProfile_PhysicalAddress_Shelf = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))).clone(namedValues=NamedValues(("anyShelf", 1), ("shelf1", 2), ("shelf2", 3), ("shelf3", 4), ("shelf4", 5), ("shelf5", 6), ("shelf6", 7), ("shelf7", 8), ("shelf8", 9), ("shelf9", 10)))).setLabel("serialInterfaceProfile-PhysicalAddress-Shelf").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_PhysicalAddress_Shelf.setStatus('mandatory')
+serialInterfaceProfile_PhysicalAddress_Slot = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 55, 56, 57, 58, 49, 50, 42, 53, 54, 45, 46, 51, 59))).clone(namedValues=NamedValues(("anySlot", 1), ("slot1", 2), ("slot2", 3), ("slot3", 4), ("slot4", 5), ("slot5", 6), ("slot6", 7), ("slot7", 8), ("slot8", 9), ("slot9", 10), ("slot10", 11), ("slot11", 12), ("slot12", 13), ("slot13", 14), ("slot14", 15), ("slot15", 16), ("slot16", 17), ("slot17", 18), ("slot18", 19), ("slot19", 20), ("slot20", 21), ("slot21", 22), ("slot22", 23), ("slot23", 24), ("slot24", 25), ("slot25", 26), ("slot26", 27), ("slot27", 28), ("slot28", 29), ("slot29", 30), ("slot30", 31), ("slot31", 32), ("slot32", 33), ("slot33", 34), ("slot34", 35), ("slot35", 36), ("slot36", 37), ("slot37", 38), ("slot38", 39), ("slot39", 40), ("slot40", 41), ("aLim", 55), ("bLim", 56), ("cLim", 57), ("dLim", 58), ("leftController", 49), ("rightController", 50), ("controller", 42), ("firstControlModule", 53), ("secondControlModule", 54), ("trunkModule1", 45), ("trunkModule2", 46), ("controlModule", 51), ("slotPrimary", 59)))).setLabel("serialInterfaceProfile-PhysicalAddress-Slot").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_PhysicalAddress_Slot.setStatus('mandatory')
+serialInterfaceProfile_PhysicalAddress_ItemNumber = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 6), Integer32()).setLabel("serialInterfaceProfile-PhysicalAddress-ItemNumber").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_PhysicalAddress_ItemNumber.setStatus('mandatory')
+serialInterfaceProfile_TermRate = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 7), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9))).clone(namedValues=NamedValues(("n-300Bps", 1), ("n-1200Bps", 2), ("n-2400Bps", 3), ("n-4800Bps", 4), ("n-9600Bps", 5), ("n-19200Bps", 6), ("n-38400Bps", 7), ("n-57600Bps", 8), ("n-115200Bps", 9)))).setLabel("serialInterfaceProfile-TermRate").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_TermRate.setStatus('mandatory')
+serialInterfaceProfile_FlowControl = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 8), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("none", 1), ("xonXoff", 2), ("hardwareHandshake", 3)))).setLabel("serialInterfaceProfile-FlowControl").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_FlowControl.setStatus('mandatory')
+serialInterfaceProfile_UserProfile = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 9), DisplayString()).setLabel("serialInterfaceProfile-UserProfile").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_UserProfile.setStatus('mandatory')
+serialInterfaceProfile_AutoLogout = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 10), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("serialInterfaceProfile-AutoLogout").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_AutoLogout.setStatus('mandatory')
+serialInterfaceProfile_ConsoleMode = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 12), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("on", 1), ("off", 2), ("yCable", 3)))).setLabel("serialInterfaceProfile-ConsoleMode").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_ConsoleMode.setStatus('mandatory')
+serialInterfaceProfile_Action_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 69, 1, 1, 11), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noAction", 1), ("createProfile", 2), ("deleteProfile", 3)))).setLabel("serialInterfaceProfile-Action-o").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: serialInterfaceProfile_Action_o.setStatus('mandatory')
+mibBuilder.exportSymbols("ASCEND-MIBCONS-MIB", serialInterfaceProfile_AutoLogout=serialInterfaceProfile_AutoLogout, mibserialInterfaceProfile=mibserialInterfaceProfile, mibserialInterfaceProfileTable=mibserialInterfaceProfileTable, serialInterfaceProfile_Shelf_o=serialInterfaceProfile_Shelf_o, DisplayString=DisplayString, mibserialInterfaceProfileEntry=mibserialInterfaceProfileEntry, serialInterfaceProfile_Action_o=serialInterfaceProfile_Action_o, serialInterfaceProfile_FlowControl=serialInterfaceProfile_FlowControl, serialInterfaceProfile_PhysicalAddress_Shelf=serialInterfaceProfile_PhysicalAddress_Shelf, serialInterfaceProfile_Item_o=serialInterfaceProfile_Item_o, serialInterfaceProfile_ConsoleMode=serialInterfaceProfile_ConsoleMode, serialInterfaceProfile_Slot_o=serialInterfaceProfile_Slot_o, serialInterfaceProfile_PhysicalAddress_ItemNumber=serialInterfaceProfile_PhysicalAddress_ItemNumber, serialInterfaceProfile_UserProfile=serialInterfaceProfile_UserProfile, serialInterfaceProfile_TermRate=serialInterfaceProfile_TermRate, serialInterfaceProfile_PhysicalAddress_Slot=serialInterfaceProfile_PhysicalAddress_Slot)

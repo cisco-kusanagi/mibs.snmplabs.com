@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module CXVSHELL-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CXVSHELL-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 18:18:09 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+cxMc600, = mibBuilder.importSymbols("CXProduct-SMI", "cxMc600")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+TimeTicks, IpAddress, Integer32, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Counter64, Unsigned32, iso, ModuleIdentity, NotificationType, MibIdentifier, ObjectIdentity, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "IpAddress", "Integer32", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Counter64", "Unsigned32", "iso", "ModuleIdentity", "NotificationType", "MibIdentifier", "ObjectIdentity", "Bits")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+cxVShell = MibIdentifier((1, 3, 6, 1, 4, 1, 495, 2, 1, 1, 3))
+voxCardsMapTable = MibTable((1, 3, 6, 1, 4, 1, 495, 2, 1, 1, 3, 1), )
+if mibBuilder.loadTexts: voxCardsMapTable.setStatus('mandatory')
+voxCardsMapEntry = MibTableRow((1, 3, 6, 1, 4, 1, 495, 2, 1, 1, 3, 1, 1), ).setIndexNames((0, "CXVSHELL-MIB", "voxCardNo"))
+if mibBuilder.loadTexts: voxCardsMapEntry.setStatus('mandatory')
+voxCardNo = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 1, 3, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 8))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: voxCardNo.setStatus('mandatory')
+voxSlotNo = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 1, 3, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 8))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: voxSlotNo.setStatus('mandatory')
+voxConnStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 1, 3, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("recorded-in-config", 1), ("failed", 2), ("connected", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: voxConnStatus.setStatus('mandatory')
+voxCardRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 1, 3, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("invalid", 1), ("valid", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: voxCardRowStatus.setStatus('mandatory')
+cxvshellMibLevel = MibScalar((1, 3, 6, 1, 4, 1, 495, 2, 1, 1, 3, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cxvshellMibLevel.setStatus('mandatory')
+mibBuilder.exportSymbols("CXVSHELL-MIB", cxVShell=cxVShell, voxSlotNo=voxSlotNo, voxCardNo=voxCardNo, voxConnStatus=voxConnStatus, voxCardRowStatus=voxCardRowStatus, cxvshellMibLevel=cxvshellMibLevel, voxCardsMapTable=voxCardsMapTable, voxCardsMapEntry=voxCardsMapEntry)

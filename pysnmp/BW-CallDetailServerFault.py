@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module BW-CallDetailServerFault (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BW-CallDetailServerFault
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:25:01 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+problemText, component, timeStamp, faultFields, systemName, severity, alarmName, identifier, recommendedActionsText, alarmState, subcomponent, common = mibBuilder.importSymbols("BroadworksFault", "problemText", "component", "timeStamp", "faultFields", "systemName", "severity", "alarmName", "identifier", "recommendedActionsText", "alarmState", "subcomponent", "common")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Integer32, Counter32, ModuleIdentity, MibIdentifier, Counter64, Gauge32, iso, Bits, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, TimeTicks, ObjectIdentity, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "Counter32", "ModuleIdentity", "MibIdentifier", "Counter64", "Gauge32", "iso", "Bits", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "TimeTicks", "ObjectIdentity", "IpAddress")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+systemFaults = ModuleIdentity((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1))
+systemFaults.setRevisions(('2000-09-19 14:31',))
+if mibBuilder.loadTexts: systemFaults.setLastUpdated('200201220000Z')
+if mibBuilder.loadTexts: systemFaults.setOrganization('Broadsoft, Inc')
+bwPMCallDetailServerLaunched = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2001)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwPMCallDetailServerLaunched.setStatus('current')
+bwPMCallDetailServerShutDown = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2002)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwPMCallDetailServerShutDown.setStatus('current')
+bwPMCallDetailServerRestarted = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2003)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwPMCallDetailServerRestarted.setStatus('current')
+bwPMCallDetailServerDeath = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2004)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwPMCallDetailServerDeath.setStatus('current')
+bwNetworkServerRequestError = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2005)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwNetworkServerRequestError.setStatus('current')
+bwCAPSCallCenterLinkDown = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2006)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwCAPSCallCenterLinkDown.setStatus('current')
+bwOCIReportingLinkDown = NotificationType((1, 3, 6, 1, 4, 1, 6431, 1, 1, 1, 2007)).setObjects(("BroadworksFault", "identifier"), ("BroadworksFault", "timeStamp"), ("BroadworksFault", "alarmName"), ("BroadworksFault", "systemName"), ("BroadworksFault", "severity"), ("BroadworksFault", "component"), ("BroadworksFault", "subcomponent"), ("BroadworksFault", "problemText"), ("BroadworksFault", "recommendedActionsText"))
+if mibBuilder.loadTexts: bwOCIReportingLinkDown.setStatus('current')
+mibBuilder.exportSymbols("BW-CallDetailServerFault", bwPMCallDetailServerLaunched=bwPMCallDetailServerLaunched, bwPMCallDetailServerDeath=bwPMCallDetailServerDeath, bwPMCallDetailServerRestarted=bwPMCallDetailServerRestarted, systemFaults=systemFaults, bwOCIReportingLinkDown=bwOCIReportingLinkDown, PYSNMP_MODULE_ID=systemFaults, bwPMCallDetailServerShutDown=bwPMCallDetailServerShutDown, bwNetworkServerRequestError=bwNetworkServerRequestError, bwCAPSCallCenterLinkDown=bwCAPSCallCenterLinkDown)

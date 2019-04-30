@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module MITEL-ERN (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MITEL-ERN
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:02:58 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+mitelAppCallServer, = mibBuilder.importSymbols("MITEL-MIB", "mitelAppCallServer")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+sysName, = mibBuilder.importSymbols("SNMPv2-MIB", "sysName")
+Integer32, iso, NotificationType, ObjectIdentity, NotificationType, IpAddress, Counter32, Bits, Unsigned32, ModuleIdentity, Counter64, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "iso", "NotificationType", "ObjectIdentity", "NotificationType", "IpAddress", "Counter32", "Bits", "Unsigned32", "ModuleIdentity", "Counter64", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+class Integer32(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(-2147483648, 2147483647)
+
+class DateAndTime(OctetString):
+    subtypeSpec = OctetString.subtypeSpec + ConstraintsUnion(ValueSizeConstraint(8, 8), ValueSizeConstraint(11, 11), )
+mitelCsEmergencyResponse = MibIdentifier((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3))
+mitelCsErSeqNumber = MibScalar((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 1), Integer32())
+if mibBuilder.loadTexts: mitelCsErSeqNumber.setStatus('mandatory')
+mitelCsErCallType = MibScalar((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 2), Integer32())
+if mibBuilder.loadTexts: mitelCsErCallType.setStatus('mandatory')
+mitelCsErDetectTime = MibScalar((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 3), DateAndTime())
+if mibBuilder.loadTexts: mitelCsErDetectTime.setStatus('mandatory')
+mitelCsErCallingDN = MibScalar((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 4), DisplayString())
+if mibBuilder.loadTexts: mitelCsErCallingDN.setStatus('mandatory')
+mitelCsErCallingPNI = MibScalar((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 5), DisplayString())
+if mibBuilder.loadTexts: mitelCsErCallingPNI.setStatus('mandatory')
+mitelCsErCesidDigits = MibScalar((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 6), DisplayString())
+if mibBuilder.loadTexts: mitelCsErCesidDigits.setStatus('mandatory')
+mitelCsErDialledDigits = MibScalar((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 7), DisplayString())
+if mibBuilder.loadTexts: mitelCsErDialledDigits.setStatus('mandatory')
+mitelCsErRegistrationDN = MibScalar((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 8), DisplayString())
+if mibBuilder.loadTexts: mitelCsErRegistrationDN.setStatus('mandatory')
+mitelCsErUnackTable = MibTable((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 9), )
+if mibBuilder.loadTexts: mitelCsErUnackTable.setStatus('mandatory')
+mitelCsErUnackTableEntry = MibTableRow((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 9, 1), ).setIndexNames((0, "MITEL-ERN", "mitelCsErUnackTableIndex"))
+if mibBuilder.loadTexts: mitelCsErUnackTableEntry.setStatus('mandatory')
+mitelCsErUnackTableIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 9, 1, 1), Integer32())
+if mibBuilder.loadTexts: mitelCsErUnackTableIndex.setStatus('mandatory')
+mitelCsErUnackTableToken = MibTableColumn((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 9, 1, 2), Integer32()).setMaxAccess("writeonly")
+if mibBuilder.loadTexts: mitelCsErUnackTableToken.setStatus('mandatory')
+mitelCsErNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3, 10))
+mitelCsErNotification = NotificationType((1, 3, 6, 1, 4, 1, 1027, 4, 1, 1, 3) + (0,401)).setObjects(("SNMPv2-MIB", "sysName"), ("MITEL-ERN", "mitelCsErSeqNumber"), ("MITEL-ERN", "mitelCsErCallType"), ("MITEL-ERN", "mitelCsErDetectTime"), ("MITEL-ERN", "mitelCsErCallingDN"), ("MITEL-ERN", "mitelCsErCallingPNI"), ("MITEL-ERN", "mitelCsErCesidDigits"), ("MITEL-ERN", "mitelCsErDialledDigits"), ("MITEL-ERN", "mitelCsErRegistrationDN"), ("MITEL-ERN", "mitelCsErUnackTableIndex"), ("MITEL-ERN", "mitelCsErUnackTableToken"))
+mibBuilder.exportSymbols("MITEL-ERN", mitelCsErNotifications=mitelCsErNotifications, mitelCsErRegistrationDN=mitelCsErRegistrationDN, mitelCsErCesidDigits=mitelCsErCesidDigits, mitelCsErUnackTableEntry=mitelCsErUnackTableEntry, mitelCsErDetectTime=mitelCsErDetectTime, mitelCsErUnackTableIndex=mitelCsErUnackTableIndex, mitelCsEmergencyResponse=mitelCsEmergencyResponse, mitelCsErUnackTable=mitelCsErUnackTable, mitelCsErDialledDigits=mitelCsErDialledDigits, mitelCsErSeqNumber=mitelCsErSeqNumber, mitelCsErCallType=mitelCsErCallType, Integer32=Integer32, mitelCsErCallingPNI=mitelCsErCallingPNI, mitelCsErCallingDN=mitelCsErCallingDN, mitelCsErUnackTableToken=mitelCsErUnackTableToken, mitelCsErNotification=mitelCsErNotification, DateAndTime=DateAndTime)

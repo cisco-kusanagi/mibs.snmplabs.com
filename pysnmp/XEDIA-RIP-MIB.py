@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module XEDIA-RIP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/XEDIA-RIP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:36:37 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+rip2IfConfEntry, = mibBuilder.importSymbols("RIPv2-MIB", "rip2IfConfEntry")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+Bits, Counter64, iso, IpAddress, ModuleIdentity, MibIdentifier, NotificationType, Unsigned32, Integer32, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, ObjectIdentity, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "Counter64", "iso", "IpAddress", "ModuleIdentity", "MibIdentifier", "NotificationType", "Unsigned32", "Integer32", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "ObjectIdentity", "TimeTicks")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+xediaMibs, = mibBuilder.importSymbols("XEDIA-REG", "xediaMibs")
+xediaRipMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 838, 3, 5))
+if mibBuilder.loadTexts: xediaRipMIB.setLastUpdated('9702182155Z')
+if mibBuilder.loadTexts: xediaRipMIB.setOrganization('Xedia Corp.')
+xripObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 5, 1))
+xripConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 5, 2))
+xripAdminStat = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 5, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('enabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xripAdminStat.setStatus('current')
+xripImportAdmin = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 5, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('enabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xripImportAdmin.setStatus('current')
+xripImportMetric = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 5, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 15)).clone(6)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xripImportMetric.setStatus('current')
+xripUpdateTimer = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 5, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(10, 360)).clone(30)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xripUpdateTimer.setStatus('current')
+xRip2XIfConfTable = MibTable((1, 3, 6, 1, 4, 1, 838, 3, 5, 1, 10), )
+if mibBuilder.loadTexts: xRip2XIfConfTable.setStatus('current')
+xRip2XIfConfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 838, 3, 5, 1, 10, 1), )
+rip2IfConfEntry.registerAugmentions(("XEDIA-RIP-MIB", "xRip2XIfConfEntry"))
+xRip2XIfConfEntry.setIndexNames(*rip2IfConfEntry.getIndexNames())
+if mibBuilder.loadTexts: xRip2XIfConfEntry.setStatus('current')
+xrip2IfConfSlowConvergenceTechnique = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 5, 1, 10, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("none", 1), ("splitHorizon", 2), ("poisonReverse", 3))).clone('poisonReverse')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xrip2IfConfSlowConvergenceTechnique.setStatus('current')
+xrip2IfConfTriggerEvents = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 5, 1, 10, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('enabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xrip2IfConfTriggerEvents.setStatus('current')
+xripCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 5, 2, 1))
+xripGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 5, 2, 2))
+xripCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 838, 3, 5, 2, 1, 1)).setObjects(("XEDIA-RIP-MIB", "xripAllGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    xripCompliance = xripCompliance.setStatus('current')
+xripAllGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 838, 3, 5, 2, 2, 1)).setObjects(("XEDIA-RIP-MIB", "xripAdminStat"), ("XEDIA-RIP-MIB", "xripImportAdmin"), ("XEDIA-RIP-MIB", "xripImportMetric"), ("XEDIA-RIP-MIB", "xrip2IfConfSlowConvergenceTechnique"), ("XEDIA-RIP-MIB", "xrip2IfConfTriggerEvents"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    xripAllGroup = xripAllGroup.setStatus('current')
+mibBuilder.exportSymbols("XEDIA-RIP-MIB", xripConformance=xripConformance, xripImportMetric=xripImportMetric, xripCompliance=xripCompliance, xRip2XIfConfTable=xRip2XIfConfTable, xripAllGroup=xripAllGroup, xediaRipMIB=xediaRipMIB, xRip2XIfConfEntry=xRip2XIfConfEntry, xrip2IfConfTriggerEvents=xrip2IfConfTriggerEvents, xripAdminStat=xripAdminStat, xripImportAdmin=xripImportAdmin, xripUpdateTimer=xripUpdateTimer, xripCompliances=xripCompliances, xripObjects=xripObjects, PYSNMP_MODULE_ID=xediaRipMIB, xripGroups=xripGroups, xrip2IfConfSlowConvergenceTechnique=xrip2IfConfSlowConvergenceTechnique)

@@ -1,0 +1,52 @@
+#
+# PySNMP MIB module RBN-MEDIA-GATEWAY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RBN-MEDIA-GATEWAY-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:44:35 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+IANAItuProbableCause, IANAItuEventType = mibBuilder.importSymbols("IANA-ITU-ALARM-TC-MIB", "IANAItuProbableCause", "IANAItuEventType")
+ItuPerceivedSeverity, = mibBuilder.importSymbols("ITU-ALARM-TC-MIB", "ItuPerceivedSeverity")
+rbnMgmt, = mibBuilder.importSymbols("RBN-SMI", "rbnMgmt")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+Gauge32, ModuleIdentity, Integer32, Counter64, iso, NotificationType, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, Counter32, Bits, IpAddress, TimeTicks, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "ModuleIdentity", "Integer32", "Counter64", "iso", "NotificationType", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "Counter32", "Bits", "IpAddress", "TimeTicks", "ObjectIdentity")
+DateAndTime, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "DateAndTime", "TextualConvention", "DisplayString")
+rbnMediaGatewayMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 2352, 2, 52))
+rbnMediaGatewayMib.setRevisions(('2010-04-19 00:00', '2009-09-30 00:00',))
+if mibBuilder.loadTexts: rbnMediaGatewayMib.setLastUpdated('201004190000Z')
+if mibBuilder.loadTexts: rbnMediaGatewayMib.setOrganization('Ericsson Inc.')
+rbnMediaGatewayNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 52, 0))
+rbnMediaGatewayObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 52, 1))
+rbnMediaGatewayConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 52, 2))
+rbnMediaGatewayNotify = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 52, 1, 1))
+rbnMGEventDateAndTime = MibScalar((1, 3, 6, 1, 4, 1, 2352, 2, 52, 1, 1, 1), DateAndTime()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: rbnMGEventDateAndTime.setStatus('current')
+rbnMGEventSeverity = MibScalar((1, 3, 6, 1, 4, 1, 2352, 2, 52, 1, 1, 2), ItuPerceivedSeverity()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: rbnMGEventSeverity.setStatus('current')
+rbnMGEventSender = MibScalar((1, 3, 6, 1, 4, 1, 2352, 2, 52, 1, 1, 3), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 64))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: rbnMGEventSender.setStatus('current')
+rbnMGEventType = MibScalar((1, 3, 6, 1, 4, 1, 2352, 2, 52, 1, 1, 4), IANAItuEventType()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: rbnMGEventType.setStatus('current')
+rbnMGEventProbableCause = MibScalar((1, 3, 6, 1, 4, 1, 2352, 2, 52, 1, 1, 5), IANAItuProbableCause()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: rbnMGEventProbableCause.setStatus('current')
+rbnMGEventInformation = MibScalar((1, 3, 6, 1, 4, 1, 2352, 2, 52, 1, 1, 6), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 256))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: rbnMGEventInformation.setStatus('current')
+rbnH248LinkStatusAlarm = NotificationType((1, 3, 6, 1, 4, 1, 2352, 2, 52, 0, 1)).setObjects(("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventDateAndTime"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventSeverity"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventSender"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventType"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventProbableCause"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventInformation"))
+if mibBuilder.loadTexts: rbnH248LinkStatusAlarm.setStatus('current')
+rbnMediaGatewayCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 52, 2, 1))
+rbnMediaGatewayGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 52, 2, 2))
+rbnMGCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2352, 2, 52, 2, 1, 1)).setObjects(("RBN-MEDIA-GATEWAY-MIB", "rbnMGNotifyObjectGroup"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGLinkNotifyGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnMGCompliance = rbnMGCompliance.setStatus('current')
+rbnMGNotifyObjectGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2352, 2, 52, 2, 2, 1)).setObjects(("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventDateAndTime"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventSeverity"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventSender"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventType"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventProbableCause"), ("RBN-MEDIA-GATEWAY-MIB", "rbnMGEventInformation"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnMGNotifyObjectGroup = rbnMGNotifyObjectGroup.setStatus('current')
+rbnMGLinkNotifyGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 2352, 2, 52, 2, 2, 2)).setObjects(("RBN-MEDIA-GATEWAY-MIB", "rbnH248LinkStatusAlarm"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnMGLinkNotifyGroup = rbnMGLinkNotifyGroup.setStatus('current')
+mibBuilder.exportSymbols("RBN-MEDIA-GATEWAY-MIB", rbnMGNotifyObjectGroup=rbnMGNotifyObjectGroup, rbnMediaGatewayObjects=rbnMediaGatewayObjects, rbnMediaGatewayGroups=rbnMediaGatewayGroups, rbnMGCompliance=rbnMGCompliance, rbnMGEventProbableCause=rbnMGEventProbableCause, rbnMGEventInformation=rbnMGEventInformation, rbnMediaGatewayMib=rbnMediaGatewayMib, rbnMGEventDateAndTime=rbnMGEventDateAndTime, rbnMediaGatewayConformance=rbnMediaGatewayConformance, rbnMediaGatewayNotify=rbnMediaGatewayNotify, rbnMGEventSeverity=rbnMGEventSeverity, rbnH248LinkStatusAlarm=rbnH248LinkStatusAlarm, rbnMGLinkNotifyGroup=rbnMGLinkNotifyGroup, rbnMGEventSender=rbnMGEventSender, rbnMediaGatewayCompliances=rbnMediaGatewayCompliances, rbnMGEventType=rbnMGEventType, PYSNMP_MODULE_ID=rbnMediaGatewayMib, rbnMediaGatewayNotifications=rbnMediaGatewayNotifications)

@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module TRAPEZE-NETWORKS-CLUSTER-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TRAPEZE-NETWORKS-CLUSTER-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:19:52 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+ObjectIdentity, Counter64, iso, Counter32, ModuleIdentity, IpAddress, Unsigned32, MibIdentifier, Integer32, NotificationType, Bits, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "Counter64", "iso", "Counter32", "ModuleIdentity", "IpAddress", "Unsigned32", "MibIdentifier", "Integer32", "NotificationType", "Bits", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32")
+TextualConvention, TruthValue, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TruthValue", "DisplayString")
+TrpzApNum, = mibBuilder.importSymbols("TRAPEZE-NETWORKS-AP-TC", "TrpzApNum")
+trpzMibs, = mibBuilder.importSymbols("TRAPEZE-NETWORKS-ROOT-MIB", "trpzMibs")
+trpzClusterMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 14525, 4, 21))
+trpzClusterMib.setRevisions(('2011-02-24 00:01',))
+if mibBuilder.loadTexts: trpzClusterMib.setLastUpdated('201102240001Z')
+if mibBuilder.loadTexts: trpzClusterMib.setOrganization('Trapeze Networks')
+trpzClusterMibObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 14525, 4, 21, 1))
+trpzClusterApAssignmentTable = MibTable((1, 3, 6, 1, 4, 1, 14525, 4, 21, 1, 1), )
+if mibBuilder.loadTexts: trpzClusterApAssignmentTable.setStatus('current')
+trpzClusterApAssignmentEntry = MibTableRow((1, 3, 6, 1, 4, 1, 14525, 4, 21, 1, 1, 1), ).setIndexNames((0, "TRAPEZE-NETWORKS-CLUSTER-MIB", "trpzClusterApAssignApNum"))
+if mibBuilder.loadTexts: trpzClusterApAssignmentEntry.setStatus('current')
+trpzClusterApAssignApNum = MibTableColumn((1, 3, 6, 1, 4, 1, 14525, 4, 21, 1, 1, 1, 1), TrpzApNum())
+if mibBuilder.loadTexts: trpzClusterApAssignApNum.setStatus('current')
+trpzClusterApAssignPamIp = MibTableColumn((1, 3, 6, 1, 4, 1, 14525, 4, 21, 1, 1, 1, 2), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: trpzClusterApAssignPamIp.setStatus('current')
+trpzClusterApAssignSamIp = MibTableColumn((1, 3, 6, 1, 4, 1, 14525, 4, 21, 1, 1, 1, 3), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: trpzClusterApAssignSamIp.setStatus('current')
+trpzClusterApAssignConnectedToPam = MibTableColumn((1, 3, 6, 1, 4, 1, 14525, 4, 21, 1, 1, 1, 4), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: trpzClusterApAssignConnectedToPam.setStatus('current')
+trpzClusterApAssignConnectedToSam = MibTableColumn((1, 3, 6, 1, 4, 1, 14525, 4, 21, 1, 1, 1, 5), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: trpzClusterApAssignConnectedToSam.setStatus('current')
+trpzClusterConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 14525, 4, 21, 2))
+trpzClusterCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 14525, 4, 21, 2, 1))
+trpzClusterGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 14525, 4, 21, 2, 2))
+trpzClusterCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 14525, 4, 21, 2, 1, 1)).setObjects(("TRAPEZE-NETWORKS-CLUSTER-MIB", "trpzClusterApAssignmentGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    trpzClusterCompliance = trpzClusterCompliance.setStatus('current')
+trpzClusterApAssignmentGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 14525, 4, 21, 2, 2, 1)).setObjects(("TRAPEZE-NETWORKS-CLUSTER-MIB", "trpzClusterApAssignPamIp"), ("TRAPEZE-NETWORKS-CLUSTER-MIB", "trpzClusterApAssignSamIp"), ("TRAPEZE-NETWORKS-CLUSTER-MIB", "trpzClusterApAssignConnectedToPam"), ("TRAPEZE-NETWORKS-CLUSTER-MIB", "trpzClusterApAssignConnectedToSam"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    trpzClusterApAssignmentGroup = trpzClusterApAssignmentGroup.setStatus('current')
+mibBuilder.exportSymbols("TRAPEZE-NETWORKS-CLUSTER-MIB", trpzClusterApAssignSamIp=trpzClusterApAssignSamIp, trpzClusterApAssignmentTable=trpzClusterApAssignmentTable, trpzClusterApAssignmentGroup=trpzClusterApAssignmentGroup, trpzClusterMibObjects=trpzClusterMibObjects, trpzClusterConformance=trpzClusterConformance, trpzClusterGroups=trpzClusterGroups, trpzClusterCompliance=trpzClusterCompliance, trpzClusterApAssignApNum=trpzClusterApAssignApNum, trpzClusterApAssignConnectedToSam=trpzClusterApAssignConnectedToSam, trpzClusterCompliances=trpzClusterCompliances, trpzClusterApAssignConnectedToPam=trpzClusterApAssignConnectedToPam, trpzClusterApAssignmentEntry=trpzClusterApAssignmentEntry, trpzClusterApAssignPamIp=trpzClusterApAssignPamIp, PYSNMP_MODULE_ID=trpzClusterMib, trpzClusterMib=trpzClusterMib)

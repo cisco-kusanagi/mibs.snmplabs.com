@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module ASCEND-MIBQOS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ASCEND-MIBQOS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:12:04 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+configuration, = mibBuilder.importSymbols("ASCEND-MIB", "configuration")
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, TimeTicks, MibIdentifier, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, ObjectIdentity, iso, Bits, Counter64, Unsigned32, Gauge32, Counter32, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "TimeTicks", "MibIdentifier", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "ObjectIdentity", "iso", "Bits", "Counter64", "Unsigned32", "Gauge32", "Counter32", "IpAddress")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+class DisplayString(OctetString):
+    pass
+
+mibqosProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 529, 23, 169))
+mibqosProfileTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 169, 1), )
+if mibBuilder.loadTexts: mibqosProfileTable.setStatus('mandatory')
+mibqosProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 169, 1, 1), ).setIndexNames((0, "ASCEND-MIBQOS-MIB", "qosProfile-Index-o"))
+if mibBuilder.loadTexts: mibqosProfileEntry.setStatus('mandatory')
+qosProfile_Index_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 1, 1, 1), Integer32()).setLabel("qosProfile-Index-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: qosProfile_Index_o.setStatus('mandatory')
+qosProfile_Enabled = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("qosProfile-Enabled").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qosProfile_Enabled.setStatus('mandatory')
+qosProfile_AllowClientDscp = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("qosProfile-AllowClientDscp").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qosProfile_AllowClientDscp.setStatus('mandatory')
+qosProfile_Action_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noAction", 1), ("createProfile", 2), ("deleteProfile", 3)))).setLabel("qosProfile-Action-o").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qosProfile_Action_o.setStatus('mandatory')
+mibqosProfile_TagMapTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 169, 2), ).setLabel("mibqosProfile-TagMapTable")
+if mibBuilder.loadTexts: mibqosProfile_TagMapTable.setStatus('mandatory')
+mibqosProfile_TagMapEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 169, 2, 1), ).setLabel("mibqosProfile-TagMapEntry").setIndexNames((0, "ASCEND-MIBQOS-MIB", "qosProfile-TagMap-Index-o"), (0, "ASCEND-MIBQOS-MIB", "qosProfile-TagMap-Index1-o"))
+if mibBuilder.loadTexts: mibqosProfile_TagMapEntry.setStatus('mandatory')
+qosProfile_TagMap_Index_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 2, 1, 1), Integer32()).setLabel("qosProfile-TagMap-Index-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: qosProfile_TagMap_Index_o.setStatus('mandatory')
+qosProfile_TagMap_Index1_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 2, 1, 2), Integer32()).setLabel("qosProfile-TagMap-Index1-o").setMaxAccess("readonly")
+if mibBuilder.loadTexts: qosProfile_TagMap_Index1_o.setStatus('mandatory')
+qosProfile_TagMap_Active = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("qosProfile-TagMap-Active").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qosProfile_TagMap_Active.setStatus('mandatory')
+qosProfile_TagMap_Dscp = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 2, 1, 4), DisplayString()).setLabel("qosProfile-TagMap-Dscp").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qosProfile_TagMap_Dscp.setStatus('mandatory')
+qosProfile_TagMap_QosTag = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 169, 2, 1, 5), Integer32()).setLabel("qosProfile-TagMap-QosTag").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qosProfile_TagMap_QosTag.setStatus('mandatory')
+mibBuilder.exportSymbols("ASCEND-MIBQOS-MIB", qosProfile_TagMap_QosTag=qosProfile_TagMap_QosTag, qosProfile_TagMap_Active=qosProfile_TagMap_Active, mibqosProfileEntry=mibqosProfileEntry, qosProfile_AllowClientDscp=qosProfile_AllowClientDscp, DisplayString=DisplayString, mibqosProfileTable=mibqosProfileTable, qosProfile_Enabled=qosProfile_Enabled, mibqosProfile_TagMapTable=mibqosProfile_TagMapTable, qosProfile_Action_o=qosProfile_Action_o, qosProfile_TagMap_Index1_o=qosProfile_TagMap_Index1_o, qosProfile_Index_o=qosProfile_Index_o, mibqosProfile_TagMapEntry=mibqosProfile_TagMapEntry, qosProfile_TagMap_Index_o=qosProfile_TagMap_Index_o, mibqosProfile=mibqosProfile, qosProfile_TagMap_Dscp=qosProfile_TagMap_Dscp)

@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module ZYXEL-FDB-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZYXEL-FDB-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:43:50 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion")
+EnabledStatus, = mibBuilder.importSymbols("P-BRIDGE-MIB", "EnabledStatus")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+IpAddress, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, Bits, iso, Gauge32, MibIdentifier, NotificationType, Integer32, Unsigned32, ModuleIdentity, ObjectIdentity, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "Bits", "iso", "Gauge32", "MibIdentifier", "NotificationType", "Integer32", "Unsigned32", "ModuleIdentity", "ObjectIdentity", "Counter64")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+esMgmt, = mibBuilder.importSymbols("ZYXEL-ES-SMI", "esMgmt")
+zyxelFdb = ModuleIdentity((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 48))
+if mibBuilder.loadTexts: zyxelFdb.setLastUpdated('201207010000Z')
+if mibBuilder.loadTexts: zyxelFdb.setOrganization('Enterprise Solution ZyXEL')
+zyxelMacStatus = MibIdentifier((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 48, 1))
+zyxelMacStatusNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 48, 2))
+zyMacFlush = MibScalar((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 48, 1, 1), EnabledStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyMacFlush.setStatus('current')
+zyMacFlushPort = MibScalar((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 48, 1, 2), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyMacFlushPort.setStatus('current')
+zyMacFlushVlan = MibScalar((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 48, 1, 3), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyMacFlushVlan.setStatus('current')
+zyMacForwardingTableFull = NotificationType((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 48, 2, 1))
+if mibBuilder.loadTexts: zyMacForwardingTableFull.setStatus('current')
+zyMacForwardingTableFullRecovered = NotificationType((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 48, 2, 2))
+if mibBuilder.loadTexts: zyMacForwardingTableFullRecovered.setStatus('current')
+mibBuilder.exportSymbols("ZYXEL-FDB-MIB", zyMacForwardingTableFullRecovered=zyMacForwardingTableFullRecovered, zyMacForwardingTableFull=zyMacForwardingTableFull, zyxelMacStatusNotifications=zyxelMacStatusNotifications, zyxelFdb=zyxelFdb, zyMacFlush=zyMacFlush, zyxelMacStatus=zyxelMacStatus, PYSNMP_MODULE_ID=zyxelFdb, zyMacFlushVlan=zyMacFlushVlan, zyMacFlushPort=zyMacFlushPort)

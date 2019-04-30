@@ -1,0 +1,46 @@
+#
+# PySNMP MIB module L2L3-VPN-MCAST-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/L2L3-VPN-MCAST-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:54:19 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+InetAddress, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetAddressType")
+jnxL2L3VpnMcastExperiment, = mibBuilder.importSymbols("JUNIPER-EXPERIMENT-MIB", "jnxL2L3VpnMcastExperiment")
+jnxMibs, = mibBuilder.importSymbols("JUNIPER-SMI", "jnxMibs")
+MplsLabel, = mibBuilder.importSymbols("MPLS-TC-STD-MIB", "MplsLabel")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, experimental, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, Integer32, ObjectIdentity, IpAddress, Counter32, TimeTicks, Counter64, Gauge32, Unsigned32, Bits, NotificationType, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "experimental", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "Integer32", "ObjectIdentity", "IpAddress", "Counter32", "TimeTicks", "Counter64", "Gauge32", "Unsigned32", "Bits", "NotificationType", "ModuleIdentity")
+DisplayString, RowStatus, TimeInterval, TimeStamp, RowPointer, TextualConvention, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "RowStatus", "TimeInterval", "TimeStamp", "RowPointer", "TextualConvention", "TruthValue")
+jnxL2L3VpnMcastMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1))
+jnxL2L3VpnMcastMIB.setRevisions(('2012-11-05 12:00',))
+if mibBuilder.loadTexts: jnxL2L3VpnMcastMIB.setLastUpdated('201211051200Z')
+if mibBuilder.loadTexts: jnxL2L3VpnMcastMIB.setOrganization('IETF Layer-3 Virtual Private Networks Working Group.')
+class JnxL2L3VpnMcastProviderTunnelType(TextualConvention, Integer32):
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6, 7))
+    namedValues = NamedValues(("unconfigured", 0), ("rsvp-p2mp", 1), ("ldp-p2mp", 2), ("pim-ssm", 3), ("pim-asm", 4), ("pim-bidir", 5), ("ingress-replication", 6), ("ldp-mp2mp", 7))
+
+jnxL2L3VpnMcastObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1))
+jnxL2L3VpnMcastPmsiStates = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1))
+jnxL2L3VpnMcastPmsiTunnelAttributeTable = MibTable((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1, 1), )
+if mibBuilder.loadTexts: jnxL2L3VpnMcastPmsiTunnelAttributeTable.setStatus('current')
+jnxL2L3VpnMcastPmsiTunnelAttributeEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1, 1, 1), ).setIndexNames((0, "L2L3-VPN-MCAST-MIB", "jnxL2L3VpnMcastPmsiTunnelAttributeFlags"), (0, "L2L3-VPN-MCAST-MIB", "jnxL2L3VpnMcastPmsiTunnelAttributeType"), (0, "L2L3-VPN-MCAST-MIB", "jnxL2L3VpnMcastPmsiTunnelAttributeLabel"), (0, "L2L3-VPN-MCAST-MIB", "jnxL2L3VpnMcastPmsiTunnelAttributeId"))
+if mibBuilder.loadTexts: jnxL2L3VpnMcastPmsiTunnelAttributeEntry.setStatus('current')
+jnxL2L3VpnMcastPmsiTunnelAttributeFlags = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1, 1, 1, 1), OctetString().subtype(subtypeSpec=ValueSizeConstraint(1, 1)).setFixedLength(1))
+if mibBuilder.loadTexts: jnxL2L3VpnMcastPmsiTunnelAttributeFlags.setStatus('current')
+jnxL2L3VpnMcastPmsiTunnelAttributeType = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1, 1, 1, 2), JnxL2L3VpnMcastProviderTunnelType())
+if mibBuilder.loadTexts: jnxL2L3VpnMcastPmsiTunnelAttributeType.setStatus('current')
+jnxL2L3VpnMcastPmsiTunnelAttributeLabel = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1, 1, 1, 3), MplsLabel())
+if mibBuilder.loadTexts: jnxL2L3VpnMcastPmsiTunnelAttributeLabel.setStatus('current')
+jnxL2L3VpnMcastPmsiTunnelAttributeId = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1, 1, 1, 4), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 37)))
+if mibBuilder.loadTexts: jnxL2L3VpnMcastPmsiTunnelAttributeId.setStatus('current')
+jnxL2L3VpnMcastPmsiTunnelPointer = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1, 1, 1, 5), RowPointer()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxL2L3VpnMcastPmsiTunnelPointer.setStatus('current')
+jnxL2L3VpnMcastPmsiTunnelIf = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 5, 11, 1, 1, 1, 1, 1, 6), RowPointer()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxL2L3VpnMcastPmsiTunnelIf.setStatus('current')
+mibBuilder.exportSymbols("L2L3-VPN-MCAST-MIB", jnxL2L3VpnMcastPmsiTunnelAttributeType=jnxL2L3VpnMcastPmsiTunnelAttributeType, jnxL2L3VpnMcastPmsiTunnelAttributeFlags=jnxL2L3VpnMcastPmsiTunnelAttributeFlags, jnxL2L3VpnMcastPmsiTunnelAttributeEntry=jnxL2L3VpnMcastPmsiTunnelAttributeEntry, jnxL2L3VpnMcastPmsiTunnelAttributeId=jnxL2L3VpnMcastPmsiTunnelAttributeId, JnxL2L3VpnMcastProviderTunnelType=JnxL2L3VpnMcastProviderTunnelType, jnxL2L3VpnMcastObjects=jnxL2L3VpnMcastObjects, PYSNMP_MODULE_ID=jnxL2L3VpnMcastMIB, jnxL2L3VpnMcastPmsiTunnelAttributeLabel=jnxL2L3VpnMcastPmsiTunnelAttributeLabel, jnxL2L3VpnMcastMIB=jnxL2L3VpnMcastMIB, jnxL2L3VpnMcastPmsiTunnelIf=jnxL2L3VpnMcastPmsiTunnelIf, jnxL2L3VpnMcastPmsiTunnelPointer=jnxL2L3VpnMcastPmsiTunnelPointer, jnxL2L3VpnMcastPmsiStates=jnxL2L3VpnMcastPmsiStates, jnxL2L3VpnMcastPmsiTunnelAttributeTable=jnxL2L3VpnMcastPmsiTunnelAttributeTable)

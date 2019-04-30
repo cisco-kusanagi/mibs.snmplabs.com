@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module ZHONE-PHY-LINE-TYPES (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZHONE-PHY-LINE-TYPES
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:41:35 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+IpAddress, NotificationType, Counter64, ModuleIdentity, MibIdentifier, Integer32, Unsigned32, transmission, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, iso, ObjectIdentity, TimeTicks, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "NotificationType", "Counter64", "ModuleIdentity", "MibIdentifier", "Integer32", "Unsigned32", "transmission", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "iso", "ObjectIdentity", "TimeTicks", "Bits")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+zhoneModules, zhonePhysical, zhoneSlotIndex, zhoneShelfIndex = mibBuilder.importSymbols("Zhone", "zhoneModules", "zhonePhysical", "zhoneSlotIndex", "zhoneShelfIndex")
+phyZhoneLineTypes = ModuleIdentity((1, 3, 6, 1, 4, 1, 5504, 6, 1))
+phyZhoneLineTypes.setRevisions(('2003-05-27 11:55', '2003-02-11 11:23',))
+if mibBuilder.loadTexts: phyZhoneLineTypes.setLastUpdated('200305271116Z')
+if mibBuilder.loadTexts: phyZhoneLineTypes.setOrganization('Organization.')
+zhoneLineTypes = ObjectIdentity((1, 3, 6, 1, 4, 1, 5504, 5, 11))
+if mibBuilder.loadTexts: zhoneLineTypes.setStatus('current')
+ulcTable = MibTable((1, 3, 6, 1, 4, 1, 5504, 5, 11, 1), )
+if mibBuilder.loadTexts: ulcTable.setStatus('current')
+ulcEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5504, 5, 11, 1, 1), ).setIndexNames((0, "Zhone", "zhoneShelfIndex"), (0, "Zhone", "zhoneSlotIndex"), (0, "ZHONE-PHY-LINE-TYPES", "ulcPortIndex"))
+if mibBuilder.loadTexts: ulcEntry.setStatus('current')
+ulcPortIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 5, 11, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 12)))
+if mibBuilder.loadTexts: ulcPortIndex.setStatus('current')
+ulcPortType = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 5, 11, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("pots", 1), ("isdn", 2), ("ebs", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ulcPortType.setStatus('current')
+ulcTrapEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 5, 11, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('disabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ulcTrapEnable.setStatus('current')
+mibBuilder.exportSymbols("ZHONE-PHY-LINE-TYPES", ulcPortType=ulcPortType, PYSNMP_MODULE_ID=phyZhoneLineTypes, phyZhoneLineTypes=phyZhoneLineTypes, ulcTable=ulcTable, zhoneLineTypes=zhoneLineTypes, ulcEntry=ulcEntry, ulcTrapEnable=ulcTrapEnable, ulcPortIndex=ulcPortIndex)

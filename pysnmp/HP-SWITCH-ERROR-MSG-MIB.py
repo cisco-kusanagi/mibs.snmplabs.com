@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module HP-SWITCH-ERROR-MSG-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-SWITCH-ERROR-MSG-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:24:17 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint")
+hpSwitch, = mibBuilder.importSymbols("HP-ICF-OID", "hpSwitch")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, iso, Bits, NotificationType, Counter32, IpAddress, ModuleIdentity, Counter64, Unsigned32, Gauge32, TimeTicks, MibIdentifier, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "iso", "Bits", "NotificationType", "Counter32", "IpAddress", "ModuleIdentity", "Counter64", "Unsigned32", "Gauge32", "TimeTicks", "MibIdentifier", "ObjectIdentity")
+DateAndTime, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DateAndTime", "DisplayString", "TextualConvention")
+hpSwitchErrorMsgMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68))
+hpSwitchErrorMsgMIB.setRevisions(('2009-04-06 00:00',))
+if mibBuilder.loadTexts: hpSwitchErrorMsgMIB.setLastUpdated('200904060000Z')
+if mibBuilder.loadTexts: hpSwitchErrorMsgMIB.setOrganization('HP Networking')
+hpSwitchErrorMsgObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1))
+hpSwitchErrorMsgTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1), )
+if mibBuilder.loadTexts: hpSwitchErrorMsgTable.setStatus('current')
+hpSwitchErrorMsgEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1, 1), ).setIndexNames((0, "HP-SWITCH-ERROR-MSG-MIB", "hpSwitchErrorEntityType"), (0, "HP-SWITCH-ERROR-MSG-MIB", "hpSwitchErrorEntityHandle"), (0, "HP-SWITCH-ERROR-MSG-MIB", "hpSwitchErrorSnmpSeqCode"))
+if mibBuilder.loadTexts: hpSwitchErrorMsgEntry.setStatus('current')
+hpSwitchErrorEntityType = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("others", 1), ("cliSession", 2), ("webSession", 3), ("ipV4Address", 4), ("ipV6Address", 5), ("oaApplication", 6))))
+if mibBuilder.loadTexts: hpSwitchErrorEntityType.setStatus('current')
+hpSwitchErrorEntityHandle = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1, 1, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 96)))
+if mibBuilder.loadTexts: hpSwitchErrorEntityHandle.setStatus('current')
+hpSwitchErrorSnmpSeqCode = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)))
+if mibBuilder.loadTexts: hpSwitchErrorSnmpSeqCode.setStatus('current')
+hpSwitchErrorTime = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1, 1, 4), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpSwitchErrorTime.setStatus('current')
+hpSwitchErrorFailedOID = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1, 1, 5), ObjectIdentifier()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpSwitchErrorFailedOID.setStatus('current')
+hpSwitchEntityErrorMsg = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1, 1, 6), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpSwitchEntityErrorMsg.setStatus('current')
+hpSwitchSnmpErrorCode = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 1, 1, 1, 7), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 18))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpSwitchSnmpErrorCode.setStatus('current')
+hpSwitchErrorMsgMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 2))
+hpSwitchErrorMsgMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 2, 1))
+hpSwitchErrorMsgMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 2, 2))
+hpSwitchErrorMsgMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 2, 1, 1)).setObjects(("HP-SWITCH-ERROR-MSG-MIB", "hpSwitchErrorMsgMIBGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpSwitchErrorMsgMIBCompliance = hpSwitchErrorMsgMIBCompliance.setStatus('current')
+hpSwitchErrorMsgMIBGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 68, 2, 2, 1)).setObjects(("HP-SWITCH-ERROR-MSG-MIB", "hpSwitchErrorTime"), ("HP-SWITCH-ERROR-MSG-MIB", "hpSwitchErrorFailedOID"), ("HP-SWITCH-ERROR-MSG-MIB", "hpSwitchEntityErrorMsg"), ("HP-SWITCH-ERROR-MSG-MIB", "hpSwitchSnmpErrorCode"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpSwitchErrorMsgMIBGroup = hpSwitchErrorMsgMIBGroup.setStatus('current')
+mibBuilder.exportSymbols("HP-SWITCH-ERROR-MSG-MIB", hpSwitchErrorMsgObjects=hpSwitchErrorMsgObjects, hpSwitchErrorMsgMIBCompliances=hpSwitchErrorMsgMIBCompliances, hpSwitchErrorMsgMIBCompliance=hpSwitchErrorMsgMIBCompliance, PYSNMP_MODULE_ID=hpSwitchErrorMsgMIB, hpSwitchErrorSnmpSeqCode=hpSwitchErrorSnmpSeqCode, hpSwitchErrorMsgEntry=hpSwitchErrorMsgEntry, hpSwitchErrorMsgTable=hpSwitchErrorMsgTable, hpSwitchErrorMsgMIBConformance=hpSwitchErrorMsgMIBConformance, hpSwitchSnmpErrorCode=hpSwitchSnmpErrorCode, hpSwitchEntityErrorMsg=hpSwitchEntityErrorMsg, hpSwitchErrorMsgMIBGroups=hpSwitchErrorMsgMIBGroups, hpSwitchErrorMsgMIB=hpSwitchErrorMsgMIB, hpSwitchErrorEntityType=hpSwitchErrorEntityType, hpSwitchErrorFailedOID=hpSwitchErrorFailedOID, hpSwitchErrorEntityHandle=hpSwitchErrorEntityHandle, hpSwitchErrorTime=hpSwitchErrorTime, hpSwitchErrorMsgMIBGroup=hpSwitchErrorMsgMIBGroup)

@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module HH3C-VRRP-EXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HH3C-VRRP-EXT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:17:41 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+hh3cCommon, = mibBuilder.importSymbols("HH3C-OID-MIB", "hh3cCommon")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, iso, TimeTicks, Counter64, NotificationType, Integer32, Counter32, Gauge32, IpAddress, Bits, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "iso", "TimeTicks", "Counter64", "NotificationType", "Integer32", "Counter32", "Gauge32", "IpAddress", "Bits", "Unsigned32")
+TextualConvention, DisplayString, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "RowStatus")
+vrrpOperVrId, = mibBuilder.importSymbols("VRRP-MIB", "vrrpOperVrId")
+hh3cVrrpExt = ModuleIdentity((1, 3, 6, 1, 4, 1, 25506, 2, 24))
+if mibBuilder.loadTexts: hh3cVrrpExt.setLastUpdated('200412090000Z')
+if mibBuilder.loadTexts: hh3cVrrpExt.setOrganization('Hangzhou H3C Tech. Co., Ltd.')
+hh3cVrrpExtMibObject = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 24, 1))
+hh3cVrrpExtTable = MibTable((1, 3, 6, 1, 4, 1, 25506, 2, 24, 1, 1), )
+if mibBuilder.loadTexts: hh3cVrrpExtTable.setStatus('current')
+hh3cVrrpExtEntry = MibTableRow((1, 3, 6, 1, 4, 1, 25506, 2, 24, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "VRRP-MIB", "vrrpOperVrId"), (0, "HH3C-VRRP-EXT-MIB", "hh3cVrrpExtTrackInterface"))
+if mibBuilder.loadTexts: hh3cVrrpExtEntry.setStatus('current')
+hh3cVrrpExtTrackInterface = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 24, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)))
+if mibBuilder.loadTexts: hh3cVrrpExtTrackInterface.setStatus('current')
+hh3cVrrpExtPriorityReduce = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 24, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 255)).clone(10)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hh3cVrrpExtPriorityReduce.setStatus('current')
+hh3cVrrpExtRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 24, 1, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hh3cVrrpExtRowStatus.setStatus('current')
+mibBuilder.exportSymbols("HH3C-VRRP-EXT-MIB", hh3cVrrpExtEntry=hh3cVrrpExtEntry, hh3cVrrpExtRowStatus=hh3cVrrpExtRowStatus, hh3cVrrpExtMibObject=hh3cVrrpExtMibObject, hh3cVrrpExtTable=hh3cVrrpExtTable, hh3cVrrpExtPriorityReduce=hh3cVrrpExtPriorityReduce, PYSNMP_MODULE_ID=hh3cVrrpExt, hh3cVrrpExt=hh3cVrrpExt, hh3cVrrpExtTrackInterface=hh3cVrrpExtTrackInterface)

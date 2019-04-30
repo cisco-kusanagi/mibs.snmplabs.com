@@ -1,0 +1,40 @@
+#
+# PySNMP MIB module SALIX-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SALIX-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:51:53 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+TimeTicks, Bits, Integer32, ObjectIdentity, enterprises, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Unsigned32, IpAddress, iso, MibIdentifier, Counter32, NotificationType, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Bits", "Integer32", "ObjectIdentity", "enterprises", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Unsigned32", "IpAddress", "iso", "MibIdentifier", "Counter32", "NotificationType", "ModuleIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+salixTechnologies = ModuleIdentity((1, 3, 6, 1, 4, 1, 2158))
+if mibBuilder.loadTexts: salixTechnologies.setLastUpdated('9810130000Z')
+if mibBuilder.loadTexts: salixTechnologies.setOrganization('SALIX Technologies')
+salixMIBCompliance = MibIdentifier((1, 3, 6, 1, 4, 1, 2158, 6))
+salixExperimental = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 1))
+if mibBuilder.loadTexts: salixExperimental.setStatus('current')
+salixGeneric = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 2))
+if mibBuilder.loadTexts: salixGeneric.setStatus('current')
+salixProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 3))
+if mibBuilder.loadTexts: salixProducts.setStatus('current')
+salixRegistrations = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 4))
+if mibBuilder.loadTexts: salixRegistrations.setStatus('current')
+salixPlatforms = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 5))
+if mibBuilder.loadTexts: salixPlatforms.setStatus('current')
+hybridSwitch = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 3, 1))
+if mibBuilder.loadTexts: hybridSwitch.setStatus('current')
+voip = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 3, 2))
+if mibBuilder.loadTexts: voip.setStatus('current')
+platform1 = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 5, 1))
+if mibBuilder.loadTexts: platform1.setStatus('current')
+salixGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2158, 6, 1))
+salixCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2158, 6, 2))
+salixCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2158, 6, 2, 1)).setObjects()
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    salixCompliance = salixCompliance.setStatus('current')
+mibBuilder.exportSymbols("SALIX-MIB", salixMIBCompliance=salixMIBCompliance, hybridSwitch=hybridSwitch, salixProducts=salixProducts, platform1=platform1, salixExperimental=salixExperimental, salixCompliance=salixCompliance, salixTechnologies=salixTechnologies, salixPlatforms=salixPlatforms, voip=voip, salixGroups=salixGroups, salixRegistrations=salixRegistrations, salixGeneric=salixGeneric, PYSNMP_MODULE_ID=salixTechnologies, salixCompliances=salixCompliances)

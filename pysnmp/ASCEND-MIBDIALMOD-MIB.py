@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module ASCEND-MIBDIALMOD-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ASCEND-MIBDIALMOD-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:11:02 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+configuration, = mibBuilder.importSymbols("ASCEND-MIB", "configuration")
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, TimeTicks, Gauge32, IpAddress, Counter32, Counter64, NotificationType, MibIdentifier, Bits, Unsigned32, ObjectIdentity, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "TimeTicks", "Gauge32", "IpAddress", "Counter32", "Counter64", "NotificationType", "MibIdentifier", "Bits", "Unsigned32", "ObjectIdentity", "ModuleIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+class DisplayString(OctetString):
+    pass
+
+mibdialModifierProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 529, 23, 74))
+mibdialModifierProfileTable = MibTable((1, 3, 6, 1, 4, 1, 529, 23, 74, 1), )
+if mibBuilder.loadTexts: mibdialModifierProfileTable.setStatus('mandatory')
+mibdialModifierProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1), ).setIndexNames((0, "ASCEND-MIBDIALMOD-MIB", "dialModifierProfile-Name"))
+if mibBuilder.loadTexts: mibdialModifierProfileEntry.setStatus('mandatory')
+dialModifierProfile_Name = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 1), DisplayString()).setLabel("dialModifierProfile-Name").setMaxAccess("readonly")
+if mibBuilder.loadTexts: dialModifierProfile_Name.setStatus('mandatory')
+dialModifierProfile_Active = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("dialModifierProfile-Active").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_Active.setStatus('mandatory')
+dialModifierProfile_UserSuppliedTg = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("no", 1), ("yes", 2)))).setLabel("dialModifierProfile-UserSuppliedTg").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_UserSuppliedTg.setStatus('mandatory')
+dialModifierProfile_TrunkGroupFilter = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 4), Integer32()).setLabel("dialModifierProfile-TrunkGroupFilter").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_TrunkGroupFilter.setStatus('mandatory')
+dialModifierProfile_SlotFilter = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 5), Integer32()).setLabel("dialModifierProfile-SlotFilter").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_SlotFilter.setStatus('mandatory')
+dialModifierProfile_PortTypeFilter = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("any", 1), ("maxpots", 2)))).setLabel("dialModifierProfile-PortTypeFilter").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_PortTypeFilter.setStatus('mandatory')
+dialModifierProfile_PrefixFilter = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 7), DisplayString()).setLabel("dialModifierProfile-PrefixFilter").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_PrefixFilter.setStatus('mandatory')
+dialModifierProfile_LengthFilter = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 8), Integer32()).setLabel("dialModifierProfile-LengthFilter").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_LengthFilter.setStatus('mandatory')
+dialModifierProfile_DialPlan = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 9), Integer32()).setLabel("dialModifierProfile-DialPlan").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_DialPlan.setStatus('mandatory')
+dialModifierProfile_NewTrunkGroup = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 10), Integer32()).setLabel("dialModifierProfile-NewTrunkGroup").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_NewTrunkGroup.setStatus('mandatory')
+dialModifierProfile_Action_o = MibScalar((1, 3, 6, 1, 4, 1, 529, 23, 74, 1, 1, 11), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noAction", 1), ("createProfile", 2), ("deleteProfile", 3)))).setLabel("dialModifierProfile-Action-o").setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dialModifierProfile_Action_o.setStatus('mandatory')
+mibBuilder.exportSymbols("ASCEND-MIBDIALMOD-MIB", mibdialModifierProfile=mibdialModifierProfile, dialModifierProfile_Action_o=dialModifierProfile_Action_o, dialModifierProfile_DialPlan=dialModifierProfile_DialPlan, dialModifierProfile_Active=dialModifierProfile_Active, dialModifierProfile_PortTypeFilter=dialModifierProfile_PortTypeFilter, mibdialModifierProfileEntry=mibdialModifierProfileEntry, DisplayString=DisplayString, dialModifierProfile_Name=dialModifierProfile_Name, dialModifierProfile_SlotFilter=dialModifierProfile_SlotFilter, dialModifierProfile_TrunkGroupFilter=dialModifierProfile_TrunkGroupFilter, dialModifierProfile_LengthFilter=dialModifierProfile_LengthFilter, dialModifierProfile_NewTrunkGroup=dialModifierProfile_NewTrunkGroup, dialModifierProfile_PrefixFilter=dialModifierProfile_PrefixFilter, mibdialModifierProfileTable=mibdialModifierProfileTable, dialModifierProfile_UserSuppliedTg=dialModifierProfile_UserSuppliedTg)

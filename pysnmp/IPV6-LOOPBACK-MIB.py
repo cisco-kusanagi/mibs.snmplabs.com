@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module IPV6-LOOPBACK-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/IPV6-LOOPBACK-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:45:39 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+InetAddressPrefixLength, = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressPrefixLength")
+Ipv6AddressPrefix, = mibBuilder.importSymbols("IPV6-TC", "Ipv6AddressPrefix")
+agentLoopbackID, = mibBuilder.importSymbols("LOOPBACK-MIB", "agentLoopbackID")
+switch, = mibBuilder.importSymbols("QUANTA-SWITCH-MIB", "switch")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Counter64, IpAddress, NotificationType, MibIdentifier, TimeTicks, Bits, iso, ModuleIdentity, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, mib_2, Gauge32, Counter32, Unsigned32, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "IpAddress", "NotificationType", "MibIdentifier", "TimeTicks", "Bits", "iso", "ModuleIdentity", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "mib-2", "Gauge32", "Counter32", "Unsigned32", "Integer32")
+TruthValue, RowStatus, DisplayString, PhysAddress, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "RowStatus", "DisplayString", "PhysAddress", "TextualConvention")
+ipv6Loopback = ModuleIdentity((1, 3, 6, 1, 4, 1, 7244, 2, 23))
+if mibBuilder.loadTexts: ipv6Loopback.setLastUpdated('201108310000Z')
+if mibBuilder.loadTexts: ipv6Loopback.setOrganization('QCI')
+agentLoopbackIpv6Group = MibIdentifier((1, 3, 6, 1, 4, 1, 7244, 2, 23, 1))
+agentLoopbackIpv6PrefixTable = MibTable((1, 3, 6, 1, 4, 1, 7244, 2, 23, 1, 1), )
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixTable.setStatus('current')
+agentLoopbackIpv6PrefixEntry = MibTableRow((1, 3, 6, 1, 4, 1, 7244, 2, 23, 1, 1, 1), ).setIndexNames((0, "LOOPBACK-MIB", "agentLoopbackID"), (0, "IPV6-LOOPBACK-MIB", "agentLoopbackIpv6PrefixPrefix"), (0, "IPV6-LOOPBACK-MIB", "agentLoopbackIpv6PrefixPrefixLen"))
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixEntry.setStatus('current')
+agentLoopbackIpv6PrefixPrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 7244, 2, 23, 1, 1, 1, 1), Ipv6AddressPrefix())
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefix.setStatus('current')
+agentLoopbackIpv6PrefixPrefixLen = MibTableColumn((1, 3, 6, 1, 4, 1, 7244, 2, 23, 1, 1, 1, 2), InetAddressPrefixLength())
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefixLen.setStatus('current')
+agentLoopbackIpv6PrefixStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 7244, 2, 23, 1, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixStatus.setStatus('current')
+mibBuilder.exportSymbols("IPV6-LOOPBACK-MIB", agentLoopbackIpv6PrefixEntry=agentLoopbackIpv6PrefixEntry, agentLoopbackIpv6PrefixStatus=agentLoopbackIpv6PrefixStatus, ipv6Loopback=ipv6Loopback, PYSNMP_MODULE_ID=ipv6Loopback, agentLoopbackIpv6Group=agentLoopbackIpv6Group, agentLoopbackIpv6PrefixPrefixLen=agentLoopbackIpv6PrefixPrefixLen, agentLoopbackIpv6PrefixTable=agentLoopbackIpv6PrefixTable, agentLoopbackIpv6PrefixPrefix=agentLoopbackIpv6PrefixPrefix)

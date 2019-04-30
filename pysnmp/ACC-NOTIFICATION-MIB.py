@@ -1,0 +1,47 @@
+#
+# PySNMP MIB module ACC-NOTIFICATION-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ACC-NOTIFICATION-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 16:56:25 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+accCommon, = mibBuilder.importSymbols("ANDOVER-CONTROLS-MIB", "accCommon")
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+Gauge32, iso, NotificationType, ObjectIdentity, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, Unsigned32, TimeTicks, Counter32, ModuleIdentity, IpAddress, Counter64, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "iso", "NotificationType", "ObjectIdentity", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "Unsigned32", "TimeTicks", "Counter32", "ModuleIdentity", "IpAddress", "Counter64", "Bits")
+RowStatus, TextualConvention, DisplayString, StorageType = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "TextualConvention", "DisplayString", "StorageType")
+accNotificationMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 10829, 4, 1))
+accNotificationMIB.setRevisions(('2002-10-30 09:46',))
+if mibBuilder.loadTexts: accNotificationMIB.setLastUpdated('200210300946Z')
+if mibBuilder.loadTexts: accNotificationMIB.setOrganization('Andover Controls Corporation')
+accNotifyObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1))
+accNotifyList = MibIdentifier((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1))
+accNotifyNumber = MibScalar((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: accNotifyNumber.setStatus('current')
+accNotifyTable = MibTable((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1, 2), )
+if mibBuilder.loadTexts: accNotifyTable.setStatus('current')
+accNotifyEntry = MibTableRow((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1, 2, 1), ).setIndexNames((0, "ACC-NOTIFICATION-MIB", "notifyIndex"))
+if mibBuilder.loadTexts: accNotifyEntry.setStatus('current')
+notifyIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1, 2, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: notifyIndex.setStatus('current')
+notifyAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1, 2, 1, 2), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: notifyAddress.setStatus('current')
+notifyType = MibTableColumn((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("none", 0), ("trap", 1))).clone('none')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: notifyType.setStatus('current')
+notifyStorageType = MibTableColumn((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1, 2, 1, 4), StorageType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: notifyStorageType.setStatus('current')
+notifyRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 10829, 4, 1, 1, 1, 2, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("active", 1), ("inActive", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: notifyRowStatus.setStatus('current')
+accNotifyConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 10829, 4, 1, 3))
+accNotifyCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 10829, 4, 1, 3, 1))
+accNotifyBasicCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 10829, 4, 1, 3, 1, 1)).setObjects(("ACC-NOTIFICATION-MIB", "accNotifyGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    accNotifyBasicCompliance = accNotifyBasicCompliance.setStatus('current')
+accNotifyGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 10829, 4, 1, 3, 2))
+accNotifyGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 10829, 4, 1, 3, 2, 1)).setObjects(("ACC-NOTIFICATION-MIB", "notifyIndex"), ("ACC-NOTIFICATION-MIB", "notifyAddress"), ("ACC-NOTIFICATION-MIB", "notifyType"), ("ACC-NOTIFICATION-MIB", "notifyStorageType"), ("ACC-NOTIFICATION-MIB", "notifyRowStatus"), ("ACC-NOTIFICATION-MIB", "accNotifyNumber"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    accNotifyGroup = accNotifyGroup.setStatus('current')
+mibBuilder.exportSymbols("ACC-NOTIFICATION-MIB", accNotifyConformance=accNotifyConformance, accNotifyNumber=accNotifyNumber, accNotifyList=accNotifyList, accNotifyObjects=accNotifyObjects, notifyType=notifyType, accNotifyTable=accNotifyTable, accNotifyBasicCompliance=accNotifyBasicCompliance, accNotifyGroups=accNotifyGroups, notifyIndex=notifyIndex, notifyRowStatus=notifyRowStatus, accNotifyEntry=accNotifyEntry, notifyStorageType=notifyStorageType, accNotifyGroup=accNotifyGroup, PYSNMP_MODULE_ID=accNotificationMIB, accNotifyCompliances=accNotifyCompliances, notifyAddress=notifyAddress, accNotificationMIB=accNotificationMIB)

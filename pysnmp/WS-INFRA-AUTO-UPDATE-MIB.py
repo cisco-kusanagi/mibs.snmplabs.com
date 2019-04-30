@@ -1,0 +1,58 @@
+#
+# PySNMP MIB module WS-INFRA-AUTO-UPDATE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/WS-INFRA-AUTO-UPDATE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:30:22 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Counter32, Bits, ModuleIdentity, TimeTicks, ObjectIdentity, Integer32, iso, IpAddress, Gauge32, Unsigned32, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Counter32", "Bits", "ModuleIdentity", "TimeTicks", "ObjectIdentity", "Integer32", "iso", "IpAddress", "Gauge32", "Unsigned32", "MibIdentifier")
+TextualConvention, DisplayString, TruthValue, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "TruthValue", "RowStatus")
+wsInfraAutoUpdate, = mibBuilder.importSymbols("WS-INFRA-SMI-MIB", "wsInfraAutoUpdate")
+DoActionNow, = mibBuilder.importSymbols("WS-TYPE-MIB", "DoActionNow")
+wsInfraAutoUpdateModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1))
+wsInfraAutoUpdateModule.setRevisions(('2007-05-02 15:56', '2007-01-22 17:34', '2006-10-07 15:17', '2006-08-11 16:34', '2006-08-09 15:40',))
+if mibBuilder.loadTexts: wsInfraAutoUpdateModule.setLastUpdated('200705021557Z')
+if mibBuilder.loadTexts: wsInfraAutoUpdateModule.setOrganization('Symbol Technologies')
+class DoActionState(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("success", 1), ("failure", 2), ("inProgress", 3))
+
+wsInfraAutoUpdateTable = MibTable((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1), )
+if mibBuilder.loadTexts: wsInfraAutoUpdateTable.setStatus('current')
+wsInfraAutoUpdateEntry = MibTableRow((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1), ).setIndexNames((0, "WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateIndex"))
+if mibBuilder.loadTexts: wsInfraAutoUpdateEntry.setStatus('current')
+wsInfraAutoUpdateIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(1, 3))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: wsInfraAutoUpdateIndex.setStatus('current')
+wsInfraAutoUpdateEnableUpdate = MibTableColumn((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateEnableUpdate.setStatus('current')
+wsInfraAutoUpdateFileLoc = MibTableColumn((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1, 3), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateFileLoc.setStatus('current')
+wsInfraAutoUpdateSvrIpAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1, 4), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateSvrIpAddr.setStatus('current')
+wsInfraAutoUpdateSvrProtocol = MibTableColumn((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 4, 8, 9, 10, 11, 12, 13))).clone(namedValues=NamedValues(("unset", 0), ("flash", 4), ("http", 8), ("ftp", 9), ("tftp", 10), ("cf", 11), ("usb1", 12), ("usb2", 13)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateSvrProtocol.setStatus('current')
+wsInfraAutoUpdateSvrUsername = MibTableColumn((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1, 6), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 49))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateSvrUsername.setStatus('current')
+wsInfraAutoUpdateSvrPassword = MibTableColumn((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1, 7), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 49))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateSvrPassword.setStatus('current')
+wsInfraAutoUpdateRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 1, 1, 8), RowStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateRowStatus.setStatus('current')
+wsInfraAutoUpdateImageFileVersion = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 29))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateImageFileVersion.setStatus('current')
+wsInfraAutoUpdateStart = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 3), DoActionNow()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraAutoUpdateStart.setStatus('current')
+wsInfraAutoUpdateMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 100))
+wsInfraAutoUpdateMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 100, 1))
+wsInfraAutoUpdateGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 100, 1, 1)).setObjects(("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateIndex"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateEnableUpdate"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateFileLoc"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateSvrIpAddr"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateSvrProtocol"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateSvrUsername"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateSvrPassword"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateStart"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateImageFileVersion"), ("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    wsInfraAutoUpdateGroup = wsInfraAutoUpdateGroup.setStatus('current')
+wsInfraAutoUpdateMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 100, 2))
+wsInfraAutoUpdateMibCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 388, 14, 1, 11, 1, 100, 2, 1)).setObjects(("WS-INFRA-AUTO-UPDATE-MIB", "wsInfraAutoUpdateGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    wsInfraAutoUpdateMibCompliance = wsInfraAutoUpdateMibCompliance.setStatus('current')
+mibBuilder.exportSymbols("WS-INFRA-AUTO-UPDATE-MIB", wsInfraAutoUpdateSvrUsername=wsInfraAutoUpdateSvrUsername, wsInfraAutoUpdateGroup=wsInfraAutoUpdateGroup, wsInfraAutoUpdateMIBConformance=wsInfraAutoUpdateMIBConformance, wsInfraAutoUpdateMIBGroups=wsInfraAutoUpdateMIBGroups, wsInfraAutoUpdateFileLoc=wsInfraAutoUpdateFileLoc, wsInfraAutoUpdateSvrProtocol=wsInfraAutoUpdateSvrProtocol, PYSNMP_MODULE_ID=wsInfraAutoUpdateModule, wsInfraAutoUpdateIndex=wsInfraAutoUpdateIndex, wsInfraAutoUpdateMIBCompliances=wsInfraAutoUpdateMIBCompliances, wsInfraAutoUpdateStart=wsInfraAutoUpdateStart, wsInfraAutoUpdateSvrPassword=wsInfraAutoUpdateSvrPassword, wsInfraAutoUpdateRowStatus=wsInfraAutoUpdateRowStatus, wsInfraAutoUpdateModule=wsInfraAutoUpdateModule, wsInfraAutoUpdateEntry=wsInfraAutoUpdateEntry, wsInfraAutoUpdateMibCompliance=wsInfraAutoUpdateMibCompliance, wsInfraAutoUpdateSvrIpAddr=wsInfraAutoUpdateSvrIpAddr, wsInfraAutoUpdateEnableUpdate=wsInfraAutoUpdateEnableUpdate, DoActionState=DoActionState, wsInfraAutoUpdateImageFileVersion=wsInfraAutoUpdateImageFileVersion, wsInfraAutoUpdateTable=wsInfraAutoUpdateTable)

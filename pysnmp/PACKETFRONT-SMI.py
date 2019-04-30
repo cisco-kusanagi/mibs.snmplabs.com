@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module PACKETFRONT-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PACKETFRONT-SMI
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:27:02 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Unsigned32, ObjectIdentity, Gauge32, TimeTicks, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, MibIdentifier, enterprises, Counter32, Counter64, NotificationType, IpAddress, Integer32, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "ObjectIdentity", "Gauge32", "TimeTicks", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "MibIdentifier", "enterprises", "Counter32", "Counter64", "NotificationType", "IpAddress", "Integer32", "iso")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+packetfront = ModuleIdentity((1, 3, 6, 1, 4, 1, 9303))
+packetfront.setRevisions(('2009-03-23 10:39', '2008-01-17 14:05', '2007-05-11 12:28',))
+if mibBuilder.loadTexts: packetfront.setLastUpdated('200903231039Z')
+if mibBuilder.loadTexts: packetfront.setOrganization('PacketFront Systems AB')
+pfProduct = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 1))
+if mibBuilder.loadTexts: pfProduct.setStatus('current')
+pfConfig = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 2))
+if mibBuilder.loadTexts: pfConfig.setStatus('current')
+ipdConfig = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 2, 1))
+if mibBuilder.loadTexts: ipdConfig.setStatus('current')
+pfExperiment = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 3))
+if mibBuilder.loadTexts: pfExperiment.setStatus('current')
+pfMgmt = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 4))
+if mibBuilder.loadTexts: pfMgmt.setStatus('current')
+pfModules = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 5))
+if mibBuilder.loadTexts: pfModules.setStatus('current')
+mibBuilder.exportSymbols("PACKETFRONT-SMI", pfProduct=pfProduct, ipdConfig=ipdConfig, pfConfig=pfConfig, pfMgmt=pfMgmt, pfModules=pfModules, pfExperiment=pfExperiment, PYSNMP_MODULE_ID=packetfront, packetfront=packetfront)

@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module ZhoneMasterAgent-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZhoneMasterAgent-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:46:41 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Counter64, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, ModuleIdentity, Integer32, ObjectIdentity, Bits, IpAddress, iso, TimeTicks, NotificationType, Unsigned32, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "ModuleIdentity", "Integer32", "ObjectIdentity", "Bits", "IpAddress", "iso", "TimeTicks", "NotificationType", "Unsigned32", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+zhoneMasterAgent, zhoneModules = mibBuilder.importSymbols("Zhone", "zhoneMasterAgent", "zhoneModules")
+zhoneMasterAgentMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5504, 6, 10))
+zhoneMasterAgentMIB.setRevisions(('2000-09-12 11:16',))
+if mibBuilder.loadTexts: zhoneMasterAgentMIB.setLastUpdated('200009121459Z')
+if mibBuilder.loadTexts: zhoneMasterAgentMIB.setOrganization('Zhone Technogogies, Inc.')
+maRequestPort = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: maRequestPort.setStatus('current')
+maTrapPort = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: maTrapPort.setStatus('current')
+maPerfSaRequests = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 3), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maPerfSaRequests.setStatus('current')
+maPerfSaResponses = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 4), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maPerfSaResponses.setStatus('current')
+maPerfSnmpErrors = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 5), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maPerfSnmpErrors.setStatus('current')
+maPerfSaTimeouts = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 6), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maPerfSaTimeouts.setStatus('current')
+mibBuilder.exportSymbols("ZhoneMasterAgent-MIB", maPerfSnmpErrors=maPerfSnmpErrors, maPerfSaResponses=maPerfSaResponses, PYSNMP_MODULE_ID=zhoneMasterAgentMIB, zhoneMasterAgentMIB=zhoneMasterAgentMIB, maPerfSaRequests=maPerfSaRequests, maTrapPort=maTrapPort, maRequestPort=maRequestPort, maPerfSaTimeouts=maPerfSaTimeouts)

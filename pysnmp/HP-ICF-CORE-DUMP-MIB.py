@@ -1,0 +1,46 @@
+#
+# PySNMP MIB module HP-ICF-CORE-DUMP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-ICF-CORE-DUMP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:21:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+hpicfCommon, = mibBuilder.importSymbols("HP-ICF-OID", "hpicfCommon")
+InetAddress, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetAddressType")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Counter64, MibIdentifier, ModuleIdentity, Unsigned32, Counter32, Integer32, IpAddress, TimeTicks, Bits, iso, NotificationType, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Counter64", "MibIdentifier", "ModuleIdentity", "Unsigned32", "Counter32", "Integer32", "IpAddress", "TimeTicks", "Bits", "iso", "NotificationType", "Gauge32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+hpicfCoreDumpMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14))
+hpicfCoreDumpMIB.setRevisions(('2010-06-13 00:00',))
+if mibBuilder.loadTexts: hpicfCoreDumpMIB.setLastUpdated('201006130000Z')
+if mibBuilder.loadTexts: hpicfCoreDumpMIB.setOrganization('Hp Networking')
+hpicfCoreDumpObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1))
+hpicfCoreDumpConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 2))
+hpicfCoreDumpConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1, 1))
+hpicfCoreDumpTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1, 1, 1), )
+if mibBuilder.loadTexts: hpicfCoreDumpTable.setStatus('current')
+hpicfCoreDumpEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1, 1, 1, 1), ).setIndexNames((0, "HP-ICF-CORE-DUMP-MIB", "hpicfCoreDumpModule"))
+if mibBuilder.loadTexts: hpicfCoreDumpEntry.setStatus('current')
+hpicfCoreDumpModule = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)))
+if mibBuilder.loadTexts: hpicfCoreDumpModule.setStatus('current')
+hpicfCoreDumpMmStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('enabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfCoreDumpMmStatus.setStatus('current')
+hpicfCoreDumpImStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('enabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfCoreDumpImStatus.setStatus('current')
+hpicfCoreDumpTftpServerAddressType = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1, 1, 2), InetAddressType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfCoreDumpTftpServerAddressType.setStatus('current')
+hpicfCoreDumpTftpServerAddress = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 1, 1, 3), InetAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfCoreDumpTftpServerAddress.setStatus('current')
+hpicfCoreDumpConfigGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 2, 1))
+hpicfCoreDumpCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 2, 2))
+hpicfCoreDumpConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 2, 1, 1)).setObjects(("HP-ICF-CORE-DUMP-MIB", "hpicfCoreDumpMmStatus"), ("HP-ICF-CORE-DUMP-MIB", "hpicfCoreDumpImStatus"), ("HP-ICF-CORE-DUMP-MIB", "hpicfCoreDumpTftpServerAddress"), ("HP-ICF-CORE-DUMP-MIB", "hpicfCoreDumpTftpServerAddressType"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfCoreDumpConfigGroup = hpicfCoreDumpConfigGroup.setStatus('current')
+hpicfCoreDumpCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 1, 14, 2, 2, 1)).setObjects(("HP-ICF-CORE-DUMP-MIB", "hpicfCoreDumpConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfCoreDumpCompliance = hpicfCoreDumpCompliance.setStatus('current')
+mibBuilder.exportSymbols("HP-ICF-CORE-DUMP-MIB", hpicfCoreDumpModule=hpicfCoreDumpModule, hpicfCoreDumpEntry=hpicfCoreDumpEntry, hpicfCoreDumpMmStatus=hpicfCoreDumpMmStatus, hpicfCoreDumpConfigGroups=hpicfCoreDumpConfigGroups, hpicfCoreDumpConfigGroup=hpicfCoreDumpConfigGroup, hpicfCoreDumpCompliances=hpicfCoreDumpCompliances, hpicfCoreDumpImStatus=hpicfCoreDumpImStatus, hpicfCoreDumpMIB=hpicfCoreDumpMIB, PYSNMP_MODULE_ID=hpicfCoreDumpMIB, hpicfCoreDumpTable=hpicfCoreDumpTable, hpicfCoreDumpCompliance=hpicfCoreDumpCompliance, hpicfCoreDumpConformance=hpicfCoreDumpConformance, hpicfCoreDumpConfig=hpicfCoreDumpConfig, hpicfCoreDumpTftpServerAddress=hpicfCoreDumpTftpServerAddress, hpicfCoreDumpObjects=hpicfCoreDumpObjects, hpicfCoreDumpTftpServerAddressType=hpicfCoreDumpTftpServerAddressType)

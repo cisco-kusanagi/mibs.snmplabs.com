@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module PORTGROUP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PORTGROUP-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:32:33 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion")
+dlink_common_mgmt, = mibBuilder.importSymbols("DLINK-ID-REC-MIB", "dlink-common-mgmt")
+PortList, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "PortList")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+IpAddress, Gauge32, NotificationType, TimeTicks, MibIdentifier, Counter32, Counter64, ObjectIdentity, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, ModuleIdentity, Bits, iso = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "Gauge32", "NotificationType", "TimeTicks", "MibIdentifier", "Counter32", "Counter64", "ObjectIdentity", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "ModuleIdentity", "Bits", "iso")
+DisplayString, TextualConvention, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention", "RowStatus")
+swPortGroupMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 12, 88))
+if mibBuilder.loadTexts: swPortGroupMIB.setLastUpdated('1001110000Z')
+if mibBuilder.loadTexts: swPortGroupMIB.setOrganization('D-Link Corp.')
+swPortGroupMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 12, 88, 1))
+swPortGroupTable = MibTable((1, 3, 6, 1, 4, 1, 171, 12, 88, 1, 1), )
+if mibBuilder.loadTexts: swPortGroupTable.setStatus('current')
+swPortGroupEntry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 12, 88, 1, 1, 1), ).setIndexNames((0, "PORTGROUP-MIB", "swPortGroupID"))
+if mibBuilder.loadTexts: swPortGroupEntry.setStatus('current')
+swPortGroupID = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 88, 1, 1, 1, 1), Integer32())
+if mibBuilder.loadTexts: swPortGroupID.setStatus('current')
+swPortGroupRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 88, 1, 1, 1, 2), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swPortGroupRowStatus.setStatus('current')
+swPortGroupName = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 88, 1, 1, 1, 3), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 16))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swPortGroupName.setStatus('current')
+swPortGroupPorts = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 88, 1, 1, 1, 4), PortList()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swPortGroupPorts.setStatus('current')
+mibBuilder.exportSymbols("PORTGROUP-MIB", swPortGroupName=swPortGroupName, PYSNMP_MODULE_ID=swPortGroupMIB, swPortGroupTable=swPortGroupTable, swPortGroupMIB=swPortGroupMIB, swPortGroupMIBObjects=swPortGroupMIBObjects, swPortGroupID=swPortGroupID, swPortGroupRowStatus=swPortGroupRowStatus, swPortGroupEntry=swPortGroupEntry, swPortGroupPorts=swPortGroupPorts)

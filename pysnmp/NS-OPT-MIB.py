@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module NS-OPT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NS-OPT-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:14:57 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Gauge32, IpAddress, MibIdentifier, enterprises, Bits, TimeTicks, ModuleIdentity, iso, Counter32, Integer32, Counter64, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Gauge32", "IpAddress", "MibIdentifier", "enterprises", "Bits", "TimeTicks", "ModuleIdentity", "iso", "Counter32", "Integer32", "Counter64", "Unsigned32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+codex = MibIdentifier((1, 3, 6, 1, 4, 1, 449))
+cdxProductSpecific = MibIdentifier((1, 3, 6, 1, 4, 1, 449, 2))
+cdx6500 = MibIdentifier((1, 3, 6, 1, 4, 1, 449, 2, 1))
+cdx6500Configuration = MibIdentifier((1, 3, 6, 1, 4, 1, 449, 2, 1, 2))
+cdx6500CfgGeneralGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 449, 2, 1, 2, 2))
+cdx6500Statistics = MibIdentifier((1, 3, 6, 1, 4, 1, 449, 2, 1, 3))
+cdx6500StatOtherStatsGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 449, 2, 1, 3, 2))
+cdx6500Controls = MibIdentifier((1, 3, 6, 1, 4, 1, 449, 2, 1, 4))
+class DisplayString(OctetString):
+    pass
+
+cdx6500NetServCfgTable = MibTable((1, 3, 6, 1, 4, 1, 449, 2, 1, 2, 2, 20), )
+if mibBuilder.loadTexts: cdx6500NetServCfgTable.setStatus('mandatory')
+cdx6500NetServCfgTableEntry = MibTableRow((1, 3, 6, 1, 4, 1, 449, 2, 1, 2, 2, 20, 1), ).setIndexNames((0, "NS-OPT-MIB", "cdx6500NetServCfgEntryNumber"))
+if mibBuilder.loadTexts: cdx6500NetServCfgTableEntry.setStatus('mandatory')
+cdx6500NetServCfgEntryNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 449, 2, 1, 2, 2, 20, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cdx6500NetServCfgEntryNumber.setStatus('mandatory')
+cdx6500NetServCfgPortAndStnId = MibTableColumn((1, 3, 6, 1, 4, 1, 449, 2, 1, 2, 2, 20, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 31))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cdx6500NetServCfgPortAndStnId.setStatus('mandatory')
+cdx6500NetServCfgFeaturesLevel = MibTableColumn((1, 3, 6, 1, 4, 1, 449, 2, 1, 2, 2, 20, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("disable", 1), ("negotiate", 2), ("required", 3), ("forceOn", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cdx6500NetServCfgFeaturesLevel.setStatus('mandatory')
+cdx6500NetServStatTable = MibTable((1, 3, 6, 1, 4, 1, 449, 2, 1, 3, 2, 11), )
+if mibBuilder.loadTexts: cdx6500NetServStatTable.setStatus('mandatory')
+cdx6500NetServStatTableEntry = MibTableRow((1, 3, 6, 1, 4, 1, 449, 2, 1, 3, 2, 11, 1), )
+if mibBuilder.loadTexts: cdx6500NetServStatTableEntry.setStatus('mandatory')
+cdx6500NetServStatUsedChannels = MibTableColumn((1, 3, 6, 1, 4, 1, 449, 2, 1, 3, 2, 11, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cdx6500NetServStatUsedChannels.setStatus('mandatory')
+cdx6500NetServStatMaxChannels = MibTableColumn((1, 3, 6, 1, 4, 1, 449, 2, 1, 3, 2, 11, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cdx6500NetServStatMaxChannels.setStatus('mandatory')
+cdx6500NetServStatUnavailChannels = MibTableColumn((1, 3, 6, 1, 4, 1, 449, 2, 1, 3, 2, 11, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cdx6500NetServStatUnavailChannels.setStatus('mandatory')
+mibBuilder.exportSymbols("NS-OPT-MIB", cdx6500NetServStatUnavailChannels=cdx6500NetServStatUnavailChannels, cdx6500CfgGeneralGroup=cdx6500CfgGeneralGroup, cdx6500NetServStatTable=cdx6500NetServStatTable, DisplayString=DisplayString, cdxProductSpecific=cdxProductSpecific, cdx6500NetServCfgPortAndStnId=cdx6500NetServCfgPortAndStnId, cdx6500StatOtherStatsGroup=cdx6500StatOtherStatsGroup, cdx6500NetServStatTableEntry=cdx6500NetServStatTableEntry, cdx6500NetServStatMaxChannels=cdx6500NetServStatMaxChannels, cdx6500NetServStatUsedChannels=cdx6500NetServStatUsedChannels, cdx6500NetServCfgTableEntry=cdx6500NetServCfgTableEntry, cdx6500Controls=cdx6500Controls, cdx6500Configuration=cdx6500Configuration, cdx6500NetServCfgFeaturesLevel=cdx6500NetServCfgFeaturesLevel, cdx6500NetServCfgEntryNumber=cdx6500NetServCfgEntryNumber, cdx6500=cdx6500, codex=codex, cdx6500NetServCfgTable=cdx6500NetServCfgTable, cdx6500Statistics=cdx6500Statistics)

@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module NMS-QOS-QUEUE (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NMS-QOS-QUEUE
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:12:40 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+nmstemporary, = mibBuilder.importSymbols("NMS-SMI", "nmstemporary")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+NotificationType, MibIdentifier, iso, Counter64, Gauge32, TimeTicks, Bits, Unsigned32, Counter32, Integer32, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "MibIdentifier", "iso", "Counter64", "Gauge32", "TimeTicks", "Bits", "Unsigned32", "Counter32", "Integer32", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+nmsQosQueue = MibIdentifier((1, 3, 6, 1, 4, 1, 11606, 10, 3, 7))
+nmsQosQueueTable = MibTable((1, 3, 6, 1, 4, 1, 11606, 10, 3, 7, 1), )
+if mibBuilder.loadTexts: nmsQosQueueTable.setStatus('mandatory')
+nmsQosQueueEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11606, 10, 3, 7, 1, 1), ).setIndexNames((0, "NMS-QOS-QUEUE", "ifIndex"), (0, "NMS-QOS-QUEUE", "queueNo"))
+if mibBuilder.loadTexts: nmsQosQueueEntry.setStatus('mandatory')
+ifIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 3, 7, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ifIndex.setStatus('mandatory')
+queueNo = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 3, 7, 1, 1, 2), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: queueNo.setStatus('mandatory')
+queueLen = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 3, 7, 1, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: queueLen.setStatus('mandatory')
+queueDrops = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 3, 7, 1, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: queueDrops.setStatus('mandatory')
+queueCross = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 3, 7, 1, 1, 5), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: queueCross.setStatus('mandatory')
+mibBuilder.exportSymbols("NMS-QOS-QUEUE", ifIndex=ifIndex, queueLen=queueLen, queueDrops=queueDrops, queueNo=queueNo, queueCross=queueCross, nmsQosQueueTable=nmsQosQueueTable, nmsQosQueue=nmsQosQueue, nmsQosQueueEntry=nmsQosQueueEntry)

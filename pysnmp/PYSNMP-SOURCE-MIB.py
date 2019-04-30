@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module PYSNMP-SOURCE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PYSNMP-SOURCE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:34:19 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint")
+pysnmpModuleIDs, = mibBuilder.importSymbols("PYSNMP-MIB", "pysnmpModuleIDs")
+snmpTargetAddrEntry, = mibBuilder.importSymbols("SNMP-TARGET-MIB", "snmpTargetAddrEntry")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+TimeTicks, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Unsigned32, Bits, Integer32, ModuleIdentity, ObjectIdentity, MibIdentifier, IpAddress, Counter64, iso, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Unsigned32", "Bits", "Integer32", "ModuleIdentity", "ObjectIdentity", "MibIdentifier", "IpAddress", "Counter64", "iso", "Gauge32")
+TAddress, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "TAddress", "DisplayString", "TextualConvention")
+pysnmpSourceMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 20408, 3, 1, 8))
+pysnmpSourceMIB.setRevisions(('2017-04-14 00:00', '2015-01-16 00:00',))
+if mibBuilder.loadTexts: pysnmpSourceMIB.setLastUpdated('201704140000Z')
+if mibBuilder.loadTexts: pysnmpSourceMIB.setOrganization('The PySNMP Project')
+pysnmpSourceMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 20408, 3, 1, 8, 1))
+pysnmpSourceMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 20408, 3, 1, 8, 2))
+snmpSourceAddrTable = MibTable((1, 3, 6, 1, 4, 1, 20408, 3, 1, 8, 1, 1), )
+if mibBuilder.loadTexts: snmpSourceAddrTable.setStatus('current')
+snmpSourceAddrEntry = MibTableRow((1, 3, 6, 1, 4, 1, 20408, 3, 1, 8, 1, 1, 1), )
+snmpTargetAddrEntry.registerAugmentions(("PYSNMP-SOURCE-MIB", "snmpSourceAddrEntry"))
+snmpSourceAddrEntry.setIndexNames(*snmpTargetAddrEntry.getIndexNames())
+if mibBuilder.loadTexts: snmpSourceAddrEntry.setStatus('current')
+snmpSourceAddrTAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 20408, 3, 1, 8, 1, 1, 1, 1), TAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: snmpSourceAddrTAddress.setStatus('current')
+pysnmpSourceMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 20408, 3, 1, 8, 2, 1))
+pysnmpSourceMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 20408, 3, 1, 8, 2, 2))
+mibBuilder.exportSymbols("PYSNMP-SOURCE-MIB", pysnmpSourceMIB=pysnmpSourceMIB, PYSNMP_MODULE_ID=pysnmpSourceMIB, snmpSourceAddrTable=snmpSourceAddrTable, snmpSourceAddrEntry=snmpSourceAddrEntry, pysnmpSourceMIBCompliances=pysnmpSourceMIBCompliances, pysnmpSourceMIBGroups=pysnmpSourceMIBGroups, snmpSourceAddrTAddress=snmpSourceAddrTAddress, pysnmpSourceMIBConformance=pysnmpSourceMIBConformance, pysnmpSourceMIBObjects=pysnmpSourceMIBObjects)

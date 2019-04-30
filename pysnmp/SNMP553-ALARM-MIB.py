@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module SNMP553-ALARM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SNMP553-ALARM-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:00:38 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+snmp553s, = mibBuilder.importSymbols("SNMP553S-MGMT-MIB", "snmp553s")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Integer32, NotificationType, Bits, IpAddress, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Unsigned32, ModuleIdentity, ObjectIdentity, Gauge32, Counter32, Counter64, TimeTicks, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "NotificationType", "Bits", "IpAddress", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Unsigned32", "ModuleIdentity", "ObjectIdentity", "Gauge32", "Counter32", "Counter64", "TimeTicks", "iso")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+snmp553sTextAlarm = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 6, 3, 9))
+snmp553sTextAlarmMIBversion = MibScalar((1, 3, 6, 1, 4, 1, 498, 6, 3, 9, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(5, 5)).setFixedLength(5)).setMaxAccess("readonly")
+if mibBuilder.loadTexts: snmp553sTextAlarmMIBversion.setStatus('mandatory')
+snmp553sTextAlarmGlobal = MibScalar((1, 3, 6, 1, 4, 1, 498, 6, 3, 9, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("disable", 1), ("enable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: snmp553sTextAlarmGlobal.setStatus('mandatory')
+snmp553sTextAlarmTable = MibTable((1, 3, 6, 1, 4, 1, 498, 6, 3, 9, 3), )
+if mibBuilder.loadTexts: snmp553sTextAlarmTable.setStatus('mandatory')
+snmp553sTextAlarmEntry = MibTableRow((1, 3, 6, 1, 4, 1, 498, 6, 3, 9, 3, 1), ).setIndexNames((0, "SNMP553-ALARM-MIB", "alarmNumber"))
+if mibBuilder.loadTexts: snmp553sTextAlarmEntry.setStatus('mandatory')
+alarmNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 498, 6, 3, 9, 3, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alarmNumber.setStatus('mandatory')
+description = MibTableColumn((1, 3, 6, 1, 4, 1, 498, 6, 3, 9, 3, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: description.setStatus('mandatory')
+status = MibTableColumn((1, 3, 6, 1, 4, 1, 498, 6, 3, 9, 3, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("inactive", 1), ("active", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: status.setStatus('mandatory')
+snmp553sTextAlarmTrap = NotificationType((1, 3, 6, 1, 4, 1, 498, 6, 3) + (0,1)).setObjects(("SNMP553-ALARM-MIB", "description"), ("SNMP553-ALARM-MIB", "status"))
+mibBuilder.exportSymbols("SNMP553-ALARM-MIB", snmp553sTextAlarmTrap=snmp553sTextAlarmTrap, description=description, snmp553sTextAlarmGlobal=snmp553sTextAlarmGlobal, alarmNumber=alarmNumber, snmp553sTextAlarm=snmp553sTextAlarm, snmp553sTextAlarmEntry=snmp553sTextAlarmEntry, status=status, snmp553sTextAlarmTable=snmp553sTextAlarmTable, snmp553sTextAlarmMIBversion=snmp553sTextAlarmMIBversion)

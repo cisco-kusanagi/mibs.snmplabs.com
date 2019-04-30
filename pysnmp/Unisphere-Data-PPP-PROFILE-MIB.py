@@ -1,0 +1,90 @@
+#
+# PySNMP MIB module Unisphere-Data-PPP-PROFILE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Unisphere-Data-PPP-PROFILE-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:25:09 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+iso, ObjectIdentity, Bits, Integer32, Counter32, Counter64, IpAddress, ModuleIdentity, Gauge32, Unsigned32, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "ObjectIdentity", "Bits", "Integer32", "Counter32", "Counter64", "IpAddress", "ModuleIdentity", "Gauge32", "Unsigned32", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+usDataMibs, = mibBuilder.importSymbols("Unisphere-Data-MIBs", "usDataMibs")
+UsdPppAuthentication, = mibBuilder.importSymbols("Unisphere-Data-PPP-MIB", "UsdPppAuthentication")
+UsdSetMap, UsdName, UsdEnable = mibBuilder.importSymbols("Unisphere-Data-TC", "UsdSetMap", "UsdName", "UsdEnable")
+usdPppProfileMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45))
+usdPppProfileMIB.setRevisions(('2002-01-25 14:00', '2002-01-16 17:58', '2002-01-08 19:43', '2001-10-02 12:41',))
+if mibBuilder.loadTexts: usdPppProfileMIB.setLastUpdated('200201251400Z')
+if mibBuilder.loadTexts: usdPppProfileMIB.setOrganization('Unisphere Networks, Inc.')
+usdPppProfileObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1))
+usdPppProfile = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1))
+usdPppProfileTable = MibTable((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1), )
+if mibBuilder.loadTexts: usdPppProfileTable.setStatus('current')
+usdPppProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1), ).setIndexNames((0, "Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileId"))
+if mibBuilder.loadTexts: usdPppProfileEntry.setStatus('current')
+usdPppProfileId = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 1), Unsigned32())
+if mibBuilder.loadTexts: usdPppProfileId.setStatus('current')
+usdPppProfileSetMap = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 2), UsdSetMap()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileSetMap.setStatus('current')
+usdPppProfileLcpMagicNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("false", 1), ("true", 2))).clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileLcpMagicNumber.setStatus('current')
+usdPppProfileLcpKeepalive = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(0, 0), ValueRangeConstraint(30, 300), )).clone(30)).setUnits('seconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileLcpKeepalive.setStatus('current')
+usdPppProfileLcpAuthentication = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 5), UsdPppAuthentication().clone('none')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileLcpAuthentication.setStatus('current')
+usdPppProfileIpPeerDnsPriority = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 6), UsdEnable().clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileIpPeerDnsPriority.setStatus('current')
+usdPppProfileIpPeerWinsPriority = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 7), UsdEnable().clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileIpPeerWinsPriority.setStatus('current')
+usdPppProfileLcpInitialMRU = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 8), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(1, 1), ValueRangeConstraint(64, 65535), )).clone(1)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileLcpInitialMRU.setStatus('current')
+usdPppProfilePacketLog = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 9), UsdEnable().clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfilePacketLog.setStatus('current')
+usdPppProfileStateLog = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 10), UsdEnable().clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileStateLog.setStatus('current')
+usdPppProfileChapMinChallengeLength = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 11), Integer32().subtype(subtypeSpec=ValueRangeConstraint(8, 63)).clone(16)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileChapMinChallengeLength.setStatus('current')
+usdPppProfileChapMaxChallengeLength = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 12), Integer32().subtype(subtypeSpec=ValueRangeConstraint(8, 63)).clone(32)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileChapMaxChallengeLength.setStatus('current')
+usdPppProfilePassiveMode = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 13), UsdEnable().clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfilePassiveMode.setStatus('current')
+usdPppProfileMlppp = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 14), UsdEnable().clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileMlppp.setStatus('current')
+usdPppProfileIpcpNetmask = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 15), UsdEnable().clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileIpcpNetmask.setStatus('current')
+usdPppProfileAuthenticatorVirtualRouter = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 1, 1, 1, 1, 16), UsdName()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: usdPppProfileAuthenticatorVirtualRouter.setStatus('current')
+usdPppProfileConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4))
+usdPppProfileCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 1))
+usdPppProfileGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 2))
+usdPppProfileCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 1, 1)).setObjects(("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdPppProfileCompliance = usdPppProfileCompliance.setStatus('obsolete')
+usdPppProfileCompliance2 = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 1, 2)).setObjects(("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileGroup2"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdPppProfileCompliance2 = usdPppProfileCompliance2.setStatus('obsolete')
+usdPppProfileCompliance3 = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 1, 3)).setObjects(("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileGroup3"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdPppProfileCompliance3 = usdPppProfileCompliance3.setStatus('obsolete')
+usdPppProfileCompliance4 = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 1, 4)).setObjects(("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileGroup4"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdPppProfileCompliance4 = usdPppProfileCompliance4.setStatus('current')
+usdPppProfileGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 2, 1)).setObjects(("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileSetMap"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpMagicNumber"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpKeepalive"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpAuthentication"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpPeerDnsPriority"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpPeerWinsPriority"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpInitialMRU"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfilePacketLog"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileStateLog"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileChapMinChallengeLength"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileChapMaxChallengeLength"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfilePassiveMode"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdPppProfileGroup = usdPppProfileGroup.setStatus('obsolete')
+usdPppProfileGroup2 = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 2, 2)).setObjects(("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileSetMap"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpMagicNumber"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpKeepalive"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpAuthentication"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpPeerDnsPriority"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpPeerWinsPriority"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpInitialMRU"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfilePacketLog"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileStateLog"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileChapMinChallengeLength"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileChapMaxChallengeLength"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfilePassiveMode"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileMlppp"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdPppProfileGroup2 = usdPppProfileGroup2.setStatus('obsolete')
+usdPppProfileGroup3 = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 2, 3)).setObjects(("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileSetMap"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpMagicNumber"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpKeepalive"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpAuthentication"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpPeerDnsPriority"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpPeerWinsPriority"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpInitialMRU"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfilePacketLog"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileStateLog"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileChapMinChallengeLength"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileChapMaxChallengeLength"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfilePassiveMode"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileMlppp"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpcpNetmask"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdPppProfileGroup3 = usdPppProfileGroup3.setStatus('obsolete')
+usdPppProfileGroup4 = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 45, 4, 2, 4)).setObjects(("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileSetMap"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpMagicNumber"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpKeepalive"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpAuthentication"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpPeerDnsPriority"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpPeerWinsPriority"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileLcpInitialMRU"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfilePacketLog"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileStateLog"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileChapMinChallengeLength"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileChapMaxChallengeLength"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfilePassiveMode"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileMlppp"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileIpcpNetmask"), ("Unisphere-Data-PPP-PROFILE-MIB", "usdPppProfileAuthenticatorVirtualRouter"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usdPppProfileGroup4 = usdPppProfileGroup4.setStatus('current')
+mibBuilder.exportSymbols("Unisphere-Data-PPP-PROFILE-MIB", usdPppProfileStateLog=usdPppProfileStateLog, usdPppProfileConformance=usdPppProfileConformance, usdPppProfileIpcpNetmask=usdPppProfileIpcpNetmask, PYSNMP_MODULE_ID=usdPppProfileMIB, usdPppProfileMIB=usdPppProfileMIB, usdPppProfile=usdPppProfile, usdPppProfileLcpKeepalive=usdPppProfileLcpKeepalive, usdPppProfileEntry=usdPppProfileEntry, usdPppProfileMlppp=usdPppProfileMlppp, usdPppProfileIpPeerWinsPriority=usdPppProfileIpPeerWinsPriority, usdPppProfileGroup2=usdPppProfileGroup2, usdPppProfileObjects=usdPppProfileObjects, usdPppProfilePassiveMode=usdPppProfilePassiveMode, usdPppProfileCompliance=usdPppProfileCompliance, usdPppProfileLcpInitialMRU=usdPppProfileLcpInitialMRU, usdPppProfileSetMap=usdPppProfileSetMap, usdPppProfileTable=usdPppProfileTable, usdPppProfileGroup3=usdPppProfileGroup3, usdPppProfileId=usdPppProfileId, usdPppProfilePacketLog=usdPppProfilePacketLog, usdPppProfileAuthenticatorVirtualRouter=usdPppProfileAuthenticatorVirtualRouter, usdPppProfileChapMaxChallengeLength=usdPppProfileChapMaxChallengeLength, usdPppProfileGroup=usdPppProfileGroup, usdPppProfileLcpAuthentication=usdPppProfileLcpAuthentication, usdPppProfileCompliance4=usdPppProfileCompliance4, usdPppProfileCompliance3=usdPppProfileCompliance3, usdPppProfileGroups=usdPppProfileGroups, usdPppProfileIpPeerDnsPriority=usdPppProfileIpPeerDnsPriority, usdPppProfileCompliances=usdPppProfileCompliances, usdPppProfileChapMinChallengeLength=usdPppProfileChapMinChallengeLength, usdPppProfileLcpMagicNumber=usdPppProfileLcpMagicNumber, usdPppProfileGroup4=usdPppProfileGroup4, usdPppProfileCompliance2=usdPppProfileCompliance2)

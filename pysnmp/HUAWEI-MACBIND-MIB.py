@@ -1,0 +1,40 @@
+#
+# PySNMP MIB module HUAWEI-MACBIND-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HUAWEI-MACBIND-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:34:47 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+hwDatacomm, = mibBuilder.importSymbols("HUAWEI-MIB", "hwDatacomm")
+mplsVpnVrfName, = mibBuilder.importSymbols("MPLS-VPN-MIB", "mplsVpnVrfName")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+ModuleIdentity, TimeTicks, Counter64, ObjectIdentity, Unsigned32, IpAddress, Integer32, iso, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Counter32, Bits, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "TimeTicks", "Counter64", "ObjectIdentity", "Unsigned32", "IpAddress", "Integer32", "iso", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Counter32", "Bits", "MibIdentifier")
+RowStatus, MacAddress, TextualConvention, DisplayString, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "MacAddress", "TextualConvention", "DisplayString", "TruthValue")
+hwMACBIND = ModuleIdentity((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9))
+if mibBuilder.loadTexts: hwMACBIND.setLastUpdated('200304110900Z')
+if mibBuilder.loadTexts: hwMACBIND.setOrganization('Huawei Technologies co.,Ltd.')
+hwMacBindMibObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 1))
+hwMacBindEnableFlag = MibScalar((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 1, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwMacBindEnableFlag.setStatus('current')
+hwMacBindTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 1, 2), )
+if mibBuilder.loadTexts: hwMacBindTable.setStatus('current')
+hwMacBindEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 1, 2, 1), ).setIndexNames((0, "MPLS-VPN-MIB", "mplsVpnVrfName"), (0, "HUAWEI-MACBIND-MIB", "hwMacBindIPAddress"))
+if mibBuilder.loadTexts: hwMacBindEntry.setStatus('current')
+hwMacBindIPAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 1, 2, 1, 1), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwMacBindIPAddress.setStatus('current')
+hwMacBindMacAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 1, 2, 1, 2), MacAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hwMacBindMacAddress.setStatus('current')
+hwMacBindRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 1, 2, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hwMacBindRowStatus.setStatus('current')
+hwMacBindMibConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 2))
+hwMacBindMibGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 2, 1))
+hwMacBindTableGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 2, 1, 1)).setObjects(("HUAWEI-MACBIND-MIB", "hwMacBindIPAddress"), ("HUAWEI-MACBIND-MIB", "hwMacBindMacAddress"), ("HUAWEI-MACBIND-MIB", "hwMacBindRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwMacBindTableGroup = hwMacBindTableGroup.setStatus('current')
+hwMacBindEnableGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2011, 5, 25, 9, 2, 1, 2)).setObjects(("HUAWEI-MACBIND-MIB", "hwMacBindEnableFlag"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwMacBindEnableGroup = hwMacBindEnableGroup.setStatus('current')
+mibBuilder.exportSymbols("HUAWEI-MACBIND-MIB", hwMacBindEnableFlag=hwMacBindEnableFlag, hwMacBindIPAddress=hwMacBindIPAddress, hwMacBindMacAddress=hwMacBindMacAddress, hwMacBindTableGroup=hwMacBindTableGroup, hwMacBindRowStatus=hwMacBindRowStatus, hwMACBIND=hwMACBIND, hwMacBindMibConformance=hwMacBindMibConformance, PYSNMP_MODULE_ID=hwMACBIND, hwMacBindTable=hwMacBindTable, hwMacBindMibGroup=hwMacBindMibGroup, hwMacBindEntry=hwMacBindEntry, hwMacBindEnableGroup=hwMacBindEnableGroup, hwMacBindMibObjects=hwMacBindMibObjects)

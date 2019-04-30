@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module TIARA-NETWORKS-PRODUCTS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TIARA-NETWORKS-PRODUCTS-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 21:09:08 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, Gauge32, Counter32, Bits, NotificationType, iso, Unsigned32, ObjectIdentity, IpAddress, Counter64, MibIdentifier, Integer32, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Gauge32", "Counter32", "Bits", "NotificationType", "iso", "Unsigned32", "ObjectIdentity", "IpAddress", "Counter64", "MibIdentifier", "Integer32", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+tiaraProducts, tiaraModules = mibBuilder.importSymbols("TIARA-NETWORKS-SMI", "tiaraProducts", "tiaraModules")
+tiaraProductsMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 3174, 3, 1))
+tiaraProductsMIB.setRevisions(('1999-04-23 00:00',))
+if mibBuilder.loadTexts: tiaraProductsMIB.setLastUpdated('9904230000Z')
+if mibBuilder.loadTexts: tiaraProductsMIB.setOrganization('Tiara Networks, Inc.')
+tiara1400 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 1))
+tiara6100 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 2))
+tiara6200 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 3))
+tiara6300 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 4))
+tiara1200 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 5))
+tiara1250 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 6))
+tiara1450 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 7))
+tiara7011 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 8))
+tiara7030 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 9))
+tiara7050 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 10))
+tiara4100 = MibIdentifier((1, 3, 6, 1, 4, 1, 3174, 1, 11))
+mibBuilder.exportSymbols("TIARA-NETWORKS-PRODUCTS-MIB", tiara7050=tiara7050, tiara6200=tiara6200, tiara6100=tiara6100, tiara6300=tiara6300, tiara7030=tiara7030, tiaraProductsMIB=tiaraProductsMIB, tiara4100=tiara4100, tiara1200=tiara1200, tiara1400=tiara1400, tiara1450=tiara1450, tiara1250=tiara1250, tiara7011=tiara7011, PYSNMP_MODULE_ID=tiaraProductsMIB)

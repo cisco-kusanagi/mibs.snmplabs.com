@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module BROCADE-CONTEXT-MAPPING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BROCADE-CONTEXT-MAPPING-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 17:23:42 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection")
+bcsiModules, = mibBuilder.importSymbols("Brocade-REG-MIB", "bcsiModules")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+Counter32, ObjectIdentity, IpAddress, iso, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, NotificationType, Bits, ModuleIdentity, Integer32, TimeTicks, Gauge32, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "ObjectIdentity", "IpAddress", "iso", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "NotificationType", "Bits", "ModuleIdentity", "Integer32", "TimeTicks", "Gauge32", "MibIdentifier")
+DisplayString, TextualConvention, StorageType, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention", "StorageType", "RowStatus")
+brocadeContextMappingMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7))
+brocadeContextMappingMIB.setRevisions(('2015-06-18 00:00',))
+if mibBuilder.loadTexts: brocadeContextMappingMIB.setLastUpdated('201506180000Z')
+if mibBuilder.loadTexts: brocadeContextMappingMIB.setOrganization(' Brocade Communications Systems, Inc.')
+bContextMapMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 0))
+bContextMapMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1))
+bContextMapMIBConform = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2))
+bcmContexMapConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1))
+bcmContextMappingTable = MibTable((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1), )
+if mibBuilder.loadTexts: bcmContextMappingTable.setStatus('current')
+bcmContextMappingEntry = MibTableRow((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1), ).setIndexNames((0, "BROCADE-CONTEXT-MAPPING-MIB", "bcmContextMappingVacmContextName"))
+if mibBuilder.loadTexts: bcmContextMappingEntry.setStatus('current')
+bcmContextMappingVacmContextName = MibTableColumn((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1, 1), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 32)))
+if mibBuilder.loadTexts: bcmContextMappingVacmContextName.setStatus('current')
+bcmContextMappingVrfName = MibTableColumn((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1, 2), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bcmContextMappingVrfName.setStatus('current')
+bcmContextMappingStorageType = MibTableColumn((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1, 3), StorageType().clone('nonVolatile')).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bcmContextMappingStorageType.setStatus('current')
+bcmContextMappingRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1, 4), RowStatus()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bcmContextMappingRowStatus.setStatus('current')
+brocadeContextMapMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2, 1))
+brocadeContextMapMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2, 2))
+brocadeContextMapMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2, 1, 1)).setObjects(("BROCADE-CONTEXT-MAPPING-MIB", "brocadeContextMapConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    brocadeContextMapMIBCompliance = brocadeContextMapMIBCompliance.setStatus('current')
+brocadeContextMapConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2, 2, 1)).setObjects(("BROCADE-CONTEXT-MAPPING-MIB", "bcmContextMappingVrfName"), ("BROCADE-CONTEXT-MAPPING-MIB", "bcmContextMappingStorageType"), ("BROCADE-CONTEXT-MAPPING-MIB", "bcmContextMappingRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    brocadeContextMapConfigGroup = brocadeContextMapConfigGroup.setStatus('current')
+mibBuilder.exportSymbols("BROCADE-CONTEXT-MAPPING-MIB", brocadeContextMapMIBGroups=brocadeContextMapMIBGroups, PYSNMP_MODULE_ID=brocadeContextMappingMIB, bContextMapMIBObjects=bContextMapMIBObjects, bcmContextMappingEntry=bcmContextMappingEntry, bcmContextMappingVrfName=bcmContextMappingVrfName, bcmContextMappingStorageType=bcmContextMappingStorageType, brocadeContextMapMIBCompliance=brocadeContextMapMIBCompliance, brocadeContextMappingMIB=brocadeContextMappingMIB, bcmContexMapConfig=bcmContexMapConfig, bcmContextMappingTable=bcmContextMappingTable, brocadeContextMapMIBCompliances=brocadeContextMapMIBCompliances, bContextMapMIBConform=bContextMapMIBConform, bContextMapMIBNotifs=bContextMapMIBNotifs, bcmContextMappingVacmContextName=bcmContextMappingVacmContextName, brocadeContextMapConfigGroup=brocadeContextMapConfigGroup, bcmContextMappingRowStatus=bcmContextMappingRowStatus)

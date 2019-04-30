@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module MITEL-RIP2EXTENSION-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MITEL-RIP2EXTENSION-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:03:15 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint")
+rip2IfConfAddress, = mibBuilder.importSymbols("RIPv2-MIB", "rip2IfConfAddress")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, Unsigned32, MibIdentifier, iso, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, Counter64, enterprises, IpAddress, NotificationType, ObjectIdentity, Bits, Counter32, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "Unsigned32", "MibIdentifier", "iso", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "Counter64", "enterprises", "IpAddress", "NotificationType", "ObjectIdentity", "Bits", "Counter32", "Integer32")
+RowStatus, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "DisplayString", "TextualConvention")
+mitelRouterRipExtensionGroup = ModuleIdentity((1, 3, 6, 1, 4, 1, 1027, 4, 8, 1, 6))
+mitelRouterRipExtensionGroup.setRevisions(('2003-03-24 10:36', '1999-03-01 00:00',))
+if mibBuilder.loadTexts: mitelRouterRipExtensionGroup.setLastUpdated('200303241036Z')
+if mibBuilder.loadTexts: mitelRouterRipExtensionGroup.setOrganization('MITEL Corporation')
+mitel = MibIdentifier((1, 3, 6, 1, 4, 1, 1027))
+mitelProprietary = MibIdentifier((1, 3, 6, 1, 4, 1, 1027, 4))
+mitelPropIpNetworking = MibIdentifier((1, 3, 6, 1, 4, 1, 1027, 4, 8))
+mitelIpNetRouter = MibIdentifier((1, 3, 6, 1, 4, 1, 1027, 4, 8, 1))
+mitelRipExtGrpIfConfTable = MibTable((1, 3, 6, 1, 4, 1, 1027, 4, 8, 1, 6, 1), )
+if mibBuilder.loadTexts: mitelRipExtGrpIfConfTable.setStatus('current')
+mitelRipExtGrpIfConfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 1027, 4, 8, 1, 6, 1, 1), ).setIndexNames((0, "RIPv2-MIB", "rip2IfConfAddress"))
+if mibBuilder.loadTexts: mitelRipExtGrpIfConfEntry.setStatus('current')
+mitelIfConfTblSendDefaultRoutes = MibTableColumn((1, 3, 6, 1, 4, 1, 1027, 4, 8, 1, 6, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: mitelIfConfTblSendDefaultRoutes.setStatus('current')
+mitelIfConfTblRipType = MibTableColumn((1, 3, 6, 1, 4, 1, 1027, 4, 8, 1, 6, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("rip", 1), ("triggerRip", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: mitelIfConfTblRipType.setStatus('current')
+mitelIfConfTblRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 1027, 4, 8, 1, 6, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: mitelIfConfTblRowStatus.setStatus('current')
+mibBuilder.exportSymbols("MITEL-RIP2EXTENSION-MIB", mitelIfConfTblRipType=mitelIfConfTblRipType, mitelIfConfTblSendDefaultRoutes=mitelIfConfTblSendDefaultRoutes, mitelIfConfTblRowStatus=mitelIfConfTblRowStatus, mitelPropIpNetworking=mitelPropIpNetworking, mitelRipExtGrpIfConfEntry=mitelRipExtGrpIfConfEntry, mitelProprietary=mitelProprietary, PYSNMP_MODULE_ID=mitelRouterRipExtensionGroup, mitelIpNetRouter=mitelIpNetRouter, mitelRouterRipExtensionGroup=mitelRouterRipExtensionGroup, mitelRipExtGrpIfConfTable=mitelRipExtGrpIfConfTable, mitel=mitel)

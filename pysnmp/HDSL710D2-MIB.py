@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module HDSL710D2-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HDSL710D2-MIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 19:12:03 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+hdsl710D2, = mibBuilder.importSymbols("GDCHDSL-MIB", "hdsl710D2")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, IpAddress, Unsigned32, iso, Counter32, ModuleIdentity, Bits, Integer32, Gauge32, ObjectIdentity, MibIdentifier, Counter64, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "IpAddress", "Unsigned32", "iso", "Counter32", "ModuleIdentity", "Bits", "Integer32", "Gauge32", "ObjectIdentity", "MibIdentifier", "Counter64", "TimeTicks")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hdsl710D2System = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 1))
+hdsl710D2Version = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 1, 1))
+gdc710D2SystemMIBversion = MibScalar((1, 3, 6, 1, 4, 1, 498, 11, 9, 1, 1, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(5, 5)).setFixedLength(5)).setMaxAccess("readonly")
+if mibBuilder.loadTexts: gdc710D2SystemMIBversion.setStatus('mandatory')
+hdsl710D2Alarms = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2))
+hdsl710D2NoResponseAlm = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 1))
+hdsl710D2DiagRxErrAlm = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 2))
+hdsl710D2PowerUpAlm = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 3))
+hdsl710D2UnitFailure = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 4))
+hdsl710D2ChecksumCorrupt = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 5))
+hdsl710D2LossofSignal = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 6))
+hdsl710D2UnavailableSec = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 7))
+hdsl710D2ErrorSec = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 8))
+hdsl710D2LossofSyncWord = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 9))
+hdsl710D2MajorBER = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 10))
+hdsl710D2MinorBER = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 9, 2, 11))
+mibBuilder.exportSymbols("HDSL710D2-MIB", hdsl710D2LossofSignal=hdsl710D2LossofSignal, hdsl710D2Alarms=hdsl710D2Alarms, hdsl710D2UnitFailure=hdsl710D2UnitFailure, hdsl710D2System=hdsl710D2System, hdsl710D2UnavailableSec=hdsl710D2UnavailableSec, hdsl710D2LossofSyncWord=hdsl710D2LossofSyncWord, gdc710D2SystemMIBversion=gdc710D2SystemMIBversion, hdsl710D2Version=hdsl710D2Version, hdsl710D2ChecksumCorrupt=hdsl710D2ChecksumCorrupt, hdsl710D2MajorBER=hdsl710D2MajorBER, hdsl710D2DiagRxErrAlm=hdsl710D2DiagRxErrAlm, hdsl710D2ErrorSec=hdsl710D2ErrorSec, hdsl710D2MinorBER=hdsl710D2MinorBER, hdsl710D2NoResponseAlm=hdsl710D2NoResponseAlm, hdsl710D2PowerUpAlm=hdsl710D2PowerUpAlm)

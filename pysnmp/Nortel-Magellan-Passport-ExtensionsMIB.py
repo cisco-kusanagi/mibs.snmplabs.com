@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module Nortel-Magellan-Passport-ExtensionsMIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Nortel-Magellan-Passport-ExtensionsMIB
+# Produced by pysmi-0.3.4 at Mon Apr 29 20:17:31 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+RowPointer, = mibBuilder.importSymbols("Nortel-Magellan-Passport-StandardTextualConventionsMIB", "RowPointer")
+components, passportMIBs = mibBuilder.importSymbols("Nortel-Magellan-Passport-UsefulDefinitionsMIB", "components", "passportMIBs")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, Counter32, iso, Bits, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, ModuleIdentity, MibIdentifier, Counter64, IpAddress, Integer32, TimeTicks, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "Counter32", "iso", "Bits", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "ModuleIdentity", "MibIdentifier", "Counter64", "IpAddress", "Integer32", "TimeTicks", "NotificationType")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+extensionsMIB = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5))
+extensions = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 1, 4))
+extensionIfTable = MibTable((1, 3, 6, 1, 4, 1, 562, 2, 4, 1, 4, 1), )
+if mibBuilder.loadTexts: extensionIfTable.setStatus('mandatory')
+extensionIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 562, 2, 4, 1, 4, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: extensionIfEntry.setStatus('mandatory')
+ifRowPointer = MibTableColumn((1, 3, 6, 1, 4, 1, 562, 2, 4, 1, 4, 1, 1, 1), RowPointer()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: ifRowPointer.setStatus('mandatory')
+extensionsGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5, 1))
+extensionsGroupBC = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5, 1, 3))
+extensionsGroupBC02 = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5, 1, 3, 2))
+extensionsGroupBC02A = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5, 1, 3, 2, 2))
+extensionsCapabilities = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5, 3))
+extensionsCapabilitiesBC = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5, 3, 3))
+extensionsCapabilitiesBC02 = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5, 3, 3, 2))
+extensionsCapabilitiesBC02A = MibIdentifier((1, 3, 6, 1, 4, 1, 562, 2, 4, 2, 5, 3, 3, 2, 2))
+mibBuilder.exportSymbols("Nortel-Magellan-Passport-ExtensionsMIB", extensionsCapabilities=extensionsCapabilities, extensionsCapabilitiesBC02A=extensionsCapabilitiesBC02A, extensionIfEntry=extensionIfEntry, extensionsCapabilitiesBC=extensionsCapabilitiesBC, extensionsGroupBC02A=extensionsGroupBC02A, extensionsCapabilitiesBC02=extensionsCapabilitiesBC02, extensionsGroup=extensionsGroup, extensionsGroupBC=extensionsGroupBC, ifRowPointer=ifRowPointer, extensions=extensions, extensionsGroupBC02=extensionsGroupBC02, extensionIfTable=extensionIfTable, extensionsMIB=extensionsMIB)
