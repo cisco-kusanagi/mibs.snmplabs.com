@@ -1,0 +1,55 @@
+#
+# PySNMP MIB module PDN-DHCP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PDN-DHCP-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:38:26 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+pdn_common, = mibBuilder.importSymbols("PDN-HEADER-MIB", "pdn-common")
+SwitchState, = mibBuilder.importSymbols("PDN-TC", "SwitchState")
+dot1qVlanStaticEntry, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "dot1qVlanStaticEntry")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, TimeTicks, Integer32, Counter64, Counter32, IpAddress, ModuleIdentity, NotificationType, iso, Bits, Unsigned32, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "TimeTicks", "Integer32", "Counter64", "Counter32", "IpAddress", "ModuleIdentity", "NotificationType", "iso", "Bits", "Unsigned32", "Gauge32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+pdnDhcpMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57))
+pdnDhcpMIB.setRevisions(('2004-09-14 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: pdnDhcpMIB.setRevisionsDescriptions(('Initial release.',))
+if mibBuilder.loadTexts: pdnDhcpMIB.setLastUpdated('200409130000Z')
+if mibBuilder.loadTexts: pdnDhcpMIB.setOrganization('Paradyne Networks MIB Working Group Other information about group editing the MIB')
+if mibBuilder.loadTexts: pdnDhcpMIB.setContactInfo('Paradyne Networks, Inc. 8545 126th Avenue North Largo, FL 33733 www.paradyne.com General Comments to: mibwg_team@paradyne.com Editor Clay Sikes')
+if mibBuilder.loadTexts: pdnDhcpMIB.setDescription("The MIB module provides objects to manage an interface's Dynamic Host Configuration Protocol (DHCP).")
+pdnDhcpNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 0))
+pdnDhcpObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 1))
+pdnDhcpAFNs = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 2))
+pdnDhcpConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 3))
+pdnDhcpVlanConfigTable = MibTable((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 1, 1), )
+if mibBuilder.loadTexts: pdnDhcpVlanConfigTable.setStatus('current')
+if mibBuilder.loadTexts: pdnDhcpVlanConfigTable.setDescription('The PDN DHCP VLAN Configuration Table. This table manages DHCP configuration options. The index allows the configuration to be applied on a per VLAN basis.')
+pdnDhcpVlanConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 1, 1, 1), )
+dot1qVlanStaticEntry.registerAugmentions(("PDN-DHCP-MIB", "pdnDhcpVlanConfigEntry"))
+pdnDhcpVlanConfigEntry.setIndexNames(*dot1qVlanStaticEntry.getIndexNames())
+if mibBuilder.loadTexts: pdnDhcpVlanConfigEntry.setStatus('current')
+if mibBuilder.loadTexts: pdnDhcpVlanConfigEntry.setDescription('An entry in the PDN DHCP VLAN Configuration Table.')
+pdnDhcpVlanConfigOption82 = MibTableColumn((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 1, 1, 1, 1), SwitchState().clone('disabled')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: pdnDhcpVlanConfigOption82.setStatus('current')
+if mibBuilder.loadTexts: pdnDhcpVlanConfigOption82.setDescription('The DHCP Relay Agent Information (Option 82) circuit identifier suboption. When enabled, Option82 will be supported. When disabled, Option 82 will not be supported.')
+pdnDhcpCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 3, 1))
+pdnDhcpGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 3, 2))
+pdnDhcpCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 3, 1, 1)).setObjects(("PDN-DHCP-MIB", "pdnDhcpVlanConfigOpt82Group"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    pdnDhcpCompliance = pdnDhcpCompliance.setStatus('current')
+if mibBuilder.loadTexts: pdnDhcpCompliance.setDescription('The compliance statement for network elements implementing DHCP.')
+pdnDhcpObjGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 3, 2, 1))
+pdnDhcpAfnGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 3, 2, 2))
+pdnDhcpNtfyGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 3, 2, 3))
+pdnDhcpVlanConfigOpt82Group = ObjectGroup((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 57, 3, 2, 1, 2)).setObjects(("PDN-DHCP-MIB", "pdnDhcpVlanConfigOption82"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    pdnDhcpVlanConfigOpt82Group = pdnDhcpVlanConfigOpt82Group.setStatus('current')
+if mibBuilder.loadTexts: pdnDhcpVlanConfigOpt82Group.setDescription('Configures DHCP Option 82 on a per-VLAN basis.')
+mibBuilder.exportSymbols("PDN-DHCP-MIB", pdnDhcpAfnGroups=pdnDhcpAfnGroups, pdnDhcpNotifications=pdnDhcpNotifications, PYSNMP_MODULE_ID=pdnDhcpMIB, pdnDhcpAFNs=pdnDhcpAFNs, pdnDhcpVlanConfigTable=pdnDhcpVlanConfigTable, pdnDhcpVlanConfigEntry=pdnDhcpVlanConfigEntry, pdnDhcpCompliances=pdnDhcpCompliances, pdnDhcpGroups=pdnDhcpGroups, pdnDhcpCompliance=pdnDhcpCompliance, pdnDhcpObjGroups=pdnDhcpObjGroups, pdnDhcpVlanConfigOpt82Group=pdnDhcpVlanConfigOpt82Group, pdnDhcpObjects=pdnDhcpObjects, pdnDhcpMIB=pdnDhcpMIB, pdnDhcpNtfyGroups=pdnDhcpNtfyGroups, pdnDhcpVlanConfigOption82=pdnDhcpVlanConfigOption82, pdnDhcpConformance=pdnDhcpConformance)

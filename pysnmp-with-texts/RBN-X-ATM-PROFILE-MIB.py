@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module RBN-X-ATM-PROFILE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RBN-X-ATM-PROFILE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:53:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint")
+atmTrafficDescrParamEntry, = mibBuilder.importSymbols("ATM-MIB", "atmTrafficDescrParamEntry")
+rbnExperiment, = mibBuilder.importSymbols("RBN-SMI", "rbnExperiment")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, MibIdentifier, TimeTicks, ObjectIdentity, Unsigned32, IpAddress, Gauge32, Counter64, ModuleIdentity, iso, Integer32, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "MibIdentifier", "TimeTicks", "ObjectIdentity", "Unsigned32", "IpAddress", "Gauge32", "Counter64", "ModuleIdentity", "iso", "Integer32", "Bits")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+rbnXAtmProfileMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2352, 3, 2))
+if mibBuilder.loadTexts: rbnXAtmProfileMIB.setLastUpdated('9807161645Z')
+if mibBuilder.loadTexts: rbnXAtmProfileMIB.setOrganization('RedBack Networks, Inc.')
+if mibBuilder.loadTexts: rbnXAtmProfileMIB.setContactInfo(' RedBack Networks, Inc. Postal: 1389 Moffett Park Drive Sunnyvale, CA 94089-1134 USA Phone: +1 408 548 3500 Fax: +1 408 548 3599 E-mail: mib-info@RedBackNetworks.com')
+if mibBuilder.loadTexts: rbnXAtmProfileMIB.setDescription('The MIB for instrumenting parameters associated with an ATM profile (traffic descriptor) beyond those instrumented by standards-track MIBs. This MIB is positioned in the RedBack Networks experimental MIB space because it mirrors MIB objects currently being developed by the IETF atommib Working Group, namely additions to the atmTrafficDescrParamTable found in the revised ATM-MIB (draft-ietf-atommib-atm1ng-XX.txt). At such time as the revised ATM-MIB superceeds the one defined in RFC 1695. this MIB will be obsoleted in favor of the IETF one.')
+rbnXAtmProfileMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 3, 2, 1))
+rbnXAtmProfileTable = MibTable((1, 3, 6, 1, 4, 1, 2352, 3, 2, 1, 1), )
+if mibBuilder.loadTexts: rbnXAtmProfileTable.setStatus('current')
+if mibBuilder.loadTexts: rbnXAtmProfileTable.setDescription('This table provides a collection of auxiliary objects providing parameters for atm profiles.')
+rbnXAtmProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2352, 3, 2, 1, 1, 1), )
+atmTrafficDescrParamEntry.registerAugmentions(("RBN-X-ATM-PROFILE-MIB", "rbnXAtmProfileEntry"))
+rbnXAtmProfileEntry.setIndexNames(*atmTrafficDescrParamEntry.getIndexNames())
+if mibBuilder.loadTexts: rbnXAtmProfileEntry.setStatus('current')
+if mibBuilder.loadTexts: rbnXAtmProfileEntry.setDescription('Each entry in this table represents a profile.')
+rbnXAtmServiceCategory = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 3, 2, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("other", 1), ("cbr", 2), ("rtVbr", 3), ("nrtVbr", 4), ("abr", 5), ("ubr", 6)))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbnXAtmServiceCategory.setStatus('current')
+if mibBuilder.loadTexts: rbnXAtmServiceCategory.setDescription('The service category for circuits which reference the given profile.')
+rbnXAtmProfileMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 3, 2, 2))
+rbnXAtmProfileMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 3, 2, 2, 1))
+rbnXAtmProfileMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 3, 2, 2, 2))
+rbnXAtmProfileMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2352, 3, 2, 2, 2, 1)).setObjects(("RBN-X-ATM-PROFILE-MIB", "rbnXAtmProfileGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnXAtmProfileMIBCompliance = rbnXAtmProfileMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: rbnXAtmProfileMIBCompliance.setDescription('The compliance statement for RedBack Networks SNMP entities which represent AAL5 VCL statistics')
+rbnXAtmProfileGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2352, 3, 2, 2, 1, 1)).setObjects(("RBN-X-ATM-PROFILE-MIB", "rbnXAtmServiceCategory"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnXAtmProfileGroup = rbnXAtmProfileGroup.setStatus('current')
+if mibBuilder.loadTexts: rbnXAtmProfileGroup.setDescription('A collection of objects providing supplemental ATM Traffic Descriptor (Profile) information beyond that specified by IETF standards-track MIBs')
+mibBuilder.exportSymbols("RBN-X-ATM-PROFILE-MIB", rbnXAtmProfileMIBConformance=rbnXAtmProfileMIBConformance, rbnXAtmProfileMIBGroups=rbnXAtmProfileMIBGroups, rbnXAtmProfileMIBCompliances=rbnXAtmProfileMIBCompliances, PYSNMP_MODULE_ID=rbnXAtmProfileMIB, rbnXAtmServiceCategory=rbnXAtmServiceCategory, rbnXAtmProfileTable=rbnXAtmProfileTable, rbnXAtmProfileMIBCompliance=rbnXAtmProfileMIBCompliance, rbnXAtmProfileGroup=rbnXAtmProfileGroup, rbnXAtmProfileMIBObjects=rbnXAtmProfileMIBObjects, rbnXAtmProfileMIB=rbnXAtmProfileMIB, rbnXAtmProfileEntry=rbnXAtmProfileEntry)

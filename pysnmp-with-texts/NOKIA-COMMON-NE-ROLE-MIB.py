@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module NOKIA-COMMON-NE-ROLE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NOKIA-COMMON-NE-ROLE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:23:23 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint")
+ntcCommonMibs, = mibBuilder.importSymbols("NOKIA-COMMON-MIB-OID-REGISTRATION-MIB", "ntcCommonMibs")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, Integer32, MibIdentifier, Unsigned32, Counter32, iso, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Gauge32, Bits, IpAddress, TimeTicks, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Integer32", "MibIdentifier", "Unsigned32", "Counter32", "iso", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Gauge32", "Bits", "IpAddress", "TimeTicks", "Counter64")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+netCommonNERole = MibIdentifier((1, 3, 6, 1, 4, 1, 94, 1, 16, 7, 6))
+coneRoleTable = MibTable((1, 3, 6, 1, 4, 1, 94, 1, 16, 7, 6, 1), )
+if mibBuilder.loadTexts: coneRoleTable.setStatus('mandatory')
+if mibBuilder.loadTexts: coneRoleTable.setDescription('This table contains information of the roles of this network element')
+coneRoleEntry = MibTableRow((1, 3, 6, 1, 4, 1, 94, 1, 16, 7, 6, 1, 1), ).setIndexNames((0, "NOKIA-COMMON-NE-ROLE-MIB", "coneRoleIndex"))
+if mibBuilder.loadTexts: coneRoleEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: coneRoleEntry.setDescription('This contains information concerning each currently active role in the NE.')
+coneRoleIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 94, 1, 16, 7, 6, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2147483647))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: coneRoleIndex.setStatus('mandatory')
+if mibBuilder.loadTexts: coneRoleIndex.setDescription('Used as an index of the table. The value of this variable shall be incremented by 1 for each new entry of this table.')
+coneRowIdx = MibTableColumn((1, 3, 6, 1, 4, 1, 94, 1, 16, 7, 6, 1, 1, 2), ObjectIdentifier()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: coneRowIdx.setStatus('mandatory')
+if mibBuilder.loadTexts: coneRowIdx.setDescription('This variable contains value regarding the registered oid of role in NOKIA-COMMON-...-MIB.')
+coneInfo = MibTableColumn((1, 3, 6, 1, 4, 1, 94, 1, 16, 7, 6, 1, 1, 3), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: coneInfo.setStatus('mandatory')
+if mibBuilder.loadTexts: coneInfo.setDescription('This variable contains textual description of the role.')
+mibBuilder.exportSymbols("NOKIA-COMMON-NE-ROLE-MIB", coneRoleEntry=coneRoleEntry, coneRoleIndex=coneRoleIndex, coneRowIdx=coneRowIdx, netCommonNERole=netCommonNERole, coneRoleTable=coneRoleTable, coneInfo=coneInfo)

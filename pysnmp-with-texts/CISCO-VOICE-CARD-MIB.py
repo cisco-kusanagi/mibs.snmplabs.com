@@ -1,0 +1,56 @@
+#
+# PySNMP MIB module CISCO-VOICE-CARD-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-VOICE-CARD-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:19:13 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+Unsigned32, Counter64, Bits, NotificationType, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, MibIdentifier, Counter32, iso, ObjectIdentity, IpAddress, ModuleIdentity, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Counter64", "Bits", "NotificationType", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "MibIdentifier", "Counter32", "iso", "ObjectIdentity", "IpAddress", "ModuleIdentity", "TimeTicks")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ciscoVoiceCard = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 300576))
+ciscoVoiceCard.setRevisions(('2002-02-15 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoVoiceCard.setRevisionsDescriptions(('Initial version',))
+if mibBuilder.loadTexts: ciscoVoiceCard.setLastUpdated('200202150000Z')
+if mibBuilder.loadTexts: ciscoVoiceCard.setOrganization('Cisco Systems, Inc')
+if mibBuilder.loadTexts: ciscoVoiceCard.setContactInfo(' Cisco Systems Customer Service Postal: 170 W. Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-voice@cisco.com')
+if mibBuilder.loadTexts: ciscoVoiceCard.setDescription('The MIB module to configure voice-card specific parameters such as codec complexity in voice- enabled cisco routers.')
+ciscoVoiceCardNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 300576, 0))
+ciscoVoiceCardObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 300576, 1))
+cVoiceCardTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 300576, 1, 1), )
+if mibBuilder.loadTexts: cVoiceCardTable.setStatus('current')
+if mibBuilder.loadTexts: cVoiceCardTable.setDescription('A list of voice card entries. The number of entries is the number of slots in the router.')
+cVoiceCardEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 300576, 1, 1, 1), ).setIndexNames((0, "CISCO-VOICE-CARD-MIB", "cVoiceCardIndex"))
+if mibBuilder.loadTexts: cVoiceCardEntry.setStatus('current')
+if mibBuilder.loadTexts: cVoiceCardEntry.setDescription('An entry containing management information applicable to a particular voice card. The number of entries is the same as the number of slots in the router. This is a constant for a given router.')
+cVoiceCardIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 300576, 1, 1, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(1, 255)))
+if mibBuilder.loadTexts: cVoiceCardIndex.setStatus('current')
+if mibBuilder.loadTexts: cVoiceCardIndex.setDescription('A unique value, greater than zero, used to index the cVoiceCardTable.')
+cVoiceCardSlotNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 300576, 1, 1, 1, 2), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cVoiceCardSlotNumber.setStatus('current')
+if mibBuilder.loadTexts: cVoiceCardSlotNumber.setDescription('The slot number of the slot containing this voice card.')
+cVoiceCardCodecComplexity = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 300576, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(2, 4))).clone(namedValues=NamedValues(("hc", 2), ("mc", 4)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cVoiceCardCodecComplexity.setStatus('current')
+if mibBuilder.loadTexts: cVoiceCardCodecComplexity.setDescription('Determines whether the voice ports in the card can support all codecs or not. Medium complexity configuration can not support all codecs, while High Complexity configuration supports all codecs. The card may support all types of codecs listed, but the NMS setting a value will force the card only to use the codecs limited by the Codec Complexity configured.')
+cVoiceCardAdminStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 300576, 1, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("up", 1), ("down", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cVoiceCardAdminStatus.setStatus('current')
+if mibBuilder.loadTexts: cVoiceCardAdminStatus.setDescription('Administrative status of the voice card. The voice card is administratively down if all voice ports are shut. The agent changes the status whenever the status of the voice card changes in the router. The voice card changes state immediately when the NMS changes the state of this object.')
+ciscoVoiceCardConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 300576, 2))
+ciscoVoiceCardMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 300576, 2, 1))
+ciscoVoiceCardMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 300576, 2, 2))
+ciscoVoiceCardMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 300576, 2, 1, 1)).setObjects(("CISCO-VOICE-CARD-MIB", "ciscoVoiceCardGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoVoiceCardMIBCompliance = ciscoVoiceCardMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: ciscoVoiceCardMIBCompliance.setDescription('Describes the requirements for conformance to the Cisco Voice Card MIB.')
+ciscoVoiceCardGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 300576, 2, 2, 1)).setObjects(("CISCO-VOICE-CARD-MIB", "cVoiceCardSlotNumber"), ("CISCO-VOICE-CARD-MIB", "cVoiceCardCodecComplexity"), ("CISCO-VOICE-CARD-MIB", "cVoiceCardAdminStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoVoiceCardGroup = ciscoVoiceCardGroup.setStatus('current')
+if mibBuilder.loadTexts: ciscoVoiceCardGroup.setDescription('A collection of objects providing voice card specific functionality.')
+mibBuilder.exportSymbols("CISCO-VOICE-CARD-MIB", ciscoVoiceCard=ciscoVoiceCard, cVoiceCardIndex=cVoiceCardIndex, cVoiceCardCodecComplexity=cVoiceCardCodecComplexity, ciscoVoiceCardMIBCompliances=ciscoVoiceCardMIBCompliances, PYSNMP_MODULE_ID=ciscoVoiceCard, ciscoVoiceCardNotifications=ciscoVoiceCardNotifications, ciscoVoiceCardMIBGroups=ciscoVoiceCardMIBGroups, ciscoVoiceCardObjects=ciscoVoiceCardObjects, cVoiceCardSlotNumber=cVoiceCardSlotNumber, ciscoVoiceCardGroup=ciscoVoiceCardGroup, ciscoVoiceCardConformance=ciscoVoiceCardConformance, cVoiceCardEntry=cVoiceCardEntry, cVoiceCardAdminStatus=cVoiceCardAdminStatus, cVoiceCardTable=cVoiceCardTable, ciscoVoiceCardMIBCompliance=ciscoVoiceCardMIBCompliance)

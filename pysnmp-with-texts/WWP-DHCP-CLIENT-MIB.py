@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module WWP-DHCP-CLIENT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/WWP-DHCP-CLIENT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:37:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Unsigned32, MibIdentifier, Integer32, ObjectIdentity, ModuleIdentity, Counter32, TimeTicks, Counter64, Gauge32, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Bits, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "MibIdentifier", "Integer32", "ObjectIdentity", "ModuleIdentity", "Counter32", "TimeTicks", "Counter64", "Gauge32", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Bits", "iso")
+TextualConvention, DisplayString, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "TruthValue")
+wwpModules, = mibBuilder.importSymbols("WWP-SMI", "wwpModules")
+wwpDhcpClientMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 6141, 2, 18))
+wwpDhcpClientMIB.setRevisions(('2001-04-03 17:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: wwpDhcpClientMIB.setRevisionsDescriptions(('Initial creation.',))
+if mibBuilder.loadTexts: wwpDhcpClientMIB.setLastUpdated('200104031700Z')
+if mibBuilder.loadTexts: wwpDhcpClientMIB.setOrganization('World Wide Packets, Inc')
+if mibBuilder.loadTexts: wwpDhcpClientMIB.setContactInfo(' Mib Meister Postal: World Wide Packets P.O. Box 950 Veradale, WA 99037 USA Phone: +1 509 242 9000 Email: mib.meister@worldwidepackets.com')
+if mibBuilder.loadTexts: wwpDhcpClientMIB.setDescription('The MIB module to configure DHCP on WWP products.')
+wwpDhcpClientMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 6141, 2, 18, 1))
+wwpDhcpClient = MibIdentifier((1, 3, 6, 1, 4, 1, 6141, 2, 18, 1, 1))
+wwpDhcpClientMIBNotificationPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 6141, 2, 18, 2))
+wwpDhcpClientMIBNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 6141, 2, 18, 2, 0))
+wwpDhcpClientMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 6141, 2, 18, 3))
+wwpDhcpClientMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 6141, 2, 18, 3, 1))
+wwpDhcpClientMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 6141, 2, 18, 3, 2))
+wwpDhcpActivate = MibScalar((1, 3, 6, 1, 4, 1, 6141, 2, 18, 1, 1, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wwpDhcpActivate.setStatus('current')
+if mibBuilder.loadTexts: wwpDhcpActivate.setDescription('Activate the DHCP operation with a value of True(1) or stop it with False(2).')
+wwpDhcpIfName = MibScalar((1, 3, 6, 1, 4, 1, 6141, 2, 18, 1, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 32)).clone('mgmt')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wwpDhcpIfName.setStatus('current')
+if mibBuilder.loadTexts: wwpDhcpIfName.setDescription('The ifName associated with the Dhcp Operation.')
+wwpDhcpDiscoveryMsgInterval = MibScalar((1, 3, 6, 1, 4, 1, 6141, 2, 18, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)).clone(125)).setUnits('miliseconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wwpDhcpDiscoveryMsgInterval.setStatus('current')
+if mibBuilder.loadTexts: wwpDhcpDiscoveryMsgInterval.setDescription('The time interval for discovery messages issued before the client received the first reply.')
+wwpDhcpLeaseTime = MibScalar((1, 3, 6, 1, 4, 1, 6141, 2, 18, 1, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)).clone(24)).setUnits('Hours').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wwpDhcpLeaseTime.setStatus('current')
+if mibBuilder.loadTexts: wwpDhcpLeaseTime.setDescription('The requested lease time option to be used with DHCPDISCOVER or DHCPREQUEST messages.')
+mibBuilder.exportSymbols("WWP-DHCP-CLIENT-MIB", PYSNMP_MODULE_ID=wwpDhcpClientMIB, wwpDhcpClientMIBNotifications=wwpDhcpClientMIBNotifications, wwpDhcpLeaseTime=wwpDhcpLeaseTime, wwpDhcpClientMIBGroups=wwpDhcpClientMIBGroups, wwpDhcpIfName=wwpDhcpIfName, wwpDhcpDiscoveryMsgInterval=wwpDhcpDiscoveryMsgInterval, wwpDhcpClientMIBCompliances=wwpDhcpClientMIBCompliances, wwpDhcpClientMIBNotificationPrefix=wwpDhcpClientMIBNotificationPrefix, wwpDhcpActivate=wwpDhcpActivate, wwpDhcpClient=wwpDhcpClient, wwpDhcpClientMIB=wwpDhcpClientMIB, wwpDhcpClientMIBConformance=wwpDhcpClientMIBConformance, wwpDhcpClientMIBObjects=wwpDhcpClientMIBObjects)

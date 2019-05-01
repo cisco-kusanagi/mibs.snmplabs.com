@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module DNOS-IPV6-LOOPBACK-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DNOS-IPV6-LOOPBACK-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:51:35 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion")
+dnOS, = mibBuilder.importSymbols("DELL-REF-MIB", "dnOS")
+agentLoopbackID, = mibBuilder.importSymbols("DNOS-LOOPBACK-MIB", "agentLoopbackID")
+InetAddressPrefixLength, = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressPrefixLength")
+Ipv6AddressPrefix, = mibBuilder.importSymbols("IPV6-TC", "Ipv6AddressPrefix")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Integer32, ObjectIdentity, Unsigned32, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, ModuleIdentity, Counter32, TimeTicks, Counter64, MibIdentifier, Bits, Gauge32, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "ObjectIdentity", "Unsigned32", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "ModuleIdentity", "Counter32", "TimeTicks", "Counter64", "MibIdentifier", "Bits", "Gauge32", "iso")
+RowStatus, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "DisplayString", "TextualConvention")
+fastPathIpv6Loopback = ModuleIdentity((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23))
+fastPathIpv6Loopback.setRevisions(('2011-01-26 00:00', '2007-05-23 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: fastPathIpv6Loopback.setRevisionsDescriptions(('Postal address updated.', 'Dell branding related changes.',))
+if mibBuilder.loadTexts: fastPathIpv6Loopback.setLastUpdated('201101260000Z')
+if mibBuilder.loadTexts: fastPathIpv6Loopback.setOrganization('Dell, Inc.')
+if mibBuilder.loadTexts: fastPathIpv6Loopback.setContactInfo('')
+if mibBuilder.loadTexts: fastPathIpv6Loopback.setDescription('The Dell Networking Private MIB for Loopback IPV6 address configuration')
+agentLoopbackIpv6Group = MibIdentifier((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1))
+agentLoopbackIpv6PrefixTable = MibTable((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1), )
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixTable.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixTable.setDescription('A table of the Ipv6 prefixes associated with loopback instances')
+agentLoopbackIpv6PrefixEntry = MibTableRow((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1, 1), ).setIndexNames((0, "DNOS-LOOPBACK-MIB", "agentLoopbackID"), (0, "DNOS-IPV6-LOOPBACK-MIB", "agentLoopbackIpv6PrefixPrefix"), (0, "DNOS-IPV6-LOOPBACK-MIB", "agentLoopbackIpv6PrefixPrefixLen"))
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixEntry.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixEntry.setDescription('')
+agentLoopbackIpv6PrefixPrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1, 1, 1), Ipv6AddressPrefix())
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefix.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefix.setDescription('The prefix associated with the loopback interface. The data type is used to model the Ipv6 address. It is a binary string of 16 octects in network byte-order. It specifies the IP address of loopback which will be in Ipv6 Format, generated using internal interface number.')
+agentLoopbackIpv6PrefixPrefixLen = MibTableColumn((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1, 1, 2), InetAddressPrefixLength())
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefixLen.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefixLen.setDescription('The length of the prefix (in bits).')
+agentLoopbackIpv6PrefixStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixStatus.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixStatus.setDescription('Status of this instance.Row can be added or deleted by setting the value to createAndGo/destroy active(1) - this Loopback instance is active createAndGo(4) - set to this value to create an instance destroy(6) - set to this value to delete an instance')
+mibBuilder.exportSymbols("DNOS-IPV6-LOOPBACK-MIB", PYSNMP_MODULE_ID=fastPathIpv6Loopback, agentLoopbackIpv6Group=agentLoopbackIpv6Group, agentLoopbackIpv6PrefixTable=agentLoopbackIpv6PrefixTable, agentLoopbackIpv6PrefixEntry=agentLoopbackIpv6PrefixEntry, agentLoopbackIpv6PrefixPrefixLen=agentLoopbackIpv6PrefixPrefixLen, fastPathIpv6Loopback=fastPathIpv6Loopback, agentLoopbackIpv6PrefixPrefix=agentLoopbackIpv6PrefixPrefix, agentLoopbackIpv6PrefixStatus=agentLoopbackIpv6PrefixStatus)

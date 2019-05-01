@@ -1,0 +1,40 @@
+#
+# PySNMP MIB module MY-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MY-SMI
+# Produced by pysmi-0.3.4 at Wed May  1 14:16:14 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+enterprises, Bits, Unsigned32, IpAddress, ModuleIdentity, Counter32, ObjectIdentity, Integer32, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, NotificationType, TimeTicks, Gauge32, iso = mibBuilder.importSymbols("SNMPv2-SMI", "enterprises", "Bits", "Unsigned32", "IpAddress", "ModuleIdentity", "Counter32", "ObjectIdentity", "Integer32", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "NotificationType", "TimeTicks", "Gauge32", "iso")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+my = MibIdentifier((1, 3, 6, 1, 4, 1, 171))
+products = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 10))
+switchMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97))
+switchMib.setRevisions(('2002-03-19 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: switchMib.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: switchMib.setLastUpdated('200203190000Z')
+if mibBuilder.loadTexts: switchMib.setOrganization('D-Link Crop.')
+if mibBuilder.loadTexts: switchMib.setContactInfo(' http://support.dlink.com')
+if mibBuilder.loadTexts: switchMib.setDescription('The Structure of Management Information for the My enterprise.')
+mySwitchProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 1))
+if mibBuilder.loadTexts: mySwitchProducts.setStatus('current')
+if mibBuilder.loadTexts: mySwitchProducts.setDescription('mySwitchProducts is the root OBJECT IDENTIFIER from which sysObjectID values are assigned for switch. Actual values are defined in MY-PRODUCTS-MIB.')
+myMgmt = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 2))
+if mibBuilder.loadTexts: myMgmt.setStatus('current')
+if mibBuilder.loadTexts: myMgmt.setDescription('myMgmt is the main subtree for those functional mib.')
+myAgentCapability = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 3))
+if mibBuilder.loadTexts: myAgentCapability.setStatus('current')
+if mibBuilder.loadTexts: myAgentCapability.setDescription('myAgentCapability provides a root object identifier from which AGENT-CAPABILITIES values may be assigned.')
+myModules = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 4))
+if mibBuilder.loadTexts: myModules.setStatus('current')
+if mibBuilder.loadTexts: myModules.setDescription('myModules provides a root object identifier from which MODULE-IDENTITY values may be assigned.')
+myExperiment = ObjectIdentity((1, 3, 6, 1, 4, 1, 171, 10, 97, 5))
+if mibBuilder.loadTexts: myExperiment.setStatus('current')
+if mibBuilder.loadTexts: myExperiment.setDescription('myExperiment provides a root object identifier from which experimental mibs may be temporarily based. mibs are typicially based here if they fall in one of two categories 1) are IETF work-in-process mibs which have not been assigned a permanent object identifier by the IANA. 2) are my work-in-process which has not been assigned a permanent object identifier by the my assigned number authority, typicially because the mib is not ready for deployment. NOTE WELL: support for mibs in the myExperiment subtree will be deleted when a permanent object identifier assignment is made.')
+mibBuilder.exportSymbols("MY-SMI", myModules=myModules, myExperiment=myExperiment, my=my, products=products, myMgmt=myMgmt, PYSNMP_MODULE_ID=switchMib, switchMib=switchMib, myAgentCapability=myAgentCapability, mySwitchProducts=mySwitchProducts)

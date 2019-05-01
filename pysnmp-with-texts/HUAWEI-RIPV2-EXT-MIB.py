@@ -1,0 +1,47 @@
+#
+# PySNMP MIB module HUAWEI-RIPV2-EXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HUAWEI-RIPV2-EXT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:48:09 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+hwDatacomm, = mibBuilder.importSymbols("HUAWEI-MIB", "hwDatacomm")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, iso, Integer32, NotificationType, Bits, ModuleIdentity, TimeTicks, Unsigned32, IpAddress, ObjectIdentity, Counter32, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "iso", "Integer32", "NotificationType", "Bits", "ModuleIdentity", "TimeTicks", "Unsigned32", "IpAddress", "ObjectIdentity", "Counter32", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier")
+RowStatus, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "DisplayString", "TextualConvention")
+hwRipv2Ext = ModuleIdentity((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120))
+if mibBuilder.loadTexts: hwRipv2Ext.setLastUpdated('200605261430Z')
+if mibBuilder.loadTexts: hwRipv2Ext.setOrganization('Huawei Technologies Co., Ltd.')
+if mibBuilder.loadTexts: hwRipv2Ext.setContactInfo('R&D BeiJing, Huawei Technologies co.,Ltd. Huawei Bld.,NO.3 Xinxi Rd., Shang-Di Information Industry Base, Hai-Dian District Beijing P.R. China Zip:100085 Http://www.huawei.com E-mail:support@huawei.com')
+if mibBuilder.loadTexts: hwRipv2Ext.setDescription('The HUAWEI-RIPv2-EXT-MIB.mib contains objects to configure RIP module, including query RIP process, RIP VPN-instance configuration and status. This MIB module objects indicate hwRip2ProcInstTable. RIP can support many processes, but mib can support only one of them. To get more RIP configuration, it is required to locate one specified RIP process. ')
+hwRip2ProcInstTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 1), )
+if mibBuilder.loadTexts: hwRip2ProcInstTable.setStatus('current')
+if mibBuilder.loadTexts: hwRip2ProcInstTable.setDescription('A list of Process id and their VRF Name.')
+hwRip2ProcInstEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 1, 1), ).setIndexNames((0, "HUAWEI-RIPV2-EXT-MIB", "hwRip2ProcessId"))
+if mibBuilder.loadTexts: hwRip2ProcInstEntry.setStatus('current')
+if mibBuilder.loadTexts: hwRip2ProcInstEntry.setDescription('Information about the VRF of a process.')
+hwRip2ProcessId = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)))
+if mibBuilder.loadTexts: hwRip2ProcessId.setStatus('current')
+if mibBuilder.loadTexts: hwRip2ProcessId.setDescription('The RIP process id.')
+hwRip2VrfName = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 1, 1, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(1, 31))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwRip2VrfName.setStatus('current')
+if mibBuilder.loadTexts: hwRip2VrfName.setDescription('VRF Name.')
+hwRip2CurrentProcId = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hwRip2CurrentProcId.setStatus('current')
+if mibBuilder.loadTexts: hwRip2CurrentProcId.setDescription('The current process id for which processing is being done.')
+hwRip2Conformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 2))
+hwRip2Groups = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 2, 1))
+hwRip2Compliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 2, 2))
+hwRip2Compliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 2, 2, 1)).setObjects(("HUAWEI-RIPV2-EXT-MIB", "hwRip2ExtGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwRip2Compliance = hwRip2Compliance.setStatus('current')
+if mibBuilder.loadTexts: hwRip2Compliance.setDescription('The compliance statement for SNMPv2 entities which implement the HUAWEI RIP extension MIB.')
+hwRip2ExtGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2011, 5, 25, 120, 2, 1, 2)).setObjects(("HUAWEI-RIPV2-EXT-MIB", "hwRip2VrfName"), ("HUAWEI-RIPV2-EXT-MIB", "hwRip2CurrentProcId"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwRip2ExtGroup = hwRip2ExtGroup.setStatus('current')
+if mibBuilder.loadTexts: hwRip2ExtGroup.setDescription('The HUAWEI RIPv2 extension Table.')
+mibBuilder.exportSymbols("HUAWEI-RIPV2-EXT-MIB", hwRip2ProcInstTable=hwRip2ProcInstTable, hwRip2Conformance=hwRip2Conformance, hwRip2ExtGroup=hwRip2ExtGroup, hwRip2ProcessId=hwRip2ProcessId, hwRip2VrfName=hwRip2VrfName, hwRip2ProcInstEntry=hwRip2ProcInstEntry, hwRip2Compliances=hwRip2Compliances, hwRip2Groups=hwRip2Groups, hwRip2Compliance=hwRip2Compliance, PYSNMP_MODULE_ID=hwRipv2Ext, hwRip2CurrentProcId=hwRip2CurrentProcId, hwRipv2Ext=hwRipv2Ext)

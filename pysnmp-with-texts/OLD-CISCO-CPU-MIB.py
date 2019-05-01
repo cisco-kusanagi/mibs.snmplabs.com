@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module OLD-CISCO-CPU-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/OLD-CISCO-CPU-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:32:38 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+local, = mibBuilder.importSymbols("CISCO-SMI", "local")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+TimeTicks, Bits, IpAddress, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, Unsigned32, Gauge32, ModuleIdentity, Integer32, NotificationType, Counter64, ObjectIdentity, iso = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Bits", "IpAddress", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "Unsigned32", "Gauge32", "ModuleIdentity", "Integer32", "NotificationType", "Counter64", "ObjectIdentity", "iso")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+lcpu = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 2, 1))
+busyPer = MibScalar((1, 3, 6, 1, 4, 1, 9, 2, 1, 56), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: busyPer.setStatus('mandatory')
+if mibBuilder.loadTexts: busyPer.setDescription('CPU busy percentage in the last 5 second period. Not the last 5 realtime seconds but the last 5 second period in the scheduler.')
+avgBusy1 = MibScalar((1, 3, 6, 1, 4, 1, 9, 2, 1, 57), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: avgBusy1.setStatus('mandatory')
+if mibBuilder.loadTexts: avgBusy1.setDescription('1 minute exponentially-decayed moving average of the CPU busy percentage.')
+avgBusy5 = MibScalar((1, 3, 6, 1, 4, 1, 9, 2, 1, 58), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: avgBusy5.setStatus('mandatory')
+if mibBuilder.loadTexts: avgBusy5.setDescription('5 minute exponentially-decayed moving average of the CPU busy percentage.')
+idleCount = MibScalar((1, 3, 6, 1, 4, 1, 9, 2, 1, 59), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: idleCount.setStatus('mandatory')
+if mibBuilder.loadTexts: idleCount.setDescription('cisco internal variable. not to be used')
+idleWired = MibScalar((1, 3, 6, 1, 4, 1, 9, 2, 1, 60), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: idleWired.setStatus('mandatory')
+if mibBuilder.loadTexts: idleWired.setDescription('cisco internal variable. not to be used')
+mibBuilder.exportSymbols("OLD-CISCO-CPU-MIB", lcpu=lcpu, avgBusy1=avgBusy1, idleWired=idleWired, busyPer=busyPer, idleCount=idleCount, avgBusy5=avgBusy5)

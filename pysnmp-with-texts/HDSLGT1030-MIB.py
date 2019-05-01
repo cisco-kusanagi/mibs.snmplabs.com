@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module HDSLGT1030-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HDSLGT1030-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:25:22 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint")
+hdslGT1030, = mibBuilder.importSymbols("GDCHDSL-MIB", "hdslGT1030")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+NotificationType, Unsigned32, Bits, IpAddress, Counter64, TimeTicks, iso, MibIdentifier, ModuleIdentity, Integer32, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Unsigned32", "Bits", "IpAddress", "Counter64", "TimeTicks", "iso", "MibIdentifier", "ModuleIdentity", "Integer32", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "Gauge32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+hdslGT1030System = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 1))
+hdslGT1030Version = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 1, 1))
+gdcGT1030SystemMIBversion = MibScalar((1, 3, 6, 1, 4, 1, 498, 11, 25, 1, 1, 1), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(5, 5)).setFixedLength(5)).setMaxAccess("readonly")
+if mibBuilder.loadTexts: gdcGT1030SystemMIBversion.setStatus('mandatory')
+if mibBuilder.loadTexts: gdcGT1030SystemMIBversion.setDescription("Identifies the version of the MIB. The format of the version is x.yzT, where 'x' identifies the major revision number, 'y' identifies the minor revision number, 'z' identifies the typographical revision, and T identifies the test revision. Acceptable values for the individual revision components are as follows: x: 1 - 9 y: 0 - 9 z: 0 - 9 T: A - Z Upon formal release, no designation for the test revision will be present.")
+hdslGT1030Alarms = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2))
+hdslGT1030NoResponseAlm = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 1))
+hdslGT1030DiagRxErrAlm = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 2))
+hdslGT1030PowerUpAlm = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 3))
+hdslGT1030UnitFailure = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 4))
+hdslGT1030ChecksumCorrupt = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 5))
+hdslGT1030LossofSignal = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 6))
+hdslGT1030UnavailableSec = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 7))
+hdslGT1030ErrorSec = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 8))
+hdslGT1030LossofSyncWord = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 9))
+hdslGT1030MajorBER = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 10))
+hdslGT1030MinorBER = MibIdentifier((1, 3, 6, 1, 4, 1, 498, 11, 25, 2, 11))
+mibBuilder.exportSymbols("HDSLGT1030-MIB", hdslGT1030Version=hdslGT1030Version, hdslGT1030UnavailableSec=hdslGT1030UnavailableSec, gdcGT1030SystemMIBversion=gdcGT1030SystemMIBversion, hdslGT1030PowerUpAlm=hdslGT1030PowerUpAlm, hdslGT1030MajorBER=hdslGT1030MajorBER, hdslGT1030DiagRxErrAlm=hdslGT1030DiagRxErrAlm, hdslGT1030ErrorSec=hdslGT1030ErrorSec, hdslGT1030System=hdslGT1030System, hdslGT1030UnitFailure=hdslGT1030UnitFailure, hdslGT1030MinorBER=hdslGT1030MinorBER, hdslGT1030LossofSignal=hdslGT1030LossofSignal, hdslGT1030Alarms=hdslGT1030Alarms, hdslGT1030NoResponseAlm=hdslGT1030NoResponseAlm, hdslGT1030ChecksumCorrupt=hdslGT1030ChecksumCorrupt, hdslGT1030LossofSyncWord=hdslGT1030LossofSyncWord)

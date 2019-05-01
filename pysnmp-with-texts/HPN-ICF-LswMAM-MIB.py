@@ -1,0 +1,85 @@
+#
+# PySNMP MIB module HPN-ICF-LswMAM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HPN-ICF-LswMAM-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:39:56 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+hpnicfdot1qVlanIndex, = mibBuilder.importSymbols("HPN-ICF-LswVLAN-MIB", "hpnicfdot1qVlanIndex")
+hpnicflswCommon, = mibBuilder.importSymbols("HPN-ICF-OID-MIB", "hpnicflswCommon")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Integer32, Counter32, IpAddress, ModuleIdentity, Gauge32, Counter64, iso, MibIdentifier, ObjectIdentity, TimeTicks, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "Counter32", "IpAddress", "ModuleIdentity", "Gauge32", "Counter64", "iso", "MibIdentifier", "ObjectIdentity", "TimeTicks", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "NotificationType")
+MacAddress, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "MacAddress", "DisplayString", "TextualConvention")
+hpnicfLswMacPort = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3))
+hpnicfLswMacPort.setRevisions(('2001-06-29 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: hpnicfLswMacPort.setRevisionsDescriptions((' ',))
+if mibBuilder.loadTexts: hpnicfLswMacPort.setLastUpdated('200106290000Z')
+if mibBuilder.loadTexts: hpnicfLswMacPort.setOrganization('')
+if mibBuilder.loadTexts: hpnicfLswMacPort.setContactInfo('')
+if mibBuilder.loadTexts: hpnicfLswMacPort.setDescription(' ')
+class InterfaceIndex(TextualConvention, Integer32):
+    description = "A unique value, greater than zero, for each interface or interface sub-layer in the managed system. It is recommended that values are assigned contiguously starting from 1. The value for each interface sub- layer must remain constant at least from one re- initialization of the entity's network management system to the next re-initialization."
+    status = 'current'
+    displayHint = 'd'
+
+class PortList(TextualConvention, OctetString):
+    description = "Each octet within this value specifies a set of eight ports, with the first octet specifying ports 1 through 8, the second octet specifying ports 9 through 16, etc. Within each octet, the most significant bit represents the lowest numbered port, and the least significant bit represents the highest numbered port. Thus, each port of the bridge is represented by a single bit within the value of this object. If that bit has a value of '1' then that port is included in the set of ports; the port is not included if its bit has a value of '0'."
+    status = 'current'
+
+hpnicfdot1qMacSearchTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 1), )
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchTable.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchTable.setDescription('Information table for searching port with mac address ')
+hpnicfdot1qMacSearchEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 1, 1), ).setIndexNames((0, "HPN-ICF-LswMAM-MIB", "hpnicfdot1qMacSearchAddress"), (0, "HPN-ICF-LswMAM-MIB", "hpnicfdot1qMacSearchVlanID"))
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchEntry.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchEntry.setDescription(' Information table for searching port with mac address entry ')
+hpnicfdot1qMacSearchAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 1, 1, 1), MacAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchAddress.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchAddress.setDescription('MAC address')
+hpnicfdot1qMacSearchVlanID = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(-1, -1), ValueRangeConstraint(1, 4096), ))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchVlanID.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchVlanID.setDescription(' VLANID of the native VLAN of the MAC address to be searched for ')
+hpnicfdot1qMacSearchPort = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 1, 1, 3), InterfaceIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchPort.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchPort.setDescription('Interface index corresponding to the MAC address')
+hpnicfdot1qMacSearchAgeTime = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 1, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchAgeTime.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qMacSearchAgeTime.setDescription(' Address aging time')
+hpnicfdot1qTpFdbSetTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 2), )
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetTable.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetTable.setDescription('Unicast address setting table ')
+hpnicfdot1qTpFdbSetEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 2, 1), ).setIndexNames((0, "HPN-ICF-LswVLAN-MIB", "hpnicfdot1qVlanIndex"), (0, "HPN-ICF-LswMAM-MIB", "hpnicfdot1qTpFdbSetAddress"))
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetEntry.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetEntry.setDescription(' Unicast address setting table entry ')
+hpnicfdot1qTpFdbSetAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 2, 1, 1), MacAddress())
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetAddress.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetAddress.setDescription('Unicast MAC address ')
+hpnicfdot1qTpFdbSetPort = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 2, 1, 2), InterfaceIndex()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetPort.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetPort.setDescription('Interface index corresponding to the MAC address ')
+hpnicfdot1qTpFdbSetStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 3, 6, 7, 9, 11))).clone(namedValues=NamedValues(("other", 1), ("learned", 3), ("static", 6), ("dynamic", 7), ("blackhole", 9), ("security", 11)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetStatus.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetStatus.setDescription('State corresponding to the MAC address')
+hpnicfdot1qTpFdbSetOperate = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 2, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("add", 1), ("delete", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetOperate.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbSetOperate.setDescription('Add or delete an MAC address. Read operation not supported.')
+hpnicfdot1qTpFdbGroupSetTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 3), )
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetTable.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetTable.setDescription('Multistcast address setting table, whose maximal row number is dynamically changed by the influence of IGSP. When reaching the upper limit of the table, no more row could be added, then an error will be returned.')
+hpnicfdot1qTpFdbGroupSetEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 3, 1), ).setIndexNames((0, "HPN-ICF-LswVLAN-MIB", "hpnicfdot1qVlanIndex"), (0, "HPN-ICF-LswMAM-MIB", "hpnicfdot1qTpFdbGroupSetAddress"))
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetEntry.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetEntry.setDescription('Multicast address setting table entry.')
+hpnicfdot1qTpFdbGroupSetAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 3, 1, 1), MacAddress())
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetAddress.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetAddress.setDescription('Multicast MAC address.')
+hpnicfdot1qTpFdbGroupSetPort = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 3, 1, 2), PortList()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetPort.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetPort.setDescription('The complete set of ports, in this VLAN, to which frames destined to this Multicast MAC address are currently being explicitly forwarded. This does not include ports for which this address is only implicitly forwarded.')
+hpnicfdot1qTpFdbGroupSetOperate = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 35, 3, 3, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("add", 1), ("delete", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetOperate.setStatus('current')
+if mibBuilder.loadTexts: hpnicfdot1qTpFdbGroupSetOperate.setDescription('Add or delete a Multicast MAC address. Read operation is meaningless. When adding a Multicast MAC address, it is required to provide MacAddress, VLAN and PortList all. For deleting operation, MacAddress and VLAN must be provided, but hpnicfdot1qTpFdbGroupSetPort is optional.')
+mibBuilder.exportSymbols("HPN-ICF-LswMAM-MIB", PortList=PortList, hpnicfdot1qMacSearchVlanID=hpnicfdot1qMacSearchVlanID, hpnicfdot1qTpFdbGroupSetAddress=hpnicfdot1qTpFdbGroupSetAddress, hpnicfdot1qTpFdbSetOperate=hpnicfdot1qTpFdbSetOperate, hpnicfdot1qMacSearchAgeTime=hpnicfdot1qMacSearchAgeTime, hpnicfdot1qTpFdbGroupSetEntry=hpnicfdot1qTpFdbGroupSetEntry, hpnicfdot1qMacSearchAddress=hpnicfdot1qMacSearchAddress, hpnicfdot1qTpFdbGroupSetPort=hpnicfdot1qTpFdbGroupSetPort, hpnicfdot1qTpFdbSetEntry=hpnicfdot1qTpFdbSetEntry, hpnicfdot1qTpFdbSetTable=hpnicfdot1qTpFdbSetTable, hpnicfdot1qTpFdbGroupSetOperate=hpnicfdot1qTpFdbGroupSetOperate, PYSNMP_MODULE_ID=hpnicfLswMacPort, hpnicfdot1qTpFdbSetPort=hpnicfdot1qTpFdbSetPort, hpnicfdot1qMacSearchPort=hpnicfdot1qMacSearchPort, hpnicfLswMacPort=hpnicfLswMacPort, hpnicfdot1qMacSearchTable=hpnicfdot1qMacSearchTable, InterfaceIndex=InterfaceIndex, hpnicfdot1qTpFdbSetAddress=hpnicfdot1qTpFdbSetAddress, hpnicfdot1qTpFdbGroupSetTable=hpnicfdot1qTpFdbGroupSetTable, hpnicfdot1qMacSearchEntry=hpnicfdot1qMacSearchEntry, hpnicfdot1qTpFdbSetStatus=hpnicfdot1qTpFdbSetStatus)

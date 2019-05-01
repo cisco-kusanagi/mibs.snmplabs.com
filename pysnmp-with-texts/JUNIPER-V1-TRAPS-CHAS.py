@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module JUNIPER-V1-TRAPS-CHAS (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/JUNIPER-V1-TRAPS-CHAS
+# Produced by pysmi-0.3.4 at Wed May  1 14:01:24 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, Integer32, iso, NotificationType, Gauge32, enterprises, Counter64, MibIdentifier, NotificationType, IpAddress, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Unsigned32, Bits, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "Integer32", "iso", "NotificationType", "Gauge32", "enterprises", "Counter64", "MibIdentifier", "NotificationType", "IpAddress", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Unsigned32", "Bits", "ModuleIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+juniperMIB = MibIdentifier((1, 3, 6, 1, 4, 1, 2636))
+jnxMibs = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3))
+jnxBoxAnatomy = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 1))
+jnxContentsTable = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 1, 8))
+jnxContentsEntry = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 1, 8, 1))
+jnxContentsContainerIndex = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 1, 8, 1, 1))
+jnxContentsL1Index = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 1, 8, 1, 2))
+jnxContentsL2Index = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 1, 8, 1, 3))
+jnxContentsL3Index = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 1, 8, 1, 4))
+jnxContentsDescr = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 1, 8, 1, 6))
+jnxPowerSupplyFailureV1 = NotificationType((1, 3, 6, 1, 4, 1, 2636) + (0,1)).setObjects(("JUNIPER-V1-TRAPS-CHAS", "jnxContentsContainerIndex"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL1Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL2Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL3Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsDescr"))
+if mibBuilder.loadTexts: jnxPowerSupplyFailureV1.setDescription('A jnxPowerSupplyFailure trap signifies that the specified power supply in the chassis has been in the failure (bad DC output) condition.')
+jnxFanFailureV1 = NotificationType((1, 3, 6, 1, 4, 1, 2636) + (0,2)).setObjects(("JUNIPER-V1-TRAPS-CHAS", "jnxContentsContainerIndex"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL1Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL2Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL3Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsDescr"))
+if mibBuilder.loadTexts: jnxFanFailureV1.setDescription('A jnxFanFailure trap signifies that the specified cooling fan or impeller in the chassis has been in the failure (not spinning) condition.')
+jnxOverTemperatureV1 = NotificationType((1, 3, 6, 1, 4, 1, 2636) + (0,3)).setObjects(("JUNIPER-V1-TRAPS-CHAS", "jnxContentsContainerIndex"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL1Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL2Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsL3Index"), ("JUNIPER-V1-TRAPS-CHAS", "jnxContentsDescr"))
+if mibBuilder.loadTexts: jnxOverTemperatureV1.setDescription('A jnxOverTemperature trap signifies that the specified hardware component in the chassis has experienced over temperature condition.')
+mibBuilder.exportSymbols("JUNIPER-V1-TRAPS-CHAS", jnxContentsL1Index=jnxContentsL1Index, jnxPowerSupplyFailureV1=jnxPowerSupplyFailureV1, jnxContentsDescr=jnxContentsDescr, jnxMibs=jnxMibs, jnxFanFailureV1=jnxFanFailureV1, jnxContentsEntry=jnxContentsEntry, jnxContentsTable=jnxContentsTable, juniperMIB=juniperMIB, jnxContentsL3Index=jnxContentsL3Index, jnxContentsL2Index=jnxContentsL2Index, jnxBoxAnatomy=jnxBoxAnatomy, jnxContentsContainerIndex=jnxContentsContainerIndex, jnxOverTemperatureV1=jnxOverTemperatureV1)

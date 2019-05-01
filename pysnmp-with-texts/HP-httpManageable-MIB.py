@@ -1,0 +1,110 @@
+#
+# PySNMP MIB module HP-httpManageable-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-httpManageable-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:37:06 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+TimeTicks, Integer32, ModuleIdentity, Unsigned32, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, Counter64, IpAddress, NotificationType, Gauge32, Counter32, MibIdentifier, enterprises, iso = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Integer32", "ModuleIdentity", "Unsigned32", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "Counter64", "IpAddress", "NotificationType", "Gauge32", "Counter32", "MibIdentifier", "enterprises", "iso")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hpHttpMgMod = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 36, 1))
+hpHttpMgMod.setRevisions(('1997-06-26 00:00', '1996-06-12 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: hpHttpMgMod.setRevisionsDescriptions(('Incorporated NetCitizen definitions', 'Initial Version',))
+if mibBuilder.loadTexts: hpHttpMgMod.setLastUpdated('9706260000Z')
+if mibBuilder.loadTexts: hpHttpMgMod.setOrganization('Hewlett-Packard Web-based Management Working Group')
+if mibBuilder.loadTexts: hpHttpMgMod.setContactInfo('WG E-mail: webmgmt@sysman.hpl.hp.com Chair: Brian Harrison Postal: Hewlett-Packard 10500 Ridgeview Court Cupertino CA 95014 USA Tel: +1-408-343-5661 Fax: +1-408-343-6537 E-mail: brian_harrison@hp.com')
+if mibBuilder.loadTexts: hpHttpMgMod.setDescription('Management information for HTTP manageable devices. This MIB gives SNMP systems information on how to manage a device using HTTP.')
+hp = MibIdentifier((1, 3, 6, 1, 4, 1, 11))
+nm = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2))
+hpWebMgmt = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 36))
+class Utf8String(TextualConvention, OctetString):
+    description = 'To facilitate internationalization, this TC represents information taken from the ISO/IEC IS 10646-1 character set, encoded as an octet string using the UTF-8 character encoding scheme described in RFC 2044 [10]. For strings in 7-bit US-ASCII, there is no impact since the UTF-8 representation is identical to the US-ASCII encoding.'
+    status = 'current'
+    displayHint = '255a'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 255)
+
+hpHttpMgTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 0))
+hpHttpMgObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1))
+hpHttpMgGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 2))
+hpHttpMgCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 3))
+hpHttpMgDefaults = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 1))
+hpHttpMgDefaultURL = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 1, 1), Utf8String()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpHttpMgDefaultURL.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgDefaultURL.setDescription('A Uniform Resource Locator (URL), as defined in RFC1738, for the default management information for this device. This URL is typically used by a HTTP browser to display management information for this device. This default page should contain links to any other management pages for this device.')
+hpHttpMgNetCitizen = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2))
+hpHttpMgMgmtSrvrURL = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 1), Utf8String()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpHttpMgMgmtSrvrURL.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgMgmtSrvrURL.setDescription('URL of management server for this device. ')
+hpHttpMgID = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 2), Utf8String()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpHttpMgID.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgID.setDescription('Unique identifier for this entity. This ID must not change even if network address or removable cards are changed. For devices with fixed MAC addresses this may be the same as ifPhysAddress; for devices with fixed serial numbers this may be the same as hpHttpMgSerialNumber.')
+hpHttpMgHealth = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("unknown", 1), ("information", 2), ("ok", 3), ("warning", 4), ("critical", 5), ("nonrecoverable", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpHttpMgHealth.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgHealth.setDescription('Operating status of this entity.')
+hpHttpMgManufacturer = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 4), Utf8String()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpHttpMgManufacturer.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgManufacturer.setDescription("Manufacturer of the hardware for this entity e.g. 'Hewlett-Packard'.")
+hpHttpMgProduct = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 5), Utf8String().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpHttpMgProduct.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgProduct.setDescription("Manufacturer's product number for this entity, e.g. 'D1234A'.")
+hpHttpMgVersion = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 6), Utf8String().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpHttpMgVersion.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgVersion.setDescription("Version number of this entity, e.g. 'A.00.01'. Where several version numbers are available, this represents the software version.")
+hpHttpMgHWVersion = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 7), Utf8String().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpHttpMgHWVersion.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgHWVersion.setDescription("Version number of the hardware for this entity, e.g. 'A.00.01'.")
+hpHttpMgROMVersion = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 8), Utf8String().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpHttpMgROMVersion.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgROMVersion.setDescription("Version number of ROM for this entity, e.g. 'A.00.01'.")
+hpHttpMgSerialNumber = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 9), Utf8String().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpHttpMgSerialNumber.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgSerialNumber.setDescription('Serial number of entity. It is recommended that this be factory set and read only; if not factory set, should initially be blank.')
+hpHttpMgAssetNumber = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 10), Utf8String().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpHttpMgAssetNumber.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgAssetNumber.setDescription('Asset number of entity. This is not normally modified once set.')
+hpHttpMgPhone = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 1, 2, 11), Utf8String().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpHttpMgPhone.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgPhone.setDescription('Phone number of contact person for this entity.')
+hpHttpMgHealthTrap = NotificationType((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 0, 1)).setObjects(("HP-httpManageable-MIB", "hpHttpMgHealth"))
+if mibBuilder.loadTexts: hpHttpMgHealthTrap.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgHealthTrap.setDescription('Sent whenever hpHttpMgHealth changes state.')
+hpHttpMgShutdown = NotificationType((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 0, 2))
+if mibBuilder.loadTexts: hpHttpMgShutdown.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgShutdown.setDescription('Sent when the agent is about to shut down.')
+hpHttpMgMinCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 3, 1)).setObjects(("HP-httpManageable-MIB", "hpHttpMgDefaultGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpHttpMgMinCompliance = hpHttpMgMinCompliance.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgMinCompliance.setDescription('The compliance statement for SNMP entities which are http manageable.')
+hpHttpMgBasicNetCitizenCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 3, 2)).setObjects(("HP-httpManageable-MIB", "hpHttpMgDefaultGroup"), ("HP-httpManageable-MIB", "hpHttpMgBasicNetCitizenGroup"), ("HP-httpManageable-MIB", "hpHttpMgBasicNetCitizenTrapGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpHttpMgBasicNetCitizenCompliance = hpHttpMgBasicNetCitizenCompliance.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgBasicNetCitizenCompliance.setDescription(' The compliance statement for SNMP entities which meet basic NetCitizen crieria')
+hpHttpMgDefaultGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 2, 1)).setObjects(("HP-httpManageable-MIB", "hpHttpMgDefaultURL"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpHttpMgDefaultGroup = hpHttpMgDefaultGroup.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgDefaultGroup.setDescription('The objects providing information applicable to all http manageable systems')
+hpHttpMgBasicNetCitizenGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 2, 2)).setObjects(("HP-httpManageable-MIB", "hpHttpMgMgmtSrvrURL"), ("HP-httpManageable-MIB", "hpHttpMgID"), ("HP-httpManageable-MIB", "hpHttpMgHealth"), ("HP-httpManageable-MIB", "hpHttpMgManufacturer"), ("HP-httpManageable-MIB", "hpHttpMgProduct"), ("HP-httpManageable-MIB", "hpHttpMgVersion"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpHttpMgBasicNetCitizenGroup = hpHttpMgBasicNetCitizenGroup.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgBasicNetCitizenGroup.setDescription('Additional HP NetCitizen objects')
+hpHttpMgBasicNetCitizenTrapGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 2, 3)).setObjects(("HP-httpManageable-MIB", "hpHttpMgHealthTrap"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpHttpMgBasicNetCitizenTrapGroup = hpHttpMgBasicNetCitizenTrapGroup.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgBasicNetCitizenTrapGroup.setDescription('HP NetCitizen notifications')
+hpHttpMgExtendedNetCitizenGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 2, 4)).setObjects(("HP-httpManageable-MIB", "hpHttpMgHWVersion"), ("HP-httpManageable-MIB", "hpHttpMgROMVersion"), ("HP-httpManageable-MIB", "hpHttpMgSerialNumber"), ("HP-httpManageable-MIB", "hpHttpMgAssetNumber"), ("HP-httpManageable-MIB", "hpHttpMgPhone"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpHttpMgExtendedNetCitizenGroup = hpHttpMgExtendedNetCitizenGroup.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgExtendedNetCitizenGroup.setDescription('Additional HP NetCitizen objects')
+hpHttpMgExtendedNetCitizenTrapGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 11, 2, 36, 1, 2, 5)).setObjects(("HP-httpManageable-MIB", "hpHttpMgShutdown"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpHttpMgExtendedNetCitizenTrapGroup = hpHttpMgExtendedNetCitizenTrapGroup.setStatus('current')
+if mibBuilder.loadTexts: hpHttpMgExtendedNetCitizenTrapGroup.setDescription('HP NetCitizen notifications')
+mibBuilder.exportSymbols("HP-httpManageable-MIB", PYSNMP_MODULE_ID=hpHttpMgMod, hpHttpMgBasicNetCitizenGroup=hpHttpMgBasicNetCitizenGroup, hpHttpMgHWVersion=hpHttpMgHWVersion, hpHttpMgPhone=hpHttpMgPhone, hpHttpMgMod=hpHttpMgMod, hpHttpMgManufacturer=hpHttpMgManufacturer, hpHttpMgHealthTrap=hpHttpMgHealthTrap, hpHttpMgDefaults=hpHttpMgDefaults, hpHttpMgSerialNumber=hpHttpMgSerialNumber, hpHttpMgAssetNumber=hpHttpMgAssetNumber, hpHttpMgMgmtSrvrURL=hpHttpMgMgmtSrvrURL, hpHttpMgDefaultGroup=hpHttpMgDefaultGroup, nm=nm, hp=hp, hpHttpMgProduct=hpHttpMgProduct, hpHttpMgExtendedNetCitizenTrapGroup=hpHttpMgExtendedNetCitizenTrapGroup, hpHttpMgROMVersion=hpHttpMgROMVersion, hpWebMgmt=hpWebMgmt, hpHttpMgTraps=hpHttpMgTraps, hpHttpMgObjects=hpHttpMgObjects, Utf8String=Utf8String, hpHttpMgNetCitizen=hpHttpMgNetCitizen, hpHttpMgExtendedNetCitizenGroup=hpHttpMgExtendedNetCitizenGroup, hpHttpMgID=hpHttpMgID, hpHttpMgGroups=hpHttpMgGroups, hpHttpMgVersion=hpHttpMgVersion, hpHttpMgBasicNetCitizenTrapGroup=hpHttpMgBasicNetCitizenTrapGroup, hpHttpMgHealth=hpHttpMgHealth, hpHttpMgShutdown=hpHttpMgShutdown, hpHttpMgBasicNetCitizenCompliance=hpHttpMgBasicNetCitizenCompliance, hpHttpMgCompliances=hpHttpMgCompliances, hpHttpMgDefaultURL=hpHttpMgDefaultURL, hpHttpMgMinCompliance=hpHttpMgMinCompliance)

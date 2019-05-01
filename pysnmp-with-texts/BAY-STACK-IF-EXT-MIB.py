@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module BAY-STACK-IF-EXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BAY-STACK-IF-EXT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:35:14 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion")
+InterfaceIndex, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, IpAddress, iso, NotificationType, Bits, ModuleIdentity, TimeTicks, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, MibIdentifier, Counter64, Counter32, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "IpAddress", "iso", "NotificationType", "Bits", "ModuleIdentity", "TimeTicks", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "MibIdentifier", "Counter64", "Counter32", "Integer32")
+DisplayString, TruthValue, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TruthValue", "TextualConvention")
+bayStackMibs, = mibBuilder.importSymbols("SYNOPTICS-ROOT-MIB", "bayStackMibs")
+bayStackIfExtMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 45, 5, 40))
+bayStackIfExtMib.setRevisions(('2012-05-31 00:00', '2010-11-03 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: bayStackIfExtMib.setRevisionsDescriptions(('Ver 2: Added bsIfExtDirectedBroadcast.', 'Ver 1: Initial version.',))
+if mibBuilder.loadTexts: bayStackIfExtMib.setLastUpdated('201205310000Z')
+if mibBuilder.loadTexts: bayStackIfExtMib.setOrganization('Avaya')
+if mibBuilder.loadTexts: bayStackIfExtMib.setContactInfo('avaya.com')
+if mibBuilder.loadTexts: bayStackIfExtMib.setDescription('This MIB module contains miscellaneous per-interface extensions.')
+bsIfExtNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 45, 5, 40, 0))
+bsIfExtObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 45, 5, 40, 1))
+bsIfExtScalars = MibIdentifier((1, 3, 6, 1, 4, 1, 45, 5, 40, 1, 1))
+bsIfExtDirectedBroadcast = MibScalar((1, 3, 6, 1, 4, 1, 45, 5, 40, 1, 1, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: bsIfExtDirectedBroadcast.setStatus('current')
+if mibBuilder.loadTexts: bsIfExtDirectedBroadcast.setDescription('Indicates whether directed broadcast is enabled globally.')
+bsIfExtIfTable = MibTable((1, 3, 6, 1, 4, 1, 45, 5, 40, 1, 2), )
+if mibBuilder.loadTexts: bsIfExtIfTable.setStatus('current')
+if mibBuilder.loadTexts: bsIfExtIfTable.setDescription('This table contains per-interface extensions.')
+bsIfExtIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 45, 5, 40, 1, 2, 1), ).setIndexNames((0, "BAY-STACK-IF-EXT-MIB", "bsIfExtIfIndex"))
+if mibBuilder.loadTexts: bsIfExtIfEntry.setStatus('current')
+if mibBuilder.loadTexts: bsIfExtIfEntry.setDescription('An entry containing objects for controlling unicast storm control settings for an interface.')
+bsIfExtIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 40, 1, 2, 1, 1), InterfaceIndex())
+if mibBuilder.loadTexts: bsIfExtIfIndex.setStatus('current')
+if mibBuilder.loadTexts: bsIfExtIfIndex.setDescription('The ifIndex value of the interface.')
+bsIfExtIfDirectedBroadcast = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 5, 40, 1, 2, 1, 2), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: bsIfExtIfDirectedBroadcast.setStatus('current')
+if mibBuilder.loadTexts: bsIfExtIfDirectedBroadcast.setDescription('Indicates whether directed broadcast is enabled on the interface.')
+mibBuilder.exportSymbols("BAY-STACK-IF-EXT-MIB", bsIfExtIfEntry=bsIfExtIfEntry, bsIfExtNotifications=bsIfExtNotifications, bsIfExtScalars=bsIfExtScalars, bsIfExtIfDirectedBroadcast=bsIfExtIfDirectedBroadcast, bayStackIfExtMib=bayStackIfExtMib, bsIfExtIfIndex=bsIfExtIfIndex, bsIfExtObjects=bsIfExtObjects, PYSNMP_MODULE_ID=bayStackIfExtMib, bsIfExtDirectedBroadcast=bsIfExtDirectedBroadcast, bsIfExtIfTable=bsIfExtIfTable)

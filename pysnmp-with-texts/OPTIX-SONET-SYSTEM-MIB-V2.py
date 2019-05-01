@@ -1,0 +1,45 @@
+#
+# PySNMP MIB module OPTIX-SONET-SYSTEM-MIB-V2 (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/OPTIX-SONET-SYSTEM-MIB-V2
+# Produced by pysmi-0.3.4 at Wed May  1 14:35:21 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection")
+optixProvisionSonet, = mibBuilder.importSymbols("OPTIX-OID-MIB", "optixProvisionSonet")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+TimeTicks, Gauge32, ModuleIdentity, Counter32, IpAddress, NotificationType, MibIdentifier, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, iso, Integer32, Counter64, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Gauge32", "ModuleIdentity", "Counter32", "IpAddress", "NotificationType", "MibIdentifier", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "iso", "Integer32", "Counter64", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+optixsonetSysAttribute = ModuleIdentity((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4))
+if mibBuilder.loadTexts: optixsonetSysAttribute.setLastUpdated('200605232007Z')
+if mibBuilder.loadTexts: optixsonetSysAttribute.setOrganization('Your organization')
+if mibBuilder.loadTexts: optixsonetSysAttribute.setContactInfo('Your contact info')
+if mibBuilder.loadTexts: optixsonetSysAttribute.setDescription('Enter the description for this MIB module.')
+optixsonetNeType = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 1))
+optixsonetVendId = MibScalar((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 1, 1), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: optixsonetVendId.setStatus('current')
+if mibBuilder.loadTexts: optixsonetVendId.setDescription('The vendor identifier of the equipment. Valid value is a string.')
+optixsonetDeviceType = MibScalar((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 1, 2), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: optixsonetDeviceType.setStatus('current')
+if mibBuilder.loadTexts: optixsonetDeviceType.setDescription('Device type')
+optixsonetEquipType = MibScalar((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 1, 3), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: optixsonetEquipType.setStatus('current')
+if mibBuilder.loadTexts: optixsonetEquipType.setDescription('Equipment type.It is a 40 bytes string.Valid value is ADM,MUX or MSPP. ADM means Multi Add/Drop Multiplexer. MUX means Multiplexer. MSPP means Multi-Service Transport Platform. ')
+optixsonetNeVersion = MibScalar((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 1, 4), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: optixsonetNeVersion.setStatus('current')
+if mibBuilder.loadTexts: optixsonetNeVersion.setDescription('The software release version of the NE. It is a 40 bytes string.')
+optixsonetSysAttributeConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 2))
+optixsonetSysAttributeGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 2, 1))
+currentObjectGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 2, 1, 1)).setObjects(("OPTIX-SONET-SYSTEM-MIB-V2", "optixsonetVendId"), ("OPTIX-SONET-SYSTEM-MIB-V2", "optixsonetDeviceType"), ("OPTIX-SONET-SYSTEM-MIB-V2", "optixsonetEquipType"), ("OPTIX-SONET-SYSTEM-MIB-V2", "optixsonetNeVersion"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    currentObjectGroup = currentObjectGroup.setStatus('current')
+if mibBuilder.loadTexts: currentObjectGroup.setDescription('Enter the description of the created OBJECT-GROUP.')
+optixsonetSysAttributeCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 2, 2))
+basicCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2011, 2, 25, 4, 20, 4, 2, 2, 1)).setObjects(("OPTIX-SONET-SYSTEM-MIB-V2", "currentObjectGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    basicCompliance = basicCompliance.setStatus('current')
+if mibBuilder.loadTexts: basicCompliance.setDescription('Enter the description of the created MODULE-COMPLIANCE.')
+mibBuilder.exportSymbols("OPTIX-SONET-SYSTEM-MIB-V2", optixsonetSysAttributeGroups=optixsonetSysAttributeGroups, PYSNMP_MODULE_ID=optixsonetSysAttribute, optixsonetNeVersion=optixsonetNeVersion, optixsonetSysAttributeConformance=optixsonetSysAttributeConformance, optixsonetDeviceType=optixsonetDeviceType, basicCompliance=basicCompliance, optixsonetVendId=optixsonetVendId, optixsonetSysAttribute=optixsonetSysAttribute, currentObjectGroup=currentObjectGroup, optixsonetSysAttributeCompliances=optixsonetSysAttributeCompliances, optixsonetEquipType=optixsonetEquipType, optixsonetNeType=optixsonetNeType)

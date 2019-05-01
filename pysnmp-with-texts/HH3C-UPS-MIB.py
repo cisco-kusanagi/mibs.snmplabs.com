@@ -1,0 +1,50 @@
+#
+# PySNMP MIB module HH3C-UPS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HH3C-UPS-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:30:12 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection")
+entPhysicalIndex, = mibBuilder.importSymbols("ENTITY-MIB", "entPhysicalIndex")
+hh3cCommon, = mibBuilder.importSymbols("HH3C-OID-MIB", "hh3cCommon")
+InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddress")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, TimeTicks, MibIdentifier, NotificationType, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, Counter64, ObjectIdentity, Integer32, Unsigned32, IpAddress, iso, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "TimeTicks", "MibIdentifier", "NotificationType", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "Counter64", "ObjectIdentity", "Integer32", "Unsigned32", "IpAddress", "iso", "Gauge32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hh3cUps = ModuleIdentity((1, 3, 6, 1, 4, 1, 25506, 2, 82))
+if mibBuilder.loadTexts: hh3cUps.setLastUpdated('200709041452Z')
+if mibBuilder.loadTexts: hh3cUps.setOrganization('H3C Technologies Co., Ltd.')
+if mibBuilder.loadTexts: hh3cUps.setContactInfo('Platform Team H3C Technologies Co., Ltd. Hai-Dian District Beijing P.R. China Http://www.h3c.com Zip:100085')
+if mibBuilder.loadTexts: hh3cUps.setDescription('This MIB describes the general information of UPS(Uninterrupted Power Supply) device.')
+hh3cUpsMibObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 82, 1))
+class Hh3cActionType(TextualConvention, Integer32):
+    description = 'A control variable used to trigger an operator events, when read, always returns a value of invalid.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("action", 1), ("invalid", 2))
+
+hh3cUpsConfigEnable = MibScalar((1, 3, 6, 1, 4, 1, 25506, 2, 82, 1, 1), Hh3cActionType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cUpsConfigEnable.setStatus('current')
+if mibBuilder.loadTexts: hh3cUpsConfigEnable.setDescription("This object identifies the operation which will make the UPS(Uninterrupted Power Supply)'s new configure become effective.")
+hh3cUpsConfigTable = MibTable((1, 3, 6, 1, 4, 1, 25506, 2, 82, 1, 2), )
+if mibBuilder.loadTexts: hh3cUpsConfigTable.setStatus('current')
+if mibBuilder.loadTexts: hh3cUpsConfigTable.setDescription('This table contains an entry for user to get some information about the UPS device.')
+hh3cUpsConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 25506, 2, 82, 1, 2, 1), ).setIndexNames((0, "HH3C-UPS-MIB", "hh3cUpsIndex"))
+if mibBuilder.loadTexts: hh3cUpsConfigEntry.setStatus('current')
+if mibBuilder.loadTexts: hh3cUpsConfigEntry.setDescription('An entry containing management information applicable to a particular UPS.')
+hh3cUpsIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 82, 1, 2, 1, 1), Integer32())
+if mibBuilder.loadTexts: hh3cUpsIndex.setStatus('current')
+if mibBuilder.loadTexts: hh3cUpsIndex.setDescription('This object identifies the index of hh3cUpsConfigTable. The object identified by this index is the same object as identified by the same value of entPhysicalIndex.')
+hh3cUpsType = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 82, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("emersonUart", 1), ("mge", 2), ("common", 3), ("emersonEth", 4), ("liebert", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hh3cUpsType.setStatus('current')
+if mibBuilder.loadTexts: hh3cUpsType.setDescription("This object identifies the type of UPS. The value 'emersonUart' means an EMERSON UPS support UART interface. The value 'mge' means a MGE UPS support ethernet interface. The value 'common' means a common UPS support standard UPSMIB. The value 'emersonEth' means an EMERSON UPS support ethernet interface. The value 'liebert' means a Liebert UPS support ethernet interface.")
+hh3cUpsIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 82, 1, 2, 1, 3), InetAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cUpsIpAddress.setStatus('current')
+if mibBuilder.loadTexts: hh3cUpsIpAddress.setDescription('This object describes the address of UPS. The value of this object is invalid if the UPS do not support ethernet interface.')
+hh3cUpsIpAddressType = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 82, 1, 2, 1, 4), InetAddressType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cUpsIpAddressType.setStatus('current')
+if mibBuilder.loadTexts: hh3cUpsIpAddressType.setDescription('This object describes the address type of UPS. The value of this object is invalid if the UPS do not support ethernet interface.')
+mibBuilder.exportSymbols("HH3C-UPS-MIB", Hh3cActionType=Hh3cActionType, hh3cUpsMibObjects=hh3cUpsMibObjects, hh3cUps=hh3cUps, hh3cUpsConfigTable=hh3cUpsConfigTable, PYSNMP_MODULE_ID=hh3cUps, hh3cUpsConfigEntry=hh3cUpsConfigEntry, hh3cUpsIndex=hh3cUpsIndex, hh3cUpsIpAddressType=hh3cUpsIpAddressType, hh3cUpsType=hh3cUpsType, hh3cUpsIpAddress=hh3cUpsIpAddress, hh3cUpsConfigEnable=hh3cUpsConfigEnable)

@@ -1,0 +1,68 @@
+#
+# PySNMP MIB module CISCO-INTERFACETOPN-EXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-INTERFACETOPN-EXT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:01:55 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+interfaceTopNControlEntry, = mibBuilder.importSymbols("INTERFACETOPN-MIB", "interfaceTopNControlEntry")
+VlanIndex, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "VlanIndex")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+NotificationType, Counter32, ObjectIdentity, iso, Unsigned32, ModuleIdentity, Counter64, TimeTicks, Integer32, MibIdentifier, Bits, IpAddress, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Counter32", "ObjectIdentity", "iso", "Unsigned32", "ModuleIdentity", "Counter64", "TimeTicks", "Integer32", "MibIdentifier", "Bits", "IpAddress", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ciscoInterfaceTopNExtMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 482))
+ciscoInterfaceTopNExtMIB.setRevisions(('2010-10-19 00:00', '2008-01-15 00:00', '2006-03-15 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoInterfaceTopNExtMIB.setRevisionsDescriptions(('Add fortyGigaEthernet in citneInterfaceTopNInterfaceType', 'Modified the object descriptions of citneInterfaceTopNCounterType, citneInterfaceTopNInterfaceType and citneInterfaceTopNVlanNumber.', 'Initial version of this MIB module.',))
+if mibBuilder.loadTexts: ciscoInterfaceTopNExtMIB.setLastUpdated('201010190000Z')
+if mibBuilder.loadTexts: ciscoInterfaceTopNExtMIB.setOrganization('Cisco Systems, Inc.')
+if mibBuilder.loadTexts: ciscoInterfaceTopNExtMIB.setContactInfo('Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-lan-switch-snmp@cisco.com')
+if mibBuilder.loadTexts: ciscoInterfaceTopNExtMIB.setDescription('This MIB module is an extension to INTERFACETOPN-MIB. It provides additional management information for sorting device interfaces.')
+ciscoInterfaceTopNExtMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 482, 0))
+ciscoInterfaceTopNExtMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 482, 1))
+ciscoInterfaceTopNExtMIBConform = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 482, 2))
+citneInterfaceTopNCaps = MibScalar((1, 3, 6, 1, 4, 1, 9, 9, 482, 1, 1), Bits().clone(namedValues=NamedValues(("utilization", 0), ("bytes", 1), ("packets", 2), ("broadcast", 3), ("multicast", 4), ("overflow", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: citneInterfaceTopNCaps.setStatus('current')
+if mibBuilder.loadTexts: citneInterfaceTopNCaps.setDescription('The type of interface counters the system is capable to do sorting on, as an extension to the interfaceTopNCaps defined in INTERFACETOPN-MIB. utilization -- The interface bandwidth utilization in 32-bit version. The utilization on ethernet interface is computed in the following methods: Ethernet utilization: (for full duplex interface, divide by 2) 10 Mbps I/O-pkts * (9.6 + 6.4) + (0.8 * I/O-Bytes) Ethernet Util = ----------------------------------------- Interval * 10,000 where 9.6 is interframe gap of Ethernet 6.4 is preamble of Ethernet 10,000 is 10Mbps 100 Mbps I/O-pkts * (96 + 64) + (8 * I/O-Bytes) Ethernet Util = -------------------------------------- Interval * 1,000,000 1000 Mbps I/O-pkts * (96 + 64) + (8 * I/O-Bytes) Ethernet Util = -------------------------------------- Interval * 10,000,000 10000Mbps I/O-pkts * (96 + 64) + (8 * I/O-Bytes) Ethernet Util = -------------------------------------- Interval * 100,000,000 All other I/O-pkts * (9.6 + 6.4) + (0.8 * I/O-Bytes) Ethernet Util = ------------------------------------------ Interval * N * 1,000 (where N is N Mbps) bytes -- the total number of bytes received and transmitted on the interface in 64-bit version. packets -- the total number of packets received and transmitted on the interface in 64-bit version. broadcast -- the total number of broadcast packets received and transmitted on the interface in 64-bit version. multicast -- the total number of multicast packets received and transmitted on the interface in 64-bit version. overflow -- the total number of transmitted buffer overflow errors on the interface in 32-bit version.')
+citneInterfaceTopNControlTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 482, 1, 2), )
+if mibBuilder.loadTexts: citneInterfaceTopNControlTable.setStatus('current')
+if mibBuilder.loadTexts: citneInterfaceTopNControlTable.setDescription('A table providing supplemental parameter information for interfaceTopNControlTable as defined in INTERFACETOPN-MIB.')
+citneInterfaceTopNControlEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 482, 1, 2, 1), )
+interfaceTopNControlEntry.registerAugmentions(("CISCO-INTERFACETOPN-EXT-MIB", "citneInterfaceTopNControlEntry"))
+citneInterfaceTopNControlEntry.setIndexNames(*interfaceTopNControlEntry.getIndexNames())
+if mibBuilder.loadTexts: citneInterfaceTopNControlEntry.setStatus('current')
+if mibBuilder.loadTexts: citneInterfaceTopNControlEntry.setDescription('An entry providing supplemental parameter information that control the creation of a report of the top N ports according to several metrics.')
+citneInterfaceTopNCounterType = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 482, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7))).clone(namedValues=NamedValues(("none", 1), ("utilization", 2), ("bytes", 3), ("packets", 4), ("broadcast", 5), ("multicast", 6), ("overflow", 7))).clone('none')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: citneInterfaceTopNCounterType.setStatus('current')
+if mibBuilder.loadTexts: citneInterfaceTopNCounterType.setDescription("The particular counter type to be sampled, as an extension to the interfaceTopNObjectVariable defined in INTERFACETOPN-MIB. Setting this object to the value of 'none' indicates that the TopN sampling is based on the counter type as specified by the corresponding interfaceTopNObjectVariable for the same entry in interfaceTopNControlTable; Setting this object to a value other than 'none' indicates that the TopN sampling is based on the counter type as specified by this object instead of the counter type as specified by the corresponding interfaceTopNObjectVariable for the same entry in interfaceTopNControlTable. For entries in the interfaceTopNTable in the INTERFACETOPN-MIB reported for counter type as specified by this citneInterfaceTopNCounterType: (1) The corresponding interfaceTopNDataSourceIndex will point to the ifIndex of the sorted interfaces; (2) If the sampled counter type is one of the following 32 bit counters: 'utilization', 'overflow', the interfaceTopNValue object is used in the corresponding entries in interfaceTopNTable. If the sampled counter type is one of the following 64 bit counters: 'bytes', 'packets', 'broadcast', 'multicast', the interfaceTopNValue64 object is used in the corresponding entries in interfaceTopNTable. This object may not be modified if the associated interfaceTopNRowStatus object is equal to 'active'.")
+citneInterfaceTopNInterfaceType = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 482, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9))).clone(namedValues=NamedValues(("all", 1), ("ethernet", 2), ("fastEthernet", 3), ("gigaEthernet", 4), ("tenGigaEthernet", 5), ("portChannel", 6), ("layer2", 7), ("layer3", 8), ("fortyGigaEthernet", 9))).clone('all')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: citneInterfaceTopNInterfaceType.setStatus('current')
+if mibBuilder.loadTexts: citneInterfaceTopNInterfaceType.setDescription("Specifies the interface type for the TopN sampling. all -- all applicable interfaces in the system. ethernet -- all Ethernet interfaces in the system. fastEthernet -- all FastEthernet interfaces in the system. gigaEthernet -- all GigabitEthernet interfaces in the system. tenGigaEthernet -- all TenGigabitEthernet interfaces in the system. portChannel -- all Port-channel interfaces in the system. layer2 -- all layer-2 interfaces in the system. layer3 -- all layer-3 interfaces in the system. fortyGigaEthernet -- all FortyGigabitEthernet interfaces in the system. This object may not be modified if the associated interfaceTopNRowStatus object is equal to 'active'.")
+citneInterfaceTopNVlanNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 482, 1, 2, 1, 3), VlanIndex()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: citneInterfaceTopNVlanNumber.setStatus('current')
+if mibBuilder.loadTexts: citneInterfaceTopNVlanNumber.setDescription("Specifies the Vlan number for the layer-2 interfaces when the object value of citneInterfaceTopNInterfaceType for the same entry is 'layer2'. If the object value of citneInterfaceTopNVlanNumber is other than zero and the corresponding citneInterfaceTopNInterfaceType is 'layer2' for the same entry, then it indicates all layer-2 interfaces in that VLAN is sampled. If the object value of citneInterfaceTopNVlanNumber is zero and the corresponding citneInterfaceTopNInterfaceType is 'layer2' for the same entry, then it indicates all layer-2 interfaces in the system regardless of their Vlan number is sampled. If the object value of citneInterfaceTopNInterfaceType is other than 'layer2', then citneInterfaceTopNVlanNumber has to take the value of 0. This object may not be modified if the associated interfaceTopNRowStatus object is equal to 'active'.")
+ciscoIfTopNExtMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 482, 2, 1))
+ciscoIfTopNExtMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 482, 2, 2))
+ciscoIfTopNExtMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 482, 2, 1, 1)).setObjects(("CISCO-INTERFACETOPN-EXT-MIB", "ciscoIfTopNExtCapsGroup"), ("CISCO-INTERFACETOPN-EXT-MIB", "ciscoIfTopNExtControlGroup"), ("CISCO-INTERFACETOPN-EXT-MIB", "ciscoIfTopNExtCtrlVlanGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoIfTopNExtMIBCompliance = ciscoIfTopNExtMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: ciscoIfTopNExtMIBCompliance.setDescription('Describes the requirements for conformance to the Cisco InterfaceTopN Extention MIB.')
+ciscoIfTopNExtCapsGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 482, 2, 2, 1)).setObjects(("CISCO-INTERFACETOPN-EXT-MIB", "citneInterfaceTopNCaps"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoIfTopNExtCapsGroup = ciscoIfTopNExtCapsGroup.setStatus('current')
+if mibBuilder.loadTexts: ciscoIfTopNExtCapsGroup.setDescription('A collection of objects providing capability information about supplemental counter type supported by the system.')
+ciscoIfTopNExtControlGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 482, 2, 2, 2)).setObjects(("CISCO-INTERFACETOPN-EXT-MIB", "citneInterfaceTopNCounterType"), ("CISCO-INTERFACETOPN-EXT-MIB", "citneInterfaceTopNInterfaceType"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoIfTopNExtControlGroup = ciscoIfTopNExtControlGroup.setStatus('current')
+if mibBuilder.loadTexts: ciscoIfTopNExtControlGroup.setDescription('A collection of objects providing information about supplemental parameters for the interfaceTopNControlTable.')
+ciscoIfTopNExtCtrlVlanGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 482, 2, 2, 3)).setObjects(("CISCO-INTERFACETOPN-EXT-MIB", "citneInterfaceTopNVlanNumber"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoIfTopNExtCtrlVlanGroup = ciscoIfTopNExtCtrlVlanGroup.setStatus('current')
+if mibBuilder.loadTexts: ciscoIfTopNExtCtrlVlanGroup.setDescription('A collection of objects providing information about supplemental vlan parameters for the interfaceTopNControlTable.')
+mibBuilder.exportSymbols("CISCO-INTERFACETOPN-EXT-MIB", ciscoInterfaceTopNExtMIBConform=ciscoInterfaceTopNExtMIBConform, ciscoIfTopNExtMIBCompliances=ciscoIfTopNExtMIBCompliances, citneInterfaceTopNVlanNumber=citneInterfaceTopNVlanNumber, ciscoInterfaceTopNExtMIB=ciscoInterfaceTopNExtMIB, ciscoIfTopNExtMIBCompliance=ciscoIfTopNExtMIBCompliance, ciscoIfTopNExtControlGroup=ciscoIfTopNExtControlGroup, ciscoIfTopNExtCtrlVlanGroup=ciscoIfTopNExtCtrlVlanGroup, citneInterfaceTopNControlTable=citneInterfaceTopNControlTable, PYSNMP_MODULE_ID=ciscoInterfaceTopNExtMIB, citneInterfaceTopNCounterType=citneInterfaceTopNCounterType, citneInterfaceTopNControlEntry=citneInterfaceTopNControlEntry, ciscoInterfaceTopNExtMIBNotifs=ciscoInterfaceTopNExtMIBNotifs, ciscoIfTopNExtMIBGroups=ciscoIfTopNExtMIBGroups, ciscoIfTopNExtCapsGroup=ciscoIfTopNExtCapsGroup, citneInterfaceTopNCaps=citneInterfaceTopNCaps, citneInterfaceTopNInterfaceType=citneInterfaceTopNInterfaceType, ciscoInterfaceTopNExtMIBObjects=ciscoInterfaceTopNExtMIBObjects)

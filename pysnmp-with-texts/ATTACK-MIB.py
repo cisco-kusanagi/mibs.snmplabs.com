@@ -1,0 +1,51 @@
+#
+# PySNMP MIB module ATTACK-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ATTACK-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:31:52 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+blueCoatMgmt, = mibBuilder.importSymbols("BLUECOAT-MIB", "blueCoatMgmt")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, TimeTicks, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Integer32, iso, NotificationType, Counter32, IpAddress, Bits, Unsigned32, MibIdentifier, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "TimeTicks", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Integer32", "iso", "NotificationType", "Counter32", "IpAddress", "Bits", "Unsigned32", "MibIdentifier", "ModuleIdentity")
+TimeStamp, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TimeStamp", "TextualConvention", "DisplayString")
+deviceAttackMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 3417, 2, 3))
+if mibBuilder.loadTexts: deviceAttackMIB.setLastUpdated('0211060300Z')
+if mibBuilder.loadTexts: deviceAttackMIB.setOrganization('Blue Coat Systems, Inc.')
+if mibBuilder.loadTexts: deviceAttackMIB.setContactInfo('support@bluecoat.com')
+if mibBuilder.loadTexts: deviceAttackMIB.setDescription('The Attack-MIB is used to monitor possible protocol attacks by hackers.')
+deviceAttackMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 3417, 2, 3, 1))
+deviceAttackMIBNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 3417, 2, 3, 2))
+deviceAttackMIBNotificationsPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 3417, 2, 3, 2, 0))
+class AttackStatus(TextualConvention, Integer32):
+    description = 'Indicates the status of the attack. no-attack(1) :no attack. under-attack(2) :attack in progress.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("no-attack", 1), ("under-attack", 2))
+
+deviceAttackValues = MibIdentifier((1, 3, 6, 1, 4, 1, 3417, 2, 3, 1, 1))
+deviceAttackTable = MibTable((1, 3, 6, 1, 4, 1, 3417, 2, 3, 1, 1, 1), )
+if mibBuilder.loadTexts: deviceAttackTable.setStatus('current')
+if mibBuilder.loadTexts: deviceAttackTable.setDescription('This table lists the various attacks that are detected.')
+deviceAttackEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3417, 2, 3, 1, 1, 1, 1), ).setIndexNames((0, "ATTACK-MIB", "deviceAttackIndex"))
+if mibBuilder.loadTexts: deviceAttackEntry.setStatus('current')
+if mibBuilder.loadTexts: deviceAttackEntry.setDescription('A deviceAttack entry describes the present state of an attack.')
+deviceAttackIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 3417, 2, 3, 1, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2147483647)))
+if mibBuilder.loadTexts: deviceAttackIndex.setStatus('current')
+if mibBuilder.loadTexts: deviceAttackIndex.setDescription('An arbitrary value which uniquely identifies an attack.')
+deviceAttackName = MibTableColumn((1, 3, 6, 1, 4, 1, 3417, 2, 3, 1, 1, 1, 1, 2), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: deviceAttackName.setStatus('current')
+if mibBuilder.loadTexts: deviceAttackName.setDescription('The textual name of the attack i.e. SYN Flood.')
+deviceAttackStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 3417, 2, 3, 1, 1, 1, 1, 3), AttackStatus()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: deviceAttackStatus.setStatus('current')
+if mibBuilder.loadTexts: deviceAttackStatus.setDescription('no-attack(1) not under attack, under-attack(2) attack in progress. The default start-up value is no-attack(1).')
+deviceAttackTime = MibTableColumn((1, 3, 6, 1, 4, 1, 3417, 2, 3, 1, 1, 1, 1, 4), TimeStamp()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: deviceAttackTime.setStatus('current')
+if mibBuilder.loadTexts: deviceAttackTime.setDescription("value of 'sysUpTime.0' at the time of the attack.")
+deviceAttackTrap = NotificationType((1, 3, 6, 1, 4, 1, 3417, 2, 3, 2, 0, 1)).setObjects(("ATTACK-MIB", "deviceAttackName"), ("ATTACK-MIB", "deviceAttackStatus"))
+if mibBuilder.loadTexts: deviceAttackTrap.setStatus('current')
+if mibBuilder.loadTexts: deviceAttackTrap.setDescription("At the start of an attack a notification is generated with 'deviceAttackStatus = under-attack(2)'. At the end of an attack a notification is generated with 'deviceAttackStatus = no-attack(1)'.")
+mibBuilder.exportSymbols("ATTACK-MIB", deviceAttackName=deviceAttackName, PYSNMP_MODULE_ID=deviceAttackMIB, deviceAttackTable=deviceAttackTable, AttackStatus=AttackStatus, deviceAttackTime=deviceAttackTime, deviceAttackTrap=deviceAttackTrap, deviceAttackMIB=deviceAttackMIB, deviceAttackMIBNotificationsPrefix=deviceAttackMIBNotificationsPrefix, deviceAttackMIBObjects=deviceAttackMIBObjects, deviceAttackIndex=deviceAttackIndex, deviceAttackValues=deviceAttackValues, deviceAttackMIBNotifications=deviceAttackMIBNotifications, deviceAttackEntry=deviceAttackEntry, deviceAttackStatus=deviceAttackStatus)

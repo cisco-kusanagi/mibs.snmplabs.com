@@ -1,0 +1,41 @@
+#
+# PySNMP MIB module TIPPINGPOINT-REG-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TIPPINGPOINT-REG-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:23:40 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+NotificationType, Gauge32, enterprises, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Unsigned32, Counter32, ObjectIdentity, MibIdentifier, ModuleIdentity, Counter64, Bits, iso, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Gauge32", "enterprises", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Unsigned32", "Counter32", "ObjectIdentity", "MibIdentifier", "ModuleIdentity", "Counter64", "Bits", "iso", "IpAddress")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+tippingpoint = ModuleIdentity((1, 3, 6, 1, 4, 1, 10734))
+tippingpoint.setRevisions(('2016-05-25 18:54',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: tippingpoint.setRevisionsDescriptions(('Updated copyright information. Minor MIB syntax fixes.',))
+if mibBuilder.loadTexts: tippingpoint.setLastUpdated('201605251854Z')
+if mibBuilder.loadTexts: tippingpoint.setOrganization('Trend Micro, Inc.')
+if mibBuilder.loadTexts: tippingpoint.setContactInfo('www.trendmicro.com')
+if mibBuilder.loadTexts: tippingpoint.setDescription("Definitions of registration identities for all TPT modules. Copyright (C) 2016 Trend Micro Incorporated. All Rights Reserved. Trend Micro makes no warranty of any kind with regard to this material, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose. Trend Micro shall not be liable for errors contained herein or for incidental or consequential damages in connection with the furnishing, performance, or use of this material. This document contains proprietary information, which is protected by copyright. No part of this document may be photocopied, reproduced, or translated into another language without the prior written consent of Trend Micro. The information is provided 'as is' without warranty of any kind and is subject to change without notice. The only warranties for Trend Micro products and services are set forth in the express warranty statements accompanying such products and services. Nothing herein should be construed as constituting an additional warranty. Trend Micro shall not be liable for technical or editorial errors or omissions contained herein. TippingPoint(R), the TippingPoint logo, and Digital Vaccine(R) are registered trademarks of Trend Micro. All other company and product names may be trademarks of their respective holders. All rights reserved. This document contains confidential information, trade secrets or both, which are the property of Trend Micro. No part of this documentation may be reproduced in any form or by any means or used to make any derivative work (such as translation, transformation, or adaptation) without written permission from Trend Micro or one of its subsidiaries. All other company and product names may be trademarks of their respective holders. ")
+tpt_reg = ObjectIdentity((1, 3, 6, 1, 4, 1, 10734, 1)).setLabel("tpt-reg")
+if mibBuilder.loadTexts: tpt_reg.setStatus('current')
+if mibBuilder.loadTexts: tpt_reg.setDescription('Sub-tree for the registered modules for TippingPoint Technologies.')
+tpt_generic = ObjectIdentity((1, 3, 6, 1, 4, 1, 10734, 2)).setLabel("tpt-generic")
+if mibBuilder.loadTexts: tpt_generic.setStatus('current')
+if mibBuilder.loadTexts: tpt_generic.setDescription('Sub-tree for common object and event definitions.')
+tpt_products = ObjectIdentity((1, 3, 6, 1, 4, 1, 10734, 3)).setLabel("tpt-products")
+if mibBuilder.loadTexts: tpt_products.setStatus('current')
+if mibBuilder.loadTexts: tpt_products.setDescription('Sub-tree for specific object and event definitions.')
+tpt_caps = ObjectIdentity((1, 3, 6, 1, 4, 1, 10734, 4)).setLabel("tpt-caps")
+if mibBuilder.loadTexts: tpt_caps.setStatus('current')
+if mibBuilder.loadTexts: tpt_caps.setDescription('Sub-tree for agent profiles.')
+tpt_reqs = ObjectIdentity((1, 3, 6, 1, 4, 1, 10734, 5)).setLabel("tpt-reqs")
+if mibBuilder.loadTexts: tpt_reqs.setStatus('current')
+if mibBuilder.loadTexts: tpt_reqs.setDescription('Sub-tree for management application requirements.')
+tpt_expr = ObjectIdentity((1, 3, 6, 1, 4, 1, 10734, 6)).setLabel("tpt-expr")
+if mibBuilder.loadTexts: tpt_expr.setStatus('current')
+if mibBuilder.loadTexts: tpt_expr.setDescription('Sub-tree for experimental definitions.')
+mibBuilder.exportSymbols("TIPPINGPOINT-REG-MIB", tippingpoint=tippingpoint, tpt_expr=tpt_expr, tpt_products=tpt_products, tpt_generic=tpt_generic, PYSNMP_MODULE_ID=tippingpoint, tpt_reg=tpt_reg, tpt_reqs=tpt_reqs, tpt_caps=tpt_caps)

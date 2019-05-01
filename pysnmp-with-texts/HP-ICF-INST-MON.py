@@ -1,0 +1,93 @@
+#
+# PySNMP MIB module HP-ICF-INST-MON (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-ICF-INST-MON
+# Produced by pysmi-0.3.4 at Wed May  1 13:34:13 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+hpSwitch, = mibBuilder.importSymbols("HP-ICF-OID", "hpSwitch")
+InterfaceIndexOrZero, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndexOrZero")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, iso, ModuleIdentity, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Bits, Unsigned32, MibIdentifier, Counter32, Integer32, TimeTicks, IpAddress, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "iso", "ModuleIdentity", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Bits", "Unsigned32", "MibIdentifier", "Counter32", "Integer32", "TimeTicks", "IpAddress", "NotificationType")
+TextualConvention, TruthValue, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TruthValue", "DisplayString")
+hpicfInstMonMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35))
+hpicfInstMonMIB.setRevisions(('2008-12-04 00:00', '2006-01-23 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: hpicfInstMonMIB.setRevisionsDescriptions(("Added 'hpicfInstConfig' object.", 'Initial revision.',))
+if mibBuilder.loadTexts: hpicfInstMonMIB.setLastUpdated('200812040000Z')
+if mibBuilder.loadTexts: hpicfInstMonMIB.setOrganization('HP Networking')
+if mibBuilder.loadTexts: hpicfInstMonMIB.setContactInfo('Hewlett-Packard Company 8000 Foothills Blvd. Roseville, CA 95747')
+if mibBuilder.loadTexts: hpicfInstMonMIB.setDescription('This MIB module contains HP proprietary definitions for Instrumentation Monitor.')
+hpicfInstMonObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1))
+hpicfInstMonConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2))
+hpicfInstMonGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 1))
+hpicfInstMonCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 2))
+hpicfInstMonLogEnable = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfInstMonLogEnable.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonLogEnable.setDescription('The operational status of the Instrumentation Monitor on this switch.')
+hpicfInstMonTrapEnable = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 2), TruthValue().clone('true')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfInstMonTrapEnable.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonTrapEnable.setDescription('The operational status of the Monitor notifications on this switch.')
+hpicfInstMonParameterTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 3), )
+if mibBuilder.loadTexts: hpicfInstMonParameterTable.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonParameterTable.setDescription('Configuration of monitored instrumentation parameters.')
+hpicfInstMonParameterEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 3, 1), ).setIndexNames((0, "HP-ICF-INST-MON", "hpicfInstMonInterfaceIndex"), (0, "HP-ICF-INST-MON", "hpicfInstMonParameterIndex"))
+if mibBuilder.loadTexts: hpicfInstMonParameterEntry.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonParameterEntry.setDescription('An entry in the hpicfInstMonParameterTable.')
+hpicfInstMonInterfaceIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 3, 1, 1), InterfaceIndexOrZero())
+if mibBuilder.loadTexts: hpicfInstMonInterfaceIndex.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonInterfaceIndex.setDescription('0 for global parameters, port number for per-port parameters.')
+hpicfInstMonParameterIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 3, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)))
+if mibBuilder.loadTexts: hpicfInstMonParameterIndex.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonParameterIndex.setDescription('The index of the parameter.')
+hpicfInstMonParameterName = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 3, 1, 3), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 20))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfInstMonParameterName.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonParameterName.setDescription('The name of the parameter.')
+hpicfInstMonParameterThreshold = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 3, 1, 4), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfInstMonParameterThreshold.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonParameterThreshold.setDescription('Generate notification if the limit is not 0 and parameter value is beyond this limit.')
+hpicfInstMonNotificationText = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 4), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpicfInstMonNotificationText.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonNotificationText.setDescription('This string is sent with hpicfInstMonNotification.')
+hpicfInstMonNotification = NotificationType((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 5)).setObjects(("HP-ICF-INST-MON", "hpicfInstMonNotificationText"))
+if mibBuilder.loadTexts: hpicfInstMonNotification.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonNotification.setDescription('This notification is generated when the monitored parameter is beyond the configured threshold value.')
+hpicfInstConfig = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 1, 6), TruthValue().clone('true')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpicfInstConfig.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstConfig.setDescription('This object enables/disables instrumentation on the switch. The value true(1) means that instrumentation is enabled; the value false(2) means that instrumentation is disabled.')
+hpicfInstMonNotificationGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 1, 1)).setObjects(("HP-ICF-INST-MON", "hpicfInstMonNotification"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfInstMonNotificationGroup = hpicfInstMonNotificationGroup.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonNotificationGroup.setDescription('This notification is generated by Monitor when parameter is beyond its threshold limit.')
+hpicfInstMonBaseGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 1, 2)).setObjects(("HP-ICF-INST-MON", "hpicfInstMonLogEnable"), ("HP-ICF-INST-MON", "hpicfInstMonTrapEnable"), ("HP-ICF-INST-MON", "hpicfInstMonParameterName"), ("HP-ICF-INST-MON", "hpicfInstMonParameterThreshold"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfInstMonBaseGroup = hpicfInstMonBaseGroup.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonBaseGroup.setDescription('A collection of objects to support basic Instrumentation Monitor configuration on HP switches.')
+hpicfInstConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 1, 3)).setObjects(("HP-ICF-INST-MON", "hpicfInstConfig"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfInstConfigGroup = hpicfInstConfigGroup.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstConfigGroup.setDescription('A collection of objects to support basic Instrumentation Collection configuration on HP switches.')
+hpicfInstMonNotifyGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 1, 4)).setObjects(("HP-ICF-INST-MON", "hpicfInstMonNotificationText"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfInstMonNotifyGroup = hpicfInstMonNotifyGroup.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonNotifyGroup.setDescription('A collection of objects to support basic notification details on HP switches.')
+hpicfInstMonBaseCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 2, 1)).setObjects(("HP-ICF-INST-MON", "hpicfInstMonBaseGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfInstMonBaseCompliance = hpicfInstMonBaseCompliance.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonBaseCompliance.setDescription('The compliance statement for HP switches running Instrumentation Monitor and implementing the HP-ICF-INST-MON MIB.')
+hpicfInstConfigCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 2, 2)).setObjects(("HP-ICF-INST-MON", "hpicfInstConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfInstConfigCompliance = hpicfInstConfigCompliance.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstConfigCompliance.setDescription('The compliance statement for HP switches running Instrumentation collection and implementing the HP-ICF-INST-MON MIB.')
+hpicfInstMonNotifyCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 35, 2, 2, 3)).setObjects(("HP-ICF-INST-MON", "hpicfInstMonNotifyGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfInstMonNotifyCompliance = hpicfInstMonNotifyCompliance.setStatus('current')
+if mibBuilder.loadTexts: hpicfInstMonNotifyCompliance.setDescription('The compliance statement for HP switches running Instrumentation Monitor.')
+mibBuilder.exportSymbols("HP-ICF-INST-MON", hpicfInstMonParameterTable=hpicfInstMonParameterTable, hpicfInstMonNotifyGroup=hpicfInstMonNotifyGroup, PYSNMP_MODULE_ID=hpicfInstMonMIB, hpicfInstMonParameterThreshold=hpicfInstMonParameterThreshold, hpicfInstMonNotificationText=hpicfInstMonNotificationText, hpicfInstMonNotification=hpicfInstMonNotification, hpicfInstMonLogEnable=hpicfInstMonLogEnable, hpicfInstMonInterfaceIndex=hpicfInstMonInterfaceIndex, hpicfInstConfig=hpicfInstConfig, hpicfInstMonConformance=hpicfInstMonConformance, hpicfInstConfigCompliance=hpicfInstConfigCompliance, hpicfInstMonNotificationGroup=hpicfInstMonNotificationGroup, hpicfInstMonNotifyCompliance=hpicfInstMonNotifyCompliance, hpicfInstMonParameterIndex=hpicfInstMonParameterIndex, hpicfInstConfigGroup=hpicfInstConfigGroup, hpicfInstMonParameterName=hpicfInstMonParameterName, hpicfInstMonTrapEnable=hpicfInstMonTrapEnable, hpicfInstMonMIB=hpicfInstMonMIB, hpicfInstMonCompliances=hpicfInstMonCompliances, hpicfInstMonBaseGroup=hpicfInstMonBaseGroup, hpicfInstMonBaseCompliance=hpicfInstMonBaseCompliance, hpicfInstMonGroups=hpicfInstMonGroups, hpicfInstMonParameterEntry=hpicfInstMonParameterEntry, hpicfInstMonObjects=hpicfInstMonObjects)

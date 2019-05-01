@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module NMS-EPON-ONU-REMOTE-SERVER-INFO (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NMS-EPON-ONU-REMOTE-SERVER-INFO
+# Produced by pysmi-0.3.4 at Wed May  1 14:21:53 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+nmsEPONGroup, = mibBuilder.importSymbols("NMS-SMI", "nmsEPONGroup")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, NotificationType, Bits, TimeTicks, Integer32, iso, Counter32, Gauge32, Unsigned32, ObjectIdentity, Counter64, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "NotificationType", "Bits", "TimeTicks", "Integer32", "iso", "Counter32", "Gauge32", "Unsigned32", "ObjectIdentity", "Counter64", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier")
+RowStatus, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "TextualConvention", "DisplayString")
+nmsEponOnuRemoteServer = MibIdentifier((1, 3, 6, 1, 4, 1, 11606, 10, 101, 28))
+nmsEponOnuRemoteServerTable = MibTable((1, 3, 6, 1, 4, 1, 11606, 10, 101, 28, 1), )
+if mibBuilder.loadTexts: nmsEponOnuRemoteServerTable.setStatus('mandatory')
+if mibBuilder.loadTexts: nmsEponOnuRemoteServerTable.setDescription('A list of epon ONU remote zerver table entries.')
+nmsEponOnuRemoteServerEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11606, 10, 101, 28, 1, 1), ).setIndexNames((0, "NMS-EPON-ONU-REMOTE-SERVER-INFO", "onuRemoteServerIndex"))
+if mibBuilder.loadTexts: nmsEponOnuRemoteServerEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: nmsEponOnuRemoteServerEntry.setDescription('A collection of EPON ONU remote server IP address table.')
+onuRemoteServerIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 28, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 1000))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: onuRemoteServerIndex.setStatus('mandatory')
+if mibBuilder.loadTexts: onuRemoteServerIndex.setDescription('ONU remote server IP address Index. This value is index of . 0-this value is deleted. Default value is none. ')
+onuRemoteServerIpAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 28, 1, 1, 2), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: onuRemoteServerIpAddr.setStatus('mandatory')
+if mibBuilder.loadTexts: onuRemoteServerIpAddr.setDescription('ONU remote server IP address.')
+onuRemoteServerRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 28, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: onuRemoteServerRowStatus.setStatus('mandatory')
+if mibBuilder.loadTexts: onuRemoteServerRowStatus.setDescription('ONU remote server IP address setting row status. These two items: onuRemoteServerIndex, onuRemoteServerIpAddr, are set together. ')
+mibBuilder.exportSymbols("NMS-EPON-ONU-REMOTE-SERVER-INFO", onuRemoteServerIpAddr=onuRemoteServerIpAddr, nmsEponOnuRemoteServer=nmsEponOnuRemoteServer, onuRemoteServerIndex=onuRemoteServerIndex, nmsEponOnuRemoteServerEntry=nmsEponOnuRemoteServerEntry, nmsEponOnuRemoteServerTable=nmsEponOnuRemoteServerTable, onuRemoteServerRowStatus=onuRemoteServerRowStatus)

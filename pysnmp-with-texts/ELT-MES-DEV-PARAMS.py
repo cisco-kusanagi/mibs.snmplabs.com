@@ -1,0 +1,40 @@
+#
+# PySNMP MIB module ELT-MES-DEV-PARAMS (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ELT-MES-DEV-PARAMS
+# Produced by pysmi-0.3.4 at Wed May  1 12:59:59 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint")
+eltMes, = mibBuilder.importSymbols("ELTEX-MES", "eltMes")
+rndImageInfoEntry, = mibBuilder.importSymbols("RADLAN-DEVICEPARAMS-MIB", "rndImageInfoEntry")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, Unsigned32, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, NotificationType, MibIdentifier, Gauge32, Integer32, Counter32, ObjectIdentity, iso, Bits, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Unsigned32", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "NotificationType", "MibIdentifier", "Gauge32", "Integer32", "Counter32", "ObjectIdentity", "iso", "Bits", "TimeTicks")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+eltMesDevParams = ModuleIdentity((1, 3, 6, 1, 4, 1, 35265, 1, 23, 2))
+eltMesDevParams.setRevisions(('2015-09-16 00:00', '2012-12-14 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: eltMesDevParams.setRevisionsDescriptions(('Added eltImageInfoTable.', 'Initial revision.',))
+if mibBuilder.loadTexts: eltMesDevParams.setLastUpdated('201212140000Z')
+if mibBuilder.loadTexts: eltMesDevParams.setOrganization('Eltex Enterprise Co, Ltd.')
+if mibBuilder.loadTexts: eltMesDevParams.setContactInfo('www.eltex.nsk.ru')
+if mibBuilder.loadTexts: eltMesDevParams.setDescription("This private MIB module defines Eltex's device parameters MIBs.")
+eltMesBootPassword = MibIdentifier((1, 3, 6, 1, 4, 1, 35265, 1, 23, 2, 17))
+eltImageInfoTable = MibTable((1, 3, 6, 1, 4, 1, 35265, 1, 23, 2, 18), )
+if mibBuilder.loadTexts: eltImageInfoTable.setStatus('current')
+if mibBuilder.loadTexts: eltImageInfoTable.setDescription('The table contains information about images')
+eltImageInfoEntry = MibTableRow((1, 3, 6, 1, 4, 1, 35265, 1, 23, 2, 18, 1), )
+rndImageInfoEntry.registerAugmentions(("ELT-MES-DEV-PARAMS", "eltImageInfoEntry"))
+eltImageInfoEntry.setIndexNames(*rndImageInfoEntry.getIndexNames())
+if mibBuilder.loadTexts: eltImageInfoEntry.setStatus('current')
+if mibBuilder.loadTexts: eltImageInfoEntry.setDescription('This table augments existing RADLAN table rndImageInfoTable')
+eltImage1CommitHash = MibTableColumn((1, 3, 6, 1, 4, 1, 35265, 1, 23, 2, 18, 1, 1), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: eltImage1CommitHash.setStatus('current')
+if mibBuilder.loadTexts: eltImage1CommitHash.setDescription('Hash commit of image-1.')
+eltImage2CommitHash = MibTableColumn((1, 3, 6, 1, 4, 1, 35265, 1, 23, 2, 18, 1, 2), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: eltImage2CommitHash.setStatus('current')
+if mibBuilder.loadTexts: eltImage2CommitHash.setDescription('Hash commit of image-2.')
+mibBuilder.exportSymbols("ELT-MES-DEV-PARAMS", eltImageInfoEntry=eltImageInfoEntry, eltImageInfoTable=eltImageInfoTable, eltMesDevParams=eltMesDevParams, PYSNMP_MODULE_ID=eltMesDevParams, eltImage2CommitHash=eltImage2CommitHash, eltMesBootPassword=eltMesBootPassword, eltImage1CommitHash=eltImage1CommitHash)

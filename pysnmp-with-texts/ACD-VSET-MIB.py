@@ -1,0 +1,78 @@
+#
+# PySNMP MIB module ACD-VSET-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ACD-VSET-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:13:03 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+acdMibs, = mibBuilder.importSymbols("ACCEDIAN-SMI", "acdMibs")
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+Counter64, ObjectIdentity, Counter32, MibIdentifier, Unsigned32, Gauge32, ModuleIdentity, Bits, TimeTicks, iso, Integer32, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "ObjectIdentity", "Counter32", "MibIdentifier", "Unsigned32", "Gauge32", "ModuleIdentity", "Bits", "TimeTicks", "iso", "Integer32", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType")
+TextualConvention, DisplayString, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "RowStatus")
+acdVSet = ModuleIdentity((1, 3, 6, 1, 4, 1, 22420, 2, 13))
+acdVSet.setRevisions(('2012-01-11 01:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: acdVSet.setRevisionsDescriptions(('Initial version of MIB module ACD-VSET-MIB.',))
+if mibBuilder.loadTexts: acdVSet.setLastUpdated('201201110100Z')
+if mibBuilder.loadTexts: acdVSet.setOrganization('Accedian Networks, Inc.')
+if mibBuilder.loadTexts: acdVSet.setContactInfo('Accedian Technical Assistance Center Accedian Networks, Inc. 2351 Alfred-Nobel blvd., Suite N-410 Saint-Laurent, Quebec Canada H4S 2A9 E-mail: support@accedian.com')
+if mibBuilder.loadTexts: acdVSet.setDescription('The VLAN sets database for this Accedian Networks device.')
+acdVSetNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 22420, 2, 13, 0))
+acdVSetMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1))
+acdVSetConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 22420, 2, 13, 2))
+acdVSetConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1))
+class AcdVsetVlanType(TextualConvention, Integer32):
+    description = 'The type of VLAN to be used.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("cvlan", 1), ("svlan", 2))
+
+acdVSetConfigTable = MibTable((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1), )
+if mibBuilder.loadTexts: acdVSetConfigTable.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigTable.setDescription('Table of all VID set.')
+acdVSetConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1), ).setIndexNames((0, "ACD-VSET-MIB", "acdVSetConfigPolicyListID"), (0, "ACD-VSET-MIB", "acdVSetConfigID"))
+if mibBuilder.loadTexts: acdVSetConfigEntry.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigEntry.setDescription('An entry consisting of all settings to a VLAN set.')
+acdVSetConfigPolicyListID = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 1), Unsigned32())
+if mibBuilder.loadTexts: acdVSetConfigPolicyListID.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigPolicyListID.setDescription('This object identifies for which Policy list of this VLAN set.')
+acdVSetConfigID = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 2), Unsigned32())
+if mibBuilder.loadTexts: acdVSetConfigID.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigID.setDescription('Unique value for each VLAN set instance.')
+acdVSetConfigRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: acdVSetConfigRowStatus.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigRowStatus.setDescription('All columns must have a valid value before a row can be activated. To create a new VLAN set you shall provide the a unique name, the type and policy list id for an empty row with the RowStatus set to Create and Go. To delete the VLAN set you need to set the RowStatus to destroy.')
+acdVSetConfigName = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 4), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(1, 32))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: acdVSetConfigName.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigName.setDescription('This is a string to uniquely identify the VLAN set.')
+acdVSetConfigVlanType = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 5), AcdVsetVlanType().clone('cvlan')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: acdVSetConfigVlanType.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigVlanType.setDescription('VLAN Ethernet type.')
+acdVSetConfigVlanIDs0to1023 = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 6), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: acdVSetConfigVlanIDs0to1023.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigVlanIDs0to1023.setDescription("Each octet specifies a set of eight VLANs, the first octet specifying VLAN ID 0 through 7, and so on. Within each octet, the most significant bit represents the lowest numbered VLAN ID. If that bit has a value of '1' then that VLAN is included in the set of VLANs; the VLAN is not included otherwise.")
+acdVSetConfigVlanIDs1024to2047 = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 7), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: acdVSetConfigVlanIDs1024to2047.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigVlanIDs1024to2047.setDescription("Each octet specifies a set of eight VLANs, the first octet specifying VLAN ID 1024 through 1031, and so on. Within each octet, the most significant bit represents the lowest numbered VLAN ID. If that bit has a value of '1' then that VLAN is included in the set of VLANs; the VLAN is not included otherwise.")
+acdVSetConfigVlanIDs2048to3071 = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 8), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: acdVSetConfigVlanIDs2048to3071.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigVlanIDs2048to3071.setDescription("Each octet specifies a set of eight VLANs, the first octet specifying VLAN ID 2048 through 2055, and so on. Within each octet, the most significant bit represents the lowest numbered VLAN ID. If that bit has a value of '1' then that VLAN is included in the set of VLANs; the VLAN is not included otherwise.")
+acdVSetConfigVlanIDs3072to4095 = MibTableColumn((1, 3, 6, 1, 4, 1, 22420, 2, 13, 1, 1, 1, 1, 9), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 128))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: acdVSetConfigVlanIDs3072to4095.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigVlanIDs3072to4095.setDescription("Each octet specifies a set of eight VLANs, the first octet specifying VLAN ID 3072 through 3079, and so on. Within each octet, the most significant bit represents the lowest numbered VLAN ID. If that bit has a value of '1' then that VLAN is included in the set of VLANs; the VLAN is not included otherwise.")
+acdVSetCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 22420, 2, 13, 2, 1))
+acdVSetGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 22420, 2, 13, 2, 2))
+acdVSetConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 22420, 2, 13, 2, 2, 1)).setObjects(("ACD-VSET-MIB", "acdVSetConfigRowStatus"), ("ACD-VSET-MIB", "acdVSetConfigName"), ("ACD-VSET-MIB", "acdVSetConfigVlanType"), ("ACD-VSET-MIB", "acdVSetConfigVlanIDs0to1023"), ("ACD-VSET-MIB", "acdVSetConfigVlanIDs1024to2047"), ("ACD-VSET-MIB", "acdVSetConfigVlanIDs2048to3071"), ("ACD-VSET-MIB", "acdVSetConfigVlanIDs3072to4095"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    acdVSetConfigGroup = acdVSetConfigGroup.setStatus('current')
+if mibBuilder.loadTexts: acdVSetConfigGroup.setDescription('Objects for the VLAN set configuration Group.')
+acdVSetCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 22420, 2, 13, 2, 1, 1)).setObjects(("ACD-VSET-MIB", "acdVSetConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    acdVSetCompliance = acdVSetCompliance.setStatus('current')
+if mibBuilder.loadTexts: acdVSetCompliance.setDescription('The compliance statement for support of the ACD-VSET-MIB module.')
+mibBuilder.exportSymbols("ACD-VSET-MIB", acdVSetConfigEntry=acdVSetConfigEntry, acdVSetConfigName=acdVSetConfigName, PYSNMP_MODULE_ID=acdVSet, acdVSetGroups=acdVSetGroups, acdVSetCompliances=acdVSetCompliances, acdVSetConformance=acdVSetConformance, acdVSetConfigID=acdVSetConfigID, AcdVsetVlanType=AcdVsetVlanType, acdVSetMIBObjects=acdVSetMIBObjects, acdVSetConfigVlanIDs3072to4095=acdVSetConfigVlanIDs3072to4095, acdVSetNotifications=acdVSetNotifications, acdVSetConfig=acdVSetConfig, acdVSetConfigVlanIDs2048to3071=acdVSetConfigVlanIDs2048to3071, acdVSetConfigTable=acdVSetConfigTable, acdVSetCompliance=acdVSetCompliance, acdVSetConfigVlanType=acdVSetConfigVlanType, acdVSetConfigPolicyListID=acdVSetConfigPolicyListID, acdVSetConfigGroup=acdVSetConfigGroup, acdVSetConfigVlanIDs1024to2047=acdVSetConfigVlanIDs1024to2047, acdVSet=acdVSet, acdVSetConfigRowStatus=acdVSetConfigRowStatus, acdVSetConfigVlanIDs0to1023=acdVSetConfigVlanIDs0to1023)

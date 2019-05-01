@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module Fore-If-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Fore-If-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:17:09 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+foreIfExtension, = mibBuilder.importSymbols("Fore-Common-MIB", "foreIfExtension")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Unsigned32, Integer32, Counter32, ModuleIdentity, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, TimeTicks, Counter64, IpAddress, iso, MibIdentifier, Bits, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Integer32", "Counter32", "ModuleIdentity", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "TimeTicks", "Counter64", "IpAddress", "iso", "MibIdentifier", "Bits", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+foreIfModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 326, 1, 15, 1))
+if mibBuilder.loadTexts: foreIfModule.setLastUpdated('9709081030-0400')
+if mibBuilder.loadTexts: foreIfModule.setOrganization('FORE')
+if mibBuilder.loadTexts: foreIfModule.setContactInfo(' Postal: FORE Systems Inc. 1000 FORE Drive Warrendale, PA 15086-7502 Tel: +1 724 742 6900 Email: nm_mibs@fore.com Web: http://www.fore.com')
+if mibBuilder.loadTexts: foreIfModule.setDescription('This MIB module defines the FORE Systems interface table. This table contains information necessary to configure the MTU size of an interface.')
+foreIfGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 326, 1, 15, 2))
+foreIfTable = MibTable((1, 3, 6, 1, 4, 1, 326, 1, 15, 2, 1), )
+if mibBuilder.loadTexts: foreIfTable.setStatus('current')
+if mibBuilder.loadTexts: foreIfTable.setDescription('A table of information per interface. This is an extension of the standard ifTable')
+foreIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 326, 1, 15, 2, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: foreIfEntry.setStatus('current')
+if mibBuilder.loadTexts: foreIfEntry.setDescription('A table of information per interface')
+foreIfMtu = MibTableColumn((1, 3, 6, 1, 4, 1, 326, 1, 15, 2, 1, 1, 1), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: foreIfMtu.setStatus('current')
+if mibBuilder.loadTexts: foreIfMtu.setDescription('The size of the largest datagram which can be sent/received on the interface, specified in octets. For interfaces that are used for transmitting network datagrams, this is the size of the largest network datagram that can be sent on the interface. Currently this variable can be set for qaaX interfaces only.')
+mibBuilder.exportSymbols("Fore-If-MIB", foreIfMtu=foreIfMtu, foreIfEntry=foreIfEntry, foreIfTable=foreIfTable, PYSNMP_MODULE_ID=foreIfModule, foreIfModule=foreIfModule, foreIfGroup=foreIfGroup)

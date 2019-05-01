@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module XIRCOM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/XIRCOM-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:44:28 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, NotificationType, IpAddress, Bits, Integer32, Counter64, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, ObjectIdentity, iso, enterprises, TimeTicks, MibIdentifier, ModuleIdentity, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "NotificationType", "IpAddress", "Bits", "Integer32", "Counter64", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "ObjectIdentity", "iso", "enterprises", "TimeTicks", "MibIdentifier", "ModuleIdentity", "NotificationType")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+xircom = MibIdentifier((1, 3, 6, 1, 4, 1, 588))
+printers = MibIdentifier((1, 3, 6, 1, 4, 1, 588, 1))
+printerStatus = MibScalar((1, 3, 6, 1, 4, 1, 588, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: printerStatus.setStatus('mandatory')
+if mibBuilder.loadTexts: printerStatus.setDescription('Bitfield with the following bit positions defined bit 0 - other error bit 1 - paper out bit 2 - io error bit 3 - offline')
+acceptPrintJobs = MibScalar((1, 3, 6, 1, 4, 1, 588, 1, 2), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: acceptPrintJobs.setStatus('mandatory')
+if mibBuilder.loadTexts: acceptPrintJobs.setDescription('Set to one if the system is accepting new print jobs ')
+queuedJobs = MibScalar((1, 3, 6, 1, 4, 1, 588, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: queuedJobs.setStatus('mandatory')
+if mibBuilder.loadTexts: queuedJobs.setDescription('the number of queued print jobs ')
+sendTrap = MibScalar((1, 3, 6, 1, 4, 1, 588, 1, 4), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: sendTrap.setStatus('mandatory')
+if mibBuilder.loadTexts: sendTrap.setDescription('Bitfield with the following bit positions defined bit 0 - other error bit 1 - paper out bit 2 - io error bit 3 - offline If the bit is set, a trap is sent when the status of that bit position in printerStatus changes')
+printerTrap = NotificationType((1, 3, 6, 1, 4, 1, 588, 1) + (0,0)).setObjects(("XIRCOM-MIB", "printerStatus"))
+if mibBuilder.loadTexts: printerTrap.setDescription('The printer status changed')
+mibBuilder.exportSymbols("XIRCOM-MIB", xircom=xircom, printers=printers, sendTrap=sendTrap, queuedJobs=queuedJobs, printerStatus=printerStatus, acceptPrintJobs=acceptPrintJobs, printerTrap=printerTrap)

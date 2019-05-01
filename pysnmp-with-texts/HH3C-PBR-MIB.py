@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module HH3C-PBR-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HH3C-PBR-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:28:54 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+hh3cCommon, = mibBuilder.importSymbols("HH3C-OID-MIB", "hh3cCommon")
+InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddress")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+iso, Unsigned32, Integer32, IpAddress, MibIdentifier, ObjectIdentity, ModuleIdentity, Counter64, Bits, Gauge32, TimeTicks, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "Unsigned32", "Integer32", "IpAddress", "MibIdentifier", "ObjectIdentity", "ModuleIdentity", "Counter64", "Bits", "Gauge32", "TimeTicks", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType")
+DisplayString, TruthValue, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TruthValue", "TextualConvention")
+hh3cPBR = ModuleIdentity((1, 3, 6, 1, 4, 1, 25506, 2, 113))
+hh3cPBR.setRevisions(('2010-12-10 15:58',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: hh3cPBR.setRevisionsDescriptions(('The initial version of this MIB file.',))
+if mibBuilder.loadTexts: hh3cPBR.setLastUpdated('201012101558Z')
+if mibBuilder.loadTexts: hh3cPBR.setOrganization('Hangzhou H3C Technologies Co., Ltd.')
+if mibBuilder.loadTexts: hh3cPBR.setContactInfo('Platform Team H3C Technologies Co., Ltd. Hai-Dian District Beijing P.R. China http://www.h3c.com Zip: 100085')
+if mibBuilder.loadTexts: hh3cPBR.setDescription('This MIB contains objects to manage the configuration and information of policy based routing. It routes IP packets by user defined policy other than normal destination address based routing. ')
+hh3cPBRObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1))
+hh3cPBRGlobal = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 1))
+hh3cPBRMibTrap = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 2))
+hh3cPBRNexthopTrapEnabled = MibScalar((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 1, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cPBRNexthopTrapEnabled.setStatus('current')
+if mibBuilder.loadTexts: hh3cPBRNexthopTrapEnabled.setDescription("The value is a global setting. The feature will not work until the value is set to 'true'. If the value is set to 'false', the feature will stop working.")
+hh3cPBRTrapObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 2, 1))
+hh3cPBRNexthopAddrType = MibScalar((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 2, 1, 1), InetAddressType()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: hh3cPBRNexthopAddrType.setStatus('current')
+if mibBuilder.loadTexts: hh3cPBRNexthopAddrType.setDescription('Indicating address type of hh3cPBRNexthopAddr, which can be either IPv4 or IPv6.')
+hh3cPBRNexthopAddr = MibScalar((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 2, 1, 2), InetAddress()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: hh3cPBRNexthopAddr.setStatus('current')
+if mibBuilder.loadTexts: hh3cPBRNexthopAddr.setDescription('The involved nexthop IP address of trap information.')
+hh3cPBRTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 2, 2))
+hh3cPBRTrapsPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 2, 2, 0))
+hh3cPBRNexthopFailedTrap = NotificationType((1, 3, 6, 1, 4, 1, 25506, 2, 113, 1, 2, 2, 0, 1)).setObjects(("HH3C-PBR-MIB", "hh3cPBRNexthopAddrType"), ("HH3C-PBR-MIB", "hh3cPBRNexthopAddr"))
+if mibBuilder.loadTexts: hh3cPBRNexthopFailedTrap.setStatus('current')
+if mibBuilder.loadTexts: hh3cPBRNexthopFailedTrap.setDescription('When the nexthop of policy based routing apply clause became unreachable according to routing information, trap is generated and is sent to the remote monitoring device.')
+mibBuilder.exportSymbols("HH3C-PBR-MIB", hh3cPBRNexthopAddrType=hh3cPBRNexthopAddrType, PYSNMP_MODULE_ID=hh3cPBR, hh3cPBRTrapsPrefix=hh3cPBRTrapsPrefix, hh3cPBRGlobal=hh3cPBRGlobal, hh3cPBRNexthopFailedTrap=hh3cPBRNexthopFailedTrap, hh3cPBRTraps=hh3cPBRTraps, hh3cPBRNexthopAddr=hh3cPBRNexthopAddr, hh3cPBRObjects=hh3cPBRObjects, hh3cPBRTrapObjects=hh3cPBRTrapObjects, hh3cPBRNexthopTrapEnabled=hh3cPBRNexthopTrapEnabled, hh3cPBR=hh3cPBR, hh3cPBRMibTrap=hh3cPBRMibTrap)

@@ -1,0 +1,77 @@
+#
+# PySNMP MIB module Juniper-BRIDGE-ETHERNET-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Juniper-BRIDGE-ETHERNET-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:01:55 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+InterfaceIndex, InterfaceIndexOrZero = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex", "InterfaceIndexOrZero")
+juniMibs, = mibBuilder.importSymbols("Juniper-MIBs", "juniMibs")
+JuniNextIfIndex, = mibBuilder.importSymbols("Juniper-TC", "JuniNextIfIndex")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+IpAddress, Unsigned32, iso, Integer32, Bits, Counter32, TimeTicks, MibIdentifier, Gauge32, NotificationType, ModuleIdentity, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "Unsigned32", "iso", "Integer32", "Bits", "Counter32", "TimeTicks", "MibIdentifier", "Gauge32", "NotificationType", "ModuleIdentity", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity")
+DisplayString, RowStatus, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "RowStatus", "TextualConvention")
+juniBridgeEthernetMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31))
+juniBridgeEthernetMIB.setRevisions(('2005-12-14 17:10', '2002-09-16 21:44', '2000-09-26 14:43', '2000-03-27 23:45', '1999-12-10 18:30',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: juniBridgeEthernetMIB.setRevisionsDescriptions(('Added interface MTU object.', 'Replaced Unisphere names with Juniper names.', 'Make it SMIv2 conformant.', 'Obsolete juniBridgedEthProxyArp.', 'Initial version of this MIB module.',))
+if mibBuilder.loadTexts: juniBridgeEthernetMIB.setLastUpdated('200512141710Z')
+if mibBuilder.loadTexts: juniBridgeEthernetMIB.setOrganization('Juniper Networks, Inc.')
+if mibBuilder.loadTexts: juniBridgeEthernetMIB.setContactInfo(' Juniper Networks, Inc. Postal: 10 Technology Park Drive Westford MA 01886-3146 USA Tel: +1 978 589 5800 Email: mib@Juniper.net')
+if mibBuilder.loadTexts: juniBridgeEthernetMIB.setDescription('The Bridge Ethernet MIB for the Juniper Networks enterprise.')
+juniBridgedEthernetObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1))
+juniBridgedEthernetIfLayer = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1))
+juniBridgedEthernetNextIfIndex = MibScalar((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 1), JuniNextIfIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: juniBridgedEthernetNextIfIndex.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetNextIfIndex.setDescription('Coordinate ifIndex value allocation for entries in juniBridgedEthernetIfTable. A GET of this object returns the next available ifIndex value to be used to create an entry in the associated interface table; or zero, if no valid ifIndex value is available. This object also returns a value of zero when it is the lexicographic successor of a varbind presented in an SNMP GETNEXT or GETBULK request, for which circumstance it is assumed that ifIndex allocation is unintended. Successive GETs will typically return different values, thus avoiding collisions among cooperating management clients seeking to create table entries simultaneously.')
+juniBridgedEthernetIfTable = MibTable((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2), )
+if mibBuilder.loadTexts: juniBridgedEthernetIfTable.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetIfTable.setDescription('The parameters for the BridgedEthernet service on this interface.')
+juniBridgedEthernetIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1), ).setIndexNames((0, "Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfIfIndex"))
+if mibBuilder.loadTexts: juniBridgedEthernetIfEntry.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetIfEntry.setDescription('The Parameters for a particular Bridged Ethernet interface. Creating/deleting entries in this table causes corresponding entries for be created/deleted in ifTable/ifXTable/juniIfTable.')
+juniBridgedEthernetIfIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 1), InterfaceIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: juniBridgedEthernetIfIfIndex.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetIfIfIndex.setDescription('The ifIndex value of the corresponding ifEntry.')
+juniBridgedEthernetProxyArp = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("enableRestricted", 1), ("enableUnrestricted", 2), ("disable", 3))).clone('enableRestricted')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: juniBridgedEthernetProxyArp.setStatus('obsolete')
+if mibBuilder.loadTexts: juniBridgedEthernetProxyArp.setDescription('The proxyArp configuration setting for this entry. *** NOTE: This MIB object has been obsoleted. ***')
+juniBridgedEthernetIfLowerIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 3), InterfaceIndexOrZero()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: juniBridgedEthernetIfLowerIfIndex.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetIfLowerIfIndex.setDescription('The ifIndex of an interface over which this Bridged Ethernet interface is to be layered. A value of zero indicates no layering. An implementation may choose to require that a nonzero value be configured at entry creation.')
+juniBridgedEthernetIfRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: juniBridgedEthernetIfRowStatus.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetIfRowStatus.setDescription('Controls creation/deletion of entries in this table according to the RowStatus textual convention, constrained to support the following values only: createAndGo destroy To create an entry in this table, the following entry objects MUST be explicitly configured: juniBridgedEthernetIfRowStatus juniBridgedEthernetIfLowerIfIndex In addition, when creating an entry the following conditions must hold: A value for juniBridgedEthernetIfIndex must have been determined previously, by reading juniBridgedEthernetNextIfIndex. The interface identified by juniBridgedEthernetIfLowerIfIndex must exist, and must be an interface type that permits layering of Bridged Ethernet above it. A corresponding entry in ifTable/ifXTable/juniIfTable is created/destroyed as a result of creating/destroying an entry in this table.')
+juniBridgedEthernetIfMtu = MibTableColumn((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 1, 1, 2, 1, 5), Integer32().subtype(subtypeSpec=ValueRangeConstraint(64, 9180)).clone(1518)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: juniBridgedEthernetIfMtu.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetIfMtu.setDescription('The configured maximum transfer unit (MTU) for this ethernet interface. The operational value is reported in the corresponding Interfaces MIB ifMtu object.')
+juniBridgeEthernetConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4))
+juniBridgeEthernetCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 1))
+juniBridgeEthernetGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 2))
+juniBridgedEthernetCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 1, 1)).setObjects(("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetGroup2"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    juniBridgedEthernetCompliance = juniBridgedEthernetCompliance.setStatus('deprecated')
+if mibBuilder.loadTexts: juniBridgedEthernetCompliance.setDescription('The compliance statement for entities which implement the Juniper bridged Ethernet MIB. This statement became deprecated when additional configuration for Bridged Ethernet was added.')
+juniBridgedEthernetCompliance2 = ModuleCompliance((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 1, 2)).setObjects(("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetGroup3"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    juniBridgedEthernetCompliance2 = juniBridgedEthernetCompliance2.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetCompliance2.setDescription('The compliance statement for entities which implement the Juniper bridged Ethernet MIB.')
+juniBridgedEthernetGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 2, 1)).setObjects(("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetNextIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetProxyArp"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfLowerIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    juniBridgedEthernetGroup = juniBridgedEthernetGroup.setStatus('obsolete')
+if mibBuilder.loadTexts: juniBridgedEthernetGroup.setDescription('A collection of objects providing management of Bridged Ethernet interfaces in a Juniper product. This group became obsolete when juniBridgedEthernetProxyArp was made obsolete.')
+juniBridgedEthernetGroup2 = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 2, 2)).setObjects(("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetNextIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfLowerIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    juniBridgedEthernetGroup2 = juniBridgedEthernetGroup2.setStatus('deprecated')
+if mibBuilder.loadTexts: juniBridgedEthernetGroup2.setDescription('A collection of objects providing management of Bridged Ethernet interfaces in a Juniper product. This group became deprecated when the juniBridgedEthernetIfMtu object was added.')
+juniBridgedEthernetGroup3 = ObjectGroup((1, 3, 6, 1, 4, 1, 4874, 2, 2, 31, 4, 2, 3)).setObjects(("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetNextIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfLowerIfIndex"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfRowStatus"), ("Juniper-BRIDGE-ETHERNET-MIB", "juniBridgedEthernetIfMtu"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    juniBridgedEthernetGroup3 = juniBridgedEthernetGroup3.setStatus('current')
+if mibBuilder.loadTexts: juniBridgedEthernetGroup3.setDescription('A collection of objects providing management of Bridged Ethernet interfaces in a Juniper product.')
+mibBuilder.exportSymbols("Juniper-BRIDGE-ETHERNET-MIB", juniBridgedEthernetIfLowerIfIndex=juniBridgedEthernetIfLowerIfIndex, juniBridgedEthernetObjects=juniBridgedEthernetObjects, juniBridgedEthernetIfEntry=juniBridgedEthernetIfEntry, juniBridgedEthernetIfRowStatus=juniBridgedEthernetIfRowStatus, juniBridgedEthernetNextIfIndex=juniBridgedEthernetNextIfIndex, juniBridgedEthernetGroup=juniBridgedEthernetGroup, juniBridgedEthernetProxyArp=juniBridgedEthernetProxyArp, juniBridgedEthernetGroup2=juniBridgedEthernetGroup2, juniBridgeEthernetConformance=juniBridgeEthernetConformance, juniBridgedEthernetIfIfIndex=juniBridgedEthernetIfIfIndex, juniBridgedEthernetIfLayer=juniBridgedEthernetIfLayer, juniBridgedEthernetIfTable=juniBridgedEthernetIfTable, juniBridgedEthernetCompliance2=juniBridgedEthernetCompliance2, juniBridgeEthernetGroups=juniBridgeEthernetGroups, juniBridgeEthernetMIB=juniBridgeEthernetMIB, juniBridgedEthernetGroup3=juniBridgedEthernetGroup3, PYSNMP_MODULE_ID=juniBridgeEthernetMIB, juniBridgedEthernetCompliance=juniBridgedEthernetCompliance, juniBridgeEthernetCompliances=juniBridgeEthernetCompliances, juniBridgedEthernetIfMtu=juniBridgedEthernetIfMtu)

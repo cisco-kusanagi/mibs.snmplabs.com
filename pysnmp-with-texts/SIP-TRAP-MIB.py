@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module SIP-TRAP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SIP-TRAP-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:04:30 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+csID, comment, moduleID, gwIP, percent, code, port, reason, timeOccurred, gwID, csType, registrationStatus, gwType = mibBuilder.importSymbols("AGGREGATED-EXT-MIB", "csID", "comment", "moduleID", "gwIP", "percent", "code", "port", "reason", "timeOccurred", "gwID", "csType", "registrationStatus", "gwType")
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, Counter32, Counter64, Integer32, ObjectName, iso, MibIdentifier, NotificationType, ObjectIdentity, IpAddress, TimeTicks, enterprises, Gauge32, Bits, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, snmpModules = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Counter32", "Counter64", "Integer32", "ObjectName", "iso", "MibIdentifier", "NotificationType", "ObjectIdentity", "IpAddress", "TimeTicks", "enterprises", "Gauge32", "Bits", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "snmpModules")
+TextualConvention, TruthValue, RowStatus, TestAndIncr, TimeStamp, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TruthValue", "RowStatus", "TestAndIncr", "TimeStamp", "DisplayString")
+lucent = MibIdentifier((1, 3, 6, 1, 4, 1, 1751))
+products = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1))
+softSwitch = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1, 1198))
+sipDeviceServer = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 5))
+sipTraps = ModuleIdentity((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 5, 0))
+if mibBuilder.loadTexts: sipTraps.setLastUpdated('240701')
+if mibBuilder.loadTexts: sipTraps.setOrganization('Lucent Technologies')
+if mibBuilder.loadTexts: sipTraps.setContactInfo('')
+if mibBuilder.loadTexts: sipTraps.setDescription('The MIB module for entities implementing the xxxx protocol.')
+sipCSConnectionStatus = NotificationType((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 5, 0, 0)).setObjects(("AGGREGATED-EXT-MIB", "timeOccurred"), ("AGGREGATED-EXT-MIB", "code"), ("AGGREGATED-EXT-MIB", "csID"), ("AGGREGATED-EXT-MIB", "csType"), ("AGGREGATED-EXT-MIB", "registrationStatus"), ("AGGREGATED-EXT-MIB", "reason"), ("AGGREGATED-EXT-MIB", "comment"))
+if mibBuilder.loadTexts: sipCSConnectionStatus.setStatus('current')
+if mibBuilder.loadTexts: sipCSConnectionStatus.setDescription("Indicates the registration status of the device server(registered, unregistered or registration failed). VARIABLE DEFINITIONS: 1) timeStamp - time when the alarm occured, in <sec>.<usec> format 2) code - bitwise OR of severity, facility, errorCode, instanceID, severity<<28 | facility<<24 | errorCode<<16 | instanceid 3) csID - call server identifier which will be returned by the call server when any device server registers to it. 4) csType - call server type, 'primary' or 'secondary'. (Right now this information does not come from the call server. It is set to 'primary'.) value = 0 for primary, value = 1 for secondary 5) registrationStatus - registered | unregistred | registrationFailed depending on whether the device server is registered, unregistered or could not register to the call server respectively. 6) reason - {unreachable | unknown | invalidParam}, indicates the cause for the registration failure. 7) comment - Any comment sent along with this trap. Severity: INFO for registration/unregistration. CRITICAL for failed registration.")
+sipDSError = NotificationType((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 5, 0, 1)).setObjects(("AGGREGATED-EXT-MIB", "timeOccurred"), ("AGGREGATED-EXT-MIB", "code"), ("AGGREGATED-EXT-MIB", "reason"), ("AGGREGATED-EXT-MIB", "comment"))
+if mibBuilder.loadTexts: sipDSError.setStatus('current')
+if mibBuilder.loadTexts: sipDSError.setDescription('When any error occurs in the device server. VARIABLE DEFINITIONS: 1) timeStamp - time when the alarm occured, in <sec>.<usec> format 2) code - bitwise OR of severity, facility, errorCode, instanceID, severity<<28 | facility<<24 | errorCode<<16 | instanceid 3) reason - the reason for the error that occurs in the device server. Takes one of these values: internalError | systemResourceUnavailable | unknown 4) comment - Any comment sent along with this trap. Severity: INFO (internalError), MAJOR (systemResourceUnavailable), INFO (unknownError - any other errors).')
+sipCommandFailed = NotificationType((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 5, 0, 2)).setObjects(("AGGREGATED-EXT-MIB", "timeOccurred"), ("AGGREGATED-EXT-MIB", "code"), ("AGGREGATED-EXT-MIB", "reason"), ("AGGREGATED-EXT-MIB", "comment"))
+if mibBuilder.loadTexts: sipCommandFailed.setStatus('current')
+if mibBuilder.loadTexts: sipCommandFailed.setDescription('Triggered when any request is failed by the device server. VARIABLE DEFINITIONS: 1) timeStamp - time when the alarm occured, in <sec>.<usec> format 2) code - bitwise OR of severity, facility, errorCode, instanceID, severity<<28 | facility<<24 | errorCode<<16 | instanceid 3) reason - reason for the failure of the command. {internalError | systemResourceUnavailable | notSupported | unknown } 4) comment - Any comment sent along with this trap. Severity: MINOR (or may be command sensitive).')
+mibBuilder.exportSymbols("SIP-TRAP-MIB", sipDSError=sipDSError, sipTraps=sipTraps, lucent=lucent, products=products, sipDeviceServer=sipDeviceServer, sipCSConnectionStatus=sipCSConnectionStatus, softSwitch=softSwitch, PYSNMP_MODULE_ID=sipTraps, sipCommandFailed=sipCommandFailed)

@@ -1,0 +1,78 @@
+#
+# PySNMP MIB module CISCO-WAN-ATM-PREF-ROUTE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-WAN-ATM-PREF-ROUTE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:20:08 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+PnniPortId, PnniNodeId = mibBuilder.importSymbols("PNNI-MIB", "PnniPortId", "PnniNodeId")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+Counter32, TimeTicks, Bits, Counter64, Integer32, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, MibIdentifier, iso, NotificationType, ModuleIdentity, ObjectIdentity, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "TimeTicks", "Bits", "Counter64", "Integer32", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "MibIdentifier", "iso", "NotificationType", "ModuleIdentity", "ObjectIdentity", "Unsigned32")
+TextualConvention, DisplayString, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "RowStatus")
+ciscoWanATMPrefRouteMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 99996))
+ciscoWanATMPrefRouteMIB.setRevisions(('2002-06-25 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoWanATMPrefRouteMIB.setRevisionsDescriptions(('Initial version of the preferred routes MIB. Preferred Route allows the user an improved control over the Soft Permanent Virtual Circuit (SPVC) or Soft Permanent Virtual Path (SPVP) connections. The use of network resources by these connections can be explicitly specified through the exact lowest-level nodes and the associated links the connection has to traverse. In subsequent discussion, the term SPVC implicitly applies also to SPVP. Preferred route is specified only at originating node. When an originating node selects a connection to be rerouted, the node searches for a route. If a preferred route is configured for the connection, the originating node uses the configured route as the basis of routing. Terminologies used: Network Element (NE): The pair of a node identifier and the egress port Identifier associated to the node. Master node of a connection: It is the node which owns the connection and is responsible to establish a data path from its end to the remote end. Route Identifier: It is a number uniquely identifying a preferred route within the master node. A preferred route consists of up to 20 network elements. The number of network elements valid within the route is specified by the user. Contextually, the node at the first network element is the originating node; the node at the last network element (as specified by the user in the number of valid network elements) is the destination node.',))
+if mibBuilder.loadTexts: ciscoWanATMPrefRouteMIB.setLastUpdated('200206250000Z')
+if mibBuilder.loadTexts: ciscoWanATMPrefRouteMIB.setOrganization('Cisco System Inc.')
+if mibBuilder.loadTexts: ciscoWanATMPrefRouteMIB.setContactInfo(' Cisco Systems Customer Service Postal: 170 West Tasman Drive, San Jose CA 95134-1706. USA Tel: +1 800 553-NETS E-mail: cs-wanatm@cisco.com')
+if mibBuilder.loadTexts: ciscoWanATMPrefRouteMIB.setDescription('This MIB facilitates the maintenance of preferred routes configuration.')
+ciscoWanATMPrefRouteMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 99996, 0))
+ciscoWanATMPrefRouteMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1))
+cwaPrefRouteConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 99996, 2))
+class RouteId(TextualConvention, Unsigned32):
+    description = 'A value that uniquely identifies a preferred route for an SPVC connection.'
+    status = 'current'
+    subtypeSpec = Unsigned32.subtypeSpec + ValueRangeConstraint(0, 65535)
+
+cwaPrefRouteConfTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 1), )
+if mibBuilder.loadTexts: cwaPrefRouteConfTable.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteConfTable.setDescription('This table contains a list of preferred routes configured at the master node.')
+cwaPrefRouteConfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 1, 1), ).setIndexNames((0, "CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteId"))
+if mibBuilder.loadTexts: cwaPrefRouteConfEntry.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteConfEntry.setDescription('An entry in the preferred routes table. Each entry is keyed by a route identifier. The number of leading network elements to be used are specified by the object cwaPrefRouteNetwElemCount.')
+cwaPrefRouteId = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 1, 1, 1), RouteId())
+if mibBuilder.loadTexts: cwaPrefRouteId.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteId.setDescription('A unique identifier to an entry of the preferred routes table. The identifier cannot be zero.')
+cwaPrefRouteNwElemCount = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 1, 1, 2), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(1, 20))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cwaPrefRouteNwElemCount.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteNwElemCount.setDescription('A value that indicates in the preferred route entry the number of leading network elements which are integral to the preferred route.')
+cwaPrefRouteRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cwaPrefRouteRowStatus.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteRowStatus.setDescription("To create, modify and delete a preferred route entry. Only the value 'active', 'createAndGo', and 'destroy' are supported. The value of this variable is set to 'active' by the managed system for each valid entry. If a management station wants to delete an entry from the database, this value is set to 'destroy'. If a management station wants to create a new entry, this value is set to 'createAndGo'. The modification of an 'active' row is permitted.")
+cwaPrefRouteNwElemTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 2), )
+if mibBuilder.loadTexts: cwaPrefRouteNwElemTable.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteNwElemTable.setDescription('The table contains a list of network elements, each of which is indexed by the route identifier and the position of the network element within the preferred route. Position 1 refers to the first network element, while position 20 refers to the last network element.')
+cwaPrefRouteNwElemEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 2, 1), ).setIndexNames((0, "CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteId"), (0, "CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteNwElemPos"))
+if mibBuilder.loadTexts: cwaPrefRouteNwElemEntry.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteNwElemEntry.setDescription('An entry in the preferred route network element table. The entry can be modified on the fly. The entry will not be used in the preferred route if its position specified by cwaPrefRouteNwElemPos is greater than cwaPrefRouteNwElemCount.')
+cwaPrefRouteNwElemPos = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 2, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(1, 20)))
+if mibBuilder.loadTexts: cwaPrefRouteNwElemPos.setReference('ATM Forum PNNI 1.1 Section 6.4.6.4')
+if mibBuilder.loadTexts: cwaPrefRouteNwElemPos.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteNwElemPos.setDescription('The network element position identifies the position of the network element within the preferred route.')
+cwaPrefRouteNwElemNodeId = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 2, 1, 2), PnniNodeId()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cwaPrefRouteNwElemNodeId.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteNwElemNodeId.setDescription('The 22-octet logical node identifier of a PNNI node.')
+cwaPrefRouteNwElemPortId = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 2, 1, 3), PnniPortId()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cwaPrefRouteNwElemPortId.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteNwElemPortId.setDescription('The 32-bit logical port identifier of an egress port on the associated PNNI node for the network element.')
+cwaPrefRouteNwElemRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 99996, 1, 2, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cwaPrefRouteNwElemRowStatus.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteNwElemRowStatus.setDescription("To create, modify and delete a network element (node identifier and port identifier). Only the value 'active', 'createAndGo', and 'destroy' are supported. The value of this variable is set to 'active' by the managed system for each valid entry. If a management station wants to delete an entry from the database, this value is set to 'destroy'. If a management station wants to create a new entry, this value is set to 'createAndGo'. The modification of an 'active' row is permitted.")
+cwaPrefRouteCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 99996, 2, 1))
+cwaPrefMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 99996, 2, 2))
+cwaPrefMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 99996, 2, 1, 1)).setObjects(("CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteMIBGroups"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cwaPrefMIBCompliance = cwaPrefMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefMIBCompliance.setDescription('The compliance statement for SNMPv2 entities which implement the preferred route.')
+cwaPrefRouteMIBGroups = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 99996, 2, 2, 1)).setObjects(("CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteNwElemCount"), ("CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteRowStatus"), ("CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteNwElemNodeId"), ("CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteNwElemPortId"), ("CISCO-WAN-ATM-PREF-ROUTE-MIB", "cwaPrefRouteNwElemRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cwaPrefRouteMIBGroups = cwaPrefRouteMIBGroups.setStatus('current')
+if mibBuilder.loadTexts: cwaPrefRouteMIBGroups.setDescription('This group contains a list of objects which identify a preferred route.')
+mibBuilder.exportSymbols("CISCO-WAN-ATM-PREF-ROUTE-MIB", ciscoWanATMPrefRouteMIB=ciscoWanATMPrefRouteMIB, ciscoWanATMPrefRouteMIBNotifs=ciscoWanATMPrefRouteMIBNotifs, cwaPrefRouteCompliances=cwaPrefRouteCompliances, cwaPrefRouteNwElemCount=cwaPrefRouteNwElemCount, cwaPrefMIBGroups=cwaPrefMIBGroups, cwaPrefRouteNwElemRowStatus=cwaPrefRouteNwElemRowStatus, cwaPrefRouteConfEntry=cwaPrefRouteConfEntry, cwaPrefRouteMIBGroups=cwaPrefRouteMIBGroups, cwaPrefRouteNwElemNodeId=cwaPrefRouteNwElemNodeId, cwaPrefMIBCompliance=cwaPrefMIBCompliance, cwaPrefRouteConfTable=cwaPrefRouteConfTable, RouteId=RouteId, cwaPrefRouteRowStatus=cwaPrefRouteRowStatus, cwaPrefRouteId=cwaPrefRouteId, cwaPrefRouteConformance=cwaPrefRouteConformance, cwaPrefRouteNwElemPortId=cwaPrefRouteNwElemPortId, cwaPrefRouteNwElemTable=cwaPrefRouteNwElemTable, PYSNMP_MODULE_ID=ciscoWanATMPrefRouteMIB, cwaPrefRouteNwElemEntry=cwaPrefRouteNwElemEntry, cwaPrefRouteNwElemPos=cwaPrefRouteNwElemPos, ciscoWanATMPrefRouteMIBObjects=ciscoWanATMPrefRouteMIBObjects)

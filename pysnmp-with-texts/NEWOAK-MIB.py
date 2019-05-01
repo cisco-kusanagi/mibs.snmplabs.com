@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module NEWOAK-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NEWOAK-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:26:49 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, Counter32, Unsigned32, iso, NotificationType, ModuleIdentity, enterprises, Integer32, MibIdentifier, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Gauge32, TimeTicks, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "Counter32", "Unsigned32", "iso", "NotificationType", "ModuleIdentity", "enterprises", "Integer32", "MibIdentifier", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Gauge32", "TimeTicks", "IpAddress")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+newoak = MibIdentifier((1, 3, 6, 1, 4, 1, 2505))
+contivity = ModuleIdentity((1, 3, 6, 1, 4, 1, 2505, 1))
+contivity.setRevisions(('1900-05-12 20:45',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: contivity.setRevisionsDescriptions(('Reversed the 1600 and 2600 ids.',))
+if mibBuilder.loadTexts: contivity.setLastUpdated('0004252130Z')
+if mibBuilder.loadTexts: contivity.setOrganization('Nortel')
+if mibBuilder.loadTexts: contivity.setContactInfo('support@nortel.com Postal: Nortel 600 Technology Park Drive Billerica, MA 01821 Tel: +1 978 670 8888 E-Mail: support@nortel.com')
+if mibBuilder.loadTexts: contivity.setDescription('This MIB defines the sysObjectIDs for different variations of the VPN Router.')
+vpnRouter2000 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 2))
+vpnRouter1000 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 3))
+vpnRouter4500 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 4))
+vpnRouter15XX = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 5))
+vpnRouter2500 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 6))
+vpnRouter1600 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 7))
+vpnRouter2600 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 8))
+vpnRouter4600 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 9))
+vpnRouter1700 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 1700))
+vpnRouter1740 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 1740))
+vpnRouter1750 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 1750))
+vpnRouter2700 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 2700))
+vpnRouter1010 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 1010))
+vpnRouter1050 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 1050))
+vpnRouter1100 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 1100))
+vpnRouter600 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 600))
+vpnRouter5000 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 5000))
+vpnRouter2750 = MibIdentifier((1, 3, 6, 1, 4, 1, 2505, 2750))
+mibBuilder.exportSymbols("NEWOAK-MIB", vpnRouter1050=vpnRouter1050, vpnRouter2700=vpnRouter2700, vpnRouter1600=vpnRouter1600, vpnRouter2600=vpnRouter2600, vpnRouter2500=vpnRouter2500, vpnRouter2750=vpnRouter2750, vpnRouter1750=vpnRouter1750, PYSNMP_MODULE_ID=contivity, vpnRouter4600=vpnRouter4600, newoak=newoak, vpnRouter1000=vpnRouter1000, vpnRouter1010=vpnRouter1010, vpnRouter1740=vpnRouter1740, contivity=contivity, vpnRouter15XX=vpnRouter15XX, vpnRouter4500=vpnRouter4500, vpnRouter1700=vpnRouter1700, vpnRouter1100=vpnRouter1100, vpnRouter2000=vpnRouter2000, vpnRouter5000=vpnRouter5000, vpnRouter600=vpnRouter600)

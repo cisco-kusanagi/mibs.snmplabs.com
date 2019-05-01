@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module PDN-DEVICE-TIME-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PDN-DEVICE-TIME-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:38:24 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+pdn_time, = mibBuilder.importSymbols("PDN-HEADER-MIB", "pdn-time")
+NTPMode, = mibBuilder.importSymbols("PDN-TC", "NTPMode")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Integer32, ModuleIdentity, MibIdentifier, iso, Gauge32, ObjectIdentity, Bits, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Unsigned32, IpAddress, Counter32, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "ModuleIdentity", "MibIdentifier", "iso", "Gauge32", "ObjectIdentity", "Bits", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Unsigned32", "IpAddress", "Counter32", "TimeTicks")
+DateAndTime, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DateAndTime", "DisplayString", "TextualConvention")
+devTimeMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 20, 1))
+devTimeMIBTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 20, 2))
+devTimeAndDate = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 20, 1, 1))
+devNTP = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 20, 1, 2))
+devDateAndTime = MibScalar((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 20, 1, 1, 1), DateAndTime()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: devDateAndTime.setStatus('mandatory')
+if mibBuilder.loadTexts: devDateAndTime.setDescription('This objects displays the date and time on the entity. It allows an NMS to set the date and time in the appropriate timezone ')
+devNTPServerIP = MibScalar((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 20, 1, 2, 1), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: devNTPServerIP.setStatus('mandatory')
+if mibBuilder.loadTexts: devNTPServerIP.setDescription('This Objects allows an NMS to configure theNTP server IP address')
+devNTPMode = MibScalar((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 20, 1, 2, 2), NTPMode()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: devNTPMode.setStatus('mandatory')
+if mibBuilder.loadTexts: devNTPMode.setDescription('This Objects allows an NMS to configure the mode NTP will operate in Unicast mode -- In this mode NTP will poll a specific server. In this mode it is necessary for a NTP server to be configured using the NTPServerIP object Broadcast Mode -- In this mode NTP will broadcast a request and any NTP server could respond Default value is Broadcast')
+devNTPSynchronised = MibScalar((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 20, 1, 2, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 24))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: devNTPSynchronised.setStatus('mandatory')
+if mibBuilder.loadTexts: devNTPSynchronised.setDescription('This Objects allows an NMS to configure the time interval (in hrs) when the device will synchronize its clock with the NTP server Default value is 1')
+mibBuilder.exportSymbols("PDN-DEVICE-TIME-MIB", devTimeAndDate=devTimeAndDate, devNTP=devNTP, devTimeMIBTraps=devTimeMIBTraps, devTimeMIBObjects=devTimeMIBObjects, devNTPServerIP=devNTPServerIP, devDateAndTime=devDateAndTime, devNTPMode=devNTPMode, devNTPSynchronised=devNTPSynchronised)

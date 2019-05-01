@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module NMS-EPON-OLT-MULTICAST-VLAN (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NMS-EPON-OLT-MULTICAST-VLAN
+# Produced by pysmi-0.3.4 at Wed May  1 14:21:42 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+nmsEPONGroup, = mibBuilder.importSymbols("NMS-SMI", "nmsEPONGroup")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+TimeTicks, Gauge32, Counter32, Bits, MibIdentifier, Counter64, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, ModuleIdentity, iso, IpAddress, Integer32, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "Gauge32", "Counter32", "Bits", "MibIdentifier", "Counter64", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "ModuleIdentity", "iso", "IpAddress", "Integer32", "NotificationType")
+RowStatus, MacAddress, TruthValue, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "MacAddress", "TruthValue", "DisplayString", "TextualConvention")
+nmsEponOltMulticastVlan = MibIdentifier((1, 3, 6, 1, 4, 1, 11606, 10, 101, 5))
+nmseponoltmulticastvlanTable = MibTable((1, 3, 6, 1, 4, 1, 11606, 10, 101, 5, 1), )
+if mibBuilder.loadTexts: nmseponoltmulticastvlanTable.setStatus('mandatory')
+if mibBuilder.loadTexts: nmseponoltmulticastvlanTable.setDescription('A list of epon olt multicast forwarding table entries.')
+nmsEponOltMulticastVlanEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11606, 10, 101, 5, 1, 1), ).setIndexNames((0, "NMS-EPON-OLT-MULTICAST-VLAN", "oltMcVlanId"), (0, "NMS-EPON-OLT-MULTICAST-VLAN", "oltMcIpAddress"))
+if mibBuilder.loadTexts: nmsEponOltMulticastVlanEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: nmsEponOltMulticastVlanEntry.setDescription('A collection of additional objects in the epon olt multicast forwarding table.')
+oltMcVlanId = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 5, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 4094))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oltMcVlanId.setStatus('mandatory')
+if mibBuilder.loadTexts: oltMcVlanId.setDescription('OLT multicast vlan id, as one of the index together with oltMcIpAddress.')
+oltMcVlanIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 5, 1, 1, 2), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oltMcVlanIpAddress.setStatus('mandatory')
+if mibBuilder.loadTexts: oltMcVlanIpAddress.setDescription('The IP multicast group address for which this entry contains information. As one of the index together with oltMcVlanId.')
+oltMcVlanRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 101, 5, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: oltMcVlanRowStatus.setStatus('mandatory')
+if mibBuilder.loadTexts: oltMcVlanRowStatus.setDescription('OLT multicast vlan table row status.')
+mibBuilder.exportSymbols("NMS-EPON-OLT-MULTICAST-VLAN", oltMcVlanId=oltMcVlanId, oltMcVlanRowStatus=oltMcVlanRowStatus, nmsEponOltMulticastVlan=nmsEponOltMulticastVlan, nmsEponOltMulticastVlanEntry=nmsEponOltMulticastVlanEntry, nmseponoltmulticastvlanTable=nmseponoltmulticastvlanTable, oltMcVlanIpAddress=oltMcVlanIpAddress)

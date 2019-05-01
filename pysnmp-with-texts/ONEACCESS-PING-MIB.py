@@ -1,0 +1,57 @@
+#
+# PySNMP MIB module ONEACCESS-PING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ONEACCESS-PING-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:34:34 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint")
+pingCtlOwnerIndex, pingCtlTestName = mibBuilder.importSymbols("DISMAN-PING-MIB", "pingCtlOwnerIndex", "pingCtlTestName")
+oneAccess, oacExpIMPing, oacMIBModules = mibBuilder.importSymbols("ONEACCESS-GLOBAL-REG", "oneAccess", "oacExpIMPing", "oacMIBModules")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+Bits, Counter32, Unsigned32, Counter64, ObjectIdentity, NotificationType, iso, IpAddress, Gauge32, Integer32, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, mib_2, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "Counter32", "Unsigned32", "Counter64", "ObjectIdentity", "NotificationType", "iso", "IpAddress", "Gauge32", "Integer32", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "mib-2", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+oacPingMIBModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 13191, 1, 100, 6601))
+oacPingMIBModule.setRevisions(('2011-06-15 00:00', '2010-07-08 00:01',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: oacPingMIBModule.setRevisionsDescriptions(('Fixed Minor correction added last revision.', 'This MIB module describes proprietary extensions to DISMAN-PING-MIB.',))
+if mibBuilder.loadTexts: oacPingMIBModule.setLastUpdated('201106150000Z')
+if mibBuilder.loadTexts: oacPingMIBModule.setOrganization(' OneAccess ')
+if mibBuilder.loadTexts: oacPingMIBModule.setContactInfo('Pascal KESTELOOT Postal: ONE ACCESS 381 Avenue du Gnral de Gaulle 92140 Clamart, France FRANCE Tel: (+33) 01 41 87 70 00 Fax: (+33) 01 41 87 74 00 E-mail: pascal.kesteloot@oneaccess-net.com')
+if mibBuilder.loadTexts: oacPingMIBModule.setDescription('Contact updated')
+oacPingNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 0))
+oacPingObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 1))
+oacPingConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 2))
+oacPingResultsTable = MibTable((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 1, 3), )
+if mibBuilder.loadTexts: oacPingResultsTable.setStatus('current')
+if mibBuilder.loadTexts: oacPingResultsTable.setDescription('Defines the Ping Results Table for providing the capability of performing ping operations at a remote host. This table contains objects outside the scope of RFC2925. An entry is added to the oacPingResultsTable when an pingCtlEntry is started by successful transition of its pingCtlAdminStatus object to enabled(1). An entry is removed from the oaPingResultsTable when its corresponding pingCtlEntry is deleted.')
+oacPingResultsEntry = MibTableRow((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 1, 3, 1), ).setIndexNames((0, "DISMAN-PING-MIB", "pingCtlOwnerIndex"), (0, "DISMAN-PING-MIB", "pingCtlTestName"))
+if mibBuilder.loadTexts: oacPingResultsEntry.setStatus('current')
+if mibBuilder.loadTexts: oacPingResultsEntry.setDescription('Defines an entry in the oacPingResultsTable. The oacPingResultsTable has the same indexing as the pingCtlTable in order for a oaPingResultsEntry to correspond to the pingCtlEntry that caused it to be created.')
+oacPingJitterSamples = MibTableColumn((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 1, 3, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oacPingJitterSamples.setStatus('current')
+if mibBuilder.loadTexts: oacPingJitterSamples.setDescription('Reflects the number of jitter samples taken, it is usually one less than pingResultsProbeResponses. If 0, then the values of oacPingResultsMinJitter, oacPingResultsMaxJitter and oacPingResultsAverageJitter are not valid.')
+oacPingResultsMinJitter = MibTableColumn((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 1, 3, 1, 2), Unsigned32()).setUnits('microseconds').setMaxAccess("readonly")
+if mibBuilder.loadTexts: oacPingResultsMinJitter.setStatus('current')
+if mibBuilder.loadTexts: oacPingResultsMinJitter.setDescription('The minimum ping jitter value measured.')
+oacPingResultsMaxJitter = MibTableColumn((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 1, 3, 1, 3), Unsigned32()).setUnits('microseconds').setMaxAccess("readonly")
+if mibBuilder.loadTexts: oacPingResultsMaxJitter.setStatus('current')
+if mibBuilder.loadTexts: oacPingResultsMaxJitter.setDescription('The maximum ping jitter value measured.')
+oacPingResultsAverageJitter = MibTableColumn((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 1, 3, 1, 4), Unsigned32()).setUnits('microseconds').setMaxAccess("readonly")
+if mibBuilder.loadTexts: oacPingResultsAverageJitter.setStatus('current')
+if mibBuilder.loadTexts: oacPingResultsAverageJitter.setDescription('The average ping jitter value measured.')
+oacPingCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 2, 1))
+oacPingGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 2, 2))
+oacPingCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 2, 1, 1)).setObjects(("ONEACCESS-PING-MIB", "oacPingGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    oacPingCompliance = oacPingCompliance.setStatus('current')
+if mibBuilder.loadTexts: oacPingCompliance.setDescription('The compliance statement for the ONEACCESS-PING-MIB.')
+oacPingGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 13191, 10, 3, 4, 3, 2, 2, 1)).setObjects(("ONEACCESS-PING-MIB", "oacPingJitterSamples"), ("ONEACCESS-PING-MIB", "oacPingResultsMinJitter"), ("ONEACCESS-PING-MIB", "oacPingResultsMaxJitter"), ("ONEACCESS-PING-MIB", "oacPingResultsAverageJitter"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    oacPingGroup = oacPingGroup.setStatus('current')
+if mibBuilder.loadTexts: oacPingGroup.setDescription('The group of objects that comprise the OneAccess extensions to the remote ping capability in RFC2925.')
+mibBuilder.exportSymbols("ONEACCESS-PING-MIB", oacPingResultsAverageJitter=oacPingResultsAverageJitter, oacPingMIBModule=oacPingMIBModule, oacPingObjects=oacPingObjects, oacPingCompliance=oacPingCompliance, oacPingResultsMaxJitter=oacPingResultsMaxJitter, oacPingJitterSamples=oacPingJitterSamples, PYSNMP_MODULE_ID=oacPingMIBModule, oacPingResultsEntry=oacPingResultsEntry, oacPingGroup=oacPingGroup, oacPingResultsTable=oacPingResultsTable, oacPingConformance=oacPingConformance, oacPingCompliances=oacPingCompliances, oacPingResultsMinJitter=oacPingResultsMinJitter, oacPingNotifications=oacPingNotifications, oacPingGroups=oacPingGroups)

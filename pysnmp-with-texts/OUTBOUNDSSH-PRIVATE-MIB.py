@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module OUTBOUNDSSH-PRIVATE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/OUTBOUNDSSH-PRIVATE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:35:44 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+switch, = mibBuilder.importSymbols("QUANTA-SWITCH-MIB", "switch")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, iso, MibIdentifier, Bits, Unsigned32, Counter64, Counter32, NotificationType, ModuleIdentity, TimeTicks, ObjectIdentity, IpAddress, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "iso", "MibIdentifier", "Bits", "Unsigned32", "Counter64", "Counter32", "NotificationType", "ModuleIdentity", "TimeTicks", "ObjectIdentity", "IpAddress", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+outboundSSHPrivate = ModuleIdentity((1, 3, 6, 1, 4, 1, 7244, 2, 21))
+if mibBuilder.loadTexts: outboundSSHPrivate.setLastUpdated('201108310000Z')
+if mibBuilder.loadTexts: outboundSSHPrivate.setOrganization('QCI')
+if mibBuilder.loadTexts: outboundSSHPrivate.setContactInfo(' Customer Support Postal: Quanta Computer Inc. 4, Wen Ming 1 St., Kuei Shan Hsiang, Tao Yuan Shien, Taiwan, R.O.C. Tel: +886 3 328 0050 E-Mail: strong.chen@quantatw.com')
+if mibBuilder.loadTexts: outboundSSHPrivate.setDescription('The QCI Private MIB for Outbound SSH')
+agentOutboundSSHGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 7244, 2, 21, 1))
+agentOutboundSSHAdminMode = MibScalar((1, 3, 6, 1, 4, 1, 7244, 2, 21, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2))).clone('enable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: agentOutboundSSHAdminMode.setStatus('current')
+if mibBuilder.loadTexts: agentOutboundSSHAdminMode.setDescription(' Admin-mode of the Outbound SSH.')
+agentOutboundSSHMaxNoOfSessions = MibScalar((1, 3, 6, 1, 4, 1, 7244, 2, 21, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 5)).clone(5)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: agentOutboundSSHMaxNoOfSessions.setStatus('current')
+if mibBuilder.loadTexts: agentOutboundSSHMaxNoOfSessions.setDescription(' The maximum no. of Outbound SSH sessions allowed.')
+agentOutboundSSHTimeout = MibScalar((1, 3, 6, 1, 4, 1, 7244, 2, 21, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 160)).clone(5)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: agentOutboundSSHTimeout.setStatus('current')
+if mibBuilder.loadTexts: agentOutboundSSHTimeout.setDescription(' The login inactivity timeout value for Outbound SSH.')
+mibBuilder.exportSymbols("OUTBOUNDSSH-PRIVATE-MIB", agentOutboundSSHTimeout=agentOutboundSSHTimeout, agentOutboundSSHAdminMode=agentOutboundSSHAdminMode, agentOutboundSSHMaxNoOfSessions=agentOutboundSSHMaxNoOfSessions, PYSNMP_MODULE_ID=outboundSSHPrivate, outboundSSHPrivate=outboundSSHPrivate, agentOutboundSSHGroup=agentOutboundSSHGroup)

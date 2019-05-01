@@ -1,0 +1,191 @@
+#
+# PySNMP MIB module ATM-POLICY-CONSTRAINT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ATM-POLICY-CONSTRAINT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:31:17 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+enterprises, Counter64, Unsigned32, ObjectIdentity, NotificationType, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Integer32, iso, MibIdentifier, Counter32, Bits, ModuleIdentity, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "enterprises", "Counter64", "Unsigned32", "ObjectIdentity", "NotificationType", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Integer32", "iso", "MibIdentifier", "Counter32", "Bits", "ModuleIdentity", "TimeTicks")
+TextualConvention, DisplayString, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "RowStatus")
+atmPolicyConstraintMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1))
+atmPolicyConstraintMIB.setRevisions(('2003-07-08 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: atmPolicyConstraintMIB.setRevisionsDescriptions(('Initial version of the MIB for Policy Constraints.',))
+if mibBuilder.loadTexts: atmPolicyConstraintMIB.setLastUpdated('200307080000Z')
+if mibBuilder.loadTexts: atmPolicyConstraintMIB.setOrganization('The ATM Forum.')
+if mibBuilder.loadTexts: atmPolicyConstraintMIB.setContactInfo('The ATM Forum 2570 West El Camino Real, Suite 304 Mountain View, CA 94040-1313 USA Phone: +1 650-949-670 Fax: +1 415-949-6705 info@atmforum.com')
+if mibBuilder.loadTexts: atmPolicyConstraintMIB.setDescription('The MIB module for Policy Contraints of ATM Forum Policy Routing. The Policy Constraint MIB is organized as two main tables: the policyConstraintTable and the policyTable. The policyConstraintTable provides the entries that can be referenced by other MIB objects to utilize a policy constraint. Each entry in the table contains a set of up to six pointers into the policyTable. The policyTable specifies the operators of a policy. Associated with the policyTable are the policyNeNscTable and the policyRpNscTable. These two tables contain the lists of NSCs on which the policy operators operate. To create a policy, the management station should first create an associated instance of the row status in a policyEntry, using a value of policyIndex that is not currently in use. The object policyNextPolicyIndex can be read to get an available policyIndex. It must also, either in the same or in successive PDUs, create the associated instances of the Ne-NSC and Rp-NSC lists for the policyIndex. It should also specify the values for the policy operators. Once the appropriate instance of all the configuration objects have been created for the policyEntry, policyRpNscEntry, and the policyNeNscEntry (as appropriate), the row status of the policyEntry should be set to active to activate the policy. The policy constraint table can include pointers to policies that are notReady but they must exist. If such a policy constraint is used for a call establishment request, then that policy is not used in the signaled policy constraint. ')
+atmForum = MibIdentifier((1, 3, 6, 1, 4, 1, 353))
+atmForumNetworkManagement = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5))
+atmfSignalling = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9))
+atmfPolicyConstraint = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9, 5))
+policyConstraintMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1))
+class NetworkEntityNetworkServiceCategory(TextualConvention, Integer32):
+    reference = 'ATMF Policy Routing Version 1.0'
+    description = 'A Network Entity Network Service Category (Ne-NSC) is a Network Service Category (NSC) that applies to the entire network entity (including all resources) and advertises properties of the network entity. The term network entity refers to a horizontal link, an uplink, a node, a spoke, a bypass or a set of reachable ATM addresses. Ne-NSC identifier values within the range 65000 through 65535, inclusive, are well known Ne-NSCs. The semantics of well-known Ne-NSCs are defined by the ATM Forum. The distinguished value of 65536 is used to indicate an invalid value and is used to remove Ne-NSC entries from Ne-NSC lists.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(1, 65536)
+
+class ResourcePartitionNetworkServiceCategory(TextualConvention, Integer32):
+    reference = 'ATMF Policy Routing Version 1.0'
+    description = 'A Resource Partition NSC (Rp-NSC) is an NSC that applies to a resource partition of a network entity. Note that association of a set of Rp-NSCs to a resource partition mandates that connections specify at least one of these Rp-NSCs as part of their associated policy in order to have access to resources of that partition. Those resources are then used to determine whether the resource partition is acceptable for carrying a given connection. The Rp-NSC Identifier value 0 is referred to as Rp-NSC_Bare and identifies bare resources. Rp-NSC identifier values within the range 65000 through 65535, inclusive, are well known Ne-NSCs. The semantics of well-known Ne-NSCs are defined by the ATM Forum. '
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 65535)
+
+class PolicyConstraintIndex(TextualConvention, Integer32):
+    description = 'The value of this object identifies a row in the policyConstraintTable. This row identifier can be used within other MIBs to apply a policy constraint to a connection establishment request. The distinguished value zero signifies that no row has been identified. The maximum value for this index is controlled by the policyConstraintMaxium object. The distinguished value of 0 is used to indicate an invalid value.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 65535)
+
+class PolicyConstraintPolicyIndex(TextualConvention, Integer32):
+    description = 'The value of this object identifies the position of a policy with a policy constraint. The policies are applied in the order of 1 first and 6 last.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(1, 6)
+
+class PolicyIndex(TextualConvention, Integer32):
+    description = 'The value of this object identifies a row in the policyTable. It is used within the policyConstraintTable to identify which policy is in use in the policy constraint. The distinguished value zero signifies that no policy is defined.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 65535)
+
+class PolicyOperator(TextualConvention, Integer32):
+    description = 'The value of this object identifies a row in the policyNeNscTable. It is used to distinguish between the Ne-NSC list used for a require and the must avoid part of a policy.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("requires", 1), ("mustAvoid", 2))
+
+policyConstraintBaseGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 1))
+policyConstraintMaximum = MibScalar((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: policyConstraintMaximum.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintMaximum.setDescription('The maximum number of concurrent active policy constraints that are allowed by the agent. A value of 0 for this object implies that there is no limit on the number of concurrent active policy constraints.')
+policyMaximum = MibScalar((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: policyMaximum.setStatus('current')
+if mibBuilder.loadTexts: policyMaximum.setDescription('The maximum number of concurrent active policies that are allowed by the agent. A value of 0 for this object implies that there is no limit on the number of concurrent active policies.')
+policyNeNSCListMaximum = MibScalar((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: policyNeNSCListMaximum.setStatus('current')
+if mibBuilder.loadTexts: policyNeNSCListMaximum.setDescription('The maximum number of Ne-NSCs that can be included in the Ne-NSC list of a policy. A value of 0 for this object implies that there is no limit.')
+policyRpNSCListMaximum = MibScalar((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: policyRpNSCListMaximum.setStatus('current')
+if mibBuilder.loadTexts: policyRpNSCListMaximum.setDescription('The maximum number of Rp-NSC entries that can be included in the Rp-NSC list of a policy. A value of 0 for this object implies that there is no limit.')
+policyConstraintGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2))
+policyNextPolicyConstraintIndex = MibScalar((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 1), PolicyConstraintIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: policyNextPolicyConstraintIndex.setStatus('current')
+if mibBuilder.loadTexts: policyNextPolicyConstraintIndex.setDescription('Coordinate policyConstraintIndex value allocation for entries in the policyConstraintTable. A GET of this object returns the next available policyConstraintIndex to be used to create an entry in the policyTable; or zero if no valid policyIndex value is available. This object also returns a value of zero when it is the lexicographic successor of a varbind presented in an SNMP GETNEXT or GETBULK request, for which circumstance it is assumed that policyConstraintIndex allocation is unintended. Successive GETs will typically return different values, Thus avoiding collisions among cooperating management clients seeking to create table entries simultaneously.')
+policyConstraintTable = MibTable((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 2), )
+if mibBuilder.loadTexts: policyConstraintTable.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintTable.setDescription('The table whose entries describe the policy constraints configured in the agent.')
+policyConstraintEntry = MibTableRow((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 2, 1), ).setIndexNames((0, "ATM-POLICY-CONSTRAINT-MIB", "policyConstraintIndex"), (0, "ATM-POLICY-CONSTRAINT-MIB", "policyConstraintPolicyIndex"))
+if mibBuilder.loadTexts: policyConstraintEntry.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintEntry.setDescription('Each entry in this table specifies a policy constraint. The policy constraint consists of up to 6 policies. A policy constraint must contain at least one policy if it is to be used in another MIB object. The order of the policies within the policy constraint is important and defines the order in which the policies are to be applied during path selection and call establishment. If a policy is specified in the policy constraint, but that policy does not exist as an active row of the policyTable, then that policy is ignored when the policy constraint is used for call establishment.')
+policyConstraintIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 2, 1, 1), PolicyConstraintIndex())
+if mibBuilder.loadTexts: policyConstraintIndex.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintIndex.setDescription('An arbitrary integer uniquely identifying a policy constraint. Its value can be used within other managed objects to apply a policy constraint to the object.')
+policyConstraintPolicyIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 2, 1, 2), PolicyConstraintPolicyIndex())
+if mibBuilder.loadTexts: policyConstraintPolicyIndex.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintPolicyIndex.setDescription('An integer uniquely identifying a policy within a policy constraint. The value of this index defines the order in which the policies of the policy constraint are applied.')
+policyIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 2, 1, 3), PolicyIndex()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyIndex.setStatus('current')
+if mibBuilder.loadTexts: policyIndex.setDescription('The index into the policyTable for the policy to be used in a given position within the the policy constraint. There must be an entry in the policyTable for this policy index or the set is rejected. The distinguished value of zero may be used to indicate no policy is to be used in the position.')
+policyConstraintRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 2, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyConstraintRowStatus.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintRowStatus.setDescription('To create, delete, activate and de-activate a row of a policy constraint. Only those rows of the PolicyConstraintTable that have an active status are considered when the policyConstraintIndex is used for call establishment. ')
+policyConstraintNameTable = MibTable((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 3), )
+if mibBuilder.loadTexts: policyConstraintNameTable.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintNameTable.setDescription('The table whose entries define the names for the policy constraints.')
+policyConstraintNameEntry = MibTableRow((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 3, 1), ).setIndexNames((0, "ATM-POLICY-CONSTRAINT-MIB", "policyConstraintIndex"))
+if mibBuilder.loadTexts: policyConstraintNameEntry.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintNameEntry.setDescription('Each entry in this table specifies a name of a policy constraint.')
+policyConstraintName = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 3, 1, 1), DisplayString()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyConstraintName.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintName.setDescription('The name of the Policy Constraint. This is used to facilitate management of the policy constraints between SNMP and other management interfaces.')
+policyConstraintNameRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 2, 3, 1, 2), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyConstraintNameRowStatus.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintNameRowStatus.setDescription('To create, delete, activate and de-activate a name of a policy constraint.')
+policyGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3))
+policyNextPolicyIndex = MibScalar((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 1), PolicyIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: policyNextPolicyIndex.setStatus('current')
+if mibBuilder.loadTexts: policyNextPolicyIndex.setDescription('Coordinate policyIndex value allocation for entries in policyTable. A GET of this object returns the next available policyIndex to be used to create an entry in the policyTable; or zero if no valid policyIndex value is available. This object also returns a value of zero when it is the lexicographic successor of a varbind presented in an SNMP GETNEXT or GETBULK request, for which circumstance it is assumed that policyIndex allocation is unintended. Successive GETs will typically return different values, Thus avoiding collisions among cooperating management clients seeking to create table entries simultaneously.')
+policyTable = MibTable((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 2), )
+if mibBuilder.loadTexts: policyTable.setStatus('current')
+if mibBuilder.loadTexts: policyTable.setDescription("The table whose entries describe the policies configured. Each policy contains two possible policy operators: 'require' and 'must avoid'. The require policy operator can be applied with an Ne-NSC list, an Rp-NSC list or both. The must avoid policy operator can be applied with only an Ne-NSc list. In order to create a new policy, the policyRowStatus should be set to createAndWait. The status should not be set to active until the remaining objects of the entry have been specified. If an existing entry is to be modified, then the RowStatus should be set to notInService, the objects modified, and then the RowStatus set to active. If the RowStatus is set to indicate that the entry is to become active (CreateAndGo or Active), then the following rules are checked: 1) At least one of requireNeNscOperator or requireRpNscOperator or mustAvoidNeNscOperator must be specified. 2) If the requireNeNscOperator is specified, then at least one Ne-NSC value must exist in an active row of the policyNeNscTable for this policyIndex and an policyOperator of require. 3) If the requireRpNscOperator is specified, then at least one Rp-NSC value must exist in an active row of the policyRpNscTable for this policyIndex. 4) If the mustAvoidNeNscOperator is specified, then at least one Ne-NSC value must exist in an active row of the policyNeNscTable for this policyIndex and an policyOperator of mustAvoid. If a row is deleted from this table, then the corresponding rows of the policyNeNscTable and policyRpNscTable are also deleted. In addition, any entries in the policyConstraintTable that reference this policyIndex are removed. ")
+policyEntry = MibTableRow((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 2, 1), ).setIndexNames((0, "ATM-POLICY-CONSTRAINT-MIB", "policyIndex"))
+if mibBuilder.loadTexts: policyEntry.setStatus('current')
+if mibBuilder.loadTexts: policyEntry.setDescription('An entry representing a policy.')
+policyName = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 2, 1, 1), DisplayString()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyName.setStatus('current')
+if mibBuilder.loadTexts: policyName.setDescription('A textual string describing the policy. This is used to facilitate management of the policies between SNMP and other management interfaces.')
+requireNeNscOperator = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noop", 1), ("logicalAND", 2), ("logicalOR", 3))).clone('noop')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: requireNeNscOperator.setStatus('current')
+if mibBuilder.loadTexts: requireNeNscOperator.setDescription('An integer identifying the NSC List operator for the Ne-NSC list of the require policy operator. The policy operator singleNeNsc is assumed if only one Ne-NSC is specified in the associated Ne-NSC list. ')
+requireRpNscOperator = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noop", 1), ("logicalAND", 2), ("logicalOR", 3))).clone('noop')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: requireRpNscOperator.setStatus('current')
+if mibBuilder.loadTexts: requireRpNscOperator.setDescription('An integer identifying the NSC List operator for the Rp-NSC list of the require policy operator. The policy operator singleRpNsc is assumed if only one Rp-NSC is specified in the associated Ne-NSC list. ')
+mustAvoidNeNscOperator = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 2, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noop", 1), ("logicalAND", 2), ("logicalOR", 3))).clone('noop')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: mustAvoidNeNscOperator.setStatus('current')
+if mibBuilder.loadTexts: mustAvoidNeNscOperator.setDescription('An integer identifying the NSC List operator for the Ne-NSC list of the must avoid policy operator. The policy operator singleNeNsc is assumed if only one Ne-NSC is specified in the associated Ne-NSC list. ')
+policyRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 2, 1, 5), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyRowStatus.setStatus('current')
+if mibBuilder.loadTexts: policyRowStatus.setDescription('Used to create and delete entries in this table. When a new entry is being created or an existing entry is being modified, then the RowStatus should be set to createAndWait or notInService. Once the objects for this row have been set, then the RowStatus should be set to active. When a row is active, it can be used in a policy constraint to effect the establishment of a call. If a policy is used in a policy constraint while it is not active, then it shall be ignored during call establishment.')
+policyNeNscTable = MibTable((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 3), )
+if mibBuilder.loadTexts: policyNeNscTable.setStatus('current')
+if mibBuilder.loadTexts: policyNeNscTable.setDescription('The table whose entries describe the NeNSCs of the Ne-NSC lists of a policy.')
+policyNeNscEntry = MibTableRow((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 3, 1), ).setIndexNames((0, "ATM-POLICY-CONSTRAINT-MIB", "policyIndex"), (0, "ATM-POLICY-CONSTRAINT-MIB", "policyOperator"), (0, "ATM-POLICY-CONSTRAINT-MIB", "policyNeNscIndex"))
+if mibBuilder.loadTexts: policyNeNscEntry.setStatus('current')
+if mibBuilder.loadTexts: policyNeNscEntry.setDescription('An entry representing the Ne-NSC list for a policy.')
+policyNeNscIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 3, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)))
+if mibBuilder.loadTexts: policyNeNscIndex.setStatus('current')
+if mibBuilder.loadTexts: policyNeNscIndex.setDescription('An integer identifying the NeNSC within the Ne_NSC list of a policy.')
+policyOperator = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 3, 1, 2), PolicyOperator())
+if mibBuilder.loadTexts: policyOperator.setStatus('current')
+if mibBuilder.loadTexts: policyOperator.setDescription('An integer identifying whether the Ne-NSC list is part of the require or must avoid operator of a policy.')
+policyNeNsc = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 3, 1, 3), NetworkEntityNetworkServiceCategory()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyNeNsc.setStatus('current')
+if mibBuilder.loadTexts: policyNeNsc.setDescription('One of the Ne-NSCs of the Ne-NSC list of the policy. The policyNeNscOperator object defines how the list is to be used by the policy. Setting this object with a value of 65536 is equivalent to deleting the object. Deleting the object will fail if there are no other policyNeNsc objects with the same policyIndex and policyOperator and the policyRowStatus object for the policyIndex has the value active')
+policyNeNscRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 3, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyNeNscRowStatus.setStatus('current')
+if mibBuilder.loadTexts: policyNeNscRowStatus.setDescription('Used to create and delete entries in this table. When a new entry is being created or an existing entry is being modified, then the RowStatus should be set to createAndWait or notInService. Once the objects for this row have been set, then the RowStatus should be set to active. When a row is active, it can be used in a policy to effect the establishment of a call. If a policyNeNscEntry is used in a policy while it is not active, then it shall be ignored during the application of the policy.')
+policyRpNscTable = MibTable((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 4), )
+if mibBuilder.loadTexts: policyRpNscTable.setStatus('current')
+if mibBuilder.loadTexts: policyRpNscTable.setDescription('The table whose entries describe the RpNSCs of the Rp-NSC list of a policy.')
+policyRpNscEntry = MibTableRow((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 4, 1), ).setIndexNames((0, "ATM-POLICY-CONSTRAINT-MIB", "policyIndex"), (0, "ATM-POLICY-CONSTRAINT-MIB", "policyRpNscIndex"))
+if mibBuilder.loadTexts: policyRpNscEntry.setStatus('current')
+if mibBuilder.loadTexts: policyRpNscEntry.setDescription('An entry representing the Ne-NSC list for a policy.')
+policyRpNscIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 4, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)))
+if mibBuilder.loadTexts: policyRpNscIndex.setStatus('current')
+if mibBuilder.loadTexts: policyRpNscIndex.setDescription('An integer identifying the RpNSC within the Rp_NSC list of a policy.')
+policyRpNsc = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 4, 1, 2), ResourcePartitionNetworkServiceCategory()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyRpNsc.setStatus('current')
+if mibBuilder.loadTexts: policyRpNsc.setDescription('One of the Rp-NSCs of the Rp-NSC list of the policy. The policyRpNscOperator object defines how the list is to be used by the policy. Setting this object with a value of 65536 is equivalent to deleting the object. Deleting the object will fail if there are no other policyRpNsc objects with the same policyIndex and the policyRowStatus object for the policyIndex has the value active')
+policyRpNscRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 4, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: policyRpNscRowStatus.setStatus('current')
+if mibBuilder.loadTexts: policyRpNscRowStatus.setDescription('Used to create and delete entries in this table. When a new entry is being created or an existing entry is being modified, then the RowStatus should be set to createAndWait or notInService. Once the objects for this row have been set, then the RowStatus should be set to active. When a row is active, it can be used in a policy to effect the establishment of a call. If a policyRpNSC Entry is used in a policy while it is not active, then it shall be ignored during the application of that policy')
+policyReferenceTable = MibTable((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 5), )
+if mibBuilder.loadTexts: policyReferenceTable.setStatus('current')
+if mibBuilder.loadTexts: policyReferenceTable.setDescription('This table provides pointers to entries in the policyConstraintTable that reference the policyIndex. This is provided to facilitate management of the policies and policy constraints. ')
+policyReferenceEntry = MibTableRow((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 5, 1), ).setIndexNames((0, "ATM-POLICY-CONSTRAINT-MIB", "policyIndex"), (0, "ATM-POLICY-CONSTRAINT-MIB", "policyConstraintIndex"))
+if mibBuilder.loadTexts: policyReferenceEntry.setStatus('current')
+if mibBuilder.loadTexts: policyReferenceEntry.setDescription('An entry for the policy reference table. ')
+policyReferencePCIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 3, 5, 1, 1), PolicyConstraintIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: policyReferencePCIndex.setStatus('current')
+if mibBuilder.loadTexts: policyReferencePCIndex.setDescription('If any of the entries of the PolicyConstraintTable for the specified policyConstraintIndex has a value for its policyIndex that matches the policyIndex of this entry, then this returns the policyConstraintIndex; otherwise, the value zero is returned. This object should be walked using GETNEXT and specifying an initial value of zero for the policyConstraintIndex. If a value of zero is returned, then there are no more matching entries for the policyIndex. ')
+policyConstraintMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 4))
+policyConstraintMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 4, 1))
+policyConstraintMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 4, 2))
+policyConstraintMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 4, 1, 1)).setObjects(("ATM-POLICY-CONSTRAINT-MIB", "policyConstraintMIBMandatoryGroup"), ("ATM-POLICY-CONSTRAINT-MIB", "policyConstraintMIBOptionalGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    policyConstraintMIBCompliance = policyConstraintMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintMIBCompliance.setDescription('The compliance statement for entities which implement the Policy Routing Addendum for Policy Constraint MIB. Groups of objects required to support certain functionality are identified by the suffix MandatoryGroup. Groups of optional objects are identified by the suffix OptionalGroup.')
+policyConstraintMIBMandatoryGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 4, 2, 1)).setObjects(("ATM-POLICY-CONSTRAINT-MIB", "policyConstraintMaximum"), ("ATM-POLICY-CONSTRAINT-MIB", "policyMaximum"), ("ATM-POLICY-CONSTRAINT-MIB", "policyNeNSCListMaximum"), ("ATM-POLICY-CONSTRAINT-MIB", "policyRpNSCListMaximum"), ("ATM-POLICY-CONSTRAINT-MIB", "policyIndex"), ("ATM-POLICY-CONSTRAINT-MIB", "policyConstraintRowStatus"), ("ATM-POLICY-CONSTRAINT-MIB", "requireNeNscOperator"), ("ATM-POLICY-CONSTRAINT-MIB", "requireRpNscOperator"), ("ATM-POLICY-CONSTRAINT-MIB", "mustAvoidNeNscOperator"), ("ATM-POLICY-CONSTRAINT-MIB", "policyRowStatus"), ("ATM-POLICY-CONSTRAINT-MIB", "policyNeNsc"), ("ATM-POLICY-CONSTRAINT-MIB", "policyNeNscRowStatus"), ("ATM-POLICY-CONSTRAINT-MIB", "policyRpNsc"), ("ATM-POLICY-CONSTRAINT-MIB", "policyRpNscRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    policyConstraintMIBMandatoryGroup = policyConstraintMIBMandatoryGroup.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintMIBMandatoryGroup.setDescription('A collection of objects required when policy constraint specification is supported.')
+policyConstraintMIBOptionalGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 353, 5, 9, 5, 1, 1, 4, 2, 2)).setObjects(("ATM-POLICY-CONSTRAINT-MIB", "policyNextPolicyConstraintIndex"), ("ATM-POLICY-CONSTRAINT-MIB", "policyConstraintName"), ("ATM-POLICY-CONSTRAINT-MIB", "policyConstraintNameRowStatus"), ("ATM-POLICY-CONSTRAINT-MIB", "policyNextPolicyIndex"), ("ATM-POLICY-CONSTRAINT-MIB", "policyName"), ("ATM-POLICY-CONSTRAINT-MIB", "policyReferencePCIndex"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    policyConstraintMIBOptionalGroup = policyConstraintMIBOptionalGroup.setStatus('current')
+if mibBuilder.loadTexts: policyConstraintMIBOptionalGroup.setDescription('A collection of optional objects used for path and connection trace.')
+mibBuilder.exportSymbols("ATM-POLICY-CONSTRAINT-MIB", requireNeNscOperator=requireNeNscOperator, policyNeNSCListMaximum=policyNeNSCListMaximum, policyReferencePCIndex=policyReferencePCIndex, policyNeNscTable=policyNeNscTable, policyConstraintMIBOptionalGroup=policyConstraintMIBOptionalGroup, policyConstraintRowStatus=policyConstraintRowStatus, policyNeNscEntry=policyNeNscEntry, policyConstraintMIBCompliance=policyConstraintMIBCompliance, policyConstraintMaximum=policyConstraintMaximum, policyMaximum=policyMaximum, policyNeNscRowStatus=policyNeNscRowStatus, policyReferenceEntry=policyReferenceEntry, atmForum=atmForum, policyNextPolicyIndex=policyNextPolicyIndex, policyRpNscEntry=policyRpNscEntry, policyConstraintGroup=policyConstraintGroup, requireRpNscOperator=requireRpNscOperator, PolicyConstraintPolicyIndex=PolicyConstraintPolicyIndex, policyRowStatus=policyRowStatus, policyConstraintNameTable=policyConstraintNameTable, atmPolicyConstraintMIB=atmPolicyConstraintMIB, policyRpNsc=policyRpNsc, policyRpNSCListMaximum=policyRpNSCListMaximum, policyConstraintTable=policyConstraintTable, policyEntry=policyEntry, policyOperator=policyOperator, policyNeNsc=policyNeNsc, policyTable=policyTable, policyRpNscIndex=policyRpNscIndex, policyConstraintMIBCompliances=policyConstraintMIBCompliances, PolicyIndex=PolicyIndex, policyConstraintBaseGroup=policyConstraintBaseGroup, PolicyOperator=PolicyOperator, policyGroup=policyGroup, policyName=policyName, policyConstraintMIBGroups=policyConstraintMIBGroups, policyReferenceTable=policyReferenceTable, ResourcePartitionNetworkServiceCategory=ResourcePartitionNetworkServiceCategory, policyNeNscIndex=policyNeNscIndex, policyConstraintNameEntry=policyConstraintNameEntry, atmfPolicyConstraint=atmfPolicyConstraint, policyConstraintIndex=policyConstraintIndex, PYSNMP_MODULE_ID=atmPolicyConstraintMIB, policyConstraintEntry=policyConstraintEntry, policyNextPolicyConstraintIndex=policyNextPolicyConstraintIndex, policyConstraintName=policyConstraintName, policyConstraintMIBObjects=policyConstraintMIBObjects, policyRpNscTable=policyRpNscTable, policyConstraintMIBConformance=policyConstraintMIBConformance, policyConstraintMIBMandatoryGroup=policyConstraintMIBMandatoryGroup, policyConstraintPolicyIndex=policyConstraintPolicyIndex, PolicyConstraintIndex=PolicyConstraintIndex, NetworkEntityNetworkServiceCategory=NetworkEntityNetworkServiceCategory, policyRpNscRowStatus=policyRpNscRowStatus, atmfSignalling=atmfSignalling, mustAvoidNeNscOperator=mustAvoidNeNscOperator, atmForumNetworkManagement=atmForumNetworkManagement, policyIndex=policyIndex, policyConstraintNameRowStatus=policyConstraintNameRowStatus)

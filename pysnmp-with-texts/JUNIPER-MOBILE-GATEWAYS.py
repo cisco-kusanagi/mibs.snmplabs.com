@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module JUNIPER-MOBILE-GATEWAYS (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/JUNIPER-MOBILE-GATEWAYS
+# Produced by pysmi-0.3.4 at Wed May  1 14:00:18 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint")
+InetAddress, InetPortNumber, InetAddressType, InetAddressPrefixLength = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetPortNumber", "InetAddressType", "InetAddressPrefixLength")
+Ipv6AddressIfIdentifier, Ipv6Address, Ipv6AddressPrefix = mibBuilder.importSymbols("IPV6-TC", "Ipv6AddressIfIdentifier", "Ipv6Address", "Ipv6AddressPrefix")
+EnabledStatus, = mibBuilder.importSymbols("JUNIPER-MIMSTP-MIB", "EnabledStatus")
+jnxMobileGatewayMibRoot, = mibBuilder.importSymbols("JUNIPER-SMI", "jnxMobileGatewayMibRoot")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibIdentifier, ModuleIdentity, Bits, Unsigned32, Integer32, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Counter64, NotificationType, iso, Gauge32, Counter32, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "ModuleIdentity", "Bits", "Unsigned32", "Integer32", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Counter64", "NotificationType", "iso", "Gauge32", "Counter32", "IpAddress")
+TruthValue, DisplayString, RowStatus, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "DisplayString", "RowStatus", "TextualConvention")
+jnxMobileGateways = ModuleIdentity((1, 3, 6, 1, 4, 1, 2636, 3, 66, 4))
+jnxMobileGateways.setRevisions(('2011-01-03 12:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: jnxMobileGateways.setRevisionsDescriptions(('Initial version',))
+if mibBuilder.loadTexts: jnxMobileGateways.setLastUpdated('201101031200Z')
+if mibBuilder.loadTexts: jnxMobileGateways.setOrganization('Juniper Networks, Inc.')
+if mibBuilder.loadTexts: jnxMobileGateways.setContactInfo('Juniper Technical Assistance Center Juniper Networks, Inc. 1194 N. Mathilda Avenue Sunnyvale, CA 94089 E-mail: support@juniper.net')
+if mibBuilder.loadTexts: jnxMobileGateways.setDescription('This module defines objects pertaining to Mobile-Edge Gateways')
+jnxMbgGwIndexTable = MibTable((1, 3, 6, 1, 4, 1, 2636, 3, 66, 4, 1), )
+if mibBuilder.loadTexts: jnxMbgGwIndexTable.setStatus('current')
+if mibBuilder.loadTexts: jnxMbgGwIndexTable.setDescription('Each entry corresponds to a mobile gateway ')
+jnxMbgGwIndexEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2636, 3, 66, 4, 1, 1), ).setIndexNames((0, "JUNIPER-MOBILE-GATEWAYS", "jnxMbgGwIndex"))
+if mibBuilder.loadTexts: jnxMbgGwIndexEntry.setStatus('current')
+if mibBuilder.loadTexts: jnxMbgGwIndexEntry.setDescription('A specification of the mobile gateway')
+jnxMbgGwIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 3, 66, 4, 1, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxMbgGwIndex.setStatus('current')
+if mibBuilder.loadTexts: jnxMbgGwIndex.setDescription('Gateway Index.')
+jnxMbgGwName = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 3, 66, 4, 1, 1, 2), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxMbgGwName.setStatus('current')
+if mibBuilder.loadTexts: jnxMbgGwName.setDescription('Gateway Name.')
+jnxMbgGwType = MibTableColumn((1, 3, 6, 1, 4, 1, 2636, 3, 66, 4, 1, 1, 3), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: jnxMbgGwType.setStatus('current')
+if mibBuilder.loadTexts: jnxMbgGwType.setDescription('Gateway type: PGW/SGW.')
+mibBuilder.exportSymbols("JUNIPER-MOBILE-GATEWAYS", jnxMobileGateways=jnxMobileGateways, jnxMbgGwIndex=jnxMbgGwIndex, jnxMbgGwIndexEntry=jnxMbgGwIndexEntry, PYSNMP_MODULE_ID=jnxMobileGateways, jnxMbgGwType=jnxMbgGwType, jnxMbgGwName=jnxMbgGwName, jnxMbgGwIndexTable=jnxMbgGwIndexTable)

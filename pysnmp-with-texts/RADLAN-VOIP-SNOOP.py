@@ -1,0 +1,113 @@
+#
+# PySNMP MIB module RADLAN-VOIP-SNOOP (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RADLAN-VOIP-SNOOP
+# Produced by pysmi-0.3.4 at Wed May  1 14:50:26 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection")
+InterfaceIndex, ifIndex = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex", "ifIndex")
+InetAddressType, InetZoneIndex, InetAddress, InetVersion, InetAddressPrefixLength = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetZoneIndex", "InetAddress", "InetVersion", "InetAddressPrefixLength")
+VlanId, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "VlanId")
+rnd, = mibBuilder.importSymbols("RADLAN-MIB", "rnd")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+IpAddress, ModuleIdentity, Unsigned32, Integer32, Counter64, Gauge32, ObjectIdentity, NotificationType, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, TimeTicks, Counter32, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "ModuleIdentity", "Unsigned32", "Integer32", "Counter64", "Gauge32", "ObjectIdentity", "NotificationType", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "TimeTicks", "Counter32", "MibIdentifier")
+RowStatus, TruthValue, TextualConvention, MacAddress, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "RowStatus", "TruthValue", "TextualConvention", "MacAddress", "DisplayString")
+rlVoipSnoop = ModuleIdentity((1, 3, 6, 1, 4, 1, 89, 213))
+if mibBuilder.loadTexts: rlVoipSnoop.setLastUpdated('200604020000Z')
+if mibBuilder.loadTexts: rlVoipSnoop.setOrganization('')
+if mibBuilder.loadTexts: rlVoipSnoop.setContactInfo('')
+if mibBuilder.loadTexts: rlVoipSnoop.setDescription('The private MIB module definition for VOIP Snoop.')
+rlVoipMngSnoopEnableScalar = MibScalar((1, 3, 6, 1, 4, 1, 89, 213, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlVoipMngSnoopEnableScalar.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopEnableScalar.setDescription('VOIP Global Enable/Disable.')
+class RlVoipQosType(TextualConvention, Integer32):
+    description = 'Type of QoS: VPT or DSCP.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("queue", 1), ("vpt", 2), ("dscp", 3))
+
+rlVoipMngSnoopQosTable = MibTable((1, 3, 6, 1, 4, 1, 89, 213, 2), )
+if mibBuilder.loadTexts: rlVoipMngSnoopQosTable.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopQosTable.setDescription('The (conceptual) table for configuration of VOIP QOS.')
+rlVoipMngSnoopQosEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 213, 2, 1), ).setIndexNames((0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopQosType"))
+if mibBuilder.loadTexts: rlVoipMngSnoopQosEntry.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopQosEntry.setDescription('An entry (conceptual row) in the rlVoipMngSnoopQosTable.')
+rlVoipMngSnoopQosType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 2, 1, 1), RlVoipQosType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlVoipMngSnoopQosType.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopQosType.setDescription('Current type of QoS of VOIP packets')
+rlVoipMngSnoopQosValue = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 2, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 63))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlVoipMngSnoopQosValue.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopQosValue.setDescription('The value depends on rlVoipMngSnoopQosType, that will be assigned to each VOIP packet. The range of VPT value is 0..7. The range of DSCP value is 0..63. The range of queue value is 0..7.')
+class RlVoipMngSnoopIfIndexStatus(TextualConvention, Integer32):
+    description = 'VOIP status of the port: enable or disable.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1))
+    namedValues = NamedValues(("disable", 0), ("enable", 1))
+
+rlVoipMngSnoopIfIndexTable = MibTable((1, 3, 6, 1, 4, 1, 89, 213, 3), )
+if mibBuilder.loadTexts: rlVoipMngSnoopIfIndexTable.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopIfIndexTable.setDescription('VOIP ports entry. The entry created when VOIP snooping enabled on port.')
+rlVoipMngSnoopIfIndexEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 213, 3, 1), ).setIndexNames((0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopIfIndex"))
+if mibBuilder.loadTexts: rlVoipMngSnoopIfIndexEntry.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopIfIndexEntry.setDescription('The row definition for this table.')
+rlVoipMngSnoopIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 3, 1, 1), Integer32())
+if mibBuilder.loadTexts: rlVoipMngSnoopIfIndex.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopIfIndex.setDescription('Interface Index.')
+rlVoipMngSnoopIfIndexStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 3, 1, 2), RlVoipMngSnoopIfIndexStatus()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlVoipMngSnoopIfIndexStatus.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopIfIndexStatus.setDescription('Enable or Disable VOIP status on the ifIndex.')
+class RlVoipProtocolType(TextualConvention, Integer32):
+    description = 'Type of protocol.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("sip", 1), ("h323", 2), ("sccp", 3))
+
+class RlVoipTcpUdpType(TextualConvention, Integer32):
+    description = 'Type of IP protocol.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("udp", 1), ("tcp", 2))
+
+rlVoipMngSnoopSessionTable = MibTable((1, 3, 6, 1, 4, 1, 89, 213, 4), )
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionTable.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionTable.setDescription('VOIP session entry. The entry created when VOIP snooping creates the RTP session.')
+rlVoipMngSnoopSessionEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 213, 4, 1), ).setIndexNames((0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopSessionDstIpAddrType"), (0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopSessionDstIpAddr"), (0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopSessionSrcIpAddrType"), (0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopSessionSrcIpAddr"), (0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopSessionDstUdpRtp"), (0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopSessionDstUdpRtcp"), (0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopSessionSrcUdpRtp"), (0, "RADLAN-VOIP-SNOOP", "rlVoipMngSnoopSessionSrcUdpRtcp"))
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionEntry.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionEntry.setDescription('The row definition for this table.')
+rlVoipMngSnoopSessionDstIpAddrType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 1), InetAddressType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionDstIpAddrType.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionDstIpAddrType.setDescription('The address type of rlVoipMngSnoopSessionDstIpAddr.')
+rlVoipMngSnoopSessionDstIpAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 2), InetAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionDstIpAddr.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionDstIpAddr.setDescription('Destination IP address.')
+rlVoipMngSnoopSessionSrcIpAddrType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 3), InetAddressType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSrcIpAddrType.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSrcIpAddrType.setDescription('The address type of rlVoipMngSnoopSessionSrcIpAddr.')
+rlVoipMngSnoopSessionSrcIpAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 4), InetAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSrcIpAddr.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSrcIpAddr.setDescription('Source IP address.')
+rlVoipMngSnoopSessionDstUdpRtp = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 5), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionDstUdpRtp.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionDstUdpRtp.setDescription('Destination Udp RTP port.')
+rlVoipMngSnoopSessionDstUdpRtcp = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 6), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionDstUdpRtcp.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionDstUdpRtcp.setDescription('Destination Udp RTCP port.')
+rlVoipMngSnoopSessionSrcUdpRtp = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 7), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSrcUdpRtp.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSrcUdpRtp.setDescription('Source Udp RTP port.')
+rlVoipMngSnoopSessionSrcUdpRtcp = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 8), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSrcUdpRtcp.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSrcUdpRtcp.setDescription('Source Udp RTCP port.')
+rlVoipMngSnoopSessionProtocolType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 9), RlVoipProtocolType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionProtocolType.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionProtocolType.setDescription('Type of signalling protocol.')
+rlVoipMngSnoopSessionSessionId = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 10), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSessionId.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionSessionId.setDescription('Destination Udp RTCP port.')
+rlVoipMngSnoopSessionTcpUdpType = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 213, 4, 1, 11), RlVoipTcpUdpType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionTcpUdpType.setStatus('current')
+if mibBuilder.loadTexts: rlVoipMngSnoopSessionTcpUdpType.setDescription('IP TCP or UDP protocol.')
+mibBuilder.exportSymbols("RADLAN-VOIP-SNOOP", rlVoipMngSnoopSessionDstIpAddr=rlVoipMngSnoopSessionDstIpAddr, rlVoipMngSnoopIfIndex=rlVoipMngSnoopIfIndex, rlVoipMngSnoopEnableScalar=rlVoipMngSnoopEnableScalar, rlVoipMngSnoopSessionDstUdpRtcp=rlVoipMngSnoopSessionDstUdpRtcp, rlVoipMngSnoopQosEntry=rlVoipMngSnoopQosEntry, rlVoipMngSnoopSessionDstIpAddrType=rlVoipMngSnoopSessionDstIpAddrType, rlVoipMngSnoopSessionSessionId=rlVoipMngSnoopSessionSessionId, rlVoipMngSnoopSessionSrcUdpRtcp=rlVoipMngSnoopSessionSrcUdpRtcp, RlVoipQosType=RlVoipQosType, rlVoipMngSnoopIfIndexTable=rlVoipMngSnoopIfIndexTable, RlVoipProtocolType=RlVoipProtocolType, rlVoipMngSnoopSessionEntry=rlVoipMngSnoopSessionEntry, rlVoipMngSnoopQosValue=rlVoipMngSnoopQosValue, rlVoipMngSnoopSessionProtocolType=rlVoipMngSnoopSessionProtocolType, PYSNMP_MODULE_ID=rlVoipSnoop, rlVoipMngSnoopIfIndexStatus=rlVoipMngSnoopIfIndexStatus, rlVoipMngSnoopQosType=rlVoipMngSnoopQosType, rlVoipMngSnoopSessionTable=rlVoipMngSnoopSessionTable, rlVoipMngSnoopSessionSrcIpAddrType=rlVoipMngSnoopSessionSrcIpAddrType, rlVoipMngSnoopSessionSrcUdpRtp=rlVoipMngSnoopSessionSrcUdpRtp, rlVoipSnoop=rlVoipSnoop, RlVoipMngSnoopIfIndexStatus=RlVoipMngSnoopIfIndexStatus, rlVoipMngSnoopSessionSrcIpAddr=rlVoipMngSnoopSessionSrcIpAddr, rlVoipMngSnoopQosTable=rlVoipMngSnoopQosTable, rlVoipMngSnoopSessionDstUdpRtp=rlVoipMngSnoopSessionDstUdpRtp, rlVoipMngSnoopSessionTcpUdpType=rlVoipMngSnoopSessionTcpUdpType, RlVoipTcpUdpType=RlVoipTcpUdpType, rlVoipMngSnoopIfIndexEntry=rlVoipMngSnoopIfIndexEntry)

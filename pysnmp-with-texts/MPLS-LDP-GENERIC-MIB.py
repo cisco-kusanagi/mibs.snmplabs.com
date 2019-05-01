@@ -1,0 +1,66 @@
+#
+# PySNMP MIB module MPLS-LDP-GENERIC-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MPLS-LDP-GENERIC-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:14:31 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint")
+InterfaceIndexOrZero, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndexOrZero")
+mplsLdpEntityLdpId, mplsLdpEntityObjects, mplsLdpEntityIndex = mibBuilder.importSymbols("MPLS-LDP-MIB", "mplsLdpEntityLdpId", "mplsLdpEntityObjects", "mplsLdpEntityIndex")
+mplsMIB, = mibBuilder.importSymbols("MPLS-TC-MIB", "mplsMIB")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+Unsigned32, MibIdentifier, ObjectIdentity, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, iso, Counter32, Bits, ModuleIdentity, NotificationType, Integer32, TimeTicks, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "MibIdentifier", "ObjectIdentity", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "iso", "Counter32", "Bits", "ModuleIdentity", "NotificationType", "Integer32", "TimeTicks", "Counter64")
+StorageType, DisplayString, RowStatus, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "StorageType", "DisplayString", "RowStatus", "TextualConvention")
+mplsLdpGenericMIB = ModuleIdentity((1, 3, 6, 1, 2, 1, 10, 9999, 6))
+mplsLdpGenericMIB.setRevisions(('2002-08-08 12:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: mplsLdpGenericMIB.setRevisionsDescriptions(('Initial version published as part of RFC XXXX.',))
+if mibBuilder.loadTexts: mplsLdpGenericMIB.setLastUpdated('200208081200Z')
+if mibBuilder.loadTexts: mplsLdpGenericMIB.setOrganization('Multiprotocol Label Switching (mpls) Working Group')
+if mibBuilder.loadTexts: mplsLdpGenericMIB.setContactInfo('Joan Cucchiara (jcucchiara@crescentnetworks.com) Crescent Networks Hans Sjostrand (hans@ipunplugged.com) ipUnplugged James V. Luciani (jluciani@crescentnetworks.com) Crescent Networks Working Group Chairs: George Swallow, email: swallow@cisco.com Loa Andersson, email: loa.andersson@utfors.se MPLS Working Group, email: mpls@uu.net ')
+if mibBuilder.loadTexts: mplsLdpGenericMIB.setDescription("This MIB contains managed object definitions for the 'Multiprotocol Label Switching, Label Distribution Protocol, LDP' document which use as their Layer 2 ethernet.")
+mplsLdpGenericObjects = MibIdentifier((1, 3, 6, 1, 2, 1, 10, 9999, 6, 1))
+mplsLdpGenericConformance = MibIdentifier((1, 3, 6, 1, 2, 1, 10, 9999, 6, 3))
+mplsLdpEntityGenericObjects = MibIdentifier((1, 3, 6, 1, 3, 97, 1, 2, 5))
+mplsLdpEntityGenLRTable = MibTable((1, 3, 6, 1, 3, 97, 1, 2, 5, 1), )
+if mibBuilder.loadTexts: mplsLdpEntityGenLRTable.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpEntityGenLRTable.setDescription("The MPLS LDP Entity Generic Label Range Table. The purpose of this table is to provide a mechanism for configurating a contiguous range of generic labels, or a 'label range' for LDP Entities. LDP Entities which use Generic Labels must have at least one entry in this table.")
+mplsLdpEntityGenLREntry = MibTableRow((1, 3, 6, 1, 3, 97, 1, 2, 5, 1, 1), ).setIndexNames((0, "MPLS-LDP-MIB", "mplsLdpEntityLdpId"), (0, "MPLS-LDP-MIB", "mplsLdpEntityIndex"), (0, "MPLS-LDP-GENERIC-MIB", "mplsLdpEntityGenLRMin"), (0, "MPLS-LDP-GENERIC-MIB", "mplsLdpEntityGenLRMax"))
+if mibBuilder.loadTexts: mplsLdpEntityGenLREntry.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpEntityGenLREntry.setDescription("A row in the LDP Entity Generic Label Range Table. One entry in this table contains information on a single range of labels represented by the configured Upper and Lower Bounds pairs. NOTE: there is NO corresponding LDP message which relates to the information in this table, however, this table does provide a way for a user to 'reserve' a generic label range. NOTE: The ranges for a specific LDP Entity are UNIQUE and non-overlapping. A row will not be created unless a unique and non-overlapping range is specified.")
+mplsLdpEntityGenLRMin = MibTableColumn((1, 3, 6, 1, 3, 97, 1, 2, 5, 1, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 1048575)))
+if mibBuilder.loadTexts: mplsLdpEntityGenLRMin.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpEntityGenLRMin.setDescription('The minimum label configured for this range.')
+mplsLdpEntityGenLRMax = MibTableColumn((1, 3, 6, 1, 3, 97, 1, 2, 5, 1, 1, 2), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 1048575)))
+if mibBuilder.loadTexts: mplsLdpEntityGenLRMax.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpEntityGenLRMax.setDescription('The maximum label configured for this range.')
+mplsLdpEntityGenIfIndexOrZero = MibTableColumn((1, 3, 6, 1, 3, 97, 1, 2, 5, 1, 1, 3), InterfaceIndexOrZero()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: mplsLdpEntityGenIfIndexOrZero.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpEntityGenIfIndexOrZero.setDescription("This value represents either the InterfaceIndex of the 'ifLayer' where these Generic Label would be created, or 0 (zero). The value of zero means that the InterfaceIndex is not known. For example, if the InterfaceIndex is created subsequent to the Generic Label's creation, then it would not be known. However, if the InterfaceIndex is known, then it must be represented by this value. If an InterfaceIndex becomes known, then the network management entity (e.g. SNMP agent) responsible for this object MUST change the value from 0 (zero) to the value of the InterfaceIndex.")
+mplsLdpEntityGenLRStorageType = MibTableColumn((1, 3, 6, 1, 3, 97, 1, 2, 5, 1, 1, 4), StorageType()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: mplsLdpEntityGenLRStorageType.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpEntityGenLRStorageType.setDescription('The storage type for this entry.')
+mplsLdpEntityGenLRRowStatus = MibTableColumn((1, 3, 6, 1, 3, 97, 1, 2, 5, 1, 1, 5), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: mplsLdpEntityGenLRRowStatus.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpEntityGenLRRowStatus.setDescription("An object that allows entries in this table to be created and deleted using the RowStatus convention. There must exist at least one entry in this table for every LDP Entity that has a generic label configured. NOTE: This RowStatus object should have the same value of the 'mplsLdpEntityRowStatus' related to this entry.")
+mplsLdpGenericGroups = MibIdentifier((1, 3, 6, 1, 2, 1, 10, 9999, 6, 3, 1))
+mplsLdpGenericCompliances = MibIdentifier((1, 3, 6, 1, 2, 1, 10, 9999, 6, 3, 2))
+mplsLdpGenModuleFullCompliance = ModuleCompliance((1, 3, 6, 1, 2, 1, 10, 9999, 6, 3, 2, 1)).setObjects(("MPLS-LDP-GENERIC-MIB", "mplsLdpGenericGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    mplsLdpGenModuleFullCompliance = mplsLdpGenModuleFullCompliance.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpGenModuleFullCompliance.setDescription('The Module is implemented with support for read-create and read-write. In other words, both monitoring and configuration are available when using this MODULE-COMPLIANCE.')
+mplsLdpGenModuleROCompliance = ModuleCompliance((1, 3, 6, 1, 2, 1, 10, 9999, 6, 3, 2, 2)).setObjects(("MPLS-LDP-GENERIC-MIB", "mplsLdpGenericGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    mplsLdpGenModuleROCompliance = mplsLdpGenModuleROCompliance.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpGenModuleROCompliance.setDescription('The Module is implemented with support for read-only. In other words, only monitoring is available by implementing this MODULE-COMPLIANCE.')
+mplsLdpGenericGroup = ObjectGroup((1, 3, 6, 1, 2, 1, 10, 9999, 6, 3, 1, 1)).setObjects(("MPLS-LDP-GENERIC-MIB", "mplsLdpEntityGenIfIndexOrZero"), ("MPLS-LDP-GENERIC-MIB", "mplsLdpEntityGenLRStorageType"), ("MPLS-LDP-GENERIC-MIB", "mplsLdpEntityGenLRRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    mplsLdpGenericGroup = mplsLdpGenericGroup.setStatus('current')
+if mibBuilder.loadTexts: mplsLdpGenericGroup.setDescription('Objects that apply to all MPLS LDP implementations using Generic Lables.')
+mibBuilder.exportSymbols("MPLS-LDP-GENERIC-MIB", mplsLdpEntityGenLRStorageType=mplsLdpEntityGenLRStorageType, mplsLdpEntityGenericObjects=mplsLdpEntityGenericObjects, mplsLdpEntityGenLRMin=mplsLdpEntityGenLRMin, mplsLdpGenericConformance=mplsLdpGenericConformance, mplsLdpEntityGenLRTable=mplsLdpEntityGenLRTable, mplsLdpEntityGenLRMax=mplsLdpEntityGenLRMax, mplsLdpEntityGenLREntry=mplsLdpEntityGenLREntry, mplsLdpGenModuleROCompliance=mplsLdpGenModuleROCompliance, mplsLdpGenModuleFullCompliance=mplsLdpGenModuleFullCompliance, mplsLdpGenericCompliances=mplsLdpGenericCompliances, mplsLdpEntityGenIfIndexOrZero=mplsLdpEntityGenIfIndexOrZero, mplsLdpGenericGroup=mplsLdpGenericGroup, mplsLdpGenericObjects=mplsLdpGenericObjects, mplsLdpGenericGroups=mplsLdpGenericGroups, mplsLdpGenericMIB=mplsLdpGenericMIB, mplsLdpEntityGenLRRowStatus=mplsLdpEntityGenLRRowStatus, PYSNMP_MODULE_ID=mplsLdpGenericMIB)

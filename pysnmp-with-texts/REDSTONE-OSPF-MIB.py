@@ -1,0 +1,63 @@
+#
+# PySNMP MIB module REDSTONE-OSPF-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/REDSTONE-OSPF-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:55:43 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint")
+ospfIfEntry, = mibBuilder.importSymbols("OSPF-MIB", "ospfIfEntry")
+rsMgmt, = mibBuilder.importSymbols("REDSTONE-SMI", "rsMgmt")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+ModuleIdentity, Bits, Counter64, iso, Unsigned32, Integer32, IpAddress, MibIdentifier, Gauge32, TimeTicks, ObjectIdentity, NotificationType, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Bits", "Counter64", "iso", "Unsigned32", "Integer32", "IpAddress", "MibIdentifier", "Gauge32", "TimeTicks", "ObjectIdentity", "NotificationType", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+rsOspfMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2773, 2, 14))
+rsOspfMIB.setRevisions(('1998-01-01 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: rsOspfMIB.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: rsOspfMIB.setLastUpdated('9801010000Z')
+if mibBuilder.loadTexts: rsOspfMIB.setOrganization('Redstone Communications, Inc.')
+if mibBuilder.loadTexts: rsOspfMIB.setContactInfo(' Redstone Communications, Inc. 5 Carlisle Road Westford MA 01886 USA Tel: +1-978-692-1999 Email: mib@redstonecom.com ')
+if mibBuilder.loadTexts: rsOspfMIB.setDescription('The OSPF Protocol MIB for the Redstone Communications Inc. enterprise.')
+rsOspfObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 14, 1))
+rsOspfGeneralGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 14, 1, 1))
+rsOspfProcessId = MibScalar((1, 3, 6, 1, 4, 1, 2773, 2, 14, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsOspfProcessId.setStatus('current')
+if mibBuilder.loadTexts: rsOspfProcessId.setDescription("An identifier having special semantics when set. When this object's value is zero, OSPF is disabled and cannot be configured. Setting this object to a nonzero value enables OSPF operation and permits further OSPF configuration to be performed. When this object's value is nonzero, setting it to a value of zero disables OSPF operation and clears all existing OSPF configuration. Once set to a nonzero value, this object cannot be set to a different nonzero value without first setting it to zero. (This MIB object mimics the behavior of the OSPF 'process ID' parameter used through the command-line interface.)")
+rsOspfMaxPathSplits = MibScalar((1, 3, 6, 1, 4, 1, 2773, 2, 14, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 16))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsOspfMaxPathSplits.setStatus('current')
+if mibBuilder.loadTexts: rsOspfMaxPathSplits.setDescription('The maximum number of equal-cost routes that will be maintained by the OSPF protocol. A change in this value will be taken into account at the next shortest-path-first recalculation.')
+rsOspfSpfHoldInterval = MibScalar((1, 3, 6, 1, 4, 1, 2773, 2, 14, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 5))).setUnits('seconds').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsOspfSpfHoldInterval.setStatus('current')
+if mibBuilder.loadTexts: rsOspfSpfHoldInterval.setDescription('The minimum amount of time that must elapse between shortest-path-first recalculations. Reducing this value can cause an immediate SPF recalulation if the new value is less than the current value of rsOspfSpfHoldTimeRemaining and other SPF-inducing protocol events have occurred.')
+rsOspfIfTable = MibTable((1, 3, 6, 1, 4, 1, 2773, 2, 14, 1, 2), )
+if mibBuilder.loadTexts: rsOspfIfTable.setStatus('current')
+if mibBuilder.loadTexts: rsOspfIfTable.setDescription('The Redstone OSPF Interface Table describes the OSPF-specific characteristics of interfaces.')
+rsOspfIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2773, 2, 14, 1, 2, 1), )
+ospfIfEntry.registerAugmentions(("REDSTONE-OSPF-MIB", "rsOspfIfEntry"))
+rsOspfIfEntry.setIndexNames(*ospfIfEntry.getIndexNames())
+if mibBuilder.loadTexts: rsOspfIfEntry.setStatus('current')
+if mibBuilder.loadTexts: rsOspfIfEntry.setDescription('The OSPF Interface Entry describes OSPF-specific characteristics of one interface.')
+rsOspfIfCost = MibTableColumn((1, 3, 6, 1, 4, 1, 2773, 2, 14, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535)).clone(10)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rsOspfIfCost.setStatus('current')
+if mibBuilder.loadTexts: rsOspfIfCost.setDescription('The cost value for this interface.')
+rsOspfConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 14, 4))
+rsOspfCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 14, 4, 1))
+rsOspfGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 14, 4, 2))
+rsOspfCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2773, 2, 14, 4, 1, 1)).setObjects(("REDSTONE-OSPF-MIB", "rsOspfBasicGroup"), ("REDSTONE-OSPF-MIB", "rsOspfIfGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsOspfCompliance = rsOspfCompliance.setStatus('current')
+if mibBuilder.loadTexts: rsOspfCompliance.setDescription('The compliance statement for entities which implement the Redstone OSPF MIB.')
+rsOspfBasicGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2773, 2, 14, 4, 2, 1)).setObjects(("REDSTONE-OSPF-MIB", "rsOspfProcessId"), ("REDSTONE-OSPF-MIB", "rsOspfMaxPathSplits"), ("REDSTONE-OSPF-MIB", "rsOspfSpfHoldInterval"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsOspfBasicGroup = rsOspfBasicGroup.setStatus('current')
+if mibBuilder.loadTexts: rsOspfBasicGroup.setDescription('A collection of objects for managing general OSPF capabilities in a Redstone product.')
+rsOspfIfGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2773, 2, 14, 4, 2, 2)).setObjects(("REDSTONE-OSPF-MIB", "rsOspfIfCost"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsOspfIfGroup = rsOspfIfGroup.setStatus('current')
+if mibBuilder.loadTexts: rsOspfIfGroup.setDescription('A collection of objects for managing OSPF Interface capabilities in a Redstone product.')
+mibBuilder.exportSymbols("REDSTONE-OSPF-MIB", rsOspfGeneralGroup=rsOspfGeneralGroup, rsOspfSpfHoldInterval=rsOspfSpfHoldInterval, rsOspfGroups=rsOspfGroups, PYSNMP_MODULE_ID=rsOspfMIB, rsOspfIfTable=rsOspfIfTable, rsOspfCompliance=rsOspfCompliance, rsOspfObjects=rsOspfObjects, rsOspfMaxPathSplits=rsOspfMaxPathSplits, rsOspfBasicGroup=rsOspfBasicGroup, rsOspfMIB=rsOspfMIB, rsOspfIfCost=rsOspfIfCost, rsOspfIfEntry=rsOspfIfEntry, rsOspfCompliances=rsOspfCompliances, rsOspfIfGroup=rsOspfIfGroup, rsOspfProcessId=rsOspfProcessId, rsOspfConformance=rsOspfConformance)

@@ -1,0 +1,83 @@
+#
+# PySNMP MIB module ARISTA-CONFIG-MAN-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ARISTA-CONFIG-MAN-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:24:58 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+aristaMibs, = mibBuilder.importSymbols("ARISTA-SMI-MIB", "aristaMibs")
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+iso, MibIdentifier, Bits, Counter64, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, ObjectIdentity, IpAddress, Gauge32, Counter32, Unsigned32, Integer32, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "MibIdentifier", "Bits", "Counter64", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "ObjectIdentity", "IpAddress", "Gauge32", "Counter32", "Unsigned32", "Integer32", "NotificationType")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+aristaConfigManMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 30065, 3, 9))
+aristaConfigManMIB.setRevisions(('2014-08-15 00:00', '2014-05-06 13:00', '2012-08-23 13:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: aristaConfigManMIB.setRevisionsDescriptions(('Updated postal and e-mail addresses.', 'Addition of session(6) under ConfigHistoryEventMedium.', 'Initial version.',))
+if mibBuilder.loadTexts: aristaConfigManMIB.setLastUpdated('201408150000Z')
+if mibBuilder.loadTexts: aristaConfigManMIB.setOrganization('Arista Networks, Inc.')
+if mibBuilder.loadTexts: aristaConfigManMIB.setContactInfo('Arista Networks, Inc. Postal: 5453 Great America Parkway Santa Clara, CA 95054 Tel: +1 408 547-5500 E-mail: snmp@arista.com')
+if mibBuilder.loadTexts: aristaConfigManMIB.setDescription('This MIB provides notifications in case of configuration events. Notification to the managing device are sent (aristaConfigManEvent) in case of the occurence of a config event. The config events can take place from any of the following sources: cli commands issued via CLI snmp snmpsets via SNMP aristaConfigManEvent would provide information about command source config source, config destination, config source URL (for instance flash, ftp, http and so on) and config destination URL. ')
+class ConfigHistoryEventMedium(TextualConvention, Integer32):
+    description = 'The source or destination of a configuration change, save, or copy. erase erasing destination (source only) running live operational data commandSource the command source itself startup what the system will use next reboot url when the source/destination is a URL (like: flash, ftp, http etc). The value of URL will be present in aristaCmdHistoryEventConfigSourceURLScheme or aristaCmdHistoryEventConfigDestURLScheme. none when none of the above mentioned options apply.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6))
+    namedValues = NamedValues(("none", 0), ("erase", 1), ("commandSource", 2), ("running", 3), ("startup", 4), ("url", 5), ("session", 6))
+
+aristaConfigManMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1))
+aristaConfigManMibConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 30065, 3, 9, 2))
+aristaCmdHistory = MibIdentifier((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1))
+aristaCmdHistoryRunningLastChanged = MibScalar((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 1), TimeTicks()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aristaCmdHistoryRunningLastChanged.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryRunningLastChanged.setDescription('The value of sysUpTime when the running configuration was last changed.')
+aristaCmdHistoryEventTable = MibTable((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2), )
+if mibBuilder.loadTexts: aristaCmdHistoryEventTable.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventTable.setDescription('A table of configuration events on this router.')
+aristaCmdHistoryEventEntry = MibTableRow((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2, 1), ).setIndexNames((0, "ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventIndex"))
+if mibBuilder.loadTexts: aristaCmdHistoryEventEntry.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventEntry.setDescription('Information about a configuration event on this router.')
+aristaCmdHistoryEventIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2, 1, 1), Unsigned32())
+if mibBuilder.loadTexts: aristaCmdHistoryEventIndex.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventIndex.setDescription('A monotonically increasing integer for the sole purpose of indexing events.')
+aristaCmdHistoryEventTime = MibTableColumn((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2, 1, 2), TimeTicks()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aristaCmdHistoryEventTime.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventTime.setDescription('The value of sysUpTime when the configuration event occurred.')
+aristaCmdHistoryEventCommandSource = MibTableColumn((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("commandLine", 0), ("snmp", 1)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aristaCmdHistoryEventCommandSource.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventCommandSource.setDescription('The source from where the config command was initiated.')
+aristaCmdHistoryEventConfigSource = MibTableColumn((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2, 1, 4), ConfigHistoryEventMedium()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aristaCmdHistoryEventConfigSource.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventConfigSource.setDescription('The configuration data source for the event.')
+aristaCmdHistoryEventConfigDestination = MibTableColumn((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2, 1, 5), ConfigHistoryEventMedium()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aristaCmdHistoryEventConfigDestination.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventConfigDestination.setDescription('The configuration data destination for the event.')
+aristaCmdHistoryEventConfigSourceURLScheme = MibTableColumn((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2, 1, 6), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aristaCmdHistoryEventConfigSourceURLScheme.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventConfigSourceURLScheme.setDescription('The config source URL scheme.')
+aristaCmdHistoryEventConfigDestURLScheme = MibTableColumn((1, 3, 6, 1, 4, 1, 30065, 3, 9, 1, 1, 2, 1, 7), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: aristaCmdHistoryEventConfigDestURLScheme.setStatus('current')
+if mibBuilder.loadTexts: aristaCmdHistoryEventConfigDestURLScheme.setDescription('The config destination URL scheme.')
+aristaConfigManMIBNotificationPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 30065, 3, 9, 3))
+aristaConfigManMIBNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 30065, 3, 9, 3, 0))
+aristaConfigManEvent = NotificationType((1, 3, 6, 1, 4, 1, 30065, 3, 9, 3, 0, 1)).setObjects(("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventCommandSource"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventConfigSource"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventConfigDestination"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventConfigSourceURLScheme"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventConfigDestURLScheme"))
+if mibBuilder.loadTexts: aristaConfigManEvent.setStatus('current')
+if mibBuilder.loadTexts: aristaConfigManEvent.setDescription('Notification of a configuration management event as recorded in aristaCmdHistoryEventTable.')
+aristaConfigManMibCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 30065, 3, 9, 2, 1))
+aristaConfigManMibGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 30065, 3, 9, 2, 1, 2))
+aristaConfigManMibCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 30065, 3, 9, 2, 1, 1)).setObjects(("ARISTA-CONFIG-MAN-MIB", "aristaConfigEventDetailGroup"), ("ARISTA-CONFIG-MAN-MIB", "aristaConfigManMibNotificationsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    aristaConfigManMibCompliance = aristaConfigManMibCompliance.setStatus('current')
+if mibBuilder.loadTexts: aristaConfigManMibCompliance.setDescription('The compliance statement for Arista switches that support CONFIG-MAN-MIB.')
+aristaConfigEventDetailGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 30065, 3, 9, 2, 1, 2, 1)).setObjects(("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryRunningLastChanged"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventTime"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventCommandSource"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventConfigSource"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventConfigDestination"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventConfigSourceURLScheme"), ("ARISTA-CONFIG-MAN-MIB", "aristaCmdHistoryEventConfigDestURLScheme"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    aristaConfigEventDetailGroup = aristaConfigEventDetailGroup.setStatus('current')
+if mibBuilder.loadTexts: aristaConfigEventDetailGroup.setDescription('The collection of objects that represent the redundancy status in the system.')
+aristaConfigManMibNotificationsGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 30065, 3, 9, 2, 1, 2, 2)).setObjects(("ARISTA-CONFIG-MAN-MIB", "aristaConfigManEvent"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    aristaConfigManMibNotificationsGroup = aristaConfigManMibNotificationsGroup.setStatus('current')
+if mibBuilder.loadTexts: aristaConfigManMibNotificationsGroup.setDescription('The collection of notifications generated by the system upon configuration events.')
+mibBuilder.exportSymbols("ARISTA-CONFIG-MAN-MIB", aristaConfigManEvent=aristaConfigManEvent, ConfigHistoryEventMedium=ConfigHistoryEventMedium, aristaCmdHistoryEventTable=aristaCmdHistoryEventTable, aristaConfigManMibCompliance=aristaConfigManMibCompliance, aristaConfigManMIBObjects=aristaConfigManMIBObjects, aristaConfigManMIBNotifications=aristaConfigManMIBNotifications, aristaCmdHistoryEventCommandSource=aristaCmdHistoryEventCommandSource, aristaConfigEventDetailGroup=aristaConfigEventDetailGroup, aristaConfigManMibCompliances=aristaConfigManMibCompliances, aristaCmdHistoryEventConfigDestURLScheme=aristaCmdHistoryEventConfigDestURLScheme, aristaConfigManMibGroups=aristaConfigManMibGroups, aristaCmdHistoryEventConfigSourceURLScheme=aristaCmdHistoryEventConfigSourceURLScheme, aristaCmdHistoryEventTime=aristaCmdHistoryEventTime, aristaConfigManMibConformance=aristaConfigManMibConformance, aristaConfigManMibNotificationsGroup=aristaConfigManMibNotificationsGroup, aristaConfigManMIB=aristaConfigManMIB, aristaConfigManMIBNotificationPrefix=aristaConfigManMIBNotificationPrefix, aristaCmdHistoryEventIndex=aristaCmdHistoryEventIndex, aristaCmdHistoryEventConfigDestination=aristaCmdHistoryEventConfigDestination, aristaCmdHistoryEventConfigSource=aristaCmdHistoryEventConfigSource, aristaCmdHistory=aristaCmdHistory, PYSNMP_MODULE_ID=aristaConfigManMIB, aristaCmdHistoryRunningLastChanged=aristaCmdHistoryRunningLastChanged, aristaCmdHistoryEventEntry=aristaCmdHistoryEventEntry)

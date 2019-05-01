@@ -1,0 +1,56 @@
+#
+# PySNMP MIB module CISCO-MGX82XX-MODULE-RSRC-PART-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-MGX82XX-MODULE-RSRC-PART-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:07:26 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection")
+cardGeneric, = mibBuilder.importSymbols("BASIS-MIB", "cardGeneric")
+ciscoWan, = mibBuilder.importSymbols("CISCOWAN-SMI", "ciscoWan")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+iso, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, IpAddress, Unsigned32, Bits, TimeTicks, Counter32, ObjectIdentity, Counter64, NotificationType, Gauge32, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "IpAddress", "Unsigned32", "Bits", "TimeTicks", "Counter32", "ObjectIdentity", "Counter64", "NotificationType", "Gauge32", "ModuleIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ciscoMgx82xxModuleRsrcPartMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 351, 150, 73))
+ciscoMgx82xxModuleRsrcPartMIB.setRevisions(('2003-04-18 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoMgx82xxModuleRsrcPartMIB.setRevisionsDescriptions(('Initial version of the MIB. The content of this MIB was originally available in CISCO-WAN-AXIPOP-MIB defined using SMIv1. The applicable objects from CISCO-WAN-AXIPOP-MIB are defined using SMIv2 in this MIB. Also the descriptions of some of the objects have been modified.',))
+if mibBuilder.loadTexts: ciscoMgx82xxModuleRsrcPartMIB.setLastUpdated('200304180000Z')
+if mibBuilder.loadTexts: ciscoMgx82xxModuleRsrcPartMIB.setOrganization('Cisco Systems, Inc.')
+if mibBuilder.loadTexts: ciscoMgx82xxModuleRsrcPartMIB.setContactInfo(' Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-wanatm@cisco.com')
+if mibBuilder.loadTexts: ciscoMgx82xxModuleRsrcPartMIB.setDescription('The MIB module to configure the resource partition on service modules(cards) supported in MGX82xx and MGX88xx products. This MIB is supported in following Service Modules: AUSM (ATM UNI Service Module) CESM (Circuit Emulation Service Module) FRSM (Frame Relay Service Module) VISM (Voice Interworking Service Module) PXM1 (Processor Switch Module) Terminlogies used: LCN : Logical Connection Number. GLCN : Global LCN. Controller - Software ( and possibly hardware) which manages topology and network resources. This performs source routing for ent-to-end SVCs, including general call acceptance GCAC, setup calls with other controllers. PNNI and MPLS are examples for the Controller.')
+cardResourcePartition = MibIdentifier((1, 3, 6, 1, 4, 1, 351, 110, 2, 9))
+cardLcnPartitionType = MibScalar((1, 3, 6, 1, 4, 1, 351, 110, 2, 9, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("noPartition", 1), ("controllerBased", 2), ("portControllerBased", 3))).clone('noPartition')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cardLcnPartitionType.setStatus('current')
+if mibBuilder.loadTexts: cardLcnPartitionType.setDescription('This object specifies the type of partition on LCN: The possible values are: noPartition(1): all controllers compete for the totoal (G)LCNs limited by the card controllerBased(2): the total number of (G)LCNs available to each controller is fixed but no reservation on each port. The number for each controller is specified in the cardResPartGrpTable. portControllerBased(3): a certain number of (G)LCNs available on each port for each controller is reserved, it is specified in the port resouce partition table. NOTE: This object has to be configured before adding any connections. Once a connection is added, this object cannot be changed until all of the connections are deleted.')
+cardResPartGrpTable = MibTable((1, 3, 6, 1, 4, 1, 351, 110, 2, 9, 2), )
+if mibBuilder.loadTexts: cardResPartGrpTable.setStatus('current')
+if mibBuilder.loadTexts: cardResPartGrpTable.setDescription("This table contains the configuration of all the resource partition(s) that are on the card level, such as (G)LCN (if the object cardLcnPartitionType is configured as controller-based, if not, there is no need to configure this table since it'll be useless).")
+cardResPartGrpEntry = MibTableRow((1, 3, 6, 1, 4, 1, 351, 110, 2, 9, 2, 1), ).setIndexNames((0, "CISCO-MGX82XX-MODULE-RSRC-PART-MIB", "cardResPartCtrlrNum"))
+if mibBuilder.loadTexts: cardResPartGrpEntry.setStatus('current')
+if mibBuilder.loadTexts: cardResPartGrpEntry.setDescription('An entry in the table. Each entry contains number of LCNs available.')
+cardResPartCtrlrNum = MibTableColumn((1, 3, 6, 1, 4, 1, 351, 110, 2, 9, 2, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("par", 1), ("pnni", 2), ("tag", 3)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cardResPartCtrlrNum.setStatus('current')
+if mibBuilder.loadTexts: cardResPartCtrlrNum.setDescription("This object identifies the controller managing the partition. par(1) - Portable Auto Route(PAR). This is a VSI Master controller implementing Cisco Proprietary protocol for network routing and topology in a Network containing only Cisco Switches. pnni(2) - Private Network-to-Network Interface (PNNI) controller. The PNNI protocol is used between private ATM Switches and between groups of ATM switches. This protocol is defined for distributing topology information between switches and clusters of switches. tag(3) - Label(tag) Switch Controller(TSC).The LSC Implements MPLS (Multi Protocol Label Switching) protocol. The LSC is a router which is capable of controlling the operation of a separate ATM switch so that the two of them together function as a single ATM-LSR (ATM Label Switch Router). The LSC controls the operation of the ATM Switch using a 'Switch Control Protocol', which allows the LSC to setup and remove cross-connects on the ATM switch, to discover the configuration and capabilities of the controlled switch, and to gather statistics from the controlled switch.")
+cardResPartRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 351, 110, 2, 9, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("add", 1), ("del", 2), ("mod", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cardResPartRowStatus.setStatus('current')
+if mibBuilder.loadTexts: cardResPartRowStatus.setDescription('This object is used for adding/modifying the entries in the table.')
+cardResPartNumOfLcnAvail = MibTableColumn((1, 3, 6, 1, 4, 1, 351, 110, 2, 9, 2, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cardResPartNumOfLcnAvail.setStatus('current')
+if mibBuilder.loadTexts: cardResPartNumOfLcnAvail.setDescription('This object is configured to reserve the number of (G)LCNs for one controller on a SM card, it can be used on any port but the total number of connections added on all of the ports for that particular controller cannot exceed this number.')
+cmmRsrcPartMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 351, 150, 73, 2))
+cmmRsrcPartMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 351, 150, 73, 2, 1))
+cmmRsrcPartMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 351, 150, 73, 2, 2))
+cmmRsrcPartCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 351, 150, 73, 2, 1, 1)).setObjects(("CISCO-MGX82XX-MODULE-RSRC-PART-MIB", "cmmRsrcPartGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmmRsrcPartCompliance = cmmRsrcPartCompliance.setStatus('current')
+if mibBuilder.loadTexts: cmmRsrcPartCompliance.setDescription('The compliance statement for entities which implement the Frame Relay Resource Partition MIB.')
+cmmRsrcPartGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 351, 150, 73, 2, 2, 1)).setObjects(("CISCO-MGX82XX-MODULE-RSRC-PART-MIB", "cardLcnPartitionType"), ("CISCO-MGX82XX-MODULE-RSRC-PART-MIB", "cardResPartCtrlrNum"), ("CISCO-MGX82XX-MODULE-RSRC-PART-MIB", "cardResPartRowStatus"), ("CISCO-MGX82XX-MODULE-RSRC-PART-MIB", "cardResPartNumOfLcnAvail"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cmmRsrcPartGroup = cmmRsrcPartGroup.setStatus('current')
+if mibBuilder.loadTexts: cmmRsrcPartGroup.setDescription('A collection of objects providing the resource partition configuration information in service modules.')
+mibBuilder.exportSymbols("CISCO-MGX82XX-MODULE-RSRC-PART-MIB", cardLcnPartitionType=cardLcnPartitionType, cardResPartCtrlrNum=cardResPartCtrlrNum, PYSNMP_MODULE_ID=ciscoMgx82xxModuleRsrcPartMIB, cardResPartGrpTable=cardResPartGrpTable, ciscoMgx82xxModuleRsrcPartMIB=ciscoMgx82xxModuleRsrcPartMIB, cardResPartRowStatus=cardResPartRowStatus, cmmRsrcPartMIBConformance=cmmRsrcPartMIBConformance, cmmRsrcPartGroup=cmmRsrcPartGroup, cardResPartNumOfLcnAvail=cardResPartNumOfLcnAvail, cardResPartGrpEntry=cardResPartGrpEntry, cmmRsrcPartCompliance=cmmRsrcPartCompliance, cmmRsrcPartMIBGroups=cmmRsrcPartMIBGroups, cmmRsrcPartMIBCompliances=cmmRsrcPartMIBCompliances, cardResourcePartition=cardResourcePartition)

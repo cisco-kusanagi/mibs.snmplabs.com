@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module Unisphere-Data-Registry (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Unisphere-Data-Registry
+# Produced by pysmi-0.3.4 at Wed May  1 15:31:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, Integer32, Gauge32, ObjectIdentity, iso, ModuleIdentity, NotificationType, Counter64, Bits, Counter32, Unsigned32, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "Integer32", "Gauge32", "ObjectIdentity", "iso", "ModuleIdentity", "NotificationType", "Counter64", "Bits", "Counter32", "Unsigned32", "TimeTicks")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+usAdmin, = mibBuilder.importSymbols("Unisphere-SMI", "usAdmin")
+usDataAdmin = ModuleIdentity((1, 3, 6, 1, 4, 1, 4874, 4, 2))
+usDataAdmin.setRevisions(('2001-09-25 15:25', '2001-06-01 21:18',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: usDataAdmin.setRevisionsDescriptions(('Change the name of the MRX.', 'Initial version of this SNMP management information module.',))
+if mibBuilder.loadTexts: usDataAdmin.setLastUpdated('200109251525Z')
+if mibBuilder.loadTexts: usDataAdmin.setOrganization('Unisphere Networks, Inc.')
+if mibBuilder.loadTexts: usDataAdmin.setContactInfo(' Unisphere Networks, Inc. Postal: 10 Technology Park Drive Westford, MA 01886 USA Tel: +1 978 589 5800 Email: mib@UnisphereNetworks.com')
+if mibBuilder.loadTexts: usDataAdmin.setDescription('Administratively assigned object identifiers for Unisphere Networks data communications products.')
+usDataRegistry = ObjectIdentity((1, 3, 6, 1, 4, 1, 4874, 4, 2, 1))
+if mibBuilder.loadTexts: usDataRegistry.setStatus('current')
+if mibBuilder.loadTexts: usDataRegistry.setDescription('The root for administratively assigned object identifiers for Unisphere Networks Data cross-product objects.')
+usdErxRegistry = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 4, 2, 2))
+usdMrxRegistry = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 4, 2, 3))
+usDataEntPhysicalType = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 4, 2, 1, 1))
+usdPcmciaFlashCard = ObjectIdentity((1, 3, 6, 1, 4, 1, 4874, 4, 2, 1, 1, 1))
+if mibBuilder.loadTexts: usdPcmciaFlashCard.setStatus('current')
+if mibBuilder.loadTexts: usdPcmciaFlashCard.setDescription('The vendor type id for a standard PCMCIA flash card.')
+usd85MegT2FlashCard = ObjectIdentity((1, 3, 6, 1, 4, 1, 4874, 4, 2, 1, 1, 1, 1))
+if mibBuilder.loadTexts: usd85MegT2FlashCard.setStatus('current')
+if mibBuilder.loadTexts: usd85MegT2FlashCard.setDescription('The vendor type id for an 85 Megabyte Type II ATA PCMCIA flash card (Product Code: PCM-85).')
+usd220MegT2FlashCard = ObjectIdentity((1, 3, 6, 1, 4, 1, 4874, 4, 2, 1, 1, 1, 2))
+if mibBuilder.loadTexts: usd220MegT2FlashCard.setStatus('current')
+if mibBuilder.loadTexts: usd220MegT2FlashCard.setDescription('The vendor type id for a 220 Megabyte Type II ATA PCMCIA flash card (Product Code: FLASH-220M).')
+usdTraceRouteImplementationTypes = MibIdentifier((1, 3, 6, 1, 4, 1, 4874, 4, 2, 1, 2))
+usdTraceRouteUsingIcmpProbe = ObjectIdentity((1, 3, 6, 1, 4, 1, 4874, 4, 2, 1, 2, 1))
+if mibBuilder.loadTexts: usdTraceRouteUsingIcmpProbe.setStatus('current')
+if mibBuilder.loadTexts: usdTraceRouteUsingIcmpProbe.setDescription('Indicates that an implementation is using ICMP probes to perform the trace-route operation.')
+mibBuilder.exportSymbols("Unisphere-Data-Registry", usdMrxRegistry=usdMrxRegistry, usd220MegT2FlashCard=usd220MegT2FlashCard, usDataRegistry=usDataRegistry, usdPcmciaFlashCard=usdPcmciaFlashCard, usDataAdmin=usDataAdmin, usd85MegT2FlashCard=usd85MegT2FlashCard, PYSNMP_MODULE_ID=usDataAdmin, usdTraceRouteUsingIcmpProbe=usdTraceRouteUsingIcmpProbe, usDataEntPhysicalType=usDataEntPhysicalType, usdErxRegistry=usdErxRegistry, usdTraceRouteImplementationTypes=usdTraceRouteImplementationTypes)

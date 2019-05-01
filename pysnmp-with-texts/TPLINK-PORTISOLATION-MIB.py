@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module TPLINK-PORTISOLATION-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TPLINK-PORTISOLATION-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:25:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, ObjectIdentity, TimeTicks, ModuleIdentity, NotificationType, Counter32, Gauge32, MibIdentifier, Unsigned32, IpAddress, Integer32, Counter64, iso = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "ObjectIdentity", "TimeTicks", "ModuleIdentity", "NotificationType", "Counter32", "Gauge32", "MibIdentifier", "Unsigned32", "IpAddress", "Integer32", "Counter64", "iso")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+tplinkMgmt, = mibBuilder.importSymbols("TPLINK-MIB", "tplinkMgmt")
+tplinkPortIsolationMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 11863, 6, 13))
+tplinkPortIsolationMIB.setRevisions(('2012-12-13 09:30',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: tplinkPortIsolationMIB.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: tplinkPortIsolationMIB.setLastUpdated('201212130930Z')
+if mibBuilder.loadTexts: tplinkPortIsolationMIB.setOrganization('TPLINK')
+if mibBuilder.loadTexts: tplinkPortIsolationMIB.setContactInfo('www.tplink.com.cn')
+if mibBuilder.loadTexts: tplinkPortIsolationMIB.setDescription('The config of the port isolation.')
+tplinkPortIsolationMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 13, 1))
+tplinkPortIsolationMIBNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 13, 2))
+portIsolationCtrlTable = MibTable((1, 3, 6, 1, 4, 1, 11863, 6, 13, 1, 1), )
+if mibBuilder.loadTexts: portIsolationCtrlTable.setStatus('current')
+if mibBuilder.loadTexts: portIsolationCtrlTable.setDescription('A list of port isolation.')
+portIsolationCtrlEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11863, 6, 13, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: portIsolationCtrlEntry.setStatus('current')
+if mibBuilder.loadTexts: portIsolationCtrlEntry.setDescription('The entry of the port isolation list .')
+portIsolationPortId = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 13, 1, 1, 1, 1), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 16))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: portIsolationPortId.setStatus('current')
+if mibBuilder.loadTexts: portIsolationPortId.setDescription('The port id.')
+portIsolationForList = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 13, 1, 1, 1, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: portIsolationForList.setStatus('current')
+if mibBuilder.loadTexts: portIsolationForList.setDescription('The forward portlist,such as 1/0/1-5,1/0/9-11,1/0/16.')
+portIsolationLagId = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 13, 1, 1, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 10))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: portIsolationLagId.setStatus('current')
+if mibBuilder.loadTexts: portIsolationLagId.setDescription('The trunk id of the port.')
+mibBuilder.exportSymbols("TPLINK-PORTISOLATION-MIB", portIsolationLagId=portIsolationLagId, portIsolationPortId=portIsolationPortId, tplinkPortIsolationMIBNotifications=tplinkPortIsolationMIBNotifications, portIsolationCtrlEntry=portIsolationCtrlEntry, tplinkPortIsolationMIB=tplinkPortIsolationMIB, portIsolationCtrlTable=portIsolationCtrlTable, tplinkPortIsolationMIBObjects=tplinkPortIsolationMIBObjects, portIsolationForList=portIsolationForList, PYSNMP_MODULE_ID=tplinkPortIsolationMIB)

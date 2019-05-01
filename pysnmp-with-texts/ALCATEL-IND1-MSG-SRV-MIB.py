@@ -1,0 +1,55 @@
+#
+# PySNMP MIB module ALCATEL-IND1-MSG-SRV-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ALCATEL-IND1-MSG-SRV-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:18:34 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+softentIND1MsgSrvMIB, = mibBuilder.importSymbols("ALCATEL-IND1-BASE", "softentIND1MsgSrvMIB")
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint")
+InetAddress, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetAddressType")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+MibIdentifier, Bits, TimeTicks, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, IpAddress, Counter64, ObjectIdentity, iso, Integer32, ModuleIdentity, NotificationType, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "Bits", "TimeTicks", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "IpAddress", "Counter64", "ObjectIdentity", "iso", "Integer32", "ModuleIdentity", "NotificationType", "Unsigned32")
+TextualConvention, MacAddress, DisplayString, DateAndTime = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "MacAddress", "DisplayString", "DateAndTime")
+alcatelIND1MsgSrvMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1))
+alcatelIND1MsgSrvMIB.setRevisions(('2013-06-05 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: alcatelIND1MsgSrvMIB.setRevisionsDescriptions(('The QIP Message Service provides a framework for components such as DHCP server interact with other QIP components in the network. This MIB provides the configuration information for Message Service.',))
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIB.setLastUpdated('201306050000Z')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIB.setOrganization('Alcatel - Architects Of An Internet World')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIB.setContactInfo('Please consult with Customer Service to insure the most appropriate version of this document is used with the products in question: Alcatel Internetworking, Incorporated (Division 1, Formerly XYLAN Corporation) 26801 West Agoura Road Agoura Hills, CA 91301-5122 United States Of America Telephone: North America +1 800 995 2696 Latin America +1 877 919 9526 Europe +31 23 556 0100 Asia +65 394 7933 All Other +1 818 878 4507 Electronic Mail: support@ind.alcatel.com World Wide Web: http://www.ind.alcatel.com File Transfer Protocol: ftp://ftp.ind.alcatel.com/pub/products/mibs')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIB.setDescription('This module describes an authoritative enterprise-specific Simple Network Management Protocol (SNMP) Management Information Base (MIB): For the Birds Of Prey Product Line MsgSrv for dynamically assigning IP to clients. The right to make changes in specification and other information contained in this document without prior notice is reserved. No liability shall be assumed for any incidental, indirect, special, or consequential damages whatsoever arising from or related to this document or the information contained herein. Vendors, end-users, and other interested parties are granted non-exclusive license to use this specification in connection with management of the products for which it is intended to be used. Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated ALL RIGHTS RESERVED WORLDWIDE')
+alcatelIND1MsgSrvMIBNotifications = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 0))
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBNotifications.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBNotifications.setDescription('Branch For Message Service Subsystem Notifications.')
+alcatelIND1MsgSrvMIBObjects = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 1))
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBObjects.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBObjects.setDescription('Branch For Message Service Subsystem Managed Objects.')
+alcatelIND1MsgSrvMIBConformance = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 2))
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBConformance.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBConformance.setDescription('Branch for MsgSrv Module MIB Subsystem Conformance Information.')
+alcatelIND1MsgSrvMIBGroups = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 2, 1))
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBGroups.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBGroups.setDescription('Branch for MsgSrv Module MIB Subsystem Units of Conformance.')
+alcatelIND1MsgSrvMIBCompliances = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 2, 2))
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBCompliances.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBCompliances.setDescription('Branch for MsgSrv Module MIB Subsystem Compliance Statements.')
+alaMsgSrvGlobalConfigStatus = MibScalar((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2))).clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: alaMsgSrvGlobalConfigStatus.setStatus('current')
+if mibBuilder.loadTexts: alaMsgSrvGlobalConfigStatus.setDescription('This object is used to enable(1) or disable(2) QIP Message Service on the switch.')
+alaMsgSrvGlobalRestart = MibScalar((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("inactive", 1), ("restart", 2))).clone('inactive')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: alaMsgSrvGlobalRestart.setStatus('current')
+if mibBuilder.loadTexts: alaMsgSrvGlobalRestart.setDescription('This object is used to restart(2) the QIP Message Service on the switch. Default value is inactive(1) which user can not set.')
+alcatelIND1MsgSrvMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 2, 2, 1)).setObjects(("ALCATEL-IND1-MSG-SRV-MIB", "alaMsgSrvGlobalConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    alcatelIND1MsgSrvMIBCompliance = alcatelIND1MsgSrvMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1MsgSrvMIBCompliance.setDescription('Compliance statement for QIP Message Service.')
+alaMsgSrvGlobalConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 79, 1, 2, 1, 1)).setObjects(("ALCATEL-IND1-MSG-SRV-MIB", "alaMsgSrvGlobalConfigStatus"), ("ALCATEL-IND1-MSG-SRV-MIB", "alaMsgSrvGlobalRestart"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    alaMsgSrvGlobalConfigGroup = alaMsgSrvGlobalConfigGroup.setStatus('current')
+if mibBuilder.loadTexts: alaMsgSrvGlobalConfigGroup.setDescription('Collection of objects for management of QIP Message Service Global Configuration.')
+mibBuilder.exportSymbols("ALCATEL-IND1-MSG-SRV-MIB", alcatelIND1MsgSrvMIBConformance=alcatelIND1MsgSrvMIBConformance, alcatelIND1MsgSrvMIBCompliances=alcatelIND1MsgSrvMIBCompliances, alaMsgSrvGlobalRestart=alaMsgSrvGlobalRestart, alcatelIND1MsgSrvMIBGroups=alcatelIND1MsgSrvMIBGroups, alaMsgSrvGlobalConfigGroup=alaMsgSrvGlobalConfigGroup, alcatelIND1MsgSrvMIBNotifications=alcatelIND1MsgSrvMIBNotifications, alcatelIND1MsgSrvMIBObjects=alcatelIND1MsgSrvMIBObjects, alcatelIND1MsgSrvMIB=alcatelIND1MsgSrvMIB, alcatelIND1MsgSrvMIBCompliance=alcatelIND1MsgSrvMIBCompliance, PYSNMP_MODULE_ID=alcatelIND1MsgSrvMIB, alaMsgSrvGlobalConfigStatus=alaMsgSrvGlobalConfigStatus)

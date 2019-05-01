@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module ELTEX-MES-HWENVIROMENT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ELTEX-MES-HWENVIROMENT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:01:22 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+eltMes, = mibBuilder.importSymbols("ELTEX-MES", "eltMes")
+RlEnvMonState, = mibBuilder.importSymbols("RADLAN-HWENVIROMENT", "RlEnvMonState")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Unsigned32, TimeTicks, Gauge32, MibIdentifier, ObjectIdentity, Counter32, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, Integer32, IpAddress, Bits, iso, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "TimeTicks", "Gauge32", "MibIdentifier", "ObjectIdentity", "Counter32", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "Integer32", "IpAddress", "Bits", "iso", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+eltMesEnv = ModuleIdentity((1, 3, 6, 1, 4, 1, 35265, 1, 23, 11))
+eltMesEnv.setRevisions(('2016-03-04 00:00', '2015-06-11 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: eltMesEnv.setRevisionsDescriptions(('Add eltEnvResetButtonMode scalar.', 'Initial revision.',))
+if mibBuilder.loadTexts: eltMesEnv.setLastUpdated('201603040000Z')
+if mibBuilder.loadTexts: eltMesEnv.setOrganization('Eltex Enterprise Co, Ltd.')
+if mibBuilder.loadTexts: eltMesEnv.setContactInfo('www.eltex.nsk.ru')
+if mibBuilder.loadTexts: eltMesEnv.setDescription("This private MIB module contains Eltex's hardware enviroment definition.")
+eltEnvMonBatteryStatusTable = MibTable((1, 3, 6, 1, 4, 1, 35265, 1, 23, 11, 1), )
+if mibBuilder.loadTexts: eltEnvMonBatteryStatusTable.setStatus('current')
+if mibBuilder.loadTexts: eltEnvMonBatteryStatusTable.setDescription('The table of battery status maintained by the environmental monitor card.')
+eltEnvMonBatteryStatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 35265, 1, 23, 11, 1, 1), ).setIndexNames((0, "ELTEX-MES-HWENVIROMENT-MIB", "eltEnvMonBatteryStatusIndex"))
+if mibBuilder.loadTexts: eltEnvMonBatteryStatusEntry.setStatus('current')
+if mibBuilder.loadTexts: eltEnvMonBatteryStatusEntry.setDescription('An entry in the battery status table, representing the status of the associated battery maintained by the environmental monitor.')
+eltEnvMonBatteryStatusIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 35265, 1, 23, 11, 1, 1, 1), Integer32())
+if mibBuilder.loadTexts: eltEnvMonBatteryStatusIndex.setStatus('current')
+if mibBuilder.loadTexts: eltEnvMonBatteryStatusIndex.setDescription('Unique index for the battery being instrumented. This index is for SNMP purposes only, and has no intrinsic meaning.')
+eltEnvMonBatteryState = MibTableColumn((1, 3, 6, 1, 4, 1, 35265, 1, 23, 11, 1, 1, 2), RlEnvMonState()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: eltEnvMonBatteryState.setStatus('current')
+if mibBuilder.loadTexts: eltEnvMonBatteryState.setDescription('The mandatory state of the battery being instrumented.')
+eltEnvMonBatteryStatusCharge = MibTableColumn((1, 3, 6, 1, 4, 1, 35265, 1, 23, 11, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(0, 100), ValueRangeConstraint(255, 255), ))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: eltEnvMonBatteryStatusCharge.setStatus('current')
+if mibBuilder.loadTexts: eltEnvMonBatteryStatusCharge.setDescription('Remaining percentage of battery charge. Value of 255 means that this parameter is undefined due to battery not supporting this feature or because it cannot be obtained in current state.')
+eltEnvResetButtonMode = MibScalar((1, 3, 6, 1, 4, 1, 35265, 1, 23, 11, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("enable", 0), ("disable", 1), ("reset-only", 2))).clone('enable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: eltEnvResetButtonMode.setStatus('current')
+if mibBuilder.loadTexts: eltEnvResetButtonMode.setDescription('Mode of reset button: 0 - Enable, 1 - disable, 2 - reset-only mode')
+mibBuilder.exportSymbols("ELTEX-MES-HWENVIROMENT-MIB", eltEnvMonBatteryStatusEntry=eltEnvMonBatteryStatusEntry, eltEnvMonBatteryStatusIndex=eltEnvMonBatteryStatusIndex, eltEnvMonBatteryStatusCharge=eltEnvMonBatteryStatusCharge, PYSNMP_MODULE_ID=eltMesEnv, eltEnvResetButtonMode=eltEnvResetButtonMode, eltMesEnv=eltMesEnv, eltEnvMonBatteryState=eltEnvMonBatteryState, eltEnvMonBatteryStatusTable=eltEnvMonBatteryStatusTable)

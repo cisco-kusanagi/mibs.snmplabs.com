@@ -1,0 +1,61 @@
+#
+# PySNMP MIB module CLAVISTER-TRAPS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CLAVISTER-TRAPS-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:25:02 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+clavisterOSTrapInfo, clavisterOSTrap = mibBuilder.importSymbols("CLAVISTER-SMI", "clavisterOSTrapInfo", "clavisterOSTrap")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+iso, IpAddress, TimeTicks, Counter32, ObjectIdentity, NotificationType, Unsigned32, MibIdentifier, Integer32, Counter64, Gauge32, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "IpAddress", "TimeTicks", "Counter32", "ObjectIdentity", "NotificationType", "Unsigned32", "MibIdentifier", "Integer32", "Counter64", "Gauge32", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+clavisterOSTrapMibModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 5089, 1, 1, 0))
+clavisterOSTrapMibModule.setRevisions(('2006-05-19 09:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: clavisterOSTrapMibModule.setRevisionsDescriptions(('Initial version.',))
+if mibBuilder.loadTexts: clavisterOSTrapMibModule.setLastUpdated('200605190900Z')
+if mibBuilder.loadTexts: clavisterOSTrapMibModule.setOrganization('Clavister AB')
+if mibBuilder.loadTexts: clavisterOSTrapMibModule.setContactInfo('Clavister Support Box 393 SE-891 28 ORNSKOLDSVIK SWEDEN Tel: +46-660-299200 E-mail: support@clavister.com http://www.clavister.com')
+if mibBuilder.loadTexts: clavisterOSTrapMibModule.setDescription('Clavister Trap MIB')
+clavisterOSTrapVarSeverity = MibScalar((1, 3, 6, 1, 4, 1, 5089, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6, 7))).clone(namedValues=NamedValues(("emergency", 0), ("alert", 1), ("critical", 2), ("error", 3), ("warning", 4), ("notice", 5), ("info", 6), ("debug", 7)))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: clavisterOSTrapVarSeverity.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapVarSeverity.setDescription('Severity')
+clavisterOSTrapVarCategory = MibScalar((1, 3, 6, 1, 4, 1, 5089, 1, 1, 5), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: clavisterOSTrapVarCategory.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapVarCategory.setDescription('Category')
+clavisterOSTrapVarID = MibScalar((1, 3, 6, 1, 4, 1, 5089, 1, 1, 6), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: clavisterOSTrapVarID.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapVarID.setDescription('ID')
+clavisterOSTrapVarEvent = MibScalar((1, 3, 6, 1, 4, 1, 5089, 1, 1, 7), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: clavisterOSTrapVarEvent.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapVarEvent.setDescription('Event')
+clavisterOSTrapVarAction = MibScalar((1, 3, 6, 1, 4, 1, 5089, 1, 1, 8), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: clavisterOSTrapVarAction.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapVarAction.setDescription('Action')
+clavisterOSTrapVarTime = MibScalar((1, 3, 6, 1, 4, 1, 5089, 1, 1, 9), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: clavisterOSTrapVarTime.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapVarTime.setDescription('Timestamp of event')
+clavisterOSTrapVarMessage = MibScalar((1, 3, 6, 1, 4, 1, 5089, 1, 1, 10), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: clavisterOSTrapVarMessage.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapVarMessage.setDescription('Formated string with all variables')
+clavisterOSGenericTrap = NotificationType((1, 3, 6, 1, 4, 1, 5089, 1, 0, 1)).setObjects(("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarSeverity"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarCategory"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarID"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarEvent"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarAction"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarTime"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarMessage"))
+if mibBuilder.loadTexts: clavisterOSGenericTrap.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSGenericTrap.setDescription('Generic Event')
+clavisterOSTrapGroupTrap = NotificationGroup((1, 3, 6, 1, 4, 1, 5089, 1, 1, 1)).setObjects(("CLAVISTER-TRAPS-MIB", "clavisterOSGenericTrap"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    clavisterOSTrapGroupTrap = clavisterOSTrapGroupTrap.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapGroupTrap.setDescription('Traps')
+clavisterOSTrapGroupVar = ObjectGroup((1, 3, 6, 1, 4, 1, 5089, 1, 1, 2)).setObjects(("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarSeverity"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarCategory"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarID"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarEvent"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarAction"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarTime"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapVarMessage"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    clavisterOSTrapGroupVar = clavisterOSTrapGroupVar.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapGroupVar.setDescription('Variables')
+clavisterOSTrapCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5089, 1, 1, 3)).setObjects(("CLAVISTER-TRAPS-MIB", "clavisterOSTrapGroupTrap"), ("CLAVISTER-TRAPS-MIB", "clavisterOSTrapGroupVar"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    clavisterOSTrapCompliance = clavisterOSTrapCompliance.setStatus('current')
+if mibBuilder.loadTexts: clavisterOSTrapCompliance.setDescription('Compliance')
+mibBuilder.exportSymbols("CLAVISTER-TRAPS-MIB", clavisterOSTrapMibModule=clavisterOSTrapMibModule, clavisterOSTrapVarID=clavisterOSTrapVarID, clavisterOSTrapGroupVar=clavisterOSTrapGroupVar, clavisterOSTrapVarTime=clavisterOSTrapVarTime, clavisterOSTrapVarSeverity=clavisterOSTrapVarSeverity, PYSNMP_MODULE_ID=clavisterOSTrapMibModule, clavisterOSTrapVarMessage=clavisterOSTrapVarMessage, clavisterOSTrapGroupTrap=clavisterOSTrapGroupTrap, clavisterOSTrapCompliance=clavisterOSTrapCompliance, clavisterOSTrapVarCategory=clavisterOSTrapVarCategory, clavisterOSTrapVarEvent=clavisterOSTrapVarEvent, clavisterOSTrapVarAction=clavisterOSTrapVarAction, clavisterOSGenericTrap=clavisterOSGenericTrap)

@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module SALIX-PRODUCTS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SALIX-PRODUCTS-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:00:25 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+salixProducts, salixGroups, salixRegistrations, salixGeneric = mibBuilder.importSymbols("SALIX-MIB", "salixProducts", "salixGroups", "salixRegistrations", "salixGeneric")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Unsigned32, NotificationType, IpAddress, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, iso, Integer32, Gauge32, TimeTicks, ModuleIdentity, ObjectIdentity, Counter64, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "NotificationType", "IpAddress", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "iso", "Integer32", "Gauge32", "TimeTicks", "ModuleIdentity", "ObjectIdentity", "Counter64", "MibIdentifier")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+salixProductsMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2158, 2, 1))
+if mibBuilder.loadTexts: salixProductsMIB.setLastUpdated('9810130000Z')
+if mibBuilder.loadTexts: salixProductsMIB.setOrganization('SALIX Technologies')
+if mibBuilder.loadTexts: salixProductsMIB.setContactInfo('904 Wind River Lane Suite 101 Gaithersburg, MD 20878 (301)-417-0017')
+if mibBuilder.loadTexts: salixProductsMIB.setDescription('The MIB containing OID Values for SALIX products')
+hne = MibIdentifier((1, 3, 6, 1, 4, 1, 2158, 4, 1))
+hneAgent = MibIdentifier((1, 3, 6, 1, 4, 1, 2158, 4, 2))
+hneAgentMajorVersion = MibScalar((1, 3, 6, 1, 4, 1, 2158, 4, 2, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hneAgentMajorVersion.setStatus('current')
+if mibBuilder.loadTexts: hneAgentMajorVersion.setDescription('An entry in the dDownloadTable that identifies the parameters necessary to download software to plug-in unit(s).')
+hneAgentSubVersion = MibScalar((1, 3, 6, 1, 4, 1, 2158, 4, 2, 2), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hneAgentSubVersion.setStatus('current')
+if mibBuilder.loadTexts: hneAgentSubVersion.setDescription('An entry in the hneSysHrSWInstalledDownloadTable that identifies the parameters necessary to download software to plug-in unit(s).')
+itx = ObjectIdentity((1, 3, 6, 1, 4, 1, 2158, 4, 3))
+if mibBuilder.loadTexts: itx.setStatus('current')
+if mibBuilder.loadTexts: itx.setDescription('The IT-XChange product OID')
+mibBuilder.exportSymbols("SALIX-PRODUCTS-MIB", salixProductsMIB=salixProductsMIB, itx=itx, PYSNMP_MODULE_ID=salixProductsMIB, hneAgent=hneAgent, hneAgentMajorVersion=hneAgentMajorVersion, hne=hne, hneAgentSubVersion=hneAgentSubVersion)

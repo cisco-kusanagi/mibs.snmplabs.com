@@ -1,0 +1,41 @@
+#
+# PySNMP MIB module HH3C-GRE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HH3C-GRE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:27:17 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint")
+hh3cCommon, = mibBuilder.importSymbols("HH3C-OID-MIB", "hh3cCommon")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Unsigned32, ObjectIdentity, Integer32, Counter64, NotificationType, Gauge32, Bits, IpAddress, iso, ModuleIdentity, TimeTicks, MibIdentifier, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "ObjectIdentity", "Integer32", "Counter64", "NotificationType", "Gauge32", "Bits", "IpAddress", "iso", "ModuleIdentity", "TimeTicks", "MibIdentifier", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+hh3cGre = ModuleIdentity((1, 3, 6, 1, 4, 1, 25506, 2, 54))
+hh3cGre.setRevisions(('2005-06-04 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: hh3cGre.setRevisionsDescriptions(('The initial revision of this MIB module. ',))
+if mibBuilder.loadTexts: hh3cGre.setLastUpdated('200506040000Z')
+if mibBuilder.loadTexts: hh3cGre.setOrganization('Hangzhou H3C Tech. Co., Ltd.')
+if mibBuilder.loadTexts: hh3cGre.setContactInfo('Platform Team Hangzhou H3C Tech. Co., Ltd. Hai-Dian District Beijing P.R. China http://www.h3c.com Zip:100085 ')
+if mibBuilder.loadTexts: hh3cGre.setDescription('This MIB contains objects to Manage configuration and Monitor running state for GRE. ')
+hh3cGreObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1))
+hh3cGreTable = MibTable((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1), )
+if mibBuilder.loadTexts: hh3cGreTable.setStatus('current')
+if mibBuilder.loadTexts: hh3cGreTable.setDescription('A table of Generic Routing Encapsulation(GRE) configuration. It contains configuration of GRE Key, and enable flags of Key and Checksum. The detail of Key and Checksum is described in RFC2784 and RFC2890. ')
+hh3cGreEntry = MibTableRow((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: hh3cGreEntry.setStatus('current')
+if mibBuilder.loadTexts: hh3cGreEntry.setDescription('The entry of hh3cGreTable ')
+hh3cGreKeyValue = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1, 1, 1), Unsigned32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cGreKeyValue.setStatus('current')
+if mibBuilder.loadTexts: hh3cGreKeyValue.setDescription('The value of GRE key ')
+hh3cGreKey = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cGreKey.setStatus('current')
+if mibBuilder.loadTexts: hh3cGreKey.setDescription('The enable flag of GRE key ')
+hh3cGreChecksum = MibTableColumn((1, 3, 6, 1, 4, 1, 25506, 2, 54, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hh3cGreChecksum.setStatus('current')
+if mibBuilder.loadTexts: hh3cGreChecksum.setDescription('The enable flag of GRE Checksum ')
+mibBuilder.exportSymbols("HH3C-GRE-MIB", hh3cGreKey=hh3cGreKey, hh3cGreKeyValue=hh3cGreKeyValue, hh3cGreObjects=hh3cGreObjects, hh3cGreChecksum=hh3cGreChecksum, hh3cGreTable=hh3cGreTable, hh3cGre=hh3cGre, hh3cGreEntry=hh3cGreEntry, PYSNMP_MODULE_ID=hh3cGre)

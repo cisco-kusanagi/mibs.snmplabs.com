@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module NETSCREEN-ZONE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NETSCREEN-ZONE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:20:46 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+netscreenZone, = mibBuilder.importSymbols("NETSCREEN-SMI", "netscreenZone")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+iso, TimeTicks, MibIdentifier, Bits, Counter32, IpAddress, Gauge32, Unsigned32, ObjectIdentity, Integer32, ModuleIdentity, NotificationType, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "TimeTicks", "MibIdentifier", "Bits", "Counter32", "IpAddress", "Gauge32", "Unsigned32", "ObjectIdentity", "Integer32", "ModuleIdentity", "NotificationType", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+netscreenZoneMibModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 3224, 8, 0))
+netscreenZoneMibModule.setRevisions(('2004-05-03 00:00', '2004-03-03 00:00', '2003-11-13 00:00', '2001-09-28 00:00', '2000-05-08 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: netscreenZoneMibModule.setRevisionsDescriptions(('Modified copyright and contact information', 'Converted to SMIv2 by Longview Software', 'Correct spelling mistake', 'no comment', 'Creation Date',))
+if mibBuilder.loadTexts: netscreenZoneMibModule.setLastUpdated('200405032022Z')
+if mibBuilder.loadTexts: netscreenZoneMibModule.setOrganization('Juniper Networks, Inc.')
+if mibBuilder.loadTexts: netscreenZoneMibModule.setContactInfo('Customer Support 1194 North Mathilda Avenue Sunnyvale, California 94089-1206 USA Tel: 1-800-638-8296 E-mail: customerservice@juniper.net HTTP://www.juniper.net')
+if mibBuilder.loadTexts: netscreenZoneMibModule.setDescription('This module defines the object that are used to monitor all the security zones')
+nsZoneCfg = MibIdentifier((1, 3, 6, 1, 4, 1, 3224, 8, 1))
+nsZoneCfgTable = MibTable((1, 3, 6, 1, 4, 1, 3224, 8, 1, 1), )
+if mibBuilder.loadTexts: nsZoneCfgTable.setStatus('current')
+if mibBuilder.loadTexts: nsZoneCfgTable.setDescription('NetScreen device can have lots of secure zone. This table collects the zones exiting in NetScreen device.')
+nsZoneCfgEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3224, 8, 1, 1, 1), ).setIndexNames((0, "NETSCREEN-ZONE-MIB", "nsZoneCfgId"))
+if mibBuilder.loadTexts: nsZoneCfgEntry.setStatus('current')
+if mibBuilder.loadTexts: nsZoneCfgEntry.setDescription('Each entry in the table holds a set of configuration parameters associated with an instance of secure zone.')
+nsZoneCfgId = MibTableColumn((1, 3, 6, 1, 4, 1, 3224, 8, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsZoneCfgId.setStatus('current')
+if mibBuilder.loadTexts: nsZoneCfgId.setDescription('A unique value for zone table. Its value ranges between 1 and 65535 and may not be contiguous. the index has no other meaning but a pure index')
+nsZoneCfgName = MibTableColumn((1, 3, 6, 1, 4, 1, 3224, 8, 1, 1, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsZoneCfgName.setStatus('current')
+if mibBuilder.loadTexts: nsZoneCfgName.setDescription('Secure zone name.')
+nsZoneCfgType = MibTableColumn((1, 3, 6, 1, 4, 1, 3224, 8, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4))).clone(namedValues=NamedValues(("regular", 0), ("layer2", 1), ("tunnel", 2), ("null", 3), ("func", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsZoneCfgType.setStatus('current')
+if mibBuilder.loadTexts: nsZoneCfgType.setDescription('Secure zone type. Regular is sec(L3) and layer2 is sec(L2) type')
+nsZoneCfgVsys = MibTableColumn((1, 3, 6, 1, 4, 1, 3224, 8, 1, 1, 1, 4), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsZoneCfgVsys.setStatus('current')
+if mibBuilder.loadTexts: nsZoneCfgVsys.setDescription('VSYS this security zone belongs to.')
+mibBuilder.exportSymbols("NETSCREEN-ZONE-MIB", nsZoneCfg=nsZoneCfg, nsZoneCfgId=nsZoneCfgId, nsZoneCfgTable=nsZoneCfgTable, nsZoneCfgName=nsZoneCfgName, nsZoneCfgType=nsZoneCfgType, nsZoneCfgVsys=nsZoneCfgVsys, PYSNMP_MODULE_ID=netscreenZoneMibModule, nsZoneCfgEntry=nsZoneCfgEntry, netscreenZoneMibModule=netscreenZoneMibModule)

@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module CXOSP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CXOSP-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:33:14 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection")
+cxOSP, = mibBuilder.importSymbols("CXProduct-SMI", "cxOSP")
+Validation, AreaID = mibBuilder.importSymbols("RFC1253-MIB", "Validation", "AreaID")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+IpAddress, iso, Gauge32, ModuleIdentity, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, ObjectIdentity, NotificationType, Counter64, Bits, Counter32, MibIdentifier, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "iso", "Gauge32", "ModuleIdentity", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "ObjectIdentity", "NotificationType", "Counter64", "Bits", "Counter32", "MibIdentifier", "Integer32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ospAreaTable = MibTable((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 43, 1), )
+if mibBuilder.loadTexts: ospAreaTable.setReference('OSPF Version 2, Section 6 The Area Data Structure')
+if mibBuilder.loadTexts: ospAreaTable.setStatus('mandatory')
+if mibBuilder.loadTexts: ospAreaTable.setDescription("Information describing the configured parameters and cumulative statistics of the router's attached areas.")
+ospAreaEntry = MibTableRow((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 43, 1, 1), ).setIndexNames((0, "CXOSP-MIB", "ospAreaId"))
+if mibBuilder.loadTexts: ospAreaEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: ospAreaEntry.setDescription("Information describing the configured parameters and cumulative statistics of one of the router's attached areas.")
+ospAreaId = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 43, 1, 1, 1), AreaID()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ospAreaId.setReference('OSPF Version 2, Appendix C.2 Area parameters')
+if mibBuilder.loadTexts: ospAreaId.setStatus('mandatory')
+if mibBuilder.loadTexts: ospAreaId.setDescription('A 32-bit integer uniquely identifying an area. Area ID 0.0.0.0 is used for the OSPF backbone.')
+ospAreaStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 6, 43, 1, 1, 2), Validation().clone('valid')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: ospAreaStatus.setStatus('mandatory')
+if mibBuilder.loadTexts: ospAreaStatus.setDescription("This variable displays the validity or invalidity of the ospfAreaEntry entry (refer to rfc1253). Setting it to 'invalid' has the effect of rendering it inoperative. The internal effect (row removal) is implementation dependent.")
+mibBuilder.exportSymbols("CXOSP-MIB", ospAreaTable=ospAreaTable, ospAreaStatus=ospAreaStatus, ospAreaId=ospAreaId, ospAreaEntry=ospAreaEntry)

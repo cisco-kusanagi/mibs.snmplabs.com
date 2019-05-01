@@ -1,0 +1,92 @@
+#
+# PySNMP MIB module HUAWEI-BGP-ACCOUNTING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HUAWEI-BGP-ACCOUNTING-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:43:03 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion")
+hwDatacomm, = mibBuilder.importSymbols("HUAWEI-MIB", "hwDatacomm")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+Counter64, Counter32, Unsigned32, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, MibIdentifier, TimeTicks, Integer32, Gauge32, ModuleIdentity, NotificationType, iso, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "Counter32", "Unsigned32", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "MibIdentifier", "TimeTicks", "Integer32", "Gauge32", "ModuleIdentity", "NotificationType", "iso", "ObjectIdentity")
+TextualConvention, DisplayString, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString", "RowStatus")
+hwBgpAcctMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39))
+if mibBuilder.loadTexts: hwBgpAcctMIB.setLastUpdated('200705100000Z')
+if mibBuilder.loadTexts: hwBgpAcctMIB.setOrganization('Huawei Technologies co.,Ltd.')
+if mibBuilder.loadTexts: hwBgpAcctMIB.setContactInfo(' R&D BeiJing, Huawei Technologies co.,Ltd. Huawei Bld.,NO.3 Xinxi Rd., Shang-Di Information Industry Base, Hai-Dian District Beijing P.R. China Zip:100085 Http://www.huawei.com E-mail:support@huawei.com ')
+if mibBuilder.loadTexts: hwBgpAcctMIB.setDescription('The HUAWEI-BGP-ACCOUNTING-MIB contains objects to Manage configuration and Monitor running state for BGP Accounting feature.')
+class AddressType(TextualConvention, Integer32):
+    description = ' invalid(0) source(1) destination(2) '
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1, 2))
+    namedValues = NamedValues(("invalid", 0), ("source", 1), ("destination", 2))
+
+class DirectionType(TextualConvention, Integer32):
+    description = 'invalid(0) inbound(1) outbound(2) inbound-and-outbound(3) '
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3))
+    namedValues = NamedValues(("invalid", 0), ("inbound", 1), ("outbound", 2), ("inboundAndOutbound", 3))
+
+hwBgpAcctMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1))
+hwBgpAcctCfgTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 1), )
+if mibBuilder.loadTexts: hwBgpAcctCfgTable.setStatus('current')
+if mibBuilder.loadTexts: hwBgpAcctCfgTable.setDescription('The hwBgpAcctCfgTable provides the configuration of BGP Accounting.')
+hwBgpAcctCfgEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 1, 1), ).setIndexNames((0, "HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctCfgIfIndex"))
+if mibBuilder.loadTexts: hwBgpAcctCfgEntry.setStatus('current')
+if mibBuilder.loadTexts: hwBgpAcctCfgEntry.setDescription('Each HwBgpAcctCfgEntry provides BGP accounting configuration for traffic of interest on an ingress and/or egress interface. ')
+hwbgpAcctCfgIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 1, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwbgpAcctCfgIfIndex.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctCfgIfIndex.setDescription('Interface Index, equal to ifIndex.')
+hwbgpAcctSrcOrDest = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 1, 1, 2), AddressType().clone(2)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hwbgpAcctSrcOrDest.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctSrcOrDest.setDescription('An integer value greater than 0, that uniquely identifies BGP accounting based on source address or destination address. 1 is source ,2 is destination, and the defaule value is 2')
+hwbgpAcctDirection = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 1, 1, 3), DirectionType().clone(1)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hwbgpAcctDirection.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctDirection.setDescription('An integer value greater than 0, that uniquely identifies BGP accounting the inbound traffic or outbound traffic. 1 is inbound ,2 is outbound, and 3 is both inbound and outbound')
+hwbgpAcctCfgRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 1, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hwbgpAcctCfgRowStatus.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctCfgRowStatus.setDescription('RowStatus. Three actions are used: active, createAndGo, destroy')
+hwBgpAcctStatTable = MibTable((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 2), )
+if mibBuilder.loadTexts: hwBgpAcctStatTable.setStatus('current')
+if mibBuilder.loadTexts: hwBgpAcctStatTable.setDescription('The hwBgpAcctStatTable provides BGP accounting statistics for ingress and egress traffic on an interface. This data could be used for purposes like billing.')
+hwBgpAcctStatEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 2, 1), ).setIndexNames((0, "HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctStatIfIndex"), (0, "HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctTrafficIndex"))
+if mibBuilder.loadTexts: hwBgpAcctStatEntry.setStatus('current')
+if mibBuilder.loadTexts: hwBgpAcctStatEntry.setDescription('Each hwBgpAcctStatEntry provides statistics for traffic of interest on an ingress and/or egress interfaces. The statistics include ingress packet counts, ingress octet counts, egress packet counts and egress octet counts. Entries are created when traffic-type is configured on an interface. Entries are deleted automatically when the user removes the corresponding traffic-type configuration from an interface.')
+hwbgpAcctStatIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 2, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwbgpAcctStatIfIndex.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctStatIfIndex.setDescription('Interface Index, equal to ifIndex.')
+hwbgpAcctTrafficIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwbgpAcctTrafficIndex.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctTrafficIndex.setDescription('An integer value greater than 0, that uniquely identifies a traffic-type. The traffic-type means the traffic coming into an interface can be differentiated into different types. It is up to the user to give meaning to and configure the various traffic-types on an interface.')
+hwbgpAcctInPacketCount = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 2, 1, 3), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwbgpAcctInPacketCount.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctInPacketCount.setDescription('The total number of packets received for a particular traffic-type on an interface.')
+hwbgpAcctInOctetCount = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 2, 1, 4), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwbgpAcctInOctetCount.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctInOctetCount.setDescription('The total number of octets received for a particular traffic-type on an interface.')
+hwbgpAcctOutPacketCount = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 2, 1, 5), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwbgpAcctOutPacketCount.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctOutPacketCount.setDescription('The total number of packets transmitted for a particular traffic-type on an interface.')
+hwbgpAcctOutOctetCount = MibTableColumn((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 1, 2, 1, 6), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hwbgpAcctOutOctetCount.setStatus('current')
+if mibBuilder.loadTexts: hwbgpAcctOutOctetCount.setDescription('The total number of octets transmitted for a particular traffic-type on an interface.')
+hwBgpAcctConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 2))
+hwBgpAcctCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 2, 1))
+hwBgpAcctCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 2, 1, 1)).setObjects(("HUAWEI-BGP-ACCOUNTING-MIB", "hwBgpAcctCfgGroup"), ("HUAWEI-BGP-ACCOUNTING-MIB", "hwBgpAcctStatGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwBgpAcctCompliance = hwBgpAcctCompliance.setStatus('current')
+if mibBuilder.loadTexts: hwBgpAcctCompliance.setDescription('The compliance statement for entities that implement ip bgp-accouting on a router.')
+hwBgpAcctStatGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 2, 2))
+hwBgpAcctCfgGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 2, 2, 1)).setObjects(("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctCfgIfIndex"), ("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctSrcOrDest"), ("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctDirection"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwBgpAcctCfgGroup = hwBgpAcctCfgGroup.setStatus('current')
+if mibBuilder.loadTexts: hwBgpAcctCfgGroup.setDescription('Required objects to provide hwBgpAcctMIB objects configuration information. hwBgpAcctCfgGroup is optional.')
+hwBgpAcctStatGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2011, 5, 25, 39, 2, 2, 2)).setObjects(("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctStatIfIndex"), ("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctTrafficIndex"), ("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctInPacketCount"), ("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctInOctetCount"), ("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctOutPacketCount"), ("HUAWEI-BGP-ACCOUNTING-MIB", "hwbgpAcctOutOctetCount"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hwBgpAcctStatGroup = hwBgpAcctStatGroup.setStatus('current')
+if mibBuilder.loadTexts: hwBgpAcctStatGroup.setDescription('Required objects to provide hwBgpAcctMIB objects configuration information. hwBgpAcctStatGroup is optional.')
+mibBuilder.exportSymbols("HUAWEI-BGP-ACCOUNTING-MIB", hwBgpAcctConformance=hwBgpAcctConformance, hwbgpAcctCfgRowStatus=hwbgpAcctCfgRowStatus, AddressType=AddressType, hwbgpAcctSrcOrDest=hwbgpAcctSrcOrDest, hwbgpAcctOutPacketCount=hwbgpAcctOutPacketCount, DirectionType=DirectionType, hwBgpAcctCfgGroup=hwBgpAcctCfgGroup, hwBgpAcctCompliance=hwBgpAcctCompliance, hwBgpAcctStatEntry=hwBgpAcctStatEntry, hwBgpAcctStatGroups=hwBgpAcctStatGroups, hwBgpAcctMIBObjects=hwBgpAcctMIBObjects, hwBgpAcctStatTable=hwBgpAcctStatTable, hwBgpAcctCompliances=hwBgpAcctCompliances, hwBgpAcctStatGroup=hwBgpAcctStatGroup, hwbgpAcctOutOctetCount=hwbgpAcctOutOctetCount, hwbgpAcctTrafficIndex=hwbgpAcctTrafficIndex, hwBgpAcctCfgTable=hwBgpAcctCfgTable, hwbgpAcctInPacketCount=hwbgpAcctInPacketCount, hwbgpAcctDirection=hwbgpAcctDirection, hwbgpAcctInOctetCount=hwbgpAcctInOctetCount, PYSNMP_MODULE_ID=hwBgpAcctMIB, hwBgpAcctMIB=hwBgpAcctMIB, hwbgpAcctStatIfIndex=hwbgpAcctStatIfIndex, hwBgpAcctCfgEntry=hwBgpAcctCfgEntry, hwbgpAcctCfgIfIndex=hwbgpAcctCfgIfIndex)

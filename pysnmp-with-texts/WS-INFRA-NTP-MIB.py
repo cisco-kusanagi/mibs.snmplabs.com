@@ -1,0 +1,61 @@
+#
+# PySNMP MIB module WS-INFRA-NTP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/WS-INFRA-NTP-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:37:17 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+MibIdentifier, Bits, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, Counter32, Unsigned32, TimeTicks, NotificationType, iso, ObjectIdentity, Counter64, Gauge32, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "Bits", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "Counter32", "Unsigned32", "TimeTicks", "NotificationType", "iso", "ObjectIdentity", "Counter64", "Gauge32", "Integer32")
+DisplayString, DateAndTime, TextualConvention, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "DateAndTime", "TextualConvention", "TruthValue")
+wsInfraNTP, = mibBuilder.importSymbols("WS-INFRA-SMI-MIB", "wsInfraNTP")
+wsInfraNTPMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1))
+wsInfraNTPMIB.setRevisions(('2006-05-26 12:37', '2005-10-12 14:21', '2005-08-12 13:58', '2005-06-28 11:58', '2005-06-27 14:34', '2005-06-24 12:07', '2005-06-23 13:17', '2005-06-22 10:34', '2005-06-20 11:05', '2005-06-09 15:24', '2005-06-07 18:43', '2005-05-04 16:13', '2005-05-04 10:58',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: wsInfraNTPMIB.setRevisionsDescriptions(('01a13', '01a12', '01a11', '01a10', '01a09', '01a08', '01a07', '01a06', '01a05', '01a04', '01a03', '01a02', '01a01',))
+if mibBuilder.loadTexts: wsInfraNTPMIB.setLastUpdated('200506271058Z')
+if mibBuilder.loadTexts: wsInfraNTPMIB.setOrganization('Symbol Technologies')
+if mibBuilder.loadTexts: wsInfraNTPMIB.setContactInfo('Symbol Technologies, Inc. Customer Service Postal: One Symbol Plaza Holtsville, NY 11742-1300 USA Tel: +1. 631.738.6213 E-mail: support@symbol.com Web: http://www.symbol.com/support')
+if mibBuilder.loadTexts: wsInfraNTPMIB.setDescription('Description.')
+wsInfraNtpEnable = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 1), TruthValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraNtpEnable.setStatus('obsolete')
+if mibBuilder.loadTexts: wsInfraNtpEnable.setDescription('Enable NTP.')
+wsInfraNtp1Server = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 2), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraNtp1Server.setStatus('obsolete')
+if mibBuilder.loadTexts: wsInfraNtp1Server.setDescription('Preffered NTP Server IPAddr.')
+wsInfraNtp2Server = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 3), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraNtp2Server.setStatus('obsolete')
+if mibBuilder.loadTexts: wsInfraNtp2Server.setDescription('1st alternate NTP Server IPAddr.')
+wsInfraNtp3Server = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 4), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraNtp3Server.setStatus('obsolete')
+if mibBuilder.loadTexts: wsInfraNtp3Server.setDescription('2nd alternate NTP Server IPAddr.')
+wsInfraNtpTimeZone = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 5), DisplayString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraNtpTimeZone.setStatus('current')
+if mibBuilder.loadTexts: wsInfraNtpTimeZone.setDescription('NTP time zone currently support CET EET EST5EDT CST6CDT MST7MDT PST8PDT Africa/Cairo Africa/Casablanca Africa/Harare Africa/Johannesburg Africa/Lagos Africa/Nairobi America/Anchorage America/Bogota America/Buenos_Aires America/Caracas America/Chicago America/Costa_Rica America/Denver America/Indianapolis America/Los_Angeles America/Mexico_City America/Montreal America/New_York America/Phoenix America/Santiago America/Sao_Paulo America/St_Johns America/Tegucigalpa America/Thule America/Winnipeg Asia/Almaty Asia/Baghdad Asia/Baku Asia/Bangkok Asia/Calcutta Asia/Chongqing Asia/Colombo Asia/Dhaka Asia/Dubai Asia/Hong_Kong Asia/Irkutsk Asia/Jerusalem Asia/Kabul Asia/Karachi Asia/Katmandu Asia/Krasnoyarsk Asia/Kuala_Lumpur Asia/Kuwait Asia/Magadan Asia/Rangoon Asia/Seoul Asia/Singapore Asia/Shanghai Asia/Taipei Asia/Tehran Asia/Tokyo Asia/Vladivostok Asia/Yakutsk Asia/Yekaterinburg Atlantic/Azores Atlantic/Cape_Verde Atlantic/Reykjavik Atlantic/South_Georgia Australia/Adelaide Australia/Brisbane Australia/Hobart Australia/Perth Australia/Sydney Europe/Amsterdam Europe/Athens Europe/Belgrade Europe/Berlin Europe/Brussels Europe/Bucharest Europe/Copenhagen Europe/Dublin Europe/Helsinki Europe/Istanbul Europe/Lisbon Europe/London Europe/Madrid Europe/Moscow Europe/Paris Europe/Prague Europe/Rome Europe/Stockholm Europe/Warsaw Europe/Zurich Pacific/Apia Pacific/Auckland Pacific/Fiji Pacific/Guam Pacific/Honolulu Pacific/Tongatapu ')
+wsInfraNtpCurrentDateTime = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 6), DateAndTime()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wsInfraNtpCurrentDateTime.setStatus('current')
+if mibBuilder.loadTexts: wsInfraNtpCurrentDateTime.setDescription('Current Date and Time. If NTP is not running, or has not yet synchronized time, this value will be 0.')
+wsInfraNtpAllTimeZones = MibScalar((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 7), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 5000))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: wsInfraNtpAllTimeZones.setStatus('current')
+if mibBuilder.loadTexts: wsInfraNtpAllTimeZones.setDescription('Lists all possible timezones separated by newlines.')
+wsInfraNTPMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 100))
+wsInfraNTPMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 100, 1))
+wsInfraNTPGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 100, 1, 1)).setObjects(("WS-INFRA-NTP-MIB", "wsInfraNtpAllTimeZones"), ("WS-INFRA-NTP-MIB", "wsInfraNtpCurrentDateTime"), ("WS-INFRA-NTP-MIB", "wsInfraNtpTimeZone"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    wsInfraNTPGroup = wsInfraNTPGroup.setStatus('current')
+if mibBuilder.loadTexts: wsInfraNTPGroup.setDescription('Description.')
+wsInfraNTPGroupObsolete = ObjectGroup((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 100, 1, 2)).setObjects(("WS-INFRA-NTP-MIB", "wsInfraNtpEnable"), ("WS-INFRA-NTP-MIB", "wsInfraNtp1Server"), ("WS-INFRA-NTP-MIB", "wsInfraNtp2Server"), ("WS-INFRA-NTP-MIB", "wsInfraNtp3Server"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    wsInfraNTPGroupObsolete = wsInfraNTPGroupObsolete.setStatus('obsolete')
+if mibBuilder.loadTexts: wsInfraNTPGroupObsolete.setDescription('Description.')
+wsInfraNTPMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 100, 2))
+wsInfraNTPMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 388, 14, 1, 10, 1, 100, 2, 1)).setObjects(("WS-INFRA-NTP-MIB", "wsInfraNTPGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    wsInfraNTPMIBCompliance = wsInfraNTPMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: wsInfraNTPMIBCompliance.setDescription('Description.')
+mibBuilder.exportSymbols("WS-INFRA-NTP-MIB", wsInfraNTPMIBGroups=wsInfraNTPMIBGroups, wsInfraNTPMIB=wsInfraNTPMIB, wsInfraNtp1Server=wsInfraNtp1Server, wsInfraNTPGroupObsolete=wsInfraNTPGroupObsolete, wsInfraNtpEnable=wsInfraNtpEnable, wsInfraNTPMIBCompliances=wsInfraNTPMIBCompliances, wsInfraNTPMIBCompliance=wsInfraNTPMIBCompliance, wsInfraNtp2Server=wsInfraNtp2Server, wsInfraNtp3Server=wsInfraNtp3Server, wsInfraNTPMIBConformance=wsInfraNTPMIBConformance, wsInfraNtpCurrentDateTime=wsInfraNtpCurrentDateTime, wsInfraNtpAllTimeZones=wsInfraNtpAllTimeZones, wsInfraNtpTimeZone=wsInfraNtpTimeZone, PYSNMP_MODULE_ID=wsInfraNTPMIB, wsInfraNTPGroup=wsInfraNTPGroup)

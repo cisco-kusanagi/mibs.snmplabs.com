@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module DLINK-3100-SAFE-GUARD-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DLINK-3100-SAFE-GUARD-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:48:58 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint")
+rnd, = mibBuilder.importSymbols("DLINK-3100-MIB", "rnd")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+IpAddress, Gauge32, iso, Unsigned32, Integer32, Bits, NotificationType, TimeTicks, Counter32, MibIdentifier, Counter64, ObjectIdentity, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "Gauge32", "iso", "Unsigned32", "Integer32", "Bits", "NotificationType", "TimeTicks", "Counter32", "MibIdentifier", "Counter64", "ObjectIdentity", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+DisplayString, TextualConvention, TruthValue = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention", "TruthValue")
+rlSafeGuard = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 131))
+rlSafeGuard.setRevisions(('2007-11-18 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: rlSafeGuard.setRevisionsDescriptions(('Initial revision.',))
+if mibBuilder.loadTexts: rlSafeGuard.setLastUpdated('2007111800Z')
+if mibBuilder.loadTexts: rlSafeGuard.setOrganization('Dlink, Inc.')
+if mibBuilder.loadTexts: rlSafeGuard.setContactInfo('www.dlink.com')
+if mibBuilder.loadTexts: rlSafeGuard.setDescription('Safe Guard MIBs')
+rlSafeGuardEnabled = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 131, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlSafeGuardEnabled.setStatus('current')
+if mibBuilder.loadTexts: rlSafeGuardEnabled.setDescription('The scalar enables/disables Safeguard engine.')
+rlSafeGuardStatus = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 131, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("idle", 0), ("attack", 1)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlSafeGuardStatus.setStatus('current')
+if mibBuilder.loadTexts: rlSafeGuardStatus.setDescription('Returns the SafeGuard status.')
+rlSafeGuardCpuUtilizationUpper = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 131, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 100)).clone(70)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlSafeGuardCpuUtilizationUpper.setStatus('current')
+if mibBuilder.loadTexts: rlSafeGuardCpuUtilizationUpper.setDescription('The scalar defines CPU utilization percentage threshold for detection of the start of an attack.')
+rlSafeGuardCpuUtilizationLower = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 131, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 100)).clone(20)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlSafeGuardCpuUtilizationLower.setStatus('current')
+if mibBuilder.loadTexts: rlSafeGuardCpuUtilizationLower.setDescription('The scalar defines CPU utilization percentage threshold for detection of the end of an attack.')
+rlSafeGuardBroadcastRateUpper = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 131, 5), Integer32().subtype(subtypeSpec=ValueRangeConstraint(90, 1000)).clone(350)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlSafeGuardBroadcastRateUpper.setStatus('current')
+if mibBuilder.loadTexts: rlSafeGuardBroadcastRateUpper.setDescription('The scalar defines Broadcast rate threshold for detection of the start of an attack.')
+rlSafeGuardBroadcastRateLower = MibScalar((1, 3, 6, 1, 4, 1, 171, 10, 94, 89, 89, 131, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(90, 1000)).clone(100)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlSafeGuardBroadcastRateLower.setStatus('current')
+if mibBuilder.loadTexts: rlSafeGuardBroadcastRateLower.setDescription('The scalar defines Broadcast rate threshold for detection of the end of an attack.')
+mibBuilder.exportSymbols("DLINK-3100-SAFE-GUARD-MIB", rlSafeGuard=rlSafeGuard, rlSafeGuardBroadcastRateUpper=rlSafeGuardBroadcastRateUpper, rlSafeGuardCpuUtilizationLower=rlSafeGuardCpuUtilizationLower, rlSafeGuardBroadcastRateLower=rlSafeGuardBroadcastRateLower, rlSafeGuardEnabled=rlSafeGuardEnabled, rlSafeGuardCpuUtilizationUpper=rlSafeGuardCpuUtilizationUpper, rlSafeGuardStatus=rlSafeGuardStatus, PYSNMP_MODULE_ID=rlSafeGuard)

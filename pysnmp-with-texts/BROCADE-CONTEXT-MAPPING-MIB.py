@@ -1,0 +1,58 @@
+#
+# PySNMP MIB module BROCADE-CONTEXT-MAPPING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/BROCADE-CONTEXT-MAPPING-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:40:50 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+bcsiModules, = mibBuilder.importSymbols("Brocade-REG-MIB", "bcsiModules")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Integer32, MibIdentifier, TimeTicks, Unsigned32, Gauge32, IpAddress, Counter32, ModuleIdentity, Counter64, iso, NotificationType, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Integer32", "MibIdentifier", "TimeTicks", "Unsigned32", "Gauge32", "IpAddress", "Counter32", "ModuleIdentity", "Counter64", "iso", "NotificationType", "Bits")
+StorageType, DisplayString, TextualConvention, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "StorageType", "DisplayString", "TextualConvention", "RowStatus")
+brocadeContextMappingMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7))
+brocadeContextMappingMIB.setRevisions(('2015-06-18 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: brocadeContextMappingMIB.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: brocadeContextMappingMIB.setLastUpdated('201506180000Z')
+if mibBuilder.loadTexts: brocadeContextMappingMIB.setOrganization(' Brocade Communications Systems, Inc.')
+if mibBuilder.loadTexts: brocadeContextMappingMIB.setContactInfo('Brocade Communications Systems, Inc. Postal: 130 Holger Way San Jose, CA 95134 U.S.A Tel: +1-408-333-8000 E-mail: support@Brocade.com web: www.brocade.com.')
+if mibBuilder.loadTexts: brocadeContextMappingMIB.setDescription("This MIB module is for the management of the SNMP context in the Brocade managed entities. An SNMP context, or just 'context' for short, is a collection of management information accessible by an SNMP entity. An item of management information may exist in more than one context. An SNMP entity potentially has access to many contexts. While SNMP context itself is generically defined to cater to the access of multiple instances of the MIB modules and management information, it is required to define what 'context' means for a given managed entity. This MIB module provides the management of such context. As technology evolves, the definition of the context can evolve and hence such definition should be extensible. The context referred in this management module is same as 'contextName' as defined in the SNMPv3 PDU and also maps to the 'snmpCommunityContextName' of snmpCommunityTable in 'SNMP-COMMUNITY-MIB'. The rest of the elements of procedure described for processing SNMP PDU remains the same. Glossary of the terms used in this MIB: -------------------------------------- SNMP Context - Name of the SNMP context name used in SNMPv3 PDU/SNMPv2 community mapping. VRF - Virtual Routing and Forwarding. ")
+bContextMapMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 0))
+bContextMapMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1))
+bContextMapMIBConform = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2))
+bcmContexMapConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1))
+bcmContextMappingTable = MibTable((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1), )
+if mibBuilder.loadTexts: bcmContextMappingTable.setStatus('current')
+if mibBuilder.loadTexts: bcmContextMappingTable.setDescription('A tabe that provides the mapping of SNMP context represented by the value of (vacmContextName) to the various entities within the entities within the managed device.')
+bcmContextMappingEntry = MibTableRow((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1), ).setIndexNames((0, "BROCADE-CONTEXT-MAPPING-MIB", "bcmContextMappingVacmContextName"))
+if mibBuilder.loadTexts: bcmContextMappingEntry.setStatus('current')
+if mibBuilder.loadTexts: bcmContextMappingEntry.setDescription('A conceptual entry (row) of this table. Each entry represents a Context and has all the mapping information of the managed device.')
+bcmContextMappingVacmContextName = MibTableColumn((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1, 1), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 32)))
+if mibBuilder.loadTexts: bcmContextMappingVacmContextName.setStatus('current')
+if mibBuilder.loadTexts: bcmContextMappingVacmContextName.setDescription('The vacmContextName given to the SNMP context. This is a human readable name identifying a particular SNMP VACM context at a particular SNMP entity. The empty contextName (zero length) represents the default context.')
+bcmContextMappingVrfName = MibTableColumn((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1, 2), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bcmContextMappingVrfName.setStatus('current')
+if mibBuilder.loadTexts: bcmContextMappingVrfName.setDescription("This object specifies the VRF name mapped to this 'context'.")
+bcmContextMappingStorageType = MibTableColumn((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1, 3), StorageType().clone('nonVolatile')).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bcmContextMappingStorageType.setStatus('current')
+if mibBuilder.loadTexts: bcmContextMappingStorageType.setDescription("The storage type for this conceptual row. Conceptual rows having the value 'permanent' need not allow write-access to any columnar objects in the row.")
+bcmContextMappingRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 1, 1, 1, 1, 4), RowStatus()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: bcmContextMappingRowStatus.setStatus('current')
+if mibBuilder.loadTexts: bcmContextMappingRowStatus.setDescription('This object facilitates the creation, modification or deletion of a conceptual row in this table.')
+brocadeContextMapMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2, 1))
+brocadeContextMapMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2, 2))
+brocadeContextMapMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2, 1, 1)).setObjects(("BROCADE-CONTEXT-MAPPING-MIB", "brocadeContextMapConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    brocadeContextMapMIBCompliance = brocadeContextMapMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: brocadeContextMapMIBCompliance.setDescription('The compliance statement for entities which implement BROCADE-CONEXT-MAPPING-MIB.')
+brocadeContextMapConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 1588, 3, 1, 7, 2, 2, 1)).setObjects(("BROCADE-CONTEXT-MAPPING-MIB", "bcmContextMappingVrfName"), ("BROCADE-CONTEXT-MAPPING-MIB", "bcmContextMappingStorageType"), ("BROCADE-CONTEXT-MAPPING-MIB", "bcmContextMappingRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    brocadeContextMapConfigGroup = brocadeContextMapConfigGroup.setStatus('current')
+if mibBuilder.loadTexts: brocadeContextMapConfigGroup.setDescription('A collection of objects for the management of the Brocade SNMP context Mapping.')
+mibBuilder.exportSymbols("BROCADE-CONTEXT-MAPPING-MIB", bContextMapMIBConform=bContextMapMIBConform, PYSNMP_MODULE_ID=brocadeContextMappingMIB, brocadeContextMappingMIB=brocadeContextMappingMIB, bcmContextMappingTable=bcmContextMappingTable, bcmContextMappingEntry=bcmContextMappingEntry, bcmContextMappingVrfName=bcmContextMappingVrfName, bcmContexMapConfig=bcmContexMapConfig, brocadeContextMapMIBCompliances=brocadeContextMapMIBCompliances, bcmContextMappingRowStatus=bcmContextMappingRowStatus, brocadeContextMapMIBCompliance=brocadeContextMapMIBCompliance, bContextMapMIBNotifs=bContextMapMIBNotifs, bcmContextMappingVacmContextName=bcmContextMappingVacmContextName, bContextMapMIBObjects=bContextMapMIBObjects, brocadeContextMapConfigGroup=brocadeContextMapConfigGroup, brocadeContextMapMIBGroups=brocadeContextMapMIBGroups, bcmContextMappingStorageType=bcmContextMappingStorageType)

@@ -1,0 +1,50 @@
+#
+# PySNMP MIB module RBN-SMS1000-ENVMON-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RBN-SMS1000-ENVMON-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:53:21 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+rbnMgmt, = mibBuilder.importSymbols("RBN-SMI", "rbnMgmt")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+iso, Bits, TimeTicks, NotificationType, Counter32, IpAddress, Unsigned32, Counter64, ObjectIdentity, Gauge32, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "Bits", "TimeTicks", "NotificationType", "Counter32", "IpAddress", "Unsigned32", "Counter64", "ObjectIdentity", "Gauge32", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "MibIdentifier")
+TextualConvention, TruthValue, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TruthValue", "DisplayString")
+rbnSMS1000EnvMonMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2352, 2, 3))
+if mibBuilder.loadTexts: rbnSMS1000EnvMonMIB.setLastUpdated('9810062300Z')
+if mibBuilder.loadTexts: rbnSMS1000EnvMonMIB.setOrganization('RedBack Networks, Inc.')
+if mibBuilder.loadTexts: rbnSMS1000EnvMonMIB.setContactInfo(' RedBack Networks, Inc. Postal: 1389 Moffett Park Drive Sunnyvale, CA 94089-1134 USA Phone: +1 408 548 3500 Fax: +1 408 548 3599 E-mail: mib-info@RedBackNetworks.com')
+if mibBuilder.loadTexts: rbnSMS1000EnvMonMIB.setDescription('The MIB used to manage the SMS1000 Environmental Monitor functionality.')
+rbnSMS1000EnvMonMIBNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 3, 0))
+rbnSMS1000EnvMonMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 3, 1))
+rbnSMS1000EnvMonMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 3, 2))
+rbnSMS1000FanFail = MibScalar((1, 3, 6, 1, 4, 1, 2352, 2, 3, 1, 1), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnSMS1000FanFail.setStatus('current')
+if mibBuilder.loadTexts: rbnSMS1000FanFail.setDescription('The status of the SMS 1000 fan assemblies. If this object has the value true, then one or both of the SMS 1000 fan assemblies has failed. If this object has the value false, then all installed fan assemblies are operational.')
+rbnSMS1000PowerFail = MibScalar((1, 3, 6, 1, 4, 1, 2352, 2, 3, 1, 2), TruthValue()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnSMS1000PowerFail.setStatus('current')
+if mibBuilder.loadTexts: rbnSMS1000PowerFail.setDescription('The status of the SMS 1000 power modules. If this object has the value true, then one or both of the SMS 1000 power modules has failed. If this object has the value false, then all installed power modules are operational.')
+rbnSMS1000FanFailChange = NotificationType((1, 3, 6, 1, 4, 1, 2352, 2, 3, 0, 1)).setObjects(("RBN-SMS1000-ENVMON-MIB", "rbnSMS1000FanFail"))
+if mibBuilder.loadTexts: rbnSMS1000FanFailChange.setStatus('current')
+if mibBuilder.loadTexts: rbnSMS1000FanFailChange.setDescription('A rbnSMS1000FanFailChange notification signifies that the value of rbnSMS1000FanFail has changed.')
+rbnSMS1000PowerFailChange = NotificationType((1, 3, 6, 1, 4, 1, 2352, 2, 3, 0, 2)).setObjects(("RBN-SMS1000-ENVMON-MIB", "rbnSMS1000PowerFail"))
+if mibBuilder.loadTexts: rbnSMS1000PowerFailChange.setStatus('current')
+if mibBuilder.loadTexts: rbnSMS1000PowerFailChange.setDescription('A rbnSMS1000PowerFailChange notification signifies that the value of rbnSMS1000PowerFail has changed')
+rbnSMS1000EnvMonMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 3, 2, 1))
+rbnSMS1000EnvMonMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 3, 2, 2))
+rbnSMS1000EnvMonMIBObjectGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2352, 2, 3, 2, 1, 1)).setObjects(("RBN-SMS1000-ENVMON-MIB", "rbnSMS1000FanFail"), ("RBN-SMS1000-ENVMON-MIB", "rbnSMS1000PowerFail"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnSMS1000EnvMonMIBObjectGroup = rbnSMS1000EnvMonMIBObjectGroup.setStatus('current')
+if mibBuilder.loadTexts: rbnSMS1000EnvMonMIBObjectGroup.setDescription('A collection of objects providing SMS 1000 environmental monitor information.')
+rbnSMS1000EnvMonMIBNotificationGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 2352, 2, 3, 2, 1, 2)).setObjects(("RBN-SMS1000-ENVMON-MIB", "rbnSMS1000FanFailChange"), ("RBN-SMS1000-ENVMON-MIB", "rbnSMS1000PowerFailChange"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnSMS1000EnvMonMIBNotificationGroup = rbnSMS1000EnvMonMIBNotificationGroup.setStatus('current')
+if mibBuilder.loadTexts: rbnSMS1000EnvMonMIBNotificationGroup.setDescription('A collection of notifications providing SMS 1000 environmental monitor information.')
+rbnSMS1000EnvMonMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2352, 2, 3, 2, 2, 1)).setObjects(("RBN-SMS1000-ENVMON-MIB", "rbnSMS1000EnvMonMIBObjectGroup"), ("RBN-SMS1000-ENVMON-MIB", "rbnSMS1000EnvMonMIBNotificationGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnSMS1000EnvMonMIBCompliance = rbnSMS1000EnvMonMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: rbnSMS1000EnvMonMIBCompliance.setDescription('The compliance statement for the SMS 1000 EnvMon MIB')
+mibBuilder.exportSymbols("RBN-SMS1000-ENVMON-MIB", rbnSMS1000EnvMonMIBObjectGroup=rbnSMS1000EnvMonMIBObjectGroup, rbnSMS1000EnvMonMIBConformance=rbnSMS1000EnvMonMIBConformance, rbnSMS1000PowerFailChange=rbnSMS1000PowerFailChange, rbnSMS1000FanFail=rbnSMS1000FanFail, PYSNMP_MODULE_ID=rbnSMS1000EnvMonMIB, rbnSMS1000PowerFail=rbnSMS1000PowerFail, rbnSMS1000EnvMonMIBObjects=rbnSMS1000EnvMonMIBObjects, rbnSMS1000EnvMonMIBNotifications=rbnSMS1000EnvMonMIBNotifications, rbnSMS1000EnvMonMIBNotificationGroup=rbnSMS1000EnvMonMIBNotificationGroup, rbnSMS1000EnvMonMIBCompliance=rbnSMS1000EnvMonMIBCompliance, rbnSMS1000EnvMonMIB=rbnSMS1000EnvMonMIB, rbnSMS1000FanFailChange=rbnSMS1000FanFailChange, rbnSMS1000EnvMonMIBGroups=rbnSMS1000EnvMonMIBGroups, rbnSMS1000EnvMonMIBCompliances=rbnSMS1000EnvMonMIBCompliances)

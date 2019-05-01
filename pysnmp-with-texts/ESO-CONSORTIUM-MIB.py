@@ -1,0 +1,40 @@
+#
+# PySNMP MIB module ESO-CONSORTIUM-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ESO-CONSORTIUM-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:06:36 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Counter64, snmpModules, ModuleIdentity, Bits, IpAddress, enterprises, ObjectIdentity, iso, MibIdentifier, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Unsigned32, TimeTicks, Counter32, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "snmpModules", "ModuleIdentity", "Bits", "IpAddress", "enterprises", "ObjectIdentity", "iso", "MibIdentifier", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Unsigned32", "TimeTicks", "Counter32", "Integer32")
+TextualConvention, AutonomousType, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "AutonomousType", "DisplayString")
+esoConsortiumMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 14832))
+esoConsortiumMIB.setRevisions(('2003-02-03 00:00', '2003-02-03 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: esoConsortiumMIB.setRevisionsDescriptions((' Changes in preparation for public release. - Added Object Identities for AES use while AES is being standardized. - As of this writing, there are no additional authentication protocols specified in this document. ', 'Initial version, intended to be published as an Internet Draft. ',))
+if mibBuilder.loadTexts: esoConsortiumMIB.setLastUpdated('200302030000Z')
+if mibBuilder.loadTexts: esoConsortiumMIB.setOrganization('ESO (Extended Security Options) Consortium')
+if mibBuilder.loadTexts: esoConsortiumMIB.setContactInfo(' ESO Consortium Coordinator SNMP Research Postal Address: SNMP Research, Inc 3001 Kimberlin Heights Rd. Knoxville, TN 37920-9716 USA Tel: +1 865 573 1434 Fax: +1 865 573 9197 E-mail: eso-consortium@snmp.com WWW: http://www.snmp.com/eso')
+if mibBuilder.loadTexts: esoConsortiumMIB.setDescription(' The ESO Consortium is an umbrella organization for registration of not-yet-standardized SNMP security modules in the enterprise space. The objects published here are intended to provide a common naming and registration for authentication and privacy protocol extensions to the SNMP USM Module (RFC3414). The authentication and privacy protocol objects specified herein are intended to be used as values for usmUserAuthProtocol and usmUserPrivProtocol when managing SNMPv3 users via the snmpUsmMIB. ')
+esoConsortiumMIBObjectIdentities = MibIdentifier((1, 3, 6, 1, 4, 1, 14832, 1))
+usm3DESPrivProtocol = ObjectIdentity((1, 3, 6, 1, 4, 1, 14832, 1, 1))
+if mibBuilder.loadTexts: usm3DESPrivProtocol.setStatus('current')
+if mibBuilder.loadTexts: usm3DESPrivProtocol.setDescription(' The 3DES-EDE Symmetric Encryption Protocol. This is the protocol as specified in draft-reeder-snmpv3-usm-3desede-00, and in the updates to that draft available at http://www.snmp.com/eso/. ')
+if mibBuilder.loadTexts: usm3DESPrivProtocol.setReference(' - Data Encryption Standard, National Institute of Standards and Technology. Federal Information Processing Standard (FIPS) Publication 46-3, (1999, pending approval). Will supersede FIPS Publication 46-2. - Data Encryption Algorithm, American National Standards Institute. ANSI X3.92-1981, (December, 1980). - DES Modes of Operation, National Institute of Standards and Technology. Federal Information Processing Standard (FIPS) Publication 81, (December, 1980). - Data Encryption Algorithm - Modes of Operation, American National Standards Institute. ANSI X3.106-1983, (May 1983). ')
+usmAESCfb128PrivProtocol = ObjectIdentity((1, 3, 6, 1, 4, 1, 14832, 1, 2))
+if mibBuilder.loadTexts: usmAESCfb128PrivProtocol.setStatus('current')
+if mibBuilder.loadTexts: usmAESCfb128PrivProtocol.setDescription('The CFB128-AES-128 Privacy Protocol. This is the protocol as specified in draft-blumenthal-aes-usm-04.txt available at http://www.snmp.com/eso. This object replaces the usmAesCfb128Protocol OBJECT-IDENTITY. This assignment is made separately here, as the assignments in draft-blumenthal-aes-usm-04 are transient. Note that while draft-blumenthal-aes-usm-04 is referenced here, no interoperability problems have been encountered with draft-blumenthal-aes-usm-05 (also available at http://www.snmp.com/eso) for this privacy protocol. ')
+if mibBuilder.loadTexts: usmAESCfb128PrivProtocol.setReference("- The AES Cipher Algorithm in the SNMP's User-based Security Model. Internet Draft draft-blumenthal-aes-usm-04. - Specification for the ADVANCED ENCRYPTION STANDARD (DRAFT). Federal Information Processing Standard (FIPS) Publication 197. (November 2001). - Dworkin, M., NIST Recommendation for Block Cipher Modes of Operation, Methods and Techniques (DRAFT). NIST Special Publication 800-38A (December 2001). ")
+usmAESCfb192PrivProtocol = ObjectIdentity((1, 3, 6, 1, 4, 1, 14832, 1, 3))
+if mibBuilder.loadTexts: usmAESCfb192PrivProtocol.setStatus('current')
+if mibBuilder.loadTexts: usmAESCfb192PrivProtocol.setDescription('The CFB128-AES-192 Privacy Protocol. Note that this object replaces the usmAesCfb192Protocol OBJECT-IDENTITY of draft-blumenthal-aes-usm-04 (available at http://www.snmp.com/eso). This assignment is made separately here, as the assignments in draft-blumenthal-aes-usm-04 are transient.')
+if mibBuilder.loadTexts: usmAESCfb192PrivProtocol.setReference('See References for usmAESCfb128PrivProtocol (above)')
+usmAESCfb256PrivProtocol = ObjectIdentity((1, 3, 6, 1, 4, 1, 14832, 1, 4))
+if mibBuilder.loadTexts: usmAESCfb256PrivProtocol.setStatus('current')
+if mibBuilder.loadTexts: usmAESCfb256PrivProtocol.setDescription('The CFB128-AES-256 Privacy Protocol. Note that this object replaces the usmAesCfb256Protocol OBJECT-IDENTITY of draft-blumenthal-aes-usm-04. (available at http://www.snmp.com/eso). This assignment is made separately here, as the assignments in draft-blumenthal-aes-usm-04 are transient.')
+if mibBuilder.loadTexts: usmAESCfb256PrivProtocol.setReference('See References for usmAESCfb128PrivProtocol (above)')
+mibBuilder.exportSymbols("ESO-CONSORTIUM-MIB", usm3DESPrivProtocol=usm3DESPrivProtocol, usmAESCfb192PrivProtocol=usmAESCfb192PrivProtocol, esoConsortiumMIB=esoConsortiumMIB, esoConsortiumMIBObjectIdentities=esoConsortiumMIBObjectIdentities, usmAESCfb256PrivProtocol=usmAESCfb256PrivProtocol, usmAESCfb128PrivProtocol=usmAESCfb128PrivProtocol, PYSNMP_MODULE_ID=esoConsortiumMIB)

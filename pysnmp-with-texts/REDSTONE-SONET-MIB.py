@@ -1,0 +1,56 @@
+#
+# PySNMP MIB module REDSTONE-SONET-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/REDSTONE-SONET-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:55:51 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+rsMgmt, = mibBuilder.importSymbols("REDSTONE-SMI", "rsMgmt")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+MibIdentifier, iso, Bits, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, Counter64, ModuleIdentity, IpAddress, ObjectIdentity, Gauge32, Integer32, Counter32, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "iso", "Bits", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "Counter64", "ModuleIdentity", "IpAddress", "ObjectIdentity", "Gauge32", "Integer32", "Counter32", "TimeTicks")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+rsSonetMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2773, 2, 7))
+rsSonetMIB.setRevisions(('1998-01-01 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: rsSonetMIB.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: rsSonetMIB.setLastUpdated('9801010000Z')
+if mibBuilder.loadTexts: rsSonetMIB.setOrganization('Redstone Communications, Inc.')
+if mibBuilder.loadTexts: rsSonetMIB.setContactInfo(' Redstone Communications, Inc. 5 Carlisle Road Westford MA 01886 USA Tel: +1-978-692-1999 Email: mib@redstonecom.com ')
+if mibBuilder.loadTexts: rsSonetMIB.setDescription('The SONET MIB for the Redstone Communications Inc. enterprise.')
+rsSonetObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 7, 1))
+rsSonetMediumTable = MibTable((1, 3, 6, 1, 4, 1, 2773, 2, 7, 1, 1), )
+if mibBuilder.loadTexts: rsSonetMediumTable.setStatus('current')
+if mibBuilder.loadTexts: rsSonetMediumTable.setDescription('This table contains entries for SONET interfaces present in the system.')
+rsSonetMediumEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2773, 2, 7, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: rsSonetMediumEntry.setStatus('current')
+if mibBuilder.loadTexts: rsSonetMediumEntry.setDescription('Each entry describes the characteristics of an SONET interface.')
+rsSonetMediumType = MibTableColumn((1, 3, 6, 1, 4, 1, 2773, 2, 7, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("sonet", 1), ("sdh", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsSonetMediumType.setStatus('current')
+if mibBuilder.loadTexts: rsSonetMediumType.setDescription('This variable identifies whether a SONET or a SDH signal is used across this interface.')
+rsSonetMediumLoopbackConfig = MibTableColumn((1, 3, 6, 1, 4, 1, 2773, 2, 7, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3))).clone(namedValues=NamedValues(("sonetNoLoop", 0), ("sonetFacilityLoop", 1), ("sonetTerminalLoop", 2), ("sonetOtherLoop", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsSonetMediumLoopbackConfig.setStatus('current')
+if mibBuilder.loadTexts: rsSonetMediumLoopbackConfig.setDescription('The current loopback state of the SONET/SDH interface. The values mean: sonetNoLoop Not in the loopback state. A device that is not capable of performing a loopback on this interface shall always return this value. sonetFacilityLoop The received signal at this interface is looped back out through the corresponding transmitter in the return direction. sonetTerminalLoop The signal that is about to be transmitted is connected to the associated incoming receiver. sonetOtherLoop Loopbacks that are not defined here.')
+rsSonetMediumTimingSource = MibTableColumn((1, 3, 6, 1, 4, 1, 2773, 2, 7, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("loop", 0), ("internal", 1)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsSonetMediumTimingSource.setStatus('current')
+if mibBuilder.loadTexts: rsSonetMediumTimingSource.setDescription('Selects the source from which transmit timing is derived. loop(1) indicates timing is recovered from the receiver; internal(2) indicates timing is taken from the internal system timing reference.')
+rsSonetMediumCircuitIdentifier = MibTableColumn((1, 3, 6, 1, 4, 1, 2773, 2, 7, 1, 1, 1, 4), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rsSonetMediumCircuitIdentifier.setStatus('current')
+if mibBuilder.loadTexts: rsSonetMediumCircuitIdentifier.setDescription("This variable contains the transmission vendor's circuit identifier, for the purpose of facilitating troubleshooting.")
+rsSonetConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 7, 4))
+rsSonetCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 7, 4, 1))
+rsSonetGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2773, 2, 7, 4, 2))
+rsSonetCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2773, 2, 7, 4, 1, 1)).setObjects(("REDSTONE-SONET-MIB", "rsSonetGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsSonetCompliance = rsSonetCompliance.setStatus('current')
+if mibBuilder.loadTexts: rsSonetCompliance.setDescription('The compliance statement for entities which implement the Redstone SONET MIB.')
+rsSonetGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2773, 2, 7, 4, 2, 1)).setObjects(("REDSTONE-SONET-MIB", "rsSonetMediumType"), ("REDSTONE-SONET-MIB", "rsSonetMediumLoopbackConfig"), ("REDSTONE-SONET-MIB", "rsSonetMediumTimingSource"), ("REDSTONE-SONET-MIB", "rsSonetMediumCircuitIdentifier"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rsSonetGroup = rsSonetGroup.setStatus('current')
+if mibBuilder.loadTexts: rsSonetGroup.setDescription('A collection of objects providing management of SONET interfaces in a Redstone product.')
+mibBuilder.exportSymbols("REDSTONE-SONET-MIB", rsSonetMIB=rsSonetMIB, rsSonetMediumTable=rsSonetMediumTable, rsSonetMediumType=rsSonetMediumType, rsSonetObjects=rsSonetObjects, rsSonetMediumCircuitIdentifier=rsSonetMediumCircuitIdentifier, rsSonetMediumTimingSource=rsSonetMediumTimingSource, rsSonetConformance=rsSonetConformance, rsSonetCompliances=rsSonetCompliances, rsSonetGroup=rsSonetGroup, rsSonetMediumEntry=rsSonetMediumEntry, PYSNMP_MODULE_ID=rsSonetMIB, rsSonetMediumLoopbackConfig=rsSonetMediumLoopbackConfig, rsSonetGroups=rsSonetGroups, rsSonetCompliance=rsSonetCompliance)

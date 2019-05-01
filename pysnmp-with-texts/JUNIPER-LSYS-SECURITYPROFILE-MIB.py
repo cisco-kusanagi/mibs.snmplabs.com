@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module JUNIPER-LSYS-SECURITYPROFILE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/JUNIPER-LSYS-SECURITYPROFILE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:59:53 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+jnxLsysSecurityProfile, = mibBuilder.importSymbols("JUNIPER-JS-SMI", "jnxLsysSecurityProfile")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, Unsigned32, Bits, IpAddress, Counter64, TimeTicks, Integer32, Counter32, NotificationType, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, Gauge32, iso, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Unsigned32", "Bits", "IpAddress", "Counter64", "TimeTicks", "Integer32", "Counter32", "NotificationType", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "Gauge32", "iso", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+jnxLsysSpZone = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 1))
+jnxLsysSpScheduler = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 2))
+jnxLsysSpPolicy = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 3))
+jnxLsysSpPolicywcnt = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 4))
+jnxLsysSpFlowgate = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 5))
+jnxLsysSpFlowsess = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 6))
+jnxLsysSpAuthentry = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 7))
+jnxLsysSpNATsrcpool = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 8))
+jnxLsysSpNATdstpool = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 9))
+jnxLsysSpNATsrcpatad = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 10))
+jnxLsysSpNATsrcnopatad = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 11))
+jnxLsysSpNATsrcrule = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 12))
+jnxLsysSpNATdstrule = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 13))
+jnxLsysSpNATstaticrule = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 14))
+jnxLsysSpNATconebind = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 15))
+jnxLsysSpNATpoipnum = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 16))
+jnxLsysSpNATRuleRefPfx = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 17))
+jnxLsysSpCPU = MibIdentifier((1, 3, 6, 1, 4, 1, 2636, 3, 39, 1, 17, 18))
+mibBuilder.exportSymbols("JUNIPER-LSYS-SECURITYPROFILE-MIB", jnxLsysSpAuthentry=jnxLsysSpAuthentry, jnxLsysSpPolicy=jnxLsysSpPolicy, jnxLsysSpFlowgate=jnxLsysSpFlowgate, jnxLsysSpNATsrcrule=jnxLsysSpNATsrcrule, jnxLsysSpNATdstpool=jnxLsysSpNATdstpool, jnxLsysSpNATconebind=jnxLsysSpNATconebind, jnxLsysSpNATdstrule=jnxLsysSpNATdstrule, jnxLsysSpNATRuleRefPfx=jnxLsysSpNATRuleRefPfx, jnxLsysSpCPU=jnxLsysSpCPU, jnxLsysSpNATsrcnopatad=jnxLsysSpNATsrcnopatad, jnxLsysSpFlowsess=jnxLsysSpFlowsess, jnxLsysSpNATsrcpatad=jnxLsysSpNATsrcpatad, jnxLsysSpNATstaticrule=jnxLsysSpNATstaticrule, jnxLsysSpScheduler=jnxLsysSpScheduler, jnxLsysSpZone=jnxLsysSpZone, jnxLsysSpNATpoipnum=jnxLsysSpNATpoipnum, jnxLsysSpNATsrcpool=jnxLsysSpNATsrcpool, jnxLsysSpPolicywcnt=jnxLsysSpPolicywcnt)
