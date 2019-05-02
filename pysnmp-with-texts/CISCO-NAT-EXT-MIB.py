@@ -1,0 +1,58 @@
+#
+# PySNMP MIB module CISCO-NAT-EXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-NAT-EXT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:08:15 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+entPhysicalIndex, = mibBuilder.importSymbols("ENTITY-MIB", "entPhysicalIndex")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+iso, Integer32, IpAddress, ModuleIdentity, TimeTicks, Counter64, NotificationType, Gauge32, ObjectIdentity, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, Counter32, Bits = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "Integer32", "IpAddress", "ModuleIdentity", "TimeTicks", "Counter64", "NotificationType", "Gauge32", "ObjectIdentity", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "Counter32", "Bits")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+ciscoNATExtMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 532))
+ciscoNATExtMIB.setRevisions(('2006-06-05 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoNATExtMIB.setRevisionsDescriptions(('Initial version of this MIB.',))
+if mibBuilder.loadTexts: ciscoNATExtMIB.setLastUpdated('200606050000Z')
+if mibBuilder.loadTexts: ciscoNATExtMIB.setOrganization('Cisco Systems, Inc.')
+if mibBuilder.loadTexts: ciscoNATExtMIB.setContactInfo(' Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-l4l7security@cisco.com')
+if mibBuilder.loadTexts: ciscoNATExtMIB.setDescription('This MIB is an extension to the NAT-MIB. This MIB module includes objects for providing the NAT related statistics. Acronyms: NAT Network Address Translation. ')
+ciscoNatExtMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 532, 0))
+ciscoNatExtMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 532, 1))
+ciscoNatExtMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 532, 2))
+cneAddrTranslationStatsTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 532, 1, 1), )
+if mibBuilder.loadTexts: cneAddrTranslationStatsTable.setStatus('current')
+if mibBuilder.loadTexts: cneAddrTranslationStatsTable.setDescription('A table of NAT statistics in a managed system.')
+cneAddrTranslationStatsEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 532, 1, 1, 1), ).setIndexNames((0, "ENTITY-MIB", "entPhysicalIndex"))
+if mibBuilder.loadTexts: cneAddrTranslationStatsEntry.setStatus('current')
+if mibBuilder.loadTexts: cneAddrTranslationStatsEntry.setDescription("An entry in the cneAddrTranslationStatsTable. This contains information about the NAT related statistics pertaining to a module. The entPhysicalIndex specifies the entry in entPhysicalTable with entPhysicalClass='module'.")
+cneAddrTranslationNumActive = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 532, 1, 1, 1, 1), Gauge32()).setUnits('Number of address translation entries').setMaxAccess("readonly")
+if mibBuilder.loadTexts: cneAddrTranslationNumActive.setReference('This object is an aggregate of the objects natAddrBindNumberOfEntries and natAddrPortBindNumberOfEntries defined in the RFC 4008, NAT-MIB [RFC4008]. ')
+if mibBuilder.loadTexts: cneAddrTranslationNumActive.setStatus('current')
+if mibBuilder.loadTexts: cneAddrTranslationNumActive.setDescription('The total number of address translation entries that are currently available in the NAT device. This indicates the aggregate of the translation entries created from both the static and dynamic address translation mechanisms. ')
+cneAddrTranslationNumPeak = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 532, 1, 1, 1, 2), Unsigned32()).setUnits('Number of address translation entries').setMaxAccess("readonly")
+if mibBuilder.loadTexts: cneAddrTranslationNumPeak.setStatus('current')
+if mibBuilder.loadTexts: cneAddrTranslationNumPeak.setDescription('The maximum number of address translation entries that are active at any one time since the system startup. This indicates the high watermark of address translation entries that are active at any one time since the system startup. This object includes the translation entries created from both the static and dynamic address translation mechanisms. ')
+cneAddrTranslation1min = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 532, 1, 1, 1, 3), Gauge32()).setUnits('Address translation entries per second').setMaxAccess("readonly")
+if mibBuilder.loadTexts: cneAddrTranslation1min.setStatus('current')
+if mibBuilder.loadTexts: cneAddrTranslation1min.setDescription('The averaged number of address translation entries which the NAT device establishing per second, averaged over the last 1 minute. This object includes the translation entries created from both the static and dynamic address translation mechanisms. ')
+cneAddrTranslation5min = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 532, 1, 1, 1, 4), Gauge32()).setUnits('Address translation entries per second').setMaxAccess("readonly")
+if mibBuilder.loadTexts: cneAddrTranslation5min.setStatus('current')
+if mibBuilder.loadTexts: cneAddrTranslation5min.setDescription('The averaged number of address translation entries which the NAT device establishing per second, averaged over the last 5 minutes. This object includes the translation entries created from both the static and dynamic address translation mechanisms. ')
+ciscoNatExtMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 532, 2, 1))
+ciscoNatExtMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 532, 2, 2))
+ciscoNatExtMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 532, 2, 1, 1)).setObjects(("CISCO-NAT-EXT-MIB", "ciscoNatExtAddrTransStatsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoNatExtMIBCompliance = ciscoNatExtMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: ciscoNatExtMIBCompliance.setDescription('The compliance statement for entities which implement the CISCO-NAT-EXT-MIB.')
+ciscoNatExtAddrTransStatsGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 532, 2, 2, 1)).setObjects(("CISCO-NAT-EXT-MIB", "cneAddrTranslationNumActive"), ("CISCO-NAT-EXT-MIB", "cneAddrTranslationNumPeak"), ("CISCO-NAT-EXT-MIB", "cneAddrTranslation1min"), ("CISCO-NAT-EXT-MIB", "cneAddrTranslation5min"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoNatExtAddrTransStatsGroup = ciscoNatExtAddrTransStatsGroup.setStatus('current')
+if mibBuilder.loadTexts: ciscoNatExtAddrTransStatsGroup.setDescription('This group contains the objects for NAT address translation related statistics.')
+mibBuilder.exportSymbols("CISCO-NAT-EXT-MIB", cneAddrTranslation5min=cneAddrTranslation5min, ciscoNATExtMIB=ciscoNATExtMIB, ciscoNatExtMIBCompliances=ciscoNatExtMIBCompliances, cneAddrTranslationStatsTable=cneAddrTranslationStatsTable, cneAddrTranslationNumPeak=cneAddrTranslationNumPeak, ciscoNatExtMIBCompliance=ciscoNatExtMIBCompliance, ciscoNatExtMIBGroups=ciscoNatExtMIBGroups, ciscoNatExtMIBConformance=ciscoNatExtMIBConformance, cneAddrTranslationNumActive=cneAddrTranslationNumActive, cneAddrTranslation1min=cneAddrTranslation1min, ciscoNatExtMIBObjects=ciscoNatExtMIBObjects, ciscoNatExtMIBNotifs=ciscoNatExtMIBNotifs, cneAddrTranslationStatsEntry=cneAddrTranslationStatsEntry, PYSNMP_MODULE_ID=ciscoNATExtMIB, ciscoNatExtAddrTransStatsGroup=ciscoNatExtAddrTransStatsGroup)

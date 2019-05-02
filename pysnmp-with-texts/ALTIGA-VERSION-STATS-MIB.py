@@ -1,0 +1,58 @@
+#
+# PySNMP MIB module ALTIGA-VERSION-STATS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ALTIGA-VERSION-STATS-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:21:52 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+alVersionMibModule, = mibBuilder.importSymbols("ALTIGA-GLOBAL-REG", "alVersionMibModule")
+alStatsVersion, alVersionGroup = mibBuilder.importSymbols("ALTIGA-MIB", "alStatsVersion", "alVersionGroup")
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, MibIdentifier, Bits, Counter32, IpAddress, Integer32, NotificationType, Counter64, Gauge32, ObjectIdentity, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, iso = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "MibIdentifier", "Bits", "Counter32", "IpAddress", "Integer32", "NotificationType", "Counter64", "Gauge32", "ObjectIdentity", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "iso")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+altigaVersionStatsMibModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 3076, 1, 1, 6, 2))
+altigaVersionStatsMibModule.setRevisions(('2002-09-05 13:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: altigaVersionStatsMibModule.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: altigaVersionStatsMibModule.setLastUpdated('200209051300Z')
+if mibBuilder.loadTexts: altigaVersionStatsMibModule.setOrganization('Cisco Systems, Inc.')
+if mibBuilder.loadTexts: altigaVersionStatsMibModule.setContactInfo('Cisco Systems 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-cvpn3000@cisco.com')
+if mibBuilder.loadTexts: altigaVersionStatsMibModule.setDescription('The Altiga (VPN 3000) Version MIB models counters and objects that are of management interest. Acronyms The following acronyms are used in this document: MIB: Management Information Base ')
+alStatsVersionGlobal = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 1, 1))
+alVersionMajor = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 1, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alVersionMajor.setStatus('current')
+if mibBuilder.loadTexts: alVersionMajor.setDescription('The major release number of the VPN 3000 software. In the release identifier 1.4.2, the 1 is the major release number.')
+alVersionMinor = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 1, 1, 2), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alVersionMinor.setStatus('current')
+if mibBuilder.loadTexts: alVersionMinor.setDescription('The minor release number of the VPN 3000 software. In the release identifier 1.4.2, the 4 is the minor release number.')
+alVersionInt = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 1, 1, 3), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alVersionInt.setStatus('current')
+if mibBuilder.loadTexts: alVersionInt.setDescription('The integration string of the VPN 3000 software. In the release identifier 1.4.2, the 2 is the patch release number.')
+alVersionString = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 1, 1, 4), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alVersionString.setStatus('current')
+if mibBuilder.loadTexts: alVersionString.setDescription('The string representation of the VPN 3000 software version.')
+alVersionLong = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 1, 1, 5), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alVersionLong.setStatus('current')
+if mibBuilder.loadTexts: alVersionLong.setDescription('The long string representation of the VPN 3000 software version.')
+alVersionShort = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 1, 1, 6), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alVersionShort.setStatus('current')
+if mibBuilder.loadTexts: alVersionShort.setDescription('The short string representation of the VPN3000 software version.')
+alVersionBoot = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 1, 1, 7), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alVersionBoot.setStatus('current')
+if mibBuilder.loadTexts: alVersionBoot.setDescription('The version of the Boot image.')
+altigaVersionStatsMibConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 1, 1, 6, 2, 1))
+altigaVersionStatsMibCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 1, 1, 6, 2, 1, 1))
+altigaVersionStatsMibCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 3076, 1, 1, 6, 2, 1, 1, 1)).setObjects(("ALTIGA-VERSION-STATS-MIB", "altigaVersionStatsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    altigaVersionStatsMibCompliance = altigaVersionStatsMibCompliance.setStatus('current')
+if mibBuilder.loadTexts: altigaVersionStatsMibCompliance.setDescription('The compliance statement for agents which implement the Altiga Version Statistics MIB.')
+altigaVersionStatsGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 3076, 2, 1, 1, 1, 1, 2)).setObjects(("ALTIGA-VERSION-STATS-MIB", "alVersionMajor"), ("ALTIGA-VERSION-STATS-MIB", "alVersionMinor"), ("ALTIGA-VERSION-STATS-MIB", "alVersionInt"), ("ALTIGA-VERSION-STATS-MIB", "alVersionString"), ("ALTIGA-VERSION-STATS-MIB", "alVersionLong"), ("ALTIGA-VERSION-STATS-MIB", "alVersionShort"), ("ALTIGA-VERSION-STATS-MIB", "alVersionBoot"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    altigaVersionStatsGroup = altigaVersionStatsGroup.setStatus('current')
+if mibBuilder.loadTexts: altigaVersionStatsGroup.setDescription('The objects for the version statistics.')
+mibBuilder.exportSymbols("ALTIGA-VERSION-STATS-MIB", alVersionLong=alVersionLong, alStatsVersionGlobal=alStatsVersionGlobal, altigaVersionStatsMibConformance=altigaVersionStatsMibConformance, alVersionShort=alVersionShort, altigaVersionStatsMibModule=altigaVersionStatsMibModule, altigaVersionStatsMibCompliances=altigaVersionStatsMibCompliances, altigaVersionStatsMibCompliance=altigaVersionStatsMibCompliance, altigaVersionStatsGroup=altigaVersionStatsGroup, alVersionBoot=alVersionBoot, PYSNMP_MODULE_ID=altigaVersionStatsMibModule, alVersionString=alVersionString, alVersionInt=alVersionInt, alVersionMinor=alVersionMinor, alVersionMajor=alVersionMajor)

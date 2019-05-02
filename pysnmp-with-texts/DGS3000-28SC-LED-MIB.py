@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module DGS3000-28SC-LED-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/DGS3000-28SC-LED-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:45:49 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, NotificationType, Gauge32, ObjectIdentity, Integer32, Counter64, Bits, Counter32, ModuleIdentity, iso, Unsigned32, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "NotificationType", "Gauge32", "ObjectIdentity", "Integer32", "Counter64", "Bits", "Counter32", "ModuleIdentity", "iso", "Unsigned32", "IpAddress")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+dlink_Dgs3000Proj_DGS3000_28SCax, = mibBuilder.importSymbols("SWDGS3000PRIMGMT-MIB", "dlink-Dgs3000Proj-DGS3000-28SCax")
+swLedMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 11, 133, 5, 1, 4))
+if mibBuilder.loadTexts: swLedMIB.setLastUpdated('201106100000Z')
+if mibBuilder.loadTexts: swLedMIB.setOrganization('D-Link Corp.')
+if mibBuilder.loadTexts: swLedMIB.setContactInfo('http://support.dlink.com')
+if mibBuilder.loadTexts: swLedMIB.setDescription('The Structure of LED Information for the proprietary enterprise.')
+swLedMIBObject = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 11, 133, 5, 1, 4, 1))
+swLedInfoTable = MibTable((1, 3, 6, 1, 4, 1, 171, 11, 133, 5, 1, 4, 1, 1), )
+if mibBuilder.loadTexts: swLedInfoTable.setStatus('current')
+if mibBuilder.loadTexts: swLedInfoTable.setDescription('This table contains the LED information.')
+swLedInfoEntry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 11, 133, 5, 1, 4, 1, 1, 1), ).setIndexNames((0, "DGS3000-28SC-LED-MIB", "swLedInfoUnitId"))
+if mibBuilder.loadTexts: swLedInfoEntry.setStatus('current')
+if mibBuilder.loadTexts: swLedInfoEntry.setDescription('A list of front panel LED information for each unit in the system.')
+swLedInfoUnitId = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 11, 133, 5, 1, 4, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 13))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: swLedInfoUnitId.setStatus('current')
+if mibBuilder.loadTexts: swLedInfoUnitId.setDescription('The object indicates the unit ID.')
+swLedInfoFrontPanelLedStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 11, 133, 5, 1, 4, 1, 1, 1, 2), OctetString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: swLedInfoFrontPanelLedStatus.setStatus('current')
+if mibBuilder.loadTexts: swLedInfoFrontPanelLedStatus.setDescription('This object is a set of system LED indicators. The first 32 octets are defined as next, and following octets are for logical port LED. Octet 1 is box ID led bit 7-6: reserved bit 5-4: 00B = no error 01B = system self-test error 10B = safeguard engine entering the exhausted mode bit 3-0: The actual box ID. 0x1 = box ID 1 0x2 = box ID 2 ... Octet 2 is power led: 0x01 = power work normally 0x02 = power fail Octet 3 is RPS led: 0x01 = RPS is not connected 0x02 = RPS is connected to switch but not ready to power the switch 0x03 = RPS is ready to power the switch 0x04 = RPS is powering the switch Octet 4 is console led: 0x01 = system start up 0x02 = a user is login through console 0x03 = no user is login through console Octet 5 is master led: 0x00 = standalone 0x01 = master 0x02 = back master 0x03 = slave Octet 6 is fan led: 0x01 = all fans are OK 0x02 = one or more fans fail Octet 7 is SD card led: 0x01 = SD card is unplugged 0x02 = SD card is plugged 0x03 = reading/writing 0x04 = read/write fail Octet 8 is SIO port led: bit 7-2: reserved bit 1: SIO1 link state 0B = linkdown 1B = linkup bit 0: SIO2 link state 0B = linkdown 1B = linkup Octet 9 is POE led: 0x01 = can not support POE 0x02 = link/act/speed mode 0x03 = POE mode Octet 10 is port led control state: 0x00 = Port LED control state enabled 0x01 = Port LED control state disabled Octet 11 is enable light state: 0x00 = enable light state disabled 0x01 = enable light state enabled Octet 12 is port led color state: 0x00 = enable light Port LED color state normal 0x01 = enable light Port LED color state amber 0x02 = enable light Port LED color state green Octet 13-32 are reserved. The continued octets are the logic port led. Each octet presents one port. There are two modes: link/act/speed mode and POE mode. The link/act/speed mode presents the speed duplex of port. The POE mode presents if the port deliver power to PD. The POE mode is supported by POE Switch only. The mode is determined by Octet 9. If the switch can not support POE, the mode is link/act/speed only. In each octet: link/act/speed mode: bit 7: 0B = port is not activity 1B = port is activity bit 6: 0B = not combo port 1B = combo port bit 5: the bit is available only when the port is combo port and linkup 0B = fiber linkup 1B = copper linkup bit 4: reserved bit 3: 0B = half duplex 1B = full duplex bit 2-0: 0x0 = link down 0x1 = 10Mbps 0x2 = 100Mbps 0x3 = 1000Mbps 0x4 = 10Gbps POE mode: 0x01 = no deliver power to PD 0x02 = deliver power to PD.')
+mibBuilder.exportSymbols("DGS3000-28SC-LED-MIB", swLedMIBObject=swLedMIBObject, swLedMIB=swLedMIB, PYSNMP_MODULE_ID=swLedMIB, swLedInfoEntry=swLedInfoEntry, swLedInfoTable=swLedInfoTable, swLedInfoUnitId=swLedInfoUnitId, swLedInfoFrontPanelLedStatus=swLedInfoFrontPanelLedStatus)

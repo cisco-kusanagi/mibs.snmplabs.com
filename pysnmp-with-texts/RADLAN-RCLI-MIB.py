@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module RADLAN-RCLI-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RADLAN-RCLI-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:48:41 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint")
+rnd, = mibBuilder.importSymbols("RADLAN-MIB", "rnd")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Integer32, MibIdentifier, Bits, NotificationType, iso, Unsigned32, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, TimeTicks, Counter32, Counter64, IpAddress, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "MibIdentifier", "Bits", "NotificationType", "iso", "Unsigned32", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "TimeTicks", "Counter32", "Counter64", "IpAddress", "ObjectIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+rlRCli = ModuleIdentity((1, 3, 6, 1, 4, 1, 89, 70))
+rlRCli.setRevisions(('2007-01-02 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: rlRCli.setRevisionsDescriptions(('Initial revision.',))
+if mibBuilder.loadTexts: rlRCli.setLastUpdated('200701020000Z')
+if mibBuilder.loadTexts: rlRCli.setOrganization('Radlan - a MARVELL company. Marvell Semiconductor, Inc.')
+if mibBuilder.loadTexts: rlRCli.setContactInfo('www.marvell.com')
+if mibBuilder.loadTexts: rlRCli.setDescription('This private MIB module defines RCli private MIBs.')
+rlRCliMibVersion = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlRCliMibVersion.setStatus('current')
+if mibBuilder.loadTexts: rlRCliMibVersion.setDescription("MIB's version, the current version is 1.")
+rlRCliUserPassword = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 2), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRCliUserPassword.setStatus('current')
+if mibBuilder.loadTexts: rlRCliUserPassword.setDescription('RCLI User mode Password')
+rlRCliEnablePassword = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRCliEnablePassword.setStatus('current')
+if mibBuilder.loadTexts: rlRCliEnablePassword.setDescription('RCLI Enable mode Password')
+rlRCliConfigPassword = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 4), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRCliConfigPassword.setStatus('current')
+if mibBuilder.loadTexts: rlRCliConfigPassword.setDescription('RCLI Config mode Password')
+rlRCliTimer = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 5), Integer32().subtype(subtypeSpec=ValueRangeConstraint(5, 3600))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRCliTimer.setStatus('current')
+if mibBuilder.loadTexts: rlRCliTimer.setDescription('RCLI Timeout')
+rlRcliFileAction = MibScalar((1, 3, 6, 1, 4, 1, 89, 70, 6), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("notUsedAfterReset", 1), ("usedAfterReset", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: rlRcliFileAction.setStatus('current')
+if mibBuilder.loadTexts: rlRcliFileAction.setDescription('RCLI Configuration File action determines whether The device configuration after reset will be set by the configuration file content or not.')
+mibBuilder.exportSymbols("RADLAN-RCLI-MIB", rlRCliUserPassword=rlRCliUserPassword, rlRcliFileAction=rlRcliFileAction, rlRCliMibVersion=rlRCliMibVersion, PYSNMP_MODULE_ID=rlRCli, rlRCli=rlRCli, rlRCliTimer=rlRCliTimer, rlRCliEnablePassword=rlRCliEnablePassword, rlRCliConfigPassword=rlRCliConfigPassword)

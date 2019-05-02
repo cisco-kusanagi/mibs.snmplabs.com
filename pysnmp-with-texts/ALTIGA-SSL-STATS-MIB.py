@@ -1,0 +1,58 @@
+#
+# PySNMP MIB module ALTIGA-SSL-STATS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ALTIGA-SSL-STATS-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:21:47 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+alSslMibModule, = mibBuilder.importSymbols("ALTIGA-GLOBAL-REG", "alSslMibModule")
+alStatsSsl, alSslGroup = mibBuilder.importSymbols("ALTIGA-MIB", "alStatsSsl", "alSslGroup")
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+Counter32, TimeTicks, Bits, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, Counter64, ModuleIdentity, Integer32, NotificationType, MibIdentifier, ObjectIdentity, Gauge32, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "TimeTicks", "Bits", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "Counter64", "ModuleIdentity", "Integer32", "NotificationType", "MibIdentifier", "ObjectIdentity", "Gauge32", "iso")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+altigaSslStatsMibModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 3076, 1, 1, 31, 2))
+altigaSslStatsMibModule.setRevisions(('2002-09-05 13:00', '2002-07-10 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: altigaSslStatsMibModule.setRevisionsDescriptions(('Added module compliance.', 'Updated with new header',))
+if mibBuilder.loadTexts: altigaSslStatsMibModule.setLastUpdated('200209051300Z')
+if mibBuilder.loadTexts: altigaSslStatsMibModule.setOrganization('Cisco Systems, Inc.')
+if mibBuilder.loadTexts: altigaSslStatsMibModule.setContactInfo('Cisco Systems 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-cvpn3000@cisco.com')
+if mibBuilder.loadTexts: altigaSslStatsMibModule.setDescription('The Altiga SSL Statistics MIB models counters and objects that are of management interest for SSL. Acronyms The following acronyms are used in this document: MIB: Management Information Base SSL: Secure Sockets Layer ')
+alStatsSslGlobal = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 26, 1))
+alSslStatsTotalSessions = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 26, 1, 1), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alSslStatsTotalSessions.setStatus('current')
+if mibBuilder.loadTexts: alSslStatsTotalSessions.setDescription('The number of total sessions.')
+alSslStatsActiveSessions = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 26, 1, 2), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alSslStatsActiveSessions.setStatus('current')
+if mibBuilder.loadTexts: alSslStatsActiveSessions.setDescription('The current number of active sessions.')
+alSslStatsMaxSessions = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 26, 1, 3), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alSslStatsMaxSessions.setStatus('current')
+if mibBuilder.loadTexts: alSslStatsMaxSessions.setDescription('The maximum number current of active sessions at any one time.')
+alSslStatsPreDecryptOctets = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 26, 1, 4), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alSslStatsPreDecryptOctets.setStatus('current')
+if mibBuilder.loadTexts: alSslStatsPreDecryptOctets.setDescription('The number of octets sent to the decryption engine. Includes octets used as part of negotiation.')
+alSslStatsPostDecryptOctets = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 26, 1, 5), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alSslStatsPostDecryptOctets.setStatus('current')
+if mibBuilder.loadTexts: alSslStatsPostDecryptOctets.setDescription('The number of octets received from the decryption engine.')
+alSslStatsPreEncryptOctets = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 26, 1, 6), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alSslStatsPreEncryptOctets.setStatus('current')
+if mibBuilder.loadTexts: alSslStatsPreEncryptOctets.setDescription('The number of octets send to the encryption engine.')
+alSslStatsPostEncryptOctets = MibScalar((1, 3, 6, 1, 4, 1, 3076, 2, 1, 2, 26, 1, 7), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: alSslStatsPostEncryptOctets.setStatus('current')
+if mibBuilder.loadTexts: alSslStatsPostEncryptOctets.setDescription('The number of octets received from the encryption engine. Includes octets used as part of negitiation.')
+altigaSslStatsMibConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 1, 1, 31, 2, 1))
+altigaSslStatsMibCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 3076, 1, 1, 31, 2, 1, 1))
+altigaSslStatsMibCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 3076, 1, 1, 31, 2, 1, 1, 1)).setObjects(("ALTIGA-SSL-STATS-MIB", "altigaSslStatsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    altigaSslStatsMibCompliance = altigaSslStatsMibCompliance.setStatus('current')
+if mibBuilder.loadTexts: altigaSslStatsMibCompliance.setDescription('The compliance statement for agents which implement the Altiga SSL Statistics MIB.')
+altigaSslStatsGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 3076, 2, 1, 1, 1, 26, 2)).setObjects(("ALTIGA-SSL-STATS-MIB", "alSslStatsTotalSessions"), ("ALTIGA-SSL-STATS-MIB", "alSslStatsActiveSessions"), ("ALTIGA-SSL-STATS-MIB", "alSslStatsMaxSessions"), ("ALTIGA-SSL-STATS-MIB", "alSslStatsPreDecryptOctets"), ("ALTIGA-SSL-STATS-MIB", "alSslStatsPostDecryptOctets"), ("ALTIGA-SSL-STATS-MIB", "alSslStatsPreEncryptOctets"), ("ALTIGA-SSL-STATS-MIB", "alSslStatsPostEncryptOctets"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    altigaSslStatsGroup = altigaSslStatsGroup.setStatus('current')
+if mibBuilder.loadTexts: altigaSslStatsGroup.setDescription('The objects for SSL statistics.')
+mibBuilder.exportSymbols("ALTIGA-SSL-STATS-MIB", alSslStatsPostDecryptOctets=alSslStatsPostDecryptOctets, altigaSslStatsMibModule=altigaSslStatsMibModule, altigaSslStatsMibCompliance=altigaSslStatsMibCompliance, alSslStatsPreDecryptOctets=alSslStatsPreDecryptOctets, alSslStatsPreEncryptOctets=alSslStatsPreEncryptOctets, altigaSslStatsMibCompliances=altigaSslStatsMibCompliances, alSslStatsTotalSessions=alSslStatsTotalSessions, alSslStatsActiveSessions=alSslStatsActiveSessions, altigaSslStatsGroup=altigaSslStatsGroup, altigaSslStatsMibConformance=altigaSslStatsMibConformance, alSslStatsMaxSessions=alSslStatsMaxSessions, alSslStatsPostEncryptOctets=alSslStatsPostEncryptOctets, PYSNMP_MODULE_ID=altigaSslStatsMibModule, alStatsSslGlobal=alStatsSslGlobal)

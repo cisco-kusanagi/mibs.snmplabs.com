@@ -1,0 +1,72 @@
+#
+# PySNMP MIB module RBN-BGP-ACCOUNTING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RBN-BGP-ACCOUNTING-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:52:33 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+rbnMgmt, = mibBuilder.importSymbols("RBN-SMI", "rbnMgmt")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+Bits, NotificationType, Gauge32, ObjectIdentity, Unsigned32, MibIdentifier, iso, ModuleIdentity, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, IpAddress, Integer32, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "NotificationType", "Gauge32", "ObjectIdentity", "Unsigned32", "MibIdentifier", "iso", "ModuleIdentity", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "IpAddress", "Integer32", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+rbnBgpPolAcctMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2352, 2, 20))
+rbnBgpPolAcctMIB.setRevisions(('2005-09-20 00:00', '2002-03-15 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: rbnBgpPolAcctMIB.setRevisionsDescriptions(('Added a circuit descriptor object, interface name object, context name object and updated conformation information', 'Initial version of this MIB module.',))
+if mibBuilder.loadTexts: rbnBgpPolAcctMIB.setLastUpdated('200203150000Z')
+if mibBuilder.loadTexts: rbnBgpPolAcctMIB.setOrganization('RedBack Networks, Inc.')
+if mibBuilder.loadTexts: rbnBgpPolAcctMIB.setContactInfo(' RedBack Networks, Inc. Postal: 300 Holger Way San Jose, CA 95134-1362 USA Phone: +1 408 750 5000 Fax: +1 408 750 5599 E-mail: mib-info@redback.com')
+if mibBuilder.loadTexts: rbnBgpPolAcctMIB.setDescription('The BGP policy based accounting MIB defines necessary objects to account for IP traffic differentially via the BGP policies (e.g., community list, AS path). All mib objects defined in the module are viewed within the context identified in the SNMP protocol (i.e. the community string in v1/v2c or the contextName in v3).')
+rbnBgpPolAcctMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1))
+rbnBpaTable = MibTable((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1, 1), )
+if mibBuilder.loadTexts: rbnBpaTable.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaTable.setDescription('A list of BGP Policy Accounting entries')
+rbnBpaEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "RBN-BGP-ACCOUNTING-MIB", "rbnBpaBucketIndex"))
+if mibBuilder.loadTexts: rbnBpaEntry.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaEntry.setDescription('An entry contains statistics applicable to a particular bgp based routing policy set on a particular interface. The ifIndex instances referenced by this table represent a port, channel, sub-channel or circuit layer that supports the IF-MIB ifPacketGroup, ifHCPacketGroup or ifVHCPacketGroup, and is bound to an IP interface for which BGP policy based accounting is enabled. Since the IF-MIB may provide support for a subset of the physical interfaces available on the system, it follows that support for BGP policy based accounting information in this MIB is limited to the same subset of physical interfaces supported in the IF-MIB.')
+rbnBpaBucketIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2147483647))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnBpaBucketIndex.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaBucketIndex.setDescription('An integer value greater than 0, that uniquely identifies a bgp routing policy set on this interface. ')
+rbnBpaInPacketCount = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1, 1, 1, 2), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnBpaInPacketCount.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaInPacketCount.setDescription('The total number of packets received for a particular bgp routing policy on an interface.')
+rbnBpaInOctetCount = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1, 1, 1, 3), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnBpaInOctetCount.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaInOctetCount.setDescription('The total number of octets received for a particular bgp routing policy on an interface.')
+rbnBpaCircuitDescr = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1, 1, 1, 4), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 192))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnBpaCircuitDescr.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaCircuitDescr.setDescription('A descriptive version of the interface that is consistent with information displayed in the CLI. This string is formatted as slot/port:channel:subchannel authority/level/index, with the exception that channel and subchannel are only included when appropriate. For example, 4/1 1/2/7, 4/1:1 1/2/7 or 4/1:1:1 1/2/7. If a circuit description is not available then this object contains a zero-length string')
+rbnBpaInterfaceName = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1, 1, 1, 5), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 127))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnBpaInterfaceName.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaInterfaceName.setDescription('The name of the ip interface bound to a circuit. If ip interface name is not available then this object contains a zero length string')
+rbnBpaContextName = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 20, 1, 1, 1, 6), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 63))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnBpaContextName.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaContextName.setDescription('The name of context in which this IP interface is defined. If context information is not available then this object contains a zero lenght string')
+rbnBgpPolAcctMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 20, 3))
+rbnBgpPolAcctMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 20, 3, 1))
+rbnBgpPolAcctMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 20, 3, 2))
+rbnBgpPolAcctMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2352, 2, 20, 3, 1, 1)).setObjects(("RBN-BGP-ACCOUNTING-MIB", "rbnBpaTableGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnBgpPolAcctMIBCompliance = rbnBgpPolAcctMIBCompliance.setStatus('deprecated')
+if mibBuilder.loadTexts: rbnBgpPolAcctMIBCompliance.setDescription('The compliance statement for entities which implement this Redback BGP Policy Traffic Accounting MIB.')
+rbnBgpPolAcctMIBCompliance1 = ModuleCompliance((1, 3, 6, 1, 4, 1, 2352, 2, 20, 3, 1, 2)).setObjects(("RBN-BGP-ACCOUNTING-MIB", "rbnBpaTableGroup1"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnBgpPolAcctMIBCompliance1 = rbnBgpPolAcctMIBCompliance1.setStatus('current')
+if mibBuilder.loadTexts: rbnBgpPolAcctMIBCompliance1.setDescription('The compliance statement for entities which implement this Redback BGP Policy Traffic Accounting MIB.')
+rbnBpaTableGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2352, 2, 20, 3, 2, 1)).setObjects(("RBN-BGP-ACCOUNTING-MIB", "rbnBpaBucketIndex"), ("RBN-BGP-ACCOUNTING-MIB", "rbnBpaInPacketCount"), ("RBN-BGP-ACCOUNTING-MIB", "rbnBpaInOctetCount"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnBpaTableGroup = rbnBpaTableGroup.setStatus('deprecated')
+if mibBuilder.loadTexts: rbnBpaTableGroup.setDescription('A collection of objects providing customer traffic related parameters.')
+rbnBpaTableGroup1 = ObjectGroup((1, 3, 6, 1, 4, 1, 2352, 2, 20, 3, 2, 2)).setObjects(("RBN-BGP-ACCOUNTING-MIB", "rbnBpaBucketIndex"), ("RBN-BGP-ACCOUNTING-MIB", "rbnBpaInPacketCount"), ("RBN-BGP-ACCOUNTING-MIB", "rbnBpaInOctetCount"), ("RBN-BGP-ACCOUNTING-MIB", "rbnBpaCircuitDescr"), ("RBN-BGP-ACCOUNTING-MIB", "rbnBpaInterfaceName"), ("RBN-BGP-ACCOUNTING-MIB", "rbnBpaContextName"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnBpaTableGroup1 = rbnBpaTableGroup1.setStatus('current')
+if mibBuilder.loadTexts: rbnBpaTableGroup1.setDescription('Collection of objects providing more information about traffic-index')
+mibBuilder.exportSymbols("RBN-BGP-ACCOUNTING-MIB", rbnBgpPolAcctMIBCompliances=rbnBgpPolAcctMIBCompliances, rbnBpaInPacketCount=rbnBpaInPacketCount, rbnBgpPolAcctMIBCompliance1=rbnBgpPolAcctMIBCompliance1, rbnBgpPolAcctMIBConformance=rbnBgpPolAcctMIBConformance, PYSNMP_MODULE_ID=rbnBgpPolAcctMIB, rbnBpaTableGroup=rbnBpaTableGroup, rbnBpaTableGroup1=rbnBpaTableGroup1, rbnBgpPolAcctMIBGroups=rbnBgpPolAcctMIBGroups, rbnBgpPolAcctMIBCompliance=rbnBgpPolAcctMIBCompliance, rbnBpaEntry=rbnBpaEntry, rbnBgpPolAcctMIBObjects=rbnBgpPolAcctMIBObjects, rbnBpaContextName=rbnBpaContextName, rbnBpaInterfaceName=rbnBpaInterfaceName, rbnBgpPolAcctMIB=rbnBgpPolAcctMIB, rbnBpaBucketIndex=rbnBpaBucketIndex, rbnBpaCircuitDescr=rbnBpaCircuitDescr, rbnBpaInOctetCount=rbnBpaInOctetCount, rbnBpaTable=rbnBpaTable)

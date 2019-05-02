@@ -1,0 +1,96 @@
+#
+# PySNMP MIB module CISCO-DOT11-LBS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-DOT11-LBS-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:55:48 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+InetPortNumber, InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetPortNumber", "InetAddressType", "InetAddress")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Unsigned32, Counter32, NotificationType, IpAddress, Integer32, Bits, ObjectIdentity, Counter64, MibIdentifier, iso = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Unsigned32", "Counter32", "NotificationType", "IpAddress", "Integer32", "Bits", "ObjectIdentity", "Counter64", "MibIdentifier", "iso")
+TextualConvention, TruthValue, RowStatus, DisplayString, MacAddress = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TruthValue", "RowStatus", "DisplayString", "MacAddress")
+ciscoDot11LbsMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 454))
+ciscoDot11LbsMIB.setRevisions(('2004-11-17 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoDot11LbsMIB.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: ciscoDot11LbsMIB.setLastUpdated('200411170000Z')
+if mibBuilder.loadTexts: ciscoDot11LbsMIB.setOrganization('Cisco System Inc.')
+if mibBuilder.loadTexts: ciscoDot11LbsMIB.setContactInfo(' Cisco Systems Customer Service Postal: 170 West Tasman Drive, San Jose CA 95134-1706. USA Tel: +1 800 553-NETS E-mail: cs-dot11@cisco.com')
+if mibBuilder.loadTexts: ciscoDot11LbsMIB.setDescription('This MIB module supports network management for Location Based Services on IEEE 802.11 wireless LAN devices. Location Based Services allows third party applications and positioning servers to work with Access Points to track positions of wireless clients in the network. GLOSSARY and ACRONYMS AP Access point, a transmitter/receiver device that commonly connects and transports data between a wireless network and a wired network. LBS Location Based Services MAC Medium Access Control. Layer 2 in the network model. PS Positioning Server. An application server provides IEEE 802.11 wireless client location information and services. RSSI Received Signal Strength Indication.')
+ciscoDot11LbsMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 454, 0))
+ciscoDot11LbsMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 454, 1))
+ciscoDot11LbsMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 454, 2))
+ciscoDot11LbsConfigInfo = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1))
+ciscoDot11LbsStatistics = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 2))
+class Cdot11LbsTrackMethodType(TextualConvention, Bits):
+    description = 'These are the supported methods for wireless client location tracking: rssi(0) - RSSI detection.'
+    status = 'current'
+    namedValues = NamedValues(("rssi", 0))
+
+class Cdot11LbsPsPacketType(TextualConvention, Integer32):
+    description = 'These are the types of packets sending to the positioning server. There are two packet types: extended(1) - all data field from LBS message Tag and header are included, short(2) - only the LBS message header will be included in the PS packets.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("extended", 1), ("short", 2))
+
+cdot11LbsProfileTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1), )
+if mibBuilder.loadTexts: cdot11LbsProfileTable.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsProfileTable.setDescription('This table contains the set of attributes for configuration of connection to remote LBS positioning servers and tracking methods supported on the servers. A positioning server may support LBS application at multiple UDP ports. This wireless station serves as a LBS agent to track the wireless client device. It receives multicast wireless packet sending by the client devices on specific multicast addresses and forward the information to the positioning server.')
+cdot11LbsProfileEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1), ).setIndexNames((0, "CISCO-DOT11-LBS-MIB", "cdot11LbsProfileName"))
+if mibBuilder.loadTexts: cdot11LbsProfileEntry.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsProfileEntry.setDescription('Each entry contains parameters to configure a LBS positioning server profile for this wireless station.')
+cdot11LbsProfileName = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 1), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 16)))
+if mibBuilder.loadTexts: cdot11LbsProfileName.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsProfileName.setDescription('This is the name of LBS profile for configuration of a connection to a LBS positioning server at a specific address and UDP port.')
+cdot11LbsServerAddressType = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 2), InetAddressType().clone('ipv4')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsServerAddressType.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsServerAddressType.setDescription('This is the address type of the cdot11LbsServerAddress.')
+cdot11LbsServerAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 3), InetAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsServerAddress.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsServerAddress.setDescription('This is the address of the LBS positioning server. The cdot11LbsServerAddressType specifies the type of this address.')
+cdot11LbsServerUdpPort = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 4), InetPortNumber()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsServerUdpPort.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsServerUdpPort.setDescription('This is the UDP port of the LBS positioning server used to receive LBS packets from this wireless station.')
+cdot11LbsTrackMethod = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 5), Cdot11LbsTrackMethodType().clone(namedValues=NamedValues(("rssi", 0)))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsTrackMethod.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsTrackMethod.setDescription('This specifies the method used to detect the location of the wireless client relative to the position of this wireless station. RSSI method uses the strength of the received signals from the wireless client devices to determine their positions.')
+cdot11LbsPsPacketType = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 6), Cdot11LbsPsPacketType().clone('extended')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsPsPacketType.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsPsPacketType.setDescription('This specifies the type of LBS packets sent to the LBS position server from this wireless station.')
+cdot11LbsTrackMulticast = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 7), MacAddress().clone(hexValue="014096000010")).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsTrackMulticast.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsTrackMulticast.setDescription('This is the multicast MAC destination address of the LBS frames sending from the wireless clients to this wireless station.')
+cdot11LbsMatchChannel = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 8), TruthValue().clone('true')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsMatchChannel.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsMatchChannel.setDescription("This object determines if this wireless station will include LBS frames received in channels other than the sender's channel in the RSSI measurement. If the value is 'true', this station will include only LBS frames matching the sender's channel in the RSSI measurement. If the value is 'false', all received LBS frames will be included in the measurement.")
+cdot11LbsProfileRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 1, 1, 9), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsProfileRowStatus.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsProfileRowStatus.setDescription("This configures a new LBS positioning server for this wireless station and modifies or deletes an existing positioning server configuration. Creation of rows must be done via 'createAndGo' and with the cdot11LbsServerAddress and cdot11LbsServerUdpPort set to the address and UDP of the LBS positioning server. This object will become 'notInService' if the NMS successfully performs a multivarbind set for all required objects including this object while this profile is not attached to any wireless interface or a connection cannot be established to the LBS positioning server. This object will become 'active' when this profile is attached to at least one wireless interface via cdot11LbsProfInterfaceTable and a connection to the LBS positioning server is successfully established. Modification and deletion (via 'destroy') of rows can be done when this object is 'active', or 'notInService'. Deletion of a row will remove the corresponding entries for the same profile from the cdot11LbsProfInterfaceTable.")
+cdot11LbsProfInterfaceTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 2), )
+if mibBuilder.loadTexts: cdot11LbsProfInterfaceTable.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsProfInterfaceTable.setDescription('This table configures the Location Based Services settings on the IEEE 802.11 radio interfaces of this device. This table has an expansion dependent relationship on the cdot11LbsProfileTable. This table uses the ifIndex of interfaces of ifType ieee80211(71) as the expansion index.')
+cdot11LbsProfInterfaceEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 2, 1), ).setIndexNames((0, "CISCO-DOT11-LBS-MIB", "cdot11LbsProfileName"), (0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: cdot11LbsProfInterfaceEntry.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsProfInterfaceEntry.setDescription('Each entry indicates if the LBS client location tracking by a particular location positioning server profile is enabled on an IEEE 802.11 interface.')
+cdot11LbsProfInterfaceRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 454, 1, 1, 2, 1, 1), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: cdot11LbsProfInterfaceRowStatus.setStatus('current')
+if mibBuilder.loadTexts: cdot11LbsProfInterfaceRowStatus.setDescription("This configures and attaches a LBS profile to an IEEE 802.11 wireless LAN network interface or remove a configured interface from the profile. Creation of rows must be done via 'createAndGo' and specifying the cdot11LbsProfileName of an existing profile and the ifIndex of an IEEE 802.11 interface. This object will become 'active' when the profile is attached to a network interface and a connection to the LBS positioning server is successfully established. Otherwise, if this object will become 'notInService'. Modification and deletion (via 'destroy') of rows can be done when this object is 'active' or 'notInService'. If all interfaces are removed from an 'active' profile, the profile cdot11LbsProfileRowStatus will become 'notInService'.")
+ciscoDot11LbsMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 454, 2, 1))
+ciscoDot11LbsMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 454, 2, 2))
+ciscoDot11LbsMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 454, 2, 1, 1)).setObjects(("CISCO-DOT11-LBS-MIB", "ciscoDot11LbsConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoDot11LbsMIBCompliance = ciscoDot11LbsMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: ciscoDot11LbsMIBCompliance.setDescription('The compliance statement for the ciscoDot11LbsMIB module.')
+ciscoDot11LbsConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 454, 2, 2, 1)).setObjects(("CISCO-DOT11-LBS-MIB", "cdot11LbsServerAddressType"), ("CISCO-DOT11-LBS-MIB", "cdot11LbsServerAddress"), ("CISCO-DOT11-LBS-MIB", "cdot11LbsServerUdpPort"), ("CISCO-DOT11-LBS-MIB", "cdot11LbsTrackMethod"), ("CISCO-DOT11-LBS-MIB", "cdot11LbsPsPacketType"), ("CISCO-DOT11-LBS-MIB", "cdot11LbsTrackMulticast"), ("CISCO-DOT11-LBS-MIB", "cdot11LbsMatchChannel"), ("CISCO-DOT11-LBS-MIB", "cdot11LbsProfileRowStatus"), ("CISCO-DOT11-LBS-MIB", "cdot11LbsProfInterfaceRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoDot11LbsConfigGroup = ciscoDot11LbsConfigGroup.setStatus('current')
+if mibBuilder.loadTexts: ciscoDot11LbsConfigGroup.setDescription('Configurations for IEEE 802.11 Location Based Services.')
+mibBuilder.exportSymbols("CISCO-DOT11-LBS-MIB", ciscoDot11LbsConfigGroup=ciscoDot11LbsConfigGroup, Cdot11LbsTrackMethodType=Cdot11LbsTrackMethodType, cdot11LbsServerUdpPort=cdot11LbsServerUdpPort, cdot11LbsPsPacketType=cdot11LbsPsPacketType, ciscoDot11LbsMIBObjects=ciscoDot11LbsMIBObjects, cdot11LbsTrackMulticast=cdot11LbsTrackMulticast, cdot11LbsProfInterfaceEntry=cdot11LbsProfInterfaceEntry, cdot11LbsMatchChannel=cdot11LbsMatchChannel, cdot11LbsTrackMethod=cdot11LbsTrackMethod, ciscoDot11LbsMIBCompliance=ciscoDot11LbsMIBCompliance, cdot11LbsProfileEntry=cdot11LbsProfileEntry, cdot11LbsProfInterfaceRowStatus=cdot11LbsProfInterfaceRowStatus, ciscoDot11LbsConfigInfo=ciscoDot11LbsConfigInfo, cdot11LbsProfileRowStatus=cdot11LbsProfileRowStatus, cdot11LbsProfInterfaceTable=cdot11LbsProfInterfaceTable, cdot11LbsServerAddress=cdot11LbsServerAddress, cdot11LbsProfileTable=cdot11LbsProfileTable, ciscoDot11LbsMIBNotifs=ciscoDot11LbsMIBNotifs, ciscoDot11LbsMIBConformance=ciscoDot11LbsMIBConformance, Cdot11LbsPsPacketType=Cdot11LbsPsPacketType, cdot11LbsServerAddressType=cdot11LbsServerAddressType, ciscoDot11LbsMIB=ciscoDot11LbsMIB, cdot11LbsProfileName=cdot11LbsProfileName, PYSNMP_MODULE_ID=ciscoDot11LbsMIB, ciscoDot11LbsStatistics=ciscoDot11LbsStatistics, ciscoDot11LbsMIBCompliances=ciscoDot11LbsMIBCompliances, ciscoDot11LbsMIBGroups=ciscoDot11LbsMIBGroups)

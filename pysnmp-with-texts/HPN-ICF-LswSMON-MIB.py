@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module HPN-ICF-LswSMON-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HPN-ICF-LswSMON-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:40:02 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion")
+hpnicfRhw, = mibBuilder.importSymbols("HPN-ICF-OID-MIB", "hpnicfRhw")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ObjectIdentity, iso, TimeTicks, MibIdentifier, IpAddress, Gauge32, Unsigned32, ModuleIdentity, Bits, NotificationType, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "iso", "TimeTicks", "MibIdentifier", "IpAddress", "Gauge32", "Unsigned32", "ModuleIdentity", "Bits", "NotificationType", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hpnicfSmonExtend = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 26))
+hpnicfsmonExtendObject = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 26, 1))
+hpnicfdot1qVlanStatNumber = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 26, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatNumber.setStatus('mandatory')
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatNumber.setDescription('The number of vlans that can collect statistics of packets.')
+hpnicfdot1qVlanStatStatusTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 26, 1, 2), )
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatStatusTable.setStatus('mandatory')
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatStatusTable.setDescription('VLAN statistics status table.')
+hpnicfdot1qVlanStatStatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 26, 1, 2, 1), ).setIndexNames((0, "HPN-ICF-LswSMON-MIB", "hpnicfdot1qVlanStatEnableIndex"))
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatStatusEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatStatusEntry.setDescription(' VLAN statistics status table entry.')
+hpnicfdot1qVlanStatEnableIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 26, 1, 2, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatEnableIndex.setStatus('mandatory')
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatEnableIndex.setDescription('Vlan index .')
+hpnicfdot1qVlanStatEnableStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 8, 26, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatEnableStatus.setStatus('mandatory')
+if mibBuilder.loadTexts: hpnicfdot1qVlanStatEnableStatus.setDescription('VLAN Statistics Status.It represent the current VLAN supports statistic or not.')
+mibBuilder.exportSymbols("HPN-ICF-LswSMON-MIB", hpnicfSmonExtend=hpnicfSmonExtend, hpnicfdot1qVlanStatEnableStatus=hpnicfdot1qVlanStatEnableStatus, hpnicfdot1qVlanStatEnableIndex=hpnicfdot1qVlanStatEnableIndex, hpnicfsmonExtendObject=hpnicfsmonExtendObject, hpnicfdot1qVlanStatStatusTable=hpnicfdot1qVlanStatStatusTable, hpnicfdot1qVlanStatStatusEntry=hpnicfdot1qVlanStatStatusEntry, hpnicfdot1qVlanStatNumber=hpnicfdot1qVlanStatNumber)

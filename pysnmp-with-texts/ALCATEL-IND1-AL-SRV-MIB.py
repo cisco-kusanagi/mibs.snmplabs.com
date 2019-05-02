@@ -1,0 +1,55 @@
+#
+# PySNMP MIB module ALCATEL-IND1-AL-SRV-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ALCATEL-IND1-AL-SRV-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:16:55 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+softentIND1ActiveLeaseSrvMIB, = mibBuilder.importSymbols("ALCATEL-IND1-BASE", "softentIND1ActiveLeaseSrvMIB")
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection")
+InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddress")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+Bits, iso, IpAddress, ModuleIdentity, Integer32, Gauge32, MibIdentifier, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, NotificationType, Unsigned32, TimeTicks, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "iso", "IpAddress", "ModuleIdentity", "Integer32", "Gauge32", "MibIdentifier", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "NotificationType", "Unsigned32", "TimeTicks", "ObjectIdentity")
+MacAddress, DateAndTime, DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "MacAddress", "DateAndTime", "DisplayString", "TextualConvention")
+alcatelIND1ActiveLeaseSrvMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1))
+alcatelIND1ActiveLeaseSrvMIB.setRevisions(('2013-06-05 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIB.setRevisionsDescriptions(('The QIP Active Lease Service provides a framework for components such as DHCP server interact with other QIP components in the network. This MIB provides the configuration information for Active Lease Service.',))
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIB.setLastUpdated('201306050000Z')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIB.setOrganization('Alcatel - Architects Of An Internet World')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIB.setContactInfo('Please consult with Customer Service to insure the most appropriate version of this document is used with the products in question: Alcatel Internetworking, Incorporated (Division 1, Formerly XYLAN Corporation) 26801 West Agoura Road Agoura Hills, CA 91301-5122 United States Of America Telephone: North America +1 800 995 2696 Latin America +1 877 919 9526 Europe +31 23 556 0100 Asia +65 394 7933 All Other +1 818 878 4507 Electronic Mail: support@ind.alcatel.com World Wide Web: http://www.ind.alcatel.com File Transfer Protocol: ftp://ftp.ind.alcatel.com/pub/products/mibs')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIB.setDescription('This module describes an authoritative enterprise-specific Simple Network Management Protocol (SNMP) Management Information Base (MIB): For the Birds Of Prey Product Line Active Lease Service for DHCP Server management The right to make changes in specification and other information contained in this document without prior notice is reserved. No liability shall be assumed for any incidental, indirect, special, or consequential damages whatsoever arising from or related to this document or the information contained herein. Vendors, end-users, and other interested parties are granted non-exclusive license to use this specification in connection with management of the products for which it is intended to be used. Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated ALL RIGHTS RESERVED WORLDWIDE')
+alcatelIND1ActiveLeaseSrvMIBNotifications = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 0))
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBNotifications.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBNotifications.setDescription('Branch For Active Lease Service Subsystem Notifications.')
+alcatelIND1ActiveLeaseSrvMIBObjects = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 1))
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBObjects.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBObjects.setDescription('Branch For Active Lease Service Subsystem Managed Objects.')
+alcatelIND1ActiveLeaseSrvMIBConformance = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 2))
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBConformance.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBConformance.setDescription('Branch for Active Lease Service Module MIB Subsystem i Conformance Information.')
+alcatelIND1ActiveLeaseSrvMIBGroups = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 2, 1))
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBGroups.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBGroups.setDescription('Branch for ActiveLeaseSrv Module MIB Subsystem Units of Conformance.')
+alcatelIND1ActiveLeaseSrvMIBCompliances = ObjectIdentity((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 2, 2))
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBCompliances.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBCompliances.setDescription('Branch for Active Lease Service Module MIB Subsystem Compliance Statements.')
+alaActiveLeaseSrvGlobalConfigStatus = MibScalar((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enable", 1), ("disable", 2))).clone('disable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: alaActiveLeaseSrvGlobalConfigStatus.setStatus('current')
+if mibBuilder.loadTexts: alaActiveLeaseSrvGlobalConfigStatus.setDescription('This object is used to enable(1) or disable(2) QIP Active Lease Service on the switch.')
+alaActiveLeaseSrvGlobalRestart = MibScalar((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("inactive", 1), ("restart", 2))).clone('inactive')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: alaActiveLeaseSrvGlobalRestart.setStatus('current')
+if mibBuilder.loadTexts: alaActiveLeaseSrvGlobalRestart.setDescription('This object is used to restart(2) the QIP Active Lease Service on i the switch. Default value is inactive(1) which user can not set.')
+alcatelIND1ActiveLeaseSrvMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 2, 2, 1)).setObjects(("ALCATEL-IND1-AL-SRV-MIB", "alaActiveLeaseSrvGlobalConfigGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    alcatelIND1ActiveLeaseSrvMIBCompliance = alcatelIND1ActiveLeaseSrvMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: alcatelIND1ActiveLeaseSrvMIBCompliance.setDescription('Compliance statement for QIP Active Lease Service.')
+alaActiveLeaseSrvGlobalConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 6486, 801, 1, 2, 1, 80, 1, 2, 1, 1)).setObjects(("ALCATEL-IND1-AL-SRV-MIB", "alaActiveLeaseSrvGlobalConfigStatus"), ("ALCATEL-IND1-AL-SRV-MIB", "alaActiveLeaseSrvGlobalRestart"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    alaActiveLeaseSrvGlobalConfigGroup = alaActiveLeaseSrvGlobalConfigGroup.setStatus('current')
+if mibBuilder.loadTexts: alaActiveLeaseSrvGlobalConfigGroup.setDescription('Collection of objects for management of QIP Active Lease Service Global Configuration.')
+mibBuilder.exportSymbols("ALCATEL-IND1-AL-SRV-MIB", alcatelIND1ActiveLeaseSrvMIBNotifications=alcatelIND1ActiveLeaseSrvMIBNotifications, alaActiveLeaseSrvGlobalConfigStatus=alaActiveLeaseSrvGlobalConfigStatus, alcatelIND1ActiveLeaseSrvMIBCompliance=alcatelIND1ActiveLeaseSrvMIBCompliance, alaActiveLeaseSrvGlobalRestart=alaActiveLeaseSrvGlobalRestart, alaActiveLeaseSrvGlobalConfigGroup=alaActiveLeaseSrvGlobalConfigGroup, alcatelIND1ActiveLeaseSrvMIBGroups=alcatelIND1ActiveLeaseSrvMIBGroups, PYSNMP_MODULE_ID=alcatelIND1ActiveLeaseSrvMIB, alcatelIND1ActiveLeaseSrvMIBConformance=alcatelIND1ActiveLeaseSrvMIBConformance, alcatelIND1ActiveLeaseSrvMIB=alcatelIND1ActiveLeaseSrvMIB, alcatelIND1ActiveLeaseSrvMIBCompliances=alcatelIND1ActiveLeaseSrvMIBCompliances, alcatelIND1ActiveLeaseSrvMIBObjects=alcatelIND1ActiveLeaseSrvMIBObjects)

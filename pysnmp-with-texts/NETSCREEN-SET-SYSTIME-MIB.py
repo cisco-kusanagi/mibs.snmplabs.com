@@ -1,0 +1,41 @@
+#
+# PySNMP MIB module NETSCREEN-SET-SYSTIME-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NETSCREEN-SET-SYSTIME-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:20:26 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ValueRangeConstraint")
+netscreenSetting, netscreenSettingMibModule = mibBuilder.importSymbols("NETSCREEN-SMI", "netscreenSetting", "netscreenSettingMibModule")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+iso, MibIdentifier, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, ObjectIdentity, ModuleIdentity, Unsigned32, Integer32, Bits, TimeTicks, Counter64, NotificationType, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "MibIdentifier", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "ObjectIdentity", "ModuleIdentity", "Unsigned32", "Integer32", "Bits", "TimeTicks", "Counter64", "NotificationType", "Counter32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+netscreenSetSystimeMibModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 3224, 7, 0, 6))
+netscreenSetSystimeMibModule.setRevisions(('2004-05-03 00:00', '2004-03-03 00:00', '2003-11-12 00:00', '2001-09-28 00:00', '2001-05-27 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: netscreenSetSystimeMibModule.setRevisionsDescriptions(('Modified copyright and contact information', 'Converted to SMIv2 by Longview Software', 'Correct wrong title', 'No Comment', 'Creation Date',))
+if mibBuilder.loadTexts: netscreenSetSystimeMibModule.setLastUpdated('200405032022Z')
+if mibBuilder.loadTexts: netscreenSetSystimeMibModule.setOrganization('Juniper Networks, Inc.')
+if mibBuilder.loadTexts: netscreenSetSystimeMibModule.setContactInfo('Customer Support 1194 North Mathilda Avenue Sunnyvale, California 94089-1206 USA Tel: 1-800-638-8296 E-mail: customerservice@juniper.net HTTP://www.juniper.net')
+if mibBuilder.loadTexts: netscreenSetSystimeMibModule.setDescription('This module defines the object that are used to monitor NTP setting')
+nsSetSysTime = MibIdentifier((1, 3, 6, 1, 4, 1, 3224, 7, 6))
+nsSetSysTimeGmtOffset = MibScalar((1, 3, 6, 1, 4, 1, 3224, 7, 6, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsSetSysTimeGmtOffset.setStatus('current')
+if mibBuilder.loadTexts: nsSetSysTimeGmtOffset.setDescription('GMT time offset of system time')
+nsSetSysTimeDaySaving = MibScalar((1, 3, 6, 1, 4, 1, 3224, 7, 6, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("disable", 0), ("enabled", 1)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsSetSysTimeDaySaving.setStatus('current')
+if mibBuilder.loadTexts: nsSetSysTimeDaySaving.setDescription('enable daylight time saving method.')
+nsSetSysTimeNTP = MibIdentifier((1, 3, 6, 1, 4, 1, 3224, 7, 6, 3))
+nsSetNtpEnable = MibScalar((1, 3, 6, 1, 4, 1, 3224, 7, 6, 3, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("disable", 0), ("enabled", 1)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsSetNtpEnable.setStatus('current')
+if mibBuilder.loadTexts: nsSetNtpEnable.setDescription('Enable Network Time Protocol')
+nsSetNtpServer = MibScalar((1, 3, 6, 1, 4, 1, 3224, 7, 6, 3, 2), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsSetNtpServer.setStatus('current')
+if mibBuilder.loadTexts: nsSetNtpServer.setDescription('Network Time Server ip')
+nsSetNtpUpdateInterval = MibScalar((1, 3, 6, 1, 4, 1, 3224, 7, 6, 3, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: nsSetNtpUpdateInterval.setStatus('current')
+if mibBuilder.loadTexts: nsSetNtpUpdateInterval.setDescription('If NetScreen device use NTP to get system time. This object indicate the update system clock time interval.')
+mibBuilder.exportSymbols("NETSCREEN-SET-SYSTIME-MIB", nsSetNtpServer=nsSetNtpServer, PYSNMP_MODULE_ID=netscreenSetSystimeMibModule, nsSetSysTime=nsSetSysTime, netscreenSetSystimeMibModule=netscreenSetSystimeMibModule, nsSetSysTimeDaySaving=nsSetSysTimeDaySaving, nsSetSysTimeNTP=nsSetSysTimeNTP, nsSetSysTimeGmtOffset=nsSetSysTimeGmtOffset, nsSetNtpUpdateInterval=nsSetNtpUpdateInterval, nsSetNtpEnable=nsSetNtpEnable)

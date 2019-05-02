@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module CXViewing-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CXViewing-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:33:44 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint")
+cxViewing, = mibBuilder.importSymbols("CXProduct-SMI", "cxViewing")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Integer32, Gauge32, Bits, NotificationType, MibIdentifier, IpAddress, TimeTicks, Counter32, ModuleIdentity, Counter64, ObjectIdentity, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Integer32", "Gauge32", "Bits", "NotificationType", "MibIdentifier", "IpAddress", "TimeTicks", "Counter32", "ModuleIdentity", "Counter64", "ObjectIdentity", "Unsigned32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+cxViewTable = MibTable((1, 3, 6, 1, 4, 1, 495, 2, 1, 3, 1), )
+if mibBuilder.loadTexts: cxViewTable.setStatus('mandatory')
+if mibBuilder.loadTexts: cxViewTable.setDescription('The View table.')
+cxViewEntry = MibTableRow((1, 3, 6, 1, 4, 1, 495, 2, 1, 3, 1, 1), ).setIndexNames((0, "CXViewing-MIB", "cxViewConsoleAddress"))
+if mibBuilder.loadTexts: cxViewEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: cxViewEntry.setDescription('Information of views between managers and sub-systems ')
+cxViewConsoleAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 3, 1, 1, 1), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cxViewConsoleAddress.setStatus('mandatory')
+if mibBuilder.loadTexts: cxViewConsoleAddress.setDescription('The address of a console. 0 is reserved for a local console ')
+cxViewCurrent = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 3, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 16))).setMaxAccess("writeonly")
+if mibBuilder.loadTexts: cxViewCurrent.setStatus('mandatory')
+if mibBuilder.loadTexts: cxViewCurrent.setDescription('The slot number where a sub-system sits. 0 is reserved for the sub-system where the master NME sites. Only the manager whose address matches the above address can set (or change) the value')
+cxViewNMEStatus = MibScalar((1, 3, 6, 1, 4, 1, 495, 2, 1, 3, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 16))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cxViewNMEStatus.setStatus('mandatory')
+if mibBuilder.loadTexts: cxViewNMEStatus.setDescription('Indicates if the CPU card try to get the control of management and act as a chassis server. The election mechanism needs that.')
+cxViewNMEMode = MibScalar((1, 3, 6, 1, 4, 1, 495, 2, 1, 3, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("slave", 1), ("master", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cxViewNMEMode.setStatus('mandatory')
+if mibBuilder.loadTexts: cxViewNMEMode.setDescription('Indicates if the CPU card got the control of chassis management and act as a chassis server.')
+mibBuilder.exportSymbols("CXViewing-MIB", cxViewNMEMode=cxViewNMEMode, cxViewConsoleAddress=cxViewConsoleAddress, cxViewCurrent=cxViewCurrent, cxViewTable=cxViewTable, cxViewNMEStatus=cxViewNMEStatus, cxViewEntry=cxViewEntry)

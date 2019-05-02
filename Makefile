@@ -4,13 +4,28 @@ fetch:  ## Download all mibs from the source
 	@# Wget recursive
 	wget --recursive --reject-regex 'index.html*' \
 	  --no-parent --no-host-directories http://mibs.snmplabs.com/asn1/
+	rm -rf asn1/index.html*
 
 compile:  ## Compile all MIBs into .py files
 	@for f in $$(ls asn1); do \
-	  echo "compiling $$f"; \
-	  mibdump.py --no-python-compile --destination-directory=./pysnmp --mib-source=file://$$(pwd)/asn1 $$f; \
+	  echo "## Compiling $$f"; \
+	  mibdump.py \
+	    --no-python-compile \
+	    --mib-source=file://$$(pwd)/asn1 \
+	    --destination-directory=./pysnmp \
+	    $$f; \
 	done
-	rm -rf asn1/index.html*
+
+compile-with-texts:  ## Compile With Texts all MIBs into .py files
+	@for f in $$(ls asn1); do \
+	  echo "## Compiling $$f with texts"; \
+	  mibdump.py \
+	    --generate-mib-texts \
+	    --no-python-compile \
+	    --mib-source=file://$$(pwd)/asn1 \
+	    --destination-directory=./pysnmp-with-texts \
+	    $$f; \
+	done
 
 help:  ## Print list of Makefile targets
 	@# Taken from https://github.com/spf13/hugo/blob/master/Makefile

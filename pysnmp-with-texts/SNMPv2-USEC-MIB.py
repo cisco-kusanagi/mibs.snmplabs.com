@@ -1,0 +1,77 @@
+#
+# PySNMP MIB module SNMPv2-USEC-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SNMPv2-USEC-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:08:51 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+Integer32, iso, ModuleIdentity, TimeTicks, Gauge32, MibIdentifier, snmpModules, Counter32, NotificationType, ObjectIdentity, Counter64, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "iso", "ModuleIdentity", "TimeTicks", "Gauge32", "MibIdentifier", "snmpModules", "Counter32", "NotificationType", "ObjectIdentity", "Counter64", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "IpAddress")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+usecMIB = ModuleIdentity((1, 3, 6, 1, 6, 3, 6))
+if mibBuilder.loadTexts: usecMIB.setLastUpdated('9601120000Z')
+if mibBuilder.loadTexts: usecMIB.setOrganization('IETF SNMPv2 Working Group')
+if mibBuilder.loadTexts: usecMIB.setContactInfo(' Glenn W. Waters Postal: Bell-Northern Research, Ltd. P.O. Box 3511, Station C Ottawa, ON, K1Y 4H7 Canada Tel: +1 613 763 3933 E-mail: gwaters@bnr.ca')
+if mibBuilder.loadTexts: usecMIB.setDescription('The MIB module for SNMPv2 entities implementing the user- based security model.')
+usecMIBObjects = MibIdentifier((1, 3, 6, 1, 6, 3, 6, 1))
+class AgentID(TextualConvention, OctetString):
+    description = "An agent's administratively-unique identifier. The value for this object may not be all zeros or all 'ff'H. The initial value for this object may be configured via an operator console entry or via an algorithmic function. In the later case, the following guidelines are recommended: 1) The first four octets are set to the binary equivalent of the agent's SNMP network management private enterprise number as assigned by the Internet Assigned Numbers Authority (IANA). For example, if Acme Networks has been assigned { enterprises 696 }, the first four octets would be assigned '000002b8'H. 2) The remaining eight octets are the cookie whose contents are determined via one or more enterprise- specific methods. Such methods must be designed so as to maximize the possibility that the value of this object will be unique in the agent's administrative domain. For example, the cookie may be the IP address of the agent, or the MAC address of one of the interfaces, with each address suitably padded with random octets. If multiple methods are defined, then it is recommended that the cookie be further divided into one octet that indicates the method being used and seven octets which are a function of the method."
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(12, 12)
+    fixedLength = 12
+
+usecAgent = MibIdentifier((1, 3, 6, 1, 6, 3, 6, 1, 1))
+agentID = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 1, 1), AgentID()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: agentID.setStatus('current')
+if mibBuilder.loadTexts: agentID.setDescription("The agent's administratively-unique identifier.")
+agentBoots = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 1, 2), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: agentBoots.setStatus('current')
+if mibBuilder.loadTexts: agentBoots.setDescription('The number of times that the agent has re-initialized itself since its initial configuration.')
+agentTime = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 1, 3), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setUnits('seconds').setMaxAccess("readonly")
+if mibBuilder.loadTexts: agentTime.setStatus('current')
+if mibBuilder.loadTexts: agentTime.setDescription('The number of seconds since the agent last incremented the agentBoots object.')
+agentSize = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(484, 65507))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: agentSize.setStatus('current')
+if mibBuilder.loadTexts: agentSize.setDescription('The maximum length in octets of an SNMPv2 message which this agent will accept using any transport mapping.')
+usecStats = MibIdentifier((1, 3, 6, 1, 6, 3, 6, 1, 2))
+usecStatsUnsupportedQoS = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 2, 1), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usecStatsUnsupportedQoS.setStatus('current')
+if mibBuilder.loadTexts: usecStatsUnsupportedQoS.setDescription('The total number of packets received by the SNMPv2 entity which were dropped because they requested a quality-of- service that was unknown to the agent or otherwise unavailable.')
+usecStatsNotInWindows = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 2, 2), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usecStatsNotInWindows.setStatus('current')
+if mibBuilder.loadTexts: usecStatsNotInWindows.setDescription("The total number of packets received by the SNMPv2 entity which were dropped because they appeared outside of the agent's window.")
+usecStatsUnknownUserNames = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 2, 3), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usecStatsUnknownUserNames.setStatus('current')
+if mibBuilder.loadTexts: usecStatsUnknownUserNames.setDescription('The total number of packets received by the SNMPv2 entity which were dropped because they referenced a user that was not known to the agent.')
+usecStatsWrongDigestValues = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 2, 4), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usecStatsWrongDigestValues.setStatus('current')
+if mibBuilder.loadTexts: usecStatsWrongDigestValues.setDescription("The total number of packets received by the SNMPv2 entity which were dropped because they didn't contain the expected digest value.")
+usecStatsUnknownContexts = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 2, 5), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usecStatsUnknownContexts.setStatus('current')
+if mibBuilder.loadTexts: usecStatsUnknownContexts.setDescription('The total number of packets received by the SNMPv2 entity which were dropped because they referenced a context that was not known to the agent.')
+usecStatsBadParameters = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 2, 6), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usecStatsBadParameters.setStatus('current')
+if mibBuilder.loadTexts: usecStatsBadParameters.setDescription('The total number of packets received by the SNMPv2 entity which were dropped because the <parameters> field was improperly encoded or had invalid syntax.')
+usecStatsUnauthorizedOperations = MibScalar((1, 3, 6, 1, 6, 3, 6, 1, 2, 7), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: usecStatsUnauthorizedOperations.setStatus('current')
+if mibBuilder.loadTexts: usecStatsUnauthorizedOperations.setDescription('The total number of packets received by the SNMPv2 entity which were dropped because the PDU type referred to an operation that is invalid or not authorized.')
+usecMIBConformance = MibIdentifier((1, 3, 6, 1, 6, 3, 6, 2))
+usecMIBCompliances = MibIdentifier((1, 3, 6, 1, 6, 3, 6, 2, 1))
+usecMIBGroups = MibIdentifier((1, 3, 6, 1, 6, 3, 6, 2, 2))
+usecMIBCompliance = ModuleCompliance((1, 3, 6, 1, 6, 3, 6, 2, 1, 1)).setObjects(("SNMPv2-USEC-MIB", "usecBasicGroup"), ("SNMPv2-USEC-MIB", "usecStatsGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usecMIBCompliance = usecMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: usecMIBCompliance.setDescription('The compliance statement for SNMPv2 entities which implement the SNMPv2 USEC model.')
+usecBasicGroup = ObjectGroup((1, 3, 6, 1, 6, 3, 6, 2, 2, 1)).setObjects(("SNMPv2-USEC-MIB", "agentID"), ("SNMPv2-USEC-MIB", "agentBoots"), ("SNMPv2-USEC-MIB", "agentTime"), ("SNMPv2-USEC-MIB", "agentSize"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usecBasicGroup = usecBasicGroup.setStatus('current')
+if mibBuilder.loadTexts: usecBasicGroup.setDescription('A collection of objects providing identification, clocks, and capabilities of an SNMPv2 entity which implements the SNMPv2 USEC model.')
+usecStatsGroup = ObjectGroup((1, 3, 6, 1, 6, 3, 6, 2, 2, 2)).setObjects(("SNMPv2-USEC-MIB", "usecStatsUnsupportedQoS"), ("SNMPv2-USEC-MIB", "usecStatsNotInWindows"), ("SNMPv2-USEC-MIB", "usecStatsUnknownUserNames"), ("SNMPv2-USEC-MIB", "usecStatsWrongDigestValues"), ("SNMPv2-USEC-MIB", "usecStatsUnknownContexts"), ("SNMPv2-USEC-MIB", "usecStatsBadParameters"), ("SNMPv2-USEC-MIB", "usecStatsUnauthorizedOperations"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    usecStatsGroup = usecStatsGroup.setStatus('current')
+if mibBuilder.loadTexts: usecStatsGroup.setDescription('A collection of objects providing basic error statistics of an SNMPv2 entity which implements the SNMPv2 USEC model.')
+mibBuilder.exportSymbols("SNMPv2-USEC-MIB", usecStatsGroup=usecStatsGroup, usecMIBCompliances=usecMIBCompliances, usecStatsWrongDigestValues=usecStatsWrongDigestValues, usecStatsUnknownUserNames=usecStatsUnknownUserNames, usecStatsNotInWindows=usecStatsNotInWindows, usecBasicGroup=usecBasicGroup, usecMIBConformance=usecMIBConformance, usecMIBCompliance=usecMIBCompliance, usecStats=usecStats, usecStatsBadParameters=usecStatsBadParameters, usecMIB=usecMIB, usecMIBGroups=usecMIBGroups, usecMIBObjects=usecMIBObjects, AgentID=AgentID, usecAgent=usecAgent, usecStatsUnauthorizedOperations=usecStatsUnauthorizedOperations, PYSNMP_MODULE_ID=usecMIB, agentTime=agentTime, usecStatsUnsupportedQoS=usecStatsUnsupportedQoS, usecStatsUnknownContexts=usecStatsUnknownContexts, agentSize=agentSize, agentID=agentID, agentBoots=agentBoots)

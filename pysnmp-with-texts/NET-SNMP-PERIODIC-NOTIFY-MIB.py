@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module NET-SNMP-PERIODIC-NOTIFY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NET-SNMP-PERIODIC-NOTIFY-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:18:12 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection")
+netSnmpObjects, netSnmpNotifications, netSnmpModuleIDs = mibBuilder.importSymbols("NET-SNMP-MIB", "netSnmpObjects", "netSnmpNotifications", "netSnmpModuleIDs")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, Gauge32, Unsigned32, Counter64, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, NotificationType, ModuleIdentity, iso, Bits, TimeTicks, ObjectIdentity, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "Gauge32", "Unsigned32", "Counter64", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "NotificationType", "ModuleIdentity", "iso", "Bits", "TimeTicks", "ObjectIdentity", "Counter32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+netSnmpPeriodicNotifyMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5))
+netSnmpPeriodicNotifyMib.setRevisions(('2011-04-20 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: netSnmpPeriodicNotifyMib.setRevisionsDescriptions(('First revision.',))
+if mibBuilder.loadTexts: netSnmpPeriodicNotifyMib.setLastUpdated('201104200000Z')
+if mibBuilder.loadTexts: netSnmpPeriodicNotifyMib.setOrganization('www.net-snmp.org')
+if mibBuilder.loadTexts: netSnmpPeriodicNotifyMib.setContactInfo('postal: Wes Hardaker P.O. Box 382 Davis CA 95617 email: net-snmp-coders@lists.sourceforge.net')
+if mibBuilder.loadTexts: netSnmpPeriodicNotifyMib.setDescription('Objects for periodic notifications containing data payloads')
+nsPNScalars = MibIdentifier((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 1))
+nsPNTables = MibIdentifier((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 2))
+nsPNotifyObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 3))
+nsPNotificationPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 4))
+nsPNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 4, 0))
+nsPNotificationObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 4, 1))
+nsNotifyPeriodicNotification = NotificationType((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 4, 0, 1))
+if mibBuilder.loadTexts: nsNotifyPeriodicNotification.setStatus('current')
+if mibBuilder.loadTexts: nsNotifyPeriodicNotification.setDescription('Data delivery notification from a configured list of periodic data sets to deliver. See the snmpd.conf manual page for details about configuring Net-SNMP agents for sending these notifications out on a regular basis.')
+nsPNPeriodicTime = MibScalar((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 3, 1), Unsigned32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: nsPNPeriodicTime.setStatus('current')
+if mibBuilder.loadTexts: nsPNPeriodicTime.setDescription('The number of seconds between notifications containing this data set.')
+nsPNotifyMessageNumber = MibScalar((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 3, 2), Unsigned32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: nsPNotifyMessageNumber.setStatus('current')
+if mibBuilder.loadTexts: nsPNotifyMessageNumber.setDescription('Indicates this is the Nth notification in a longer sequence of notifications')
+nsPNotifyMaxMessageNumber = MibScalar((1, 3, 6, 1, 4, 1, 8072, 3, 1, 5, 3, 3), Unsigned32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: nsPNotifyMaxMessageNumber.setStatus('current')
+if mibBuilder.loadTexts: nsPNotifyMaxMessageNumber.setDescription('The maximum number of messages this notification sequence will contain.')
+mibBuilder.exportSymbols("NET-SNMP-PERIODIC-NOTIFY-MIB", PYSNMP_MODULE_ID=netSnmpPeriodicNotifyMib, nsPNotificationObjects=nsPNotificationObjects, nsPNotificationPrefix=nsPNotificationPrefix, nsPNotifyMessageNumber=nsPNotifyMessageNumber, nsPNotifications=nsPNotifications, nsPNotifyMaxMessageNumber=nsPNotifyMaxMessageNumber, nsPNotifyObjects=nsPNotifyObjects, nsPNTables=nsPNTables, nsNotifyPeriodicNotification=nsNotifyPeriodicNotification, nsPNScalars=nsPNScalars, netSnmpPeriodicNotifyMib=netSnmpPeriodicNotifyMib, nsPNPeriodicTime=nsPNPeriodicTime)

@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module ZONE-DEFENSE-MGMT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZONE-DEFENSE-MGMT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:48:06 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint")
+dlink_common_mgmt, = mibBuilder.importSymbols("DLINK-ID-REC-MIB", "dlink-common-mgmt")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+iso, ObjectIdentity, Integer32, MibIdentifier, Counter64, ModuleIdentity, Counter32, TimeTicks, IpAddress, Gauge32, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "ObjectIdentity", "Integer32", "MibIdentifier", "Counter64", "ModuleIdentity", "Counter32", "TimeTicks", "IpAddress", "Gauge32", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "NotificationType")
+DisplayString, RowStatus, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "RowStatus", "TextualConvention")
+swZoneDefenseMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 171, 12, 92))
+if mibBuilder.loadTexts: swZoneDefenseMIB.setLastUpdated('1004120000Z')
+if mibBuilder.loadTexts: swZoneDefenseMIB.setOrganization('D-Link Corp.')
+if mibBuilder.loadTexts: swZoneDefenseMIB.setContactInfo('http://support.dlink.com')
+if mibBuilder.loadTexts: swZoneDefenseMIB.setDescription('The Structure of Zone Defense management for the proprietary enterprise.')
+swZoneDefenseMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 171, 12, 92, 1))
+swZoneDefenseTable = MibTable((1, 3, 6, 1, 4, 1, 171, 12, 92, 1, 1), )
+if mibBuilder.loadTexts: swZoneDefenseTable.setStatus('current')
+if mibBuilder.loadTexts: swZoneDefenseTable.setDescription('This table is used to create or delete Zone Defense ACL rules. The rules for Zone Defense should have the highest priority of all ACL rules.')
+swZoneDefenseEntry = MibTableRow((1, 3, 6, 1, 4, 1, 171, 12, 92, 1, 1, 1), ).setIndexNames((0, "ZONE-DEFENSE-MGMT-MIB", "swZoneDefenseAddress"))
+if mibBuilder.loadTexts: swZoneDefenseEntry.setStatus('current')
+if mibBuilder.loadTexts: swZoneDefenseEntry.setDescription('Information about the Zone Defense ACL rule.')
+swZoneDefenseAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 92, 1, 1, 1, 1), IpAddress())
+if mibBuilder.loadTexts: swZoneDefenseAddress.setStatus('current')
+if mibBuilder.loadTexts: swZoneDefenseAddress.setDescription('The IP address which will be blocked by the ACL.')
+swZoneDefenseRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 171, 12, 92, 1, 1, 1, 2), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: swZoneDefenseRowStatus.setStatus('current')
+if mibBuilder.loadTexts: swZoneDefenseRowStatus.setDescription('This object indicates the status of this entry.')
+mibBuilder.exportSymbols("ZONE-DEFENSE-MGMT-MIB", PYSNMP_MODULE_ID=swZoneDefenseMIB, swZoneDefenseMIBObjects=swZoneDefenseMIBObjects, swZoneDefenseTable=swZoneDefenseTable, swZoneDefenseEntry=swZoneDefenseEntry, swZoneDefenseRowStatus=swZoneDefenseRowStatus, swZoneDefenseMIB=swZoneDefenseMIB, swZoneDefenseAddress=swZoneDefenseAddress)

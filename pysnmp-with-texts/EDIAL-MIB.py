@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module EDIAL-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/EDIAL-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:59:27 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+InetAddress, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetAddressType")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, Counter32, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, Gauge32, MibIdentifier, IpAddress, ObjectIdentity, Bits, TimeTicks, Counter64, enterprises, Unsigned32, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Counter32", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "Gauge32", "MibIdentifier", "IpAddress", "ObjectIdentity", "Bits", "TimeTicks", "Counter64", "enterprises", "Unsigned32", "NotificationType")
+DisplayString, DateAndTime, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "DateAndTime", "TextualConvention")
+edial = ModuleIdentity((1, 3, 6, 1, 4, 1, 19631))
+edial.setRevisions(('2004-02-25 20:00', '2005-10-03 21:44',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: edial.setRevisionsDescriptions(('Released with ACS 5.6.0; Supports only NOTIFICATIONs.', 'Released with ACS 6.0; Adds Monitoring (read only).',))
+if mibBuilder.loadTexts: edial.setLastUpdated('200510032144Z')
+if mibBuilder.loadTexts: edial.setOrganization('eDial, Inc (a division of Alcatel)')
+if mibBuilder.loadTexts: edial.setContactInfo('Postal: eDial, Inc 266 Second Avenue Waltham, MA 02451 781-895-3600 WWW: http://www.edial.com/')
+if mibBuilder.loadTexts: edial.setDescription('This document contains the management information that is common to all elements in an eDial system.')
+common = MibIdentifier((1, 3, 6, 1, 4, 1, 19631, 1))
+systemFaults = MibIdentifier((1, 3, 6, 1, 4, 1, 19631, 1, 1))
+faultFields = MibIdentifier((1, 3, 6, 1, 4, 1, 19631, 1, 1, 1))
+timeStamp = MibScalar((1, 3, 6, 1, 4, 1, 19631, 1, 1, 1, 2), DateAndTime()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: timeStamp.setStatus('current')
+if mibBuilder.loadTexts: timeStamp.setDescription('The date and time at which the fault was generated.')
+msgString = MibScalar((1, 3, 6, 1, 4, 1, 19631, 1, 1, 1, 3), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: msgString.setStatus('current')
+if mibBuilder.loadTexts: msgString.setDescription('The fault message string.')
+systemName = MibScalar((1, 3, 6, 1, 4, 1, 19631, 1, 1, 1, 4), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: systemName.setStatus('current')
+if mibBuilder.loadTexts: systemName.setDescription('The hostname of the system generating the fault.')
+problemText = MibScalar((1, 3, 6, 1, 4, 1, 19631, 1, 1, 1, 9), DisplayString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: problemText.setStatus('current')
+if mibBuilder.loadTexts: problemText.setDescription('Text describing the nature of the problem. The text consists of constant and variable portions.')
+notification = NotificationType((1, 3, 6, 1, 4, 1, 19631, 1, 1, 2)).setObjects(("EDIAL-MIB", "timeStamp"), ("EDIAL-MIB", "msgString"), ("EDIAL-MIB", "systemName"), ("EDIAL-MIB", "problemText"))
+if mibBuilder.loadTexts: notification.setStatus('current')
+if mibBuilder.loadTexts: notification.setDescription('A notification indicates detection of an abnormal condition in the system.')
+mibBuilder.exportSymbols("EDIAL-MIB", PYSNMP_MODULE_ID=edial, faultFields=faultFields, systemFaults=systemFaults, common=common, edial=edial, timeStamp=timeStamp, msgString=msgString, problemText=problemText, notification=notification, systemName=systemName)

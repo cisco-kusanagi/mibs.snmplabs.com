@@ -1,0 +1,57 @@
+#
+# PySNMP MIB module OA-SL-STATISTICS-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/OA-SL-STATISTICS-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:32:03 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+Bits, Unsigned32, iso, TimeTicks, Gauge32, MibIdentifier, Integer32, enterprises, Counter64, NotificationType, ObjectIdentity, ModuleIdentity, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "Bits", "Unsigned32", "iso", "TimeTicks", "Gauge32", "MibIdentifier", "Integer32", "enterprises", "Counter64", "NotificationType", "ObjectIdentity", "ModuleIdentity", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+oaSlStatistics = ModuleIdentity((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9))
+oaSlStatistics.setRevisions(('2007-03-18 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: oaSlStatistics.setRevisionsDescriptions(('Initial edition.',))
+if mibBuilder.loadTexts: oaSlStatistics.setLastUpdated('200703180000Z')
+if mibBuilder.loadTexts: oaSlStatistics.setOrganization('MRV Communications, Inc.')
+if mibBuilder.loadTexts: oaSlStatistics.setContactInfo('Inna Levin MRV Communication, Inc http://www.mrv.com Email: ilevin@mrv.com Yakov Vaisman MRV Communication, Inc http://www.mrv.com Email: yvaisman@mrv.com')
+if mibBuilder.loadTexts: oaSlStatistics.setDescription('Supports information about Service Level statistics per port.')
+nbase = MibIdentifier((1, 3, 6, 1, 4, 1, 629))
+nbSwitchG1 = MibIdentifier((1, 3, 6, 1, 4, 1, 629, 1))
+nbSwitchG1Il = MibIdentifier((1, 3, 6, 1, 4, 1, 629, 1, 50))
+nbPortParams = MibIdentifier((1, 3, 6, 1, 4, 1, 629, 1, 50, 10))
+oaSlStatConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 101))
+oaSlStatGenSupport = MibScalar((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("notSupported", 1), ("supported", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oaSlStatGenSupport.setStatus('current')
+if mibBuilder.loadTexts: oaSlStatGenSupport.setDescription('Service Level Statistics feature support.')
+oaSlStatTable = MibTable((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 2), )
+if mibBuilder.loadTexts: oaSlStatTable.setStatus('current')
+if mibBuilder.loadTexts: oaSlStatTable.setDescription('This table configures Service Level statistics.')
+oaSlStatEntry = MibTableRow((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 2, 1), ).setIndexNames((0, "OA-SL-STATISTICS-MIB", "oaSlStatPortIndex"), (0, "OA-SL-STATISTICS-MIB", "oaSlStatServiceLevel"))
+if mibBuilder.loadTexts: oaSlStatEntry.setStatus('current')
+if mibBuilder.loadTexts: oaSlStatEntry.setDescription('Service Level statistics entry.')
+oaSlStatPortIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 256))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oaSlStatPortIndex.setStatus('current')
+if mibBuilder.loadTexts: oaSlStatPortIndex.setDescription('The index of the local port on the CO-dev to which this module is connected.')
+oaSlStatServiceLevel = MibTableColumn((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 2, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 8))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oaSlStatServiceLevel.setStatus('current')
+if mibBuilder.loadTexts: oaSlStatServiceLevel.setDescription('The Service Level value.')
+oaSlStatAggrOctets = MibTableColumn((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 2, 1, 3), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: oaSlStatAggrOctets.setStatus('current')
+if mibBuilder.loadTexts: oaSlStatAggrOctets.setDescription('Admitted bytes for flow aggregate.')
+oaSlStatMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 101, 1))
+oaSlStatMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 101, 2))
+oaSlStatMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 101, 1, 1)).setObjects(("OA-SL-STATISTICS-MIB", "oaSlStatMandatoryGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    oaSlStatMIBCompliance = oaSlStatMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: oaSlStatMIBCompliance.setDescription("The core compliance statement for all 'oaSlStatistics' MIB implementations.")
+oaSlStatMandatoryGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 629, 1, 50, 10, 9, 101, 2, 1)).setObjects(("OA-SL-STATISTICS-MIB", "oaSlStatGenSupport"), ("OA-SL-STATISTICS-MIB", "oaSlStatPortIndex"), ("OA-SL-STATISTICS-MIB", "oaSlStatServiceLevel"), ("OA-SL-STATISTICS-MIB", "oaSlStatAggrOctets"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    oaSlStatMandatoryGroup = oaSlStatMandatoryGroup.setStatus('current')
+if mibBuilder.loadTexts: oaSlStatMandatoryGroup.setDescription('Mandatory objects for grouping of Service Level statistics parameters.')
+mibBuilder.exportSymbols("OA-SL-STATISTICS-MIB", nbSwitchG1=nbSwitchG1, oaSlStatMIBCompliance=oaSlStatMIBCompliance, oaSlStatConformance=oaSlStatConformance, oaSlStatMandatoryGroup=oaSlStatMandatoryGroup, oaSlStatistics=oaSlStatistics, PYSNMP_MODULE_ID=oaSlStatistics, oaSlStatServiceLevel=oaSlStatServiceLevel, oaSlStatMIBGroups=oaSlStatMIBGroups, oaSlStatGenSupport=oaSlStatGenSupport, oaSlStatMIBCompliances=oaSlStatMIBCompliances, oaSlStatEntry=oaSlStatEntry, oaSlStatTable=oaSlStatTable, oaSlStatPortIndex=oaSlStatPortIndex, nbPortParams=nbPortParams, nbSwitchG1Il=nbSwitchG1Il, oaSlStatAggrOctets=oaSlStatAggrOctets, nbase=nbase)

@@ -1,0 +1,41 @@
+#
+# PySNMP MIB module PACKETFRONT-SMI (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PACKETFRONT-SMI
+# Produced by pysmi-0.3.4 at Wed May  1 14:36:10 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+IpAddress, ModuleIdentity, iso, ObjectIdentity, Counter64, NotificationType, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32, Gauge32, enterprises, Unsigned32, Integer32, Bits, MibIdentifier = mibBuilder.importSymbols("SNMPv2-SMI", "IpAddress", "ModuleIdentity", "iso", "ObjectIdentity", "Counter64", "NotificationType", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32", "Gauge32", "enterprises", "Unsigned32", "Integer32", "Bits", "MibIdentifier")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+packetfront = ModuleIdentity((1, 3, 6, 1, 4, 1, 9303))
+packetfront.setRevisions(('2009-03-23 10:39', '2008-01-17 14:05', '2007-05-11 12:28',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: packetfront.setRevisionsDescriptions(('Updated telephone number in contact-info', 'Correct warnings in imports', 'Created from PACKETFRONT-MIB.mib',))
+if mibBuilder.loadTexts: packetfront.setLastUpdated('200903231039Z')
+if mibBuilder.loadTexts: packetfront.setOrganization('PacketFront Systems AB')
+if mibBuilder.loadTexts: packetfront.setContactInfo('PacketFront Systems AB Customer Service Mail : Isafjordsgatan 35 SE-164 28 Kista Sweden Tel : +46 8 5090 1500 E-mail: snmp@packetfront.com Web : http://www.packetfront.com')
+if mibBuilder.loadTexts: packetfront.setDescription('The PacketFront management information base SMI definitions')
+pfProduct = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 1))
+if mibBuilder.loadTexts: pfProduct.setStatus('current')
+if mibBuilder.loadTexts: pfProduct.setDescription('The product group from which sysObjectID values are set.')
+pfConfig = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 2))
+if mibBuilder.loadTexts: pfConfig.setStatus('current')
+if mibBuilder.loadTexts: pfConfig.setDescription('The configuration subtree')
+ipdConfig = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 2, 1))
+if mibBuilder.loadTexts: ipdConfig.setStatus('current')
+if mibBuilder.loadTexts: ipdConfig.setDescription('The configuration subtree')
+pfExperiment = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 3))
+if mibBuilder.loadTexts: pfExperiment.setStatus('current')
+if mibBuilder.loadTexts: pfExperiment.setDescription('The root object for experimental objects. Experimental objects are used during development before a permanent assignment to the packetfront mib has been determined. Objects in this tree will come and go. No guarantees for their existance or accuracy is ever provided.')
+pfMgmt = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 4))
+if mibBuilder.loadTexts: pfMgmt.setStatus('current')
+if mibBuilder.loadTexts: pfMgmt.setDescription('The root object for all PacketFront management objects')
+pfModules = ObjectIdentity((1, 3, 6, 1, 4, 1, 9303, 5))
+if mibBuilder.loadTexts: pfModules.setStatus('current')
+if mibBuilder.loadTexts: pfModules.setDescription('pfModules provides a root object identifier from which the MODULE-IDENTITY values may be assigned')
+mibBuilder.exportSymbols("PACKETFRONT-SMI", ipdConfig=ipdConfig, pfProduct=pfProduct, pfConfig=pfConfig, packetfront=packetfront, pfModules=pfModules, pfExperiment=pfExperiment, pfMgmt=pfMgmt, PYSNMP_MODULE_ID=packetfront)

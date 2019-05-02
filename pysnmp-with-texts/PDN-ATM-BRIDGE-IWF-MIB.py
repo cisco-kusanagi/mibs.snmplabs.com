@@ -1,0 +1,57 @@
+#
+# PySNMP MIB module PDN-ATM-BRIDGE-IWF-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/PDN-ATM-BRIDGE-IWF-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:38:04 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+pdn_common, = mibBuilder.importSymbols("PDN-HEADER-MIB", "pdn-common")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+Integer32, Counter32, Bits, TimeTicks, ObjectIdentity, Unsigned32, Gauge32, ModuleIdentity, Counter64, IpAddress, MibIdentifier, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "Counter32", "Bits", "TimeTicks", "ObjectIdentity", "Unsigned32", "Gauge32", "ModuleIdentity", "Counter64", "IpAddress", "MibIdentifier", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType")
+TextualConvention, RowStatus, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "RowStatus", "DisplayString")
+pdnAtmBridgeIwfMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43))
+pdnAtmBridgeIwfMIB.setRevisions(('2003-04-24 00:00', '2003-03-24 00:00', '2003-03-17 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: pdnAtmBridgeIwfMIB.setRevisionsDescriptions(('Added stronger Conformance/Compliance statements.', 'Corrected typo in that the pdnAtmBridgeIwfVplVpi should have been pdnAtmBridgeIwfVclVpi.', 'Initial release.',))
+if mibBuilder.loadTexts: pdnAtmBridgeIwfMIB.setLastUpdated('200303240000Z')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfMIB.setOrganization('Paradyne Networks MIB Working Group Other information about group editing the MIB')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfMIB.setContactInfo('Paradyne Networks, Inc. 8545 126th Avenue North Largo, FL 33733 www.paradyne.com General Comments to: mibwg_team@paradyne.com Editors Clay Sikes')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfMIB.setDescription('This MIB contains objects that are used for monitoring and controlling the ATM/Bridge Interworking Function.')
+pdnAtmBridgeIwfNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 0))
+pdnAtmBridgeIwfObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 1))
+pdnAtmBridgeIwfConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 2))
+pdnAtmBridgeIwfTable = MibTable((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 1, 1), )
+if mibBuilder.loadTexts: pdnAtmBridgeIwfTable.setStatus('current')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfTable.setDescription('This table allows mapping of ATM VCs to Bridge Ports.')
+pdnAtmBridgeIwfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "PDN-ATM-BRIDGE-IWF-MIB", "pdnAtmBridgeIwfVclVpi"), (0, "PDN-ATM-BRIDGE-IWF-MIB", "pdnAtmBridgeIwfVclVci"))
+if mibBuilder.loadTexts: pdnAtmBridgeIwfEntry.setStatus('current')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfEntry.setDescription('An entry in the pdnAtmBridgeIwfTable.')
+pdnAtmBridgeIwfVclVpi = MibTableColumn((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 1, 1, 1, 1), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 4095)))
+if mibBuilder.loadTexts: pdnAtmBridgeIwfVclVpi.setStatus('current')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfVclVpi.setDescription('The VPI value of the VPL.')
+pdnAtmBridgeIwfVclVci = MibTableColumn((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 1, 1, 1, 2), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535)))
+if mibBuilder.loadTexts: pdnAtmBridgeIwfVclVci.setStatus('current')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfVclVci.setDescription('The VCI value of the VCL.')
+pdnAtmBridgeIwfRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 1, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: pdnAtmBridgeIwfRowStatus.setStatus('current')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfRowStatus.setDescription('The SNMP RowStatus of the current row.')
+pdnAtmBridgeIwfDot1dBasePort = MibTableColumn((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 1, 1, 1, 4), Unsigned32().subtype(subtypeSpec=ValueRangeConstraint(1, 65535))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: pdnAtmBridgeIwfDot1dBasePort.setStatus('current')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfDot1dBasePort.setDescription('This object specifies the bridge port the VPI/VCI maps to.')
+pdnAtmBridgeIwfCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 2, 1))
+pdnAtmBridgeIwfGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 2, 2))
+pdnAtmBridgeIwfMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 2, 1, 1)).setObjects(("PDN-ATM-BRIDGE-IWF-MIB", "pdnAtmBridgeIwfGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    pdnAtmBridgeIwfMIBCompliance = pdnAtmBridgeIwfMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfMIBCompliance.setDescription('The compliance statement for pdnAtmBridgeIwf entities which implement the pdnAtmBridgeIwfMIB.')
+pdnAtmBridgeIwfGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 1795, 2, 24, 2, 43, 2, 2, 1)).setObjects(("PDN-ATM-BRIDGE-IWF-MIB", "pdnAtmBridgeIwfRowStatus"), ("PDN-ATM-BRIDGE-IWF-MIB", "pdnAtmBridgeIwfDot1dBasePort"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    pdnAtmBridgeIwfGroup = pdnAtmBridgeIwfGroup.setStatus('current')
+if mibBuilder.loadTexts: pdnAtmBridgeIwfGroup.setDescription('Objects grouped for ATM to Bridge Port Mapping.')
+mibBuilder.exportSymbols("PDN-ATM-BRIDGE-IWF-MIB", pdnAtmBridgeIwfRowStatus=pdnAtmBridgeIwfRowStatus, PYSNMP_MODULE_ID=pdnAtmBridgeIwfMIB, pdnAtmBridgeIwfObjects=pdnAtmBridgeIwfObjects, pdnAtmBridgeIwfVclVci=pdnAtmBridgeIwfVclVci, pdnAtmBridgeIwfGroup=pdnAtmBridgeIwfGroup, pdnAtmBridgeIwfGroups=pdnAtmBridgeIwfGroups, pdnAtmBridgeIwfEntry=pdnAtmBridgeIwfEntry, pdnAtmBridgeIwfDot1dBasePort=pdnAtmBridgeIwfDot1dBasePort, pdnAtmBridgeIwfVclVpi=pdnAtmBridgeIwfVclVpi, pdnAtmBridgeIwfMIB=pdnAtmBridgeIwfMIB, pdnAtmBridgeIwfMIBCompliance=pdnAtmBridgeIwfMIBCompliance, pdnAtmBridgeIwfCompliances=pdnAtmBridgeIwfCompliances, pdnAtmBridgeIwfTable=pdnAtmBridgeIwfTable, pdnAtmBridgeIwfNotifications=pdnAtmBridgeIwfNotifications, pdnAtmBridgeIwfConformance=pdnAtmBridgeIwfConformance)

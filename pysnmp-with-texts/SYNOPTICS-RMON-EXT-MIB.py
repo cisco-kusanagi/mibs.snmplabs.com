@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module SYNOPTICS-RMON-EXT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/SYNOPTICS-RMON-EXT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:14:17 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Integer32, Counter64, IpAddress, iso, Gauge32, ModuleIdentity, Unsigned32, MibIdentifier, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, NotificationType, Bits, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "Counter64", "IpAddress", "iso", "Gauge32", "ModuleIdentity", "Unsigned32", "MibIdentifier", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "NotificationType", "Bits", "TimeTicks")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+products, = mibBuilder.importSymbols("SYNOPTICS-ROOT-MIB", "products")
+snpxRmonExt = MibIdentifier((1, 3, 6, 1, 4, 1, 45, 1, 8))
+snpxRmonGetTabExt = MibIdentifier((1, 3, 6, 1, 4, 1, 45, 1, 8, 6))
+getTable = MibIdentifier((1, 3, 6, 1, 4, 1, 45, 1, 8, 6, 1))
+getTableTable = MibTable((1, 3, 6, 1, 4, 1, 45, 1, 8, 6, 1, 1), )
+if mibBuilder.loadTexts: getTableTable.setStatus('mandatory')
+if mibBuilder.loadTexts: getTableTable.setDescription('A table of bulk GetTable entries. These entries consist of a header followed by several rows from the SNMP table being requested.')
+getTableEntry = MibTableRow((1, 3, 6, 1, 4, 1, 45, 1, 8, 6, 1, 1, 1), ).setIndexNames((0, "SYNOPTICS-RMON-EXT-MIB", "getTableSource"), (0, "SYNOPTICS-RMON-EXT-MIB", "getTableIndex"))
+if mibBuilder.loadTexts: getTableEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: getTableEntry.setDescription('A row in the table of bulk entries for getTableTable.')
+getTableSource = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 1, 8, 6, 1, 1, 1, 1), ObjectIdentifier())
+if mibBuilder.loadTexts: getTableSource.setStatus('mandatory')
+if mibBuilder.loadTexts: getTableSource.setDescription('A length encoded object identifier for the SNMP table to retrieve. For example, the RMON2 alMatrixSD table is identified as the OID number 9.1.3.6.1.2.1.16.17.1, where the first 9 is the length of the OID.')
+getTableIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 1, 8, 6, 1, 1, 1, 2), ObjectIdentifier())
+if mibBuilder.loadTexts: getTableIndex.setStatus('mandatory')
+if mibBuilder.loadTexts: getTableIndex.setDescription("A length encoded object identifier consisting of the source table's normal index values as they are specified in the MIB definition for the table. Each index value is preceded by a flag that indicates whether the index is fixed(1) or dynamic(2). When returning table rows, the agent only increments index values that are dynamic(2). Any index that is fixed(1) remains constant for the entire set of rows returned. For the initial get request, dynamic index values are set to zero. It is up to the agent to determine the first value to use. On all subsequent requests, the request OID is the one returned in the response.")
+getTableData = MibTableColumn((1, 3, 6, 1, 4, 1, 45, 1, 8, 6, 1, 1, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 1200))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: getTableData.setStatus('mandatory')
+if mibBuilder.loadTexts: getTableData.setDescription("The OCTET STRING consists of a header followed by a set of data records. The header consists of the information: response packet version number (1) [Integer16] data record encoding -- BER (1), BigEndian(2) [Integer16] agent sysUpTime value [TimeTicks] number of records in this response [Integer32] The data records consist of each dynamic index for this row plus each row entry defined in the source table's MIB definition.")
+mibBuilder.exportSymbols("SYNOPTICS-RMON-EXT-MIB", getTable=getTable, getTableEntry=getTableEntry, getTableIndex=getTableIndex, getTableSource=getTableSource, snpxRmonGetTabExt=snpxRmonGetTabExt, snpxRmonExt=snpxRmonExt, getTableData=getTableData, getTableTable=getTableTable)

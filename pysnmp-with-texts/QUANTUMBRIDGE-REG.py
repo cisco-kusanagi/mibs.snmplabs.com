@@ -1,0 +1,31 @@
+#
+# PySNMP MIB module QUANTUMBRIDGE-REG (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/QUANTUMBRIDGE-REG
+# Produced by pysmi-0.3.4 at Wed May  1 14:43:27 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+NotificationType, Integer32, enterprises, Gauge32, Counter32, ModuleIdentity, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, ObjectIdentity, iso, TimeTicks, Bits, Unsigned32, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "NotificationType", "Integer32", "enterprises", "Gauge32", "Counter32", "ModuleIdentity", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "ObjectIdentity", "iso", "TimeTicks", "Bits", "Unsigned32", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+quantumBridgeRegistrations = ModuleIdentity((1, 3, 6, 1, 4, 1, 4323, 1))
+if mibBuilder.loadTexts: quantumBridgeRegistrations.setLastUpdated('9903202155Z')
+if mibBuilder.loadTexts: quantumBridgeRegistrations.setOrganization('Quantum Bridge Communications Inc.')
+if mibBuilder.loadTexts: quantumBridgeRegistrations.setContactInfo('mvaysman@quantumbridge.com')
+if mibBuilder.loadTexts: quantumBridgeRegistrations.setDescription('This module defines the enterprises OID of Quantum Bridge and other company-wide definitions. The resulting top-level name space under the Quantum Bridge branch looks like this: Quantum Bridge quantumBridgeRegistrations - this module qbMibs - MIB modules defined in .mi2 files qbProducts - AGENT-CAPABILITIES modules defined in .mib files This is where you reserve an OIDs for a MIB module. The values are defined in the appropriate .mi2/.mo files but are in comments here so that we can have one document under source control to reserve and catalog values.')
+quantumBridge = ObjectIdentity((1, 3, 6, 1, 4, 1, 4323))
+if mibBuilder.loadTexts: quantumBridge.setStatus('current')
+if mibBuilder.loadTexts: quantumBridge.setDescription("Quantum Bridge's node in the naming hierarchy as assigned by the Internet Assigned Numbers Authority (IANA).")
+qbMibs = ObjectIdentity((1, 3, 6, 1, 4, 1, 4323, 2))
+if mibBuilder.loadTexts: qbMibs.setStatus('current')
+if mibBuilder.loadTexts: qbMibs.setDescription('A registration point under which all MIB modules are defined.')
+qbProducts = ObjectIdentity((1, 3, 6, 1, 4, 1, 4323, 3))
+if mibBuilder.loadTexts: qbProducts.setStatus('current')
+if mibBuilder.loadTexts: qbProducts.setDescription('A registration point under which all Quantum Bridge AGENT_CAPABILTIES definitions for various products(and therefore values of sysObjectId) are defined for various devices.')
+qb5000SystemID = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 3, 1))
+qb3000SystemID = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 3, 2))
+qb8000SystemID = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 3, 3))
+mibBuilder.exportSymbols("QUANTUMBRIDGE-REG", qbProducts=qbProducts, qb8000SystemID=qb8000SystemID, qb5000SystemID=qb5000SystemID, quantumBridge=quantumBridge, qb3000SystemID=qb3000SystemID, quantumBridgeRegistrations=quantumBridgeRegistrations, qbMibs=qbMibs, PYSNMP_MODULE_ID=quantumBridgeRegistrations)

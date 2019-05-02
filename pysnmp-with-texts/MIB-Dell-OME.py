@@ -1,0 +1,50 @@
+#
+# PySNMP MIB module MIB-Dell-OME (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MIB-Dell-OME
+# Produced by pysmi-0.3.4 at Wed May  1 14:12:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Counter32, Unsigned32, Integer32, Counter64, TimeTicks, NotificationType, Gauge32, iso, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, enterprises, Bits, IpAddress, NotificationType, MibIdentifier, ObjectIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "Unsigned32", "Integer32", "Counter64", "TimeTicks", "NotificationType", "Gauge32", "iso", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "enterprises", "Bits", "IpAddress", "NotificationType", "MibIdentifier", "ObjectIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+dell = MibIdentifier((1, 3, 6, 1, 4, 1, 674))
+enterpriseSW = MibIdentifier((1, 3, 6, 1, 4, 1, 674, 11000))
+sysMgmtBranch = MibIdentifier((1, 3, 6, 1, 4, 1, 674, 11000, 1000))
+omEssentialsMIB = MibIdentifier((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100))
+omEssentialsTrap = MibIdentifier((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1))
+class DellString(DisplayString):
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(0, 512)
+
+class DellString1(DisplayString):
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(0, 128)
+
+omeAlertMessage = MibScalar((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1, 1), DellString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: omeAlertMessage.setStatus('mandatory')
+if mibBuilder.loadTexts: omeAlertMessage.setDescription('Message in the alert.')
+omeAlertDevice = MibScalar((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1, 2), DellString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: omeAlertDevice.setStatus('mandatory')
+if mibBuilder.loadTexts: omeAlertDevice.setDescription('Name of the device where alert originated.')
+omeAlertSeverity = MibScalar((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1, 3), DellString1()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: omeAlertSeverity.setStatus('mandatory')
+if mibBuilder.loadTexts: omeAlertSeverity.setDescription('Original severity of the alert.')
+omeTestAlert = NotificationType((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1) + (0,1)).setObjects(("MIB-Dell-OME", "omeAlertMessage"), ("MIB-Dell-OME", "omeAlertDevice"), ("MIB-Dell-OME", "omeAlertSeverity"))
+if mibBuilder.loadTexts: omeTestAlert.setDescription('Test alert forwarded from OM Essentials.')
+omeAlertSystemUp = NotificationType((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1) + (0,1000)).setObjects(("MIB-Dell-OME", "omeAlertMessage"), ("MIB-Dell-OME", "omeAlertDevice"))
+if mibBuilder.loadTexts: omeAlertSystemUp.setDescription('System up message from OM Essentials. Sent when OM Essentials detects a device has come online.')
+omeAlertSystemDown = NotificationType((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1) + (0,1001)).setObjects(("MIB-Dell-OME", "omeAlertMessage"), ("MIB-Dell-OME", "omeAlertDevice"))
+if mibBuilder.loadTexts: omeAlertSystemDown.setDescription('System down message from OM Essentials. Sent when OM Essentials detects a device has gone offline.')
+omeAlertForwardedAlert = NotificationType((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1) + (0,2000)).setObjects(("MIB-Dell-OME", "omeAlertMessage"), ("MIB-Dell-OME", "omeAlertDevice"), ("MIB-Dell-OME", "omeAlertSeverity"))
+if mibBuilder.loadTexts: omeAlertForwardedAlert.setDescription('Forwarded alert from OM Essentials. The event may have originated as an SNMP trap or CIM indication to the OM Essentials Console. The alert format is normalized.')
+omeAlertUnknownStatus = NotificationType((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1) + (0,3001)).setObjects(("MIB-Dell-OME", "omeAlertDevice"))
+if mibBuilder.loadTexts: omeAlertUnknownStatus.setDescription('System monitoring alert from Essentials. Sent when status of the remote device is Unknown.')
+omeAlertNormalStatus = NotificationType((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1) + (0,3002)).setObjects(("MIB-Dell-OME", "omeAlertDevice"))
+if mibBuilder.loadTexts: omeAlertNormalStatus.setDescription('System monitoring alert from Essentials. Sent when status of the remote device is Normal.')
+omeAlertWarningStatus = NotificationType((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1) + (0,3003)).setObjects(("MIB-Dell-OME", "omeAlertDevice"))
+if mibBuilder.loadTexts: omeAlertWarningStatus.setDescription('System monitoring alert from Essentials. Sent when status of the remote device is Warning.')
+omeAlertCriticalStatus = NotificationType((1, 3, 6, 1, 4, 1, 674, 11000, 1000, 100, 1) + (0,3004)).setObjects(("MIB-Dell-OME", "omeAlertDevice"))
+if mibBuilder.loadTexts: omeAlertCriticalStatus.setDescription('System monitoring alert from Essentials. Sent when status of the remote device is Critical.')
+mibBuilder.exportSymbols("MIB-Dell-OME", omeAlertDevice=omeAlertDevice, omeAlertSeverity=omeAlertSeverity, sysMgmtBranch=sysMgmtBranch, omEssentialsTrap=omEssentialsTrap, enterpriseSW=enterpriseSW, omeAlertSystemDown=omeAlertSystemDown, DellString1=DellString1, omeAlertCriticalStatus=omeAlertCriticalStatus, omeTestAlert=omeTestAlert, omeAlertUnknownStatus=omeAlertUnknownStatus, omeAlertWarningStatus=omeAlertWarningStatus, omeAlertNormalStatus=omeAlertNormalStatus, omEssentialsMIB=omEssentialsMIB, omeAlertSystemUp=omeAlertSystemUp, omeAlertMessage=omeAlertMessage, DellString=DellString, omeAlertForwardedAlert=omeAlertForwardedAlert, dell=dell)

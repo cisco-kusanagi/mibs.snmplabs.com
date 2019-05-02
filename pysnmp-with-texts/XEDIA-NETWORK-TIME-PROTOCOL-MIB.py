@@ -1,0 +1,287 @@
+#
+# PySNMP MIB module XEDIA-NETWORK-TIME-PROTOCOL-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/XEDIA-NETWORK-TIME-PROTOCOL-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:42:58 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint", "ValueSizeConstraint")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+Counter32, Gauge32, ObjectIdentity, Counter64, NotificationType, Unsigned32, MibIdentifier, TimeTicks, ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, iso, Bits, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "Gauge32", "ObjectIdentity", "Counter64", "NotificationType", "Unsigned32", "MibIdentifier", "TimeTicks", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "iso", "Bits", "Integer32")
+TextualConvention, RowStatus, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "RowStatus", "DisplayString")
+xediaMibs, = mibBuilder.importSymbols("XEDIA-REG", "xediaMibs")
+xediaNetworkTimeProtocolMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 838, 3, 26))
+if mibBuilder.loadTexts: xediaNetworkTimeProtocolMIB.setLastUpdated('9812151655Z')
+if mibBuilder.loadTexts: xediaNetworkTimeProtocolMIB.setOrganization('Xedia Corp.')
+if mibBuilder.loadTexts: xediaNetworkTimeProtocolMIB.setContactInfo('support@xedia.com')
+if mibBuilder.loadTexts: xediaNetworkTimeProtocolMIB.setDescription("This module defines objects for the management of Xedia's implementation of the Network Time Protocol. This imlementation is based on RFC1305 and its successors. The purpose of the Network Time Protocol is to allow Internet hosts to syncronize to Universal Coordinated Time (UTC) through a set of distributed time servers.")
+xntpObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 26, 1))
+xntpConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 26, 2))
+class XntpIpAddress(TextualConvention, IpAddress):
+    description = 'An IPv4 address.'
+    status = 'current'
+
+class XntpPort(TextualConvention, Integer32):
+    description = 'A UDP port number.'
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 65535)
+
+class XntpDateAndTime(DisplayString):
+    description = "The value of an NTP time stamp. The value is expressed in date and time format in the UTC timescale. The accuracy of the time is in microseconds. The value is expressed as: 'yyyy/mm/dd hh:mm:ss:uuuuuu' where: y = year, m = month, d = day, h = hour, m = minute, s = second, and u = microsecond."
+    status = 'current'
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(26, 26)
+    fixedLength = 26
+
+class XntpSeconds(DisplayString):
+    description = 'A value expressed in positive or negative seconds and microseconds.'
+    status = 'current'
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(13, 13)
+    fixedLength = 13
+
+class XntpAssociationMode(TextualConvention, Integer32):
+    description = 'The association mode indicates the mode of the peer with which the local system is syncronizing. +--------------------+-------+ | ASSOCIATION TYPE | VALUE | +--------------------+-------+ UNSPECIFIED 0 SYMMETRIC ACTIVE 1 SYMMETRIC PASSIVE 2 CLIENT 3 SERVER 4 '
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4))
+    namedValues = NamedValues(("unspecifed", 0), ("symActive", 1), ("symPassive", 2), ("client", 3), ("server", 4))
+
+class XntpLeapIndication(TextualConvention, Integer32):
+    description = 'The leap indicator indicates leap second warning and syncronization status. +--------------------+-------+ | LEAP INDICATIONS | VALUE | +--------------------+-------+ NO WARNING 0 LAST MINUTE HAS 61 SECS 1 LAST MINUTE HAS 59 SECS 2 UNSYNCRONIZED 3 '
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3))
+    namedValues = NamedValues(("noWarning", 0), ("insertSecond", 1), ("deleteSecond", 2), ("unsyncronized", 3))
+
+class XntpCounter(TextualConvention, Counter32):
+    description = 'A 32 bit counter.'
+    status = 'current'
+    displayHint = 'd'
+
+class XntpAssociationCondition(TextualConvention, Integer32):
+    description = 'Indicates the condition of the peer after the last run of the algorithm to select the syncronization source. +--------------------+-------+ | CONDITION | VALUE | +--------------------+-------+ REJECTED 0 FALSETICKER 1 ELIMINATED 2 OUTLYER 3 SYNCCANDIDATE 4 DISTSYSPEER 5 SYSPEER 6 '
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1, 2, 3, 4, 5, 6))
+    namedValues = NamedValues(("rejected", 0), ("eliminated", 1), ("falseticker", 2), ("outlyer", 3), ("syncCandidate", 4), ("distSysPeer", 5), ("sysPeer", 6))
+
+class XntpReachability(TextualConvention, Integer32):
+    description = 'An octal representation of the reachability register.'
+    status = 'current'
+    displayHint = 'o'
+
+xntpSystem = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1))
+xntpAdminStatus = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('disabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xntpAdminStatus.setStatus('current')
+if mibBuilder.loadTexts: xntpAdminStatus.setDescription('Determines the NTP agent is operational.')
+xntpSrcAddressStatus = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('disabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: xntpSrcAddressStatus.setStatus('current')
+if mibBuilder.loadTexts: xntpSrcAddressStatus.setDescription('Determines if the NTP agent will send all packets from a specified source address.')
+xntpStratum = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpStratum.setStatus('current')
+if mibBuilder.loadTexts: xntpStratum.setDescription('Indicates the stratum of local clock.')
+xntpMode = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 4), XntpAssociationMode()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpMode.setStatus('current')
+if mibBuilder.loadTexts: xntpMode.setDescription('Indicates the association mode.')
+xntpPrecision = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 5), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpPrecision.setStatus('current')
+if mibBuilder.loadTexts: xntpPrecision.setDescription('Indicates the precision of the local clock.')
+xntpClockSource = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 6), XntpIpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpClockSource.setStatus('current')
+if mibBuilder.loadTexts: xntpClockSource.setDescription('Identifies the current synchronization source.')
+xntpPollInterval = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 7), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpPollInterval.setStatus('current')
+if mibBuilder.loadTexts: xntpPollInterval.setDescription('Indicates the minimum interval between transmitted messages. It is expressed in seconds as a power of 2.')
+xntpLeapIndicator = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 8), XntpLeapIndication()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpLeapIndicator.setStatus('current')
+if mibBuilder.loadTexts: xntpLeapIndicator.setDescription('Indicates leap second status and NTP syncronization status.')
+xntpRootDelay = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 9), XntpSeconds()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpRootDelay.setStatus('current')
+if mibBuilder.loadTexts: xntpRootDelay.setDescription('Indicates the delay to the root of the syncronization subnet.')
+xntpRootDispersion = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 10), XntpSeconds()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpRootDispersion.setStatus('current')
+if mibBuilder.loadTexts: xntpRootDispersion.setDescription('Indicates the maximum error relative to the root of the syncronization subnet.')
+xntpReferenceTimestamp = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 11), XntpDateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpReferenceTimestamp.setStatus('current')
+if mibBuilder.loadTexts: xntpReferenceTimestamp.setDescription('The last time the local clock was updated. If never updated, the value is zero.')
+xntpLocalTime = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 1, 12), XntpDateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpLocalTime.setStatus('current')
+if mibBuilder.loadTexts: xntpLocalTime.setDescription('The current time in NTP timescale.')
+xntpCounters = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2))
+xntpPacketsIn = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 1), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpPacketsIn.setStatus('current')
+if mibBuilder.loadTexts: xntpPacketsIn.setDescription('Indicates the number of packets received by NTP.')
+xntpBadVersion = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 2), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpBadVersion.setStatus('current')
+if mibBuilder.loadTexts: xntpBadVersion.setDescription('Indicates the number of packets discarded because of an invalid version number.')
+xntpBadStratum = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 3), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpBadStratum.setStatus('current')
+if mibBuilder.loadTexts: xntpBadStratum.setDescription('Indicates the number of packets discarded because of an invalid stratum.')
+xntpBadLength = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 4), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpBadLength.setStatus('current')
+if mibBuilder.loadTexts: xntpBadLength.setDescription('Indicates the number of packets discarded because of an invalid length.')
+xntpBadMode = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 5), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpBadMode.setStatus('current')
+if mibBuilder.loadTexts: xntpBadMode.setDescription('Indicates the number of packets discarded because of an invalid or unsupported mode.')
+xntpBadHeader = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 6), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpBadHeader.setStatus('current')
+if mibBuilder.loadTexts: xntpBadHeader.setDescription('Indicates the number of packets discarded because of an invalid header.')
+xntpBadData = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 7), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpBadData.setStatus('current')
+if mibBuilder.loadTexts: xntpBadData.setDescription('Indicates the number of packets discarded because of invalid data.')
+xntpPacketsOut = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 8), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpPacketsOut.setStatus('current')
+if mibBuilder.loadTexts: xntpPacketsOut.setDescription('Indicates the number of packets sent by NTP.')
+xntpPhaseAdjustments = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 9), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpPhaseAdjustments.setStatus('current')
+if mibBuilder.loadTexts: xntpPhaseAdjustments.setDescription('Indicates the number of times the local clock was phase adjusted.')
+xntpStepAdjustments = MibScalar((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 2, 10), XntpCounter()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpStepAdjustments.setStatus('current')
+if mibBuilder.loadTexts: xntpStepAdjustments.setDescription('Indicates the number of times the local clock was step adjusted.')
+xntpServerTable = MibTable((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 3), )
+if mibBuilder.loadTexts: xntpServerTable.setStatus('current')
+if mibBuilder.loadTexts: xntpServerTable.setDescription('The set of configured servers ')
+xntpServerEntry = MibTableRow((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 3, 1), ).setIndexNames((0, "XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpServer"))
+if mibBuilder.loadTexts: xntpServerEntry.setStatus('current')
+if mibBuilder.loadTexts: xntpServerEntry.setDescription('The information maintained for every configured server.')
+xntpServer = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 3, 1, 1), XntpIpAddress())
+if mibBuilder.loadTexts: xntpServer.setStatus('current')
+if mibBuilder.loadTexts: xntpServer.setDescription('The IP address of a server with which to attempt client/server association.')
+xntpServerVersion = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 3, 1, 2), Integer32().clone(3)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xntpServerVersion.setStatus('current')
+if mibBuilder.loadTexts: xntpServerVersion.setDescription('The version of the server.')
+xntpServerMinPoll = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 3, 1, 3), Integer32().clone(6)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xntpServerMinPoll.setStatus('current')
+if mibBuilder.loadTexts: xntpServerMinPoll.setDescription('The minimum poll interval for the server as a power of two.')
+xntpServerMaxPoll = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 3, 1, 4), Integer32().clone(10)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xntpServerMaxPoll.setStatus('current')
+if mibBuilder.loadTexts: xntpServerMaxPoll.setDescription('The maximum poll interval for the server as a power of two.')
+xntpServerRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 3, 1, 5), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xntpServerRowStatus.setStatus('current')
+if mibBuilder.loadTexts: xntpServerRowStatus.setDescription("This object only supports the values of 'createAndGo', 'active' and 'destroy'. Changing the value of this object to 'destroy' has the effect of removing the entry. To create an entry, this object must be set to 'createAndGo'.")
+xntpSAPeerTable = MibTable((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 4), )
+if mibBuilder.loadTexts: xntpSAPeerTable.setStatus('current')
+if mibBuilder.loadTexts: xntpSAPeerTable.setDescription('The current set of configured symmetric active peers')
+xntpSAPeerEntry = MibTableRow((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 4, 1), ).setIndexNames((0, "XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpSAPeer"))
+if mibBuilder.loadTexts: xntpSAPeerEntry.setStatus('current')
+if mibBuilder.loadTexts: xntpSAPeerEntry.setDescription('The information maintained for every configured symmetric active peer.')
+xntpSAPeer = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 4, 1, 1), XntpIpAddress())
+if mibBuilder.loadTexts: xntpSAPeer.setStatus('current')
+if mibBuilder.loadTexts: xntpSAPeer.setDescription('The IP address of a peer with which to attempt to form a symmetric passive association.')
+xntpSAPeerVersion = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 4, 1, 2), Integer32().clone(3)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xntpSAPeerVersion.setStatus('current')
+if mibBuilder.loadTexts: xntpSAPeerVersion.setDescription('The version of the peer.')
+xntpSAPeerMinPoll = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 4, 1, 3), Integer32().clone(6)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xntpSAPeerMinPoll.setStatus('current')
+if mibBuilder.loadTexts: xntpSAPeerMinPoll.setDescription('The minimum poll interval for the peer as a power of two.')
+xntpSAPeerMaxPoll = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 4, 1, 4), Integer32().clone(10)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xntpSAPeerMaxPoll.setStatus('current')
+if mibBuilder.loadTexts: xntpSAPeerMaxPoll.setDescription('The maximum poll interval for the peer as a power of two.')
+xntpSAPeerRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 4, 1, 5), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: xntpSAPeerRowStatus.setStatus('current')
+if mibBuilder.loadTexts: xntpSAPeerRowStatus.setDescription("This object only supports the values of 'createAndGo', 'active' and 'destroy'. Changing the value of this object to 'destroy' has the effect of removing the entry. To create an entry, this object must be set to 'createAndGo'.")
+xntpAssocTable = MibTable((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5), )
+if mibBuilder.loadTexts: xntpAssocTable.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocTable.setDescription('The set of current associations')
+xntpAssocEntry = MibTableRow((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1), ).setIndexNames((0, "XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerAddr"))
+if mibBuilder.loadTexts: xntpAssocEntry.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocEntry.setDescription('The information maintained for every association.')
+xntpAssocPeerAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 1), XntpIpAddress())
+if mibBuilder.loadTexts: xntpAssocPeerAddr.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerAddr.setDescription('The IP address of the peer.')
+xntpAssocPeerPort = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 2), XntpPort()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerPort.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerPort.setDescription('The port number of the peer.')
+xntpAssocPeerPoll = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerPoll.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerPoll.setDescription("The peer's poll interval indicated as a power of two.")
+xntpAssocHostAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 4), XntpIpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocHostAddr.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocHostAddr.setDescription('The IP address used by the local peer.')
+xntpAssocHostPort = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 5), XntpPort()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocHostPort.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocHostPort.setDescription('The port number used by the local peer.')
+xntpAssocHostPoll = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 6), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocHostPoll.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocHostPoll.setDescription("The host's poll interval indicated as a power of two.")
+xntpAssocHostMode = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 7), XntpAssociationMode()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocHostMode.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocHostMode.setDescription('The association mode of the host.')
+xntpAssocPeerMode = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 8), XntpAssociationMode()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerMode.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerMode.setDescription('The association mode of the peer.')
+xntpAssocPeerStratum = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 9), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerStratum.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerStratum.setDescription("The stratum of the peer's clock ")
+xntpAssocPeerPrecision = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 10), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerPrecision.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerPrecision.setDescription("The precesion of the peer's clock in seconds to the nearest power of two.")
+xntpAssocPeerLeap = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 11), XntpLeapIndication()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerLeap.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerLeap.setDescription("The peer's leap second status.")
+xntpAssocPeerCondition = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 12), XntpAssociationCondition()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerCondition.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerCondition.setDescription("The peer's condition.")
+xntpAssocPeerConfig = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 13), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1))).clone(namedValues=NamedValues(("dynamic", 0), ("configured", 1)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerConfig.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerConfig.setDescription('Indicates whether the associated was created as the result of manual configuration.')
+xntpAssocPeerRootDelay = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 14), XntpSeconds()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerRootDelay.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerRootDelay.setDescription("The peer's delay to the root of the sycnronization subnet.")
+xntpAssocPeerRootDispersion = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 15), XntpSeconds()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerRootDispersion.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerRootDispersion.setDescription('The maximum error of the peer relative to the root of the syncronization subnet.')
+xntpAssocPeerOffset = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 16), XntpSeconds()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerOffset.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerOffset.setDescription("The offset of the peer's clock relative to the local clock.")
+xntpAssocPeerDelay = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 17), XntpSeconds()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerDelay.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerDelay.setDescription('The roundtrip delay of the peer clock relative to the local clock over the network path between them.')
+xntpAssocPeerDispersion = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 18), XntpSeconds()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerDispersion.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerDispersion.setDescription('The maximum error of the peer clock relative to the local clock over the network path between them.')
+xntpAssocPeerReachability = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 19), XntpReachability()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerReachability.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerReachability.setDescription('The reachability of the peer expressed in octal.')
+xntpAssocPeerRefrTimestamp = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 20), XntpDateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerRefrTimestamp.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerRefrTimestamp.setDescription("The last time the peer's local clock was updated.")
+xntpAssocPeerXmitTimestamp = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 21), XntpDateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerXmitTimestamp.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerXmitTimestamp.setDescription('The local time when the NTP message departed the sender.')
+xntpAssocPeerOrigTimestamp = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 22), XntpDateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerOrigTimestamp.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerOrigTimestamp.setDescription('The time at the peer when its latest NTP message was sent.')
+xntpAssocPeerRecvTimestamp = MibTableColumn((1, 3, 6, 1, 4, 1, 838, 3, 26, 1, 5, 1, 23), XntpDateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: xntpAssocPeerRecvTimestamp.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocPeerRecvTimestamp.setDescription('The local time when the latest NTP message from the peer was received.')
+xntpCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 26, 2, 1))
+xntpGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 838, 3, 26, 2, 2))
+xntpCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 838, 3, 26, 2, 1, 1)).setObjects(("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpSystemGroup"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpCountersGroup"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpServerGroup"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpSAPeerGroup"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    xntpCompliance = xntpCompliance.setStatus('current')
+if mibBuilder.loadTexts: xntpCompliance.setDescription('The compliance statement for all agents that support this MIB. A compliant agent implements all objects defined in this MIB.')
+xntpSystemGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 838, 3, 26, 2, 2, 1)).setObjects(("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAdminStatus"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpSrcAddressStatus"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpStratum"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpMode"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpPrecision"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpClockSource"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpPollInterval"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpLeapIndicator"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpRootDelay"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpRootDispersion"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpReferenceTimestamp"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpLocalTime"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    xntpSystemGroup = xntpSystemGroup.setStatus('current')
+if mibBuilder.loadTexts: xntpSystemGroup.setDescription('These objects are required for the Network Time Protocol.')
+xntpCountersGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 838, 3, 26, 2, 2, 2)).setObjects(("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpPacketsIn"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpBadVersion"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpBadStratum"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpBadLength"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpBadMode"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpBadHeader"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpBadData"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpPacketsOut"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpPhaseAdjustments"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpStepAdjustments"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    xntpCountersGroup = xntpCountersGroup.setStatus('current')
+if mibBuilder.loadTexts: xntpCountersGroup.setDescription('These objects are required for the Network Time Protocol.')
+xntpServerGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 838, 3, 26, 2, 2, 3)).setObjects(("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpServerVersion"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpServerMinPoll"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpServerMaxPoll"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpServerRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    xntpServerGroup = xntpServerGroup.setStatus('current')
+if mibBuilder.loadTexts: xntpServerGroup.setDescription('These objects are required for the Network Time Protocol.')
+xntpSAPeerGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 838, 3, 26, 2, 2, 4)).setObjects(("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpSAPeerVersion"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpSAPeerMinPoll"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpSAPeerMaxPoll"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpSAPeerRowStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    xntpSAPeerGroup = xntpSAPeerGroup.setStatus('current')
+if mibBuilder.loadTexts: xntpSAPeerGroup.setDescription('These objects are required for the Network Time Protocol.')
+xntpAssocGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 838, 3, 26, 2, 2, 5)).setObjects(("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerPort"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerPoll"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocHostAddr"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocHostPort"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocHostPoll"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocHostMode"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerMode"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerStratum"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerPrecision"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerLeap"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerCondition"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerConfig"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerRootDelay"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerRootDispersion"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerOffset"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerDelay"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerDispersion"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerReachability"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerRefrTimestamp"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerXmitTimestamp"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerOrigTimestamp"), ("XEDIA-NETWORK-TIME-PROTOCOL-MIB", "xntpAssocPeerRecvTimestamp"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    xntpAssocGroup = xntpAssocGroup.setStatus('current')
+if mibBuilder.loadTexts: xntpAssocGroup.setDescription('These objects are required for the Network Time Protocol.')
+mibBuilder.exportSymbols("XEDIA-NETWORK-TIME-PROTOCOL-MIB", xntpPacketsIn=xntpPacketsIn, xntpBadData=xntpBadData, xntpSAPeerRowStatus=xntpSAPeerRowStatus, xntpSAPeerGroup=xntpSAPeerGroup, XntpSeconds=XntpSeconds, xntpCompliances=xntpCompliances, xntpSAPeer=xntpSAPeer, xntpAssocTable=xntpAssocTable, xntpObjects=xntpObjects, xntpAssocPeerPoll=xntpAssocPeerPoll, xntpAssocHostPoll=xntpAssocHostPoll, xntpAssocPeerCondition=xntpAssocPeerCondition, xntpSAPeerVersion=xntpSAPeerVersion, xntpAssocPeerStratum=xntpAssocPeerStratum, xntpAssocPeerMode=xntpAssocPeerMode, xntpSAPeerTable=xntpSAPeerTable, xntpCountersGroup=xntpCountersGroup, xntpPacketsOut=xntpPacketsOut, xntpClockSource=xntpClockSource, xntpRootDelay=xntpRootDelay, xntpAssocPeerRefrTimestamp=xntpAssocPeerRefrTimestamp, xntpAssocGroup=xntpAssocGroup, XntpLeapIndication=XntpLeapIndication, PYSNMP_MODULE_ID=xediaNetworkTimeProtocolMIB, xntpAssocPeerDispersion=xntpAssocPeerDispersion, XntpIpAddress=XntpIpAddress, XntpDateAndTime=XntpDateAndTime, xntpBadLength=xntpBadLength, xntpAssocPeerOffset=xntpAssocPeerOffset, xntpCounters=xntpCounters, xntpServerTable=xntpServerTable, xntpAssocHostPort=xntpAssocHostPort, xntpAssocPeerOrigTimestamp=xntpAssocPeerOrigTimestamp, xntpBadVersion=xntpBadVersion, xntpStepAdjustments=xntpStepAdjustments, xntpServerVersion=xntpServerVersion, xntpServerMinPoll=xntpServerMinPoll, xntpReferenceTimestamp=xntpReferenceTimestamp, XntpCounter=XntpCounter, xntpLeapIndicator=xntpLeapIndicator, xntpAssocPeerPrecision=xntpAssocPeerPrecision, xntpAssocPeerRecvTimestamp=xntpAssocPeerRecvTimestamp, xntpPrecision=xntpPrecision, XntpReachability=XntpReachability, XntpPort=XntpPort, xntpSystem=xntpSystem, xntpCompliance=xntpCompliance, xntpAdminStatus=xntpAdminStatus, xntpAssocPeerPort=xntpAssocPeerPort, XntpAssociationCondition=XntpAssociationCondition, xntpServer=xntpServer, xntpConformance=xntpConformance, xntpMode=xntpMode, xntpPollInterval=xntpPollInterval, xntpBadHeader=xntpBadHeader, xntpAssocPeerRootDelay=xntpAssocPeerRootDelay, xntpSystemGroup=xntpSystemGroup, xntpBadMode=xntpBadMode, xntpAssocPeerRootDispersion=xntpAssocPeerRootDispersion, xntpServerEntry=xntpServerEntry, xntpPhaseAdjustments=xntpPhaseAdjustments, xntpAssocHostMode=xntpAssocHostMode, xntpSAPeerMaxPoll=xntpSAPeerMaxPoll, xntpAssocHostAddr=xntpAssocHostAddr, xntpGroups=xntpGroups, XntpAssociationMode=XntpAssociationMode, xntpSAPeerEntry=xntpSAPeerEntry, xntpSrcAddressStatus=xntpSrcAddressStatus, xntpServerMaxPoll=xntpServerMaxPoll, xediaNetworkTimeProtocolMIB=xediaNetworkTimeProtocolMIB, xntpAssocPeerLeap=xntpAssocPeerLeap, xntpAssocPeerConfig=xntpAssocPeerConfig, xntpAssocPeerXmitTimestamp=xntpAssocPeerXmitTimestamp, xntpBadStratum=xntpBadStratum, xntpAssocEntry=xntpAssocEntry, xntpServerRowStatus=xntpServerRowStatus, xntpLocalTime=xntpLocalTime, xntpSAPeerMinPoll=xntpSAPeerMinPoll, xntpAssocPeerAddr=xntpAssocPeerAddr, xntpAssocPeerReachability=xntpAssocPeerReachability, xntpRootDispersion=xntpRootDispersion, xntpServerGroup=xntpServerGroup, xntpAssocPeerDelay=xntpAssocPeerDelay, xntpStratum=xntpStratum)

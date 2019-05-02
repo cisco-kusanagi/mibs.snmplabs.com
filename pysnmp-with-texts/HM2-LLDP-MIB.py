@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module HM2-LLDP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HM2-LLDP-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:31:40 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection")
+hm2ConfigurationMibs, HmEnabledStatus = mibBuilder.importSymbols("HM2-TC-MIB", "hm2ConfigurationMibs", "HmEnabledStatus")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+MibIdentifier, Integer32, TimeTicks, Counter64, Gauge32, IpAddress, Counter32, ModuleIdentity, Bits, iso, ObjectIdentity, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "Integer32", "TimeTicks", "Counter64", "Gauge32", "IpAddress", "Counter32", "ModuleIdentity", "Bits", "iso", "ObjectIdentity", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+hm2LLDPMib = ModuleIdentity((1, 3, 6, 1, 4, 1, 248, 11, 34))
+hm2LLDPMib.setRevisions(('2011-04-11 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: hm2LLDPMib.setRevisionsDescriptions(('Initial version.',))
+if mibBuilder.loadTexts: hm2LLDPMib.setLastUpdated('201104110000Z')
+if mibBuilder.loadTexts: hm2LLDPMib.setOrganization('Hirschmann Automation and Control GmbH')
+if mibBuilder.loadTexts: hm2LLDPMib.setContactInfo('Postal: Stuttgarter Str. 45-51 72654 Neckartenzlingen Germany Phone: +49 7127 140 E-mail: hac.support@belden.com')
+if mibBuilder.loadTexts: hm2LLDPMib.setDescription('Hirschmann LLDP MIB. Copyright (C) 2011. All Rights Reserved.')
+hm2LLDPMibObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 248, 11, 34, 1))
+hm2LLDPConfigGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 248, 11, 34, 1, 1))
+hm2LLDPAdminStatus = MibScalar((1, 3, 6, 1, 4, 1, 248, 11, 34, 1, 1, 1), HmEnabledStatus().clone('enable')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hm2LLDPAdminStatus.setStatus('current')
+if mibBuilder.loadTexts: hm2LLDPAdminStatus.setDescription('Enable/Disable LLDP operation. A (1) enables, a (2) disables.')
+hm2LLDPIfTable = MibTable((1, 3, 6, 1, 4, 1, 248, 11, 34, 1, 1, 2), )
+if mibBuilder.loadTexts: hm2LLDPIfTable.setStatus('current')
+if mibBuilder.loadTexts: hm2LLDPIfTable.setDescription('This table contains variables for each interface of the switch.')
+hm2LLDPIfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 248, 11, 34, 1, 1, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: hm2LLDPIfEntry.setStatus('current')
+if mibBuilder.loadTexts: hm2LLDPIfEntry.setDescription('The entry of the hmLLDPInterfaceTable.')
+hm2LLDPIfMaxNeighbors = MibTableColumn((1, 3, 6, 1, 4, 1, 248, 11, 34, 1, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 50)).clone(10)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hm2LLDPIfMaxNeighbors.setStatus('current')
+if mibBuilder.loadTexts: hm2LLDPIfMaxNeighbors.setDescription('Configure Hirschmann LLDP on this physical port. This value limits the number of entries in the remTable for this port.')
+hm2LLDPIfFDBMode = MibTableColumn((1, 3, 6, 1, 4, 1, 248, 11, 34, 1, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("lldpOnly", 1), ("macOnly", 2), ("both", 3), ("autoDetect", 4))).clone('autoDetect')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: hm2LLDPIfFDBMode.setStatus('current')
+if mibBuilder.loadTexts: hm2LLDPIfFDBMode.setDescription("If configured to lldpOnly(1), only received LLDP messages will be used to populate the LLDP-MIB's remTable. If configured to macOnly(2), a learned mac addresses out of the switch's forwarding database (FDB) will be used to populate the LLDP-MIB's remTable. A learned mac address will only be used when exactly one mac address entry is present in the FDB for the interface. If configured to both(3), both received LLDP messages and a learned mac addresses out of the switch's FDB will be used to populate the LLDP-MIB's remTable. If configured to autoDetect(4) and LLDP messages are received on this port, this mode will behave like lldpOnly(1), otherwise it will behave like macOnly(2).")
+mibBuilder.exportSymbols("HM2-LLDP-MIB", hm2LLDPIfEntry=hm2LLDPIfEntry, hm2LLDPAdminStatus=hm2LLDPAdminStatus, hm2LLDPIfFDBMode=hm2LLDPIfFDBMode, hm2LLDPMib=hm2LLDPMib, hm2LLDPIfMaxNeighbors=hm2LLDPIfMaxNeighbors, PYSNMP_MODULE_ID=hm2LLDPMib, hm2LLDPMibObjects=hm2LLDPMibObjects, hm2LLDPIfTable=hm2LLDPIfTable, hm2LLDPConfigGroup=hm2LLDPConfigGroup)

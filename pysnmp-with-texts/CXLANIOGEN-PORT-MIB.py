@@ -1,0 +1,48 @@
+#
+# PySNMP MIB module CXLANIOGEN-PORT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CXLANIOGEN-PORT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:32:58 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint")
+cxLanIoPort, = mibBuilder.importSymbols("CXProduct-SMI", "cxLanIoPort")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+iso, Counter32, MibIdentifier, IpAddress, Bits, Gauge32, Integer32, Unsigned32, ModuleIdentity, NotificationType, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, TimeTicks = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "Counter32", "MibIdentifier", "IpAddress", "Bits", "Gauge32", "Integer32", "Unsigned32", "ModuleIdentity", "NotificationType", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "TimeTicks")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+class PhysAddress(OctetString):
+    pass
+
+cxLanIoGenPortTable = MibTable((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2), )
+if mibBuilder.loadTexts: cxLanIoGenPortTable.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenPortTable.setDescription('Table which holds all the basic information on a hardware port')
+cxLanIoGenPortEntry = MibTableRow((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1), ).setIndexNames((0, "CXLANIOGEN-PORT-MIB", "cxLanIoGenPortIndex"))
+if mibBuilder.loadTexts: cxLanIoGenPortEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenPortEntry.setDescription(' Entry in the table, defines basic attributes of any LAN port.')
+cxLanIoGenPortIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cxLanIoGenPortIndex.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenPortIndex.setDescription(' An index value which identifies the LAN port where the data generation will take place. This is corrolated to the index in the cxLanIoPortTable.')
+cxLanIoGenMacAddrSrc = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1, 2), PhysAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cxLanIoGenMacAddrSrc.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenMacAddrSrc.setDescription(' Source MAC Address inserted in the frame generated.')
+cxLanIoGenMacAddrDst = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1, 3), PhysAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cxLanIoGenMacAddrDst.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenMacAddrDst.setDescription(' Destination MAC Address inserted in the frame generated.')
+cxLanIoGenType = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("invalid", 1), ("disabled", 2), ("internalLoopbackLevel1", 3), ("internalLoopbackLevel2", 4), ("noLoopbackFrameVerify", 5), ("noLoopbackFrameForward", 6)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cxLanIoGenType.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenType.setDescription(' Object to control the generator behavior.')
+cxLanIoGenDelay = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1, 5), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 255))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cxLanIoGenDelay.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenDelay.setDescription(' Indication on the delay between the frame generated.')
+cxLanIoGenFrameSize = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(64, 4096))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: cxLanIoGenFrameSize.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenFrameSize.setDescription(' Frame size generated.')
+cxLanIoGenStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1, 7), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("disabled", 2), ("internalLoopbackLevel1", 3), ("internalLoopbackLevel2", 4), ("noLoopbackFrameVerify", 5), ("noLoopbackFrameForward", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cxLanIoGenStatus.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenStatus.setDescription(' Object to report the current status of the data generator.')
+cxLanIoGenRxError = MibTableColumn((1, 3, 6, 1, 4, 1, 495, 2, 1, 5, 10, 2, 1, 8), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cxLanIoGenRxError.setStatus('mandatory')
+if mibBuilder.loadTexts: cxLanIoGenRxError.setDescription(' Number of error the data generator detected.')
+mibBuilder.exportSymbols("CXLANIOGEN-PORT-MIB", cxLanIoGenStatus=cxLanIoGenStatus, PhysAddress=PhysAddress, cxLanIoGenPortIndex=cxLanIoGenPortIndex, cxLanIoGenRxError=cxLanIoGenRxError, cxLanIoGenMacAddrSrc=cxLanIoGenMacAddrSrc, cxLanIoGenPortTable=cxLanIoGenPortTable, cxLanIoGenPortEntry=cxLanIoGenPortEntry, cxLanIoGenFrameSize=cxLanIoGenFrameSize, cxLanIoGenType=cxLanIoGenType, cxLanIoGenDelay=cxLanIoGenDelay, cxLanIoGenMacAddrDst=cxLanIoGenMacAddrDst)

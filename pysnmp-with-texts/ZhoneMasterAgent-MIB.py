@@ -1,0 +1,42 @@
+#
+# PySNMP MIB module ZhoneMasterAgent-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZhoneMasterAgent-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:52:37 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, ModuleIdentity, NotificationType, TimeTicks, Integer32, IpAddress, Gauge32, MibIdentifier, ObjectIdentity, Counter32, Counter64, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "ModuleIdentity", "NotificationType", "TimeTicks", "Integer32", "IpAddress", "Gauge32", "MibIdentifier", "ObjectIdentity", "Counter32", "Counter64", "Unsigned32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+zhoneMasterAgent, zhoneModules = mibBuilder.importSymbols("Zhone", "zhoneMasterAgent", "zhoneModules")
+zhoneMasterAgentMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5504, 6, 10))
+zhoneMasterAgentMIB.setRevisions(('2000-09-12 11:16',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: zhoneMasterAgentMIB.setRevisionsDescriptions(('V01.00.00 - Initial Release',))
+if mibBuilder.loadTexts: zhoneMasterAgentMIB.setLastUpdated('200009121459Z')
+if mibBuilder.loadTexts: zhoneMasterAgentMIB.setOrganization('Zhone Technogogies, Inc.')
+if mibBuilder.loadTexts: zhoneMasterAgentMIB.setContactInfo(' Postal: Zhone Technologies, Inc. @ Zhone Way 7001 Oakport Street Oakland, CA 94621 USA Toll-Free: +1 877-ZHONE20 (+1 877-946-6320) Tel: +1-510-777-7000 Fax: +1-510-777-7001 E-mail: support@zhone.com')
+if mibBuilder.loadTexts: zhoneMasterAgentMIB.setDescription('The MIB module to describe the Zhone specific implementation of the Master Agent. These fields go beyond those defined in RFC1907 (snmp).')
+maRequestPort = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: maRequestPort.setStatus('current')
+if mibBuilder.loadTexts: maRequestPort.setDescription('The IP Port number that should be used by the SNMP manager when sending/receiving messages. This will not be used in the initial release. The default value for this field is 161.')
+maTrapPort = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 65535))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: maTrapPort.setStatus('current')
+if mibBuilder.loadTexts: maTrapPort.setDescription('The IP port number that should be used when sending traps to any Fault Manager Service.')
+maPerfSaRequests = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 3), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maPerfSaRequests.setStatus('current')
+if mibBuilder.loadTexts: maPerfSaRequests.setDescription("Number of requests sent by the Master Agent to any Sub-Agent in the device. In a single SNMP PDU, multiple Sub-Agents may be required to process the individual VarBinds. This count will increment for each of these individual messages and therefore is not a 1:1 relationship with the number of SNMP PDU's requiring Sub-Agent Processing. ")
+maPerfSaResponses = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 4), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maPerfSaResponses.setStatus('current')
+if mibBuilder.loadTexts: maPerfSaResponses.setDescription('Number of Sub-Agent responses to the requests issued. Unless there are internal errors, this should match the maSARequestCount')
+maPerfSnmpErrors = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 5), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maPerfSnmpErrors.setStatus('current')
+if mibBuilder.loadTexts: maPerfSnmpErrors.setDescription("The number of Master-Agent errors detected on SNMP PDU's received. Examples are parsing errors but does not include such items as community table invalid and noSuchInstance cases.")
+maPerfSaTimeouts = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 7, 6), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: maPerfSaTimeouts.setStatus('current')
+if mibBuilder.loadTexts: maPerfSaTimeouts.setDescription('The number of timeouts that have occurred due to a lack of response from a sub-agent to a request.')
+mibBuilder.exportSymbols("ZhoneMasterAgent-MIB", zhoneMasterAgentMIB=zhoneMasterAgentMIB, maPerfSaRequests=maPerfSaRequests, maPerfSaResponses=maPerfSaResponses, maRequestPort=maRequestPort, maPerfSaTimeouts=maPerfSaTimeouts, PYSNMP_MODULE_ID=zhoneMasterAgentMIB, maTrapPort=maTrapPort, maPerfSnmpErrors=maPerfSnmpErrors)

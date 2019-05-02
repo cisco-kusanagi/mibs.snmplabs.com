@@ -1,0 +1,82 @@
+#
+# PySNMP MIB module ZXR10-MPLS-L2VPN-STATIS (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZXR10-MPLS-L2VPN-STATIS
+# Produced by pysmi-0.3.4 at Wed May  1 15:48:23 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ValueSizeConstraint", "ConstraintsIntersection")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+ModuleIdentity, Counter32, Bits, Integer32, Gauge32, ObjectIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, iso, TimeTicks, MibIdentifier, Counter64, NotificationType, Unsigned32 = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Counter32", "Bits", "Integer32", "Gauge32", "ObjectIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "iso", "TimeTicks", "MibIdentifier", "Counter64", "NotificationType", "Unsigned32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+zxr10L2vpn, = mibBuilder.importSymbols("ZXR10-SMI", "zxr10L2vpn")
+zxr10MplsL2vpnStatisMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6))
+zxr10MplsL2vpnStatisMIB.setRevisions(('2005-07-26 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: zxr10MplsL2vpnStatisMIB.setRevisionsDescriptions(('',))
+if mibBuilder.loadTexts: zxr10MplsL2vpnStatisMIB.setLastUpdated('200507260000Z')
+if mibBuilder.loadTexts: zxr10MplsL2vpnStatisMIB.setOrganization('ZTE Corporation')
+if mibBuilder.loadTexts: zxr10MplsL2vpnStatisMIB.setContactInfo('ZTE Corporation Nanjing Institute of ZTE Corporation No.68 Zijinghua Rd. Yuhuatai District, Nanjing, China Tel: +86-25-52870000')
+if mibBuilder.loadTexts: zxr10MplsL2vpnStatisMIB.setDescription('ZXROS v4.6.03 Mpls L2vpn query and configuration MIB')
+zxr10L2vpnStatisObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1))
+class DisplayString(OctetString):
+    pass
+
+class InterfaceIndex(TextualConvention, Integer32):
+    description = "A unique value, greater than zero, for each interface or interface sub-layer in the managed system. It is recommended that values are assigned contiguously starting from 1. The value for each interface sub-layer must remain constant at least from one re-initialization of the entity's network management system to the next re-initialization."
+    status = 'current'
+    displayHint = 'd'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(1, 2147483647)
+
+zxr10L2vpnStatisTable = MibTable((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 1), )
+if mibBuilder.loadTexts: zxr10L2vpnStatisTable.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisTable.setDescription('Mpls L2vpn instance query table')
+zxr10L2vpnStatisEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 1, 1), ).setIndexNames((0, "ZXR10-MPLS-L2VPN-STATIS", "zxr10L2vpnStatisVCID"))
+if mibBuilder.loadTexts: zxr10L2vpnStatisEntry.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisEntry.setDescription('Information of Mpls L2vpn instance configured on a PE')
+zxr10L2vpnStatisVCID = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 1, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisVCID.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVCID.setDescription('')
+zxr10L2vpnStatisVpnName = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 1, 1, 2), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 16))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisVpnName.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVpnName.setDescription('')
+zxr10L2vpnStatisRecvPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 1, 1, 3), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisRecvPkts.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisRecvPkts.setDescription('')
+zxr10L2vpnStatisRecvBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 1, 1, 4), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisRecvBytes.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisRecvBytes.setDescription('')
+zxr10L2vpnStatisSndPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 1, 1, 5), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisSndPkts.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisSndPkts.setDescription('')
+zxr10L2vpnStatisSndBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 1, 1, 6), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisSndBytes.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisSndBytes.setDescription('')
+zxr10L2vpnStatisVcTable = MibTable((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 2), )
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcTable.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcTable.setDescription('')
+zxr10L2vpnStatisVcEntry = MibTableRow((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 2, 1), ).setIndexNames((0, "ZXR10-MPLS-L2VPN-STATIS", "zxr10L2vpnStatisVcID"), (0, "ZXR10-MPLS-L2VPN-STATIS", "zxr10L2vpnStatisVcPeerAddr"))
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcEntry.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcEntry.setDescription('Information of Mpls L2vpn instance configured on a PE')
+zxr10L2vpnStatisVcID = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 2, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcID.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcID.setDescription('')
+zxr10L2vpnStatisVcPeerAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 2, 1, 2), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcPeerAddr.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcPeerAddr.setDescription('')
+zxr10L2vpnStatisVcRecvPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 2, 1, 3), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcRecvPkts.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcRecvPkts.setDescription('')
+zxr10L2vpnStatisVcRecvBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 2, 1, 4), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcRecvBytes.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcRecvBytes.setDescription('')
+zxr10L2vpnStatisVcSndPkts = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 2, 1, 5), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcSndPkts.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcSndPkts.setDescription('')
+zxr10L2vpnStatisVcSndBytes = MibTableColumn((1, 3, 6, 1, 4, 1, 3902, 3, 104, 6, 1, 2, 1, 6), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcSndBytes.setStatus('current')
+if mibBuilder.loadTexts: zxr10L2vpnStatisVcSndBytes.setDescription('')
+mibBuilder.exportSymbols("ZXR10-MPLS-L2VPN-STATIS", zxr10L2vpnStatisVcPeerAddr=zxr10L2vpnStatisVcPeerAddr, zxr10L2vpnStatisVcTable=zxr10L2vpnStatisVcTable, zxr10L2vpnStatisVcSndBytes=zxr10L2vpnStatisVcSndBytes, zxr10L2vpnStatisSndBytes=zxr10L2vpnStatisSndBytes, InterfaceIndex=InterfaceIndex, zxr10L2vpnStatisVCID=zxr10L2vpnStatisVCID, zxr10L2vpnStatisSndPkts=zxr10L2vpnStatisSndPkts, zxr10L2vpnStatisVcRecvPkts=zxr10L2vpnStatisVcRecvPkts, zxr10L2vpnStatisVcEntry=zxr10L2vpnStatisVcEntry, zxr10L2vpnStatisTable=zxr10L2vpnStatisTable, zxr10L2vpnStatisVpnName=zxr10L2vpnStatisVpnName, zxr10L2vpnStatisObjects=zxr10L2vpnStatisObjects, PYSNMP_MODULE_ID=zxr10MplsL2vpnStatisMIB, zxr10L2vpnStatisVcID=zxr10L2vpnStatisVcID, zxr10L2vpnStatisVcSndPkts=zxr10L2vpnStatisVcSndPkts, zxr10L2vpnStatisRecvBytes=zxr10L2vpnStatisRecvBytes, zxr10L2vpnStatisEntry=zxr10L2vpnStatisEntry, zxr10MplsL2vpnStatisMIB=zxr10MplsL2vpnStatisMIB, zxr10L2vpnStatisRecvPkts=zxr10L2vpnStatisRecvPkts, zxr10L2vpnStatisVcRecvBytes=zxr10L2vpnStatisVcRecvBytes, DisplayString=DisplayString)

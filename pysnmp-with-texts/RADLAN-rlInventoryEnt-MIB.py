@@ -1,0 +1,51 @@
+#
+# PySNMP MIB module RADLAN-rlInventoryEnt-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RADLAN-rlInventoryEnt-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:51:12 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ValueSizeConstraint")
+rnd, = mibBuilder.importSymbols("RADLAN-MIB", "rnd")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Gauge32, Counter64, iso, Unsigned32, ObjectIdentity, Bits, Integer32, MibIdentifier, Counter32, TimeTicks, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Gauge32", "Counter64", "iso", "Unsigned32", "ObjectIdentity", "Bits", "Integer32", "MibIdentifier", "Counter32", "TimeTicks", "IpAddress")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+class UnitIfindexType(TextualConvention, Integer32):
+    description = 'Unit or ifindex type.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(0, 1))
+    namedValues = NamedValues(("unit", 0), ("ifindex", 1))
+
+rlInventoryEntTable = MibTable((1, 3, 6, 1, 4, 1, 89, 217), )
+if mibBuilder.loadTexts: rlInventoryEntTable.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntTable.setDescription('A table that contains INVENTORY entities in the system.')
+rlInventoryEntEntry = MibTableRow((1, 3, 6, 1, 4, 1, 89, 217, 1), ).setIndexNames((0, "RADLAN-rlInventoryEnt-MIB", "rlInventoryEntUnitOrIfindex"), (0, "RADLAN-rlInventoryEnt-MIB", "rlInventoryEntUnitIfindexID"))
+if mibBuilder.loadTexts: rlInventoryEntEntry.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntEntry.setDescription('An entry (conceptual row) in the rlInventoryEnvTable.')
+rlInventoryEntUnitOrIfindex = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 217, 1, 1), UnitIfindexType()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlInventoryEntUnitOrIfindex.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntUnitOrIfindex.setDescription('this field will be equal to zero if this is a unit else 1 if this is a port.')
+rlInventoryEntUnitIfindexID = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 217, 1, 2), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlInventoryEntUnitIfindexID.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntUnitIfindexID.setDescription('if rlInventoryEntUnitOrIfindex = 0 this field contain the unit number else if rlInventoryEntUnitOrIfindex = 1 This field contain the if_index number.')
+rlInventoryEntVendorID = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 217, 1, 3), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlInventoryEntVendorID.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntVendorID.setDescription('Vendor identification')
+rlInventoryEntPID = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 217, 1, 4), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlInventoryEntPID.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntPID.setDescription('Physical identification')
+rlInventoryEntName = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 217, 1, 5), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlInventoryEntName.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntName.setDescription('Unit number of interface name')
+rlInventoryEntDescription = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 217, 1, 6), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlInventoryEntDescription.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntDescription.setDescription('Description of the entity')
+rlInventoryEntSerialNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 217, 1, 7), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlInventoryEntSerialNumber.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntSerialNumber.setDescription('The serial number of the interface or unit.')
+rlInventoryEntUnitNum = MibTableColumn((1, 3, 6, 1, 4, 1, 89, 217, 1, 8), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rlInventoryEntUnitNum.setStatus('current')
+if mibBuilder.loadTexts: rlInventoryEntUnitNum.setDescription('if rlInventoryEntUnitOrIfindex = 1 this field contain the unit number that associated to this port')
+mibBuilder.exportSymbols("RADLAN-rlInventoryEnt-MIB", rlInventoryEntTable=rlInventoryEntTable, rlInventoryEntPID=rlInventoryEntPID, rlInventoryEntUnitNum=rlInventoryEntUnitNum, rlInventoryEntVendorID=rlInventoryEntVendorID, rlInventoryEntName=rlInventoryEntName, UnitIfindexType=UnitIfindexType, rlInventoryEntUnitOrIfindex=rlInventoryEntUnitOrIfindex, rlInventoryEntDescription=rlInventoryEntDescription, rlInventoryEntSerialNumber=rlInventoryEntSerialNumber, rlInventoryEntEntry=rlInventoryEntEntry, rlInventoryEntUnitIfindexID=rlInventoryEntUnitIfindexID)

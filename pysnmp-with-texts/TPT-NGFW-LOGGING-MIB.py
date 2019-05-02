@@ -1,0 +1,100 @@
+#
+# PySNMP MIB module TPT-NGFW-LOGGING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TPT-NGFW-LOGGING-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:26:27 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+InetAddressType, InetAddress = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressType", "InetAddress")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+Counter64, NotificationType, Gauge32, Integer32, ObjectIdentity, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, IpAddress, MibIdentifier, Bits, Counter32, ModuleIdentity, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "NotificationType", "Gauge32", "Integer32", "ObjectIdentity", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "IpAddress", "MibIdentifier", "Bits", "Counter32", "ModuleIdentity", "iso")
+TextualConvention, DateAndTime, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DateAndTime", "DisplayString")
+tpt_ngfw_objs, tpt_ngfw_groups, tpt_ngfw_params, Severity, tpt_ngfw_eventsV2, tpt_ngfw_compls = mibBuilder.importSymbols("TPT-NGFW-REG-MIB", "tpt-ngfw-objs", "tpt-ngfw-groups", "tpt-ngfw-params", "Severity", "tpt-ngfw-eventsV2", "tpt-ngfw-compls")
+tptNgfwSystemSerial, = mibBuilder.importSymbols("TPT-NGFW-SYSTEM-INFO-MIB", "tptNgfwSystemSerial")
+tptNgfwLogging = ModuleIdentity((1, 3, 6, 1, 4, 1, 10734, 3, 9, 2, 5))
+tptNgfwLogging.setRevisions(('2016-05-25 18:54', '2013-03-13 12:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: tptNgfwLogging.setRevisionsDescriptions(('Updated copyright information. Minor MIB syntax fixes.', 'Initial version of NGFW Logging MIB.',))
+if mibBuilder.loadTexts: tptNgfwLogging.setLastUpdated('201605251854Z')
+if mibBuilder.loadTexts: tptNgfwLogging.setOrganization('Trend Micro, Inc.')
+if mibBuilder.loadTexts: tptNgfwLogging.setContactInfo('www.trendmicro.com')
+if mibBuilder.loadTexts: tptNgfwLogging.setDescription(" Logging information and notifications for TippingPoint Next-Generation Firewall products. Copyright (C) 2016 Trend Micro Incorporated. All Rights Reserved. Trend Micro makes no warranty of any kind with regard to this material, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose. Trend Micro shall not be liable for errors contained herein or for incidental or consequential damages in connection with the furnishing, performance, or use of this material. This document contains proprietary information, which is protected by copyright. No part of this document may be photocopied, reproduced, or translated into another language without the prior written consent of Trend Micro. The information is provided 'as is' without warranty of any kind and is subject to change without notice. The only warranties for Trend Micro products and services are set forth in the express warranty statements accompanying such products and services. Nothing herein should be construed as constituting an additional warranty. Trend Micro shall not be liable for technical or editorial errors or omissions contained herein. TippingPoint(R), the TippingPoint logo, and Digital Vaccine(R) are registered trademarks of Trend Micro. All other company and product names may be trademarks of their respective holders. All rights reserved. This document contains confidential information, trade secrets or both, which are the property of Trend Micro. No part of this documentation may be reproduced in any form or by any means or used to make any derivative work (such as translation, transformation, or adaptation) without written permission from Trend Micro or one of its subsidiaries. All other company and product names may be trademarks of their respective holders. ")
+class AuditLogResult(TextualConvention, Integer32):
+    description = 'The result of an audit check: success, or fail. '
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("success", 1), ("failed", 2))
+
+class AuditLogCategory(TextualConvention, Integer32):
+    description = 'The functional location of where an audit check was made and generated a log entry. '
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24))
+    namedValues = NamedValues(("undefined", 1), ("general", 2), ("login", 3), ("logout", 4), ("user", 5), ("time", 6), ("policy", 7), ("update", 8), ("boot", 9), ("report", 10), ("host", 11), ("cfg", 12), ("device", 13), ("sms", 14), ("server", 15), ("segment", 16), ("license", 17), ("ha", 18), ("monitor", 19), ("ipFilter", 20), ("connTable", 21), ("hostComm", 22), ("tse", 23), ("cf", 24))
+
+tptNgfwSysLogNotify = NotificationType((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 0, 15)).setObjects(("TPT-NGFW-SYSTEM-INFO-MIB", "tptNgfwSystemSerial"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyTime"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyHost"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifySource"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifySeverity"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyText"))
+if mibBuilder.loadTexts: tptNgfwSysLogNotify.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwSysLogNotify.setDescription('System log notification. ')
+tptNgfwLogNotifyTime = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 60), DateAndTime()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwLogNotifyTime.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwLogNotifyTime.setDescription('The date and time when the entry was logged. ')
+tptNgfwLogNotifyHost = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 61), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 255))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwLogNotifyHost.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwLogNotifyHost.setDescription('The host name that generated the system log. ')
+tptNgfwLogNotifySource = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 62), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 80))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwLogNotifySource.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwLogNotifySource.setDescription('The component that generated the system log. ')
+tptNgfwLogNotifySeverity = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 63), Severity()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwLogNotifySeverity.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwLogNotifySeverity.setDescription('The severity of the logged event. ')
+tptNgfwLogNotifyText = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 64), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 4096))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwLogNotifyText.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwLogNotifyText.setDescription('The full log text. ')
+tptNgfwAuditLogNotify = NotificationType((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 0, 16)).setObjects(("TPT-NGFW-SYSTEM-INFO-MIB", "tptNgfwSystemSerial"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyTime"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyAccess"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyType"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyIpAddrType"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyIpAddr"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyCategory"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyResult"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyUser"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyMessage"))
+if mibBuilder.loadTexts: tptNgfwAuditLogNotify.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotify.setDescription('Audit-log notification. ')
+tptNgfwAuditLogNotifyAccess = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 65), Unsigned32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyAccess.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyAccess.setDescription('The access level of the user initiating the audit check and generating the log. This is a bit field with the following mapping: 0x0 - normal 0x1 - operator 0x4 - administrator 0x8 - super-user ')
+tptNgfwAuditLogNotifyType = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 66), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 40))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyType.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyType.setDescription('The interface source of the audit log action. ')
+tptNgfwAuditLogNotifyIpAddrType = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 67), InetAddressType()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyIpAddrType.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyIpAddrType.setDescription('The type of IP address from which the user connected. ')
+tptNgfwAuditLogNotifyIpAddr = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 68), InetAddress()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyIpAddr.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyIpAddr.setDescription('The IP address from which the user connected. ')
+tptNgfwAuditLogNotifyCategory = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 69), AuditLogCategory()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyCategory.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyCategory.setDescription('The functional area where the audit log was generated. ')
+tptNgfwAuditLogNotifyResult = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 70), AuditLogResult()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyResult.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyResult.setDescription('The result, pass or fail, of an audit check. ')
+tptNgfwAuditLogNotifyUser = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 71), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 80))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyUser.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyUser.setDescription('The user initiating the audit check and generating the log. ')
+tptNgfwAuditLogNotifyMessage = MibScalar((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 1, 72), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(0, 4096))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyMessage.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwAuditLogNotifyMessage.setDescription('A description of what configuration change was attempted (and possibly succeeded) by the user. ')
+tptNgfwVpnLogNotify = NotificationType((1, 3, 6, 1, 4, 1, 10734, 3, 9, 3, 0, 17)).setObjects(("TPT-NGFW-SYSTEM-INFO-MIB", "tptNgfwSystemSerial"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyTime"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifySeverity"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifySource"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyText"))
+if mibBuilder.loadTexts: tptNgfwVpnLogNotify.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwVpnLogNotify.setDescription('A notification for VPN log information. ')
+tptNgfwLoggingGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 10734, 3, 9, 1, 1, 9)).setObjects(("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyTime"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyHost"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifySource"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifySeverity"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLogNotifyText"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyAccess"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyType"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyIpAddrType"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyIpAddr"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyCategory"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyResult"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyUser"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotifyMessage"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    tptNgfwLoggingGroup = tptNgfwLoggingGroup.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwLoggingGroup.setDescription('Logging group consisting of system, audit, and VPN log objects. ')
+tptNgfwLoggingNotificationGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 10734, 3, 9, 1, 1, 10)).setObjects(("TPT-NGFW-LOGGING-MIB", "tptNgfwSysLogNotify"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwAuditLogNotify"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwVpnLogNotify"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    tptNgfwLoggingNotificationGroup = tptNgfwLoggingNotificationGroup.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwLoggingNotificationGroup.setDescription('NGFW Logging notifications. ')
+tptNgfwLoggingCompl = ModuleCompliance((1, 3, 6, 1, 4, 1, 10734, 3, 9, 1, 2, 3)).setObjects(("TPT-NGFW-LOGGING-MIB", "tptNgfwLoggingGroup"), ("TPT-NGFW-LOGGING-MIB", "tptNgfwLoggingNotificationGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    tptNgfwLoggingCompl = tptNgfwLoggingCompl.setStatus('current')
+if mibBuilder.loadTexts: tptNgfwLoggingCompl.setDescription('Compliance for TippingPoint Next-generation Firewall logging MIB. ')
+mibBuilder.exportSymbols("TPT-NGFW-LOGGING-MIB", tptNgfwLogNotifySeverity=tptNgfwLogNotifySeverity, tptNgfwLoggingGroup=tptNgfwLoggingGroup, tptNgfwVpnLogNotify=tptNgfwVpnLogNotify, tptNgfwAuditLogNotifyUser=tptNgfwAuditLogNotifyUser, tptNgfwLogging=tptNgfwLogging, tptNgfwLogNotifySource=tptNgfwLogNotifySource, tptNgfwAuditLogNotify=tptNgfwAuditLogNotify, tptNgfwAuditLogNotifyType=tptNgfwAuditLogNotifyType, tptNgfwLoggingCompl=tptNgfwLoggingCompl, tptNgfwSysLogNotify=tptNgfwSysLogNotify, tptNgfwAuditLogNotifyAccess=tptNgfwAuditLogNotifyAccess, AuditLogResult=AuditLogResult, tptNgfwLogNotifyText=tptNgfwLogNotifyText, tptNgfwLoggingNotificationGroup=tptNgfwLoggingNotificationGroup, tptNgfwLogNotifyTime=tptNgfwLogNotifyTime, tptNgfwLogNotifyHost=tptNgfwLogNotifyHost, tptNgfwAuditLogNotifyIpAddr=tptNgfwAuditLogNotifyIpAddr, tptNgfwAuditLogNotifyCategory=tptNgfwAuditLogNotifyCategory, tptNgfwAuditLogNotifyResult=tptNgfwAuditLogNotifyResult, tptNgfwAuditLogNotifyIpAddrType=tptNgfwAuditLogNotifyIpAddrType, tptNgfwAuditLogNotifyMessage=tptNgfwAuditLogNotifyMessage, PYSNMP_MODULE_ID=tptNgfwLogging, AuditLogCategory=AuditLogCategory)

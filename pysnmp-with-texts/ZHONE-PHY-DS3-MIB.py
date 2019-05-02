@@ -1,0 +1,46 @@
+#
+# PySNMP MIB module ZHONE-PHY-DS3-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZHONE-PHY-DS3-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:47:47 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+dsx3ConfigEntry, = mibBuilder.importSymbols("DS3-MIB", "dsx3ConfigEntry")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+Unsigned32, Bits, ModuleIdentity, NotificationType, Gauge32, iso, Counter64, TimeTicks, MibIdentifier, ObjectIdentity, IpAddress, Integer32, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Bits", "ModuleIdentity", "NotificationType", "Gauge32", "iso", "Counter64", "TimeTicks", "MibIdentifier", "ObjectIdentity", "IpAddress", "Integer32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter32")
+TruthValue, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TruthValue", "TextualConvention", "DisplayString")
+zhoneModules, zhoneDs3Ext = mibBuilder.importSymbols("Zhone", "zhoneModules", "zhoneDs3Ext")
+phyDs3 = ModuleIdentity((1, 3, 6, 1, 4, 1, 5504, 6, 17))
+phyDs3.setRevisions(('2001-05-14 14:35', '2001-04-25 14:25', '2001-03-15 08:34',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: phyDs3.setRevisionsDescriptions(('V01.02.00 - Add Atm Framing Support.', 'V01.01.00 - Add E3 Framing Support.', 'V01.00.00 - Initial Release',))
+if mibBuilder.loadTexts: phyDs3.setLastUpdated('200105151435Z')
+if mibBuilder.loadTexts: phyDs3.setOrganization('Zhone Technologies, Inc.')
+if mibBuilder.loadTexts: phyDs3.setContactInfo(' Postal: Zhone Technologies, Inc. @ Zhone Way 7001 Oakport Street Oakland, CA 94621 USA Toll-Free: +1 877-ZHONE20 (+1 877-946-6320) Tel: +1-510-777-7000 Fax: +1-510-777-7001 E-mail: support@zhone.com')
+if mibBuilder.loadTexts: phyDs3.setDescription('DS3 physical MIB to configure and monitor DS3 physical attributes. ')
+dsx3ConfigExtGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5504, 5, 10, 1)).setObjects(("ZHONE-PHY-DS3-MIB", "dsx3ConfigExtScrambleEnabled"), ("ZHONE-PHY-DS3-MIB", "dsx3ConfigExtE3Framing"), ("ZHONE-PHY-DS3-MIB", "dsx3ConfigExtAtmFraming"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    dsx3ConfigExtGroup = dsx3ConfigExtGroup.setStatus('current')
+if mibBuilder.loadTexts: dsx3ConfigExtGroup.setDescription('Description.')
+dsx3ConfigExtTable = MibTable((1, 3, 6, 1, 4, 1, 5504, 5, 10, 2), )
+if mibBuilder.loadTexts: dsx3ConfigExtTable.setStatus('current')
+if mibBuilder.loadTexts: dsx3ConfigExtTable.setDescription('This is an extenion of the standard Ds3 MIB (RFC 2496).')
+dsx3ConfigExtEntry = MibTableRow((1, 3, 6, 1, 4, 1, 5504, 5, 10, 2, 1), )
+dsx3ConfigEntry.registerAugmentions(("ZHONE-PHY-DS3-MIB", "dsx3ConfigExtEntry"))
+dsx3ConfigExtEntry.setIndexNames(*dsx3ConfigEntry.getIndexNames())
+if mibBuilder.loadTexts: dsx3ConfigExtEntry.setStatus('current')
+if mibBuilder.loadTexts: dsx3ConfigExtEntry.setDescription('Each row is an extension to the dsx3ConfigExtTable for Zhone specific fields. This row is created when the augmented dsx3ConfigEntry is created.')
+dsx3ConfigExtScrambleEnabled = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 5, 10, 2, 1, 1), TruthValue().clone('true')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dsx3ConfigExtScrambleEnabled.setStatus('current')
+if mibBuilder.loadTexts: dsx3ConfigExtScrambleEnabled.setDescription('This field describes the enabled status of the Ds3 Scramble mode. If this field is true(1) then Scramble mode is enabled, if this field is false(2) scramble mode is disable.')
+dsx3ConfigExtE3Framing = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 5, 10, 2, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("e3FrameOther", 1), ("e3FrameG832", 2), ("e3FrameG751", 3))).clone('e3FrameG832')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dsx3ConfigExtE3Framing.setStatus('current')
+if mibBuilder.loadTexts: dsx3ConfigExtE3Framing.setDescription('This field describes the status of the E3 Framing mode. If this field is e3FrameG832(2) then E3 Framing Format will be G832, if this field is e3FrameG751 then E3 Framing Format will be G751.')
+dsx3ConfigExtAtmFraming = MibTableColumn((1, 3, 6, 1, 4, 1, 5504, 5, 10, 2, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("dsx3AtmFramingOther", 1), ("dsx3AtmFramingPLCP", 2), ("dsx3AtmFramingDirectCellMapped", 3))).clone('dsx3AtmFramingDirectCellMapped')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: dsx3ConfigExtAtmFraming.setStatus('current')
+if mibBuilder.loadTexts: dsx3ConfigExtAtmFraming.setDescription('This field describes the status of the Atm Framing mode. If this field is PLCP(2) then Atm Framing Format will be PLCP, if this field is DirectCellMapped(3) then Atm Framing Format will be Direct Cell Mapped.')
+mibBuilder.exportSymbols("ZHONE-PHY-DS3-MIB", dsx3ConfigExtGroup=dsx3ConfigExtGroup, dsx3ConfigExtScrambleEnabled=dsx3ConfigExtScrambleEnabled, dsx3ConfigExtE3Framing=dsx3ConfigExtE3Framing, phyDs3=phyDs3, dsx3ConfigExtAtmFraming=dsx3ConfigExtAtmFraming, dsx3ConfigExtTable=dsx3ConfigExtTable, PYSNMP_MODULE_ID=phyDs3, dsx3ConfigExtEntry=dsx3ConfigExtEntry)

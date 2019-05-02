@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module FC-DS1-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/FC-DS1-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:12:49 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, OctetString, Integer = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "OctetString", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint", "ConstraintsIntersection")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, ModuleIdentity, MibIdentifier, snmpModules, IpAddress, NotificationType, iso, enterprises, NotificationType, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Bits, ObjectIdentity, Unsigned32, Counter32, Integer32, ObjectName = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "ModuleIdentity", "MibIdentifier", "snmpModules", "IpAddress", "NotificationType", "iso", "enterprises", "NotificationType", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Bits", "ObjectIdentity", "Unsigned32", "Counter32", "Integer32", "ObjectName")
+TextualConvention, RowStatus, TestAndIncr, TruthValue, DisplayString, TimeStamp = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "RowStatus", "TestAndIncr", "TruthValue", "DisplayString", "TimeStamp")
+lucent = MibIdentifier((1, 3, 6, 1, 4, 1, 1751))
+products = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1))
+softSwitch = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1, 1198))
+fcDeviceServer = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 9))
+fcDS1 = ModuleIdentity((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 9, 1))
+if mibBuilder.loadTexts: fcDS1.setLastUpdated('240701')
+if mibBuilder.loadTexts: fcDS1.setOrganization('Lucent Technologies')
+if mibBuilder.loadTexts: fcDS1.setContactInfo('')
+if mibBuilder.loadTexts: fcDS1.setDescription('The MIB module for entities implementing the xxxx protocol.')
+fcSystem = MibIdentifier((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 9, 1, 1))
+fCServer = MibScalar((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 9, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 2048))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: fCServer.setStatus('current')
+if mibBuilder.loadTexts: fCServer.setDescription('fcServer is an integer, FC Server in the alarm origin field')
+fCApp = MibScalar((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 9, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2048))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: fCApp.setStatus('current')
+if mibBuilder.loadTexts: fCApp.setDescription('fcApp is an integer, FC Application ID to identify the application')
+fCDescText = MibScalar((1, 3, 6, 1, 4, 1, 1751, 1, 1198, 9, 1, 1, 3), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: fCDescText.setStatus('current')
+if mibBuilder.loadTexts: fCDescText.setDescription('Application Alarm description text')
+mibBuilder.exportSymbols("FC-DS1-MIB", lucent=lucent, fCApp=fCApp, fcDS1=fcDS1, products=products, softSwitch=softSwitch, PYSNMP_MODULE_ID=fcDS1, fCServer=fCServer, fCDescText=fCDescText, fcDeviceServer=fcDeviceServer, fcSystem=fcSystem)

@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module NMS-L2-PROTOCOL-TUNNEL-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/NMS-L2-PROTOCOL-TUNNEL-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:22:15 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion", "SingleValueConstraint")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+nmsMgmt, = mibBuilder.importSymbols("NMS-SMI", "nmsMgmt")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ObjectIdentity, Integer32, Bits, NotificationType, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, TimeTicks, Gauge32, iso, Counter32, MibIdentifier, IpAddress, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "Integer32", "Bits", "NotificationType", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "TimeTicks", "Gauge32", "iso", "Counter32", "MibIdentifier", "IpAddress", "ModuleIdentity")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+nmsL2ProtocolTunnelMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 11606, 10, 9, 357))
+if mibBuilder.loadTexts: nmsL2ProtocolTunnelMIB.setLastUpdated('201302210000Z')
+if mibBuilder.loadTexts: nmsL2ProtocolTunnelMIB.setOrganization('')
+if mibBuilder.loadTexts: nmsL2ProtocolTunnelMIB.setContactInfo('')
+if mibBuilder.loadTexts: nmsL2ProtocolTunnelMIB.setDescription('This MIB module is for layer 2 protocol tunneling configurations. Layer 2 protocol tunneling function allows separate user networks to be considered as a single LAN. These user networks are connected via a switched network, which is running L2PT, and transparently forwads the specified l2 protocol data units(PDUs) from one user network to another.')
+l2ptMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11606, 10, 9, 357, 1))
+l2ptGlobal = MibIdentifier((1, 3, 6, 1, 4, 1, 11606, 10, 9, 357, 1, 1))
+l2ptIntfTable = MibTable((1, 3, 6, 1, 4, 1, 11606, 10, 9, 357, 1, 2), )
+if mibBuilder.loadTexts: l2ptIntfTable.setStatus('current')
+if mibBuilder.loadTexts: l2ptIntfTable.setDescription('This table contains the L2 protocol tunnel configuration of interfaces. Currently supported L2 PDU type is STP.')
+l2ptIntfEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11606, 10, 9, 357, 1, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: l2ptIntfEntry.setStatus('current')
+if mibBuilder.loadTexts: l2ptIntfEntry.setDescription('L2 protocol tunnel configuration of interfaces.')
+l2ptIntfStpTnl = MibTableColumn((1, 3, 6, 1, 4, 1, 11606, 10, 9, 357, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("enabled", 1), ("disabled", 2))).clone('disabled')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: l2ptIntfStpTnl.setStatus('current')
+if mibBuilder.loadTexts: l2ptIntfStpTnl.setDescription('Indicates if the tunneling of STP BPDUs is enabled on this interface.')
+mibBuilder.exportSymbols("NMS-L2-PROTOCOL-TUNNEL-MIB", l2ptGlobal=l2ptGlobal, l2ptIntfStpTnl=l2ptIntfStpTnl, l2ptMIBObjects=l2ptMIBObjects, nmsL2ProtocolTunnelMIB=nmsL2ProtocolTunnelMIB, l2ptIntfTable=l2ptIntfTable, PYSNMP_MODULE_ID=nmsL2ProtocolTunnelMIB, l2ptIntfEntry=l2ptIntfEntry)

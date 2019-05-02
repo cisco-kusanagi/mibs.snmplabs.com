@@ -1,0 +1,112 @@
+#
+# PySNMP MIB module HP-ICF-FTRCO (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HP-ICF-FTRCO
+# Produced by pysmi-0.3.4 at Wed May  1 13:33:31 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint")
+hpSwitch, = mibBuilder.importSymbols("HP-ICF-OID", "hpSwitch")
+PortList, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "PortList")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+ObjectIdentity, IpAddress, Gauge32, MibIdentifier, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, Integer32, TimeTicks, Counter64, NotificationType, Bits, Counter32, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "IpAddress", "Gauge32", "MibIdentifier", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "Integer32", "TimeTicks", "Counter64", "NotificationType", "Bits", "Counter32", "ModuleIdentity")
+DisplayString, DateAndTime, TruthValue, RowStatus, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "DateAndTime", "TruthValue", "RowStatus", "TextualConvention")
+hpicfFtrCo = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46))
+hpicfFtrCo.setRevisions(('2010-06-01 00:00', '2009-08-28 00:02',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: hpicfFtrCo.setRevisionsDescriptions(('Added aclPermitLogging.', 'Initial revision.',))
+if mibBuilder.loadTexts: hpicfFtrCo.setLastUpdated('201006010000Z')
+if mibBuilder.loadTexts: hpicfFtrCo.setOrganization('HP Networking')
+if mibBuilder.loadTexts: hpicfFtrCo.setContactInfo('Hewlett Packard Company 8000 Foothills Blvd. Roseville, CA 95747')
+if mibBuilder.loadTexts: hpicfFtrCo.setDescription('This MIB module manages Application Coordination Restriction Policies')
+class VidList(TextualConvention, OctetString):
+    description = 'Each octet within this value specifies a set of eight VlanIIndex (VID), with the first octet specifying VIDs 1 through 8, the second octet specifying VIDs 9 through 16, etc. Within each octet, the most significant bit represents the lowest numbered VID, and the least significant bit represents the highest numbered VID. Thus, each VID is represented by a single bit within the value of this object. If that bit has a value of 1 then that VID is included in the set of VIDs; the VID is not included if its bit has a value of 0. This list represents the entire range of VlanIndex values defined in the scope of IEEE 802.1Q.'
+    status = 'current'
+    displayHint = '512x'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(512, 512)
+    fixedLength = 512
+
+class IndexName(TextualConvention, OctetString):
+    description = "This object is valid when used as an index - an IndexName is similar to a DisplayString, except that it does allow a tilde ('~') and spaces within ts definition. Otherwise it fully follows the textual-convention of the standard DisplayString definition."
+    status = 'current'
+    displayHint = '32a'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 32)
+
+hpicfFtrcoObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1))
+hpFtrCoEntityTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 1), )
+if mibBuilder.loadTexts: hpFtrCoEntityTable.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoEntityTable.setDescription("Table of all Entities setting restrictions, as set by some external entity. Any restriction for an Entity can be deleted by deleting the Entity name, by deleting a specific restriction, or by any expiration value. Once an Entity name has been added to the table, it exist until the name has specifically been removed. Entity rows also maintain the 'next-index' value for any restriction table entry.")
+hpFtrCoEntityEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 1, 1), ).setIndexNames((0, "HP-ICF-FTRCO", "hpFtrCoEntityName"))
+if mibBuilder.loadTexts: hpFtrCoEntityEntry.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoEntityEntry.setDescription('A row entry in the table for a specific entity user of the Feature Coordinator facility. Entries in this table are created and removed dynamically. An entity can add and remove a restriction regarding some pre-defined facility in the switch and it will only be for a specific Entity name. If the Entity name is removed, so are all of its restrictions.')
+hpFtrCoEntityName = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 1, 1, 1), IndexName().subtype(subtypeSpec=ValueSizeConstraint(1, 32)))
+if mibBuilder.loadTexts: hpFtrCoEntityName.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoEntityName.setDescription('An administratively assigned string, which may be used to identify the unique owner of a set of restrictions.')
+hpFtrCoRestrictNextIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)).clone(1)).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoRestrictNextIndex.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictNextIndex.setDescription("Is the next indexing parameter that allows multiple, like restrictions. It is has a default value of 1 and is incremented each time its index value is used. This is an independent value and must be specified as the next added index (regardless of the restriction type). In the event there is a collision due to a race with reading the current value, the 'losing' restriction is denied and the value should be re-read for a next attempt. The value is always 1 whenever a new Entity record is created.")
+hpFtrCoEntityDate = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 1, 1, 3), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpFtrCoEntityDate.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoEntityDate.setDescription("This represents the switch's understanding of the current UTC time. It should be used when setting an restriction expiration DateAndTime value. Please note that this value is uniquely determined each time the object is read (dynamic) and is subject to changing when a change is made to the switch's configuration (e.g. setting the local time-zone).")
+hpFtrCoEntityStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 1, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoEntityStatus.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoEntityStatus.setDescription('Administrative status of this Entity entry.')
+hpFtrCoRestrictionTable = MibTable((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2), )
+if mibBuilder.loadTexts: hpFtrCoRestrictionTable.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictionTable.setDescription('Table of all restrictions, set by an external entity. The restrictions can be deleted by deleting the entity name or by the restriction expiration value. Expiration policies are logically ORed so that any policy expiration that is met causes the restriction to be removed.')
+hpFtrCoRestrictEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1), ).setIndexNames((0, "HP-ICF-FTRCO", "hpFtrCoEntityName"), (0, "HP-ICF-FTRCO", "hpFtrCoRestrictId"), (0, "HP-ICF-FTRCO", "hpFtrCoRestrictIndex"))
+if mibBuilder.loadTexts: hpFtrCoRestrictEntry.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictEntry.setDescription('An entry in the table for a specific Entity user of the Feature Coordinator facility. Entries in this table are created and removed dynamically. An entity can add and remove a restriction to some facility in the switch. These entries can also expire, based on entity specified criteria. A restriction is never modified (all restrictions are only created or deleted). If a value needs to be modified, a new restriction could be added and then the old one deleted (e.g. adding or removing an interface).')
+hpFtrCoRestrictId = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24))).clone(namedValues=NamedValues(("vidIpConfig", 1), ("vidDelete", 2), ("portSecurity", 3), ("portAcl", 4), ("portSourcePortFilter", 5), ("portMeshing", 6), ("portLacp", 7), ("distributedTrunk", 8), ("portVirusThrottling", 9), ("portSflow", 10), ("portDhcpSnoop", 11), ("portLoopDetection", 12), ("portBpduPvstGuard", 13), ("qinq", 14), ("portQos", 15), ("portRateLimit", 16), ("portStaticMac", 17), ("portIpLockdown", 18), ("portIgmp", 19), ("portMirrorDestination", 20), ("portLinkConfig", 21), ("portLldp", 22), ("portKeepalive", 23), ("aclPermitLogging", 24))))
+if mibBuilder.loadTexts: hpFtrCoRestrictId.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictId.setDescription('The Restriction enumeration (Id). Expect this list to grow as are more restrictions are developed (and needed).')
+hpFtrCoRestrictIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 2), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647)))
+if mibBuilder.loadTexts: hpFtrCoRestrictIndex.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictIndex.setDescription("An indexing parameter to allow multiple, like restrictions. It is created by the Entity portion of MIB and used for addressing an individual restriction rule. Any new restriction added to a restriction table must be equal to the current 'next-restriction' value.")
+hpFtrCoRestrictIdParm = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoRestrictIdParm.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictIdParm.setDescription('An optional parameter for the restriction enumeration.')
+hpFtrCoRestrictStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoRestrictStatus.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictStatus.setDescription('Administrative status of this entry.')
+hpFtrCoRestrictMessage = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 5), SnmpAdminString().subtype(subtypeSpec=ValueSizeConstraint(1, 255))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoRestrictMessage.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictMessage.setDescription("An error message containing information about the restriction that can be used by the caller, indicating the reason for this restriction being in place. It is occasionally referred to as a friendly error message. SIZE reflects that a message must exist and that it has a maximum 'String' length of 255 character.")
+hpFtrCoRestrictPorts = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 6), PortList()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoRestrictPorts.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictPorts.setDescription('A list of ports, if applicable to the restriction.')
+hpFtrCoRestrictVlans = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 7), VidList()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoRestrictVlans.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoRestrictVlans.setDescription('A VidList of vlan IDs, if applicable to the restriction.')
+hpFtrCoExpireSlot = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 8), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 2147483647))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoExpireSlot.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoExpireSlot.setDescription('Setting this value will cause this restriction to expire when corresponding switch slot is signaled to be down. Note, if the slot never comes up, there will be no slot-down signal.')
+hpFtrCoExpireApplication = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 9), IndexName().subtype(subtypeSpec=ValueSizeConstraint(0, 32))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoExpireApplication.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoExpireApplication.setDescription('This setting will cause the restriction to expire whenever a signal is received that this application-name has gone down.')
+hpFtrCoExpireVidDelete = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 10), Integer32().subtype(subtypeSpec=ValueRangeConstraint(0, 4096))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoExpireVidDelete.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoExpireVidDelete.setDescription('A signal indicating this VlanIndex has been deleted will cause this restriction to expire. The specified VID record must exist in the switch configuration for this policy to be set. NOTE: ExpireVidDelete is unused in this release; it is available, you can set it; but it is totally ignored with current processing.')
+hpFtrCoExpireDate = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 11), DateAndTime()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoExpireDate.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoExpireDate.setDescription('This expiration event occurs whenever it is determined that the switch-time exceeds this setting. The switches sw_time() represents the UTC time value (relative to Jan 1, 1990) used with this comparison (compare with sw_localtime). NOTE: ExpireDate is unused in this release; it is available, you can set it; but it is totally ignored with current processing.')
+hpFtrCoExpireBoot = MibTableColumn((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 1, 2, 1, 12), TruthValue().clone('false')).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: hpFtrCoExpireBoot.setStatus('current')
+if mibBuilder.loadTexts: hpFtrCoExpireBoot.setDescription("When specified as 'true', this expiration event occurs whenever the switch reboots. It is a necessary expiration policy since all restrictions are persistent and it is possible that we can have an obsolete policy (slot-down) following a power-fail condition.")
+hpicfFtrCoConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 2))
+hpicfFtrCoCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 2, 1))
+hpicfFtrCoGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 2, 2))
+hpicfFtrCoCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 2, 1, 1)).setObjects(("HP-ICF-FTRCO", "hpicfFtrCoGroup"), ("HP-ICF-FTRCO", "hpicfFtrCoGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfFtrCoCompliance = hpicfFtrCoCompliance.setStatus('current')
+if mibBuilder.loadTexts: hpicfFtrCoCompliance.setDescription('The compliance statement for HP switches implementing the HP-ICF-FTRCO-MIB.')
+hpicfFtrCoGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 5, 1, 46, 2, 2, 1)).setObjects(("HP-ICF-FTRCO", "hpFtrCoRestrictNextIndex"), ("HP-ICF-FTRCO", "hpFtrCoEntityDate"), ("HP-ICF-FTRCO", "hpFtrCoEntityStatus"), ("HP-ICF-FTRCO", "hpFtrCoRestrictIdParm"), ("HP-ICF-FTRCO", "hpFtrCoRestrictStatus"), ("HP-ICF-FTRCO", "hpFtrCoRestrictMessage"), ("HP-ICF-FTRCO", "hpFtrCoRestrictPorts"), ("HP-ICF-FTRCO", "hpFtrCoRestrictVlans"), ("HP-ICF-FTRCO", "hpFtrCoExpireSlot"), ("HP-ICF-FTRCO", "hpFtrCoExpireApplication"), ("HP-ICF-FTRCO", "hpFtrCoExpireVidDelete"), ("HP-ICF-FTRCO", "hpFtrCoExpireDate"), ("HP-ICF-FTRCO", "hpFtrCoExpireBoot"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpicfFtrCoGroup = hpicfFtrCoGroup.setStatus('current')
+if mibBuilder.loadTexts: hpicfFtrCoGroup.setDescription('A collection of HP proprietary objects to support Feature Coordinator.')
+mibBuilder.exportSymbols("HP-ICF-FTRCO", PYSNMP_MODULE_ID=hpicfFtrCo, VidList=VidList, hpicfFtrCoCompliances=hpicfFtrCoCompliances, hpFtrCoRestrictPorts=hpFtrCoRestrictPorts, hpicfFtrCoCompliance=hpicfFtrCoCompliance, hpFtrCoExpireSlot=hpFtrCoExpireSlot, hpFtrCoEntityStatus=hpFtrCoEntityStatus, hpicfFtrCoConformance=hpicfFtrCoConformance, hpFtrCoRestrictIdParm=hpFtrCoRestrictIdParm, IndexName=IndexName, hpicfFtrcoObjects=hpicfFtrcoObjects, hpFtrCoRestrictIndex=hpFtrCoRestrictIndex, hpFtrCoRestrictStatus=hpFtrCoRestrictStatus, hpFtrCoEntityTable=hpFtrCoEntityTable, hpicfFtrCo=hpicfFtrCo, hpFtrCoExpireApplication=hpFtrCoExpireApplication, hpFtrCoRestrictVlans=hpFtrCoRestrictVlans, hpFtrCoEntityDate=hpFtrCoEntityDate, hpicfFtrCoGroups=hpicfFtrCoGroups, hpFtrCoRestrictMessage=hpFtrCoRestrictMessage, hpicfFtrCoGroup=hpicfFtrCoGroup, hpFtrCoRestrictId=hpFtrCoRestrictId, hpFtrCoRestrictEntry=hpFtrCoRestrictEntry, hpFtrCoEntityEntry=hpFtrCoEntityEntry, hpFtrCoExpireBoot=hpFtrCoExpireBoot, hpFtrCoExpireVidDelete=hpFtrCoExpireVidDelete, hpFtrCoExpireDate=hpFtrCoExpireDate, hpFtrCoRestrictionTable=hpFtrCoRestrictionTable, hpFtrCoEntityName=hpFtrCoEntityName, hpFtrCoRestrictNextIndex=hpFtrCoRestrictNextIndex)

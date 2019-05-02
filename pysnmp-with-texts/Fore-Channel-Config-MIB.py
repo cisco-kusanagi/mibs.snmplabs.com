@@ -1,0 +1,30 @@
+#
+# PySNMP MIB module Fore-Channel-Config-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/Fore-Channel-Config-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:16:54 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, SingleValueConstraint, ValueRangeConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "SingleValueConstraint", "ValueRangeConstraint", "ValueSizeConstraint")
+asx, = mibBuilder.importSymbols("Fore-Common-MIB", "asx")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, ModuleIdentity, IpAddress, ObjectIdentity, Bits, Integer32, NotificationType, Counter64, Counter32, TimeTicks, Unsigned32, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "ModuleIdentity", "IpAddress", "ObjectIdentity", "Bits", "Integer32", "NotificationType", "Counter64", "Counter32", "TimeTicks", "Unsigned32", "Gauge32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+channelControlGroup = ModuleIdentity((1, 3, 6, 1, 4, 1, 326, 2, 2, 1, 1, 11))
+if mibBuilder.loadTexts: channelControlGroup.setLastUpdated('9911050000Z')
+if mibBuilder.loadTexts: channelControlGroup.setOrganization('FORE')
+if mibBuilder.loadTexts: channelControlGroup.setContactInfo(' Postal: FORE Systems Inc. 1000 FORE Drive Warrendale, PA 15086-7502 Tel: +1 724 742 6900 Email: nm_mibs@fore.com Web: http://www.fore.com')
+if mibBuilder.loadTexts: channelControlGroup.setDescription(" This mib is used to configure channelized operating modes for interfaces that can operate in either channelized or concatenated mode. For now, this is used to support the configuration of the Channelized OC12 netmod. In that netmod, each port can operate as an STS12c atm cell source, or it can be configured to operate as 4 STS3c streams channelized over an STS12 sonet path, or it can operate as 12xDS3 streams carried in STS3 paths, which in turn, are multiplexed into an STS12 path. This mib exports a single table which contains an row for each channelizable port in the switch. Each row has 1 modifiable column to set the operating mode of the port. Note that changing a port's operating mode may make dramatic modifications to this and other tables as switching the mode of an interface may create or destory other interfaces.")
+channelConfigTable = MibTable((1, 3, 6, 1, 4, 1, 326, 2, 2, 1, 1, 11, 1), )
+if mibBuilder.loadTexts: channelConfigTable.setStatus('current')
+if mibBuilder.loadTexts: channelConfigTable.setDescription('A table of channelized port configuration information.')
+channelConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 326, 2, 2, 1, 1, 11, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: channelConfigEntry.setStatus('current')
+if mibBuilder.loadTexts: channelConfigEntry.setDescription('A table entry containing channelized port configuration information')
+channelConfigMode = MibTableColumn((1, 3, 6, 1, 4, 1, 326, 2, 2, 1, 1, 11, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 1, 2))).clone(namedValues=NamedValues(("sts12c", 0), ("sts3cX4", 1), ("ds3X12", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: channelConfigMode.setStatus('current')
+if mibBuilder.loadTexts: channelConfigMode.setDescription('This value indicates the current operating mode of the specified interface. Note that not all modes may be chosen for a particular interface. Also note that even though values are given in the Sonet hierarchy, these values can also be use to set the corresponding SDH hierarchy value if the underlying port is operating in SDH mode.')
+mibBuilder.exportSymbols("Fore-Channel-Config-MIB", channelConfigEntry=channelConfigEntry, channelConfigTable=channelConfigTable, PYSNMP_MODULE_ID=channelControlGroup, channelConfigMode=channelConfigMode, channelControlGroup=channelControlGroup)

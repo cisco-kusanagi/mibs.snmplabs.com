@@ -1,0 +1,108 @@
+#
+# PySNMP MIB module QB-TIMING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/QB-TIMING-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:43:38 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+ObjectIdentifier, Integer, OctetString = mibBuilder.importSymbols("ASN1", "ObjectIdentifier", "Integer", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+InterfaceIndexOrZero, ifIndex, InterfaceIndex = mibBuilder.importSymbols("IF-MIB", "InterfaceIndexOrZero", "ifIndex", "InterfaceIndex")
+qbMibs, = mibBuilder.importSymbols("QUANTUMBRIDGE-REG", "qbMibs")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+Integer32, TimeTicks, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, Counter32, iso, NotificationType, Bits, ModuleIdentity, Unsigned32, Counter64, MibIdentifier, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "TimeTicks", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "Counter32", "iso", "NotificationType", "Bits", "ModuleIdentity", "Unsigned32", "Counter64", "MibIdentifier", "Gauge32")
+TextualConvention, TruthValue, DisplayString, RowStatus = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TruthValue", "DisplayString", "RowStatus")
+qbTimingMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 4323, 2, 11))
+if mibBuilder.loadTexts: qbTimingMIB.setLastUpdated('0101011634Z')
+if mibBuilder.loadTexts: qbTimingMIB.setOrganization('Quantum Bridge Inc.')
+if mibBuilder.loadTexts: qbTimingMIB.setContactInfo('mvaysman@quantumbridge.com')
+if mibBuilder.loadTexts: qbTimingMIB.setDescription('This module defines objects for timing management of OAS system.')
+qbTimingObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1))
+qbTimingTables = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 2, 11, 2))
+qbTimingConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 2, 11, 3))
+class QbTimingCableLength(TextualConvention, Integer32):
+    description = 'The range of feet of cable from the QB5000 to the Building Integrated Timing Supply.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7))
+    namedValues = NamedValues(("length0to110ft", 1), ("length110to220ft", 2), ("length220to330ft", 3), ("length330to440ft", 4), ("length440to550ft", 5), ("length550to660ft", 6), ("lengthGreater660ft", 7))
+
+class QbTimingFraming(TextualConvention, Integer32):
+    description = 'Indicates the signal framing.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+    namedValues = NamedValues(("other", 1), ("dsx1ESF", 2), ("dsx1D4", 3), ("dsx1E1", 4), ("dsx1E1CRC", 5), ("dsx1E1MF", 6), ("dsx1E1CRCMF", 7), ("dsx1Unframed", 8), ("dsx1E1Unframed", 9), ("dsx1DS2M12", 10), ("dsx2E2", 11), ("dsx1SF", 12))
+
+class QbTimingPort(TextualConvention, Integer32):
+    description = 'Indicates a selected timing port.'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("timing-port1", 1), ("timing-port2", 2))
+
+qbTimingGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1))
+qbTimingModeAdminStatus = MibScalar((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 8))).clone(namedValues=NamedValues(("freerun", 1), ("external", 2), ("loop", 3), ("holdover", 8)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingModeAdminStatus.setStatus('current')
+if mibBuilder.loadTexts: qbTimingModeAdminStatus.setDescription("The object is used to set the desired timing configuration of an OAS system. Setting this object to 'freerun(1)' depending on the installed TGS3 option, causes one of the following results: 1. If the board in the MAIN slot does not have the TGS3 card installed, the local oscillator on the board is used as the synchronization source. 2. If the board in the MAIN slot has the TGS3 card installed, the synchronization is derived from the TGS3 card. Setting this object to 'external(2)' selects the external BITS input as the timing source. Setting this object to 'loop(3)' causes the timing mode to switch loop-timed. When the object is set to 'loop', the 'qbTimingLoopInLineRef' must be set to an appropriate ifindex. The value holdover can not be set here. When qbTimingModeAdminStatus is loop(3), and you set the qbTimingHoldoverCtl to holdover, qbTimingModeAdminStatus will have a value of holdover")
+qbTimingModeOperStatus = MibScalar((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))).clone(namedValues=NamedValues(("freerun", 1), ("external", 2), ("loop", 3), ("holdoverMntc", 4), ("holdoverAuto", 5), ("notOperational", 6)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: qbTimingModeOperStatus.setStatus('current')
+if mibBuilder.loadTexts: qbTimingModeOperStatus.setDescription("The object indicates the actual status of the timing of an OAS system. A value 'notOperational(6)' indicates that the shelf doesn't have operational timing equpment available. A value 'freerun(1) indicates the free-running timing mode. A value 'external(2)' indicates the external timing mode of the shelf. A value 'loop(3)' indicates the loop-timed timing mode of the shelf. A value 'holdoverMntc(4)' indicates the timing mode was intentionally switched to 'holdover' by setting 'qbTimingHooldover' to 'holdover'. A value 'holdoverAuto(5)' indicates the timing mode was intentionally switched due to hardware problems")
+qbTimingOutputMode = MibScalar((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("disable", 1), ("lock", 2), ("track", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingOutputMode.setStatus('current')
+if mibBuilder.loadTexts: qbTimingOutputMode.setDescription("This object is used to disable or enable the BITS output signals at the timing ports. Setting the object to 'lock' or track must be accompanied by setting 'qbTimingOutLineRef to an appropriate ifIndex")
+qbTimingHoldoverCtl = MibScalar((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("holdover", 1), ("clearholdover", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingHoldoverCtl.setStatus('current')
+if mibBuilder.loadTexts: qbTimingHoldoverCtl.setDescription("The object forces the OAS system into one of two states depending on whether the TGS3 is equipped. If the TGS3 card is not installed the set command fails. Setting this object to 'holdover(1)', when the TGS3 card is installed,forces the OAS system into holdover maintenance mod. Setting the value to 'holdover' is only valid when the system 'qbTimingOperStatus' is either 'external' or 'loop' Setting this object to 'clearholdover(2)' causes the timing mode to reinstate the original timing mode and can achieved if 'qbTimingOperStatus' is set to 'holdoverMntc'.")
+qbTimingSourceStatus = MibScalar((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 5), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("primary", 1), ("secondary", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingSourceStatus.setStatus('current')
+if mibBuilder.loadTexts: qbTimingSourceStatus.setDescription("This is used to switch the external output source to the primary or secondary source. Note: this object works in conjunction with 'qbTimingModeAdminStatus'.")
+qbTimingInLineRef = MibScalar((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 6), InterfaceIndexOrZero()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingInLineRef.setStatus('current')
+if mibBuilder.loadTexts: qbTimingInLineRef.setDescription("The value of ifIndex corresponding to the optical port interface that provides a source for the system time reference. The object is changed in conjunction with 'qbTimingOutputMode'. When 'qbTimingModeAdminStatus' is set to 'freerun' the object is irrelevant and the agent returns 0. Note: only slots main-a, au-1 or au-7 may be selected for this port. The object is relevant only for WAN622, S622-T, Q-155, Q-155T, D155VT/VC, and D155VT/VC-T ports. Only one port at the time can be used as the timing source.")
+qbTimingOutLineRef = MibScalar((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 7), InterfaceIndexOrZero()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingOutLineRef.setStatus('current')
+if mibBuilder.loadTexts: qbTimingOutLineRef.setDescription("The value of ifIndex corresponding to the port interface that provides a line reference for the external timing outputs. The object is changed in conjunction with 'qbTimingOutputMode'. When 'qbTimingAdminStatus' is set to 'freerun' this object is irrelevant and the agent returns 0. Note: this object is relevant only for main and au-1/au-2 and au-7/au-8 slots.")
+qbTimingPortTable = MibTable((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8), )
+if mibBuilder.loadTexts: qbTimingPortTable.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortTable.setDescription('A list of timing port entries. The number of entries is 2 (timing_port1 and timing_port2). Every entry contains the following configuration settings: the format line, format cable length(for ports configured for as DS1), line coding, framing and impendance(for ports configures as E1).')
+qbTimingPortEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1), ).setIndexNames((0, "QB-TIMING-MIB", "qbTimingPort"))
+if mibBuilder.loadTexts: qbTimingPortEntry.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortEntry.setDescription('Entry containing information for a particular timing port in the OAS system.')
+qbTimingPort = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 1), QbTimingPort())
+if mibBuilder.loadTexts: qbTimingPort.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPort.setDescription('The timing port number')
+qbTimingPortName = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 2), DisplayString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: qbTimingPortName.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortName.setDescription('A descriptive string of the timing port')
+qbTimingPortFormat = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("ds1", 1), ("e1", 2), ("noValue", 3))).clone('ds1')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingPortFormat.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortFormat.setDescription('The object is used to set the signal format for the external timing ports.')
+qbTimingPortLineCoding = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7))).clone(namedValues=NamedValues(("dsx1JBZS", 1), ("dsx1B8ZS", 2), ("dsx1HDB3", 3), ("dsx1ZBTSI", 4), ("dsx1AMI", 5), ("other", 6), ("dsx1B6ZS", 7))).clone('dsx1AMI')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingPortLineCoding.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortLineCoding.setDescription('The object is used to set the signal linecoding.')
+qbTimingPortFraming = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 5), QbTimingFraming().clone('dsx1SF')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingPortFraming.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortFraming.setDescription('The object is used to set the signal linecoding.')
+qbTimingPortCableLength = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 6), QbTimingCableLength().clone(1)).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingPortCableLength.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortCableLength.setDescription('The object is used to set the range of cable from the OAS to the external synchronization source. The value entered is interpreted by the agent to have a cable length within the range associated with the value. Note: this value is applicable only for DS1 ports. ')
+qbTimingPortImpedanceMode = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 7), Integer32().subtype(subtypeSpec=ConstraintsUnion(ValueRangeConstraint(75, 75), ValueRangeConstraint(120, 120), )).clone(120)).setUnits('in ohms').setMaxAccess("readwrite")
+if mibBuilder.loadTexts: qbTimingPortImpedanceMode.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortImpedanceMode.setDescription('The object is used to set the impendance in ohms. Note: this value is applicable only for E1 ports.')
+qbTimingPortOperStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 8), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("up", 1), ("down", 2), ("los", 3), ("eqpFailure", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: qbTimingPortOperStatus.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortOperStatus.setDescription('The object indicates the output operational status of the timing port. up(1) - timing port up down(2)- timing port down los(3) - Los of Signal eqpFailure(4) - Equipment problem or TGS card is removed')
+qbTimingPortInOperStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4323, 2, 11, 1, 1, 8, 1, 9), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))).clone(namedValues=NamedValues(("up", 1), ("down", 2), ("los", 3), ("eqpFailure", 4)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: qbTimingPortInOperStatus.setStatus('current')
+if mibBuilder.loadTexts: qbTimingPortInOperStatus.setDescription('The object indicates the input operational status of the timing port. up(1) - timing port up down(2)- timing port down los(3) - Los of Signal eqpFailure(4) - Equipment problem or TGS card is removed')
+qbTimingCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 2, 11, 3, 1))
+qbTimingGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 4323, 2, 11, 3, 2))
+qbTimingCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 4323, 2, 11, 3, 1, 1)).setObjects(("QB-TIMING-MIB", "qbTimingAllGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    qbTimingCompliance = qbTimingCompliance.setStatus('current')
+if mibBuilder.loadTexts: qbTimingCompliance.setDescription('The compliance statement for all agents that support this MIB. A compliant agent implements all objects defined in this MIB.')
+qbTimingAllGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 4323, 2, 11, 3, 2, 1)).setObjects(("QB-TIMING-MIB", "qbTimingModeAdminStatus"), ("QB-TIMING-MIB", "qbTimingModeOperStatus"), ("QB-TIMING-MIB", "qbTimingOutputMode"), ("QB-TIMING-MIB", "qbTimingSourceStatus"), ("QB-TIMING-MIB", "qbTimingHoldoverCtl"), ("QB-TIMING-MIB", "qbTimingSourceStatus"), ("QB-TIMING-MIB", "qbTimingInLineRef"), ("QB-TIMING-MIB", "qbTimingOutLineRef"), ("QB-TIMING-MIB", "qbTimingPortName"), ("QB-TIMING-MIB", "qbTimingPortFormat"), ("QB-TIMING-MIB", "qbTimingPortLineCoding"), ("QB-TIMING-MIB", "qbTimingPortFraming"), ("QB-TIMING-MIB", "qbTimingPortCableLength"), ("QB-TIMING-MIB", "qbTimingPortImpedanceMode"), ("QB-TIMING-MIB", "qbTimingPortOperStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    qbTimingAllGroup = qbTimingAllGroup.setStatus('current')
+if mibBuilder.loadTexts: qbTimingAllGroup.setDescription('The set of all accessible objects in this MIB.')
+mibBuilder.exportSymbols("QB-TIMING-MIB", QbTimingPort=QbTimingPort, QbTimingCableLength=QbTimingCableLength, qbTimingModeOperStatus=qbTimingModeOperStatus, qbTimingPortFraming=qbTimingPortFraming, qbTimingCompliances=qbTimingCompliances, qbTimingTables=qbTimingTables, qbTimingSourceStatus=qbTimingSourceStatus, qbTimingPortTable=qbTimingPortTable, qbTimingInLineRef=qbTimingInLineRef, qbTimingConformance=qbTimingConformance, qbTimingPortImpedanceMode=qbTimingPortImpedanceMode, qbTimingObjects=qbTimingObjects, QbTimingFraming=QbTimingFraming, qbTimingHoldoverCtl=qbTimingHoldoverCtl, qbTimingAllGroup=qbTimingAllGroup, qbTimingPortOperStatus=qbTimingPortOperStatus, qbTimingPortInOperStatus=qbTimingPortInOperStatus, qbTimingGroup=qbTimingGroup, qbTimingCompliance=qbTimingCompliance, qbTimingModeAdminStatus=qbTimingModeAdminStatus, qbTimingOutLineRef=qbTimingOutLineRef, qbTimingPortName=qbTimingPortName, PYSNMP_MODULE_ID=qbTimingMIB, qbTimingPort=qbTimingPort, qbTimingOutputMode=qbTimingOutputMode, qbTimingMIB=qbTimingMIB, qbTimingGroups=qbTimingGroups, qbTimingPortLineCoding=qbTimingPortLineCoding, qbTimingPortEntry=qbTimingPortEntry, qbTimingPortFormat=qbTimingPortFormat, qbTimingPortCableLength=qbTimingPortCableLength)

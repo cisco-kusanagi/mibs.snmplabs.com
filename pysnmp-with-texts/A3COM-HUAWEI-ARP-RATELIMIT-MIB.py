@@ -1,0 +1,40 @@
+#
+# PySNMP MIB module A3COM-HUAWEI-ARP-RATELIMIT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/A3COM-HUAWEI-ARP-RATELIMIT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:03:50 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+h3cCommon, = mibBuilder.importSymbols("A3COM-HUAWEI-OID-MIB", "h3cCommon")
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+TimeTicks, IpAddress, ObjectIdentity, Unsigned32, NotificationType, Counter32, ModuleIdentity, Integer32, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, Bits, iso, Counter64, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "IpAddress", "ObjectIdentity", "Unsigned32", "NotificationType", "Counter32", "ModuleIdentity", "Integer32", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Bits", "iso", "Counter64", "Gauge32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+h3cARPRatelimit = ModuleIdentity((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110))
+h3cARPRatelimit.setRevisions(('2009-12-08 19:12',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: h3cARPRatelimit.setRevisionsDescriptions(('The initial version of this MIB file.',))
+if mibBuilder.loadTexts: h3cARPRatelimit.setLastUpdated('200912081912Z')
+if mibBuilder.loadTexts: h3cARPRatelimit.setOrganization('Hangzhou H3C Technologies Co., Ltd.')
+if mibBuilder.loadTexts: h3cARPRatelimit.setContactInfo('Platform Team H3C Technologies Co., Ltd. Hai-Dian District Beijing P.R. China http://www.h3c.com Zip: 100085')
+if mibBuilder.loadTexts: h3cARPRatelimit.setDescription('This MIB file defines the ARP packet rate limit configuration. The ARP packet rate limit feature monitors and controls the rate of ARP packets delivered to the CPU on a device. The current version supports the monitoring feature only.')
+h3cARPRatelimitObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110, 1))
+h3cARPRatelimitTrap = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110, 1, 1))
+h3cARPRatelimitTraps = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110, 1, 1, 0))
+h3cARPRatelimitOverspeedTrap = NotificationType((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110, 1, 1, 0, 1)).setObjects(("A3COM-HUAWEI-ARP-RATELIMIT-MIB", "h3cARPRatelimitTrapVer"), ("A3COM-HUAWEI-ARP-RATELIMIT-MIB", "h3cARPRatelimitTrapCount"), ("A3COM-HUAWEI-ARP-RATELIMIT-MIB", "h3cARPRatelimitTrapMsg"))
+if mibBuilder.loadTexts: h3cARPRatelimitOverspeedTrap.setStatus('current')
+if mibBuilder.loadTexts: h3cARPRatelimitOverspeedTrap.setDescription('If the rate of ARP packets delivered to the CPU on a device exceeds the threshold, a trap message is generated and sent to the remote monitoring device.')
+h3cARPRatelimitTrapObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110, 1, 1, 1))
+h3cARPRatelimitTrapVer = MibScalar((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110, 1, 1, 1, 1), Unsigned32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: h3cARPRatelimitTrapVer.setStatus('current')
+if mibBuilder.loadTexts: h3cARPRatelimitTrapVer.setDescription('The version of trap information.')
+h3cARPRatelimitTrapCount = MibScalar((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110, 1, 1, 1, 2), Unsigned32()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: h3cARPRatelimitTrapCount.setStatus('current')
+if mibBuilder.loadTexts: h3cARPRatelimitTrapCount.setDescription('Number of cells in the trap message. A trap message may contain multiple cells, each of which indicates that the rate information of ARP packets exceeds the threshold.')
+h3cARPRatelimitTrapMsg = MibScalar((1, 3, 6, 1, 4, 1, 43, 45, 1, 10, 2, 110, 1, 1, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(1, 254))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: h3cARPRatelimitTrapMsg.setStatus('current')
+if mibBuilder.loadTexts: h3cARPRatelimitTrapMsg.setDescription("This object is the cell section in a trap message sent from a monitored device. This object can contain multiple cells. This object is in the format of '<cell1><cell2>...'. Each cell consists of 17 octets in the format of '<TrapOrigin><IfIndex><OverSpeedValue><Threshold><Interval>'. <TrapOrigin> indicates the source of the trap message and has size of 1 octet. It only supports the following values. 1 - Global. 2 - Interface. <IfIndex> is the index of the interface where the rate of ARP packet exceeds the threshold and has size of 4 octets. It is 0xFFFFFFFF when <TrapOrigin> is 1(Global). <OverSpeedValue> indicates the rate that ARP packets are actually delivered and has size of 4 octets. <Threshold> indicates the threshold that ARP packets can be delivered to CPU and has size of 4 octets. <Interval> indicates the interval that a trap message is sent out and has size of 4 octets.")
+mibBuilder.exportSymbols("A3COM-HUAWEI-ARP-RATELIMIT-MIB", h3cARPRatelimitTrapCount=h3cARPRatelimitTrapCount, h3cARPRatelimitTrapMsg=h3cARPRatelimitTrapMsg, h3cARPRatelimitObjects=h3cARPRatelimitObjects, h3cARPRatelimitTraps=h3cARPRatelimitTraps, h3cARPRatelimitTrapObjects=h3cARPRatelimitTrapObjects, h3cARPRatelimit=h3cARPRatelimit, h3cARPRatelimitTrapVer=h3cARPRatelimitTrapVer, h3cARPRatelimitTrap=h3cARPRatelimitTrap, h3cARPRatelimitOverspeedTrap=h3cARPRatelimitOverspeedTrap, PYSNMP_MODULE_ID=h3cARPRatelimit)

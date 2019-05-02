@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module TPLINK-IPV6-SOURCE-GUARD-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TPLINK-IPV6-SOURCE-GUARD-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:25:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Integer32, Gauge32, Unsigned32, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, Bits, MibIdentifier, NotificationType, IpAddress, Counter32, ObjectIdentity, ModuleIdentity, Counter64, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Integer32", "Gauge32", "Unsigned32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "Bits", "MibIdentifier", "NotificationType", "IpAddress", "Counter32", "ObjectIdentity", "ModuleIdentity", "Counter64", "iso")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+tplinkMgmt, = mibBuilder.importSymbols("TPLINK-MIB", "tplinkMgmt")
+tplinkIpv6SourceGuardMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 11863, 6, 94))
+tplinkIpv6SourceGuardMIB.setRevisions(('2012-12-13 09:30',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: tplinkIpv6SourceGuardMIB.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: tplinkIpv6SourceGuardMIB.setLastUpdated('201212130930Z')
+if mibBuilder.loadTexts: tplinkIpv6SourceGuardMIB.setOrganization('TPLINK')
+if mibBuilder.loadTexts: tplinkIpv6SourceGuardMIB.setContactInfo('www.tplink.com.cn')
+if mibBuilder.loadTexts: tplinkIpv6SourceGuardMIB.setDescription('Private MIB for IPv6 source guard configuration.')
+tplinkIpv6SourceGuardMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 94, 1))
+tplinkIpv6SourceGuardNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 94, 2))
+tpIpv6SourceGuardConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 11863, 6, 94, 1, 1))
+tpIpv6SourceGuardConfigTable = MibTable((1, 3, 6, 1, 4, 1, 11863, 6, 94, 1, 1, 1), )
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigTable.setStatus('current')
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigTable.setDescription('A list of IPv6 source guard config entries. Here you can configure the IPv6 Source Guard feature.')
+tpIpv6SourceGuardConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 11863, 6, 94, 1, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"))
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigEntry.setStatus('current')
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigEntry.setDescription('An entry contains of the information of IPv6 source guard config.')
+tpIpv6SourceGuardConfigPort = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 94, 1, 1, 1, 1, 1), OctetString().subtype(subtypeSpec=ValueSizeConstraint(1, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigPort.setStatus('current')
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigPort.setDescription('port number')
+tpIpv6SourceGuardConfigType = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 94, 1, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(0, 2))).clone(namedValues=NamedValues(("disable", 0), ("sipv6-mac", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigType.setStatus('current')
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigType.setDescription('Select Security Type for the port. 0. disable: Select this option to disable the IPv6 Source Guard feature for the port. 1. SIPv6: Only the packets with its source IPv6 address and port number matched to the IPv6-MAC binding rules can be processed. 2. SIPv6+MAC: Only the packets with its source IPv6 address, source MAC address and port number matched to the IPv6-MAC binding rules can be processed.')
+tpIpv6SourceGuardConfigPortLag = MibTableColumn((1, 3, 6, 1, 4, 1, 11863, 6, 94, 1, 1, 1, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(1, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigPortLag.setStatus('current')
+if mibBuilder.loadTexts: tpIpv6SourceGuardConfigPortLag.setDescription('the lag the port belong to')
+mibBuilder.exportSymbols("TPLINK-IPV6-SOURCE-GUARD-MIB", tpIpv6SourceGuardConfigPort=tpIpv6SourceGuardConfigPort, tpIpv6SourceGuardConfigPortLag=tpIpv6SourceGuardConfigPortLag, tpIpv6SourceGuardConfigTable=tpIpv6SourceGuardConfigTable, tplinkIpv6SourceGuardMIBObjects=tplinkIpv6SourceGuardMIBObjects, PYSNMP_MODULE_ID=tplinkIpv6SourceGuardMIB, tplinkIpv6SourceGuardMIB=tplinkIpv6SourceGuardMIB, tpIpv6SourceGuardConfigEntry=tpIpv6SourceGuardConfigEntry, tpIpv6SourceGuardConfig=tpIpv6SourceGuardConfig, tpIpv6SourceGuardConfigType=tpIpv6SourceGuardConfigType, tplinkIpv6SourceGuardNotifications=tplinkIpv6SourceGuardNotifications)

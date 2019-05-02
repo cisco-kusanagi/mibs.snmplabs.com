@@ -1,0 +1,56 @@
+#
+# PySNMP MIB module CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 12:18:53 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, SingleValueConstraint, ValueSizeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "SingleValueConstraint", "ValueSizeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+InterfaceIndexOrZero, = mibBuilder.importSymbols("CISCO-TC", "InterfaceIndexOrZero")
+VlanIndex, = mibBuilder.importSymbols("CISCO-VTP-MIB", "VlanIndex")
+InterfaceIndex, = mibBuilder.importSymbols("IF-MIB", "InterfaceIndex")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+iso, MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, IpAddress, NotificationType, Bits, Integer32, Unsigned32, ModuleIdentity, MibIdentifier, Counter64, Counter32, TimeTicks, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "IpAddress", "NotificationType", "Bits", "Integer32", "Unsigned32", "ModuleIdentity", "MibIdentifier", "Counter64", "Counter32", "TimeTicks", "Gauge32")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ciscoVlanIfTableRelationshipMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 128))
+ciscoVlanIfTableRelationshipMIB.setRevisions(('2013-07-15 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoVlanIfTableRelationshipMIB.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: ciscoVlanIfTableRelationshipMIB.setLastUpdated('9904010530Z')
+if mibBuilder.loadTexts: ciscoVlanIfTableRelationshipMIB.setOrganization('Cisco Systems, Inc.')
+if mibBuilder.loadTexts: ciscoVlanIfTableRelationshipMIB.setContactInfo('Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-snmp@cisco.com')
+if mibBuilder.loadTexts: ciscoVlanIfTableRelationshipMIB.setDescription("Cisco VLAN ifTable Relationship MIB lists VLAN-id and ifIndex information for routed VLAN interfaces. A routed VLAN interface is the router interface or sub-interface to which the router's IP address on the VLAN is attached. For example, an ISL, SDE, or 802.1Q encapsulated subinterface, or Switched Virtual Interface (SVI).")
+cviMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 128, 1))
+cviGlobals = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 1))
+cviVlanInterfaceIndexTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 1, 1), )
+if mibBuilder.loadTexts: cviVlanInterfaceIndexTable.setStatus('current')
+if mibBuilder.loadTexts: cviVlanInterfaceIndexTable.setDescription("The cviVlanInterfaceIndexTable provides a way to translate a VLAN-id in to an ifIndex, so that the routed VLAN interface's routing configuration can be obtained from interface entry in ipRouteTable. Note that some routers can have interfaces to multiple VLAN management domains, and therefore can have multiple routed VLAN interfaces which connect to different VLANs having the same VLAN-id. Thus, it is possible to have multiple rows in this table for the same VLAN-id. The cviVlanInterfaceIndexTable also provides a way to find the VLAN-id from an ifTable VLAN's ifIndex.")
+cviVlanInterfaceIndexEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 1, 1, 1), ).setIndexNames((0, "CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB", "cviVlanId"), (0, "CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB", "cviPhysicalIfIndex"))
+if mibBuilder.loadTexts: cviVlanInterfaceIndexEntry.setStatus('current')
+if mibBuilder.loadTexts: cviVlanInterfaceIndexEntry.setDescription('Each entry represents a routed VLAN interface, its corresponding physical port if any, and the ifTable entry for the routed VLAN interface. Entries are created by the agent when the routed VLAN interface is created. Operational status of routing does not affect the entries listed here. For routing configuration please refer to ipRouteTable. Entries are deleted by the agent when the routed VLAN interface is removed from the system configuration.')
+cviVlanId = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 1, 1, 1, 1), VlanIndex())
+if mibBuilder.loadTexts: cviVlanId.setStatus('current')
+if mibBuilder.loadTexts: cviVlanId.setDescription('The VLAN-id number of the routed VLAN interface.')
+cviPhysicalIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 1, 1, 1, 2), InterfaceIndexOrZero())
+if mibBuilder.loadTexts: cviPhysicalIfIndex.setStatus('current')
+if mibBuilder.loadTexts: cviPhysicalIfIndex.setDescription('For subinterfaces, this object is the ifIndex of the physical interface for the subinterface. For Switch Virtual Interfaces (SVIs), this object is zero.')
+cviRoutedVlanIfIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 1, 1, 1, 3), InterfaceIndex()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: cviRoutedVlanIfIndex.setStatus('current')
+if mibBuilder.loadTexts: cviRoutedVlanIfIndex.setDescription('The index for the ifTable entry associated with this routed VLAN interface.')
+cviMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 3))
+cviMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 3, 1))
+cviMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 3, 2))
+cviMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 3, 1, 1)).setObjects(("CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB", "cviMIBGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cviMIBCompliance = cviMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: cviMIBCompliance.setDescription('The compliance statement for entities which implement the CISCO-VLAN-INTERFACE-MIB')
+cviMIBGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 128, 1, 3, 2, 1)).setObjects(("CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB", "cviRoutedVlanIfIndex"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    cviMIBGroup = cviMIBGroup.setStatus('current')
+if mibBuilder.loadTexts: cviMIBGroup.setDescription('A set of objects to obtain VLAN-ID and ifIndex information for routed VLAN interfaces.')
+mibBuilder.exportSymbols("CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB", ciscoVlanIfTableRelationshipMIB=ciscoVlanIfTableRelationshipMIB, cviVlanId=cviVlanId, cviMIBCompliance=cviMIBCompliance, cviGlobals=cviGlobals, cviVlanInterfaceIndexTable=cviVlanInterfaceIndexTable, PYSNMP_MODULE_ID=ciscoVlanIfTableRelationshipMIB, cviVlanInterfaceIndexEntry=cviVlanInterfaceIndexEntry, cviMIBCompliances=cviMIBCompliances, cviMIBGroup=cviMIBGroup, cviPhysicalIfIndex=cviPhysicalIfIndex, cviMIBConformance=cviMIBConformance, cviMIBObjects=cviMIBObjects, cviMIBGroups=cviMIBGroups, cviRoutedVlanIfIndex=cviRoutedVlanIfIndex)

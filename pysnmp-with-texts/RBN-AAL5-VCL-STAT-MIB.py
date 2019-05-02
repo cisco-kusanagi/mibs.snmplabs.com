@@ -1,0 +1,47 @@
+#
+# PySNMP MIB module RBN-AAL5-VCL-STAT-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RBN-AAL5-VCL-STAT-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:52:21 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+atmVclVpi, atmVclVci = mibBuilder.importSymbols("ATM-MIB", "atmVclVpi", "atmVclVci")
+ifIndex, = mibBuilder.importSymbols("IF-MIB", "ifIndex")
+rbnMgmt, = mibBuilder.importSymbols("RBN-SMI", "rbnMgmt")
+rbnXAtmAal5VclStatEntry, = mibBuilder.importSymbols("RBN-X-AAL5-VCL-STAT-MIB", "rbnXAtmAal5VclStatEntry")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+Counter64, Bits, Unsigned32, Counter32, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, TimeTicks, MibIdentifier, Gauge32, Integer32, NotificationType, ObjectIdentity, IpAddress, ModuleIdentity = mibBuilder.importSymbols("SNMPv2-SMI", "Counter64", "Bits", "Unsigned32", "Counter32", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "TimeTicks", "MibIdentifier", "Gauge32", "Integer32", "NotificationType", "ObjectIdentity", "IpAddress", "ModuleIdentity")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+rbnAal5VclStatMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 2352, 2, 1))
+if mibBuilder.loadTexts: rbnAal5VclStatMIB.setLastUpdated('9804171645Z')
+if mibBuilder.loadTexts: rbnAal5VclStatMIB.setOrganization('RedBack Networks, Inc.')
+if mibBuilder.loadTexts: rbnAal5VclStatMIB.setContactInfo(' RedBack Networks, Inc. Postal: 1389 Moffett Park Drive Sunnyvale, CA 94089-1134 USA Phone: +1 408 548 3500 Fax: +1 408 548 3599 E-mail: mib-info@RedBackNetworks.com')
+if mibBuilder.loadTexts: rbnAal5VclStatMIB.setDescription('The MIB for instrumenting statistics associated with an ATM VCL beyond those instrumented by standards-track MIBs.')
+rbnAal5VclStatMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 1, 1))
+rbnAtmAal5VclStatTable = MibTable((1, 3, 6, 1, 4, 1, 2352, 2, 1, 1, 1), )
+if mibBuilder.loadTexts: rbnAtmAal5VclStatTable.setStatus('current')
+if mibBuilder.loadTexts: rbnAtmAal5VclStatTable.setDescription('This table provides a collection of auxiliary objects providing AAL5 configuration and performance statistics of a VCL.')
+rbnAtmAal5VclStatEntry = MibTableRow((1, 3, 6, 1, 4, 1, 2352, 2, 1, 1, 1, 1), )
+rbnXAtmAal5VclStatEntry.registerAugmentions(("RBN-AAL5-VCL-STAT-MIB", "rbnAtmAal5VclStatEntry"))
+rbnAtmAal5VclStatEntry.setIndexNames(*rbnXAtmAal5VclStatEntry.getIndexNames())
+if mibBuilder.loadTexts: rbnAtmAal5VclStatEntry.setStatus('current')
+if mibBuilder.loadTexts: rbnAtmAal5VclStatEntry.setDescription('Each entry in this table represents a VCL.')
+rbnAtmAal5VclOutDrops = MibTableColumn((1, 3, 6, 1, 4, 1, 2352, 2, 1, 1, 1, 1, 1), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbnAtmAal5VclOutDrops.setStatus('current')
+if mibBuilder.loadTexts: rbnAtmAal5VclOutDrops.setDescription('The number of AAL5 CPCS PDUs received for transmission on the AAL5 VCC at the interface identified by the ifIndex which were chosen to be dropped even though no errors had been detected to prevent their being transmitted. One possible reason for dropping such a PDU could be a lack of available space on the interface output queue.')
+rbnAal5VclStatMIBConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 1, 2))
+rbnAal5VclStatMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 1, 2, 1))
+rbnAal5VclStatMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 2352, 2, 1, 2, 2))
+rbnAal5VclStatMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 2352, 2, 1, 2, 2, 1)).setObjects(("RBN-AAL5-VCL-STAT-MIB", "rbnAal5VclStatGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnAal5VclStatMIBCompliance = rbnAal5VclStatMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: rbnAal5VclStatMIBCompliance.setDescription('The compliance statement for RedBack Networks SNMP entities which represent AAL5 VCL statistics')
+rbnAal5VclStatGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 2352, 2, 1, 2, 1, 1)).setObjects(("RBN-AAL5-VCL-STAT-MIB", "rbnAtmAal5VclOutDrops"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    rbnAal5VclStatGroup = rbnAal5VclStatGroup.setStatus('current')
+if mibBuilder.loadTexts: rbnAal5VclStatGroup.setDescription('A collection of objects providing supplemental AAL5 VCL information beyond that supplied by IETF standards-track MIBs')
+mibBuilder.exportSymbols("RBN-AAL5-VCL-STAT-MIB", rbnAtmAal5VclStatTable=rbnAtmAal5VclStatTable, rbnAtmAal5VclOutDrops=rbnAtmAal5VclOutDrops, rbnAtmAal5VclStatEntry=rbnAtmAal5VclStatEntry, PYSNMP_MODULE_ID=rbnAal5VclStatMIB, rbnAal5VclStatMIBCompliances=rbnAal5VclStatMIBCompliances, rbnAal5VclStatMIBCompliance=rbnAal5VclStatMIBCompliance, rbnAal5VclStatGroup=rbnAal5VclStatGroup, rbnAal5VclStatMIB=rbnAal5VclStatMIB, rbnAal5VclStatMIBConformance=rbnAal5VclStatMIBConformance, rbnAal5VclStatMIBObjects=rbnAal5VclStatMIBObjects, rbnAal5VclStatMIBGroups=rbnAal5VclStatMIBGroups)

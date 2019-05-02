@@ -1,0 +1,57 @@
+#
+# PySNMP MIB module CISCO-ACCESS-ENVMON-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-ACCESS-ENVMON-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:49:56 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueRangeConstraint, ConstraintsIntersection, SingleValueConstraint, ValueSizeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueRangeConstraint", "ConstraintsIntersection", "SingleValueConstraint", "ValueSizeConstraint")
+ciscoEnvMonTemperatureState, ciscoEnvMonTemperatureStatusDescr, ciscoEnvMonVoltageState, ciscoEnvMonSupplyStatusEntry, ciscoEnvMonVoltageStatusDescr = mibBuilder.importSymbols("CISCO-ENVMON-MIB", "ciscoEnvMonTemperatureState", "ciscoEnvMonTemperatureStatusDescr", "ciscoEnvMonVoltageState", "ciscoEnvMonSupplyStatusEntry", "ciscoEnvMonVoltageStatusDescr")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+ObjectIdentity, iso, Integer32, Counter32, TimeTicks, IpAddress, Counter64, ModuleIdentity, Unsigned32, Bits, MibScalar, MibTable, MibTableRow, MibTableColumn, MibIdentifier, Gauge32, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "ObjectIdentity", "iso", "Integer32", "Counter32", "TimeTicks", "IpAddress", "Counter64", "ModuleIdentity", "Unsigned32", "Bits", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "MibIdentifier", "Gauge32", "NotificationType")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ciscoAccessEnvMonMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 61))
+ciscoAccessEnvMonMIB.setRevisions(('1998-08-05 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoAccessEnvMonMIB.setRevisionsDescriptions(('Rename the enumerated values for caemSupplyFailedComponent and add fan, overvoltage failure events to it. Add caemVoltageNotification. ',))
+if mibBuilder.loadTexts: ciscoAccessEnvMonMIB.setLastUpdated('9808050000Z')
+if mibBuilder.loadTexts: ciscoAccessEnvMonMIB.setOrganization('Cisco Systems, Inc.')
+if mibBuilder.loadTexts: ciscoAccessEnvMonMIB.setContactInfo(' Cisco Systems Customer Service Postal: 170 W. Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-snmp@cisco.com')
+if mibBuilder.loadTexts: ciscoAccessEnvMonMIB.setDescription('The MIB module to describe the additional status of the Environmental Monitor on those Cisco Access devices which support one. ')
+caemObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 1))
+caemSupplyStatusTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 61, 1, 1), )
+if mibBuilder.loadTexts: caemSupplyStatusTable.setStatus('current')
+if mibBuilder.loadTexts: caemSupplyStatusTable.setDescription('The table contains the additional power supply information that are not covered in the ciscoEnvMonSupplyStatusTable of CISCO-ENVMON-MIB. ')
+caemSupplyStatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 61, 1, 1, 1), )
+ciscoEnvMonSupplyStatusEntry.registerAugmentions(("CISCO-ACCESS-ENVMON-MIB", "caemSupplyStatusEntry"))
+caemSupplyStatusEntry.setIndexNames(*ciscoEnvMonSupplyStatusEntry.getIndexNames())
+if mibBuilder.loadTexts: caemSupplyStatusEntry.setStatus('current')
+if mibBuilder.loadTexts: caemSupplyStatusEntry.setDescription("Additional information about the failure component or location in the power Supply beyond that provided by Cisco Environmental Monitor MIB's ciscoEnvMonSupplyStatusEntry. ")
+caemSupplyFailedComponent = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 61, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7))).clone(namedValues=NamedValues(("none", 1), ("inputVoltage", 2), ("dcOutputVoltage", 3), ("thermal", 4), ("multiple", 5), ("fan", 6), ("overvoltage", 7)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: caemSupplyFailedComponent.setStatus('current')
+if mibBuilder.loadTexts: caemSupplyFailedComponent.setDescription('The failure component of the power supply being instrumented. none - No failure. inputVoltage - Input power lost in one of the power supplies dcOutputVoltage - DC output voltage lost in one of the power supplies thermal - Power supply thermal failure. multiple - Multiple failures. fan - Fan failure overvoltage - Over voltage. ')
+caemMIBNotificationPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 2))
+caemMIBNotifications = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 2, 0))
+caemTemperatureNotification = NotificationType((1, 3, 6, 1, 4, 1, 9, 9, 61, 2, 0, 1)).setObjects(("CISCO-ENVMON-MIB", "ciscoEnvMonTemperatureStatusDescr"), ("CISCO-ENVMON-MIB", "ciscoEnvMonTemperatureState"))
+if mibBuilder.loadTexts: caemTemperatureNotification.setStatus('current')
+if mibBuilder.loadTexts: caemTemperatureNotification.setDescription("A caemTemperatureNotification is sent if the over temperature condition is detected in the managed system. This is a replacement for the ciscoEnvMonTemperatureNotification trap because the information 'ciscoEnvMonTemperatureStatusValue' required by the trap is not available in the managed system. ")
+caemVoltageNotification = NotificationType((1, 3, 6, 1, 4, 1, 9, 9, 61, 2, 0, 2)).setObjects(("CISCO-ENVMON-MIB", "ciscoEnvMonVoltageStatusDescr"), ("CISCO-ENVMON-MIB", "ciscoEnvMonVoltageState"))
+if mibBuilder.loadTexts: caemVoltageNotification.setStatus('current')
+if mibBuilder.loadTexts: caemVoltageNotification.setDescription("A caemVoltageNotification is sent if the over voltage condition is detected and ciscoEnvMonVoltageState is not set to 'notPresent' in the managed system. This is a replacement for the ciscoEnvMonVoltageNotification trap because the information 'ciscoEnvMonVoltageStatusValue' required by the trap is not available in the managed system. ")
+caemConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 3))
+caemCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 3, 1))
+caemGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 61, 3, 2))
+caemCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 61, 3, 1, 1)).setObjects(("CISCO-ACCESS-ENVMON-MIB", "caemGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    caemCompliance = caemCompliance.setStatus('current')
+if mibBuilder.loadTexts: caemCompliance.setDescription('The compliance statement for entities which implement the Cisco Environmental Monitor Supplemental MIB.')
+caemGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 61, 3, 2, 1)).setObjects(("CISCO-ACCESS-ENVMON-MIB", "caemSupplyFailedComponent"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    caemGroup = caemGroup.setStatus('current')
+if mibBuilder.loadTexts: caemGroup.setDescription('A collection of objects providing the additional Environmental Monitor information beyond that provided by Cisco Environmental Monitor MIB. ')
+mibBuilder.exportSymbols("CISCO-ACCESS-ENVMON-MIB", caemSupplyStatusTable=caemSupplyStatusTable, caemSupplyStatusEntry=caemSupplyStatusEntry, caemMIBNotifications=caemMIBNotifications, caemGroup=caemGroup, ciscoAccessEnvMonMIB=ciscoAccessEnvMonMIB, caemMIBNotificationPrefix=caemMIBNotificationPrefix, caemConformance=caemConformance, caemSupplyFailedComponent=caemSupplyFailedComponent, caemObjects=caemObjects, caemCompliance=caemCompliance, caemCompliances=caemCompliances, caemTemperatureNotification=caemTemperatureNotification, caemGroups=caemGroups, PYSNMP_MODULE_ID=ciscoAccessEnvMonMIB, caemVoltageNotification=caemVoltageNotification)

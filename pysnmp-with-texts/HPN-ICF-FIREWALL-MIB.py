@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module HPN-ICF-FIREWALL-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HPN-ICF-FIREWALL-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:39:03 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion")
+hpnicfCommon, = mibBuilder.importSymbols("HPN-ICF-OID-MIB", "hpnicfCommon")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, Unsigned32, iso, Counter64, Counter32, ModuleIdentity, Bits, Integer32, ObjectIdentity, MibIdentifier, TimeTicks, NotificationType = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "Unsigned32", "iso", "Counter64", "Counter32", "ModuleIdentity", "Bits", "Integer32", "ObjectIdentity", "MibIdentifier", "TimeTicks", "NotificationType")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+hpnicfFireWall = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 88))
+if mibBuilder.loadTexts: hpnicfFireWall.setLastUpdated('200801171450Z')
+if mibBuilder.loadTexts: hpnicfFireWall.setOrganization('')
+if mibBuilder.loadTexts: hpnicfFireWall.setContactInfo('')
+if mibBuilder.loadTexts: hpnicfFireWall.setDescription('The MIB is designed to manage Firewall products.')
+hpnicfFirewallobject = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 88, 1))
+hpnicfFirewallSpecs = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 88, 1, 1))
+hpnicfFWMaxConnNum = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 88, 1, 1, 1), Unsigned32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfFWMaxConnNum.setStatus('current')
+if mibBuilder.loadTexts: hpnicfFWMaxConnNum.setDescription('Max connection number of system.')
+hpnicfFirewallGlobalStats = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 88, 1, 2))
+hpnicfFWConnNumCurr = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 88, 1, 2, 1), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfFWConnNumCurr.setStatus('current')
+if mibBuilder.loadTexts: hpnicfFWConnNumCurr.setDescription('The number of connections that currently exist.')
+hpnicfFWConnRate = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 88, 1, 2, 2), Gauge32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfFWConnRate.setStatus('current')
+if mibBuilder.loadTexts: hpnicfFWConnRate.setDescription('Connection establishment rate.')
+mibBuilder.exportSymbols("HPN-ICF-FIREWALL-MIB", hpnicfFWConnRate=hpnicfFWConnRate, hpnicfFWConnNumCurr=hpnicfFWConnNumCurr, hpnicfFirewallSpecs=hpnicfFirewallSpecs, PYSNMP_MODULE_ID=hpnicfFireWall, hpnicfFirewallobject=hpnicfFirewallobject, hpnicfFWMaxConnNum=hpnicfFWMaxConnNum, hpnicfFireWall=hpnicfFireWall, hpnicfFirewallGlobalStats=hpnicfFirewallGlobalStats)

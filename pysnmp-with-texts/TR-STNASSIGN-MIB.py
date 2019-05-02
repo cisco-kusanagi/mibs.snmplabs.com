@@ -1,0 +1,33 @@
+#
+# PySNMP MIB module TR-STNASSIGN-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/TR-STNASSIGN-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:26:53 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+ctTRStnAssign, = mibBuilder.importSymbols("CTRON-MIB-NAMES", "ctTRStnAssign")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, Gauge32, IpAddress, Bits, Counter32, Unsigned32, NotificationType, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, ObjectIdentity, TimeTicks, Counter64, Integer32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "Gauge32", "IpAddress", "Bits", "Counter32", "Unsigned32", "NotificationType", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "ObjectIdentity", "TimeTicks", "Counter64", "Integer32")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+stnInterfaceCount = MibScalar((1, 3, 6, 1, 4, 1, 52, 4, 1, 1, 11, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: stnInterfaceCount.setStatus('mandatory')
+if mibBuilder.loadTexts: stnInterfaceCount.setDescription('Returns the number of station interfaces stored in table stnAssignTable.')
+stnAssignTable = MibTable((1, 3, 6, 1, 4, 1, 52, 4, 1, 1, 11, 2), )
+if mibBuilder.loadTexts: stnAssignTable.setStatus('mandatory')
+if mibBuilder.loadTexts: stnAssignTable.setDescription('A list of managed objects which pertains to a collection of token ring interfaces physically residing in the managing device.')
+stnAssignTableEntry = MibTableRow((1, 3, 6, 1, 4, 1, 52, 4, 1, 1, 11, 2, 1), ).setIndexNames((0, "TR-STNASSIGN-MIB", "stnAssignIndex"))
+if mibBuilder.loadTexts: stnAssignTableEntry.setStatus('mandatory')
+if mibBuilder.loadTexts: stnAssignTableEntry.setDescription('A list of managed objects which pertains to a single instance of a token ring interface physically residing in the managing device.')
+stnAssignIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 52, 4, 1, 1, 11, 2, 1, 1), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: stnAssignIndex.setStatus('mandatory')
+if mibBuilder.loadTexts: stnAssignIndex.setDescription('Returns an index to a stnAssignTable for which the information in this table pertains')
+stnAssignPortAssociation = MibTableColumn((1, 3, 6, 1, 4, 1, 52, 4, 1, 1, 11, 2, 1, 2), ObjectIdentifier()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: stnAssignPortAssociation.setStatus('mandatory')
+if mibBuilder.loadTexts: stnAssignPortAssociation.setDescription('This object, when read, would return an OID indicating the board and port to which the eagle port has been inserted. When written, this object will update the board and port data stored in this object. The OID to be passed for reading and writing is: dot5PhysMgmtPortCommonPortId.')
+stnAssignPortRing = MibTableColumn((1, 3, 6, 1, 4, 1, 52, 4, 1, 1, 11, 2, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 255))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: stnAssignPortRing.setStatus('mandatory')
+if mibBuilder.loadTexts: stnAssignPortRing.setDescription('This object will return the physical fnb ring into which the station eagle port is inserted. Return values are defined as: 1..200 - Fnb ring 1 to Fnb ring 200 201..254 - AUX ring 1 to AUX ring 54 Non multi-fnb mim boards will always return 1')
+mibBuilder.exportSymbols("TR-STNASSIGN-MIB", stnAssignIndex=stnAssignIndex, stnAssignPortAssociation=stnAssignPortAssociation, stnInterfaceCount=stnInterfaceCount, stnAssignTable=stnAssignTable, stnAssignTableEntry=stnAssignTableEntry, stnAssignPortRing=stnAssignPortRing)

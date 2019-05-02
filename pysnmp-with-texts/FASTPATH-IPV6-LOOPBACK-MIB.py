@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module FASTPATH-IPV6-LOOPBACK-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/FASTPATH-IPV6-LOOPBACK-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:12:06 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint")
+fastPath, = mibBuilder.importSymbols("BROADCOM-REF-MIB", "fastPath")
+agentLoopbackID, = mibBuilder.importSymbols("FASTPATH-LOOPBACK-MIB", "agentLoopbackID")
+InetAddressPrefixLength, = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressPrefixLength")
+Ipv6AddressPrefix, = mibBuilder.importSymbols("IPV6-TC", "Ipv6AddressPrefix")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibIdentifier, IpAddress, MibScalar, MibTable, MibTableRow, MibTableColumn, Gauge32, Counter64, NotificationType, TimeTicks, Integer32, ModuleIdentity, Unsigned32, ObjectIdentity, Bits, iso, Counter32 = mibBuilder.importSymbols("SNMPv2-SMI", "MibIdentifier", "IpAddress", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Gauge32", "Counter64", "NotificationType", "TimeTicks", "Integer32", "ModuleIdentity", "Unsigned32", "ObjectIdentity", "Bits", "iso", "Counter32")
+DisplayString, RowStatus, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "RowStatus", "TextualConvention")
+fastPathIpv6Loopback = ModuleIdentity((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23))
+fastPathIpv6Loopback.setRevisions(('2007-05-23 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: fastPathIpv6Loopback.setRevisionsDescriptions(('Broadcom branding related changes.',))
+if mibBuilder.loadTexts: fastPathIpv6Loopback.setLastUpdated('200705230000Z')
+if mibBuilder.loadTexts: fastPathIpv6Loopback.setOrganization('Broadcom Corporation')
+if mibBuilder.loadTexts: fastPathIpv6Loopback.setContactInfo(' Customer Support Postal: Broadcom Corporation 100, Perimeter Park Drive Morrisville, NC 27560 Tel: +1 919 865 2700')
+if mibBuilder.loadTexts: fastPathIpv6Loopback.setDescription('The Broadcom Private MIB for FastPath Loopback IPV6 address configuration')
+agentLoopbackIpv6Group = MibIdentifier((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1))
+agentLoopbackIpv6PrefixTable = MibTable((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1), )
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixTable.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixTable.setDescription('A table of the Ipv6 prefixes associated with loopback instances')
+agentLoopbackIpv6PrefixEntry = MibTableRow((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1, 1), ).setIndexNames((0, "FASTPATH-LOOPBACK-MIB", "agentLoopbackID"), (0, "FASTPATH-IPV6-LOOPBACK-MIB", "agentLoopbackIpv6PrefixPrefix"), (0, "FASTPATH-IPV6-LOOPBACK-MIB", "agentLoopbackIpv6PrefixPrefixLen"))
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixEntry.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixEntry.setDescription('')
+agentLoopbackIpv6PrefixPrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1, 1, 1), Ipv6AddressPrefix())
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefix.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefix.setDescription('The prefix associated with the loopback interface. The data type is used to model the Ipv6 address. It is a binary string of 16 octects in network byte-order. It specifies the IP address of loopback which will be in Ipv6 Format, generated using internal interface number.')
+agentLoopbackIpv6PrefixPrefixLen = MibTableColumn((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1, 1, 2), InetAddressPrefixLength())
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefixLen.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixPrefixLen.setDescription('The length of the prefix (in bits).')
+agentLoopbackIpv6PrefixStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 674, 10895, 5000, 2, 6132, 1, 1, 23, 1, 1, 1, 3), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixStatus.setStatus('current')
+if mibBuilder.loadTexts: agentLoopbackIpv6PrefixStatus.setDescription('Status of this instance.Row can be added or deleted by setting the value to createAndGo/destroy active(1) - this Loopback instance is active createAndGo(4) - set to this value to create an instance destroy(6) - set to this value to delete an instance')
+mibBuilder.exportSymbols("FASTPATH-IPV6-LOOPBACK-MIB", agentLoopbackIpv6PrefixPrefixLen=agentLoopbackIpv6PrefixPrefixLen, agentLoopbackIpv6PrefixStatus=agentLoopbackIpv6PrefixStatus, agentLoopbackIpv6Group=agentLoopbackIpv6Group, agentLoopbackIpv6PrefixEntry=agentLoopbackIpv6PrefixEntry, agentLoopbackIpv6PrefixPrefix=agentLoopbackIpv6PrefixPrefix, fastPathIpv6Loopback=fastPathIpv6Loopback, agentLoopbackIpv6PrefixTable=agentLoopbackIpv6PrefixTable, PYSNMP_MODULE_ID=fastPathIpv6Loopback)

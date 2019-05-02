@@ -1,0 +1,56 @@
+#
+# PySNMP MIB module ENTERASYS-SNMP-PERSISTENCE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ENTERASYS-SNMP-PERSISTENCE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:04:37 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueRangeConstraint, ConstraintsIntersection, ValueSizeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueRangeConstraint", "ConstraintsIntersection", "ValueSizeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+etsysModules, = mibBuilder.importSymbols("ENTERASYS-MIB-NAMES", "etsysModules")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ModuleCompliance, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance", "ObjectGroup")
+TimeTicks, ModuleIdentity, Counter32, MibIdentifier, iso, MibScalar, MibTable, MibTableRow, MibTableColumn, Unsigned32, ObjectIdentity, Bits, Integer32, IpAddress, Counter64, NotificationType, Gauge32 = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "ModuleIdentity", "Counter32", "MibIdentifier", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Unsigned32", "ObjectIdentity", "Bits", "Integer32", "IpAddress", "Counter64", "NotificationType", "Gauge32")
+DateAndTime, TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "DateAndTime", "TextualConvention", "DisplayString")
+etsysSnmpPersistenceMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24))
+etsysSnmpPersistenceMIB.setRevisions(('2002-09-09 20:22',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: etsysSnmpPersistenceMIB.setRevisionsDescriptions(('The initial version of this MIB module.',))
+if mibBuilder.loadTexts: etsysSnmpPersistenceMIB.setLastUpdated('200209092022Z')
+if mibBuilder.loadTexts: etsysSnmpPersistenceMIB.setOrganization('Enterasys Networks Inc')
+if mibBuilder.loadTexts: etsysSnmpPersistenceMIB.setContactInfo('Postal: Enterasys Networks 35 Industrial Way, P.O. Box 5005 Rochester, NH 03867-0505 Phone: +1 603 332 9400 E-mail: support@enterasys.com WWW: http://www.enterasys.com')
+if mibBuilder.loadTexts: etsysSnmpPersistenceMIB.setDescription('This MIB modules provides objects that allow management applications to commit persistent SNMP configuration information to persistent storage.')
+etsysSnmpPersistenceObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 1))
+etsysSnmpPersistenceMode = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("snmpNormalSave", 1), ("pushButtonSave", 2), ("timeDelayedSave", 3)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: etsysSnmpPersistenceMode.setStatus('current')
+if mibBuilder.loadTexts: etsysSnmpPersistenceMode.setDescription('Setting this object to snmpNormalSave(1) will cause this device to exhibit what could be considered normal SNMP behavior, that is each SNMP set of a persistent object will be saved to persistent storage as part of the set operation. Setting this object to pushButtonSave(2) will cause SNMP sets of persistent objects to be buffered in volatile memory until the configuration is explicitly saved to persistent memory, either through the CLI or by setting the etsysSnmpPersistenceWrite object to save(2). Setting this object to timeDelayedSave(3) will cause SNMP sets of persistent objects to be buffered in volatile memory until certain implementation dependent time conditions are met. Once these conditions are met the configuration is saved to persistent memory. Setting this object to a mode that is not supported on that particular implementation leads to an inconsistent value error. On an SNMP get operation this object will return the current persistent storage mode of operation.')
+etsysSnmpPersistenceSave = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("nop", 1), ("save", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: etsysSnmpPersistenceSave.setStatus('current')
+if mibBuilder.loadTexts: etsysSnmpPersistenceSave.setDescription("Setting this object to save(2) will cause the current configuration that is stored in volatile memory to be written to persistent memory and become the start-up configuration. This will also cause any configuration information that is part of another management interface's active configuration to become part of the start-up configuration. Any configuration changes made through SNMP will become part of the start-up configuration if and when another management interface saves the current configuration to persistent storage. Setting this object to save(2) while the value of the etsysSnmpPersistenceMode object is NOT pushButtonSave(2) MAY lead to an inconsistent value error. Setting this object to save(2) while the value of the etsysSnmpPersistenceStatus object is savingChanges(3) leads to an inconsistent value error. Setting this object to nop(1) always succeeds and has no effect. On an SNMP get operation this object will return nop(1). Management applications are advised to make use of the snmpSetSerialNo object defined in the SNMPv2-MIB to coordinate their use of this object.")
+etsysSnmpPersistenceStatus = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5))).clone(namedValues=NamedValues(("other", 1), ("unsavedChanges", 2), ("savingChanges", 3), ("saveSucceeded", 4), ("saveFailed", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysSnmpPersistenceStatus.setStatus('current')
+if mibBuilder.loadTexts: etsysSnmpPersistenceStatus.setDescription('This object reports the current status of the persistent storage system when the etsysSnmpPersistenceMode object is NOT set to snmpNormalSave(1). other - The value returned after initialization and before any configuration changes are made when the etsysSnmpPersistenceMode object is NOT set to snmpNormalSave(1). The value returned in all cases when the etsysSnmpPersistenceMode object is set to snmpNormalSave(1). unsavedChanges - The value returned when there are existing configuration changes that have not been saved to persistent storage. savingChanges - The value returned during the process of writing the current configuration to persistent storage. saveSucceeded - The value returned after the process of writing the current configuration to persistent storage has succeeded. saveFailed - The value returned after the process of writing the current configuration to persistent storage has failed. This status will reflect operations initiated through SNMP as well as all other supported management interfaces.')
+etsysSnmpPersistenceStatusTime = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 1, 4), TimeTicks()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysSnmpPersistenceStatusTime.setStatus('current')
+if mibBuilder.loadTexts: etsysSnmpPersistenceStatusTime.setDescription('The value of sysUpTime when etsysSnmpPersistenceStatus was last updated. If etsysSnmpPersistenceStatus has not been updated since initialization the value zero is returned.')
+etsysSnmpPersistenceError = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 1, 5), SnmpAdminString()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysSnmpPersistenceError.setStatus('current')
+if mibBuilder.loadTexts: etsysSnmpPersistenceError.setDescription('This object contains a descriptive error message if the last attempt to write to persistent storage has failed.')
+etsysSnmpPersistenceErrorTime = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 1, 6), DateAndTime()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: etsysSnmpPersistenceErrorTime.setStatus('current')
+if mibBuilder.loadTexts: etsysSnmpPersistenceErrorTime.setDescription("The data and time when the etsysSnmpPersistenceError was last updated. If etsysSnmpPersistenceError has not been updated since initialization the value '0000000000000000'H is returned.")
+etsysSnmpPersistenceConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 2))
+etsysSnmpPersistenceGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 2, 1))
+etsysSnmpPersistenceCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 2, 2))
+etsysSnmpPersistenceGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 2, 1, 1)).setObjects(("ENTERASYS-SNMP-PERSISTENCE-MIB", "etsysSnmpPersistenceMode"), ("ENTERASYS-SNMP-PERSISTENCE-MIB", "etsysSnmpPersistenceSave"), ("ENTERASYS-SNMP-PERSISTENCE-MIB", "etsysSnmpPersistenceStatus"), ("ENTERASYS-SNMP-PERSISTENCE-MIB", "etsysSnmpPersistenceStatusTime"), ("ENTERASYS-SNMP-PERSISTENCE-MIB", "etsysSnmpPersistenceError"), ("ENTERASYS-SNMP-PERSISTENCE-MIB", "etsysSnmpPersistenceErrorTime"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysSnmpPersistenceGroup = etsysSnmpPersistenceGroup.setStatus('current')
+if mibBuilder.loadTexts: etsysSnmpPersistenceGroup.setDescription('A collection of objects providing support for delayed persistence of otherwise persistent SNMP objects.')
+etsysSnmpPersistenceCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5624, 1, 2, 24, 2, 2, 1)).setObjects(("ENTERASYS-SNMP-PERSISTENCE-MIB", "etsysSnmpPersistenceGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysSnmpPersistenceCompliance = etsysSnmpPersistenceCompliance.setStatus('current')
+if mibBuilder.loadTexts: etsysSnmpPersistenceCompliance.setDescription('The compliance statement for devices that support delayed persistence of otherwise persistent SNMP objects.')
+mibBuilder.exportSymbols("ENTERASYS-SNMP-PERSISTENCE-MIB", etsysSnmpPersistenceErrorTime=etsysSnmpPersistenceErrorTime, etsysSnmpPersistenceGroups=etsysSnmpPersistenceGroups, etsysSnmpPersistenceSave=etsysSnmpPersistenceSave, etsysSnmpPersistenceError=etsysSnmpPersistenceError, etsysSnmpPersistenceMode=etsysSnmpPersistenceMode, etsysSnmpPersistenceConformance=etsysSnmpPersistenceConformance, etsysSnmpPersistenceMIB=etsysSnmpPersistenceMIB, PYSNMP_MODULE_ID=etsysSnmpPersistenceMIB, etsysSnmpPersistenceCompliances=etsysSnmpPersistenceCompliances, etsysSnmpPersistenceGroup=etsysSnmpPersistenceGroup, etsysSnmpPersistenceCompliance=etsysSnmpPersistenceCompliance, etsysSnmpPersistenceStatus=etsysSnmpPersistenceStatus, etsysSnmpPersistenceStatusTime=etsysSnmpPersistenceStatusTime, etsysSnmpPersistenceObjects=etsysSnmpPersistenceObjects)

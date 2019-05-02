@@ -1,0 +1,43 @@
+#
+# PySNMP MIB module WLSX-TUNNELEDNODE-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/WLSX-TUNNELEDNODE-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:37:00 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+wlsxEnterpriseMibModules, = mibBuilder.importSymbols("ARUBA-MIB", "wlsxEnterpriseMibModules")
+OctetString, Integer, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "OctetString", "Integer", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection")
+ModuleCompliance, NotificationGroup, ObjectGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup", "ObjectGroup")
+Counter32, snmpModules, Bits, Gauge32, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, iso, ObjectIdentity, NotificationType, Integer32, Unsigned32, ModuleIdentity, IpAddress, TimeTicks, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "Counter32", "snmpModules", "Bits", "Gauge32", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "iso", "ObjectIdentity", "NotificationType", "Integer32", "Unsigned32", "ModuleIdentity", "IpAddress", "TimeTicks", "Counter64")
+TimeInterval, StorageType, TestAndIncr, RowStatus, TAddress, TDomain, TextualConvention, MacAddress, PhysAddress, TruthValue, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TimeInterval", "StorageType", "TestAndIncr", "RowStatus", "TAddress", "TDomain", "TextualConvention", "MacAddress", "PhysAddress", "TruthValue", "DisplayString")
+wlsxTunneledNodeMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 14823, 2, 2, 1, 17))
+wlsxTunneledNodeMIB.setRevisions(('1907-08-06 05:19',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: wlsxTunneledNodeMIB.setRevisionsDescriptions(('The initial revision.',))
+if mibBuilder.loadTexts: wlsxTunneledNodeMIB.setLastUpdated('0708060519Z')
+if mibBuilder.loadTexts: wlsxTunneledNodeMIB.setOrganization('Aruba Wireless Networks')
+if mibBuilder.loadTexts: wlsxTunneledNodeMIB.setContactInfo('Postal: 1344 Crossman Avenue Sunnyvale, CA 94089 E-mail: dl-support@arubanetworks.com Phone: +1 408 227 4500')
+if mibBuilder.loadTexts: wlsxTunneledNodeMIB.setDescription('This MIB module defines MIB objects which provide information about the Controller Transport Service (Cts) in the Aruba controller.')
+wlsxTunneledNodeOpGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 14823, 2, 2, 1, 17, 1))
+wlsxTunneledNodeRequestTable = MibTable((1, 3, 6, 1, 4, 1, 14823, 2, 2, 1, 17, 1, 1), )
+if mibBuilder.loadTexts: wlsxTunneledNodeRequestTable.setStatus('current')
+if mibBuilder.loadTexts: wlsxTunneledNodeRequestTable.setDescription(' ')
+wlsxTunneledNodeRequestEntry = MibTableRow((1, 3, 6, 1, 4, 1, 14823, 2, 2, 1, 17, 1, 1, 1), ).setIndexNames((0, "WLSX-TUNNELEDNODE-MIB", "wlsxTunneledNodeMAC"))
+if mibBuilder.loadTexts: wlsxTunneledNodeRequestEntry.setStatus('current')
+if mibBuilder.loadTexts: wlsxTunneledNodeRequestEntry.setDescription('')
+wlsxTunneledNodeMAC = MibTableColumn((1, 3, 6, 1, 4, 1, 14823, 2, 2, 1, 17, 1, 1, 1, 1), MacAddress())
+if mibBuilder.loadTexts: wlsxTunneledNodeMAC.setStatus('current')
+if mibBuilder.loadTexts: wlsxTunneledNodeMAC.setDescription(' MAC address of the Tunneled Node ')
+wlsxTunneledNodeIp = MibTableColumn((1, 3, 6, 1, 4, 1, 14823, 2, 2, 1, 17, 1, 1, 1, 2), IpAddress()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: wlsxTunneledNodeIp.setStatus('current')
+if mibBuilder.loadTexts: wlsxTunneledNodeIp.setDescription(' IP address of the Tunneled Node ')
+wlsxNumTunnels = MibTableColumn((1, 3, 6, 1, 4, 1, 14823, 2, 2, 1, 17, 1, 1, 1, 3), Integer32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: wlsxNumTunnels.setStatus('current')
+if mibBuilder.loadTexts: wlsxNumTunnels.setDescription(' Number of tunnels originating from Tunneled Node ')
+wlsxTunneledNodeType = MibTableColumn((1, 3, 6, 1, 4, 1, 14823, 2, 2, 1, 17, 1, 1, 1, 4), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("others", 1), ("corvina", 2)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: wlsxTunneledNodeType.setStatus('current')
+if mibBuilder.loadTexts: wlsxTunneledNodeType.setDescription(' Device type of the tunnel ')
+mibBuilder.exportSymbols("WLSX-TUNNELEDNODE-MIB", wlsxTunneledNodeMAC=wlsxTunneledNodeMAC, wlsxTunneledNodeMIB=wlsxTunneledNodeMIB, wlsxTunneledNodeRequestTable=wlsxTunneledNodeRequestTable, wlsxNumTunnels=wlsxNumTunnels, wlsxTunneledNodeType=wlsxTunneledNodeType, wlsxTunneledNodeIp=wlsxTunneledNodeIp, wlsxTunneledNodeOpGroup=wlsxTunneledNodeOpGroup, wlsxTunneledNodeRequestEntry=wlsxTunneledNodeRequestEntry, PYSNMP_MODULE_ID=wlsxTunneledNodeMIB)

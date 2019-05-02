@@ -1,0 +1,40 @@
+#
+# PySNMP MIB module ZHONE-GEN-WTN-MONITOR-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZHONE-GEN-WTN-MONITOR-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:47:40 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ModuleCompliance")
+MibScalar, MibTable, MibTableRow, MibTableColumn, ObjectIdentity, TimeTicks, NotificationType, IpAddress, MibIdentifier, Counter32, Integer32, ModuleIdentity, Bits, Unsigned32, iso, Gauge32, Counter64 = mibBuilder.importSymbols("SNMPv2-SMI", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ObjectIdentity", "TimeTicks", "NotificationType", "IpAddress", "MibIdentifier", "Counter32", "Integer32", "ModuleIdentity", "Bits", "Unsigned32", "iso", "Gauge32", "Counter64")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+zhoneModules, zhoneGenWtn = mibBuilder.importSymbols("Zhone", "zhoneModules", "zhoneGenWtn")
+zhoneGenWtnMonitorModule = ModuleIdentity((1, 3, 6, 1, 4, 1, 5504, 6, 102))
+zhoneGenWtnMonitorModule.setRevisions(('1901-05-25 21:36',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: zhoneGenWtnMonitorModule.setRevisionsDescriptions(('V01.01.00 - Removed ACO related objects. Using SkyZhone_Stats_Profile.',))
+if mibBuilder.loadTexts: zhoneGenWtnMonitorModule.setLastUpdated('0009281216Z')
+if mibBuilder.loadTexts: zhoneGenWtnMonitorModule.setOrganization('Zhone Technologies, Inc.')
+if mibBuilder.loadTexts: zhoneGenWtnMonitorModule.setContactInfo(' Postal: Zhone Technologies, Inc. @ Zhone Way 7001 Oakport Street Oakland, CA 94621 USA Toll-Free: +1 877-ZHONE20 (+1 877-946-6320) Tel: +1-510-777-7000 Fax: +1-510-777-7001 E-mail: support@zhone.com')
+if mibBuilder.loadTexts: zhoneGenWtnMonitorModule.setDescription('Module for wireless transport node (ZWT) variables which report general system status.')
+wtnMonitor = ObjectIdentity((1, 3, 6, 1, 4, 1, 5504, 3, 9, 1))
+if mibBuilder.loadTexts: wtnMonitor.setStatus('current')
+if mibBuilder.loadTexts: wtnMonitor.setDescription('Collection of monitored elements for each wireless transport node.')
+wtnLedStatus = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 9, 1, 1), Bits().clone(namedValues=NamedValues(("diag", 0), ("operational", 1), ("lineInterface", 2), ("radio", 3), ("local", 4), ("remote", 5)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: wtnLedStatus.setStatus('current')
+if mibBuilder.loadTexts: wtnLedStatus.setDescription('Reflects current state of LEDs of indoor unit. A bit value of 1 indicates the LED is ON. A bit value of 0 indicates the LED of OFF. Meaning of LEDs: =========================================== diag - Upon power up the LED is turned on. If the unit successfully passes diagnostics, the LED is turned off. When operational, the LED is turned on when diagnostics are performed or when the system detects an alarm. operational - Upon power up the LED is off. When the system is operating it is turned on. The actual LED is blinked when the ZMS link is down or during software download. lineInterface - This LED is turned on when there are no wire-line alarms. For SkyZhone45 - this refers to the DS3 line. For SkyZhone155 - this refers to the fiber. For SkyZhone8e - this refers to the set of T1/E1 lines. radio - This LED is turned on when there are no radio receive alarms. local- This LED is turned on when there are not alarms present on the Near End indoor or outdoor units. remote - This LED is turned on when there are not alarms present on the Far End indoor or outdoor units.')
+wtnAlarmStatus = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 9, 1, 2), Bits().clone(namedValues=NamedValues(("minorAlarm", 0), ("criticalAlarm", 1)))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: wtnAlarmStatus.setStatus('current')
+if mibBuilder.loadTexts: wtnAlarmStatus.setDescription('Alarm Contact Status. minorAlarm(0) - when active, a minor alarm condition is present criticalAlarm(1) - when active, a critical alarm condition is present. On power up all alarms contacts are open/inactive (0).')
+radioLinkConfiguration = ObjectIdentity((1, 3, 6, 1, 4, 1, 5504, 3, 9, 2))
+if mibBuilder.loadTexts: radioLinkConfiguration.setStatus('current')
+if mibBuilder.loadTexts: radioLinkConfiguration.setDescription('Description.')
+wtnLinkName = MibScalar((1, 3, 6, 1, 4, 1, 5504, 3, 9, 2, 1), SnmpAdminString()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: wtnLinkName.setStatus('current')
+if mibBuilder.loadTexts: wtnLinkName.setDescription('Textual description which identifies link. A link is comprised of this and another SkyZhone node at the far end.')
+mibBuilder.exportSymbols("ZHONE-GEN-WTN-MONITOR-MIB", radioLinkConfiguration=radioLinkConfiguration, wtnLinkName=wtnLinkName, PYSNMP_MODULE_ID=zhoneGenWtnMonitorModule, wtnMonitor=wtnMonitor, zhoneGenWtnMonitorModule=zhoneGenWtnMonitorModule, wtnAlarmStatus=wtnAlarmStatus, wtnLedStatus=wtnLedStatus)

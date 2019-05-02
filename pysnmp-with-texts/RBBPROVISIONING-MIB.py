@@ -1,0 +1,231 @@
+#
+# PySNMP MIB module RBBPROVISIONING-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/RBBPROVISIONING-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 14:52:19 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, OctetString, ObjectIdentifier = mibBuilder.importSymbols("ASN1", "Integer", "OctetString", "ObjectIdentifier")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsIntersection, ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsIntersection", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion")
+AtmServiceCategory, AtmAddr, AtmVpIdentifier, AtmConnCastType, AtmVcIdentifier, AtmConnKind, AtmTrafficDescrParamIndex = mibBuilder.importSymbols("ATM-TC-MIB", "AtmServiceCategory", "AtmAddr", "AtmVpIdentifier", "AtmConnCastType", "AtmVcIdentifier", "AtmConnKind", "AtmTrafficDescrParamIndex")
+ifIndex, InterfaceIndex = mibBuilder.importSymbols("IF-MIB", "ifIndex", "InterfaceIndex")
+ModuleCompliance, ObjectGroup, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "ObjectGroup", "NotificationGroup")
+TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Counter64, mib_2, ObjectIdentity, Integer32, Unsigned32, MibIdentifier, Gauge32, Bits, Counter32, iso, ModuleIdentity, enterprises, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Counter64", "mib-2", "ObjectIdentity", "Integer32", "Unsigned32", "MibIdentifier", "Gauge32", "Bits", "Counter32", "iso", "ModuleIdentity", "enterprises", "IpAddress")
+DisplayString, TruthValue, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TruthValue", "TextualConvention")
+rbbProvMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 4839, 32))
+if mibBuilder.loadTexts: rbbProvMIB.setLastUpdated('9909271200Z')
+if mibBuilder.loadTexts: rbbProvMIB.setOrganization('IETF ADSL MIB Working Group')
+if mibBuilder.loadTexts: rbbProvMIB.setContactInfo(' Randy Turner Postal: 2Wire, Inc. 694 Tasman Dr. Milpitas, CA 95035 Tel: 408-895-1216 Fax: 408-428-9590 E-mail: rturner@2wire.com')
+if mibBuilder.loadTexts: rbbProvMIB.setDescription('This is the MIB Module for provisioning of broadband customer premises equipment, specifically xDSL-related services. While not precluding other broadband technology, the MIB has been constructed around existing xDSL facilities, including ATM transports.')
+class RBBServiceID(TextualConvention, ObjectIdentifier):
+    description = 'A globally unique OID that unambiguously specifies a particular service, and as much protocol and semantics as is necessary to access the service'
+    status = 'current'
+
+class RBBServiceName(DisplayString):
+    description = 'A string denoting the same information as RBBServiceOID, except this object is in human-readable form.'
+    status = 'current'
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(0, 64)
+
+class RBBServiceProvider(DisplayString):
+    description = 'A human-readable string representing the name of the private or public entity that is making the service available. For a typical internet service provider (ISP), this would be the name of the ISP company itself'
+    status = 'current'
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(0, 64)
+
+class RBBServiceStatus(TextualConvention, Integer32):
+    description = 'An enumeration representing the current state of a particular service availability or service subscription (i.e., up, down, enabled, etc.)'
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))
+    namedValues = NamedValues(("other", 1), ("up", 2), ("down", 3), ("adminDown", 4))
+
+class RBBURLType(DisplayString):
+    description = 'An octet string containing a uniform resource locator (URL). The usage of this URL is object- context dependent. See individual object descriptions that reference this textual convention'
+    status = 'current'
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(0, 128)
+
+class RBBCPEAuthType(TextualConvention, OctetString):
+    description = 'An opaque string used to identify a particular subscriber. Currently, this MIB does not specify how authentication strings are generated. This is still an open issue.'
+    status = 'current'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(0, 64)
+
+class RBBMailAddr(DisplayString):
+    description = 'The email address (user@domain) of a contact that is responsible for some entity that references this textual convention, such as the administrator for an access network, or the email address of the admin for a particular service provider'
+    status = 'current'
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(0, 64)
+
+class RBBCPESerialNumber(DisplayString):
+    description = 'Define the syntax of a product serial number'
+    status = 'current'
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(0, 32)
+
+class RBBVendorModel(DisplayString):
+    description = 'Define the syntax of a CPE vendor model'
+    status = 'current'
+    subtypeSpec = DisplayString.subtypeSpec + ValueSizeConstraint(0, 64)
+
+class RowStatus(TextualConvention, Integer32):
+    description = ''
+    status = 'current'
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6))
+    namedValues = NamedValues(("active", 1), ("notInService", 2), ("notReady", 3), ("createAndGo", 4), ("createAndWait", 5), ("destroy", 6))
+
+rbbProvMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 4839, 32, 1))
+rbbServicesGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1))
+rbbSubGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2))
+rbbCPEGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3))
+rbbVendorGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 4839, 32, 1, 4))
+rbbNotifyGroup = MibIdentifier((1, 3, 6, 1, 4, 1, 4839, 32, 1, 12))
+srvServicesTable = MibTable((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1), )
+if mibBuilder.loadTexts: srvServicesTable.setStatus('current')
+if mibBuilder.loadTexts: srvServicesTable.setDescription('This table contains a sequence of rows where each row describes a particular service that is available to a broadband customer. The service availability expressed in this table is assumed to be valid only for customers served by this management infrastructure, and may differ on a regional basis, even within the same overall access network.')
+srvServiceEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1), ).setIndexNames((0, "RBBPROVISIONING-MIB", "srvServiceIdentifier"))
+if mibBuilder.loadTexts: srvServiceEntry.setStatus('current')
+if mibBuilder.loadTexts: srvServiceEntry.setDescription('This object defines the individual rows in the SRV services table (srvServicesTable)')
+srvServiceIdentifier = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 1), RBBServiceID()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceIdentifier.setStatus('current')
+if mibBuilder.loadTexts: srvServiceIdentifier.setDescription('A unique object identifier (OID) value uniquely representing a particular service.')
+srvServiceName = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 2), RBBServiceName()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceName.setStatus('current')
+if mibBuilder.loadTexts: srvServiceName.setDescription('A human-readable name string that identifies a service to an end-user')
+srvServiceProvider = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 3), RBBServiceProvider()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceProvider.setStatus('current')
+if mibBuilder.loadTexts: srvServiceProvider.setDescription('A human-readable name string that identifies the public or private sponsoring entity for a particular service.')
+srvServiceStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 4), RBBServiceStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceStatus.setStatus('current')
+if mibBuilder.loadTexts: srvServiceStatus.setDescription('An INTEGER enumeration describing the current availability status of a particular service. NOTE: This status implies different semantics than that used by srvServiceSubrStatus')
+srvServiceConnType = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 5), AtmConnKind()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceConnType.setStatus('current')
+if mibBuilder.loadTexts: srvServiceConnType.setDescription('An enumerated value describing the type of endpoint address used to refer to a particular service, as well as whether the CPE should be an initiator or target during the connection.')
+srvServiceQOSType = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 6), Integer32()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceQOSType.setStatus('current')
+if mibBuilder.loadTexts: srvServiceQOSType.setDescription('The quality-of-service to be associated with a connection to a particular service.')
+srvServiceSpeedReq = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 7), Integer32()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceSpeedReq.setStatus('current')
+if mibBuilder.loadTexts: srvServiceSpeedReq.setDescription('The bandwidth or speed (in bits-per-second) necessary to realize a particular service')
+srvServiceLatencyReq = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 8), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3))).clone(namedValues=NamedValues(("high", 1), ("med", 2), ("low", 3)))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceLatencyReq.setStatus('current')
+if mibBuilder.loadTexts: srvServiceLatencyReq.setDescription('An enumerated value that describes whether or not a particular service has special latency requirements associated to effectively realize the service.')
+srvServiceURL = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 9), RBBURLType()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceURL.setStatus('current')
+if mibBuilder.loadTexts: srvServiceURL.setDescription('A URL string associated with a particular service. A service may be provisioned with an associated URL that can be used either as a provisioning link or as a potentially advertising source for the service.')
+srvServiceDescr = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 10), DisplayString().subtype(subtypeSpec=ValueSizeConstraint(0, 256))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvServiceDescr.setStatus('current')
+if mibBuilder.loadTexts: srvServiceDescr.setDescription('A human-readable string used to provide a brief description for a particular service.')
+srvAdminContact = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 11), RBBMailAddr()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvAdminContact.setStatus('current')
+if mibBuilder.loadTexts: srvAdminContact.setDescription('A string representing the email address of an administrator contact for the particular service. This could either be a contact used to request new service or options associated with the service, OR, could be used as a support contact address for an existing subscription.')
+srvRowInfo = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 1, 1, 1, 12), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: srvRowInfo.setStatus('current')
+if mibBuilder.loadTexts: srvRowInfo.setDescription('Maintains row status information for this table')
+rbbSubTable = MibTable((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1), )
+if mibBuilder.loadTexts: rbbSubTable.setStatus('current')
+if mibBuilder.loadTexts: rbbSubTable.setDescription('This table contains a sequence of rows where each row describes a particular service subscription between an end-user CPE and a particular service.')
+rbbSubEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1), ).setIndexNames((0, "RBBPROVISIONING-MIB", "rbbSubVendor"), (0, "RBBPROVISIONING-MIB", "rbbSubModel"), (0, "RBBPROVISIONING-MIB", "rbbSubSerialNumber"), (0, "RBBPROVISIONING-MIB", "rbbSubServiceIdentifier"))
+if mibBuilder.loadTexts: rbbSubEntry.setStatus('current')
+if mibBuilder.loadTexts: rbbSubEntry.setDescription('This object defines the individual rows in the subscription table (rbbSubTable)')
+rbbSubVendor = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 1), ObjectIdentifier()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubVendor.setStatus('current')
+if mibBuilder.loadTexts: rbbSubVendor.setDescription('The Vendor part of the index that uniquely identifies this CPE')
+rbbSubModel = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 3), RBBVendorModel()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubModel.setStatus('current')
+if mibBuilder.loadTexts: rbbSubModel.setDescription('The Model part of the index that uniquely identifies a CPE')
+rbbSubSerialNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 4), DisplayString()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubSerialNumber.setStatus('current')
+if mibBuilder.loadTexts: rbbSubSerialNumber.setDescription('The serial number part of the index that uniquely identifies a CPE')
+rbbSubServiceIdentifier = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 5), RBBServiceID()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubServiceIdentifier.setStatus('current')
+if mibBuilder.loadTexts: rbbSubServiceIdentifier.setDescription('An Index value referring to an entry in the rbbServicesTable. This is the service-side in the customer/service subscription association.')
+rbbSubVPI = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 6), AtmVpIdentifier()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubVPI.setStatus('current')
+if mibBuilder.loadTexts: rbbSubVPI.setDescription('The virtual path identifier to be used in the establishment of a PVC to a particular service, if the service is PVC- based.')
+rbbSubVCI = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 7), AtmVcIdentifier()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubVCI.setStatus('current')
+if mibBuilder.loadTexts: rbbSubVCI.setDescription('The virtual circuit identifier to be used in the establishment of a PVC to a particular service, if the service is PVC-based.')
+rbbSubAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 8), AtmAddr()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubAddr.setStatus('current')
+if mibBuilder.loadTexts: rbbSubAddr.setDescription('The end-system address to be used in the establishment of an SVC to a particular service, if the service is SVC-based.')
+rbbSubStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 9), RBBServiceStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubStatus.setStatus('current')
+if mibBuilder.loadTexts: rbbSubStatus.setDescription('The current status of this subscription, currently defined as up, down, or suspended.')
+rbbSubRowInfo = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 2, 1, 1, 10), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbSubRowInfo.setStatus('current')
+if mibBuilder.loadTexts: rbbSubRowInfo.setDescription('')
+rbbCPETable = MibTable((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1), )
+if mibBuilder.loadTexts: rbbCPETable.setStatus('current')
+if mibBuilder.loadTexts: rbbCPETable.setDescription('This table contains a sequence of rows where each row describes a particular CPE that has identified itself to the management framework.')
+rbbCPEEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1), ).setIndexNames((0, "RBBPROVISIONING-MIB", "rbbVendorOID"), (0, "RBBPROVISIONING-MIB", "rbbVendorModel"), (0, "RBBPROVISIONING-MIB", "rbbCPESerialNumber"))
+if mibBuilder.loadTexts: rbbCPEEntry.setStatus('current')
+if mibBuilder.loadTexts: rbbCPEEntry.setDescription('This object defines the individual rows in the CPE table (rbbCPETable)')
+rbbCPEAuthValue = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 1), RBBCPEAuthType()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPEAuthValue.setStatus('current')
+if mibBuilder.loadTexts: rbbCPEAuthValue.setDescription('A unique identifier that uniquely identifies a particular customer or end-user')
+rbbCPEVendorOID = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 2), ObjectIdentifier()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPEVendorOID.setStatus('current')
+if mibBuilder.loadTexts: rbbCPEVendorOID.setDescription('A unique object identifier that identifies a particular CPE vendor')
+rbbCPEVendorModel = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 3), RBBVendorModel()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPEVendorModel.setStatus('current')
+if mibBuilder.loadTexts: rbbCPEVendorModel.setDescription('')
+rbbCPEStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 4), Integer32()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPEStatus.setStatus('current')
+if mibBuilder.loadTexts: rbbCPEStatus.setDescription('An integer enumeration that identifies the current status of the CPE device')
+rbbCPESubCount = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 5), Integer32()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPESubCount.setStatus('current')
+if mibBuilder.loadTexts: rbbCPESubCount.setDescription('An integer value representing the number of service subscriptions that exist in the subscription table for this customer')
+rbbCPESubAggrSpeed = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 6), Integer32()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPESubAggrSpeed.setStatus('current')
+if mibBuilder.loadTexts: rbbCPESubAggrSpeed.setDescription('The total aggregate bandwidth required by all active subscriptions for this CPE customer.')
+rbbCPECustContact = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 7), RBBMailAddr()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPECustContact.setStatus('current')
+if mibBuilder.loadTexts: rbbCPECustContact.setDescription('The email address for the individual at the customer premises that is responsible for the broadband service.')
+rbbCPESerialNumber = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 8), RBBCPESerialNumber()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPESerialNumber.setStatus('current')
+if mibBuilder.loadTexts: rbbCPESerialNumber.setDescription('The unique hardware address or serial number associated with the CPE')
+rbbCPETrapEnable = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 9), Integer32()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPETrapEnable.setStatus('current')
+if mibBuilder.loadTexts: rbbCPETrapEnable.setDescription('A boolean value representing whether or not service-related traps are enabled or disabled for this CPE device.')
+rbbCPECurrentImage = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 10), RBBURLType()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPECurrentImage.setStatus('current')
+if mibBuilder.loadTexts: rbbCPECurrentImage.setDescription('A URL string pointing to the current image that is installed in this particular CPE/customer site')
+rbbCPEIpAddress = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 11), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPEIpAddress.setStatus('current')
+if mibBuilder.loadTexts: rbbCPEIpAddress.setDescription('')
+rbbCPERowInfo = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 3, 1, 1, 12), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbCPERowInfo.setStatus('current')
+if mibBuilder.loadTexts: rbbCPERowInfo.setDescription('')
+rbbVendorTable = MibTable((1, 3, 6, 1, 4, 1, 4839, 32, 1, 4, 1), )
+if mibBuilder.loadTexts: rbbVendorTable.setStatus('current')
+if mibBuilder.loadTexts: rbbVendorTable.setDescription('Vendor table describing types of CPE supported, and associated CPE management details.')
+rbbVendorEntry = MibTableRow((1, 3, 6, 1, 4, 1, 4839, 32, 1, 4, 1, 1), ).setIndexNames((0, "RBBPROVISIONING-MIB", "rbbVendorOID"), (0, "RBBPROVISIONING-MIB", "rbbVendorModel"))
+if mibBuilder.loadTexts: rbbVendorEntry.setStatus('current')
+if mibBuilder.loadTexts: rbbVendorEntry.setDescription('Each row describes a particular vendor model of CPE')
+rbbVendorOID = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 4, 1, 1, 1), ObjectIdentifier()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbVendorOID.setStatus('current')
+if mibBuilder.loadTexts: rbbVendorOID.setDescription('A unique object identifier value associated with a particular vendor of CPE')
+rbbVendorModel = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 4, 1, 1, 2), RBBVendorModel()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbVendorModel.setStatus('current')
+if mibBuilder.loadTexts: rbbVendorModel.setDescription("A human-readable string representing the model number for a particular vendor's CPE device")
+rbbVendorImageURL = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 4, 1, 1, 3), RBBURLType()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbVendorImageURL.setStatus('current')
+if mibBuilder.loadTexts: rbbVendorImageURL.setDescription('A URL string representing the most current version of firmware available for this CPE model')
+rbbVendorRowInfo = MibTableColumn((1, 3, 6, 1, 4, 1, 4839, 32, 1, 4, 1, 1, 4), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: rbbVendorRowInfo.setStatus('current')
+if mibBuilder.loadTexts: rbbVendorRowInfo.setDescription('')
+rbbSrvGrpSerialNumber = MibScalar((1, 3, 6, 1, 4, 1, 4839, 32, 1, 5), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbbSrvGrpSerialNumber.setStatus('current')
+if mibBuilder.loadTexts: rbbSrvGrpSerialNumber.setDescription('')
+rbbSubGrpSerialNumber = MibScalar((1, 3, 6, 1, 4, 1, 4839, 32, 1, 6), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbbSubGrpSerialNumber.setStatus('current')
+if mibBuilder.loadTexts: rbbSubGrpSerialNumber.setDescription('')
+rbbCPEGrpSerialNumber = MibScalar((1, 3, 6, 1, 4, 1, 4839, 32, 1, 7), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbbCPEGrpSerialNumber.setStatus('current')
+if mibBuilder.loadTexts: rbbCPEGrpSerialNumber.setDescription('')
+rbbVendorGrpSerialNumber = MibScalar((1, 3, 6, 1, 4, 1, 4839, 32, 1, 8), Counter32()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: rbbVendorGrpSerialNumber.setStatus('current')
+if mibBuilder.loadTexts: rbbVendorGrpSerialNumber.setDescription('')
+rbbSubNotify = NotificationType((1, 3, 6, 1, 4, 1, 4839, 32, 1, 12, 1)).setObjects(("RBBPROVISIONING-MIB", "rbbSubVendor"), ("RBBPROVISIONING-MIB", "rbbSubModel"), ("RBBPROVISIONING-MIB", "rbbSubSerialNumber"), ("RBBPROVISIONING-MIB", "rbbSubServiceIdentifier"))
+if mibBuilder.loadTexts: rbbSubNotify.setStatus('current')
+if mibBuilder.loadTexts: rbbSubNotify.setDescription('This notification indicates that a new subscription has been added to, or when a subscription has been deleted from the rbbSubTable in the rbbSubGroup. The notification includes which specific index was added so that the manager does not have to implement a search for changes.')
+rbbPowerUpNotify = NotificationType((1, 3, 6, 1, 4, 1, 4839, 32, 1, 12, 2)).setObjects(("RBBPROVISIONING-MIB", "rbbCPEVendorOID"), ("RBBPROVISIONING-MIB", "rbbCPEVendorModel"), ("RBBPROVISIONING-MIB", "rbbCPESerialNumber"))
+if mibBuilder.loadTexts: rbbPowerUpNotify.setStatus('current')
+if mibBuilder.loadTexts: rbbPowerUpNotify.setDescription('')
+mibBuilder.exportSymbols("RBBPROVISIONING-MIB", rbbCPEStatus=rbbCPEStatus, srvServiceSpeedReq=srvServiceSpeedReq, srvServiceURL=srvServiceURL, rbbCPETable=rbbCPETable, srvAdminContact=srvAdminContact, rbbVendorGroup=rbbVendorGroup, RBBServiceProvider=RBBServiceProvider, rbbSubTable=rbbSubTable, rbbSubEntry=rbbSubEntry, rbbSubModel=rbbSubModel, rbbCPEEntry=rbbCPEEntry, RBBMailAddr=RBBMailAddr, srvServiceIdentifier=srvServiceIdentifier, rbbCPECustContact=rbbCPECustContact, rbbVendorImageURL=rbbVendorImageURL, srvServiceConnType=srvServiceConnType, rbbCPESubAggrSpeed=rbbCPESubAggrSpeed, rbbSubSerialNumber=rbbSubSerialNumber, rbbProvMIB=rbbProvMIB, rbbVendorTable=rbbVendorTable, srvServiceProvider=srvServiceProvider, rbbSubGrpSerialNumber=rbbSubGrpSerialNumber, rbbNotifyGroup=rbbNotifyGroup, rbbCPEAuthValue=rbbCPEAuthValue, rbbSubNotify=rbbSubNotify, rbbVendorGrpSerialNumber=rbbVendorGrpSerialNumber, RBBCPEAuthType=RBBCPEAuthType, rbbSubGroup=rbbSubGroup, srvServiceStatus=srvServiceStatus, srvServiceLatencyReq=srvServiceLatencyReq, rbbSubStatus=rbbSubStatus, rbbServicesGroup=rbbServicesGroup, rbbProvMIBObjects=rbbProvMIBObjects, rbbVendorModel=rbbVendorModel, rbbVendorRowInfo=rbbVendorRowInfo, rbbSrvGrpSerialNumber=rbbSrvGrpSerialNumber, rbbSubAddr=rbbSubAddr, rbbSubServiceIdentifier=rbbSubServiceIdentifier, RBBURLType=RBBURLType, rbbSubVPI=rbbSubVPI, rbbSubRowInfo=rbbSubRowInfo, RBBCPESerialNumber=RBBCPESerialNumber, rbbVendorEntry=rbbVendorEntry, RBBServiceName=RBBServiceName, rbbPowerUpNotify=rbbPowerUpNotify, RowStatus=RowStatus, rbbCPESerialNumber=rbbCPESerialNumber, RBBServiceID=RBBServiceID, PYSNMP_MODULE_ID=rbbProvMIB, rbbCPEIpAddress=rbbCPEIpAddress, srvServiceDescr=srvServiceDescr, rbbSubVendor=rbbSubVendor, rbbCPESubCount=rbbCPESubCount, RBBServiceStatus=RBBServiceStatus, rbbCPEVendorOID=rbbCPEVendorOID, srvServiceEntry=srvServiceEntry, rbbCPETrapEnable=rbbCPETrapEnable, srvServiceQOSType=srvServiceQOSType, rbbCPEVendorModel=rbbCPEVendorModel, rbbCPECurrentImage=rbbCPECurrentImage, srvServiceName=srvServiceName, rbbCPEGroup=rbbCPEGroup, srvRowInfo=srvRowInfo, rbbCPERowInfo=rbbCPERowInfo, RBBVendorModel=RBBVendorModel, rbbSubVCI=rbbSubVCI, rbbCPEGrpSerialNumber=rbbCPEGrpSerialNumber, rbbVendorOID=rbbVendorOID, srvServicesTable=srvServicesTable)

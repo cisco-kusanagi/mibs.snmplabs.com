@@ -1,0 +1,56 @@
+#
+# PySNMP MIB module CISCO-HARDWARE-IP-VERIFY-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/CISCO-HARDWARE-IP-VERIFY-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 11:59:41 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+Integer, ObjectIdentifier, OctetString = mibBuilder.importSymbols("ASN1", "Integer", "ObjectIdentifier", "OctetString")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsIntersection, ValueSizeConstraint, SingleValueConstraint, ConstraintsUnion, ValueRangeConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsIntersection", "ValueSizeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ValueRangeConstraint")
+ciscoMgmt, = mibBuilder.importSymbols("CISCO-SMI", "ciscoMgmt")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+Gauge32, Integer32, Counter64, MibScalar, MibTable, MibTableRow, MibTableColumn, ModuleIdentity, NotificationType, iso, Unsigned32, Counter32, Bits, MibIdentifier, TimeTicks, ObjectIdentity, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "Integer32", "Counter64", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "ModuleIdentity", "NotificationType", "iso", "Unsigned32", "Counter32", "Bits", "MibIdentifier", "TimeTicks", "ObjectIdentity", "IpAddress")
+DisplayString, TextualConvention = mibBuilder.importSymbols("SNMPv2-TC", "DisplayString", "TextualConvention")
+ciscoHardwareIpVerifyMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 9, 9, 804))
+ciscoHardwareIpVerifyMIB.setRevisions(('2012-09-04 00:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: ciscoHardwareIpVerifyMIB.setRevisionsDescriptions(('Initial version of this MIB module.',))
+if mibBuilder.loadTexts: ciscoHardwareIpVerifyMIB.setLastUpdated('201209040000Z')
+if mibBuilder.loadTexts: ciscoHardwareIpVerifyMIB.setOrganization('Cisco Systems, Inc.')
+if mibBuilder.loadTexts: ciscoHardwareIpVerifyMIB.setContactInfo('Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-lan-switch-snmp@cisco.com')
+if mibBuilder.loadTexts: ciscoHardwareIpVerifyMIB.setDescription("This MIB module defines management objects for configuration and monitoring of the Intrusion Detection System (IDS) that checks for IP packet verification. The following terms are used throughout the MIB: IDS: Intrusion Detection System CRC: Cyclic Redundancy Check DF: Don't Fragment ")
+ciscoHardwareIpVerifyMIBNotifs = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 804, 0))
+ciscoHardwareIpVerifyMIBObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 804, 1))
+ciscoHardwareIpVerifyMIBConform = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 804, 2))
+chivIpVerifyTable = MibTable((1, 3, 6, 1, 4, 1, 9, 9, 804, 1, 1), )
+if mibBuilder.loadTexts: chivIpVerifyTable.setStatus('current')
+if mibBuilder.loadTexts: chivIpVerifyTable.setDescription('A list of IDS check configuration and statistical information for each IP type and each IDS check type on the management device.')
+chivIpVerifyEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9, 9, 804, 1, 1, 1), ).setIndexNames((0, "CISCO-HARDWARE-IP-VERIFY-MIB", "chivIpVerifyCheckIpType"), (0, "CISCO-HARDWARE-IP-VERIFY-MIB", "chivIpVerifyCheckTypeName"))
+if mibBuilder.loadTexts: chivIpVerifyEntry.setStatus('current')
+if mibBuilder.loadTexts: chivIpVerifyEntry.setDescription('An entry contains the IDS packet check configuration information and the associated counters.')
+chivIpVerifyCheckIpType = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 804, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("ipv4", 1), ("ipv6", 2))))
+if mibBuilder.loadTexts: chivIpVerifyCheckIpType.setStatus('current')
+if mibBuilder.loadTexts: chivIpVerifyCheckIpType.setDescription('This object indicates the IP address type for IDS packet check.')
+chivIpVerifyCheckTypeName = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 804, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17))).clone(namedValues=NamedValues(("addressSrcBroadcast", 1), ("addressSrcMulticast", 2), ("addressDestZero", 3), ("addressIdentical", 4), ("addressSrcReserved", 5), ("addressClassE", 6), ("checksum", 7), ("protocol", 8), ("fragment", 9), ("lengthMinimum", 10), ("lengthConsistent", 11), ("lengthMaximumFragment", 12), ("lengthMaximumUdp", 13), ("lengthMaximumTcp", 14), ("tcpFlags", 15), ("tcpTinyFlags", 16), ("version", 17))))
+if mibBuilder.loadTexts: chivIpVerifyCheckTypeName.setStatus('current')
+if mibBuilder.loadTexts: chivIpVerifyCheckTypeName.setDescription('This object indicates the IDS packet check type which can be configured on the device. Each check type is a specific criteria. Those IP packets that matches the certain criteria are dropped. addressSrcBroadcast(1) Drop the IPv4 packet if the source address is a broadcast IPv4 address. addressSrcMulticast(2) Drop the IPv4 packet if the source address is a multicast IPv4 address. addressDestZero(3) Drop the IPv4 packet if the destination address is 0.0.0.0. addressIdentical(4) Drop the IPv4 packet if the source IPv4 address is identical to destination IPv4 address. addressSrcReserved(5) Drop the IPv4 packet if the source address is a reserved IPv4 address. addressClassE(6) Drop the IPv4 packet if either the source address or destination address is a class E IPv4 address. checksum(7) Drops the IPv4 packet if its checksum is invalid. protocol(8) Drop the IPv4 packet if the packet fragment has an invalid IP protocol number fragment(9) Drop the IPv4 packet if the packet fragment has a nonzero offset and the DF bit is active. lengthMinimum(10) Drop the IPv4 packet if the Ethernet frame length is less than the IP packet length plus four octets (the CRC length). lengthConsistent(11) Drop the IPv4 or IPv6 packet where the Ethernet frame size is greater than or equal to the IP packet length plus the Ethernet header. lengthMaximumFragment(12) Drop the IPv4 or IPv6 packet if the maximum fragment offset is greater than 65536. lengthMaximumUdp(13) Drop the IPv4 or IPv6 packet if the IP payload length is less than the UDP packet length. lengthMaximumTcp(14) Drop the IPv4 or IPv6 packet if the TCP length is greater than the IP payload length. tcpFlags(15) Drop the IPv4 packet if verification of TCP packet header fails. tcpTinyFlags(16) Drop the IPv4 or IPv6 packet if the IP fragment offset is 1, or if the IP fragment offset is 0 and the IP payload length is less than 16. version(17) Drop the IPv4 packet if the Ethertype is not set to 4 (IPv4); and drops the IPv6 packet if the Ethertype is not set to 6 (IPv6).')
+chivIpVerifyCheckStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 804, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("disabled", 1), ("enabled", 2)))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: chivIpVerifyCheckStatus.setStatus('current')
+if mibBuilder.loadTexts: chivIpVerifyCheckStatus.setDescription('This object specifies the IDS packet check configuration status.')
+chivIpVerifyPacketsDropped = MibTableColumn((1, 3, 6, 1, 4, 1, 9, 9, 804, 1, 1, 1, 4), Counter64()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: chivIpVerifyPacketsDropped.setStatus('current')
+if mibBuilder.loadTexts: chivIpVerifyPacketsDropped.setDescription('This object indicates the number of packets which has been dropped.')
+ciscoHardwareIpVerifyMIBCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 804, 2, 1))
+ciscoHardwareIpVerifyMIBGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9, 9, 804, 2, 2))
+ciscoHardwareIpVerifyMIBCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9, 9, 804, 2, 1, 1)).setObjects(("CISCO-HARDWARE-IP-VERIFY-MIB", "ciscoHardwareIpVerifyMIBStatisticGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoHardwareIpVerifyMIBCompliance = ciscoHardwareIpVerifyMIBCompliance.setStatus('current')
+if mibBuilder.loadTexts: ciscoHardwareIpVerifyMIBCompliance.setDescription('The compliance statement for the CISCO-HARDWARE-IP-VERIFY-MIB.')
+ciscoHardwareIpVerifyMIBStatisticGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9, 9, 804, 2, 2, 1)).setObjects(("CISCO-HARDWARE-IP-VERIFY-MIB", "chivIpVerifyCheckStatus"), ("CISCO-HARDWARE-IP-VERIFY-MIB", "chivIpVerifyPacketsDropped"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    ciscoHardwareIpVerifyMIBStatisticGroup = ciscoHardwareIpVerifyMIBStatisticGroup.setStatus('current')
+if mibBuilder.loadTexts: ciscoHardwareIpVerifyMIBStatisticGroup.setDescription('A collection of objects that provides configuration and statistical information for IDS packet check.')
+mibBuilder.exportSymbols("CISCO-HARDWARE-IP-VERIFY-MIB", ciscoHardwareIpVerifyMIBConform=ciscoHardwareIpVerifyMIBConform, chivIpVerifyCheckIpType=chivIpVerifyCheckIpType, ciscoHardwareIpVerifyMIBStatisticGroup=ciscoHardwareIpVerifyMIBStatisticGroup, ciscoHardwareIpVerifyMIBGroups=ciscoHardwareIpVerifyMIBGroups, ciscoHardwareIpVerifyMIBCompliances=ciscoHardwareIpVerifyMIBCompliances, chivIpVerifyTable=chivIpVerifyTable, chivIpVerifyCheckStatus=chivIpVerifyCheckStatus, ciscoHardwareIpVerifyMIBObjects=ciscoHardwareIpVerifyMIBObjects, PYSNMP_MODULE_ID=ciscoHardwareIpVerifyMIB, ciscoHardwareIpVerifyMIBNotifs=ciscoHardwareIpVerifyMIBNotifs, chivIpVerifyEntry=chivIpVerifyEntry, ciscoHardwareIpVerifyMIBCompliance=ciscoHardwareIpVerifyMIBCompliance, chivIpVerifyCheckTypeName=chivIpVerifyCheckTypeName, chivIpVerifyPacketsDropped=chivIpVerifyPacketsDropped, ciscoHardwareIpVerifyMIB=ciscoHardwareIpVerifyMIB)

@@ -1,0 +1,66 @@
+#
+# PySNMP MIB module ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:04:34 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ConstraintsUnion, ValueRangeConstraint, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ConstraintsUnion", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsIntersection")
+etsysModules, = mibBuilder.importSymbols("ENTERASYS-MIB-NAMES", "etsysModules")
+ifName, = mibBuilder.importSymbols("IF-MIB", "ifName")
+InetAddress, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetAddressType")
+SnmpAdminString, = mibBuilder.importSymbols("SNMP-FRAMEWORK-MIB", "SnmpAdminString")
+NotificationGroup, ObjectGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "NotificationGroup", "ObjectGroup", "ModuleCompliance")
+Unsigned32, Counter64, NotificationType, Gauge32, Counter32, ObjectIdentity, Bits, Integer32, TimeTicks, MibIdentifier, ModuleIdentity, IpAddress, iso, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Counter64", "NotificationType", "Gauge32", "Counter32", "ObjectIdentity", "Bits", "Integer32", "TimeTicks", "MibIdentifier", "ModuleIdentity", "IpAddress", "iso", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+TextualConvention, TruthValue, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "TruthValue", "DisplayString")
+etsysRtrAdvertNotificationMIB = ModuleIdentity((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82))
+etsysRtrAdvertNotificationMIB.setRevisions(('2011-05-13 13:47',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: etsysRtrAdvertNotificationMIB.setRevisionsDescriptions(('The initial version of this MIB module',))
+if mibBuilder.loadTexts: etsysRtrAdvertNotificationMIB.setLastUpdated('201105131347Z')
+if mibBuilder.loadTexts: etsysRtrAdvertNotificationMIB.setOrganization('Enterasys Networks, Inc')
+if mibBuilder.loadTexts: etsysRtrAdvertNotificationMIB.setContactInfo('Postal: Enterasys Networks 50 Minuteman Rd. Andover, MA 01810-1008 USA Phone: +1 978 684 1000 E-mail: support@enterasys.com WWW: http://www.enterasys.com')
+if mibBuilder.loadTexts: etsysRtrAdvertNotificationMIB.setDescription('This MIB module defines a portion of the SNMP MIB under the Enterasys Networks enterprise OID pertaining to router advertisement notifications. This MIB was designed to be used for monitoring router events that have occurred in the system related to router advertisements.')
+etsysRtrAdvertNotificationObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1))
+etsysRtrAdvertConfigBranch = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1, 0))
+etsysRtrAdvertInformationBranch = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1, 1))
+etsysRtrAdvertNotificationBranch = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1, 2))
+etsysRtrAdvertInconsistentEnabled = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1, 0, 1), TruthValue().clone('false')).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: etsysRtrAdvertInconsistentEnabled.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertInconsistentEnabled.setDescription('If this object is set to true (1) a trap will be sent when an inconsistent router advertisement is processed.')
+etsysRtrAdvertInetAddrType = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1, 1, 1), InetAddressType()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: etsysRtrAdvertInetAddrType.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertInetAddrType.setDescription('A value that represents a type of Internet address specified by etsysRtrAdvertInetAddress.')
+etsysRtrAdvertInetAddress = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1, 1, 2), InetAddress()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: etsysRtrAdvertInetAddress.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertInetAddress.setDescription('The Internet Address of the router being advertised. The format of this object is defined by the etsysRtrAdvertInetAddrType object.')
+etsysRtrAdvertUserData = MibScalar((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1, 1, 3), SnmpAdminString()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: etsysRtrAdvertUserData.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertUserData.setDescription('The data pertinent to the router advertisement notification being sent (i.e. mtu, hop-limit, etc.).')
+etsysRtrAdvertInconsistent = NotificationType((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 1, 2, 1)).setObjects(("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertInetAddrType"), ("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertInetAddress"), ("IF-MIB", "ifName"), ("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertUserData"))
+if mibBuilder.loadTexts: etsysRtrAdvertInconsistent.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertInconsistent.setDescription('Inconsistent router advertisement notification. The device will send this notification when an inconsistent router advertisement is received from another router.')
+etsysRtrAdvertConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 2))
+etsysRtrAdvertGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 2, 1))
+etsysRtrAdvertCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 2, 2))
+etsysRtrAdvertConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 2, 1, 1)).setObjects(("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertInconsistentEnabled"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysRtrAdvertConfigGroup = etsysRtrAdvertConfigGroup.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertConfigGroup.setDescription('A collection of objects providing basic instrumentation of router advertisement notifications.')
+etsysRtrAdvertInformationGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 2, 1, 2)).setObjects(("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertInetAddrType"), ("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertInetAddress"), ("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertUserData"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysRtrAdvertInformationGroup = etsysRtrAdvertInformationGroup.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertInformationGroup.setDescription('A collection of objects providing router advertisement information.')
+etsysRtrAdvertNotificationGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 2, 1, 3)).setObjects(("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertInconsistent"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysRtrAdvertNotificationGroup = etsysRtrAdvertNotificationGroup.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertNotificationGroup.setDescription('The router advertisement notifications.')
+etsysRtrAdvertCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 5624, 1, 2, 82, 2, 2, 1)).setObjects(("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertConfigGroup"), ("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertInformationGroup"), ("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", "etsysRtrAdvertNotificationGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    etsysRtrAdvertCompliance = etsysRtrAdvertCompliance.setStatus('current')
+if mibBuilder.loadTexts: etsysRtrAdvertCompliance.setDescription('The compliance statement for devices that support Enterasys router advertisement notifications.')
+mibBuilder.exportSymbols("ENTERASYS-RTR-ADVERT-NOTIFICATION-MIB", etsysRtrAdvertCompliances=etsysRtrAdvertCompliances, etsysRtrAdvertInformationGroup=etsysRtrAdvertInformationGroup, PYSNMP_MODULE_ID=etsysRtrAdvertNotificationMIB, etsysRtrAdvertInconsistent=etsysRtrAdvertInconsistent, etsysRtrAdvertConfigBranch=etsysRtrAdvertConfigBranch, etsysRtrAdvertInetAddress=etsysRtrAdvertInetAddress, etsysRtrAdvertNotificationMIB=etsysRtrAdvertNotificationMIB, etsysRtrAdvertInetAddrType=etsysRtrAdvertInetAddrType, etsysRtrAdvertInformationBranch=etsysRtrAdvertInformationBranch, etsysRtrAdvertNotificationObjects=etsysRtrAdvertNotificationObjects, etsysRtrAdvertUserData=etsysRtrAdvertUserData, etsysRtrAdvertConformance=etsysRtrAdvertConformance, etsysRtrAdvertCompliance=etsysRtrAdvertCompliance, etsysRtrAdvertNotificationBranch=etsysRtrAdvertNotificationBranch, etsysRtrAdvertConfigGroup=etsysRtrAdvertConfigGroup, etsysRtrAdvertInconsistentEnabled=etsysRtrAdvertInconsistentEnabled, etsysRtrAdvertGroups=etsysRtrAdvertGroups, etsysRtrAdvertNotificationGroup=etsysRtrAdvertNotificationGroup)

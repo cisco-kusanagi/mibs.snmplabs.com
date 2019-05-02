@@ -1,0 +1,62 @@
+#
+# PySNMP MIB module HPN-ICF-NET-MAN-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/HPN-ICF-NET-MAN-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 13:40:32 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, SingleValueConstraint, ConstraintsUnion, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "SingleValueConstraint", "ConstraintsUnion", "ConstraintsIntersection")
+hpnicfCommon, = mibBuilder.importSymbols("HPN-ICF-OID-MIB", "hpnicfCommon")
+InetAddress, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddress", "InetAddressType")
+ObjectGroup, NotificationGroup, ModuleCompliance = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "NotificationGroup", "ModuleCompliance")
+Gauge32, TimeTicks, MibScalar, MibTable, MibTableRow, MibTableColumn, IpAddress, ModuleIdentity, Counter32, Integer32, ObjectIdentity, Bits, Counter64, Unsigned32, MibIdentifier, NotificationType, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "TimeTicks", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "IpAddress", "ModuleIdentity", "Counter32", "Integer32", "ObjectIdentity", "Bits", "Counter64", "Unsigned32", "MibIdentifier", "NotificationType", "iso")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+hpnicfNetMan = ModuleIdentity((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90))
+hpnicfNetMan.setRevisions(('2008-04-16 17:00',))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    if mibBuilder.loadTexts: hpnicfNetMan.setRevisionsDescriptions(('The initial version of this MIB file.',))
+if mibBuilder.loadTexts: hpnicfNetMan.setLastUpdated('200804161700Z')
+if mibBuilder.loadTexts: hpnicfNetMan.setOrganization('')
+if mibBuilder.loadTexts: hpnicfNetMan.setContactInfo('')
+if mibBuilder.loadTexts: hpnicfNetMan.setDescription('This MIB file is to provide the object definition of the network management parameters. These parameters are used to identify devices. It is useful for devices management in a dynamic address assignment network.')
+hpnicfNMConfigObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 1))
+hpnicfNMMonitorObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 2))
+hpnicfNMNotify = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3))
+hpnicfNMNotifyScalarObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3, 1))
+hpnicfNMIpAddressType = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3, 1, 1), InetAddressType()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: hpnicfNMIpAddressType.setStatus('current')
+if mibBuilder.loadTexts: hpnicfNMIpAddressType.setDescription('The IP address type of specified interface on the device.')
+hpnicfNMIpAddress = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3, 1, 2), InetAddress()).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: hpnicfNMIpAddress.setStatus('current')
+if mibBuilder.loadTexts: hpnicfNMIpAddress.setDescription('The IP address of specified interface on the device.')
+hpnicfNMCustomBuildInfo = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3, 1, 3), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 64))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: hpnicfNMCustomBuildInfo.setStatus('current')
+if mibBuilder.loadTexts: hpnicfNMCustomBuildInfo.setDescription('The customer-required information of devices, for example, OUI (Organizational Unique Identifier).')
+hpnicfNMSerialNum = MibScalar((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3, 1, 4), OctetString().subtype(subtypeSpec=ValueSizeConstraint(0, 64))).setMaxAccess("accessiblefornotify")
+if mibBuilder.loadTexts: hpnicfNMSerialNum.setStatus('current')
+if mibBuilder.loadTexts: hpnicfNMSerialNum.setDescription('The serial number used by NMS (Network Management Station) for mapping IP address and device.')
+hpnicfNMNotifyObjects = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3, 2))
+hpnicfNMNotifyObjectsPrefix = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3, 2, 0))
+hpnicfIpAddrChangeNotify = NotificationType((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 3, 2, 0, 1)).setObjects(("HPN-ICF-NET-MAN-MIB", "hpnicfNMIpAddressType"), ("HPN-ICF-NET-MAN-MIB", "hpnicfNMIpAddress"), ("HPN-ICF-NET-MAN-MIB", "hpnicfNMCustomBuildInfo"), ("HPN-ICF-NET-MAN-MIB", "hpnicfNMSerialNum"))
+if mibBuilder.loadTexts: hpnicfIpAddrChangeNotify.setStatus('current')
+if mibBuilder.loadTexts: hpnicfIpAddrChangeNotify.setDescription('This notification will be generated when the IP address of active management interface is changed. The change maybe originate from NMS, DHCP server or administrator. The management interfaces are the interfaces that assigned by administrator, which can be used to manage device, but may be inactive for link fault or IP address (IPv4 or IPv6) missing. The active management interface means an active interface, the IP address of which can be used for network management. This notification announces useful management IP address change. So it is triggered by significative IP address change. Suppose that two management interfaces on a device, Interface-A and Interface-B. Initially both interfaces are down and assigned no IP address. Configure Interface-A as the primary monitored interface, Interface-B as the secondary. Significative IP address change in following cases: 1. If Interface-A is assigned an IP address primarily, and it is linking up, then Interface-B will be ignored. A notification will be triggered, appending IP address of Interface-A. 2. If Interface-B is assigned an IP address primarily, and it is linking up, then Interface-A will be ignored. A notification will be triggered, appending IP address of Interface-B. 3. If IP address of that interface, which had its IP address announced to NMS, is changed since last notification triggered, then another notification will be sent to NMS. 4. Suppore that Interface-A was linked up and assigned an IP address primarily. If for some unknown reason, Interface-A is down or loses IP address, and Interface-B is assigned an IP address which is different with that announced to NMS before, then a notification will be triggered, appending the new IP address that Interface-B assigned. 5. A notification appending new IP address that Interface-A assigned will be triggered, if 4 occurs to Interface-B.')
+hpnicfNetManConformance = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 4))
+hpnicfNetManCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 4, 1))
+hpnicfNetManCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 4, 1, 1)).setObjects(("HPN-ICF-NET-MAN-MIB", "hpnicfNMMonitorGroup"), ("HPN-ICF-NET-MAN-MIB", "hpnicfNMNotificationGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpnicfNetManCompliance = hpnicfNetManCompliance.setStatus('current')
+if mibBuilder.loadTexts: hpnicfNetManCompliance.setDescription('The statement of compliance for those implementing the network management MIB.')
+hpnicfNetManGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 4, 2))
+hpnicfNMMonitorGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 4, 2, 1)).setObjects(("HPN-ICF-NET-MAN-MIB", "hpnicfNMIpAddressType"), ("HPN-ICF-NET-MAN-MIB", "hpnicfNMIpAddress"), ("HPN-ICF-NET-MAN-MIB", "hpnicfNMCustomBuildInfo"), ("HPN-ICF-NET-MAN-MIB", "hpnicfNMSerialNum"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpnicfNMMonitorGroup = hpnicfNMMonitorGroup.setStatus('current')
+if mibBuilder.loadTexts: hpnicfNMMonitorGroup.setDescription('A collection of objects in net management monitor group.')
+hpnicfNMNotificationGroup = NotificationGroup((1, 3, 6, 1, 4, 1, 11, 2, 14, 11, 15, 2, 90, 4, 2, 2)).setObjects(("HPN-ICF-NET-MAN-MIB", "hpnicfIpAddrChangeNotify"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    hpnicfNMNotificationGroup = hpnicfNMNotificationGroup.setStatus('current')
+if mibBuilder.loadTexts: hpnicfNMNotificationGroup.setDescription('A collection of objects in net management notification group.')
+mibBuilder.exportSymbols("HPN-ICF-NET-MAN-MIB", hpnicfNMCustomBuildInfo=hpnicfNMCustomBuildInfo, hpnicfNetManCompliance=hpnicfNetManCompliance, hpnicfIpAddrChangeNotify=hpnicfIpAddrChangeNotify, hpnicfNMIpAddressType=hpnicfNMIpAddressType, hpnicfNMNotificationGroup=hpnicfNMNotificationGroup, hpnicfNMConfigObjects=hpnicfNMConfigObjects, hpnicfNetManGroups=hpnicfNetManGroups, hpnicfNMIpAddress=hpnicfNMIpAddress, hpnicfNMNotifyObjects=hpnicfNMNotifyObjects, hpnicfNMSerialNum=hpnicfNMSerialNum, hpnicfNetManCompliances=hpnicfNetManCompliances, hpnicfNMNotifyScalarObjects=hpnicfNMNotifyScalarObjects, hpnicfNMNotify=hpnicfNMNotify, hpnicfNMMonitorObjects=hpnicfNMMonitorObjects, hpnicfNetManConformance=hpnicfNetManConformance, PYSNMP_MODULE_ID=hpnicfNetMan, hpnicfNMNotifyObjectsPrefix=hpnicfNMNotifyObjectsPrefix, hpnicfNMMonitorGroup=hpnicfNMMonitorGroup, hpnicfNetMan=hpnicfNetMan)

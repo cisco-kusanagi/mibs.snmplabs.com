@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module ZYXEL-PORT-BASED-VLAN-MIB (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/ZYXEL-PORT-BASED-VLAN-MIB
+# Produced by pysmi-0.3.4 at Wed May  1 15:51:14 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ConstraintsUnion, ConstraintsIntersection, ValueRangeConstraint, ValueSizeConstraint, SingleValueConstraint = mibBuilder.importSymbols("ASN1-REFINEMENT", "ConstraintsUnion", "ConstraintsIntersection", "ValueRangeConstraint", "ValueSizeConstraint", "SingleValueConstraint")
+dot1dBasePort, = mibBuilder.importSymbols("BRIDGE-MIB", "dot1dBasePort")
+PortList, = mibBuilder.importSymbols("Q-BRIDGE-MIB", "PortList")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+Gauge32, IpAddress, Counter32, MibIdentifier, MibScalar, MibTable, MibTableRow, MibTableColumn, Counter64, Unsigned32, Bits, TimeTicks, NotificationType, ModuleIdentity, ObjectIdentity, Integer32, iso = mibBuilder.importSymbols("SNMPv2-SMI", "Gauge32", "IpAddress", "Counter32", "MibIdentifier", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "Counter64", "Unsigned32", "Bits", "TimeTicks", "NotificationType", "ModuleIdentity", "ObjectIdentity", "Integer32", "iso")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+esMgmt, = mibBuilder.importSymbols("ZYXEL-ES-SMI", "esMgmt")
+zyxelPortBasedVlan = ModuleIdentity((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 63))
+if mibBuilder.loadTexts: zyxelPortBasedVlan.setLastUpdated('201207010000Z')
+if mibBuilder.loadTexts: zyxelPortBasedVlan.setOrganization('Enterprise Solution ZyXEL')
+if mibBuilder.loadTexts: zyxelPortBasedVlan.setContactInfo('')
+if mibBuilder.loadTexts: zyxelPortBasedVlan.setDescription('The subtree for port-based VLAN')
+zyxelPortBasedVlanSetup = MibIdentifier((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 63, 1))
+zyxelPortBasedVlanTable = MibTable((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 63, 1, 1), )
+if mibBuilder.loadTexts: zyxelPortBasedVlanTable.setStatus('current')
+if mibBuilder.loadTexts: zyxelPortBasedVlanTable.setDescription('The table contains port-based VLAN configuration. ')
+zyxelPortBasedVlanEntry = MibTableRow((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 63, 1, 1, 1), ).setIndexNames((0, "BRIDGE-MIB", "dot1dBasePort"))
+if mibBuilder.loadTexts: zyxelPortBasedVlanEntry.setStatus('current')
+if mibBuilder.loadTexts: zyxelPortBasedVlanEntry.setDescription('An entry contains port-based VLAN configuration. ')
+zyPortBasedVlanPorts = MibTableColumn((1, 3, 6, 1, 4, 1, 890, 1, 15, 3, 63, 1, 1, 1, 1), PortList()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: zyPortBasedVlanPorts.setStatus('current')
+if mibBuilder.loadTexts: zyPortBasedVlanPorts.setDescription('Set port members for each port. This allows packets to be forwarded to these port members. ')
+mibBuilder.exportSymbols("ZYXEL-PORT-BASED-VLAN-MIB", PYSNMP_MODULE_ID=zyxelPortBasedVlan, zyxelPortBasedVlanSetup=zyxelPortBasedVlanSetup, zyxelPortBasedVlan=zyxelPortBasedVlan, zyxelPortBasedVlanTable=zyxelPortBasedVlanTable, zyxelPortBasedVlanEntry=zyxelPortBasedVlanEntry, zyPortBasedVlanPorts=zyPortBasedVlanPorts)

@@ -1,0 +1,32 @@
+#
+# PySNMP MIB module MICOMETHER (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/davwang4/Dev/mibs.snmplabs.com/asn1/MICOMETHER
+# Produced by pysmi-0.3.4 at Wed May  1 14:12:36 2019
+# On host DAVWANG4-M-1475 platform Darwin version 18.5.0 by user davwang4
+# Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+SingleValueConstraint, ValueSizeConstraint, ValueRangeConstraint, ConstraintsIntersection, ConstraintsUnion = mibBuilder.importSymbols("ASN1-REFINEMENT", "SingleValueConstraint", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsIntersection", "ConstraintsUnion")
+micom_oscar, = mibBuilder.importSymbols("MICOM-OSCAR-MIB", "micom-oscar")
+ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ModuleCompliance", "NotificationGroup")
+ModuleIdentity, Unsigned32, Counter32, TimeTicks, Bits, Counter64, iso, ObjectIdentity, IpAddress, MibIdentifier, NotificationType, Integer32, Gauge32, MibScalar, MibTable, MibTableRow, MibTableColumn = mibBuilder.importSymbols("SNMPv2-SMI", "ModuleIdentity", "Unsigned32", "Counter32", "TimeTicks", "Bits", "Counter64", "iso", "ObjectIdentity", "IpAddress", "MibIdentifier", "NotificationType", "Integer32", "Gauge32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn")
+TextualConvention, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "DisplayString")
+mcmEth = MibIdentifier((1, 3, 6, 1, 4, 1, 335, 1, 4, 10))
+mcmEthCntr = MibIdentifier((1, 3, 6, 1, 4, 1, 335, 1, 4, 10, 1))
+mcmEthCntrZeroTable = MibTable((1, 3, 6, 1, 4, 1, 335, 1, 4, 10, 1, 1), )
+if mibBuilder.loadTexts: mcmEthCntrZeroTable.setStatus('obsolete')
+if mibBuilder.loadTexts: mcmEthCntrZeroTable.setDescription('NAME = ; DESC = This table was obsoleted as of release \\ 3.0; and is included here only to support \\ backwards compatibility for software \\ versions prior to release 3.0. \\ A table that contains the ethernet Port\\ specific information regarding counters\\ that can be Zeroed.; HELP = A table that contains port-specific \\ information for the MICOM Port Counter \\ Zeroing.; CAPABILITIES = NET_CFG, VPN_CFG;')
+mcmEthCntrZeroEntry = MibTableRow((1, 3, 6, 1, 4, 1, 335, 1, 4, 10, 1, 1, 1), ).setIndexNames((0, "MICOMETHER", "mcmEthCntrZeroPort"))
+if mibBuilder.loadTexts: mcmEthCntrZeroEntry.setStatus('obsolete')
+if mibBuilder.loadTexts: mcmEthCntrZeroEntry.setDescription('NAME = ; DESC = This object was obsoleted as of release \\ 3.0; and is included here only to support \\ backwards compatibility for software \\ versions prior to release 3.0. \\ The list of information maintained by\\ the ethernet Port specific to the\\ ethernet counters.; HELP = A list of information maintained by \\ every port about the MICOM E-type Filter \\ parameters for that port.; CAPABILITIES = ;')
+mcmEthCntrZeroPort = MibTableColumn((1, 3, 6, 1, 4, 1, 335, 1, 4, 10, 1, 1, 1, 1), Integer32()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: mcmEthCntrZeroPort.setStatus('obsolete')
+if mibBuilder.loadTexts: mcmEthCntrZeroPort.setDescription('NAME = ; DESC = This object was obsoleted as of release \\ 3.0; and is included here only to support \\ backwards compatibility for software \\ versions prior to release 3.0. \\ The ethernet Port that these counters\\ pertain to.; HELP = The Port to which this entry pertains.; CAPABILITIES = ;')
+mcmEthStatsGrpCounterZero = MibTableColumn((1, 3, 6, 1, 4, 1, 335, 1, 4, 10, 1, 1, 1, 2), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("reset", 1), ("other", 2)))).setMaxAccess("writeonly")
+if mibBuilder.loadTexts: mcmEthStatsGrpCounterZero.setStatus('obsolete')
+if mibBuilder.loadTexts: mcmEthStatsGrpCounterZero.setDescription('NAME = ; DESC = This object was obsoleted as of release \\ 3.0; and is included here only to support \\ backwards compatibility for software \\ versions prior to release 3.0. \\ When reset counter information is performed,\\ the ethernet statistic group counter info.\\ collected will reset to zero.; HELP = When set to reset, the StatsGrp Counters \\ should be zeroed out.; CAPABILITIES = ;')
+mcmEthCollStatsGrpCounterZero = MibTableColumn((1, 3, 6, 1, 4, 1, 335, 1, 4, 10, 1, 1, 1, 3), Integer32().subtype(subtypeSpec=ConstraintsUnion(SingleValueConstraint(1, 2))).clone(namedValues=NamedValues(("reset", 1), ("other", 2)))).setMaxAccess("writeonly")
+if mibBuilder.loadTexts: mcmEthCollStatsGrpCounterZero.setStatus('obsolete')
+if mibBuilder.loadTexts: mcmEthCollStatsGrpCounterZero.setDescription('NAME = ; DESC = This object was obsoleted as of release \\ 3.0; and is included here only to support \\ backwards compatibility for software \\ versions prior to release 3.0. \\ When reset counter information is performed,\\ the ethernet collusion statistics group counter\\ information collected will reset to Zero.; HELP = When set to reset, the Collision StatsGrp \\ Counters should be zeroed out.; CAPABILITIES = ;')
+mibBuilder.exportSymbols("MICOMETHER", mcmEthCntrZeroTable=mcmEthCntrZeroTable, mcmEthCntrZeroPort=mcmEthCntrZeroPort, mcmEthCollStatsGrpCounterZero=mcmEthCollStatsGrpCounterZero, mcmEthStatsGrpCounterZero=mcmEthStatsGrpCounterZero, mcmEth=mcmEth, mcmEthCntrZeroEntry=mcmEthCntrZeroEntry, mcmEthCntr=mcmEthCntr)
