@@ -1,0 +1,337 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCOWAN-SMI": [
+      "stratacom"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Integer32",
+      "Bits",
+      "Counter64",
+      "Unsigned32",
+      "Counter32",
+      "NOTIFICATION-TYPE",
+      "IpAddress",
+      "MODULE-IDENTITY",
+      "Gauge32",
+      "MibIdentifier",
+      "OBJECT-TYPE",
+      "OBJECT-IDENTITY",
+      "TimeTicks",
+      "iso"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "DisplayString"
+    ]
+  },
+  "rtm": {
+    "name": "rtm",
+    "oid": "1.3.6.1.4.1.351.120",
+    "class": "objectidentity"
+  },
+  "trapsConfig": {
+    "name": "trapsConfig",
+    "oid": "1.3.6.1.4.1.351.120.1",
+    "class": "objectidentity"
+  },
+  "trapConfigTable": {
+    "name": "trapConfigTable",
+    "oid": "1.3.6.1.4.1.351.120.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "The trap configuration table. This table is used for registering SNMP managers with the system. The system will send traps only to the registered SNMP mangers."
+  },
+  "trapConfigEntry": {
+    "name": "trapConfigEntry",
+    "oid": "1.3.6.1.4.1.351.120.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RTM-MIB",
+        "object": "managerIPaddress",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "An entry for each of the SNMP Manager registered. Each SNMP Manager is identified by its IP Address specified in managerIPAddress object."
+  },
+  "managerIPaddress": {
+    "name": "managerIPaddress",
+    "oid": "1.3.6.1.4.1.351.120.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "A unique index value representing the SNMP manager."
+  },
+  "managerPortNumber": {
+    "name": "managerPortNumber",
+    "oid": "1.3.6.1.4.1.351.120.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The UDP Port number on which the manager receives traps from a system."
+  },
+  "managerRowStatus": {
+    "name": "managerRowStatus",
+    "oid": "1.3.6.1.4.1.351.120.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "addRow": 1,
+          "delRow": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object is used for adding(registering) and deleting(de-registering) SNMP managers in the system. By setting this object to 'addRow' snmp manager will be registered with the system. By setting this object to 'delRow' snmp manager will be registered with the system. In some systems, the SNMP Manager will be de-registered automatically by the agent (to allow other SNMP managers to register), if manager is idle for long time( This time is called aging interval time). In order to avoid Managers being de-registered automatically it is expected that the SNMP Managers keep sending keep-alive requests(SNMP GET on this object) to the system for predefined interval(Choosen by SNMP Manager). The keep-alive requests need to be sent few minutes before the aging interval expires. The aging value of the Registered Managers are in the order of minutes(system dependent or user configured). The value supported for the aging value is system dependent. The system might support aging value per manager basis or per node basis (applicable to all the registered managers). "
+  },
+  "readingTrapsFlag": {
+    "name": "readingTrapsFlag",
+    "oid": "1.3.6.1.4.1.351.120.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "false": 1,
+          "true": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "An entry for the state of the manager. The value 'false' indicates that SNMP manager is not in the middle of uploading traps(via trapUploadTable). The value 'true' indicates that SNMP manager is in the middle of uploading traps(via trapUploadTable). When the value is 'true' the system will not send traps to the corresponding manager identified by managerIPAddress object."
+  },
+  "nextTrapSeqNum": {
+    "name": "nextTrapSeqNum",
+    "oid": "1.3.6.1.4.1.351.120.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Set by the manager to indicate the first trap(identified by this sequence number) it is interested in uploading. The agent increments this value when readingTrapsFlag is set to true(1) and SNMP Get is performed on trapUploadTable. The trapUploadTable entries returned depends upon this value. If there are no traps in the system with the the sequence number, the agent will set the value for this object to the head of FIFO(Saved traps) and return an error response."
+  },
+  "managerNumOfValidEntries": {
+    "name": "managerNumOfValidEntries",
+    "oid": "1.3.6.1.4.1.351.120.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 12
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The number of entries in trapConfigTable."
+  },
+  "lastSequenceNumber": {
+    "name": "lastSequenceNumber",
+    "oid": "1.3.6.1.4.1.351.120.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The sequence number of the last trap generated by the system. This object is used in each of the RTM Compliant trap definitions. The manager can figure out whether any trap is lost(missing) by comparing the lastSequenceNumber values received in last 2 traps."
+  },
+  "trapUploadTable": {
+    "name": "trapUploadTable",
+    "oid": "1.3.6.1.4.1.351.120.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "The trapUploadTable is used by the manager to retrieve missing(lost) traps using robust trap mechanism. The manager does a Get request on this table."
+  },
+  "trapUploadEntry": {
+    "name": "trapUploadEntry",
+    "oid": "1.3.6.1.4.1.351.120.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RTM-MIB",
+        "object": "trapManagerIPaddress",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Manager does a Get request on the elements of this entry to upload missing traps."
+  },
+  "trapManagerIPaddress": {
+    "name": "trapManagerIPaddress",
+    "oid": "1.3.6.1.4.1.351.120.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "IP address of the manager used as an index to the table. The value of this object must match with the value in the managerIPaddress object."
+  },
+  "trapSequenceNum": {
+    "name": "trapSequenceNum",
+    "oid": "1.3.6.1.4.1.351.120.1.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The sequence number associated with the trap. This sequence number has to match with the value in lastSequenceNumber object embedded in trapPduString."
+  },
+  "trapPduString": {
+    "name": "trapPduString",
+    "oid": "1.3.6.1.4.1.351.120.1.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Trap description string. This contains the Trap PDU that is stored in the system."
+  },
+  "endOfQueueFlag": {
+    "name": "endOfQueueFlag",
+    "oid": "1.3.6.1.4.1.351.120.1.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "false": 1,
+          "true": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Flag indicating the last trap saved in the system's FIFO queue."
+  },
+  "recoverTrapTable": {
+    "name": "recoverTrapTable",
+    "oid": "1.3.6.1.4.1.351.120.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "A table containing information about the traps sent from the system/switch. The total number of traps stored in the switch is implementation specific. It is expected that systems supporting RTM Mechanism save atleast least 500 traps , so that NMS applications can recover the traps if they determined it to be lost."
+  },
+  "recoverTrapEntry": {
+    "name": "recoverTrapEntry",
+    "oid": "1.3.6.1.4.1.351.120.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RTM-MIB",
+        "object": "recoverTrapSequenceNum",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "The entry for each of the traps stored in the switch."
+  },
+  "recoverTrapSequenceNum": {
+    "name": "recoverTrapSequenceNum",
+    "oid": "1.3.6.1.4.1.351.120.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The sequence number associated with the trap. The system tries to find a matching entry in the list of traps stored. If there is a match, an valid entry returned with value for 'recoverTrapPduString' object."
+  },
+  "recoverTrapPduString": {
+    "name": "recoverTrapPduString",
+    "oid": "1.3.6.1.4.1.351.120.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 512
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Trap description string. This contains the Trap PDU that is stored in the system."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/RTM-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:23:36 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "RTM-MIB"
+  }
+}

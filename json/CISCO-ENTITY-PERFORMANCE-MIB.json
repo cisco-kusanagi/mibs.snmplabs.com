@@ -1,0 +1,1056 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "ENTITY-MIB": [
+      "entPhysicalIndex"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Counter32",
+      "OBJECT-TYPE",
+      "NOTIFICATION-TYPE",
+      "Counter64",
+      "Bits",
+      "MODULE-IDENTITY",
+      "iso",
+      "OBJECT-IDENTITY",
+      "IpAddress",
+      "TimeTicks",
+      "MibIdentifier",
+      "Gauge32",
+      "Integer32",
+      "Unsigned32"
+    ],
+    "SNMPv2-TC": [
+      "DateAndTime",
+      "TruthValue",
+      "TimeStamp",
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "ciscoEntityPerformanceMIB": {
+    "name": "ciscoEntityPerformanceMIB",
+    "oid": "1.3.6.1.4.1.9.9.756",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2014-06-18 00:00",
+        "description": "Added the following objects to the MIB. cepThroughputLicensedBW, cepThroughputLevel, cepThroughputInterval, cepThroughputThreshold, cepThroughputAvgRate to cepThroughputTable. Added cepThroughputNotifEnabled to ciscoEntityPerformanceMIBNotifObjects group. Added cepThroughputNotif as a new notification to the MIB. Added a new MIB conform group, ciscoEntityPerformanceMIBThroughputGroup for the new objects. Also modified the ciscoEntityPerformanceMIBCompliance to add the new group ciscoEntityPerformanceMIBThroughputGroup."
+      },
+      {
+        "revision": "2010-09-09 00:00",
+        "description": "The initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "201406180000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-snmp@cisco.com",
+    "description": "This MIB module defines managed objects that facilitate to monitor performance of any physical entity, which are listed in the ENTITY-MIB (RFC 4133) entPhysicalTable. The performance monitoring includes utilization, input/output packet/byte rates, etc. This monitoring is through the measurement periods of current, 1-minute, 5-minutes, 15-minutes. The performance data calculation method would vary for each entity for a specific interval, hence users of this MIB should obtain the information using the object cepStatsAlgorithm for a specific interval. The performance statistics can be accumulated for the 1-minute, 5-minutes and 15-minutes (recommended) intervals. At any one time, an agent maintains one current (incomplete) interval for each interval type and up to 96 completed interval number. Fewer than 96 interval number of data will be available if the agent has been restarted within the last 24 hours for 15 minutes interval, 8 hours for 5 minutes interval, and 1.36 hours for 1 minute interval. There is no requirement for an agent to ensure fixed relationship between the start of a one/five/fifteen minute intervals and wall clock, however some agents may align the fifteen minutes interval with quarter hours. The following terminologies apply within the scope of this MIB. o entity - Any physical entity which can support performance monitoring as specified in this MIB o Utilization - The ratio of current usage to the maximum capacity the entity can handle o Input - Communication channel where packets arrive on the entity o Output - Communication channel where packets leave the entity Acronyms ======== SMA - Simple Moving Average"
+  },
+  "CiscoEntPerfMeasurement": {
+    "name": "CiscoEntPerfMeasurement",
+    "class": "textualconvention",
+    "type": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "status": "current",
+    "description": "This textual convention indicates the measurement of entity performance."
+  },
+  "CiscoEntPerfRange": {
+    "name": "CiscoEntPerfRange",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "rangePercentage": 1,
+          "rangeInt32": 2,
+          "rangeInt64": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "This textual convention indicates the allowed range for the specified measurement of entity performance. rangePercentage(1) 0 - 100 rangeInt32(2) 0 - 4294967295 rangeInt64(3) 0 - 18446744073709551615"
+  },
+  "CiscoEntPerfType": {
+    "name": "CiscoEntPerfType",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "utilization": 1,
+          "bitInputRate": 2,
+          "bitOutputRate": 3,
+          "bitDropRate": 4,
+          "packetInputRate": 5,
+          "packetOutputRate": 6,
+          "packetDropRate": 7
+        }
+      }
+    },
+    "status": "current",
+    "description": "This textual convention denotes an enumerated integer-value that represents the available various measurement types. utilization(1) - The ratio of current usage to the maximum capacity the entity can handle bitInputRate(2) - Input bit rate bitOutputRate(3) - Output bit rate bitDropRate(4) - Drop bit rate packetInputRate(5) - Input packet rate packetOutputRate(6) - Output packet rate packetDropRate(7) - Drop packet rate"
+  },
+  "CiscoEntPerfInterval": {
+    "name": "CiscoEntPerfInterval",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "current": 1,
+          "oneMinute": 2,
+          "fiveMinutes": 3,
+          "fifteenMinutes": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": "This textual convention denotes an enumerated integer-value that represents the available interval values for which the periodic statistics are to be collected. current (1) - Current interval to collect statistics. In case of any entity which only start collecting statistics from last 5/10 seconds then the entity can choose this interval oneMinute (2) - Interval to collect last 1 minute statistics fiveMinutes (3) - Interval to collect last 5 minutes statistics fifteenMinutes (4) - Interval to collect last 15 minutes statistics"
+  },
+  "CiscoEntPerfHistInterval": {
+    "name": "CiscoEntPerfHistInterval",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "oneMinute": 1,
+          "fiveMinutes": 2,
+          "fifteenMinutes": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "This textual convention denotes an enumerated integer-value that represents the available interval values for which the historic performance statistics are to be collected. oneMinute (1) - Last 1 minute statistics fiveMinutes (2) - Last 5 minutes statistics fifteenMinutes (3) - Last 15 minutes statistics"
+  },
+  "CiscoEntPerfIntervalAlgo": {
+    "name": "CiscoEntPerfIntervalAlgo",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "other": 2,
+          "current": 3,
+          "algoSMA": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": "This textual convention denotes an enumerated integer-value that represents the method used to calculate the specific interval data. unknown (1) - The calculation method is unknown other (2) - The calculation method is not list in this enumeration. current (3) - This is current data algoSMA (4) - Simple Moving Average over the specified interval"
+  },
+  "ciscoEntityPerformanceMIBNotifs": {
+    "name": "ciscoEntityPerformanceMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.756.0",
+    "class": "objectidentity"
+  },
+  "ciscoEntityPerformanceMIBObjects": {
+    "name": "ciscoEntityPerformanceMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.756.1",
+    "class": "objectidentity"
+  },
+  "ciscoEntityPerformanceMIBConform": {
+    "name": "ciscoEntityPerformanceMIBConform",
+    "oid": "1.3.6.1.4.1.9.9.756.2",
+    "class": "objectidentity"
+  },
+  "cepEntityTable": {
+    "name": "cepEntityTable",
+    "oid": "1.3.6.1.4.1.9.9.756.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table maintains the specific performance information for each physical entity, which supports performance monitoring. An agent creates a conceptual row to this table corresponding to a physical entity upon detection of a physical entity supporting the performance monitoring. An agent destroys a conceptual row from this table corresponding to a physical entity upon removal of the physical entity."
+  },
+  "cepEntityEntry": {
+    "name": "cepEntityEntry",
+    "oid": "1.3.6.1.4.1.9.9.756.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the cepEntityTable. There is an entry in this table for each entity which supports performance monitoring, as defined by a value of entPhysicalIndex."
+  },
+  "cepEntityNumReloads": {
+    "name": "cepEntityNumReloads",
+    "oid": "1.3.6.1.4.1.9.9.756.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "reloads",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the number of times the entity is reloaded, since the entity host is up."
+  },
+  "cepEntityLastReloadTime": {
+    "name": "cepEntityLastReloadTime",
+    "oid": "1.3.6.1.4.1.9.9.756.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DateAndTime",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the entity last reload time."
+  },
+  "cepConfigTable": {
+    "name": "cepConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.756.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table maintains the performance configuration information for each physical entity at various performance time intervals such as current, 1 minute, etc. An agent creates a conceptual row to this table corresponding to a physical entity for each supported performance measurement and a performance interval upon detection. The agent destroys a conceptual row from this table corresponding to a physical entity for a specific performance measurement and an interval upon removal of the physical entity."
+  },
+  "cepConfigEntry": {
+    "name": "cepConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.756.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigInterval",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigPerfType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the cepConfigTable. There is an entry in this table for each entity by a value of entPhysicalIndex, the supported performance time interval by a value of cepConfigInterval, and the supported performance type by a value of cepConfigPerfType."
+  },
+  "cepConfigInterval": {
+    "name": "cepConfigInterval",
+    "oid": "1.3.6.1.4.1.9.9.756.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfInterval",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object identifies the time interval for which the performance configuration being applied. The interval values can be current, 1 minute, etc. as specified in the CiscoEntPerfInterval."
+  },
+  "cepConfigPerfType": {
+    "name": "cepConfigPerfType",
+    "oid": "1.3.6.1.4.1.9.9.756.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object identifies the performance measurement type for which the performance configuration being applied."
+  },
+  "cepConfigPerfRange": {
+    "name": "cepConfigPerfRange",
+    "oid": "1.3.6.1.4.1.9.9.756.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfRange",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the range used by the performance configuration objects such as cepConfigRisingThreshold, etc. for the specific performance measurement type."
+  },
+  "cepConfigRisingThreshold": {
+    "name": "cepConfigRisingThreshold",
+    "oid": "1.3.6.1.4.1.9.9.756.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfMeasurement",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object contains the rising threshold value for a specific performance measurement type at a specific performance time interval. The value of this object must be greater than cepConfigFallingThreshold. The supported range of this object can be identified by the object 'cepConfigPerfRange'. The value of zero indicates that no comparison is being made between the cepStatsMeasurement object value and the threshold value, therefore no event action will be generated."
+  },
+  "cepConfigFallingThreshold": {
+    "name": "cepConfigFallingThreshold",
+    "oid": "1.3.6.1.4.1.9.9.756.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfMeasurement",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object contains the falling threshold value for a specific performance measurement type at a specific performance interval. The value of this object must be less than cepConfigRisingThreshold. The supported range of this object can be identified by the object 'cepConfigPerfRange'. The value of zero indicates that no comparison is being made between the cepStatsMeasurement object value and the threshold value, therefore no event action will be generated."
+  },
+  "cepConfigThresholdNotifEnabled": {
+    "name": "cepConfigThresholdNotifEnabled",
+    "oid": "1.3.6.1.4.1.9.9.756.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object provides the control to the threshold notification for a specific entity performance type at a specific interval. The notification will be sent based on this object value and the global object 'cepThresholdNotifEnabled'. The following table would explain when the notification would be generated. cepThresholdNotifEnabled cepConfigThresholdNotifEnabled Notify ======================== ============================== ====== true true Yes true false No false true No false false No"
+  },
+  "cepStatsTable": {
+    "name": "cepStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.756.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table maintains entity running performance, which are collected at various performance intervals. An agent creates a conceptual row to this table corresponding to a physical entity for each supported performance measurement and a performance interval upon detection. The agent destroys a conceptual row from this table corresponding to a physical entity for a specific performance measurement and an interval upon removal of the physical entity."
+  },
+  "cepStatsEntry": {
+    "name": "cepStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.756.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigInterval",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigPerfType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the cepStatsTable. There is an entry in this table for each entity by a value of entPhysicalIndex, the supported performance time interval by a value of cepConfigInterval, and the supported performance type by a value of cepConfigPerfType."
+  },
+  "cepStatsAlgorithm": {
+    "name": "cepStatsAlgorithm",
+    "oid": "1.3.6.1.4.1.9.9.756.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfIntervalAlgo",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the algorithm used to calculate the entity performance statistics over the specified interval."
+  },
+  "cepStatsMeasurement": {
+    "name": "cepStatsMeasurement",
+    "oid": "1.3.6.1.4.1.9.9.756.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfMeasurement",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides a specific performance measurement of the entity over the specified interval. The range of this object can be identified by the object 'cepConfigPerfRange'."
+  },
+  "cepEntityIntervalTable": {
+    "name": "cepEntityIntervalTable",
+    "oid": "1.3.6.1.4.1.9.9.756.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table maintains the interval information for each entity at various interval period. An agent creates a conceptual row to this table corresponding to a physical entity upon detection of a physical entity supporting the specific performance interval statistics collection. An agent destroys a conceptual row from this table corresponding to a physical entity upon removal of the physical entity."
+  },
+  "cepEntityIntervalEntry": {
+    "name": "cepEntityIntervalEntry",
+    "oid": "1.3.6.1.4.1.9.9.756.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepHistInterval",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the cepEntityIntervalTable. There is an entry in this table for each entity by a value of entPhysicalIndex, and the supported performance history time interval by a value of cepHistInterval."
+  },
+  "cepHistInterval": {
+    "name": "cepHistInterval",
+    "oid": "1.3.6.1.4.1.9.9.756.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfHistInterval",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object identifies the time interval for which the performance history being applied. The interval values can be 1 minute, 5 minutes, etc. as specified in the CiscoEntPerfHistInterval."
+  },
+  "cepIntervalTimeElapsed": {
+    "name": "cepIntervalTimeElapsed",
+    "oid": "1.3.6.1.4.1.9.9.756.1.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 899
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the number of seconds that have elapsed since the beginning of the chosen interval on this entity. If for some reason, such as an adjustment in the system's time-of-day clock, the current interval exceeds the maximum value, the agent will return the maximum value for the chosen interval. For example: Interval Maximum value ======== ============= 15 minutes 899 5 minutes 299 1 minutes 59"
+  },
+  "cepValidIntervalCount": {
+    "name": "cepValidIntervalCount",
+    "oid": "1.3.6.1.4.1.9.9.756.1.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 96
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the number of completed intervals for which valid entity performance data has been collected for the chosen interval. The value will be 96 unless the entity was brought online within the last 1.36/8/24 hours for 1/5/15 minutes interval respectively, in which case the value will be the number of completed 1/5/15 minute intervals since the entity has been online."
+  },
+  "cepIntervalStatsTable": {
+    "name": "cepIntervalStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.756.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains specific performance statistics collected by each entity over the specified interval. The table has the maximum of 96 buckets for all the supported intervals. The following table would list the total hours of history maintained for various intervals. Intervals (minutes) Buckets History ========= ======= ======= 15 96 24 hours 5 96 8 hours 1 96 1 hour 36 minutes An agent creates a conceptual row to this table corresponding to a physical entity upon detection of a physical entity supporting the specific performance statistics for a specific interval. An agent destroys a conceptual row from this table corresponding to a physical entity upon removal of the physical entity. The support for 15-minutes interval history is required for all the entities supporting performance data. However, the support for 1-minute and 5-minutes interval history for entities are optional and at the descretion of the device supporting the performance monitoring."
+  },
+  "cepIntervalStatsEntry": {
+    "name": "cepIntervalStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.756.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepHistInterval",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigPerfType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepIntervalNumber",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the cepIntervalStatsTable. There is an entry in this table for each entity by a value of entPhysicalIndex, the supported performance history time interval by a value of cepHistInterval, the supported performance statistics by a value of cepConfigPerfType and the interval number by a value of cepIntervalNumber."
+  },
+  "cepIntervalNumber": {
+    "name": "cepIntervalNumber",
+    "oid": "1.3.6.1.4.1.9.9.756.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 96
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An interval number between 1 and 96, where 1 is the most recently completed interval and 96 is the least recently completed interval. For example, if it is 15 minutes interval history, then the 96 is the interval number completed 23 hours and 45 minutes prior to interval 1."
+  },
+  "cepIntervalStatsValidData": {
+    "name": "cepIntervalStatsValidData",
+    "oid": "1.3.6.1.4.1.9.9.756.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the performance statistics for this interval is valid. The value 'true' means the performance statistics is valid, otherwise the performance statistics is invalid for the interval."
+  },
+  "cepIntervalStatsRange": {
+    "name": "cepIntervalStatsRange",
+    "oid": "1.3.6.1.4.1.9.9.756.1.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfRange",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the range information for the object 'cepIntervalStatsMeasurement'."
+  },
+  "cepIntervalStatsMeasurement": {
+    "name": "cepIntervalStatsMeasurement",
+    "oid": "1.3.6.1.4.1.9.9.756.1.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoEntPerfMeasurement",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the specific performance statistics of an entity over the specified interval. The range of this object can be identified by object 'cepIntervalStatsRange'."
+  },
+  "cepIntervalStatsCreateTime": {
+    "name": "cepIntervalStatsCreateTime",
+    "oid": "1.3.6.1.4.1.9.9.756.1.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the time stamp at which the specific performance statistics gets created."
+  },
+  "ciscoEntityPerformanceMIBNotifObjects": {
+    "name": "ciscoEntityPerformanceMIBNotifObjects",
+    "oid": "1.3.6.1.4.1.9.9.756.1.6",
+    "class": "objectidentity"
+  },
+  "cepThroughputTable": {
+    "name": "cepThroughputTable",
+    "oid": "1.3.6.1.4.1.9.9.756.1.7",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table maintains the specific throughput information for each physical entity, which supports throughput monitoring. An agent creates a conceptual row to this table corresponding to a physical entity upon detection of a physical entity supporting the throughput monitoring. An agent destroys a conceptual row from this table corresponding to a physical entity upon removal of the physical entity."
+  },
+  "cepThroughputEntry": {
+    "name": "cepThroughputEntry",
+    "oid": "1.3.6.1.4.1.9.9.756.1.7.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the cepThroughputTable. There is an entry in this table for each entity which supports throughput monitoring, as defined by a value of entPhysicalIndex."
+  },
+  "cepThroughputLicensedBW": {
+    "name": "cepThroughputLicensedBW",
+    "oid": "1.3.6.1.4.1.9.9.756.1.7.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "bits per second",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the bandwidth for installed throughput license of the entity."
+  },
+  "cepThroughputLevel": {
+    "name": "cepThroughputLevel",
+    "oid": "1.3.6.1.4.1.9.9.756.1.7.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "normal": 1,
+          "warning": 2,
+          "exceed": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the current throughput level for installed throughput license of the entity. normal (1) - Throughput usage is normal warning (2) - Throughput usage has crossed the configured threshold limit exceed (3) - Throughput usage has exceeded the total licensed bandwidth"
+  },
+  "cepThroughputInterval": {
+    "name": "cepThroughputInterval",
+    "oid": "1.3.6.1.4.1.9.9.756.1.7.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 10,
+            "max": 86400
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The object represents the configured time interval at which the cepThroughputLevel is checked for this entity."
+  },
+  "cepThroughputThreshold": {
+    "name": "cepThroughputThreshold",
+    "oid": "1.3.6.1.4.1.9.9.756.1.7.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 75,
+            "max": 95
+          }
+        ]
+      }
+    },
+    "units": "percent",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The object represents the configured throughput threshold for this entity."
+  },
+  "cepThroughputAvgRate": {
+    "name": "cepThroughputAvgRate",
+    "oid": "1.3.6.1.4.1.9.9.756.1.7.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "bits per second",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The object represents the average throughput rate in the interval cepThroughputInterval for this entity."
+  },
+  "cepThresholdNotifEnabled": {
+    "name": "cepThresholdNotifEnabled",
+    "oid": "1.3.6.1.4.1.9.9.756.1.6.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object controls the entity performance measurement rising/falling threshold notification. When this object contains a value of 'true', then generation of entity rising/falling threshold notification is enabled. If this object contains a value of 'false', then generation of entity rising/falling threshold notification is disabled. The generation of the rising/falling threshold depends on this global value as well as the object 'cepConfigThresholdNotifEnabled' present in cepConfigTable."
+  },
+  "cepThroughputNotifEnabled": {
+    "name": "cepThroughputNotifEnabled",
+    "oid": "1.3.6.1.4.1.9.9.756.1.6.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object controls throughput rate notification. When this object contains a value 'true', then generation of cepThroughputNotif is enabled. If this object contains a value 'false', then generation of cepThroughputNotif is disabled."
+  },
+  "cepPerfThreshRisingEvent": {
+    "name": "cepPerfThreshRisingEvent",
+    "oid": "1.3.6.1.4.1.9.9.756.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigPerfRange"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigRisingThreshold"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepStatsMeasurement"
+      }
+    ],
+    "status": "current",
+    "description": "A notification indicating that the specific performance measurement is rising the configured threshold on this physical entity at a specific performance interval. This notification will be sent, whenever the cepStatsMeasurement is equal to or above the cepConfigRisingThreshold for a specific performance measurement at a specific interval and the notification control objects are enabled. An agent may throttle the generation of consecutive cepPerfThreshRisingEvent notification so that there is at least a five second (suggested default) gap between notification for an entity of specific performance measurement type at a specific interval."
+  },
+  "cepPerfThreshFallingEvent": {
+    "name": "cepPerfThreshFallingEvent",
+    "oid": "1.3.6.1.4.1.9.9.756.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigPerfRange"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigFallingThreshold"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepStatsMeasurement"
+      }
+    ],
+    "status": "current",
+    "description": "A notification indicating that the specific performance measurement is falling the configured threshold on this physical entity at a specific performance interval. This notification will be sent, whenever the cepStatsMeasurement is equal to or below the cepConfigFallingThreshold for a specific performance measurement at a specific interval and the notification control objects are enabled. An agent may throttle the generation of consecutive cepPerfThreshFallingEvent notification so that there is at least a five second (suggested default) gap between notification for an entity of specific performance measurement type at a specific interval."
+  },
+  "cepThroughputNotif": {
+    "name": "cepThroughputNotif",
+    "oid": "1.3.6.1.4.1.9.9.756.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputLicensedBW"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputLevel"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputAvgRate"
+      }
+    ],
+    "status": "current",
+    "description": "A notification indicating that the average throughput rate for the configured interval has exceeded the threshold or reached maximum bandwidth allowed. This notification will be sent, whenever the cepThroughputLevel object has the value warning(2) or exceed(3). The condition for trap generation will be checked in every cepThroughputInterval. cepThroughputNotif with ceqfpThrougputLevel as warning(2) indicates that average throughput rate has crossed the configured threshold. cepThroughputNotif with cepThrougputLevel as exceed(3) indicates that average throughput rate has reached maximum licensed bandwidth."
+  },
+  "ciscoEntityPerformanceMIBCompliances": {
+    "name": "ciscoEntityPerformanceMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.756.2.1",
+    "class": "objectidentity"
+  },
+  "ciscoEntityPerformanceMIBGroups": {
+    "name": "ciscoEntityPerformanceMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2",
+    "class": "objectidentity"
+  },
+  "ciscoEntityPerformanceMIBCompliance": {
+    "name": "ciscoEntityPerformanceMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.756.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoEntityPerformanceMIBEntityGroup",
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+      },
+      {
+        "object": "ciscoEntityPerformanceMIBConfigGroup",
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+      },
+      {
+        "object": "ciscoEntityPerformanceMIBNotificationGroup",
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+      },
+      {
+        "object": "ciscoEntityPerformanceMIBPerfStatsGroup",
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+      },
+      {
+        "object": "ciscoEntityPerformanceMIBIntervalStatsGroup",
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+      },
+      {
+        "object": "ciscoEntityPerformanceMIBNotifControlGroup",
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+      },
+      {
+        "object": "ciscoEntityPerformanceMIBEntityIntervalGroup",
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+      },
+      {
+        "object": "ciscoEntityPerformanceMIBThroughputGroup",
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for CISCO-ENTITY-PERFORMANCE-MIB."
+  },
+  "ciscoEntityPerformanceMIBEntityGroup": {
+    "name": "ciscoEntityPerformanceMIBEntityGroup",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepEntityNumReloads"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepEntityLastReloadTime"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains collection of entity information objects."
+  },
+  "ciscoEntityPerformanceMIBConfigGroup": {
+    "name": "ciscoEntityPerformanceMIBConfigGroup",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigRisingThreshold"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigFallingThreshold"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigPerfRange"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepConfigThresholdNotifEnabled"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains collection of configuration objects related to performance."
+  },
+  "ciscoEntityPerformanceMIBPerfStatsGroup": {
+    "name": "ciscoEntityPerformanceMIBPerfStatsGroup",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepStatsAlgorithm"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepStatsMeasurement"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains collection of performance statistics information objects."
+  },
+  "ciscoEntityPerformanceMIBEntityIntervalGroup": {
+    "name": "ciscoEntityPerformanceMIBEntityIntervalGroup",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepIntervalTimeElapsed"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepValidIntervalCount"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains collection of performance interval data objects."
+  },
+  "ciscoEntityPerformanceMIBIntervalStatsGroup": {
+    "name": "ciscoEntityPerformanceMIBIntervalStatsGroup",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepIntervalStatsValidData"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepIntervalStatsMeasurement"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepIntervalStatsCreateTime"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepIntervalStatsRange"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains collection of performance interval statistics objects."
+  },
+  "ciscoEntityPerformanceMIBNotifControlGroup": {
+    "name": "ciscoEntityPerformanceMIBNotifControlGroup",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThresholdNotifEnabled"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputNotifEnabled"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains collection of notification control objects."
+  },
+  "ciscoEntityPerformanceMIBNotificationGroup": {
+    "name": "ciscoEntityPerformanceMIBNotificationGroup",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2.7",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepPerfThreshRisingEvent"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepPerfThreshFallingEvent"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputNotif"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains collection of performance notification objects."
+  },
+  "ciscoEntityPerformanceMIBThroughputGroup": {
+    "name": "ciscoEntityPerformanceMIBThroughputGroup",
+    "oid": "1.3.6.1.4.1.9.9.756.2.2.8",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputLicensedBW"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputLevel"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputInterval"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputThreshold"
+      },
+      {
+        "module": "CISCO-ENTITY-PERFORMANCE-MIB",
+        "object": "cepThroughputAvgRate"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains collection of throughput rate objects."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-ENTITY-PERFORMANCE-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:01:32 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-ENTITY-PERFORMANCE-MIB"
+  }
+}

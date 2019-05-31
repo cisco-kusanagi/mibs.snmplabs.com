@@ -1,0 +1,463 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "IF-MIB": [
+      "ifIndex"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "NOTIFICATION-TYPE",
+      "IpAddress",
+      "TimeTicks",
+      "OBJECT-TYPE",
+      "Counter64",
+      "Bits",
+      "Gauge32",
+      "OBJECT-IDENTITY",
+      "MibIdentifier",
+      "Counter32",
+      "iso",
+      "Unsigned32",
+      "MODULE-IDENTITY",
+      "Integer32"
+    ],
+    "SNMPv2-TC": [
+      "RowStatus",
+      "MacAddress",
+      "TEXTUAL-CONVENTION",
+      "DisplayString"
+    ]
+  },
+  "ciscoCipLanMIB": {
+    "name": "ciscoCipLanMIB",
+    "oid": "1.3.6.1.4.1.9.9.34",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "1998-01-06 00:00",
+        "description": "With the addition of Cisco's new Channel Port Adapter cards, all the references to CIP in the MIB description and object descriptions are changed to CMCC (Cisco Mainframe Channel Connection). The object names in the form of cip... or cipCard... will remain the same, but will be valid objects for the Channel Port Adapter cards."
+      },
+      {
+        "revision": "1995-04-28 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "9504280000Z",
+    "organization": "cisco IBM engineering Working Group",
+    "contactinfo": " Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-snmp@cisco.com",
+    "description": "This is the Management Information Base (MIB) module for objects used to manage the cisco internal LAN support in Cisco Mainframe Channel Connection (CMCC) environments. 1) LAN 2) Adapter The following example configuration of a router that shows the entities managed by the CIPLAN MIB. Router A ----------------------------------------- | ------------------------------------- | | | | | | | ------------------- | | | | | Adapter | -- | | | | | 400000000401 | / \\ | | | | | ADAPNO 0 |---| Ring | | | | | ------------------- | |----| | | | | Adapter |---| 1000 | | | | | | 400000000402 | \\ / | | | | | ADAPNO 1 | -- | | | | ------------------- | | | | Token Ring | | | | LAN 0 | | | | | | | | -- | | | | ------------------- / \\ | | | | | Adapter |---| Ring | | | | | | 400000000401 | | |----| | | | | ADAPNO 3 |---| 1001 | | | | | ------------------- \\ / | | | | -- | | | | | | | | Token Ring | | | | LAN 1 | | | | | | | | | | | | ------------------- | | | | | Adapter | | | | | | | 0200000000C1 |---------------| | | | | ADAPNO 4 | | | | | | ------------------- | | | | Ethernet | | | | LAN 0 | | | | | | | | | | | | ------------------- = | | | | | Adapter | / \\ | | | | | 400000000001 |===| |=====| | | | | ADAPNO 5 | \\ / | | | | ------------------- = | | | | | | | | FDDI | | | | LAN 0 | | | | | | | | CMCC CARD 6 | | | ------------------------------------- | | | ----------------------------------------- NOTE: A special ifIndex has been created to address internal LAN objects that are on the CMCC card. Physically the CMCC card would have two ifIndex's of type `other` for each CMCC Slot/Daughter Board. The additional ifIndex is made looks like the physical with the Daughter Board being replaced with a simple integer. For example: If the CMCC is in slot/bay 6; The first daughter board would have the ifIndex of 6/0. The second daughter board would have the ifIndex of 6/1. The internal objects on this CMCC card would have the ifIndex of 6/2. The ifIndex is an INTEGER to which the values will be translated to agent specific number by the agent itself. The first table is the LAN Admin table. Each entry created in this table will represent a internal CIP LAN that will be used by MAC adapters to bridge data to and from the host. The indices of the table are: * The special ifIndex that addresses the virtual objects on a CMCC card * The LAN type (token-ring, ethernet, fddi) * The unique LAN identifier NOTE: This value is used to uniquely identify each and every LAN based on LAN type and on a single CMCC card. The fields included in this table represent: * The LAN type used as on index * The unique LAN identifier used as an index * The bridging type * For Source Route Bridging, the local ring number * For Source Route Bridging, the next bridge number * For Source Route Bridging, the target ring number * For Transparent Bridging, the bridge group * The row control variable In the example above, four entries would exist. The first entry would be: - ifIndex is created by the agent - LAN type of token ring - LAN identifier of 0 - bridging type of Source Route - local ring number 1000 - next bridge number is unknown - target ring number is unknown - transparent bridge group has no meaning The second entry would be: - ifIndex is created by the agent - LAN type of token ring - LAN identifier of 1 - bridging type of Source Route - local ring number 1001 - next bridge number is unknown - target ring number is unknown - transparent bridge group has no meaning The third entry would be: - ifIndex is created by the agent - LAN type of ethernet - LAN identifier of 0 - bridging type of transparent - local ring number has no meaning - next bridge number has no meaning - target ring number has no meaning - transparent bridge group is unknown The fourth entry would be: - ifIndex is created by the agent - LAN type of fddi - LAN identifier of 0 - bridging type of transparent - local ring number has no meaning - next bridge number has no meaning - target ring number has no meaning - transparent bridge group is unknown The last table is the CIP LAN Adapter Admin table. Each entry created in this table will represent a LAN adapter on one of the CMCC internal LAN's defined in the first table. The indices of the table are: * The special ifIndex that addresses the virtual objects on a CMCC card * The LAN type (token-ring, ethernet, fddi) * The unique LAN identifier from the first table * The unique Adapter Number for this LAN type NOTE: When multiple LANs of the same type exist, this number must be kept unique by the agent. (The LAN type is defined by the Virtual LAN Admin table.) The fields included in this table represent: * The unique Adapter Number for this LAN type as defined by the LAN Admin Entry corresponding the the first two indices in this table * The MAC Address for this Adapter; this MAC Address is unique for all Adapters define on this LAN, but does not need to be unique across LANs for redundancy * The Adapter name * The row control variable In the example above, five entries would exist. The first entry would be: - ifIndex is created by the agent - the LAN type from the first table - the LAN identifier from the first table = 0 - adapter number of 0 - Mac Address of 400000000401 - Configured Name The second entry would be: - ifIndex is created by the agent - the LAN type from the first table - the LAN identifier from the first table = 0 - adapter number of 1 - Mac Address of 400000000402 - Configured Name The first entry would be: - ifIndex is created by the agent - the LAN type from the first table - the LAN identifier from the first table = 1 - adapter number of 2 - Mac Address of 400000000401 - Configured Name The first entry would be: - ifIndex is created by the agent - the LAN type from the first table - the LAN identifier from the first table = 0 - adapter number of 3 - Mac Address of 0200000000C1 - Configured Name The first entry would be: - ifIndex is created by the agent - the LAN type from the first table - the LAN identifier from the first table = 0 - adapter number of 4 - Mac Address of 400000000001 - Configured Name "
+  },
+  "cipLanObjects": {
+    "name": "cipLanObjects",
+    "oid": "1.3.6.1.4.1.9.9.34.1",
+    "class": "objectidentity"
+  },
+  "cipLan": {
+    "name": "cipLan",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1",
+    "class": "objectidentity"
+  },
+  "cipCardLanAdminTable": {
+    "name": "cipCardLanAdminTable",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains configuration information for the LAN feature on the CMCC card."
+  },
+  "cipCardLanAdminEntry": {
+    "name": "cipCardLanAdminEntry",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminLanType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminLanId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A list of CMCC LAN configuration values."
+  },
+  "cipCardLanAdminLanType": {
+    "name": "cipCardLanAdminLanType",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "iso88023csmacd": 1,
+          "iso88025tokenRing": 2,
+          "fddi": 3
+        }
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The type of Emulation applied to this CMCC LAN."
+  },
+  "cipCardLanAdminLanId": {
+    "name": "cipCardLanAdminLanId",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 31
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The index value used with the ifIndex to uniquely identify a CMCC LAN. This is just an identifier and has no relationship to the bridging protocols."
+  },
+  "cipCardLanAdminBridgeType": {
+    "name": "cipCardLanAdminBridgeType",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "transparentOnly": 1,
+          "sourcerouteOnly": 2,
+          "transpAndSourceRoute": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The bridging type supported by this CMCC LAN. The value of transparentOnly (1) is valid for all LAN types. The value of sourcerouteOnly (2) is only valid for iso88025tokenRing and fddi LAN types. The value of transpAndSourceRoute (3) is valid for all iso88025tokenRing and fddi LAN types."
+  },
+  "cipCardLanAdminSrbLocalRing": {
+    "name": "cipCardLanAdminSrbLocalRing",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4095
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The local Segment (Ring) number that uniquely identify this CIP LAN. This variable is only valid when cipCardLanAdminBridgeType is sourcerouteOnly (2) or transpAndSourceRoute (3)."
+  },
+  "cipCardLanAdminSrbBridgeNum": {
+    "name": "cipCardLanAdminSrbBridgeNum",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 15
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The Bridge number that represents this routers' bridge number. This variable is only valid when cipCardLanAdminBridgeType is sourcerouteOnly (2) or transpAndSourceRoute (3)."
+  },
+  "cipCardLanAdminSrbTargetRing": {
+    "name": "cipCardLanAdminSrbTargetRing",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4095
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The target Segment (Ring) number that is the next hop from this segment. This variable is only valid when cipCardLanAdminBridgeType is sourcerouteOnly (2) or transpAndSourceRoute (3)."
+  },
+  "cipCardLanAdminTbBridgeGrp": {
+    "name": "cipCardLanAdminTbBridgeGrp",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 63
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The transparent bridge group that this CIP LAN is a member. This variable is only valid when cipCardLanAdminBridgeType is transparentOnly (1) or transpAndSourceRoute (3)."
+  },
+  "cipCardLanAdminRowStatus": {
+    "name": "cipCardLanAdminRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used by a Management Station to create or delete the row entry in the cipCardLanAdminTable following the the RowStatus textual convention."
+  },
+  "cipCardLanAdaptAdminTable": {
+    "name": "cipCardLanAdaptAdminTable",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains configuration information for the LAN Adapter feature on the CMCC card."
+  },
+  "cipCardLanAdaptAdminEntry": {
+    "name": "cipCardLanAdaptAdminEntry",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminLanType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminLanId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdaptAdminAdaptNo",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A list of CMCC LAN Adapter configuration values."
+  },
+  "cipCardLanAdaptAdminAdaptNo": {
+    "name": "cipCardLanAdaptAdminAdaptNo",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 31
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Adapter Number used when creating a CMCC LAN Adapter. This value is given by the instance value when this row is being created. This number corresponds to the 'ADAPNO' value used VTAM XCA node definition. This number uniquely identify this Adapter from all other Adapters for the LAN type, which is identified in the associated CMCC LAN Adapter Table."
+  },
+  "cipCardLanAdaptAdminMacAddress": {
+    "name": "cipCardLanAdaptAdminMacAddress",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The Adapter MAC Address is assigned by the router administrator. It is a unique number used by protocols to address this Adapter on the CMCC LAN identified by the second index (cipCardLanAdminLanId). NOTE: In order to have duplicate MAC Addresses, they must be on different Source Route Bridge LAN's."
+  },
+  "cipCardLanAdaptAdminAdaptName": {
+    "name": "cipCardLanAdaptAdminAdaptName",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This name is assigned by the router administrator and must be unique per router. Every interface of the router can be named by the router administrator. This object provides a means of naming the CMCC LAN adapter interfaces. The Adapter Name is used in the Hierarchy Resource List when creating a Systems Network Architecture Generic Alert for the purpose of identify the CMCC LAN adapter which generated the alert."
+  },
+  "cipCardLanAdaptAdminRowStatus": {
+    "name": "cipCardLanAdaptAdminRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.34.1.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used by a Management Station to create or delete the row entry in the cipCardCsnaAdminTable following the the RowStatus textual convention."
+  },
+  "ciscoCipLanMibConformance": {
+    "name": "ciscoCipLanMibConformance",
+    "oid": "1.3.6.1.4.1.9.9.34.2",
+    "class": "objectidentity"
+  },
+  "ciscoCipLanMibCompliances": {
+    "name": "ciscoCipLanMibCompliances",
+    "oid": "1.3.6.1.4.1.9.9.34.2.1",
+    "class": "objectidentity"
+  },
+  "ciscoCipLanMibGroups": {
+    "name": "ciscoCipLanMibGroups",
+    "oid": "1.3.6.1.4.1.9.9.34.2.2",
+    "class": "objectidentity"
+  },
+  "ciscoCipLanMibCompliance": {
+    "name": "ciscoCipLanMibCompliance",
+    "oid": "1.3.6.1.4.1.9.9.34.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoLanGroup",
+        "module": "CISCO-CIPLAN-MIB"
+      },
+      {
+        "object": "ciscoLanAdaptGroup",
+        "module": "CISCO-CIPLAN-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for the CMCC LAN Support."
+  },
+  "ciscoLanGroup": {
+    "name": "ciscoLanGroup",
+    "oid": "1.3.6.1.4.1.9.9.34.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminBridgeType"
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminSrbLocalRing"
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminSrbBridgeNum"
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminSrbTargetRing"
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminTbBridgeGrp"
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdminRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing CMCC LAN Administration."
+  },
+  "ciscoLanAdaptGroup": {
+    "name": "ciscoLanAdaptGroup",
+    "oid": "1.3.6.1.4.1.9.9.34.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdaptAdminMacAddress"
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdaptAdminAdaptName"
+      },
+      {
+        "module": "CISCO-CIPLAN-MIB",
+        "object": "cipCardLanAdaptAdminRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing CMCC LAN Adapter Administration."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-CIPLAN-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:57:31 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-CIPLAN-MIB"
+  }
+}

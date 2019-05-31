@@ -1,0 +1,1095 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "IF-MIB": [
+      "ifIndex",
+      "InterfaceIndex"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "IpAddress",
+      "Gauge32",
+      "Bits",
+      "Counter32",
+      "TimeTicks",
+      "OBJECT-IDENTITY",
+      "MODULE-IDENTITY",
+      "Integer32",
+      "OBJECT-TYPE",
+      "MibIdentifier",
+      "Counter64",
+      "NOTIFICATION-TYPE",
+      "iso",
+      "Unsigned32"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "RowStatus",
+      "TimeStamp",
+      "DisplayString",
+      "TruthValue"
+    ]
+  },
+  "ciscoIfThresholdMIB": {
+    "name": "ciscoIfThresholdMIB",
+    "oid": "1.3.6.1.4.1.9.9.218",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2001-09-14 00:00",
+        "description": "Second version of this MIB module."
+      },
+      {
+        "revision": "2001-06-14 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200109140000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-dwdm@cisco.com",
+    "description": "This MIB module defines the managed objects that support monitoring of thresholds on interfaces. Configuration and monitoring of the thresholds is done through threshold templates that can be assigned to any subset of interfaces on the network element. More than one threshold template can be assigned to a given interface. This MIB module should be used when it is desired to apply a common set of thresholds to a subset of the available interfaces. If a threshold is to be applied to only one interface, then the EVENT-MIB or the RMON-MIB may be used as simpler alternatives. If a threshold is to be applied to all available interfaces, then the EVENT-MIB may be used as a simpler alternative."
+  },
+  "CifthTemplateIndex": {
+    "name": "CifthTemplateIndex",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 1000
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "An arbitrary integer that uniquely identifies a threshold template. The value for each threshold template must remain constant at least from one re-initialization of the agent's network management system to the next re-initialization. The value may change when the agent's network management system is rebooted or re-initialized."
+  },
+  "CifthTemplateIndexOrZero": {
+    "name": "CifthTemplateIndexOrZero",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 1000
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "A value of either '0' or a valid template index. The distinguished value '0' indicates no template or no unassigned template index values are available."
+  },
+  "CifthThresholdIndex": {
+    "name": "CifthThresholdIndex",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 63
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "An arbitrary integer that uniquely identifies a threshold within a threshold template. The value for each threshold must remain constant when the agent's network management system is rebooted or re-initialized."
+  },
+  "CifthThresholdList": {
+    "name": "CifthThresholdList",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "A list of thresholds defined in a given template, in which each bit represents one threshold. The bits in the first octet represent thresholds identified by cifthThresholdIndex values 0 through 7, inclusive. The bits in the second octet represent thresholds identified by integer values 8 through 15, inclusive, and so forth. The least significant bit of an octet represents the threshold identified by the lowest integer value, and the most significant bit represents the threshold identified by the highest integer value. The figure shown below illustrates the format of a threshold list. Octet 1 Octet 8 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 +-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+ | |...| | +-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | +- Threshold 56 | | | | | | | | | | | | | | +--- Threshold 57 | | | | | | | | | | | | | +----- Threshold 58 | | | | | | | | | | | | +------- Threshold 59 | | | | | | | | | | | +--------- Threshold 60 | | | | | | | | | | +----------- Threshold 61 | | | | | | | | | +------------- Threshold 62 | | | | | | | | +--------------- Threshold 63 | | | | | | | | : | | | | | | | | : | | | | | | | +--------------------- Threshold 0 | | | | | | +----------------------- Threshold 1 | | | | | +------------------------- Threshold 2 | | | | +--------------------------- Threshold 3 | | | +----------------------------- Threshold 4 | | +------------------------------- Threshold 5 | +--------------------------------- Threshold 6 +----------------------------------- Threshold 7 A bit value of '1' indicates that the threshold is being exceeded in current operation (i.e., the threshold is fired). A bit value of '0' indicates that the threshold is not being exceeded in current operation (i.e., the threshold is cleared). A threshold list of length N, where N < 8, represents a threshold list for which thresholds N*8 through 63 have the value of '0'. A special case is a threshold list having a length of '0', which represents a threshold list of all zeros."
+  },
+  "CifthThresholdSeverity": {
+    "name": "CifthThresholdSeverity",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "fail": 1,
+          "degrade": 2,
+          "info": 3,
+          "other": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": "The severity of the condition when the threshold is fired. A smaller enumerated integer value indicates that the threshold exceeded condition is more severe. The value 'fail' indicates a hard failure condition where no data can be received, or where the data received has a large number of errors which makes it impossible to recover most of the data. The value 'degrade' indicates a soft failure condition in which data received on this interface is affected, but a significant portion of the data can be recovered. The value 'info' is used to raise attention to a condition that could possibly be an impending problem or to notify the customer of an event that improves operation."
+  },
+  "CifthThresholdSeverityOrZero": {
+    "name": "CifthThresholdSeverityOrZero",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "A value of either '0' or a valid threshold severity."
+  },
+  "cIfThresholdMIBObjects": {
+    "name": "cIfThresholdMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.218.1",
+    "class": "objectidentity"
+  },
+  "cifthTemplateGroup": {
+    "name": "cifthTemplateGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1",
+    "class": "objectidentity"
+  },
+  "cifthTemplateIfAssignGroup": {
+    "name": "cifthTemplateIfAssignGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.1.2",
+    "class": "objectidentity"
+  },
+  "cifthIfThresholdFiredGroup": {
+    "name": "cifthIfThresholdFiredGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3",
+    "class": "objectidentity"
+  },
+  "cifthTemplateIndexNext": {
+    "name": "cifthTemplateIndexNext",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthTemplateIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object contains an appropriate value to be used for cifthTemplateIndex when creating entries in the cifthTemplateTable. The distinguished value 0 indicates that no unassigned entries are available. To obtain a suggested cifthTemplateIndex value for a new entry, the manager issues a management protocol retrieval operation to obtain the current value of this object. The manager may ignore this object and use alternative mechanisms for choosing an unused value of cifthTemplateIndex for a new entry. The agent will modify the value to the next unassigned index, when a new entry is created in cifthTemplateTable with the current value of this object. After deletion of an entry in cifthTemplateTable the agent will determine through its local policy when its index value will be made available for reuse."
+  },
+  "cifthTemplateLastChange": {
+    "name": "cifthTemplateLastChange",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the value of sysUpTime at the last time there was either a change to any object in any entry in cifthTemplateTable, or an entry was created or destroyed in cifthTemplateTable. If no change to cifthTemplateTable has occurred since the last re-initialization of the local network management subsystem, then this object contains a zero value."
+  },
+  "cifthTemplateTable": {
+    "name": "cifthTemplateTable",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is used to create threshold templates. Each template includes one or more thresholds (defined in the cifthThresholdTable), and can be assigned to multiple interfaces. An interface may be associated with more than one template. The assignment of templates to interfaces is done in the cifthTemplateIfAssignTable."
+  },
+  "cifthTemplateEntry": {
+    "name": "cifthTemplateEntry",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describing the general properties of a threshold template. The template is created using the cifthTemplateRowStatus object. Prior to creating an entry in the table, the manager should obtain a unique value of cifthTemplateIndex by reading the cifthTemplateIndexNext object. The values of cifthTemplateName and cifthTemplateNotifyHoldDownType must be provided before activating the entry. After creating an entry, thresholds can be defined for the template by creating entries with the same value of cifthTemplateIndex in the cifthThresholdTable. The template can then be assigned to one or more interfaces using the cifthTemplateIfAssignTable. Once an entry has been activated, the value of cifthTemplateName cannot be modified. In order to use a new value of cifthTemplateName, a new template must be defined. The values of cifthTemplateNotifyHoldDownType and cifthTemplateNotifyHoldDownTime may be modified when the entry is active. See the description clause of cifthTemplateNotifyHoldDownType for further caveats on modification of that object."
+  },
+  "cifthTemplateIndex": {
+    "name": "cifthTemplateIndex",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthTemplateIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An arbitrary integer that uniquely identifies a threshold template. The value for each threshold template must remain constant at least from one re-initialization of the agent's network management system to the next re-initialization. The value may change when the agent's network management system is rebooted or re-initialized."
+  },
+  "cifthTemplateName": {
+    "name": "cifthTemplateName",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies a unique name associated with the threshold template by the management client, and provides a non-volatile 'handle' for the template. The name must not include whitespace characters. After this value has been written to the startup configuration, the agent must retain the value until a management client deletes it. The level of retention must span reboots and re-initializations of the agent, including those that result in different assignments to the value of cifthTemplateIndex associated with this template. Once an entry has been activated, this value cannot be modified. In order to use a new value of cifthTemplateName, a new template must be defined."
+  },
+  "cifthTemplateNotifyHoldDownType": {
+    "name": "cifthTemplateNotifyHoldDownType",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "holdDownTimer": 2,
+          "fireAndClearThresholds": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the method used to prevent an excess of notifications from being generated when operation fluctuates around a threshold level. The value 'holdDownTimer' indicates that notifications for a given threshold and interface are suppressed for a short amount of time after each notification. The time value is specified in cifthTemplateNotifyHoldDownTime, which is instantiated only when this object is set to 'holdDownTimer'. After a notification is received for a given threshold and interface, the next notification for that threshold and interface will be generated after at least cifthTemplateNotifyHoldDownTime amount of time has passed, only when the threshold is next fired or cleared. The value 'fireAndClearThresholds' indicates that hysteresis is used. The management client configures two values for each threshold: one for asserting that the threshold has been exceeded (see cifthThresholdFiredValue), and a second value for asserting that the threshold is no longer being exceeded (see cifthThresholdClearedValue, which is instantiated only when this object is set to 'fireAndClearThresholds'). When this entry in cifthTemplateTable is active, this object may only be modified if there are no active entries in cifthThresholdTable with the same value of cifthTemplateIndex."
+  },
+  "cifthTemplateNotifyHoldDownTime": {
+    "name": "cifthTemplateNotifyHoldDownTime",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 3600
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 5,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The minimum amount of time between successive cifthIfThresholdFired or cifthIfThresholdCleared notifications for a given interface and template. This object is instantiated only when cifthTemplateNotifyHoldDownType is set to 'holdDownTimer'."
+  },
+  "cifthTemplateRowStatus": {
+    "name": "cifthTemplateRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used to create and delete threshold templates. The values of cifthTemplateName and cifthTemplateNotifyHoldDownType must be provided before activating the entry. An entry can only be deleted when there are no active entries in the cifthTemplateIfAssignTable with the same value of cifthTemplateIndex. When an entry is deleted, all associated entries in the cifthThresholdTable are also deleted. After the entry has been activated, this object cannot be set to any value other than 'destroy'. The row status never changes to 'notInService' after reaching the value 'active'."
+  },
+  "cifthThresholdLastChange": {
+    "name": "cifthThresholdLastChange",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the value of sysUpTime at the last time there was either a change to any object in any entry in cifthThresholdTable, or an entry was created or destroyed in cifthThresholdTable. If no change to cifthThresholdTable has occurred since the last re-initialization of the local network management subsystem, then this object contains a zero value."
+  },
+  "cifthThresholdTable": {
+    "name": "cifthThresholdTable",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the interface thresholds used in each template."
+  },
+  "cifthThresholdEntry": {
+    "name": "cifthThresholdEntry",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry specifying an interface threshold used in a threshold template. The entry is created using the cifthThresholdRowStatus object. The values of cifthThresholdObject, cifthThresholdSeverity, cifthThresholdType, and cifthThresholdFiredValue must be provided before activating the entry. If the value of cifthTemplateNotifyHoldDownType in the cifthTemplateEntry with the same value of cifthTemplateIndex is 'fireAndClearThresholds', then the value of cifthThresholdClearedValue must also be provided before activating the entry. If the value of cifthThresholdType is other than 'rateOfIncreaseExponentXIfSpeed', then the value of cifthThresholdSampleInterval must also be provided before activating the entry. The agent should not allow creation of two entries in the table with the same values of cifthTemplateIndex, cifthThresholdObject, cifthThresholdSeverity, and cifthThresholdDirection. Once an entry has been activated, the values of cifthThresholdObject, cifthThresholdSeverity, cifthThresholdType, and cifthThresholdDirection cannot be modified. In order to use new values of these objects, a new threshold must be defined. The values of cifthThresholdDescr, cifthThresholdFiredValue, cifthThresholdClearedValue, cifthThresholdSampleInterval, and cifthThresholdApsSwitchover may be modified when the entry is active."
+  },
+  "cifthThresholdIndex": {
+    "name": "cifthThresholdIndex",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthThresholdIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An arbitrary integer that uniquely identifies a threshold in a threshold template. The value for each threshold must remain constant when the agent's network management system is rebooted or re-initialized."
+  },
+  "cifthThresholdDescr": {
+    "name": "cifthThresholdDescr",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "A description of the threshold's function and use. The description must not include carriage returns."
+  },
+  "cifthThresholdObject": {
+    "name": "cifthThresholdObject",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OBJECT IDENTIFIER",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The object to be compared against the threshold values. The object must be defined in a table indexed only by ifIndex. All of the instance portion of the object identifier is truncated, since the instance(s) to be compared against the threshold are identified using the cifthTemplateIfAssignTable. If the object has syntax 'Integer32', 'Unsigned32', or 'Gauge32', then cifthThresholdType should be set to 'absoluteValue'. If the object has syntax 'Counter32' or 'Counter64', then cifthThresholdType should be set to 'deltaValue' or 'rateOfIncreaseExponentXIfSpeed'."
+  },
+  "cifthThresholdSeverity": {
+    "name": "cifthThresholdSeverity",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthThresholdSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the severity associated with the condition when the threshold is exceeded."
+  },
+  "cifthThresholdType": {
+    "name": "cifthThresholdType",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "absoluteValue": 1,
+          "deltaValue": 2,
+          "rateOfIncreaseExponentXIfSpeed": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The manner in which to compare cifthThresholdObject to cifthThresholdFiredValue and cifthThresholdClearedValue. The value 'absoluteValue' indicates that the value of cifthThresholdObject is to be compared directly to cifthThresholdFiredValue or cifthThresholdClearedValue. The value 'deltaValue' indicates that the difference between two successive samples of cifthThresholdObject is to be compared to cifthThresholdFiredValue or cifthThresholdClearedValue. The polling interval between successive samples is defined in cifthThresholdSampleInterval. The value 'rateOfIncreaseExponentXIfSpeed' indicates that the rate of increase of cifthThresholdObject is to be compared to the negated value of cifthThresholdFiredValue used as the exponent of 10, times the value of ifSpeed (if the value of ifSpeed is less than the maximum value) or ifHighSpeed (otherwise). For example, a value of cifthThresholdFiredValue of 5 on a gigabit ethernet interface indicates a threshold of 10^-5 times the interface speed, which is equal to 10,000 per second. When the value of this object is 'rateOfIncreaseExponentXIfSpeed', the polling interval between successive samples is determined automatically by the agent. When the object identified by cifthThresholdObject is a counter, a threshold type of 'deltaValue' or 'rateOfIncreaseExponentXIfSpeed' should be used. When the object identified by cifthThresholdObject is not a counter, a threshold type of 'absoluteValue' should be used."
+  },
+  "cifthThresholdDirection": {
+    "name": "cifthThresholdDirection",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "rising": 1,
+          "falling": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "rising",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object indicates which direction of movement causes the threshold to fire. The value 'rising' indicates that the threshold is fired when the current sampled value is numerically greater than or equal to the value of cifthThresholdFiredValue, and the threshold was considered to be cleared at the last sampling interval. If the value of the corresponding cifthTemplateNotifyHoldDownType object is 'fireAndClearThresholds', the threshold is cleared when the current sampled value is less than the value of cifthThresholdClearedValue, and the threshold was considered to be fired at the last sampling interval. If the value of the corresponding cifthTemplateNotifyHoldDownType object is other than 'fireAndClearThresholds', the threshold is cleared when the current sampled value is less than the value of cifthThresholdFiredValue, and the threshold was considered to be fired at the last sampling interval. The value 'falling' indicates that the threshold is fired when the current sampled value is numerically less than or equal to the value of cifthThresholdFiredValue, and the threshold was considered to be cleared at the last sampling interval. If the value of the corresponding cifthTemplateNotifyHoldDownType object is 'fireAndClearThresholds', the threshold is cleared when the current sampled value is greater than the value of cifthThresholdClearedValue, and the threshold was considered to be fired at the last sampling interval. If the value of the corresponding cifthTemplateNotifyHoldDownType object is other than 'fireAndClearThresholds', the threshold is cleared when the current sampled value is greater than the value of cifthThresholdFiredValue, and the threshold was considered to be fired at the last sampling interval."
+  },
+  "cifthThresholdFiredValue": {
+    "name": "cifthThresholdFiredValue",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": -2147483648,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "A threshold value to check against the object identified in cifthThresholdObject. If the value of cifthThresholdDirection is 'rising', then the threshold is fired when the current sampled value (absolute, delta, or rate of increase, depending on the value of cifthThresholdType) of the object identified in cifthThresholdObject is greater than or equal to this value. If the value of cifthThresholdDirection is 'falling', then the threshold is fired when the current sampled value (absolute, delta, or rate of increase, depending on the value of cifthThresholdType) of the object identified in cifthThresholdObject is less than or equal to this value."
+  },
+  "cifthThresholdClearedValue": {
+    "name": "cifthThresholdClearedValue",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": -2147483648,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "A threshold value to check against the object identified in cifthThresholdObject. If the value of cifthThresholdDirection is 'rising', then the threshold is cleared when the current sampled value (absolute, delta, or rate of increase, depending on the value of cifthThresholdType) of the object identified in cifthThresholdObject is less than this value. If the value of cifthThresholdDirection is 'falling', then the threshold is cleared when the current sampled value (absolute, delta, or rate of increase, depending on the value of cifthThresholdType) of the object identified in cifthThresholdObject is greater than this value. This object is instantiated only when the value of cifthTemplateNotifyHoldDownType in the cifthTemplateEntry with the same value of cifthTemplateIndex is 'fireAndClearThresholds'."
+  },
+  "cifthThresholdSampleInterval": {
+    "name": "cifthThresholdSampleInterval",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 5,
+            "max": 900000
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The number of milliseconds to wait between samples of the object identified in cifthThresholdObject. To encourage consistency in sampling, the interval is measured from the beginning of one check to the beginning of the next and the timer is restarted immediately when it expires, not when the check completes. This object is not instantiated when the value of cifthThresholdType is 'rateOfIncreaseExponentXIfSpeed'."
+  },
+  "cifthThresholdApsSwitchover": {
+    "name": "cifthThresholdApsSwitchover",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object indicates whether automatic protection switching (APS) switchover should be triggered, if applicable, when the threshold is fired. The value of this object takes effect when the template identified by cifthTemplateIndex is assigned to an interface that is part of an APS group. One way to configure an interface in an APS group is using the cApsChanConfigTable in the CISCO-APS-MIB."
+  },
+  "cifthThresholdRowStatus": {
+    "name": "cifthThresholdRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.218.1.1.5.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used to create and delete thresholds in templates. A new entry can only be created when there is an active entry in the cifthTemplateTable with the same value of cifthTemplateIndex. The values of cifthThresholdObject, cifthThresholdSeverity, cifthThresholdType, and cifthThresholdFiredValue must be provided before activating the entry. If the value of cifthTemplateNotifyHoldDownType in the cifthTemplateEntry with the same value of cifthTemplateIndex is 'fireAndClearThresholds', then the value of cifthThresholdClearedValue must also be provided before activating the entry. If the value of cifthThresholdType is other than 'rateOfIncreaseExponentXIfSpeed', then the value of cifthThresholdSampleInterval must also be provided before activating the entry. When an entry is activated, if there are any entries in cifthTemplateIfAssignTable with the same value of cifthTemplateIndex, then the threshold is activated on all interfaces identified in those entries that have instances of the object identified by cifthThresholdObject. When an entry is destroyed, if there are any entries in cifthTemplateIfAssignTable with the same value of cifthTemplateIndex, then the threshold is de-activated on the interfaces identified in those entries. If there are any entries in cifthIfThresholdFiredTable with cifthIfThresholdFiredTemplate value equal to this value of cifthTemplateIndex, then the bit in cifthIfThresholdsFired corresponding to this threshold is cleared in all such entries. After the entry has been activated, this object cannot be set to any value other than 'destroy'. The row status never changes to 'notInService' after reaching the value 'active'."
+  },
+  "cifthTemplateIfLastChange": {
+    "name": "cifthTemplateIfLastChange",
+    "oid": "1.3.6.1.4.1.9.9.218.1.2.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the value of sysUpTime at the last time there was either a change to any object in any entry in cifthTemplateIfAssignTable, or an entry was created or destroyed in cifthTemplateIfAssignTable. If no change to cifthTemplateIfAssignTable has occurred since the last re-initialization of the local network management subsystem, then this object contains a zero value."
+  },
+  "cifthTemplateIfAssignTable": {
+    "name": "cifthTemplateIfAssignTable",
+    "oid": "1.3.6.1.4.1.9.9.218.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the assignment of threshold templates to specific interfaces. Each threshold template may be assigned to multiple interfaces. Each interface may have multiple threshold templates assigned to it."
+  },
+  "cifthTemplateIfAssignEntry": {
+    "name": "cifthTemplateIfAssignEntry",
+    "oid": "1.3.6.1.4.1.9.9.218.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIfAssignInterface",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describing the assignment of a particular threshold template to a particular interface. The entry is created using the cifthTemplateIfAssignRowStatus object."
+  },
+  "cifthTemplateIfAssignInterface": {
+    "name": "cifthTemplateIfAssignInterface",
+    "oid": "1.3.6.1.4.1.9.9.218.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object identifies an interface to which the template is assigned."
+  },
+  "cifthTemplateIfAssignOperStatus": {
+    "name": "cifthTemplateIfAssignOperStatus",
+    "oid": "1.3.6.1.4.1.9.9.218.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "up": 1,
+          "down": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the threshold template identified by cifthTemplateIndex is operational on the interface identified by cifthTemplateIfAssignInterface. When the value of this object is 'up', this indicates that the thresholds in this template (identified by cifthTemplateIndex) are activated on this interface, with the following exception: If a threshold is defined on an object that does not have an instance for this interface, then the threshold is not activated on this interface. If any of the thresholds are being exceeded, then a corresponding entry exists in the cifthIfThresholdFiredTable. When the value of this object is 'down', this indicates that all thresholds in the template are de-activated on this interface and there is no corresponding entry in the cifthIfThresholdFiredTable, regardless of whether any of the thresholds in the template are being exceeded on this interface. One reason for a template not to be operational on an interface to which it is assigned is when the interface has two (or more) templates assigned to it that contain thresholds on the same object with the same severity and direction, i.e., thresholds with the same values of cifthThresholdObject, cifthThresholdSeverity, and cifthThresholdDirection. This may occur when a template is assigned to the interface, or when a threshold is added to a template that is already active on the interface. When this occurs, the implementation may operate on both (or all) threshold values, or it may take down one (or more) of the templates on this interface, which is indicated by changing the value of this object from 'up' to 'down'."
+  },
+  "cifthTemplateIfAssignRowStatus": {
+    "name": "cifthTemplateIfAssignRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.218.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used to create and delete entries in the table, assigning templates to interfaces and removing templates from interfaces, respectively. A new entry can only be created when there is an active entry in the cifthTemplateTable with the same value of cifthTemplateIndex. When an entry is activated, the thresholds in this template (identified by cifthTemplateIndex) are activated on this interface, with the following exception: If a threshold is defined on an object that does not have an instance for this interface, then the threshold is not activated on this interface. When an entry is destroyed, all thresholds in the template are de-activated on this interface and the corresponding entry in the cifthIfThresholdFiredTable is deleted, if it exists. After the entry has been activated, this object cannot be set to any value other than 'destroy'. The row status never changes to 'notInService' after reaching the value 'active'."
+  },
+  "cifthThresholdFiredNotifyEnable": {
+    "name": "cifthThresholdFiredNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthThresholdSeverityOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the minimum severity threshold governing the generation of cifthIfThresholdFired and cifthIfThresholdCleared notifications. For example, if the value of this object is set to 'degrade', then the agent generates these notifications if and only if the severity of the threshold being exceeded is 'degrade' or 'fail'. When the value is other than '0', the generation of cifthTemplateIfStatusChange notifications is also enabled. The value of '0' disables the generation of all notifications. By default, the value of this object is set to '0'."
+  },
+  "cifthThresholdFiredLastChange": {
+    "name": "cifthThresholdFiredLastChange",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the value of sysUpTime at the last time there was either a change to any object in any entry in cifthIfThresholdFiredTable, or an entry was added or deleted in cifthIfThresholdFiredTable. If no change to cifthIfThresholdFiredTable has occurred since the last re-initialization of the local network management subsystem, then this object contains a zero value."
+  },
+  "cifthIfThresholdFiredTable": {
+    "name": "cifthIfThresholdFiredTable",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table indicates the interfaces that currently have threshold fired conditions."
+  },
+  "cifthIfThresholdFiredEntry": {
+    "name": "cifthIfThresholdFiredEntry",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFiredTemplate",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry indicating an interface that currently has one or more threshold fired conditions based on one template."
+  },
+  "cifthIfThresholdFiredTemplate": {
+    "name": "cifthIfThresholdFiredTemplate",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthTemplateIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies a template for which one or more of the thresholds are fired on this interface."
+  },
+  "cifthIfThresholdsFired": {
+    "name": "cifthIfThresholdsFired",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthThresholdList",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies those thresholds that are currently being exceeded on this interface. If a threshold is currently being exceeded (i.e., the threshold is fired) on the interface, then the corresponding bit in the threshold list is set to one. Otherwise, the bit will be set to zero, or the bit will not be present. Only the first N octets are present in the threshold list, such that the highest octet present has at least one bit set to '1'. All higher octets with value '0' are truncated."
+  },
+  "cifthIfLastThresholdFired": {
+    "name": "cifthIfLastThresholdFired",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthThresholdIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the last threshold fired or cleared on the interface."
+  },
+  "cifthIfThresholdFiredLstChange": {
+    "name": "cifthIfThresholdFiredLstChange",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the value of sysUpTime at the last time a threshold was fired or cleared on the interface."
+  },
+  "cifthIfThresholdFiredLstSeverity": {
+    "name": "cifthIfThresholdFiredLstSeverity",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthThresholdSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the severity of the threshold that was last fired or cleared on the interface."
+  },
+  "cifthIfThresholdFiredMaxSeverity": {
+    "name": "cifthIfThresholdFiredMaxSeverity",
+    "oid": "1.3.6.1.4.1.9.9.218.1.3.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CifthThresholdSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the highest severity among the thresholds that are currently being exceeded on this interface."
+  },
+  "cIfThresholdMIBNotifications": {
+    "name": "cIfThresholdMIBNotifications",
+    "oid": "1.3.6.1.4.1.9.9.218.2",
+    "class": "objectidentity"
+  },
+  "cifthMIBNotificationsPrefix": {
+    "name": "cifthMIBNotificationsPrefix",
+    "oid": "1.3.6.1.4.1.9.9.218.2.0",
+    "class": "objectidentity"
+  },
+  "cifthIfThresholdFired": {
+    "name": "cifthIfThresholdFired",
+    "oid": "1.3.6.1.4.1.9.9.218.2.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfLastThresholdFired"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFiredLstChange"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFiredLstSeverity"
+      }
+    ],
+    "status": "current",
+    "description": "The agent generates this notification when a threshold defined in a template is asserted on an interface. If a threshold is asserted for a given interface and template, cifthTemplateNotifyHoldDownTime is set to 'holdDownTimer' for that template, and this notification has recently been sent for the same threshold on the same interface, then this notification may be suppressed."
+  },
+  "cifthIfThresholdCleared": {
+    "name": "cifthIfThresholdCleared",
+    "oid": "1.3.6.1.4.1.9.9.218.2.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfLastThresholdFired"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFiredLstChange"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFiredLstSeverity"
+      }
+    ],
+    "status": "current",
+    "description": "The agent generates this notification when a threshold, that has previously fired, is cleared on an interface. If a threshold is cleared for a given interface and template, cifthTemplateNotifyHoldDownTime is set to 'holdDownTimer' for that template, and this notification has recently been sent for the same threshold on the same interface, then this notification may be suppressed."
+  },
+  "cifthTemplateIfStatusChange": {
+    "name": "cifthTemplateIfStatusChange",
+    "oid": "1.3.6.1.4.1.9.9.218.2.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIfAssignOperStatus"
+      }
+    ],
+    "status": "current",
+    "description": "The agent generates this notification when a template comes up or goes down on an interface to which it is assigned, i.e., when the value of cifthTemplateIfAssignOperStatus changes. If a template becomes operationally down on an interface upon activation of a new entry in the cifthTemplateIfAssignTable, the agent generates this notification. The agent need not generate this notification when a new entry in the cifthTemplateIfAssignTable is activated, if the template becomes operational on the interface. The agent need not generate this notification when an entry in the cifthTemplateIfAssignTable is destroyed."
+  },
+  "cIfThresholdMIBConformance": {
+    "name": "cIfThresholdMIBConformance",
+    "oid": "1.3.6.1.4.1.9.9.218.3",
+    "class": "objectidentity"
+  },
+  "cIfThresholdMIBCompliances": {
+    "name": "cIfThresholdMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.218.3.1",
+    "class": "objectidentity"
+  },
+  "cIfThresholdMIBGroups": {
+    "name": "cIfThresholdMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.218.3.2",
+    "class": "objectidentity"
+  },
+  "cIfThresholdMIBCompliance": {
+    "name": "cIfThresholdMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.218.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cIfThresholdTemplateGroup",
+        "module": "CISCO-IF-THRESHOLD-MIB"
+      },
+      {
+        "object": "cIfThresholdFiredGroup",
+        "module": "CISCO-IF-THRESHOLD-MIB"
+      },
+      {
+        "object": "cIfThresholdNotifsGroup",
+        "module": "CISCO-IF-THRESHOLD-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities that implement the Cisco Interface Threshold MIB."
+  },
+  "cIfThresholdTemplateGroup": {
+    "name": "cIfThresholdTemplateGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIndexNext"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateLastChange"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateName"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateNotifyHoldDownType"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateRowStatus"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdLastChange"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdDescr"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdObject"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdSeverity"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdType"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdDirection"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdFiredValue"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdSampleInterval"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdRowStatus"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIfLastChange"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIfAssignOperStatus"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIfAssignRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of mandatory managed objects for configuration of threshold templates."
+  },
+  "cIfThresholdFiredGroup": {
+    "name": "cIfThresholdFiredGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdFiredNotifyEnable"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdFiredLastChange"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdsFired"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfLastThresholdFired"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFiredLstChange"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFiredLstSeverity"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFiredMaxSeverity"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of mandatory managed objects for monitoring interfaces where thresholds have been exceeded."
+  },
+  "cifthHoldDownTimerGroup": {
+    "name": "cifthHoldDownTimerGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.3.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateNotifyHoldDownTime"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of managed objects for configuration of a timer-based mechanism for suppression of excess notifications in a short time interval."
+  },
+  "cifthHoldDownHysteresisGroup": {
+    "name": "cifthHoldDownHysteresisGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.3.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdClearedValue"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of managed objects for configuration of threshold values used to assert that the threshold is no longer being exceeded. These objects are part of the hysteresis mechanism used to prevent excess notifications in a short time interval."
+  },
+  "cifthApsGroup": {
+    "name": "cifthApsGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.3.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthThresholdApsSwitchover"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of managed objects for configuration of APS switchover triggers based on interface thresholds."
+  },
+  "cIfThresholdNotifsGroup": {
+    "name": "cIfThresholdNotifsGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.3.2.6",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdFired"
+      },
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthIfThresholdCleared"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notifications generated when an interface has a threshold fired or a threshold cleared condition."
+  },
+  "cifthTemplateIfNotifsGroup": {
+    "name": "cifthTemplateIfNotifsGroup",
+    "oid": "1.3.6.1.4.1.9.9.218.3.2.7",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-IF-THRESHOLD-MIB",
+        "object": "cifthTemplateIfStatusChange"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notifications related to the assignment of templates to interfaces."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-IF-THRESHOLD-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:05:44 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-IF-THRESHOLD-MIB"
+  }
+}

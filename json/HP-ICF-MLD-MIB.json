@@ -1,0 +1,2805 @@
+{
+  "imports": {
+    "class": "imports",
+    "HP-ICF-OID": [
+      "hpSwitch"
+    ],
+    "IF-MIB": [
+      "InterfaceIndex"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddressIPv6"
+    ],
+    "IPV6-MLD-MIB": [
+      "mldInterfaceEntry"
+    ],
+    "Q-BRIDGE-MIB": [
+      "PortList"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "MODULE-IDENTITY",
+      "TimeTicks",
+      "OBJECT-IDENTITY",
+      "Unsigned32",
+      "Gauge32",
+      "Counter64",
+      "Bits",
+      "MibIdentifier",
+      "NOTIFICATION-TYPE",
+      "IpAddress",
+      "iso",
+      "Integer32",
+      "OBJECT-TYPE",
+      "Counter32"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "RowStatus",
+      "DisplayString",
+      "TruthValue"
+    ]
+  },
+  "hpicfMldMIB": {
+    "name": "hpicfMldMIB",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2015-09-11 00:00",
+        "description": "Added commands to reset MLD if it is in error state."
+      },
+      {
+        "revision": "2013-02-10 00:00",
+        "description": "Added objects hpicfMldIfEntryStartupQueryExpiryTime, hpicfMldIfEntryOtherQuerierInterval, hpicfMldIfEntryOtherQuerierExpiryTimex,compliance hpicfMldMIBComplianceV3 and group hpicfMldIfGroupV3. deprecated compliance hpicfMldMIBComplianceV2 and group hpicfMldIfGroupV2."
+      },
+      {
+        "revision": "2011-03-10 00:00",
+        "description": "Added group specific query counter and MLD state"
+      },
+      {
+        "revision": "2011-01-11 00:00",
+        "description": "Added hpicfMldPortSrcFilterMode, hpicfMldIfEntryStatMldV1ReportTx and hpicfMldIfEntryStatMldV2ReportTx."
+      },
+      {
+        "revision": "2010-09-09 00:00",
+        "description": "MLDv2 support included."
+      },
+      {
+        "revision": "2007-07-02 00:00",
+        "description": "Initial revision."
+      }
+    ],
+    "lastupdated": "201509110000Z",
+    "organization": "HP Networking",
+    "contactinfo": "Hewlett-Packard Company 8000 Foothills Blvd. Roseville, CA 95747",
+    "description": "This MIB module contains HP proprietary MIB definitions for managing MLD services including extensions to the standard MLD MIB (RFC 3019)."
+  },
+  "HpicfMcastGroupTypeDefinition": {
+    "name": "HpicfMcastGroupTypeDefinition",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "standard": 1,
+          "filtered": 2,
+          "mini": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "Type definition. This type distinguishes the different ways of tracking this device has for multicast joins. The method of tracking is primarily determined by the IGMP/MLD feature configuration. In particular if the snooping feature is enabled then port level tracking is the default which results in filtered groups. If the snooping feature is disabled then joins will result in standard groups being tracked by this device. When hardware resources are exhausted for multicast filtered bridging, joins may result in standard groups even though the snooping feature is enabled. Mini groups may be used when other resources, such as RAM, are low or exhausted."
+  },
+  "HpicfMldIfEntryState": {
+    "name": "HpicfMldIfEntryState",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "initialWait": 1,
+          "querierElection": 2,
+          "querier": 3,
+          "nonQuerier": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": "MLD interface states."
+  },
+  "hpicfMldObjects": {
+    "name": "hpicfMldObjects",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1",
+    "class": "objectidentity"
+  },
+  "hpicfMld": {
+    "name": "hpicfMld",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1",
+    "class": "objectidentity"
+  },
+  "hpicfMldConformance": {
+    "name": "hpicfMldConformance",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2",
+    "class": "objectidentity"
+  },
+  "hpicfMldGroups": {
+    "name": "hpicfMldGroups",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1",
+    "class": "objectidentity"
+  },
+  "hpicfMldCompliances": {
+    "name": "hpicfMldCompliances",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.2",
+    "class": "objectidentity"
+  },
+  "hpicfMldControlUnknownMulticast": {
+    "name": "hpicfMldControlUnknownMulticast",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When enabled along with MLD, any IPv6 Multicast packets that are not joined by an MLD host will will be restricted to ports that have detected a multicast router or ports that are configured to always forward IPv6 multicast. When set to disabled or when MLD is disabled, the unjoined IPv6 multicast packets will be flooded out all ports in the VLAN. Permanently assigned multicast addresses are always flooded and so are not impacted by this object."
+  },
+  "hpicfMldConfigForcedLeaveInterval": {
+    "name": "hpicfMldConfigForcedLeaveInterval",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When a port's hpicfMldPortConfigEntryForcedLeaveFeature is enabled, this is the amount of time allowed for an MLD Report to arrive and cancel deletion of a multicast group requested by a previous MLD Leave request. Units are tenths of seconds."
+  },
+  "hpicfMldEnabledCount": {
+    "name": "hpicfMldEnabledCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current total count of interfaces with MLD enabled."
+  },
+  "hpicfMldMcastGroupJoinsCount": {
+    "name": "hpicfMldMcastGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current total count of Multicast groups joined."
+  },
+  "hpicfMldIfTable": {
+    "name": "hpicfMldIfTable",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "HP extensions to the MLD standard MIB table mldIfTable."
+  },
+  "hpicfMldIfEntry": {
+    "name": "hpicfMldIfEntry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "hpicfMldIfEntry",
+      "module": "HP-ICF-MLD-MIB",
+      "object": "mldInterfaceEntry"
+    },
+    "status": "current",
+    "description": "HP extensions for an entry in the mldInterfaceTable."
+  },
+  "hpicfMldIfEntryQuerierFeature": {
+    "name": "hpicfMldIfEntryQuerierFeature",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Turns MLD querier functionality on and off."
+  },
+  "hpicfMldIfEntrySnoopingFeature": {
+    "name": "hpicfMldIfEntrySnoopingFeature",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When enabled along with MLD, any IPv6 Multicast packets that are joined by an MLD host will be be restricted to ports which have received the joins. This can be overridden by other features like hpicfMldPortConfigEntryPortModeFeature."
+  },
+  "hpicfMldIfEntryQuerierPort": {
+    "name": "hpicfMldIfEntryQuerierPort",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Logical port which the querier is connected to. This is determined by the presence of querier packets on this port. This value is 0 if this device is querier."
+  },
+  "hpicfMldIfEntryFilteredJoins": {
+    "name": "hpicfMldIfEntryFilteredJoins",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current total count of groups on this interface being tracked on a per port basis. Traffic for these groups will be filtered to flow only to ports with active joins, subject to HW resource limitations such as the maximum number of groups supported by the hardware."
+  },
+  "hpicfMldIfEntryStandardJoins": {
+    "name": "hpicfMldIfEntryStandardJoins",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current total count of groups on this interface being traced on a per interface basis. Traffic for these groups are flooded to the ports on the interface. These can come form joinees on interfaces which do not have MLD snooping turned on. They can also come from interfaces which have MLD snooping on, but HW resources have been exhausted for bridging traffic based on joins."
+  },
+  "hpicfMldIfEntryPortsWithMcastRouter": {
+    "name": "hpicfMldIfEntryPortsWithMcastRouter",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PortList",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This indicates which ports have a multicast router detected on them."
+  },
+  "hpicfMldIfEntryStatGeneralQueryRx": {
+    "name": "hpicfMldIfEntryStatGeneralQueryRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times an Mld General Service Query has been received on this interface."
+  },
+  "hpicfMldIfEntryStatQueryTx": {
+    "name": "hpicfMldIfEntryStatQueryTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a query has been sent from this interface."
+  },
+  "hpicfMldIfEntryStatGSQRx": {
+    "name": "hpicfMldIfEntryStatGSQRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a group specific query has been received from this interface."
+  },
+  "hpicfMldIfEntryStatGSQTx": {
+    "name": "hpicfMldIfEntryStatGSQTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a group specific query has been sent from this interface."
+  },
+  "hpicfMldIfEntryStatMldV1ReportRx": {
+    "name": "hpicfMldIfEntryStatMldV1ReportRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times an MLD version 1 report has been received on this interface."
+  },
+  "hpicfMldIfEntryStatMldV2ReportRx": {
+    "name": "hpicfMldIfEntryStatMldV2ReportRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times an MLD version 2 report has been received on this interface."
+  },
+  "hpicfMldIfEntryStatMldV1LeaveRx": {
+    "name": "hpicfMldIfEntryStatMldV1LeaveRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times an MLD version 1 leave has been received on this interface."
+  },
+  "hpicfMldIfEntryStatUnknownMldTypeRx": {
+    "name": "hpicfMldIfEntryStatUnknownMldTypeRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times an Mld packet of unknown type has been received on this interface."
+  },
+  "hpicfMldIfEntryStatUnknownPktRx": {
+    "name": "hpicfMldIfEntryStatUnknownPktRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a packet of unknown type has been sent to the MLD protocol on this device on this interface."
+  },
+  "hpicfMldIfEntryStatForwardToRoutersTx": {
+    "name": "hpicfMldIfEntryStatForwardToRoutersTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a packet has been forwarded to routers on this interface."
+  },
+  "hpicfMldIfEntryStatForwardToAllPortsTx": {
+    "name": "hpicfMldIfEntryStatForwardToAllPortsTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a packet has been forwarded to all ports on this interface."
+  },
+  "hpicfMldIfEntryStatFastLeaves": {
+    "name": "hpicfMldIfEntryStatFastLeaves",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a fast leave has occurred on this interface."
+  },
+  "hpicfMldIfEntryStatForcedFastLeaves": {
+    "name": "hpicfMldIfEntryStatForcedFastLeaves",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a forced fast leave has occurred on this interface."
+  },
+  "hpicfMldIfEntryStatJoinTimeouts": {
+    "name": "hpicfMldIfEntryStatJoinTimeouts",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times a join has timeout out on this interface."
+  },
+  "hpicfMldIfEntryStatWrongVersionQueries": {
+    "name": "hpicfMldIfEntryStatWrongVersionQueries",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of general queries received whose MLD version does not match the equivalent Interface Version."
+  },
+  "hpicfMldIfEntryLastMemberQueryCount": {
+    "name": "hpicfMldIfEntryLastMemberQueryCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.22",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Represents the number of group-specific and group-and-source-specific queries sent by the router before it assumes there are no local members."
+  },
+  "hpicfMldIfEntryStartupQueryCount": {
+    "name": "hpicfMldIfEntryStartupQueryCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.23",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Represents the number of Queries sent out on startup, separated by the Startup Query Interval (hpicfMldIfEntryStartupQueryInterval) "
+  },
+  "hpicfMldIfEntryStartupQueryInterval": {
+    "name": "hpicfMldIfEntryStartupQueryInterval",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.24",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Represents the interval between General Queries sent by a Querier on startup."
+  },
+  "hpicfMldIfEntryStatExcludeGroupJoinsCount": {
+    "name": "hpicfMldIfEntryStatExcludeGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.25",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current number of groups on this interface which are in EXCLUDE mode."
+  },
+  "hpicfMldIfEntryStatIncludeGroupJoinsCount": {
+    "name": "hpicfMldIfEntryStatIncludeGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.26",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current number of groups on this interface which are in INCLUDE mode."
+  },
+  "hpicfMldIfEntryStatFilteredExcludeGroupJoinsCount": {
+    "name": "hpicfMldIfEntryStatFilteredExcludeGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.27",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current number of filtered groups on this interface which are in EXCLUDE mode."
+  },
+  "hpicfMldIfEntryStatFilteredIncludeGroupJoinsCount": {
+    "name": "hpicfMldIfEntryStatFilteredIncludeGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.28",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current number of filtered groups on this interface which are in INCLUDE mode."
+  },
+  "hpicfMldIfEntryStatStandardExcludeGroupJoinsCount": {
+    "name": "hpicfMldIfEntryStatStandardExcludeGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.29",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current number of standard groups on this interface which are in EXCLUDE Mode. Traffic for these groups is flooded to the ports on the interface. These can come form joins on interfaces which do not have MLD snooping turned on. They can also come from interfaces which have MLD snooping on, but hardware resources have been exhausted for bridging traffic based on joins."
+  },
+  "hpicfMldIfEntryStatStandardIncludeGroupJoinsCount": {
+    "name": "hpicfMldIfEntryStatStandardIncludeGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.30",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current number of standard groups on this interface which are in INCLUDE Mode. Traffic for these groups is flooded to the ports on the interface. These can come form joins on interfaces which do not have MLD snooping turned on. They can also come from interfaces which have MLD snooping on, but hardware resources have been exhausted for bridging traffic based on joins."
+  },
+  "hpicfMldIfEntryStatV1QueryTx": {
+    "name": "hpicfMldIfEntryStatV1QueryTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.31",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of V1 Queries transmitted on this interface."
+  },
+  "hpicfMldIfEntryStatV1QueryRx": {
+    "name": "hpicfMldIfEntryStatV1QueryRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.32",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of V1 Queries received on this interface."
+  },
+  "hpicfMldIfEntryStatV2QueryTx": {
+    "name": "hpicfMldIfEntryStatV2QueryTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.33",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of V2 Queries transmitted on this interface."
+  },
+  "hpicfMldIfEntryStatV2QueryRx": {
+    "name": "hpicfMldIfEntryStatV2QueryRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.34",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of V2 Queries received on this interface."
+  },
+  "hpicfMldIfEntryStatGSSQTx": {
+    "name": "hpicfMldIfEntryStatGSSQTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.35",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Group Source Specific Queries transmitted on this interface."
+  },
+  "hpicfMldIfEntryStatGSSQRx": {
+    "name": "hpicfMldIfEntryStatGSSQRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.36",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Group Source Specific Queries received on this interface"
+  },
+  "hpicfMldIfEntryStatMalformedPktRx": {
+    "name": "hpicfMldIfEntryStatMalformedPktRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.37",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of malformed packets received on this interface."
+  },
+  "hpicfMldIfEntryStatBadCheckSumRx": {
+    "name": "hpicfMldIfEntryStatBadCheckSumRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.38",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of bad checksum packets received on this interface."
+  },
+  "hpicfMldIfEntryStatMartianSourceRx": {
+    "name": "hpicfMldIfEntryStatMartianSourceRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.39",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of packets received on this interface from Martian source. Martian source are the packets with invalid source address, e.g. 255.255.255.255."
+  },
+  "hpicfMldIfEntryStatPacketsRxOnDisabled": {
+    "name": "hpicfMldIfEntryStatPacketsRxOnDisabled",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.40",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of MLD packets received on this interface when MLD is disabled."
+  },
+  "hpicfMldIfEntryStrictVersionMode": {
+    "name": "hpicfMldIfEntryStrictVersionMode",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.41",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When true, MLD packets whose version matches the protocol version configured on this interface will be processed. Other version MLD packets will be dropped. When false, all protocol version packets will be processed irrespective of the configured version."
+  },
+  "hpicfMldIfEntryStatMldV1ReportTx": {
+    "name": "hpicfMldIfEntryStatMldV1ReportTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.42",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times an MLD version 1 report was transmitted on this interface."
+  },
+  "hpicfMldIfEntryStatMldV2ReportTx": {
+    "name": "hpicfMldIfEntryStatMldV2ReportTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.43",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times an MLD version 2 report was transmitted on this interface."
+  },
+  "hpicfMldIfEntryState": {
+    "name": "hpicfMldIfEntryState",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.44",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "HpicfMldIfEntryState",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Represents the MLD interface state."
+  },
+  "hpicfMldIfEntryStatV1GSQRx": {
+    "name": "hpicfMldIfEntryStatV1GSQRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.45",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of V1 group specific queries received on this interface."
+  },
+  "hpicfMldIfEntryStatV1GSQTx": {
+    "name": "hpicfMldIfEntryStatV1GSQTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.46",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of V1 group specific queries transmitted by this interface."
+  },
+  "hpicfMldIfEntryStatV2GSQRx": {
+    "name": "hpicfMldIfEntryStatV2GSQRx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.47",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of V2 group specific queries received on this interface."
+  },
+  "hpicfMldIfEntryStatV2GSQTx": {
+    "name": "hpicfMldIfEntryStatV2GSQTx",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.48",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of V2 group specific queries transmitted by this interface."
+  },
+  "hpicfMldIfEntryStartupQueryExpiryTime": {
+    "name": "hpicfMldIfEntryStartupQueryExpiryTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.49",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum amount of time remaining before a multicast router decides that there is no longer another multicast router which should be the querier on startup on this interface."
+  },
+  "hpicfMldIfEntryOtherQuerierInterval": {
+    "name": "hpicfMldIfEntryOtherQuerierInterval",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.50",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The length of time that must pass before a multicast router decides that there is no longer another multicast router which should be the querier on this interface."
+  },
+  "hpicfMldIfEntryOtherQuerierExpiryTime": {
+    "name": "hpicfMldIfEntryOtherQuerierExpiryTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.5.1.51",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum amount of time remaining before a multicast router decides that there is no longer another multicast router which should be the querier on this interface."
+  },
+  "hpicfMldCacheTable": {
+    "name": "hpicfMldCacheTable",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "HP extensions to the MLD standard MIB table mldCacheTable."
+  },
+  "hpicfMldCacheEntry": {
+    "name": "hpicfMldCacheEntry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheIfIndex",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheAddress",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "HP extensions for an entry in the mldCacheTable."
+  },
+  "hpicfMldCacheIfIndex": {
+    "name": "hpicfMldCacheIfIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The internetwork-layer interface for which this entry contains information for an IPv6 multicast group address."
+  },
+  "hpicfMldCacheAddress": {
+    "name": "hpicfMldCacheAddress",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv6",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 16,
+            "max": 16
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The IPv6 multicast group address for which this entry contains information."
+  },
+  "hpicfMldCacheSelf": {
+    "name": "hpicfMldCacheSelf",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "An indication of whether the local system is a member of this group address on this interface."
+  },
+  "hpicfMldCacheLastReporter": {
+    "name": "hpicfMldCacheLastReporter",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv6",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 16,
+            "max": 16
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The IPv6 address of the source of the last membership report received for this IPv6 Multicast group address on this interface. If no membership report has been received, this object has the value 0::0."
+  },
+  "hpicfMldCacheUpTime": {
+    "name": "hpicfMldCacheUpTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time elapsed since this entry was created."
+  },
+  "hpicfMldCacheExpiryTime": {
+    "name": "hpicfMldCacheExpiryTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum amount of time remaining before this entry will be aged out. A value of 0 indicates that the entry is only present because mldCacheSelf is true and that if the router left the group, this entry would be aged out immediately. Note that some implementations may process Membership Reports from the local system in the same way as reports from other hosts, so a value of 0 is not required."
+  },
+  "hpicfMldGroupType": {
+    "name": "hpicfMldGroupType",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "HpicfMcastGroupTypeDefinition",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "See HpicfMldGroupTypeDefinition description."
+  },
+  "hpicfJoinedPorts": {
+    "name": "hpicfJoinedPorts",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PortList",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Logical ports with active MLD joins on them for this entry. For Filtered groups this will be the logical ports which have active joins. For standard and mini groups this will include all logical ports on the interface running MLD."
+  },
+  "hpicfMldCacheStatus": {
+    "name": "hpicfMldCacheStatus",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this row, by which new entries may be created, or existing entries deleted from this table."
+  },
+  "hpicfMldCacheFilterMode": {
+    "name": "hpicfMldCacheFilterMode",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "include": 1,
+          "exclude": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value indicates whether the group state is include(1) or exclude(2)"
+  },
+  "hpicfMldCacheExcludeModeExpiryTimer": {
+    "name": "hpicfMldCacheExcludeModeExpiryTimer",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time remaining before the group in EXCLUDE state expires and transitions to INCLUDE mode."
+  },
+  "hpicfMldCacheVersion1HostTimer": {
+    "name": "hpicfMldCacheVersion1HostTimer",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time remaining until the local router will assume that there are no longer any MLD version 1 members on the IP subnet attached to this interface "
+  },
+  "hpicfMldCacheSrcCount": {
+    "name": "hpicfMldCacheSrcCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.6.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of sources either included or excluded for this group. If V1 host timer (hpicfMldCacheVersion1HostTimer) is active, this value will be zero."
+  },
+  "HpicfMldConfigPortModeType": {
+    "name": "HpicfMldConfigPortModeType",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "auto": 1,
+          "blocked": 2,
+          "forward": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "Type definition. See hpicfMldPortConfigEntryPortModeFeature for definition of this feature."
+  },
+  "hpicfMldPortConfigTable": {
+    "name": "hpicfMldPortConfigTable",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.7",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains information about the MLD port configurations on this switch."
+  },
+  "hpicfMldPortConfigEntry": {
+    "name": "hpicfMldPortConfigEntry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.7.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortConfigEntryInterfaceIfIndex",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortConfigEntryIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The information associated with each MLD port configuration."
+  },
+  "hpicfMldPortConfigEntryInterfaceIfIndex": {
+    "name": "hpicfMldPortConfigEntryInterfaceIfIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.7.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The internetwork-layer interface value of the interface for which MLD is enabled."
+  },
+  "hpicfMldPortConfigEntryIndex": {
+    "name": "hpicfMldPortConfigEntryIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.7.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The ifIndex value which uniquely identifies a row in the Interfaces Table for a port or trunk."
+  },
+  "hpicfMldPortConfigEntryPortModeFeature": {
+    "name": "hpicfMldPortConfigEntryPortModeFeature",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.7.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "HpicfMldConfigPortModeType",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The operational status of the MLD feature for this port or trunk. 1 implies that all IP Multicast traffic will be monitored on the port, 2 implies that IP Multicast traffic will be dropped on the port, and 3 implies that all IP Multicast traffic will be forwarded without the switch examining it."
+  },
+  "hpicfMldPortConfigEntryForcedLeaveFeature": {
+    "name": "hpicfMldPortConfigEntryForcedLeaveFeature",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.7.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The operational status of the MLD feature for this port or trunk indicates whether any MLD Leaves received for an IPv6 Multicast group will cause the group to be deleted after the hpicfMLDConfigForcedLeaveInterval if no new MLD Reports are received for that group. Normal behavior is for a group issuing a Leave to be deleted after the Querier's Maximum Response time if no MLD Report is received."
+  },
+  "hpicfMldPortConfigEntryFastLeaveFeature": {
+    "name": "hpicfMldPortConfigEntryFastLeaveFeature",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.7.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The operational status of the MLD feature for this port or trunk indicates whether any MLD Leaves received for an IPv6 Multicast group will cause the group to be deleted immediately on single- connection ports. Normal behavior is for a group issuing a Leave to be deleted after the Querier's Maximum Response time if no MLD Report is received."
+  },
+  "hpicfMldFilteredGroupPortCacheTable": {
+    "name": "hpicfMldFilteredGroupPortCacheTable",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.8",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains information about the MLD port configurations on this switch."
+  },
+  "hpicfMldFilteredGroupPortCacheEntry": {
+    "name": "hpicfMldFilteredGroupPortCacheEntry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.8.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldFilteredGroupPortCacheIfIndex",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldFilteredGroupPortCacheGroupAddress",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldFilteredGroupPortCachePortIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The information associated with each MLD port configuration."
+  },
+  "hpicfMldFilteredGroupPortCacheIfIndex": {
+    "name": "hpicfMldFilteredGroupPortCacheIfIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.8.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The internetwork-layer interface value of the interface for which MLD is enabled and for which this filtered group exists."
+  },
+  "hpicfMldFilteredGroupPortCacheGroupAddress": {
+    "name": "hpicfMldFilteredGroupPortCacheGroupAddress",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.8.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv6",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The IPv6 multicast group address for which this entry contains information."
+  },
+  "hpicfMldFilteredGroupPortCachePortIndex": {
+    "name": "hpicfMldFilteredGroupPortCachePortIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.8.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The ifIndex value which uniquely identifies a row in the Interfaces Table for a port or trunk."
+  },
+  "hpicfMldFilteredGroupPortCacheExpiryTime": {
+    "name": "hpicfMldFilteredGroupPortCacheExpiryTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.8.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum amount of time remaining before this entry will be aged out."
+  },
+  "hpicfMldSrcListTable": {
+    "name": "hpicfMldSrcListTable",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "HP extensions to the Mgmd standard MIB table mgmdRouterSrcListTable for Ipv6 type."
+  },
+  "hpicfMldSrcListEntry": {
+    "name": "hpicfMldSrcListEntry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldSrcListIfIndex",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldSrcListAddress",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldSrcListHostAddress",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "HP extensions to the Mgmd standard MIB table mgmdRouterSrcListTable for Ipv6 type."
+  },
+  "hpicfMldSrcListIfIndex": {
+    "name": "hpicfMldSrcListIfIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The internetwork-layer interface for which this entry contains information for an IPv6 multicast group address."
+  },
+  "hpicfMldSrcListAddress": {
+    "name": "hpicfMldSrcListAddress",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv6",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 16,
+            "max": 16
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The IPv6 multicast group address for which this entry contains information."
+  },
+  "hpicfMldSrcListHostAddress": {
+    "name": "hpicfMldSrcListHostAddress",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv6",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 16,
+            "max": 16
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Host Address to which this entry corresponds."
+  },
+  "hpicfMldSrcListPorts": {
+    "name": "hpicfMldSrcListPorts",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PortList",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "List of ports for which this entry is either excluded or included."
+  },
+  "hpicfMldSrcListExpiry": {
+    "name": "hpicfMldSrcListExpiry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This value indicates the relevance of the SrcList entry, whereby a non-zero value indicates this is an INCLUDE state value, and a zero value indicates this to be an EXCLUDE state value."
+  },
+  "hpicfMldSrcListUpTime": {
+    "name": "hpicfMldSrcListUpTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time elapsed since this entry was created."
+  },
+  "hpicfMldSrcListType": {
+    "name": "hpicfMldSrcListType",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.9.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "HpicfMcastGroupTypeDefinition",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "See HpicfMldGroupTypeDefinition description."
+  },
+  "hpicfMldPortSrcTable": {
+    "name": "hpicfMldPortSrcTable",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains information about the MLD PortSrc configurations on this switch."
+  },
+  "hpicfMldPortSrcEntry": {
+    "name": "hpicfMldPortSrcEntry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortSrcIfIndex",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortSrcAddress",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortSrcHostAddress",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortSrcPortIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "HP extensions for an entry in the MLD PortSrc Table."
+  },
+  "hpicfMldPortSrcIfIndex": {
+    "name": "hpicfMldPortSrcIfIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The internetwork-layer interface for which this entry contains information for an IPv6 multicast group address."
+  },
+  "hpicfMldPortSrcAddress": {
+    "name": "hpicfMldPortSrcAddress",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv6",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 16,
+            "max": 16
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The IPv6 multicast group address for which this entry contains information."
+  },
+  "hpicfMldPortSrcHostAddress": {
+    "name": "hpicfMldPortSrcHostAddress",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv6",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 16,
+            "max": 16
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Host Address to which this entry corresponds."
+  },
+  "hpicfMldPortSrcPortIndex": {
+    "name": "hpicfMldPortSrcPortIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The ifIndex value which uniquely identifies a row in the PortSrc Table for a port or trunk."
+  },
+  "hpicfMldPortSrcExpiry": {
+    "name": "hpicfMldPortSrcExpiry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This value indicates the relevance of the SrcList entry, whereby a non-zero value indicates this is an INCLUDE state value, and a zero value indicates this to be an EXCLUDE state value."
+  },
+  "hpicfMldPortSrcUpTime": {
+    "name": "hpicfMldPortSrcUpTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time elapsed since this entry was created."
+  },
+  "hpicfMldPortSrcFilterMode": {
+    "name": "hpicfMldPortSrcFilterMode",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.10.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "include": 1,
+          "exclude": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Value indicates whether the port state is include(1) or exclude(2)."
+  },
+  "hpicfMldMcastExcludeGroupJoinsCount": {
+    "name": "hpicfMldMcastExcludeGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.11",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of multicast groups in Exclude mode."
+  },
+  "hpicfMldMcastIncludeGroupJoinsCount": {
+    "name": "hpicfMldMcastIncludeGroupJoinsCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.12",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Number of multicast groups in Include mode."
+  },
+  "hpicfMldMcastPortFastLearn": {
+    "name": "hpicfMldMcastPortFastLearn",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.13",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PortList",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "List of ports on which the fast learn feature is enabled"
+  },
+  "hpicfMldGroupPortCacheTable": {
+    "name": "hpicfMldGroupPortCacheTable",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains information about the MLD port configurations on this switch."
+  },
+  "hpicfMldGroupPortCacheEntry": {
+    "name": "hpicfMldGroupPortCacheEntry",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheIfIndex",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheGroupAddress",
+        "implied": 0
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCachePortIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The information associated with each MLD port configuration."
+  },
+  "hpicfMldGroupPortCacheIfIndex": {
+    "name": "hpicfMldGroupPortCacheIfIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The internetwork-layer interface value of the interface for which MLD is enabled and for which this group exists."
+  },
+  "hpicfMldGroupPortCacheGroupAddress": {
+    "name": "hpicfMldGroupPortCacheGroupAddress",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv6",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The IPv6 multicast group address for which this entry contains information."
+  },
+  "hpicfMldGroupPortCachePortIndex": {
+    "name": "hpicfMldGroupPortCachePortIndex",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The ifIndex value which uniquely identifies a row in the Interfaces Table for a port or trunk."
+  },
+  "hpicfMldGroupPortCacheExpiryTime": {
+    "name": "hpicfMldGroupPortCacheExpiryTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum amount of time remaining before this entry will be aged out."
+  },
+  "hpicfMldGroupPortCacheUpTime": {
+    "name": "hpicfMldGroupPortCacheUpTime",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time elapsed since this entry was created."
+  },
+  "hpicfMldGroupPortCacheVersion1Timer": {
+    "name": "hpicfMldGroupPortCacheVersion1Timer",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time remaining until the local router will assume that there are no longer any MLD version 1 members on this port."
+  },
+  "hpicfMldGroupPortCacheFilterTimer": {
+    "name": "hpicfMldGroupPortCacheFilterTimer",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time remaining before the port in EXCLUDE state expires and transitions to INCLUDE mode."
+  },
+  "hpicfMldGroupPortCacheFilterMode": {
+    "name": "hpicfMldGroupPortCacheFilterMode",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "include": 1,
+          "exclude": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Value indicates whether the port state is include(1) or exclude(2)."
+  },
+  "hpicfMldGroupPortCacheExcludeSrcCount": {
+    "name": "hpicfMldGroupPortCacheExcludeSrcCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current number of sources excluded on this port."
+  },
+  "hpicfMldGroupPortCacheRequestedSrcCount": {
+    "name": "hpicfMldGroupPortCacheRequestedSrcCount",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.14.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Current number of sources requested on this port."
+  },
+  "hpicfMldReload": {
+    "name": "hpicfMldReload",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.1.1.15",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Setting this object to true will reset MLD on all interfaces, while setting this object to false does not have any impact. A get on this object will always return false."
+  },
+  "hpicfMldBaseGroup": {
+    "name": "hpicfMldBaseGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldControlUnknownMulticast"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldConfigForcedLeaveInterval"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldEnabledCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldMcastGroupJoinsCount"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects to support basic MLD configuration information on HP routers."
+  },
+  "hpicfMldIfGroup": {
+    "name": "hpicfMldIfGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryQuerierFeature"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntrySnoopingFeature"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryQuerierPort"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryFilteredJoins"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStandardJoins"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryPortsWithMcastRouter"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGeneralQueryRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatQueryTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSQTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV1ReportRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV2ReportRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV1LeaveRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatUnknownMldTypeRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatUnknownPktRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForwardToRoutersTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForwardToAllPortsTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatFastLeaves"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForcedFastLeaves"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatJoinTimeouts"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in mldInterfaceTable and used to support management of interfaces with MLD enabled."
+  },
+  "hpicfMldCacheGroup": {
+    "name": "hpicfMldCacheGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheSelf"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheLastReporter"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheUpTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheExpiryTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupType"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfJoinedPorts"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in mldCacheTable and used to support management of interfaces with MLD enabled."
+  },
+  "hpicfMldPortGroup": {
+    "name": "hpicfMldPortGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortConfigEntryPortModeFeature"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortConfigEntryForcedLeaveFeature"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortConfigEntryFastLeaveFeature"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in mldInterfaceTable and used to support management of interfaces with MLD enabled."
+  },
+  "hpicfMldFilteredGroupPortCacheGroup": {
+    "name": "hpicfMldFilteredGroupPortCacheGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldFilteredGroupPortCacheExpiryTime"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in hpicfMldCacheTable which are of type filtered. These are used to support management of interfaces with MLD enabled."
+  },
+  "hpicfMldBaseGroupV2": {
+    "name": "hpicfMldBaseGroupV2",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldControlUnknownMulticast"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldConfigForcedLeaveInterval"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldEnabledCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldMcastGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldMcastExcludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldMcastIncludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldMcastPortFastLearn"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects to support basic MLD configuration information on HP routers."
+  },
+  "hpicfMldIfGroupV2": {
+    "name": "hpicfMldIfGroupV2",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryQuerierFeature"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntrySnoopingFeature"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryQuerierPort"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryFilteredJoins"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStandardJoins"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryPortsWithMcastRouter"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGeneralQueryRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatQueryTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSQTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV1ReportRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV2ReportRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV1LeaveRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatUnknownMldTypeRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatUnknownPktRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForwardToRoutersTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForwardToAllPortsTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatFastLeaves"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForcedFastLeaves"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatJoinTimeouts"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatWrongVersionQueries"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryLastMemberQueryCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStartupQueryCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStartupQueryInterval"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatExcludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatIncludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatFilteredExcludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatFilteredIncludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatStandardExcludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatStandardIncludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV1QueryTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV1QueryRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV2QueryTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV2QueryRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSSQTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMalformedPktRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatBadCheckSumRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMartianSourceRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatPacketsRxOnDisabled"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStrictVersionMode"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV1ReportTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV2ReportTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryState"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV1GSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV1GSQTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV2GSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV2GSQTx"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in mldInterfaceTable and used to support management of interfaces with MLD enabled."
+  },
+  "hpicfMldCacheGroupV2": {
+    "name": "hpicfMldCacheGroupV2",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.8",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheSelf"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheLastReporter"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheUpTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheExpiryTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupType"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfJoinedPorts"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheStatus"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheFilterMode"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheExcludeModeExpiryTimer"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheVersion1HostTimer"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldCacheSrcCount"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in mldCacheTable and used to support management of interfaces with MLD enabled."
+  },
+  "hpicfMldSrcListGroup": {
+    "name": "hpicfMldSrcListGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.9",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldSrcListPorts"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldSrcListExpiry"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldSrcListUpTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldSrcListType"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in Mgmd standard MIB table mgmdRouterSrcListTable for Ipv6 type."
+  },
+  "hpicfMldPortSrcGroup": {
+    "name": "hpicfMldPortSrcGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.10",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortSrcExpiry"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortSrcUpTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldPortSrcFilterMode"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects containing information about the MLD PortSrc configurations on this switch"
+  },
+  "hpicfMldGroupPortCacheGroup": {
+    "name": "hpicfMldGroupPortCacheGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.11",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheExpiryTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheUpTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheVersion1Timer"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheFilterTimer"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheFilterMode"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheExcludeSrcCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldGroupPortCacheRequestedSrcCount"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in hpicfMldCacheTable. These are used to support management of interfaces with MLD enabled."
+  },
+  "hpicfMldIfGroupV3": {
+    "name": "hpicfMldIfGroupV3",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.12",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryQuerierFeature"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntrySnoopingFeature"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryQuerierPort"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryFilteredJoins"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStandardJoins"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryPortsWithMcastRouter"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGeneralQueryRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatQueryTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSQTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV1ReportRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV2ReportRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV1LeaveRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatUnknownMldTypeRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatUnknownPktRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForwardToRoutersTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForwardToAllPortsTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatFastLeaves"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatForcedFastLeaves"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatJoinTimeouts"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatWrongVersionQueries"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryLastMemberQueryCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStartupQueryCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStartupQueryInterval"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatExcludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatIncludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatFilteredExcludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatFilteredIncludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatStandardExcludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatStandardIncludeGroupJoinsCount"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV1QueryTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV1QueryRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV2QueryTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV2QueryRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSSQTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatGSSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMalformedPktRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatBadCheckSumRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMartianSourceRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatPacketsRxOnDisabled"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStrictVersionMode"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV1ReportTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatMldV2ReportTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryState"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV1GSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV1GSQTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV2GSQRx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStatV2GSQTx"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryStartupQueryExpiryTime"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryOtherQuerierInterval"
+      },
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldIfEntryOtherQuerierExpiryTime"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that extends objects defined in mldInterfaceTable and used to support management of interfaces with MLD enabled."
+  },
+  "hpicfMldReloadModeGroup": {
+    "name": "hpicfMldReloadModeGroup",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.1.13",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "HP-ICF-MLD-MIB",
+        "object": "hpicfMldReload"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for MLD Reload mode."
+  },
+  "hpicfMldMIBCompliance": {
+    "name": "hpicfMldMIBCompliance",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.2.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "hpicfMldBaseGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldIfGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldCacheGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldPortGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldFilteredGroupPortCacheGroup",
+        "module": "HP-ICF-MLD-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for HP routers running MLD and implementing the HP-ICF-MLD MIB."
+  },
+  "hpicfMldMIBComplianceV2": {
+    "name": "hpicfMldMIBComplianceV2",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.2.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "hpicfMldBaseGroupV2",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldIfGroupV2",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldCacheGroupV2",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldPortGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldFilteredGroupPortCacheGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldSrcListGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldPortSrcGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldGroupPortCacheGroup",
+        "module": "HP-ICF-MLD-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for HP routers running MLD and implementing the HP-ICF-MLD MIB."
+  },
+  "hpicfMldMIBComplianceV3": {
+    "name": "hpicfMldMIBComplianceV3",
+    "oid": "1.3.6.1.4.1.11.2.14.11.5.1.48.2.2.3",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "hpicfMldBaseGroupV2",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldIfGroupV3",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldCacheGroupV2",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldPortGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldFilteredGroupPortCacheGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldSrcListGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldPortSrcGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldGroupPortCacheGroup",
+        "module": "HP-ICF-MLD-MIB"
+      },
+      {
+        "object": "hpicfMldReloadModeGroup",
+        "module": "HP-ICF-MLD-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for HP routers running MLD and implementing the HP-ICF-MLD MIB."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/HP-ICF-MLD-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 19:24:31 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "HP-ICF-MLD-MIB"
+  }
+}

@@ -1,0 +1,558 @@
+{
+  "imports": {
+    "class": "imports",
+    "ENTERASYS-8021X-EXTENSIONS-MIB": [
+      "etsysDot1xAuthStationAddress"
+    ],
+    "ENTERASYS-MIB-NAMES": [
+      "etsysModules"
+    ],
+    "IEEE8021-PAE-MIB": [
+      "dot1xPaePortNumber"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "OBJECT-TYPE",
+      "Counter32",
+      "Integer32",
+      "Unsigned32",
+      "Bits",
+      "TimeTicks",
+      "Counter64",
+      "OBJECT-IDENTITY",
+      "MODULE-IDENTITY",
+      "MibIdentifier",
+      "NOTIFICATION-TYPE",
+      "IpAddress",
+      "Gauge32",
+      "iso"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "etsysEncr8021xConfigMIB": {
+    "name": "etsysEncr8021xConfigMIB",
+    "oid": "1.3.6.1.4.1.5624.1.2.19",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2002-03-14 20:45",
+        "description": "The initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200203142045Z",
+    "organization": "Enterasys Networks, Inc",
+    "contactinfo": "Postal: Enterasys Networks 35 Industrial Way, P.O. Box 5005 Rochester, NH 03867-0505 Phone: +1 603 332 9400 E-mail: support@enterasys.com WWW: http://www.enterasys.com",
+    "description": "The Enterasys Networks MIB module for configuring IEEE 802.1x implementations on SNMPv1-only platforms. This MIB includes encrypted variants of selected objects from the IEEE 802.1x MIB and the Enterasys 802.1x Extensions MIB. ------------------ N O T I C E Use of this MIB in any product requires the approval of the Office of the CTO, Enterasys Networks, Inc. Permission to use this MIB will not be granted for products in which SNMPv3 is now, or will soon be, implemented. Permission to use this MIB in products that are never scheduled to implement SNMPv3 will be granted on a case-by-case basis, depending on what other suitable, secure means of configuration are available in the product. ------------------ The following is a discussion of the encoding/decoding and encryption/decryption methods that must be used to extract data from an encrypted OCTET STRING. (These methods are the same as for the Enterasys Networks encrypted RADIUS Client MIB.) The encryption/decryption methods make use of an agreed-upon Secret and an Authenticator shared between the SNMP network management system and the entity that implements the MIB. The encryption/decryption algorithm, as presented herein, is taken from the RADIUS protocol, and is the method specified for encryption of Tunnel-Password Attributes in RFC 2868. To permit plug-and-play remote installation, configuration, and management of the device, the device will algorithmically derive the initial shared secret and the initial authenticator. For security reasons, the network manager should change the authenticator portion of the management encryption key after initial configuration. The methods available for doing this are implementation-specific and subject to change. All read-write and write-only access objects except the table index are encoded into fields in an OCTET STRING. Octet String Before encryption, a 'native' object must be encoded into a formatted Octet String. After decryption, the Octet String must be decoded to obtain the 'native' object. 0 1 2 3 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | Type | Length | Salt | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | String ... +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Type The data type of the non-encrypted 'native' data: 1 = Integer32 2 = OCTET STRING Length The length in octets of the native object sub-field of the Octet String, exclusive of any optional padding. Note that the Integrity Check sub-fields (CRC, OID-tail, Time Stamp, Source IP Address) are not included in this length value, but since the IC sub-fields are always present and are of fixed length, there is no impediment to proper packet parsing. Salt The Salt field is two octets in length and is used to ensure the uniqueness of the encryption key used to encrypt each object. The most significant bit (leftmost) of the Salt field MUST be set (1). The contents of each Salt field in a given SNMP packet must be unique. String 0 1 2 3 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | CRC (4 bytes) | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | OID-tail (4 bytes) | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | Time Stamp (4 bytes) | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | Source IP Address (4 bytes) | +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | Object/Padding ... +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ The plain-text String field consists of six logical sub-fields: the CRC, OID-tail, Time Stamp, Source IP address and native Object sub-fields (all of which are required), and the optional Padding sub-field. The String field MUST be treated as a counted-string of undistinguished octets, and not as a standard C/UNIX-style null-terminated, printable ASCII string. CRC Sub-field The CRC sub-field contains a 32-bit CRC (CRC-32) calculated over the following concatentated sub-fields of the String: the OID-tail, Time Stamp, Source IP Address and unpadded native Object fields. The CRC sub-field acts as an integrity check on the decrypted data. OID-tail Sub-field The OID-tail sub-field contains the least significant four octets of the Object ID of the varbind. This field is included as an integrity check on the OID of the varbind. Time Stamp Sub-field The Time Stamp sub-field contains a 32-bit unsigned integer value representing the time the encrypted message was assembled. This field acts as an integrity check by facilitating the disposal of stale or replayed messages. The time window of acceptance is implementation dependant, and may be the subject of local (i.e. managed entity) policy configuration. The Time Stamp is relative time, in units of seconds, referenced to the sysUpTime object of the managed entity. Source IP Address Sub-field The Source IP Address sub-field contains an unsigned 32-bit representation of the IPv4 address of the source of the encrypted message. This is an added check to allow verification of the source of the varbind. The CRC, OID-tail, Time Stamp, and Source IP Address sub-fields are collectively hereinafter refered to as the Integrity Check (IC) sub-fields. Object/Padding Sub-field Object The Object sub-field contains the actual or native object data followed by padding, if necessary. Padding If the combined length (in octets) of the non-encrypted CRC, OID-tail, Time Stamp, Source IP Address, and native Object sub-fields is not an even multiple of 16, then the Padding sub-field MUST be present. If it is present, the length of the Padding sub-field is variable, between 1 and 15 octets. The value of the pad octets SHOULD be zero. Encrypting/Decrypting the String Field The entire String field MUST be encrypted as follows, prior to transmission: Construct a plain-text version of the String field by concatenating the CRC, OID-tail, Time Stamp, Source IP address, and native Object sub-fields. If necessary, pad the resulting string until its length (in octets) is an even multiple of 16. It is recommended that zero octets (0x00) be used for padding. Call this plain-text P. Shared Secret The shared secret is formed from the MAC (hardware) address of the primary management interface of the managed device (containing the RADIUS Client). The MAC address is represented as up-cased, dashed-ASCII, e.g. 08-00-2B-11-22-33. Authenticator The 128-bit authenticator is a pre-defined constant. The default value of the authenticator is an Enterasys Networks trade secret. This value is settable and the user is advised to change it from the default value after initial configuration of the system. Contact the MIB author for additional information on the default value. Call the shared secret S, the [pseudo-random] 128-bit Authenticator R, and the contents of the Salt field A. Break P into 16 octet chunks p(1), p(2)...p(i), where i = len(P)/16. Call the cipher-text blocks c(1), c(2)...c(i) and the final cipher-text C. Intermediate values b(1), b(2)...c(i) are required. Encryption is performed in the following manner ('+' indicates concatenation): b(1) = MD5(S + R + A) c(1) = p(1) xor b(1) C = c(1) b(2) = MD5(S + c(1)) c(2) = p(2) xor b(2) C = C + c(2) . . . . . . b(i) = MD5(S + c(i-1)) c(i) = p(i) xor b(i) C = C + c(i) The resulting encrypted String field will contain c(1)+c(2)+...+c(i). On receipt, the process is reversed to yield the plain-text String."
+  },
+  "etsysEncrDot1xConfigObjects": {
+    "name": "etsysEncrDot1xConfigObjects",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1",
+    "class": "objectidentity"
+  },
+  "etsysEncrDot1xAuthConfigBranch": {
+    "name": "etsysEncrDot1xAuthConfigBranch",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1",
+    "class": "objectidentity"
+  },
+  "etsysEncrDot1xAuthPortConfigTable": {
+    "name": "etsysEncrDot1xAuthPortConfigTable",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table that contains encrypted configuration objects for ports that support Authenticator PAEs."
+  },
+  "etsysEncrDot1xAuthPortConfigEntry": {
+    "name": "etsysEncrDot1xAuthPortConfigEntry",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IEEE8021-PAE-MIB",
+        "object": "dot1xPaePortNumber",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each conceptual row holds configuration information for the Authenticator PAE(s) associated with one port."
+  },
+  "etsysEncrDot1xAuthAdminControlledDirections": {
+    "name": "etsysEncrDot1xAuthAdminControlledDirections",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.4.1, Admin Control Mode",
+    "status": "current",
+    "description": "An encrypted octet string containing The current value of the administrative controlled directions parameter for the Port. SYNTAX PaeControlledDirections The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthControlledPortControl": {
+    "name": "etsysEncrDot1xAuthControlledPortControl",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, AuthControlledPortControl",
+    "status": "current",
+    "description": "An encrypted octet string containing The current value of the controlled Port control parameter for the Port. SYNTAX INTEGER { forceUnauthorized(1), auto(2), forceAuthorized(3) } The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthQuietPeriod": {
+    "name": "etsysEncrDot1xAuthQuietPeriod",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, quietPeriod",
+    "status": "current",
+    "description": "An encrypted octet string containing The value, in seconds, of the quietPeriod constant currently in use by the Authenticator PAE state machine. Alternately, the default value (for ports that use station-based access control, and that therefore may support many virtual PAEs). The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthTxPeriod": {
+    "name": "etsysEncrDot1xAuthTxPeriod",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, txPeriod",
+    "status": "current",
+    "description": "An encrypted octet string containing The value, in seconds, of the txPeriod constant currently in use by the Authenticator PAE state machine. Alternately, the default value (for ports that use station-based access control, and that therefore may support many virtual PAEs). The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthSuppTimeout": {
+    "name": "etsysEncrDot1xAuthSuppTimeout",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, suppTimeout",
+    "status": "current",
+    "description": "An encrypted octet string containing The value, in seconds, of the suppTimeout constant currently in use by the Backend Authentication state machine. Alternately, the default value (for ports that use station-based access control, and that therefore may support many virtual PAEs). The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthServerTimeout": {
+    "name": "etsysEncrDot1xAuthServerTimeout",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, serverTimeout",
+    "status": "current",
+    "description": "An encrypted octet string containing The value, in seconds, of the serverTimeout constant currently in use by the Backend Authentication state machine. Alternately, the default value (for ports that use station-based access control, and that therefore may support many virtual PAEs). The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthMaxReq": {
+    "name": "etsysEncrDot1xAuthMaxReq",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, maxReq",
+    "status": "current",
+    "description": "An encrypted octet string containing The value of the maxReq constant currently in use by the Backend Authentication state machine. Alternately, the default value (for ports that use station-based access control, and that therefore may support many virtual PAEs). The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthReAuthPeriod": {
+    "name": "etsysEncrDot1xAuthReAuthPeriod",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, reAuthPeriod",
+    "status": "current",
+    "description": "An encrypted octet string containing The value, in seconds, of the reAuthPeriod constant currently in use by the Reauthentication Timer state machine. Alternately, the default value (for ports that use station-based access control, and that therefore may support many virtual PAEs). The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthReAuthEnabled": {
+    "name": "etsysEncrDot1xAuthReAuthEnabled",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, reAuthEnabled",
+    "status": "current",
+    "description": "An encrypted octet string containing The enable/disable control used by the Reauthentication Timer state machine (8.5.5.1). Alternately, the default value (for ports that use station-based access control, and that therefore may support many virtual PAEs). SYNTAX INTEGER { true(1), false(2) } The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthKeyTxEnabled": {
+    "name": "etsysEncrDot1xAuthKeyTxEnabled",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1, keyTransmissionEnabled",
+    "status": "current",
+    "description": "An encrypted octet string containing The value of the keyTransmissionEnabled constant currently in use by the Authenticator PAE state machine. Alternately, the default value (for ports that use station-based access control, and that therefore may support many virtual PAEs). SYNTAX INTEGER { true(1), false(2) } The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthPortInitTable": {
+    "name": "etsysEncrDot1xAuthPortInitTable",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table that contains encrypted initialization objects for port-based Authenticator PAEs."
+  },
+  "etsysEncrDot1xAuthPortInitEntry": {
+    "name": "etsysEncrDot1xAuthPortInitEntry",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IEEE8021-PAE-MIB",
+        "object": "dot1xPaePortNumber",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each conceptual row holds initialization objects for one port-based Authenticator PAE."
+  },
+  "etsysEncrDot1xAuthInitialize": {
+    "name": "etsysEncrDot1xAuthInitialize",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.1.2, Initialize Port",
+    "status": "current",
+    "description": "An encrypted octet string containing The initialization control for this Port. Setting this attribute to TRUE causes the Port to be initialized. The attribute value reverts to FALSE once initialization has been completed. Setting this attribute to TRUE for a Port that uses station-based access control causes all of the virtual PAEs associated with the Port to be initialized. SYNTAX INTEGER { true(1), false(2) } The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthReauthenticate": {
+    "name": "etsysEncrDot1xAuthReauthenticate",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.4.1.3 Reauthenticate",
+    "status": "current",
+    "description": "An encrypted octet string containing The reauthentication control for this Port. Setting this attribute to TRUE causes the Authenticator PAE state machine for the Port to reauthenticate the Supplicant. Setting this attribute to FALSE has no effect. This attribute always returns FALSE when it is read. Setting this attribute to TRUE for a Port that uses station-based access control causes all of the virtual PAEs associated with the Port to reauthenticate their Supplicants. SYNTAX INTEGER { true(1), false(2) } The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthStationInitTable": {
+    "name": "etsysEncrDot1xAuthStationInitTable",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table that contains encrypted configuration objects for station-based Authenticator PAEs."
+  },
+  "etsysEncrDot1xAuthStationInitEntry": {
+    "name": "etsysEncrDot1xAuthStationInitEntry",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTERASYS-8021X-EXTENSIONS-MIB",
+        "object": "etsysDot1xAuthStationAddress",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Configuration objects for one station-based Authenticator PAE."
+  },
+  "etsysEncrDot1xAuthStationInitialize": {
+    "name": "etsysEncrDot1xAuthStationInitialize",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.6.1.2, Initialize Port",
+    "status": "current",
+    "description": "An encrypted octet string containing The initialization control for this Authenticator PAE. Setting this attribute to TRUE causes the PAE to be initialized. The attribute value reverts to FALSE once initialization has completed. SYNTAX INTEGER { true(1), false(2) } The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xAuthStationReauthenticate": {
+    "name": "etsysEncrDot1xAuthStationReauthenticate",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.1.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "IEEE P802.1x Section 9.4.1.3 Reauthenticate",
+    "status": "current",
+    "description": "An encrypted octet string containing The reauthentication control for this Authenticator PAE. Setting this attribute to TRUE causes the Authenticator PAE state machine to reauthenticate the Supplicant. Setting this attribute FALSE has no effect. This attribute always returns FALSE when it is read. SYNTAX INTEGER { true(1), false(2) } The data type is 1, Integer32."
+  },
+  "etsysEncrDot1xConfigConformance": {
+    "name": "etsysEncrDot1xConfigConformance",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.2",
+    "class": "objectidentity"
+  },
+  "etsysEncrDot1xConfigGroups": {
+    "name": "etsysEncrDot1xConfigGroups",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.2.1",
+    "class": "objectidentity"
+  },
+  "etsysEncrDot1xConfigCompliances": {
+    "name": "etsysEncrDot1xConfigCompliances",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.2.2",
+    "class": "objectidentity"
+  },
+  "etsysEncrDot1xAuthConfigGroup": {
+    "name": "etsysEncrDot1xAuthConfigGroup",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.2.1.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthAdminControlledDirections"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthControlledPortControl"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthQuietPeriod"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthTxPeriod"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthSuppTimeout"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthServerTimeout"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthMaxReq"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthReAuthPeriod"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthReAuthEnabled"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthKeyTxEnabled"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for configuring IEEE 802.1x authentication at the port level. Objects belonging to this group typically have durable values."
+  },
+  "etsysEncrDot1xAuthInitGroup": {
+    "name": "etsysEncrDot1xAuthInitGroup",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.2.1.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthInitialize"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthReauthenticate"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthStationInitialize"
+      },
+      {
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB",
+        "object": "etsysEncrDot1xAuthStationReauthenticate"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for making Authenticator PAEs initialize and reauthenticate Supplicants. Writes to objects in this group trigger actions, rather than changes to durable configuration values."
+  },
+  "etsysEncrDot1xConfigCompliance": {
+    "name": "etsysEncrDot1xConfigCompliance",
+    "oid": "1.3.6.1.4.1.5624.1.2.19.2.2.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "etsysEncrDot1xAuthConfigGroup",
+        "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for devices that support the Enterasys encrypted IEEE 802.1x configuration MIB."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/ENTERASYS-ENCR-8021X-CONFIG-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 18:26:56 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "ENTERASYS-ENCR-8021X-CONFIG-MIB"
+  }
+}

@@ -1,0 +1,1298 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "CISCO-TC": [
+      "CiscoVlanList"
+    ],
+    "IF-MIB": [
+      "InterfaceIndexOrZero",
+      "InterfaceIndex"
+    ],
+    "Q-BRIDGE-MIB": [
+      "VlanId"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "iso",
+      "IpAddress",
+      "OBJECT-IDENTITY",
+      "TimeTicks",
+      "Counter32",
+      "NOTIFICATION-TYPE",
+      "Integer32",
+      "Counter64",
+      "MODULE-IDENTITY",
+      "Bits",
+      "Gauge32",
+      "MibIdentifier",
+      "Unsigned32",
+      "OBJECT-TYPE"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "TimeStamp",
+      "TruthValue",
+      "DisplayString",
+      "RowStatus"
+    ]
+  },
+  "ciscoResilientEthernetProtocolMIB": {
+    "name": "ciscoResilientEthernetProtocolMIB",
+    "oid": "1.3.6.1.4.1.9.9.601",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2011-01-11 00:00",
+        "description": "Modified crepIfPortRole object to include failedPortNoNeighbor and failedPortLogicalOpen states."
+      },
+      {
+        "revision": "2010-10-27 00:00",
+        "description": "Extended 'RepPortType' to allow 'edgeNoNeighbor' and 'edgeNoNeighborPrimary'. This was done to support REP Edge No Neighbor feature."
+      },
+      {
+        "revision": "2007-05-22 00:00",
+        "description": "Modified 'crepSegmentPreemptStatus' and 'crepIfOperStatus' objects."
+      },
+      {
+        "revision": "2007-02-19 00:00",
+        "description": "Initial Version of the MIB."
+      }
+    ],
+    "lastupdated": "201101110000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-lan-switch-snmp@cisco.com",
+    "description": "This MIB module defines objects required for managing Resilient Ethernet Protocol (REP). Resilient Ethernet Protocol (REP) is a Cisco proprietary protocol that provides an alternative to Spanning Tree Protocol (STP) to control network loops, handle link failures and improve convergence time. REP controls a group of ports connected in a segment; ensures that the segment does not create any bridging loops, and responds to link failures within the segment. The following diagram depicts a REP segment: [Sw E1]E---NE[Sw 1]NE---NE[Sw 2]NE......... . . [Sw E2]E---NE[Sw N]NE---NE[Sw N-1]NE....... Sw : Switch. E : Edge port. NE : Non-Edge port. E1/E2: Edge switches. E1 and E2 can either be same or different switches. A REP segment is a chain of ports connected to each other and configured with a segment identifier. Each segment consists of standard (non-edge) segment ports and up to two edge ports. A device can have only two ports that belong to the same segment, and each segment port can have only one external neighbor. One edge port in a REP segment acts as the primary edge port; the other as the secondary edge port. It is the primary edge port that always participates in VLAN load balancing in a REP segment. REP VLAN load balancing is achieved by blocking some VLANs at a configured alternate port and all other VLANs at an edge port. The execution (preemption) of VLAN load balancing is triggered by manually enforcing it or after a pre-defined delay, after the REP segment is complete. When segment is completed, all ports will be in open state except one port that can be in alternate state that is used for VLAN load balancing as explained above."
+  },
+  "RepPortType": {
+    "name": "RepPortType",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "notEdge": 1,
+          "edge": 2,
+          "edgePrimary": 3,
+          "edgeNoNeighbor": 4,
+          "edgeNoNeighborPrimary": 5
+        }
+      }
+    },
+    "status": "current",
+    "description": "This TC describes the port type of the REP port. 'notEdge' - non-edge Port. 'edge' - edge port for the segment. 'edgePrimary' - primary edge port for the segment. 'edgeNoNeighbor' - no neighbor edge port for the segment. 'edgeNoNeighborPrimary' - primary no neighbor edge port for the segment."
+  },
+  "RepSegmentId": {
+    "name": "RepSegmentId",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "status": "current",
+    "description": "This TC describes an object to provide the unique identifier for the REP segment."
+  },
+  "RepSegmentList": {
+    "name": "RepSegmentList",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "status": "current",
+    "description": "This TC describes an object that indicates the list of REP segments. Each octet within this value specifies a set of eight segments. The first octet represents the first 8 segments of the range of segments specified by the object, the second octet represents the next 8 segments etc. Within each octet, the most significant bit represents the lowest numbered segment, and the least significant bit represents the highest numbered segment. If that bit has a value of '1' then that segment is included in the set of segments; the segment is not included if its bit has a value of '0'. NMS may omit any zero-valued octets from the end of this string in order to reduce SetPDU size, and the agent may also omit zero-valued trailing octets, to reduce the size of GetResponse PDUs. The maximum length of the object that uses this TC is calculated to be the ceiling whole number of ((crepMaxSegmentId - crepMinSegmentId + 1) / 8). Any octets beyond this length in the SetPDU should be ignored."
+  },
+  "ciscoRepMIBNotifs": {
+    "name": "ciscoRepMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.601.0",
+    "class": "objectidentity"
+  },
+  "ciscoRepMIBObjects": {
+    "name": "ciscoRepMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.601.1",
+    "class": "objectidentity"
+  },
+  "ciscoRepMIBConform": {
+    "name": "ciscoRepMIBConform",
+    "oid": "1.3.6.1.4.1.9.9.601.2",
+    "class": "objectidentity"
+  },
+  "crepGlobalInfo": {
+    "name": "crepGlobalInfo",
+    "oid": "1.3.6.1.4.1.9.9.601.1.1",
+    "class": "objectidentity"
+  },
+  "crepInterfaceConfig": {
+    "name": "crepInterfaceConfig",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2",
+    "class": "objectidentity"
+  },
+  "crepSegmentConfig": {
+    "name": "crepSegmentConfig",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3",
+    "class": "objectidentity"
+  },
+  "crepSegmentTable": {
+    "name": "crepSegmentTable",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies REP segments configured on the device."
+  },
+  "crepSegmentEntry": {
+    "name": "crepSegmentEntry",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepSegmentId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A list of REP segment entries. The number of segments configured on the device determines the number of entries. An entry is created when a segment identifier value is configured on an interface and no matching entry exists already. The entry is deleted once the segment ceases to exist on the device."
+  },
+  "crepSegmentId": {
+    "name": "crepSegmentId",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RepSegmentId",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object identifies the segment identifier."
+  },
+  "crepSegmentInterface1": {
+    "name": "crepSegmentInterface1",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "K. McCloghrie and F. Kastenholz, 'The Interfaces Group MIB', RFC-2863, June 2000.",
+    "status": "current",
+    "description": "This object indicates the ifIndex-value assigned to the first interface that is part of the segment."
+  },
+  "crepSegmentInterface2": {
+    "name": "crepSegmentInterface2",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "K. McCloghrie and F. Kastenholz, 'The Interfaces Group MIB', RFC-2863, June 2000.",
+    "status": "current",
+    "description": "This object indicates the ifIndex-value assigned to the second interface that is part of the segment. The value of zero means that the InterfaceIndex is not known. The reasons for value being zero might include the second interface might not yet been configured for this segment and the device may be the edge of the segment."
+  },
+  "crepSegmentComplete": {
+    "name": "crepSegmentComplete",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates if the segment is complete such that no port in the segment is in failed state."
+  },
+  "crepSegmentPreempt": {
+    "name": "crepSegmentPreempt",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object should be set to true by NMS for triggering manual preemption. This may cause a momentary traffic disruption. Though this can be done for any node in the segment, it is only effective on the device acting as the REP primary edge. Setting this object false has no effect. This object always returns false when read."
+  },
+  "crepSegmentPreemptStatus": {
+    "name": "crepSegmentPreemptStatus",
+    "oid": "1.3.6.1.4.1.9.9.601.1.3.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "preemptSuccessful": 2,
+          "preemptFailure": 3,
+          "preemptTrigger": 4,
+          "preemptTriggerFailure": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the status of the last preemption trigger. 'none' - preemption trigger is not executed. 'preemptSuccessful' - preemption action for the previous trigger is successful. 'preemptFailure' - preemption trigger was successful. However, preemption failed due to some problem on the segment. 'preemptTrigger' - preemption is triggered successfully and the result is awaited. 'preemptTriggerFailure'- preemption on the segment is not performed as the preemption trigger failed. The failure could be due to invalid port ID or neighbor number specified in 'crepBlockPortNumInfo' or 'crepBlockPortIdInfo' respectively, when the value of 'crepLoadBalanceBlockPortType' is 'offset' or 'portId' respectively. In addition, reason for failure can be that crepLoadBalanceBlockPortType = 'prefFlag' and there is no REP port in the segment configured as preferred port. The value should be 'none' on all agents other than the one serving as the primary edge for the segment. The value will be 'none' on the agent serving as the primary edge for the segment if preemption trigger is not executed yet. If the device is not capable of assessing the final outcome of preemption trigger, then the state should remain in 'preemptTrigger' state."
+  },
+  "crepInterfaceConfigTable": {
+    "name": "crepInterfaceConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table provides REP configuration for interfaces in the device. This table contains one entry for each interface running REP."
+  },
+  "crepInterfaceConfigEntry": {
+    "name": "crepInterfaceConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry exists for each interface, if REP is configured on it. On a system that supports REP, all ports with ifType = 'ethernetCsmacd' and those ethernet based virtual ports with ifType = 'propVirtual' also support REP. REP can be configured or unconfigured or modified directly on the agent as well. Dynamically created rows are expected to be non-volatile such that they persist after an agent restarts."
+  },
+  "crepIfIndex": {
+    "name": "crepIfIndex",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "reference": "K. McCloghrie and F. Kastenholz, 'The Interfaces Group MIB', RFC-2863, June 2000.",
+    "status": "current",
+    "description": "This object identifies the ifIndex-value assigned to the interface."
+  },
+  "crepIfSegmentId": {
+    "name": "crepIfSegmentId",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RepSegmentId",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the segment that the interface is part. This object can be modified when crepIfConfigRowStatus is 'active'. The valid range is from crepMinSegmentId to crepMaxSegmentId."
+  },
+  "crepIfOperStatus": {
+    "name": "crepIfOperStatus",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "initDown": 2,
+          "noNeighbour": 3,
+          "oneWay": 4,
+          "twoWay": 5,
+          "flapping": 6,
+          "wait": 7,
+          "unknown": 8
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current operational link state of the REP port. If a REP configured interface is down, it will be in 'initDown' state. 'none' - REP is not operational on the interface. This value is used when sending the crepLinkStatus notification when REP configuration is removed from the interface. 'initDown' - initial REP link state. 'noNeighbor' - state in which REP is yet to discover its neighbor. 'oneWay' - the state in which messages have been received from the neighbor but the link has not been declared to be twoWay yet. 'twoWay' - the fully operational state for REP. 'flapping' - the state in which there is a mismatch in the received port information (either local or remote) for the neighbor. 'wait' - the forced transient state before REP starts discovering its neighbor. 'unknown' - the link state cannot be determined."
+  },
+  "crepIfPortRole": {
+    "name": "crepIfPortRole",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "failedPort": 1,
+          "alternatePort": 2,
+          "openPort": 3,
+          "failedPortNoNeighbor": 4,
+          "failedPortLogicalOpen": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the role or state of a REP port depending on its link status and whether it is forwarding or blocking traffic. 'failedPort' - a port with a non-operational link status, such that no traffic is forwarded on it. 'alternatePort' - a port forwarding traffic only for a subset of VLANs, for the purpose of VLAN load balancing. 'openPort' - a port forwarding traffic for all VLANs. 'failedPortNoNeighbor' - a port with a non-operational link status and does not have a external neighbor. 'failedPortLogicalOpen' - a port with a non-operational link status and does not have a external neighbor but is in forwarding state for traffic."
+  },
+  "crepIfPortID": {
+    "name": "crepIfPortID",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 8,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the REP port identifier automatically assigned by REP when enabled."
+  },
+  "crepIfAdminEdgePortType": {
+    "name": "crepIfAdminEdgePortType",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RepPortType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "notEdge",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the configured edge port type for the interface."
+  },
+  "crepIfOperEdgePortType": {
+    "name": "crepIfOperEdgePortType",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RepPortType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the actual edge port type for the interface. Value 'edge' indicates that the port is secondary edge port."
+  },
+  "crepIfPreferredConfig": {
+    "name": "crepIfPreferredConfig",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies if port should get preference to become the alternate port among other equal ports in the segment. Setting this value to true does not guaranty that the port will become the alternate port. 'crepIfPortRole' should be checked for the actual status."
+  },
+  "crepifBlockedVlans1k": {
+    "name": "crepifBlockedVlans1k",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoVlanList",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the list of VLANs configured to be blocked at the alternate port for VLANs with values of 0 through 1023. If the bit is set to '1', then the VLAN is marked for blocking. This value is only effective on the device acting as the REP primary edge. In addition, this value is effective only if 'crepLoadBalanceBlockPortType' is not 'none'."
+  },
+  "crepifBlockedVlans2k": {
+    "name": "crepifBlockedVlans2k",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoVlanList",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the list of VLANs configured to be blocked at the alternate port for VLANs with values of 1024 through 2047. If the bit is set to '1', then the VLAN is marked for blocking. This value is only effective on the device acting as the REP primary edge. In addition, this value is effective only if 'crepLoadBalanceBlockPortType' is not 'none'. This object is only instantiated on devices that support the extended VLANs."
+  },
+  "crepifBlockedVlans3k": {
+    "name": "crepifBlockedVlans3k",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoVlanList",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the list of VLANs configured to be blocked at the alternate port for VLANs with values of 2048 through 3071. If the bit is set to '1', then the VLAN is marked for blocking. This value is only effective on the device acting as the REP primary edge. In addition, this value is effective only if 'crepLoadBalanceBlockPortType' is not 'none'. This object is only instantiated on devices that support the extended VLANs."
+  },
+  "crepifBlockedVlans4k": {
+    "name": "crepifBlockedVlans4k",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoVlanList",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the list of VLANs configured to be blocked at the alternate port for VLANs with values of 3072 through 4095. If the bit is set to '1', then the VLAN is marked for blocking. This value is only effective on the device acting as the REP primary edge. In addition, this value is effective only if 'crepLoadBalanceBlockPortType' is not 'none'. This object is only instantiated on devices that support the extended VLANs."
+  },
+  "crepLoadBalanceBlockPortType": {
+    "name": "crepLoadBalanceBlockPortType",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "offset": 2,
+          "portId": 3,
+          "prefFlag": 4
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "none",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the method defined to identify the alternate port in the segment that takes part in VLAN load balancing by blocking a subset of VLANs after preemption. 'none' - no method is specified to identify the alternate port. In this case, the primary edge blocks all VLANs after preemption. 'offset' - identification is done by a number which indicates the offset of the port from an edge port. 'crepBlockPortNumInfo' defines the value. 'portId' - identification is done by the port identifier of the port. 'crepBlockPortIdInfo' defines the value. 'prefFlag' - to select the port in the segment that is configured as the preferred alternate port for VLAN load balancing. While setting the value to 'offset' or 'portId', corresponding values for the value defining objects (mentioned along with the corresponding descriptions above) should also be provided, along with. Additionally, at least one of objects that define the VLANs to be blocked (crepifBlockedVlans1k, crepifBlockedVlans2k, crepifBlockedVlans3k, crepifBlockedVlans4k) should be provided with a non-empty value, when setting the value to anything other than 'none'. This value is only effective on the device acting as the REP primary edge."
+  },
+  "crepBlockPortNumInfo": {
+    "name": "crepBlockPortNumInfo",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": -256,
+            "max": 256
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the offset of the port in the segment to be blocked for VLAN load balancing. Positive numbers indicate the offset from the primary edge port and negative numbers indicates the downstream neighbor from the secondary edge port. [Sw E1]E1---NE1[Sw 1]NE2---NE1[Sw 2]NE2......... . . [Sw E2]E2---NE2[Sw N]NE1---NE2[Sw N-1]NE1....... Sw : Switch. E : Edge port. NE : Non-Edge port. E1/E2: Edge switches. E1 and E2 can either be same or different switches. In the segment depicted above, consider port E1 on 'Sw E1' is the primary edge and E2 on 'Sw E2' is the secondary edge. Value 1 for this object indicates primary edge port, 2 indicates NE1 on 'Sw 1', 3 indicates NE2 on 'Sw 1' and so on. Value -1 indicates secondary edge port, -2 indicates NE2 on 'Sw N', -3 indicates NE1 on 'Sw N' and so on. Usage of value 0 is invalid. This value is only effective on the device acting as the REP primary edge and has relevance only if crepLoadBalanceBlockPortType = 'offset'."
+  },
+  "crepBlockPortIdInfo": {
+    "name": "crepBlockPortIdInfo",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 8,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the port identifier of the port in the segment to be blocked for VLAN load balancing. 'crepIfPortID' object of the corresponding port provides the port identifier. This value is only effective on the device acting as the REP primary edge and has relevance only if crepLoadBalanceBlockPortType = 'portId'."
+  },
+  "crepIfPreemptDelayTimer": {
+    "name": "crepIfPreemptDelayTimer",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": -1,
+            "max": 300
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": -1,
+        "format": "decimal"
+      }
+    },
+    "units": "delay in seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the interval of time that REP waits before triggering preemption after the segment is complete. The value -1 is used to indicate that no time delay is configured and the preemption will happen manually. This value is only effective on the device acting as the REP primary edge."
+  },
+  "crepIfStcnPropagateToSTP": {
+    "name": "crepIfStcnPropagateToSTP",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies if the REP edge propagates the segment topology change notifications to the spanning tree network. This value is only effective on the device acting as the REP primary edge."
+  },
+  "crepIfStcnPropagateToOtherSegs": {
+    "name": "crepIfStcnPropagateToOtherSegs",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RepSegmentList",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the list of segments to which the REP edge propagates the segment topology change notifications. This value is only effective on the device acting as the REP primary edge."
+  },
+  "crepIfStcnPropagateToIf": {
+    "name": "crepIfStcnPropagateToIf",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the interface to which the REP edge should propagate the segment topology change notifications. The interface should be of type ifType = 'ethernetCsmacd' or an ethernet based virtual port with ifType = 'propVirtual'. '0' specifies that the device should not propagate STCNs to any interface. This value is only effective on the device acting as the REP primary edge."
+  },
+  "crepIfConfigRowStatus": {
+    "name": "crepIfConfigRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.1.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used to manage the creation, deletion, and modification of rows in this table. A row may be created using the 'CreateAndGo' option. When the row is successfully created, the agent would set the RowStatus to 'active'. 'crepIfSegmentId' should be specified for the successful creation of the row. A row may be deleted by setting this object to 'destroy'. All writeable columns in this row can be modified when the value of this object is 'active'."
+  },
+  "crepInterfaceStatsTable": {
+    "name": "crepInterfaceStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table for REP interfaces statistics. This table augments the crepInterfaceConfigTable."
+  },
+  "crepInterfaceStatsEntry": {
+    "name": "crepInterfaceStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "crepInterfaceStatsEntry",
+      "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+      "object": "crepInterfaceConfigEntry"
+    },
+    "status": "current",
+    "description": "The counter entries are not persistent. This is because once REP is un-configured on the interface the row would be deleted and hence they will restart if REP is configured once again on the interface. NMS need to check for 'crepCounterDiscontinuityTime' to see if the counters have restarted."
+  },
+  "crepCounterDiscontinuityTime": {
+    "name": "crepCounterDiscontinuityTime",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime on the most recent occasion at which REP counters suffered a discontinuity on this interface. If no such discontinuities have occurred since the first initialization of REP, then this object contains the sysUpTime value of first initialization."
+  },
+  "crepLslRxPdus": {
+    "name": "crepLslRxPdus",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of link status layer PDUs received on the port."
+  },
+  "crepLslTxPdus": {
+    "name": "crepLslTxPdus",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of link status layer PDUs transmitted on the port."
+  },
+  "crepHflRxPdus": {
+    "name": "crepHflRxPdus",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of hardware flood layer PDUs received on the port."
+  },
+  "crepHflTxPdus": {
+    "name": "crepHflTxPdus",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of hardware flood layer PDUs transmitted on the port."
+  },
+  "crepBpaTlvRxPackets": {
+    "name": "crepBpaTlvRxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of blocked port advertisement TLVs received on the port."
+  },
+  "crepBpaTlvTxPackets": {
+    "name": "crepBpaTlvTxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of blocked port advertisement TLVs transmitted on the port."
+  },
+  "crepBpaStcnLslRxPackets": {
+    "name": "crepBpaStcnLslRxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of segment topology change notifications received as blocked port advertisement through link status layer."
+  },
+  "crepBpaStcnLslTxPackets": {
+    "name": "crepBpaStcnLslTxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of segment topology change notifications transmitted as blocked port advertisement through link status layer."
+  },
+  "crepBpaStcnHflRxPackets": {
+    "name": "crepBpaStcnHflRxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of segment topology change notifications received as blocked port advertisement through hardware flood layer."
+  },
+  "crepBpaStcnHflTxPackets": {
+    "name": "crepBpaStcnHflTxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of segment topology change notifications transmitted as blocked port advertisement through hardware flood layer."
+  },
+  "crepEpaElectionTlvRxPackets": {
+    "name": "crepEpaElectionTlvRxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of end port advertisement election TLVs received that are used for determining the role, namely primary edge or secondary edge."
+  },
+  "crepEpaElectionTlvTxPackets": {
+    "name": "crepEpaElectionTlvTxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of end port advertisement election TLVs transmitted that are used for determining the role, namely primary edge or secondary edge."
+  },
+  "crepEpaCommandTlvRxPackets": {
+    "name": "crepEpaCommandTlvRxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of end port advertisement command TLVs received that are used to authorize a port to takeover the segment for the purpose of VLAN load balancing."
+  },
+  "crepEpaCommandTlvTxPackets": {
+    "name": "crepEpaCommandTlvTxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of end port advertisement command TLVs transmitted that are used to authorize a port to takeover the segment for the purpose of VLAN load balancing."
+  },
+  "crepEpaInfoTlvRxPackets": {
+    "name": "crepEpaInfoTlvRxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of end port advertisement information TLVs received on the port. These messages are sent by the end ports (configured edge port, or port which is down or port which does not have internal peer) to discover the segment information."
+  },
+  "crepEpaInfoTlvTxPackets": {
+    "name": "crepEpaInfoTlvTxPackets",
+    "oid": "1.3.6.1.4.1.9.9.601.1.2.2.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of end port advertisement information TLVs transmitted on the port. These messages are sent by the end ports (configured edge port, or port which is down or port which does not have internal peer) to discover the segment information."
+  },
+  "crepVersion": {
+    "name": "crepVersion",
+    "oid": "1.3.6.1.4.1.9.9.601.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the version of REP being used."
+  },
+  "crepAdminVlan": {
+    "name": "crepAdminVlan",
+    "oid": "1.3.6.1.4.1.9.9.601.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VlanId",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The administrative VLAN used by REP to transmit its hardware flooding layer messages. If the VLAN does not already exist, set operation does not create the VLAN. The administrative VLAN cannot be the RSPAN VLAN."
+  },
+  "crepNotifsEnable": {
+    "name": "crepNotifsEnable",
+    "oid": "1.3.6.1.4.1.9.9.601.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether the system will generate REP notifications. This object affects the generation of all REP notifications defined in this MIB module."
+  },
+  "crepGlobalRepNotifsRate": {
+    "name": "crepGlobalRepNotifsRate",
+    "oid": "1.3.6.1.4.1.9.9.601.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 1000
+          }
+        ]
+      }
+    },
+    "units": "notifications per second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the maximum rate at which the system will generate notifications defined by this MIB module. If this object value is 0, then the system will not impose a limit on the rate at which it will generate notification defined by this MIB module."
+  },
+  "crepMinSegmentId": {
+    "name": "crepMinSegmentId",
+    "oid": "1.3.6.1.4.1.9.9.601.1.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RepSegmentId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the minimum segment identifier that can be configured on the device."
+  },
+  "crepMaxSegmentId": {
+    "name": "crepMaxSegmentId",
+    "oid": "1.3.6.1.4.1.9.9.601.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RepSegmentId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the maximum segment identifier that can be configured on the device."
+  },
+  "crepLinkStatus": {
+    "name": "crepLinkStatus",
+    "oid": "1.3.6.1.4.1.9.9.601.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfSegmentId"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfOperStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when a REP interface has entered or left REP link operational status. The link is considered operational when 'crepIfOperStatus' is 'twoWay'. 'crepIfOperStatus' would be 'none' if the crepInterfaceConfigEntry entry has been removed."
+  },
+  "crepPreemptionStatus": {
+    "name": "crepPreemptionStatus",
+    "oid": "1.3.6.1.4.1.9.9.601.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepSegmentPreemptStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification indicates the status of the preemption triggered on REP primary edge."
+  },
+  "crepPortRoleChange": {
+    "name": "crepPortRoleChange",
+    "oid": "1.3.6.1.4.1.9.9.601.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfSegmentId"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfPortRole"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when the role of a Port changes that are indicated by 'crepIfPortRole'."
+  },
+  "ciscoRepMIBCompliances": {
+    "name": "ciscoRepMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.601.2.1",
+    "class": "objectidentity"
+  },
+  "ciscoRepMIBGroups": {
+    "name": "ciscoRepMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.601.2.2",
+    "class": "objectidentity"
+  },
+  "ciscoRepMIBCompliance": {
+    "name": "ciscoRepMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.601.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoRepGlobalGroup",
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB"
+      },
+      {
+        "object": "ciscoRepNotificationGroup",
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB"
+      },
+      {
+        "object": "ciscoRepInterfaceGroup",
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB"
+      },
+      {
+        "object": "ciscoRepSegmentGroup",
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB."
+  },
+  "ciscoRepGlobalGroup": {
+    "name": "ciscoRepGlobalGroup",
+    "oid": "1.3.6.1.4.1.9.9.601.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepVersion"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepAdminVlan"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepNotifsEnable"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepGlobalRepNotifsRate"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepMinSegmentId"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepMaxSegmentId"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of global objects for use with the REP feature."
+  },
+  "ciscoRepInterfaceGroup": {
+    "name": "ciscoRepInterfaceGroup",
+    "oid": "1.3.6.1.4.1.9.9.601.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfSegmentId"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfOperStatus"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfPortRole"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfPortID"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfAdminEdgePortType"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfOperEdgePortType"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfPreferredConfig"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepifBlockedVlans1k"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepifBlockedVlans2k"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepifBlockedVlans3k"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepifBlockedVlans4k"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepLoadBalanceBlockPortType"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepBlockPortNumInfo"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepBlockPortIdInfo"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfPreemptDelayTimer"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfStcnPropagateToSTP"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfStcnPropagateToOtherSegs"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfStcnPropagateToIf"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepIfConfigRowStatus"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepCounterDiscontinuityTime"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepLslRxPdus"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepLslTxPdus"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepHflRxPdus"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepHflTxPdus"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepBpaTlvRxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepBpaTlvTxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepBpaStcnLslRxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepBpaStcnLslTxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepBpaStcnHflRxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepBpaStcnHflTxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepEpaElectionTlvRxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepEpaElectionTlvTxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepEpaCommandTlvRxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepEpaCommandTlvTxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepEpaInfoTlvRxPackets"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepEpaInfoTlvTxPackets"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of interface specific objects for use with the REP feature."
+  },
+  "ciscoRepNotificationGroup": {
+    "name": "ciscoRepNotificationGroup",
+    "oid": "1.3.6.1.4.1.9.9.601.2.2.3",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepLinkStatus"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepPreemptionStatus"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepPortRoleChange"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notifications for use with the REP feature."
+  },
+  "ciscoRepSegmentGroup": {
+    "name": "ciscoRepSegmentGroup",
+    "oid": "1.3.6.1.4.1.9.9.601.2.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepSegmentInterface1"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepSegmentInterface2"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepSegmentComplete"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepSegmentPreempt"
+      },
+      {
+        "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+        "object": "crepSegmentPreemptStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of segment specific objects for use with the REP feature."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:15:16 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB"
+  }
+}

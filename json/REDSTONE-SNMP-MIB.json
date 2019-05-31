@@ -1,0 +1,567 @@
+{
+  "imports": {
+    "class": "imports",
+    "REDSTONE-SMI": [
+      "rsMgmt"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "OBJECT-TYPE",
+      "Bits",
+      "Counter64",
+      "MODULE-IDENTITY",
+      "Integer32",
+      "MibIdentifier",
+      "TimeTicks",
+      "Unsigned32",
+      "Counter32",
+      "IpAddress",
+      "Gauge32",
+      "NOTIFICATION-TYPE",
+      "iso",
+      "OBJECT-IDENTITY"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "RowStatus"
+    ]
+  },
+  "rsSnmpMIB": {
+    "name": "rsSnmpMIB",
+    "oid": "1.3.6.1.4.1.2773.2.16",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "1999-07-27 00:00",
+        "description": "Add missing IMPLIED keyword to the INDEX clause of rsSnmpCommunityEntry."
+      },
+      {
+        "revision": "1998-01-01 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "9907270000Z",
+    "organization": "Redstone Communications, Inc.",
+    "contactinfo": "Redstone Communications, Inc. 5 Carlisle Road Westford MA 01886 USA +1-978-692-1999 mib@redstonecom.com",
+    "description": "MIB objects for configuring SNMP-based management access into Redstone Communications Inc. products."
+  },
+  "RsSnmpCommunityName": {
+    "name": "RsSnmpCommunityName",
+    "class": "textualconvention",
+    "type": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 31
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "An SNMP community name. The character repertoire of the string is restricted to printable, non-whitespace characters."
+  },
+  "RsSnmpTrapMask": {
+    "name": "RsSnmpTrapMask",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 4,
+            "max": 4
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "This octet string is interpreted as a bit mask, in which each bit corresponds to a category of SNMP trap. The DESCRIPTION clause of a MIB object having this SYNTAX should specify the semantics of bit values '1' and '0'. Bit definitions are as follows, where bit 31 is the most significant bit of the first octet, and bit 0 is the least significant bit of the fourth octet: Bit Category ----- ----------------------------------------------- 0 SNMP standard coldStart/warmStart/authenticationFailure 1 SNMP standard linkUp/linkDown 2 Platform inventory. 3 Environment (power, temperature, fan). 4 Bulkstats / accounting 5-31 Undefined."
+  },
+  "rsSnmpObjects": {
+    "name": "rsSnmpObjects",
+    "oid": "1.3.6.1.4.1.2773.2.16.1",
+    "class": "objectidentity"
+  },
+  "rsSnmpConformance": {
+    "name": "rsSnmpConformance",
+    "oid": "1.3.6.1.4.1.2773.2.16.2",
+    "class": "objectidentity"
+  },
+  "rsSnmpGeneral": {
+    "name": "rsSnmpGeneral",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.1",
+    "class": "objectidentity"
+  },
+  "rsSnmpCommunity": {
+    "name": "rsSnmpCommunity",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.2",
+    "class": "objectidentity"
+  },
+  "rsSnmpTrap": {
+    "name": "rsSnmpTrap",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3",
+    "class": "objectidentity"
+  },
+  "rsSnmpAuthFailId": {
+    "name": "rsSnmpAuthFailId",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.4",
+    "class": "objectidentity"
+  },
+  "rsSnmpMaxPduSize": {
+    "name": "rsSnmpMaxPduSize",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 484,
+            "max": 8192
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The maximum sized SNMP PDU, in bytes, that this agent is capable of handling. The default is 1500 bytes. The posssibility of IP fragmentation should be considered when setting this object to large values."
+  },
+  "rsSnmpCommunityTable": {
+    "name": "rsSnmpCommunityTable",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of SNMP management clients. Authentic SNMP clients are identified by a combination community name and IP address. Upon receipt of an SNMP request, this table is scanned for a matching community name. If an entry containing a matching community name is found, the entry's IP access list, if nonzero, is used to validate the source IP address received in the request; else, if the IP access list number in the matching entry is zero, the source IP address is accepted. Finally, the type of SNMP request is validated with respect to the access privilege of the matching entry (e.g. a SET Request is rejected for an entry having read-only privilege). Use of this table constitutes 'trivial authentication', i.e. no mechanism is employed to confirm the received SNMP request was indeed originated by the host identified by the IP source address."
+  },
+  "rsSnmpCommunityEntry": {
+    "name": "rsSnmpCommunityEntry",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpCommunityName",
+        "implied": 1
+      }
+    ],
+    "status": "current",
+    "description": "A table entry describing an authentic SNMP Community."
+  },
+  "rsSnmpCommunityName": {
+    "name": "rsSnmpCommunityName",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsSnmpCommunityName",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "An SNMP community name."
+  },
+  "rsSnmpCommunityRowStatus": {
+    "name": "rsSnmpCommunityRowStatus",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Controls creation/deletion of entries in this table. Only 'createAndGo' and 'destroy' enumeration values are supported."
+  },
+  "rsSnmpCommunityPrivilege": {
+    "name": "rsSnmpCommunityPrivilege",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "readOnly": 1,
+          "readWrite": 2,
+          "admin": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "readOnly",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The access privileges for a SNMP Community authenticated by this entry. readOnly Read-only access to nonadministrative portions of MIB. readWrite Read-write access to nonadministrative portions of MIB. admin Read-write access to entire MIB. 'Administrative' portions of the MIB are those portions that pertain to management access into the managed device."
+  },
+  "rsSnmpCommunityAccessList": {
+    "name": "rsSnmpCommunityAccessList",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 10000
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "If nonzero, the number of an IP access list that describes the IP hosts permitted SNMP management access to this device via the corresponding community name contained in this entry."
+  },
+  "rsSnmpTrapGlobalFilter": {
+    "name": "rsSnmpTrapGlobalFilter",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsSnmpTrapMask",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object provides global control over trap generation by this agent. For each bit position, a '1' or '0' indicates the corresponding trap category is enabled or disabled, respectively."
+  },
+  "rsSnmpTrapSource": {
+    "name": "rsSnmpTrapSource",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The ifIndex of the interface whose IP address is used as the source IP address for outbound SNMP traps. If zero, no interface is specified, the mechanism for selecting a source IP address is implementation-dependent, and may vary with each trap sent."
+  },
+  "rsSnmpTrapHostTable": {
+    "name": "rsSnmpTrapHostTable",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of SNMP Trap recipient."
+  },
+  "rsSnmpTrapHostEntry": {
+    "name": "rsSnmpTrapHostEntry",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapHostIpAddress",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A table entry describing an SNMP Trap recipient."
+  },
+  "rsSnmpTrapHostIpAddress": {
+    "name": "rsSnmpTrapHostIpAddress",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "IP address of an authorized SNMP Trap recipient. This must be a host IP address."
+  },
+  "rsSnmpTrapHostRowStatus": {
+    "name": "rsSnmpTrapHostRowStatus",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Controls creation/deletion of entries in this table. Only 'createAndGo' and 'destroy' enumeration values are supported."
+  },
+  "rsSnmpTrapHostUdpPort": {
+    "name": "rsSnmpTrapHostUdpPort",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 162,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The destination UDP port to which traps will be sent."
+  },
+  "rsSnmpTrapHostCommunity": {
+    "name": "rsSnmpTrapHostCommunity",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsSnmpCommunityName",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "An SNMP community name to be used in traps sent to this destination."
+  },
+  "rsSnmpTrapHostProtocolVersion": {
+    "name": "rsSnmpTrapHostProtocolVersion",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "v1": 0,
+          "v2c": 1
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "v1",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The format of the SNMP trap PDU to be sent to this trap destination. v1 Trap-PDU defined in RFC1157, encapsulated in Message structure also defined in RFC1157. v2c SNMPv2-Trap-PDU defined in RFC1905, encapsulated in Message structure defined in RFC1901."
+  },
+  "rsSnmpTrapHostFilter": {
+    "name": "rsSnmpTrapHostFilter",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsSnmpTrapMask",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Bit mask designating the specific trap types enabled for transmission to this trap destination. For each bit position, a '1' or '0' indicates the corresponding trap type is enabled or disabled, respectively. Note, trap generation is further constrained by the value rsSnmpTrapGlobalFilter."
+  },
+  "rsSnmpTrapHostSends": {
+    "name": "rsSnmpTrapHostSends",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.3.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of traps submitted for transmission to this destination."
+  },
+  "rsSnmpAuthFailIdIpAddress": {
+    "name": "rsSnmpAuthFailIdIpAddress",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.4.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "The source IP address contained in a received SNMP request that failed authentication."
+  },
+  "rsSnmpAuthFailIdUdpPort": {
+    "name": "rsSnmpAuthFailIdUdpPort",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.4.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "The source UDP port contained in a received SNMP request that failed authentication."
+  },
+  "rsSnmpAuthFailIdCommunity": {
+    "name": "rsSnmpAuthFailIdCommunity",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.4.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "The SNMP community contained in a received SNMP request that failed authentication."
+  },
+  "rsSnmpAuthFailIdReason": {
+    "name": "rsSnmpAuthFailIdReason",
+    "oid": "1.3.6.1.4.1.2773.2.16.1.4.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 0,
+          "badCommunityName": 1,
+          "badCommmunityUse": 2,
+          "hostDenied": 3
+        }
+      }
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "The reason a received SNMP request failed authentication: other Unspecified reason. badCommunityName The community is not recognized. badCommunityUse The community does not have privilege for the SNMP request type (e.g. SET request with a community having read-only privilege). hostDenied The host IP address was denied by the community's associated access list."
+  },
+  "rsSnmpCompliances": {
+    "name": "rsSnmpCompliances",
+    "oid": "1.3.6.1.4.1.2773.2.16.2.1",
+    "class": "objectidentity"
+  },
+  "rsSnmpGroups": {
+    "name": "rsSnmpGroups",
+    "oid": "1.3.6.1.4.1.2773.2.16.2.2",
+    "class": "objectidentity"
+  },
+  "rsSnmpCompliance": {
+    "name": "rsSnmpCompliance",
+    "oid": "1.3.6.1.4.1.2773.2.16.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "rsSnmpGroup",
+        "module": "REDSTONE-SNMP-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities which implement the Redstone SNMP MIB."
+  },
+  "rsSnmpGroup": {
+    "name": "rsSnmpGroup",
+    "oid": "1.3.6.1.4.1.2773.2.16.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpMaxPduSize"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpCommunityName"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpCommunityRowStatus"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpCommunityPrivilege"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpCommunityAccessList"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapGlobalFilter"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapSource"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapHostRowStatus"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapHostUdpPort"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapHostCommunity"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapHostProtocolVersion"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapHostFilter"
+      },
+      {
+        "module": "REDSTONE-SNMP-MIB",
+        "object": "rsSnmpTrapHostSends"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of management objects pertaining to SNMP Agent capability in a Redstone product."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/REDSTONE-SNMP-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 21:18:10 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "REDSTONE-SNMP-MIB"
+  }
+}

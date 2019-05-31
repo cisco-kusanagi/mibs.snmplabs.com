@@ -1,0 +1,3143 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-CEF-TC": [
+      "CefAdjLinkType",
+      "CefAdjacencySource",
+      "CefPathType",
+      "CefMplsLabelList",
+      "CefOperStatus",
+      "CefIpVersion",
+      "CefFailureReason",
+      "CefCCType",
+      "CefCCAction",
+      "CefCCStatus",
+      "CefAdminStatus",
+      "CefForwardingElementSpecialType",
+      "CefPrefixSearchState"
+    ],
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "CISCO-TC": [
+      "EntPhysicalIndexOrZero"
+    ],
+    "ENTITY-MIB": [
+      "entPhysicalIndex",
+      "PhysicalIndex"
+    ],
+    "HCNUM-TC": [
+      "CounterBasedGauge64"
+    ],
+    "IF-MIB": [
+      "ifIndex",
+      "InterfaceIndexOrZero"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddress",
+      "InetAddressType",
+      "InetAddressPrefixLength"
+    ],
+    "MPLS-VPN-MIB": [
+      "MplsVpnId"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "IpAddress",
+      "MibIdentifier",
+      "MODULE-IDENTITY",
+      "OBJECT-IDENTITY",
+      "Counter64",
+      "Counter32",
+      "Unsigned32",
+      "Gauge32",
+      "iso",
+      "NOTIFICATION-TYPE",
+      "OBJECT-TYPE",
+      "TimeTicks",
+      "Bits",
+      "Integer32"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "RowStatus",
+      "TimeStamp",
+      "TestAndIncr",
+      "TEXTUAL-CONVENTION",
+      "TruthValue"
+    ]
+  },
+  "ciscoCefMIB": {
+    "name": "ciscoCefMIB",
+    "oid": "1.3.6.1.4.1.9.9.492",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2006-01-30 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200601300000Z",
+    "organization": "Cisco System, Inc.",
+    "contactinfo": "Postal: Cisco Systems, Inc. 170 West Tasman Drive San Jose, CA 95134-1706 USA Tel: +1 800 553-NETS E-mail: cs-cef@cisco.com",
+    "description": "Cisco Express Forwarding (CEF) describes a high speed switching mechanism that a router uses to forward packets from the inbound to the outbound interface. CEF uses two sets of data structures or tables, which it stores in router memory: Forwarding information base (FIB) - Describes a database of information used to make forwarding decisions. It is conceptually similar to a routing table or route-cache, although its implementation is different. Adjacency - Two nodes in the network are said to be adjacent if they can reach each other via a single hop across a link layer. CEF path is a valid route to reach to a destination IP prefix. Multiple paths may exist out of a router to the same destination prefix. CEF Load balancing capability share the traffic to the destination IP prefix over all the active paths. After obtaining the prefix in the CEF table with the longest match, output forwarding follows the chain of forwarding elements. Forwarding element (FE) may process the packet, forward the packet, drop or punt the packet or it may also pass the packet to the next forwarding element in the chain for further processing. Forwarding Elements are of various types but this MIB only represents the forwarding elements of adjacency and label types. Hence a forwarding element chain will be represented as a list of labels and adjacency. The adjacency may point to a forwarding element list again, if it is not the last forwarding element in this chain. For the simplest IP forwarding case, the prefix entry will point at an adjacency forwarding element. The IP adjacency processing function will apply the output features, add the encapsulation (performing any required fixups), and may send the packet out. If loadbalancing is configured, the prefix entry will point to lists of forwarding elements. One of these lists will be selected to forward the packet. Each forwarding element list dictates which of a set of possible packet transformations to apply on the way to the same neighbour. The following diagram represents relationship between three of the core tables in this MIB module. cefPrefixTable cefFESelectionTable +---------------+ points +--------------+ | | | | a set +----> | | | | | |---------------| of FE | |--------------| | | | | Selection | | | | | | |---------------| Entries | |--------------| | | | |------------+ | |<----+ |---------------| |--------------| | | | +--------------| | | | | | +---------------+ | +--------------+ | | | points to an | adjacency entry | | | | cefAdjTable | | +---------------+ may point | +->| | | | to a set | |---------------| of FE | | | | | Selection | |---------------| Entries | | | | |----------------+ |---------------| | | +---------------+ Some of the Cisco series routers (e.g. 7500 & 12000) support distributed CEF (dCEF), in which the line cards (LCs) make the packet forwarding decisions using locally stored copies of the same Forwarding information base (FIB) and adjacency tables as the Routing Processor (RP). Inter-Process Communication (IPC) is the protocol used by routers that support distributed packet forwarding. CEF updates are encoded as external Data Representation (XDR) information elements inside IPC messages. This MIB reflects the distributed nature of CEF, e.g. CEF has different instances running on the RP and the line cards. There may be instances of inconsistency between the CEF forwarding databases(i.e between CEF forwarding database on line cards and the CEF forwarding database on the RP). CEF consistency checkers (CC) detects this inconsistency. When two databases are compared by a consistency checker, a set of records from the first (master) database is looked up in the second (slave). There are two types of consistency checkers, active and passive. Active consistency checkers are invoked in response to some stimulus, i.e. when a packet cannot be forwarded because the prefix is not in the forwarding table or in response to a Management Station request. Passive consistency checkers operate in the background, scanning portions of the databases on a periodic basis. The full-scan checkers are active consistency checkers which are invoked in response to a Management Station Request. If 64-bit counter objects in this MIB are supported, then their associated 32-bit counter objects must also be supported. The 32-bit counters will report the low 32-bits of the associated 64-bit counter count (e.g., cefPrefixPkts will report the least significant 32 bits of cefPrefixHCPkts). The same rule should be applied for the 64-bit gauge objects and their assocaited 32-bit gauge objects. If 64-bit counters in this MIB are not supported, then an agent MUST NOT instantiate the corresponding objects with an incorrect value; rather, it MUST respond with the appropriate error/exception condition (e.g., noSuchInstance or noSuchName). Counters related to CEF accounting (e.g., cefPrefixPkts) MUST NOT be instantiated if the corresponding accounting method has been disabled. This MIB allows configuration and monitoring of CEF related objects."
+  },
+  "ciscoCefMIBNotifs": {
+    "name": "ciscoCefMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.492.0",
+    "class": "objectidentity"
+  },
+  "ciscoCefMIBObjects": {
+    "name": "ciscoCefMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.492.1",
+    "class": "objectidentity"
+  },
+  "ciscoCefMIBConform": {
+    "name": "ciscoCefMIBConform",
+    "oid": "1.3.6.1.4.1.9.9.492.2",
+    "class": "objectidentity"
+  },
+  "cefFIB": {
+    "name": "cefFIB",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1",
+    "class": "objectidentity"
+  },
+  "cefAdj": {
+    "name": "cefAdj",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2",
+    "class": "objectidentity"
+  },
+  "cefFE": {
+    "name": "cefFE",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3",
+    "class": "objectidentity"
+  },
+  "cefGlobal": {
+    "name": "cefGlobal",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4",
+    "class": "objectidentity"
+  },
+  "cefInterface": {
+    "name": "cefInterface",
+    "oid": "1.3.6.1.4.1.9.9.492.1.5",
+    "class": "objectidentity"
+  },
+  "cefPeer": {
+    "name": "cefPeer",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6",
+    "class": "objectidentity"
+  },
+  "cefCC": {
+    "name": "cefCC",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7",
+    "class": "objectidentity"
+  },
+  "cefStats": {
+    "name": "cefStats",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8",
+    "class": "objectidentity"
+  },
+  "cefNotifCntl": {
+    "name": "cefNotifCntl",
+    "oid": "1.3.6.1.4.1.9.9.492.1.9",
+    "class": "objectidentity"
+  },
+  "cefFIBSummary": {
+    "name": "cefFIBSummary",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.1",
+    "class": "objectidentity"
+  },
+  "cefFIBSummaryTable": {
+    "name": "cefFIBSummaryTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains the summary information for the cefPrefixTable."
+  },
+  "cefFIBSummaryEntry": {
+    "name": "cefFIBSummaryEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contains the FIB summary related attributes for the managed entity. A row may exist for each IP version type (v4 and v6) depending upon the IP version supported on the device. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefFIBIpVersion": {
+    "name": "cefFIBIpVersion",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefIpVersion",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The version of IP forwarding."
+  },
+  "cefFIBSummaryFwdPrefixes": {
+    "name": "cefFIBSummaryFwdPrefixes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Total number of forwarding Prefixes in FIB for the IP version specified by cefFIBIpVersion object."
+  },
+  "cefPrefixTable": {
+    "name": "cefPrefixTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A list of CEF forwarding prefixes."
+  },
+  "cefPrefixEntry": {
+    "name": "cefPrefixEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixAddr",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixLen",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contains the forwarding prefix attributes. CEF prefix based non-recursive stats are maintained in internal and external buckets (depending upon the value of cefIntNonrecursiveAccouting object in the CefIntEntry). entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefPrefixType": {
+    "name": "cefPrefixType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Network Prefix Type. This object specifies the address type used for cefPrefixAddr. Prefix entries are only valid for the address type of ipv4(1) and ipv6(2)."
+  },
+  "cefPrefixAddr": {
+    "name": "cefPrefixAddr",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Network Prefix Address. The type of this address is determined by the value of the cefPrefixType object. This object is a Prefix Address containing the prefix with length specified by cefPrefixLen. Any bits beyond the length specified by cefPrefixLen are zeroed."
+  },
+  "cefPrefixLen": {
+    "name": "cefPrefixLen",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressPrefixLength",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Length in bits of the FIB Address prefix."
+  },
+  "cefPrefixForwardingInfo": {
+    "name": "cefPrefixForwardingInfo",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the associated forwarding element selection entries in cefFESelectionTable. The value of this object is index value (cefFESelectionName) of cefFESelectionTable."
+  },
+  "cefPrefixPkts": {
+    "name": "cefPrefixPkts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable per prefix accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'perPrefix' accounting), then this object represents the number of packets switched to this prefix."
+  },
+  "cefPrefixHCPkts": {
+    "name": "cefPrefixHCPkts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable per prefix accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'perPrefix' accounting), then this object represents the number of packets switched to this prefix. This object is a 64-bit version of cefPrefixPkts."
+  },
+  "cefPrefixBytes": {
+    "name": "cefPrefixBytes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable per prefix accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'perPrefix' accounting), then this object represents the number of bytes switched to this prefix."
+  },
+  "cefPrefixHCBytes": {
+    "name": "cefPrefixHCBytes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable per prefix accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'perPrefix' accounting), then this object represents the number of bytes switched to this prefix. This object is a 64-bit version of cefPrefixBytes."
+  },
+  "cefPrefixInternalNRPkts": {
+    "name": "cefPrefixInternalNRPkts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable non-recursive accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'nonRecursive' accounting), then this object represents the number of non-recursive packets in the internal bucket switched using this prefix."
+  },
+  "cefPrefixInternalNRHCPkts": {
+    "name": "cefPrefixInternalNRHCPkts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable non-recursive accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'nonRecursive' accounting), then this object represents the number of non-recursive packets in the internal bucket switched using this prefix. This object is a 64-bit version of cefPrefixInternalNRPkts."
+  },
+  "cefPrefixInternalNRBytes": {
+    "name": "cefPrefixInternalNRBytes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable nonRecursive accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'nonRecursive' accounting), then this object represents the number of non-recursive bytes in the internal bucket switched using this prefix."
+  },
+  "cefPrefixInternalNRHCBytes": {
+    "name": "cefPrefixInternalNRHCBytes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable nonRecursive accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'nonRecursive' accounting), then this object represents the number of non-recursive bytes in the internal bucket switched using this prefix. This object is a 64-bit version of cefPrefixInternalNRBytes."
+  },
+  "cefPrefixExternalNRPkts": {
+    "name": "cefPrefixExternalNRPkts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable non-recursive accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'nonRecursive' accounting), then this object represents the number of non-recursive packets in the external bucket switched using this prefix."
+  },
+  "cefPrefixExternalNRHCPkts": {
+    "name": "cefPrefixExternalNRHCPkts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable non-recursive accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'nonRecursive' accounting), then this object represents the number of non-recursive packets in the external bucket switched using this prefix. This object is a 64-bit version of cefPrefixExternalNRPkts."
+  },
+  "cefPrefixExternalNRBytes": {
+    "name": "cefPrefixExternalNRBytes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable nonRecursive accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'nonRecursive' accounting), then this object represents the number of non-recursive bytes in the external bucket switched using this prefix."
+  },
+  "cefPrefixExternalNRHCBytes": {
+    "name": "cefPrefixExternalNRHCBytes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.2.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If CEF accounting is set to enable nonRecursive accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'nonRecursive' accounting), then this object represents the number of non-recursive bytes in the external bucket switched using this prefix. This object is a 64-bit version of cefPrefixExternalNRBytes."
+  },
+  "cefLMPrefixSpinLock": {
+    "name": "cefLMPrefixSpinLock",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TestAndIncr",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An advisory lock used to allow cooperating SNMP Command Generator applications to coordinate their use of the Set operation in creating Longest Match Prefix Entries in cefLMPrefixTable. When creating a new longest prefix match entry, the value of cefLMPrefixSpinLock should be retrieved. The destination address should be determined to be unique by the SNMP Command Generator application by consulting the cefLMPrefixTable. Finally, the longest prefix entry may be created (Set), including the advisory lock. If another SNMP Command Generator application has altered the longest prefix entry in the meantime, then the spin lock's value will have changed, and so this creation will fail because it will specify the wrong value for the spin lock. Since this is an advisory lock, the use of this lock is not enforced, but not using this lock may lead to conflict with the another SNMP command responder application which may also be acting on the cefLMPrefixTable."
+  },
+  "cefLMPrefixTable": {
+    "name": "cefLMPrefixTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of Longest Match Prefix Query requests. Generator application should utilize the cefLMPrefixSpinLock to try to avoid collisions. See DESCRIPTION clause of cefLMPrefixSpinLock."
+  },
+  "cefLMPrefixEntry": {
+    "name": "cefLMPrefixEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefLMPrefixDestAddrType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefLMPrefixDestAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the managed device, then each entry represents a longest Match Prefix request. A management station wishing to get the longest Match prefix for a given destination address should create the associate instance of the row status. The row status should be set to active(1) to initiate the request. Note that this entire procedure may be initiated via a single set request which specifies a row status of createAndGo(4). Once the request completes, the management station should retrieve the values of the objects of interest, and should then delete the entry. In order to prevent old entries from clogging the table, entries will be aged out, but an entry will never be deleted within 5 minutes of completion. Entries are lost after an agent restart. I.e. to find out the longest prefix match for destination address of A.B.C.D on entity whose entityPhysicalIndex is 1, the Management station will create an entry in cefLMPrefixTable with cefLMPrefixRowStatus.1(entPhysicalIndex).1(ipv4).A.B.C.D set to createAndGo(4). Management Station may query the value of objects cefLMPrefix and cefLMPrefixLen to find out the corresponding prefix entry from the cefPrefixTable once the value of cefLMPrefixState is set to matchFound(2). entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF. "
+  },
+  "cefLMPrefixDestAddrType": {
+    "name": "cefLMPrefixDestAddrType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Destination Address Type. This object specifies the address type used for cefLMPrefixDestAddr. Longest Match Prefix entries are only valid for the address type of ipv4(1) and ipv6(2)."
+  },
+  "cefLMPrefixDestAddr": {
+    "name": "cefLMPrefixDestAddr",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Destination Address. The type of this address is determined by the value of the cefLMPrefixDestAddrType object."
+  },
+  "cefLMPrefixState": {
+    "name": "cefLMPrefixState",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefPrefixSearchState",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the state of this prefix search request."
+  },
+  "cefLMPrefixAddr": {
+    "name": "cefLMPrefixAddr",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Network Prefix Address. Index to the cefPrefixTable. The type of this address is determined by the value of the cefLMPrefixDestAddrType object."
+  },
+  "cefLMPrefixLen": {
+    "name": "cefLMPrefixLen",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressPrefixLength",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Network Prefix Length. Index to the cefPrefixTable."
+  },
+  "cefLMPrefixRowStatus": {
+    "name": "cefLMPrefixRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.4.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this table entry. Once the entry status is set to active(1), the associated entry cannot be modified until the request completes (cefLMPrefixState transitions to matchFound(2) or noMatchFound(3)). Once the longest match request has been created (i.e. the cefLMPrefixRowStatus has been made active), the entry cannot be modified - the only operation possible after this is to delete the row."
+  },
+  "cefPathTable": {
+    "name": "cefPathTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "CEF prefix path is a valid route to reach to a destination IP prefix. Multiple paths may exist out of a router to the same destination prefix. This table specify lists of CEF paths."
+  },
+  "cefPathEntry": {
+    "name": "cefPathEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixAddr",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixLen",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPathId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contain a CEF prefix path. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefPathId": {
+    "name": "cefPathId",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The locally arbitrary, but unique identifier associated with this prefix path entry."
+  },
+  "cefPathType": {
+    "name": "cefPathType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefPathType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Type for this CEF Path."
+  },
+  "cefPathInterface": {
+    "name": "cefPathInterface",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Interface associated with this CEF path. A value of zero for this object will indicate that no interface is associated with this path entry."
+  },
+  "cefPathNextHopAddr": {
+    "name": "cefPathNextHopAddr",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Next hop address associated with this CEF path. The value of this object is only relevant for attached next hop and recursive next hop path types (when the object cefPathType is set to attachedNexthop(4) or recursiveNexthop(5)). and will be set to zero for other path types. The type of this address is determined by the value of the cefPrefixType object."
+  },
+  "cefPathRecurseVrfName": {
+    "name": "cefPathRecurseVrfName",
+    "oid": "1.3.6.1.4.1.9.9.492.1.1.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MplsVpnId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The recursive vrf name associated with this path. The value of this object is only relevant for recursive next hop path types (when the object cefPathType is set to recursiveNexthop(5)), and '0x00' will be returned for other path types."
+  },
+  "cefAdjSummary": {
+    "name": "cefAdjSummary",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.1",
+    "class": "objectidentity"
+  },
+  "cefAdjSummaryTable": {
+    "name": "cefAdjSummaryTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains the summary information for the cefAdjTable."
+  },
+  "cefAdjSummaryEntry": {
+    "name": "cefAdjSummaryEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjSummaryLinkType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contains the CEF Adjacency summary related attributes for the Managed entity. A row exists for each adjacency link type. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefAdjSummaryLinkType": {
+    "name": "cefAdjSummaryLinkType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefAdjLinkType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The link type of the adjacency."
+  },
+  "cefAdjSummaryComplete": {
+    "name": "cefAdjSummaryComplete",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of complete adjacencies. The total number of adjacencies which can be used to switch traffic to a neighbour."
+  },
+  "cefAdjSummaryIncomplete": {
+    "name": "cefAdjSummaryIncomplete",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of incomplete adjacencies. The total number of adjacencies which cannot be used to switch traffic in their current state."
+  },
+  "cefAdjSummaryFixup": {
+    "name": "cefAdjSummaryFixup",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of adjacencies for which the Layer 2 encapsulation string (header) may be updated (fixed up) at packet switch time."
+  },
+  "cefAdjSummaryRedirect": {
+    "name": "cefAdjSummaryRedirect",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "1. Internet Architecture Extensions for Shared Media, RFC 1620, May 1994.",
+    "status": "current",
+    "description": "The total number of adjacencies for which ip redirect (or icmp redirection) is enabled. The value of this object is only relevant for ipv4 and ipv6 link type (when the index object cefAdjSummaryLinkType value is ipv4(1) or ipv6(2)) and will be set to zero for other link types. "
+  },
+  "cefAdjTable": {
+    "name": "cefAdjTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A list of CEF adjacencies."
+  },
+  "cefAdjEntry": {
+    "name": "cefAdjEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjNextHopAddrType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjNextHopAddr",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjConnId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjSummaryLinkType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contains the adjacency attributes. Adjacency entries may exist for all the interfaces on which packets can be switched out of the device. The interface is instantiated by ifIndex. Therefore, the interface index must have been assigned, according to the applicable procedures, before it can be meaningfully used. Generally, this means that the interface must exist. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefAdjNextHopAddrType": {
+    "name": "cefAdjNextHopAddrType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Address type for the cefAdjNextHopAddr. This object specifies the address type used for cefAdjNextHopAddr. Adjacency entries are only valid for the address type of ipv4(1) and ipv6(2)."
+  },
+  "cefAdjNextHopAddr": {
+    "name": "cefAdjNextHopAddr",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The next Hop address for this adjacency. The type of this address is determined by the value of the cefAdjNextHopAddrType object."
+  },
+  "cefAdjConnId": {
+    "name": "cefAdjConnId",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "In cases where cefLinkType, interface and the next hop address are not able to uniquely define an adjacency entry (e.g. ATM and Frame Relay Bundles), this object is a unique identifier to differentiate between these adjacency entries. In all the other cases the value of this index object will be 0."
+  },
+  "cefAdjSource": {
+    "name": "cefAdjSource",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefAdjacencySource",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If the adjacency is created because some neighbour discovery mechanism has discovered a neighbour and all the information required to build a frame header to encapsulate traffic to the neighbour is available then the source of adjacency is set to the mechanism by which the adjacency is learned."
+  },
+  "cefAdjEncap": {
+    "name": "cefAdjEncap",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The layer 2 encapsulation string to be used for sending the packet out using this adjacency."
+  },
+  "cefAdjFixup": {
+    "name": "cefAdjFixup",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "For the cases, where the encapsulation string is decided at packet switch time, the adjacency encapsulation string specified by object cefAdjEncap require a fixup. I.e. for the adjacencies out of IP Tunnels, the string prepended is an IP header which has fields which can only be setup at packet switch time. The value of this object represent the kind of fixup applied to the packet. If the encapsulation string doesn't require any fixup, then the value of this object will be of zero length."
+  },
+  "cefAdjMTU": {
+    "name": "cefAdjMTU",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Layer 3 MTU which can be transmitted using this adjacency."
+  },
+  "cefAdjForwardingInfo": {
+    "name": "cefAdjForwardingInfo",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object selects a forwarding info entry defined in the cefFESelectionTable. The selected target is defined by an entry in the cefFESelectionTable whose index value (cefFESelectionName) is equal to this object. The value of this object will be of zero length if this adjacency entry is the last forwarding element in the forwarding path."
+  },
+  "cefAdjPkts": {
+    "name": "cefAdjPkts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of pkts transmitted using this adjacency."
+  },
+  "cefAdjHCPkts": {
+    "name": "cefAdjHCPkts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of pkts transmitted using this adjacency. This object is a 64-bit version of cefAdjPkts."
+  },
+  "cefAdjBytes": {
+    "name": "cefAdjBytes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of bytes transmitted using this adjacency."
+  },
+  "cefAdjHCBytes": {
+    "name": "cefAdjHCBytes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.2.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of bytes transmitted using this adjacency. This object is a 64-bit version of cefAdjBytes."
+  },
+  "cefFESelectionTable": {
+    "name": "cefFESelectionTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A list of forwarding element selection entries."
+  },
+  "cefFESelectionEntry": {
+    "name": "cefFESelectionEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionName",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contain a CEF forwarding element selection list. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefFESelectionName": {
+    "name": "cefFESelectionName",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The locally arbitrary, but unique identifier used to select a set of forwarding element lists."
+  },
+  "cefFESelectionId": {
+    "name": "cefFESelectionId",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Secondary index to identify a forwarding elements List in this Table."
+  },
+  "cefFESelectionSpecial": {
+    "name": "cefFESelectionSpecial",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefForwardingElementSpecialType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Special processing for a destination is indicated through the use of special forwarding element. If the forwarding element list contains the special forwarding element, then this object represents the type of special forwarding element."
+  },
+  "cefFESelectionLabels": {
+    "name": "cefFESelectionLabels",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefMplsLabelList",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represent the MPLS Labels associated with this forwarding Element List. The value of this object will be irrelevant and will be set to zero length if the forwarding element list doesn't contain a label forwarding element. A zero length label list will indicate that there is no label forwarding element associated with this selection entry."
+  },
+  "cefFESelectionAdjLinkType": {
+    "name": "cefFESelectionAdjLinkType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefAdjLinkType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represent the link type for the adjacency associated with this forwarding Element List. The value of this object will be irrelevant and will be set to unknown(5) if the forwarding element list doesn't contain an adjacency forwarding element."
+  },
+  "cefFESelectionAdjInterface": {
+    "name": "cefFESelectionAdjInterface",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represent the interface for the adjacency associated with this forwarding Element List. The value of this object will be irrelevant and will be set to zero if the forwarding element list doesn't contain an adjacency forwarding element."
+  },
+  "cefFESelectionAdjNextHopAddrType": {
+    "name": "cefFESelectionAdjNextHopAddrType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represent the next hop address type for the adjacency associated with this forwarding Element List. The value of this object will be irrelevant and will be set to unknown(0) if the forwarding element list doesn't contain an adjacency forwarding element."
+  },
+  "cefFESelectionAdjNextHopAddr": {
+    "name": "cefFESelectionAdjNextHopAddr",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represent the next hop address for the adjacency associated with this forwarding Element List. The value of this object will be irrelevant and will be set to zero if the forwarding element list doesn't contain an adjacency forwarding element."
+  },
+  "cefFESelectionAdjConnId": {
+    "name": "cefFESelectionAdjConnId",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represent the connection id for the adjacency associated with this forwarding Element List. The value of this object will be irrelevant and will be set to zero if the forwarding element list doesn't contain an adjacency forwarding element. In cases where cefFESelectionAdjLinkType, interface and the next hop address are not able to uniquely define an adjacency entry (e.g. ATM and Frame Relay Bundles), this object is a unique identifier to differentiate between these adjacency entries."
+  },
+  "cefFESelectionVrfName": {
+    "name": "cefFESelectionVrfName",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MplsVpnId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represent the Vrf name for the lookup associated with this forwarding Element List. The value of this object will be irrelevant and will be set to a string containing the single octet 0x00 if the forwarding element list doesn't contain a lookup forwarding element."
+  },
+  "cefFESelectionWeight": {
+    "name": "cefFESelectionWeight",
+    "oid": "1.3.6.1.4.1.9.9.492.1.3.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represent the weighting for load balancing between multiple Forwarding Element Lists. The value of this object will be zero if load balancing is associated with this selection entry."
+  },
+  "cefCfgTable": {
+    "name": "cefCfgTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains global config parameter of CEF on the Managed device."
+  },
+  "cefCfgEntry": {
+    "name": "cefCfgEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If the Managed device supports CEF, each entry contains the CEF config parameter for the managed entity. A row may exist for each IP version type (v4 and v6) depending upon the IP version supported on the device. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefCfgAdminState": {
+    "name": "cefCfgAdminState",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefAdminStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The desired state of CEF."
+  },
+  "cefCfgOperState": {
+    "name": "cefCfgOperState",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefOperStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current operational state of CEF. If the cefCfgAdminState is disabled(2), then cefOperState will eventually go to the down(2) state unless some error has occurred. If cefCfgAdminState is changed to enabled(1) then cefCfgOperState should change to up(1) only if the CEF entity is ready to forward the packets using Cisco Express Forwarding (CEF) else it should remain in the down(2) state. The up(1) state for this object indicates that CEF entity is forwarding the packet using Cisco Express Forwarding."
+  },
+  "cefCfgDistributionAdminState": {
+    "name": "cefCfgDistributionAdminState",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefAdminStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The desired state of CEF distribution."
+  },
+  "cefCfgDistributionOperState": {
+    "name": "cefCfgDistributionOperState",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefOperStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current operational state of CEF distribution. If the cefCfgDistributionAdminState is disabled(2), then cefDistributionOperState will eventually go to the down(2) state unless some error has occurred. If cefCfgDistributionAdminState is changed to enabled(1) then cefCfgDistributionOperState should change to up(1) only if the CEF entity is ready to forward the packets using Distributed Cisco Express Forwarding (dCEF) else it should remain in the down(2) state. The up(1) state for this object indicates that CEF entity is forwarding the packet using Distributed Cisco Express Forwarding."
+  },
+  "cefCfgAccountingMap": {
+    "name": "cefCfgAccountingMap",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "nonRecursive": 0,
+        "perPrefix": 1,
+        "prefixLength": 2
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object represents a bitmap of network accounting options. CEF network accounting is disabled by default. CEF network accounting can be enabled by selecting one or more of the following CEF accounting option for the value of this object. nonRecursive(0): enables accounting through nonrecursive prefixes. perPrefix(1): enables the collection of the numbers of pkts and bytes express forwarded to a destination (prefix) prefixLength(2): enables accounting through prefixlength. Once the accounting is enabled, the corresponding stats can be retrieved from the cefPrefixTable and cefStatsPrefixLenTable. "
+  },
+  "cefCfgLoadSharingAlgorithm": {
+    "name": "cefCfgLoadSharingAlgorithm",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "original": 2,
+          "tunnel": 3,
+          "universal": 4
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates the CEF Load balancing algorithm. Setting this object to none(1) will disable the Load sharing for the specified entry. CEF load balancing can be enabled by setting this object to one of following Algorithms: original(2) : This algorithm is based on a source and destination hash tunnel(3) : This algorithm is used in tunnels environments or in environments where there are only a few source universal(4) : This algorithm uses a source and destination and ID hash If the value of this object is set to 'tunnel' or 'universal', then the FIXED ID for these algorithms may be specified by the managed object cefLoadSharingID. "
+  },
+  "cefCfgLoadSharingID": {
+    "name": "cefCfgLoadSharingID",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The Fixed ID associated with the managed object cefCfgLoadSharingAlgorithm. The hash of this object value may be used by the Load Sharing Algorithm. The value of this object is not relevant and will be set to zero if the value of managed object cefCfgLoadSharingAlgorithm is set to none(1) or original(2). The default value of this object is calculated by the device at the time of initialization."
+  },
+  "cefCfgTrafficStatsLoadInterval": {
+    "name": "cefCfgTrafficStatsLoadInterval",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The interval time over which the CEF traffic statistics are collected."
+  },
+  "cefCfgTrafficStatsUpdateRate": {
+    "name": "cefCfgTrafficStatsUpdateRate",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The frequency with which the line card sends the traffic load statistics to the Router Processor. Setting the value of this object to 0 will disable the CEF traffic statistics collection."
+  },
+  "cefResourceTable": {
+    "name": "cefResourceTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains global resource information of CEF on the Managed device."
+  },
+  "cefResourceEntry": {
+    "name": "cefResourceEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If the Managed device supports CEF, each entry contains the CEF Resource parameters for the managed entity. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefResourceMemoryUsed": {
+    "name": "cefResourceMemoryUsed",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the number of bytes from the Processor Memory Pool that are currently in use by CEF on the managed entity."
+  },
+  "cefResourceFailureReason": {
+    "name": "cefResourceFailureReason",
+    "oid": "1.3.6.1.4.1.9.9.492.1.4.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefFailureReason",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The CEF resource failure reason which may lead to CEF being disabled on the managed entity."
+  },
+  "cefIntTable": {
+    "name": "cefIntTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.5.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This Table contains interface specific information of CEF on the Managed device."
+  },
+  "cefIntEntry": {
+    "name": "cefIntEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.5.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      },
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contains the CEF attributes associated with an interface. The interface is instantiated by ifIndex. Therefore, the interface index must have been assigned, according to the applicable procedures, before it can be meaningfully used. Generally, this means that the interface must exist. A row may exist for each IP version type (v4 and v6) depending upon the IP version supported on the device. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefIntSwitchingState": {
+    "name": "cefIntSwitchingState",
+    "oid": "1.3.6.1.4.1.9.9.492.1.5.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "cefEnabled": 1,
+          "distCefEnabled": 2,
+          "cefDisabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The CEF switching State for the interface. If CEF is enabled but distributed CEF(dCEF) is disabled then CEF is in cefEnabled(1) state. If distributed CEF is enabled, then CEF is in distCefEnabled(2) state. The cefDisabled(3) state indicates that CEF is disabled. The CEF switching state is only applicable to the received packet on the interface."
+  },
+  "cefIntLoadSharing": {
+    "name": "cefIntLoadSharing",
+    "oid": "1.3.6.1.4.1.9.9.492.1.5.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "perPacket": 1,
+          "perDestination": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The status of load sharing on the interface. perPacket(1) : Router to send data packets over successive equal-cost paths without regard to individual hosts or user sessions. perDestination(2) : Router to use multiple, equal-cost paths to achieve load sharing Load sharing is enabled by default for an interface when CEF is enabled."
+  },
+  "cefIntNonrecursiveAccouting": {
+    "name": "cefIntNonrecursiveAccouting",
+    "oid": "1.3.6.1.4.1.9.9.492.1.5.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "internal": 1,
+          "external": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The CEF accounting mode for the interface. CEF prefix based non-recursive accounting on an interface can be configured to store the stats for non-recursive prefixes in a internal or external bucket. internal(1) : Count input traffic in the nonrecursive internal bucket external(2) : Count input traffic in the nonrecursive external bucket The value of this object will only be effective if value of the object cefAccountingMap is set to enable nonRecursive(1) accounting."
+  },
+  "cefPeerTable": {
+    "name": "cefPeerTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Entity acting as RP (Routing Processor) keeps the CEF states for the line card entities and communicates with the line card entities using XDR. This Table contains the CEF information related to peer entities on the managed device."
+  },
+  "cefPeerEntry": {
+    "name": "cefPeerEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "entPeerPhysicalIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contains the CEF related attributes associated with a CEF peer entity. entPhysicalIndex and entPeerPhysicalIndex are also indexes for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "entPeerPhysicalIndex": {
+    "name": "entPeerPhysicalIndex",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PhysicalIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The entity index for the CEF peer entity. Only the entities of 'module' entPhysicalClass are included here."
+  },
+  "cefPeerOperState": {
+    "name": "cefPeerOperState",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "peerDisabled": 1,
+          "peerUp": 2,
+          "peerHold": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current CEF operational state of the CEF peer entity. Cef peer entity oper state will be peerDisabled(1) in the following condition: : Cef Peer entity encounters fatal error i.e. resource allocation failure, ipc failure etc : When a reload/delete request is received from the Cef Peer Entity Once the peer entity is up and no fatal error is encountered, then the value of this object will transits to the peerUp(3) state. If the Cef Peer entity is in held stage, then the value of this object will be peerHold(3). Cef peer entity can only transit to peerDisabled(1) state from the peerHold(3) state."
+  },
+  "cefPeerNumberOfResets": {
+    "name": "cefPeerNumberOfResets",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of times the session with CEF peer entity has been reset."
+  },
+  "cefPeerFIBTable": {
+    "name": "cefPeerFIBTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Entity acting as RP (Routing Processor) keep the CEF FIB states for the line card entities and communicate with the line card entities using XDR. This Table contains the CEF FIB State related to peer entities on the managed device."
+  },
+  "cefPeerFIBEntry": {
+    "name": "cefPeerFIBEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "entPeerPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry contains the CEF FIB State associated a CEF peer entity. entPhysicalIndex and entPeerPhysicalIndex are also indexes for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefPeerFIBOperState": {
+    "name": "cefPeerFIBOperState",
+    "oid": "1.3.6.1.4.1.9.9.492.1.6.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "peerFIBDown": 1,
+          "peerFIBUp": 2,
+          "peerFIBReloadRequest": 3,
+          "peerFIBReloading": 4,
+          "peerFIBSynced": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current CEF FIB Operational State for the CEF peer entity. "
+  },
+  "cefStatsPrefixLenTable": {
+    "name": "cefStatsPrefixLenTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the CEF stats based on the Prefix Length."
+  },
+  "cefStatsPrefixLenEntry": {
+    "name": "cefStatsPrefixLenEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixLen",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device and if CEF accounting is set to enable prefix length based accounting (value of cefCfgAccountingMap object in the cefCfgEntry is set to enable 'prefixLength' accounting), each entry contains the traffic statistics for a prefix length. A row may exist for each IP version type (v4 and v6) depending upon the IP version supported on the device. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefStatsPrefixLen": {
+    "name": "cefStatsPrefixLen",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressPrefixLength",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Length in bits of the Destination IP prefix. As 0.0.0.0/0 is a valid prefix, hence 0 is a valid prefix length."
+  },
+  "cefStatsPrefixQueries": {
+    "name": "cefStatsPrefixQueries",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of queries received in the FIB database for the specified IP prefix length."
+  },
+  "cefStatsPrefixHCQueries": {
+    "name": "cefStatsPrefixHCQueries",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of queries received in the FIB database for the specified IP prefix length. This object is a 64-bit version of cefStatsPrefixQueries."
+  },
+  "cefStatsPrefixInserts": {
+    "name": "cefStatsPrefixInserts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of insert operations performed to the FIB database for the specified IP prefix length."
+  },
+  "cefStatsPrefixHCInserts": {
+    "name": "cefStatsPrefixHCInserts",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of insert operations performed to the FIB database for the specified IP prefix length. This object is a 64-bit version of cefStatsPrefixInsert."
+  },
+  "cefStatsPrefixDeletes": {
+    "name": "cefStatsPrefixDeletes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of delete operations performed to the FIB database for the specified IP prefix length."
+  },
+  "cefStatsPrefixHCDeletes": {
+    "name": "cefStatsPrefixHCDeletes",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of delete operations performed to the FIB database for the specified IP prefix length. This object is a 64-bit version of cefStatsPrefixDelete."
+  },
+  "cefStatsPrefixElements": {
+    "name": "cefStatsPrefixElements",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Total number of elements in the FIB database for the specified IP prefix length."
+  },
+  "cefStatsPrefixHCElements": {
+    "name": "cefStatsPrefixHCElements",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CounterBasedGauge64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Total number of elements in the FIB database for the specified IP prefix length. This object is a 64-bit version of cefStatsPrefixElements."
+  },
+  "cefSwitchingStatsTable": {
+    "name": "cefSwitchingStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the CEF switch stats."
+  },
+  "cefSwitchingStatsEntry": {
+    "name": "cefSwitchingStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefSwitchingIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If CEF is enabled on the Managed device, each entry specifies the switching stats. A row may exist for each IP version type (v4 and v6) depending upon the IP version supported on the device. entPhysicalIndex is also an index for this table which represents entities of 'module' entPhysicalClass which are capable of running CEF."
+  },
+  "cefSwitchingIndex": {
+    "name": "cefSwitchingIndex",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The locally arbitrary, but unique identifier associated with this switching stats entry."
+  },
+  "cefSwitchingPath": {
+    "name": "cefSwitchingPath",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Switch path where the feature was executed. Available switch paths are platform-dependent. Following are the examples of switching paths: RIB : switching with CEF assistance Low-end switching (LES) : CEF switch path PAS : CEF turbo switch path. "
+  },
+  "cefSwitchingDrop": {
+    "name": "cefSwitchingDrop",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of packets dropped by CEF."
+  },
+  "cefSwitchingHCDrop": {
+    "name": "cefSwitchingHCDrop",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of packets dropped by CEF. This object is a 64-bit version of cefSwitchingDrop."
+  },
+  "cefSwitchingPunt": {
+    "name": "cefSwitchingPunt",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of packets that could not be switched in the normal path and were punted to the next-fastest switching vector."
+  },
+  "cefSwitchingHCPunt": {
+    "name": "cefSwitchingHCPunt",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of packets that could not be switched in the normal path and were punted to the next-fastest switching vector. This object is a 64-bit version of cefSwitchingPunt."
+  },
+  "cefSwitchingPunt2Host": {
+    "name": "cefSwitchingPunt2Host",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of packets that could not be switched in the normal path and were punted to the host (process switching path). For most of the switching paths, the value of this object may be similar to cefSwitchingPunt."
+  },
+  "cefSwitchingHCPunt2Host": {
+    "name": "cefSwitchingHCPunt2Host",
+    "oid": "1.3.6.1.4.1.9.9.492.1.8.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of packets that could not be switched in the normal path and were punted to the host (process switching path). For most of the switching paths, the value of this object may be similar to cefSwitchingPunt. This object is a 64-bit version of cefSwitchingPunt2Host."
+  },
+  "cefCCGlobalTable": {
+    "name": "cefCCGlobalTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains CEF consistency checker (CC) global parameters for the managed device."
+  },
+  "cefCCGlobalEntry": {
+    "name": "cefCCGlobalEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If the managed device supports CEF, each entry contains the global consistency checker parameter for the managed device. A row may exist for each IP version type (v4 and v6) depending upon the IP version supported on the device."
+  },
+  "cefCCGlobalAutoRepairEnabled": {
+    "name": "cefCCGlobalAutoRepairEnabled",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Once an inconsistency has been detected, CEF has the ability to repair the problem. This object indicates the status of auto-repair function for the consistency checkers."
+  },
+  "cefCCGlobalAutoRepairDelay": {
+    "name": "cefCCGlobalAutoRepairDelay",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indiactes how long the consistency checker waits to fix an inconsistency. The value of this object has no effect when the value of object cefCCGlobalAutoRepairEnabled is 'false'."
+  },
+  "cefCCGlobalAutoRepairHoldDown": {
+    "name": "cefCCGlobalAutoRepairHoldDown",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates how long the consistency checker waits to re-enable auto-repair after auto-repair runs. The value of this object has no effect when the value of object cefCCGlobalAutoRepairEnabled is 'false'."
+  },
+  "cefCCGlobalErrorMsgEnabled": {
+    "name": "cefCCGlobalErrorMsgEnabled",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Enables the consistency checker to generate an error message when it detects an inconsistency."
+  },
+  "cefCCGlobalFullScanAction": {
+    "name": "cefCCGlobalFullScanAction",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefCCAction",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "ccActionNone",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Setting the value of this object to ccActionStart(1) will start the full scan consistency checkers. The Management station should poll the cefCCGlobalFullScanStatus object to get the state of full-scan operation. Once the full-scan operation completes (value of cefCCGlobalFullScanStatus object is ccStatusDone(3)), the Management station should retrieve the values of the related stats object from the cefCCTypeTable. Setting the value of this object to ccActionAbort(2) will abort the full-scan operation. The value of this object can't be set to ccActionStart(1), if the value of object cefCCGlobalFullScanStatus is ccStatusRunning(2). The value of this object will be set to cefActionNone(1) when the full scan consistency checkers have never been activated. A Management Station cannot set the value of this object to cefActionNone(1)."
+  },
+  "cefCCGlobalFullScanStatus": {
+    "name": "cefCCGlobalFullScanStatus",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefCCStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the status of the full scan consistency checker request."
+  },
+  "cefCCTypeTable": {
+    "name": "cefCCTypeTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains CEF consistency checker types specific parameters on the managed device. All detected inconsistency are signaled to the Management Station via cefInconsistencyDetection notification. "
+  },
+  "cefCCTypeEntry": {
+    "name": "cefCCTypeEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If the managed device supports CEF, each entry contains the consistency checker statistics for a consistency checker type. A row may exist for each IP version type (v4 and v6) depending upon the IP version supported on the device."
+  },
+  "cefCCType": {
+    "name": "cefCCType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefCCType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Type of the consistency checker."
+  },
+  "cefCCEnabled": {
+    "name": "cefCCEnabled",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Enables the passive consistency checker. Passive consistency checkers are disabled by default. Full-scan consistency checkers are always enabled. An attempt to set this object to 'false' for an active consistency checker will result in 'wrongValue' error."
+  },
+  "cefCCCount": {
+    "name": "cefCCCount",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The maximum number of prefixes to check per scan. The default value for this object depends upon the consistency checker type. The value of this object will be irrelevant for some of the consistency checkers and will be set to 0. A Management Station cannot set the value of this object to 0."
+  },
+  "cefCCPeriod": {
+    "name": "cefCCPeriod",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The period between scans for the consistency checker."
+  },
+  "cefCCQueriesSent": {
+    "name": "cefCCQueriesSent",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of prefix consistency queries sent to CEF forwarding databases by this consistency checker."
+  },
+  "cefCCQueriesIgnored": {
+    "name": "cefCCQueriesIgnored",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of prefix consistency queries for which the consistency checks were not performed by this consistency checker. This may be because of some internal error or resource failure."
+  },
+  "cefCCQueriesChecked": {
+    "name": "cefCCQueriesChecked",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of prefix consistency queries processed by this consistency checker."
+  },
+  "cefCCQueriesIterated": {
+    "name": "cefCCQueriesIterated",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Number of prefix consistency queries iterated back to the master database by this consistency checker."
+  },
+  "cefInconsistencyRecordTable": {
+    "name": "cefInconsistencyRecordTable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains CEF inconsistency records."
+  },
+  "cefInconsistencyRecordEntry": {
+    "name": "cefInconsistencyRecordEntry",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBIpVersion",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyRecId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "If the managed device supports CEF, each entry contains the inconsistency record."
+  },
+  "cefInconsistencyRecId": {
+    "name": "cefInconsistencyRecId",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The locally arbitrary, but unique identifier associated with this inconsistency record entry."
+  },
+  "cefInconsistencyPrefixType": {
+    "name": "cefInconsistencyPrefixType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The network prefix type associated with this inconsistency record."
+  },
+  "cefInconsistencyPrefixAddr": {
+    "name": "cefInconsistencyPrefixAddr",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The network prefix address associated with this inconsistency record. The type of this address is determined by the value of the cefInconsistencyPrefixType object."
+  },
+  "cefInconsistencyPrefixLen": {
+    "name": "cefInconsistencyPrefixLen",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressPrefixLength",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Length in bits of the inconsistency address prefix."
+  },
+  "cefInconsistencyVrfName": {
+    "name": "cefInconsistencyVrfName",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MplsVpnId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Vrf name associated with this inconsistency record."
+  },
+  "cefInconsistencyCCType": {
+    "name": "cefInconsistencyCCType",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefCCType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The type of consistency checker who generated this inconsistency record."
+  },
+  "cefInconsistencyEntity": {
+    "name": "cefInconsistencyEntity",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "EntPhysicalIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The entity for which this inconsistency record was generated. The value of this object will be irrelevant and will be set to 0 when the inconsisency record is applicable for all the entities."
+  },
+  "cefInconsistencyReason": {
+    "name": "cefInconsistencyReason",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "missing": 1,
+          "checksumErr": 2,
+          "unknown": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The reason for generating this inconsistency record. missing(1): the prefix is missing checksumErr(2): checksum error was found unknown(3): reason is unknown "
+  },
+  "entLastInconsistencyDetectTime": {
+    "name": "entLastInconsistencyDetectTime",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime at the time an inconsistency is detecetd."
+  },
+  "cefInconsistencyReset": {
+    "name": "cefInconsistencyReset",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefCCAction",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "ccActionNone",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Setting the value of this object to ccActionStart(1) will reset all the active consistency checkers. The Management station should poll the cefInconsistencyResetStatus object to get the state of inconsistency reset operation. This operation once started, cannot be aborted. Hence, the value of this object cannot be set to ccActionAbort(2). The value of this object can't be set to ccActionStart(1), if the value of object cefInconsistencyResetStatus is ccStatusRunning(2). "
+  },
+  "cefInconsistencyResetStatus": {
+    "name": "cefInconsistencyResetStatus",
+    "oid": "1.3.6.1.4.1.9.9.492.1.7.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CefCCStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the status of the consistency reset request."
+  },
+  "cefResourceFailureNotifEnable": {
+    "name": "cefResourceFailureNotifEnable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.9.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates whether or not a notification should be generated on the detection of CEF resource Failure."
+  },
+  "cefPeerStateChangeNotifEnable": {
+    "name": "cefPeerStateChangeNotifEnable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.9.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates whether or not a notification should be generated on the detection of CEF peer state change."
+  },
+  "cefPeerFIBStateChangeNotifEnable": {
+    "name": "cefPeerFIBStateChangeNotifEnable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.9.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates whether or not a notification should be generated on the detection of CEF FIB peer state change."
+  },
+  "cefNotifThrottlingInterval": {
+    "name": "cefNotifThrottlingInterval",
+    "oid": "1.3.6.1.4.1.9.9.492.1.9.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 3600
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object controls the generation of the cefInconsistencyDetection notification. If this object has a value of zero, then the throttle control is disabled. If this object has a non-zero value, then the agent must not generate more than one cefInconsistencyDetection 'notification-event' in the indicated period, where a 'notification-event' is the transmission of a single trap or inform PDU to a list of notification destinations. If additional inconsistency is detected within the throttling period, then notification-events for these inconsistencies should be suppressed by the agent until the current throttling period expires. At the end of a throttling period, one notification-event should be generated if any inconsistency was detected since the start of the throttling period. In such a case, another throttling period is started right away. An NMS should periodically poll cefInconsistencyRecordTable to detect any missed cefInconsistencyDetection notification-events, e.g., due to throttling or transmission loss. If cefNotifThrottlingInterval notification generation is enabled, the suggested default throttling period is 60 seconds, but generation of the cefInconsistencyDetection notification should be disabled by default. If the agent is capable of storing non-volatile configuration, then the value of this object must be restored after a re-initialization of the management system. The actual transmission of notifications is controlled via the MIB modules in RFC 3413."
+  },
+  "cefInconsistencyNotifEnable": {
+    "name": "cefInconsistencyNotifEnable",
+    "oid": "1.3.6.1.4.1.9.9.492.1.9.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates whether cefInconsistencyDetection notification should be generated for this managed device."
+  },
+  "cefResourceFailure": {
+    "name": "cefResourceFailure",
+    "oid": "1.3.6.1.4.1.9.9.492.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefResourceFailureReason"
+      }
+    ],
+    "status": "current",
+    "description": "A cefResourceFailure notification is generated when CEF resource failure on the managed entity is detected. The reason for this failure is indicated by cefResourcefFailureReason."
+  },
+  "cefPeerStateChange": {
+    "name": "cefPeerStateChange",
+    "oid": "1.3.6.1.4.1.9.9.492.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerOperState"
+      }
+    ],
+    "status": "current",
+    "description": "A cefPeerStateChange notification is generated if change in cefPeerOperState is detected for the peer entity."
+  },
+  "cefPeerFIBStateChange": {
+    "name": "cefPeerFIBStateChange",
+    "oid": "1.3.6.1.4.1.9.9.492.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerFIBOperState"
+      }
+    ],
+    "status": "current",
+    "description": "A cefPeerFIBStateChange notification is generated if change in cefPeerFIBOperState is detected for the peer entity."
+  },
+  "cefInconsistencyDetection": {
+    "name": "cefInconsistencyDetection",
+    "oid": "1.3.6.1.4.1.9.9.492.0.4",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "entLastInconsistencyDetectTime"
+      }
+    ],
+    "status": "current",
+    "description": "A cefInconsistencyDetection notification is generated when CEF consistency checkers detects an inconsistent prefix in one of the CEF forwarding databases. Note that the generation of cefInconsistencyDetection notifications is throttled by the agent, as specified by the 'cefNotifThrottlingInterval' object."
+  },
+  "cefMIBGroups": {
+    "name": "cefMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.492.2.1",
+    "class": "objectidentity"
+  },
+  "cefMIBCompliances": {
+    "name": "cefMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.492.2.2",
+    "class": "objectidentity"
+  },
+  "cefMIBCompliance": {
+    "name": "cefMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.492.2.2.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cefGroup",
+        "module": "CISCO-CEF-MIB"
+      },
+      {
+        "object": "cefNotifCntlGroup",
+        "module": "CISCO-CEF-MIB"
+      },
+      {
+        "object": "cefNotificationGroup",
+        "module": "CISCO-CEF-MIB"
+      },
+      {
+        "object": "cefDistributedGroup",
+        "module": "CISCO-CEF-MIB"
+      },
+      {
+        "object": "cefHCStatsGroup",
+        "module": "CISCO-CEF-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for SNMP Agents which implement this MIB."
+  },
+  "cefGroup": {
+    "name": "cefGroup",
+    "oid": "1.3.6.1.4.1.9.9.492.2.1.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFIBSummaryFwdPrefixes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixForwardingInfo"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixPkts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixBytes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixInternalNRPkts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixInternalNRBytes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixExternalNRPkts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixExternalNRBytes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefLMPrefixSpinLock"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefLMPrefixState"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefLMPrefixAddr"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefLMPrefixLen"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefLMPrefixRowStatus"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPathType"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPathInterface"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPathNextHopAddr"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPathRecurseVrfName"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjSummaryComplete"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjSummaryIncomplete"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjSummaryFixup"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjSummaryRedirect"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjSource"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjEncap"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjFixup"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjMTU"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjForwardingInfo"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjPkts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjBytes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionSpecial"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionLabels"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionAdjLinkType"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionAdjInterface"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionAdjNextHopAddrType"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionAdjNextHopAddr"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionAdjConnId"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionVrfName"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefFESelectionWeight"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgAdminState"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgOperState"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgAccountingMap"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgLoadSharingAlgorithm"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgLoadSharingID"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgTrafficStatsLoadInterval"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgTrafficStatsUpdateRate"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefResourceMemoryUsed"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefResourceFailureReason"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefIntSwitchingState"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefIntLoadSharing"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefIntNonrecursiveAccouting"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixQueries"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixInserts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixDeletes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixElements"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefSwitchingPath"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefSwitchingDrop"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefSwitchingPunt"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefSwitchingPunt2Host"
+      }
+    ],
+    "status": "current",
+    "description": "This group consists of all the managed objects which are applicable to CEF irrespective of the value of object cefDistributionOperState."
+  },
+  "cefDistributedGroup": {
+    "name": "cefDistributedGroup",
+    "oid": "1.3.6.1.4.1.9.9.492.2.1.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgDistributionAdminState"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCfgDistributionOperState"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerOperState"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerNumberOfResets"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerFIBOperState"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCGlobalAutoRepairEnabled"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCGlobalAutoRepairDelay"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCGlobalAutoRepairHoldDown"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCGlobalErrorMsgEnabled"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCGlobalFullScanStatus"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCGlobalFullScanAction"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCEnabled"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCCount"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCPeriod"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCQueriesSent"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCQueriesIgnored"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCQueriesChecked"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefCCQueriesIterated"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "entLastInconsistencyDetectTime"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyPrefixType"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyPrefixAddr"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyPrefixLen"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyVrfName"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyCCType"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyEntity"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyReason"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyReset"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyResetStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This group consists of all the Managed objects which are only applicable to CEF is the value of object cefDistributionOperState is 'up'."
+  },
+  "cefHCStatsGroup": {
+    "name": "cefHCStatsGroup",
+    "oid": "1.3.6.1.4.1.9.9.492.2.1.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixHCPkts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixHCBytes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixInternalNRHCPkts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixInternalNRHCBytes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixExternalNRHCPkts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPrefixExternalNRHCBytes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjHCPkts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefAdjHCBytes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixHCQueries"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixHCInserts"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixHCDeletes"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefStatsPrefixHCElements"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefSwitchingHCDrop"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefSwitchingHCPunt"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefSwitchingHCPunt2Host"
+      }
+    ],
+    "status": "current",
+    "description": "This group consists of all the 64-bit counter objects which are applicable to CEF irrespective of the value of object cefDistributionOperState."
+  },
+  "cefNotifCntlGroup": {
+    "name": "cefNotifCntlGroup",
+    "oid": "1.3.6.1.4.1.9.9.492.2.1.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefResourceFailureNotifEnable"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerStateChangeNotifEnable"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerFIBStateChangeNotifEnable"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefNotifThrottlingInterval"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyNotifEnable"
+      }
+    ],
+    "status": "current",
+    "description": "This group of objects controls the sending of CEF Notifications."
+  },
+  "cefNotificationGroup": {
+    "name": "cefNotificationGroup",
+    "oid": "1.3.6.1.4.1.9.9.492.2.1.6",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefResourceFailure"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerStateChange"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefPeerFIBStateChange"
+      },
+      {
+        "module": "CISCO-CEF-MIB",
+        "object": "cefInconsistencyDetection"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains the notifications for the CEF MIB."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-CEF-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:57:17 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-CEF-MIB"
+  }
+}

@@ -1,0 +1,681 @@
+{
+  "imports": {
+    "class": "imports",
+    "Job-Monitoring-MIB": [
+      "jmJobImpressionsCompleted",
+      "jmJobState",
+      "jmJobKOctetsProcessed",
+      "jmNumberOfInterveningJobs",
+      "jmJobStateReasons1",
+      "jmJobImpressionsPerCopyRequested",
+      "jmJobKOctetsPerCopyRequested",
+      "jmJobEntry"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "MibIdentifier",
+      "MODULE-IDENTITY",
+      "Bits",
+      "Unsigned32",
+      "OBJECT-IDENTITY",
+      "IpAddress",
+      "iso",
+      "NOTIFICATION-TYPE",
+      "Counter32",
+      "Counter64",
+      "TimeTicks",
+      "Gauge32",
+      "OBJECT-TYPE",
+      "Integer32"
+    ],
+    "SNMPv2-TC": [
+      "TruthValue",
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ],
+    "XEROX-COMMON-MIB": [
+      "xeroxCommonMIB"
+    ],
+    "XEROX-GENERAL-TC": [
+      "Ordinal32",
+      "XcmGenSNMPv2ErrorStatus"
+    ]
+  },
+  "xcmJmxMIB": {
+    "name": "xcmJmxMIB",
+    "oid": "1.3.6.1.4.1.253.8.83",
+    "class": "moduleidentity",
+    "lastupdated": "0211070000Z",
+    "organization": "Xerox Corporation - XCMI Working Group",
+    "contactinfo": " XCMI Editors Email: coherence@crt.xerox.com ",
+    "description": "Version: 5.401.pub The MIB module for job administration and job notifications for systems that implement the PWG Job Monitoring MIB (RFC 2707). See: Section 7 'Conformance Requirements and Implementers Guide' of the XCMI Job Monitoring TC (40jobtc.txt) for implementation and conformance guidance for the PWG Job Monitoring MIB (RFC 2707) and for mapping to the XCMI Job Monitoring MIB. Copyright (C) 2001-2002 Xerox Corporation. All Rights Reserved."
+  },
+  "XcmJmxGroupSupport": {
+    "name": "XcmJmxGroupSupport",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "The terse conformance statement of ALL mandatory, conditionally mandatory, and optional PWG Job Monitoring MIB (RFC 2707) and XCMI Ext to PWG Job Monitoring MIB objects which are supported by this management agent implementation (i.e., version) on this host system, specified in a bit-mask. The current set of values (which may be extended in the future) is given below: -- PWG Job Monitoring MIB groups 1 : jmGeneralGroup -- 2**0 2 : jmJobIDGroup -- 2**1 4 : jmJobGroup -- 2**2 8 : jmAttributeGroup -- 2**3 -- XCMI Ext to PWG Job Monitoring MIB groups 16 : jmxGeneralGroup -- 2**4 32 : jmxJobAdminGroup -- 2**5 64 : jmxJobTrapsGroup -- 2**6 128 : jmxJobOperationTrapsGroup -- 2**7 Usage: Conforming management agents shall ALWAYS accurately report their support for PWG Job Monitoring MIB (RFC 2707) and XCMI Ext to PWG Job Monitoring MIB object groups."
+  },
+  "XcmJmxJobAdminOperation": {
+    "name": "XcmJmxJobAdminOperation",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "unknown": 2,
+          "cancelJob": 3,
+          "holdJob": 4,
+          "releaseJob": 5,
+          "restartJob": 6,
+          "reprocessJob": 7,
+          "suspendJob": 8,
+          "resumeJob": 9,
+          "promoteJob": 10
+        }
+      }
+    },
+    "status": "current",
+    "description": "The current or most recent administrative operation on this job (submitted via SNMP, IPP, or any other job control protocol).",
+    "reference": "See: Section 3.3 'Job Operations' in IPP Model and Semantics [RFC-2911]. See: Section 4 'Job Operations' in IPP Job and Printer Admin Operations [IPP-ADMIN]. See: 'xcmHrDevMgmtCommandDataTag' textual convention, Section 3.4 'XCMI Standard Tagged Management Data', and Section 3.5 'Simple Device Management Requests' in XCMI Host Resources Ext TC (for security issues). See: Section 3.5.3 'Secure Simple Device Mgmt Requests' in XCMI Security TC (for security issues). See: 'xcmJmxJobAdmin[Status|InProgress]'"
+  },
+  "XcmJmxJobAccntSupport": {
+    "name": "XcmJmxJobAccntSupport",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "on": 3,
+          "off": 4,
+          "notPresent": 5
+        }
+      }
+    },
+    "status": "current",
+    "description": "Presence and configuration of a Job Accounting on the device. Note: This enumeration may be extended for more granularity in the future."
+  },
+  "xcmJmxMIBObjects": {
+    "name": "xcmJmxMIBObjects",
+    "oid": "1.3.6.1.4.1.253.8.83.1",
+    "class": "objectidentity"
+  },
+  "xcmJmxGeneral": {
+    "name": "xcmJmxGeneral",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1",
+    "class": "objectidentity"
+  },
+  "xcmJmxGeneralTable": {
+    "name": "xcmJmxGeneralTable",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of general counters and information for ease of use of the XCMI Ext to PWG Job Monitoring MIB and the PWG Job Monitoring MIB (RFC 2707) on this host system. Usage: The ONLY valid row in the 'xcmJmxGeneralTable' shall ALWAYS have an 'xcmJmxGeneralIndex' of one ('1')."
+  },
+  "xcmJmxGeneralEntry": {
+    "name": "xcmJmxGeneralEntry",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxGeneralIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry of general counters and information for ease of use of the XCMI Ext to PWG Job Monitoring MIB and the PWG Job Monitoring MIB (RFC 2707) on this host system. Usage: The ONLY valid row in the 'xcmJmxGeneralTable' shall ALWAYS have an 'xcmJmxGeneralIndex' of one ('1')."
+  },
+  "xcmJmxGeneralIndex": {
+    "name": "xcmJmxGeneralIndex",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Ordinal32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique value used by this host system to identify this conceptual row in the 'xcmJmxGeneralTable'. Usage: The ONLY valid row in the 'xcmJmxGeneralTable' shall ALWAYS have an 'xcmJmxGeneralIndex' of one ('1')."
+  },
+  "xcmJmxGeneralGroupSupport": {
+    "name": "xcmJmxGeneralGroupSupport",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "XcmJmxGroupSupport",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 31,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The terse conformance statement of ALL mandatory, conditionally mandatory, and optional PWG Job Monitoring MIB (RFC 2707) and XCMI Ext to PWG Job Monitoring MIB objects which are supported by this management agent implementation (i.e., version) on this host system, specified in a bit-mask. Usage: Conforming management agents shall ALWAYS accurately report their support for PWG Job Monitoring MIB (RFC 2707) and XCMI Ext to PWG Job Monitoring MIB object groups."
+  },
+  "xcmJmxGeneralJobCreatedCount": {
+    "name": "xcmJmxGeneralJobCreatedCount",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Total number of jobs that have been created on this managed system. The managed system MAY preserve this count across initializations and resets. Usage: If the value of this counter is not preserved across initializations and resets, then it SHALL be set to zero upon system initialization or reset. Usage: A managed system SHALL return zero if the number of jobs created is not known."
+  },
+  "xcmJmxGeneralJobCompletedCount": {
+    "name": "xcmJmxGeneralJobCompletedCount",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Total number of jobs that have completed on this managed system. The managed system MAY preserve this count across initializations and resets. Usage: If the value of this counter is not preserved across initializations and resets, then it SHALL be set to zero upon system initialization or reset. Usage: A managed system SHALL return zero if the number of jobs created is not known."
+  },
+  "xcmJmxGeneralJobOperationCount": {
+    "name": "xcmJmxGeneralJobOperationCount",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Total number of job operations that have been executed on this managed system. The managed system MAY preserve this count across initializations and resets. Usage: If the value of this counter is not preserved across initializations and resets, then it SHALL be set to zero upon system initialization or reset. Usage: A managed system SHALL return zero if the number of jobs created is not known."
+  },
+  "xcmJmxGeneralJobTrapCount": {
+    "name": "xcmJmxGeneralJobTrapCount",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Total number of job traps that have been sent from this managed system. The managed system MAY preserve this count across initializations and resets. Usage: If the value of this counter is not preserved across initializations and resets, then it SHALL be set to zero upon system initialization or reset. Usage: A managed system SHALL return zero if the number of jobs created is not known."
+  },
+  "xcmJmxGeneralJobAccntSupport": {
+    "name": "xcmJmxGeneralJobAccntSupport",
+    "oid": "1.3.6.1.4.1.253.8.83.1.1.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "XcmJmxJobAccntSupport",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "on",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This is a way to turn the Job Accounting in the device on and off when the printer supports the PWG job accounting mib. If the job accounting within the device is off then the group support will report no no group supported. If job accounting is on then the appropriate groups will be reported as supported."
+  },
+  "xcmJmxJobAdmin": {
+    "name": "xcmJmxJobAdmin",
+    "oid": "1.3.6.1.4.1.253.8.83.1.2",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobAdminTable": {
+    "name": "xcmJmxJobAdminTable",
+    "oid": "1.3.6.1.4.1.253.8.83.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "reference": "See: 'jmJobTable' in Job Monitoring MIB [RFC-2707].",
+    "status": "current",
+    "description": "A table containing job operation requests for control of jobs on this host system."
+  },
+  "xcmJmxJobAdminEntry": {
+    "name": "xcmJmxJobAdminEntry",
+    "oid": "1.3.6.1.4.1.253.8.83.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "xcmJmxJobAdminEntry",
+      "module": "XEROX-JOB-MONITORING-EXT-MIB",
+      "object": "jmJobEntry"
+    },
+    "status": "current",
+    "description": "An entry containing a job operation request for control of a job on this host system."
+  },
+  "xcmJmxJobAdminOperation": {
+    "name": "xcmJmxJobAdminOperation",
+    "oid": "1.3.6.1.4.1.253.8.83.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "XcmJmxJobAdminOperation",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "unknown",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "See: Section 3.3 'Job Operations' in IPP Model and Semantics [RFC-2911]. See: Section 4 'Job Operations' in IPP Job and Printer Admin Operations [IPP-ADMIN]. See: 'xcmHrDevMgmtCommandDataTag' textual convention, Section 3.4 'XCMI Standard Tagged Management Data', and Section 3.5 'Simple Device Management Requests' in XCMI Host Resources Ext TC (for security issues). See: Section 3.5.3 'Secure Simple Device Mgmt Requests' in XCMI Security TC (for security issues). See: 'xcmJmxJobAdmin[Status|InProgress]'",
+    "status": "current",
+    "description": "The current or most recent administrative operation on this job (submitted via SNMP, IPP, or any other job control protocol). Usage: Conforming management agents shall ALWAYS 'reject' any SNMP Set-Request to 'xcmJmxJobAdminOperation' while another job operation request is already in progress (i.e., while 'xcmJmxJobAdminInProgress' is 'true'), with 'badValue' (SNMPv1) or 'inconsistentValue' (SNMPv2/v3)."
+  },
+  "xcmJmxJobAdminStatus": {
+    "name": "xcmJmxJobAdminStatus",
+    "oid": "1.3.6.1.4.1.253.8.83.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "XcmGenSNMPv2ErrorStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "See: 'xcmJmxJobAdmin[Operation|InProgress]'",
+    "status": "current",
+    "description": "The job operation error status associated with this conceptual row in 'xcmJmxJobAdminTable'. Usage: Conforming management agents shall ALWAYS set this object to the value returned in an SNMP Set-Response PDU when a job operation request is 'accepted', ie, when 'xcmJmxJobAdminInProgress' goes from 'false' to 'true'. Usage: Conforming management agents shall ALWAYS set this object to the value of the completion status of the (possibly deferred) job operation request, when 'xcmJmxJobAdminInProgress' goes from 'true' to 'false'."
+  },
+  "xcmJmxJobAdminInProgress": {
+    "name": "xcmJmxJobAdminInProgress",
+    "oid": "1.3.6.1.4.1.253.8.83.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "See: 'xcmJmxJobAdmin[Operation|Status]'",
+    "status": "current",
+    "description": "The job operation in progress status associated with this conceptual row in 'xcmJmxJobAdminTable'. 'true' if job operation is in progress; otherwise, 'false'. Usage: Conforming management agents shall ALWAYS 'reject' any SNMP Set-Request to 'xcmJmxJobAdminOperation' while another job operation request is already in progress (i.e., while 'xcmJmxJobAdminInProgress' is 'true'), with 'badValue' (SNMPv1) or 'inconsistentValue' (SNMPv2/v3)."
+  },
+  "xcmJmxMIBNotifications": {
+    "name": "xcmJmxMIBNotifications",
+    "oid": "1.3.6.1.4.1.253.8.83.2",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobOperationV1Enterprise": {
+    "name": "xcmJmxJobOperationV1Enterprise",
+    "oid": "1.3.6.1.4.1.253.8.83.2.1",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "The value of the enterprise-specific OID in an SNMPv1 trap for a Job operation complete event sent by this managed system."
+  },
+  "xcmJmxJobOperationV2TrapPrefix": {
+    "name": "xcmJmxJobOperationV2TrapPrefix",
+    "oid": "1.3.6.1.4.1.253.8.83.2.1.0",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobOperationV2Trap": {
+    "name": "xcmJmxJobOperationV2Trap",
+    "oid": "1.3.6.1.4.1.253.8.83.2.1.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobState"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobStateReasons1"
+      },
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxJobAdminOperation"
+      },
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxJobAdminStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This SMIv2 trap corresponds to a Job operation complete event. The values of 'jmGeneralJobSetIndex' and 'jmJobIndex' for use with 'jmJobTable' for this Job are conveyed in the instance qualifier (OID suffix) of 'jmJobOperation'. Additional variable-bindings MAY be appended to this trap: - Systems with the Host Resources MIB (RFC 2790) MAY add 'hrSystemDate' (compare to IPP 'printer-current-time') - Systems MAY add other variable-bindings from any MIB",
+    "reference": "See: 'xcmJmxJobAdminOperation' in this MIB."
+  },
+  "xcmJmxJobStateV1Enterprise": {
+    "name": "xcmJmxJobStateV1Enterprise",
+    "oid": "1.3.6.1.4.1.253.8.83.2.2",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "The value of the enterprise-specific OID in an SNMPv1 trap for a Job state changed event sent by this managed system."
+  },
+  "xcmJmxJobStateV2TrapPrefix": {
+    "name": "xcmJmxJobStateV2TrapPrefix",
+    "oid": "1.3.6.1.4.1.253.8.83.2.2.0",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobStateV2Trap": {
+    "name": "xcmJmxJobStateV2Trap",
+    "oid": "1.3.6.1.4.1.253.8.83.2.2.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobState"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobStateReasons1"
+      }
+    ],
+    "status": "current",
+    "description": "This SMIv2 trap corresponds to IPP 'job-state-changed' event. The values of 'jmGeneralJobSetIndex' and 'jmJobIndex' for use with 'jmJobTable' for this Job are conveyed in the instance qualifier (OID suffix) of 'jmJobState'. Additional variable-bindings MAY be appended to this trap: - Systems with the Host Resources MIB (RFC 2790) MAY add 'hrSystemDate' (compare to IPP 'printer-current-time') - Systems MAY add other variable-bindings from any MIB",
+    "reference": "See: Section 5.3.2 'notify-events' in [IPP-NOT]."
+  },
+  "xcmJmxJobCreatedV1Enterprise": {
+    "name": "xcmJmxJobCreatedV1Enterprise",
+    "oid": "1.3.6.1.4.1.253.8.83.2.3",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "The value of the enterprise-specific OID in an SNMPv1 trap for a Job created event sent by this managed system."
+  },
+  "xcmJmxJobCreatedV2TrapPrefix": {
+    "name": "xcmJmxJobCreatedV2TrapPrefix",
+    "oid": "1.3.6.1.4.1.253.8.83.2.3.0",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobCreatedV2Trap": {
+    "name": "xcmJmxJobCreatedV2Trap",
+    "oid": "1.3.6.1.4.1.253.8.83.2.3.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobState"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobStateReasons1"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmNumberOfInterveningJobs"
+      }
+    ],
+    "status": "current",
+    "description": "This SMIv2 trap corresponds to IPP 'job-created' event.",
+    "reference": "See: Section 5.3.2 'notify-events' in [IPP-NOT]."
+  },
+  "xcmJmxJobCompletedV1Enterprise": {
+    "name": "xcmJmxJobCompletedV1Enterprise",
+    "oid": "1.3.6.1.4.1.253.8.83.2.4",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "The value of the enterprise-specific OID in an SNMPv1 trap for a Job completed event sent by this managed system."
+  },
+  "xcmJmxJobCompletedV2TrapPrefix": {
+    "name": "xcmJmxJobCompletedV2TrapPrefix",
+    "oid": "1.3.6.1.4.1.253.8.83.2.4.0",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobCompletedV2Trap": {
+    "name": "xcmJmxJobCompletedV2Trap",
+    "oid": "1.3.6.1.4.1.253.8.83.2.4.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobState"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobStateReasons1"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobKOctetsProcessed"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobImpressionsCompleted"
+      }
+    ],
+    "status": "current",
+    "description": "This SMIv2 trap corresponds to IPP 'job-completed' event.",
+    "reference": "See: Section 5.3.2 'notify-events' in [IPP-NOT]."
+  },
+  "xcmJmxJobStoppedV1Enterprise": {
+    "name": "xcmJmxJobStoppedV1Enterprise",
+    "oid": "1.3.6.1.4.1.253.8.83.2.5",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "The value of the enterprise-specific OID in an SNMPv1 trap for a Job stopped event sent by this managed system."
+  },
+  "xcmJmxJobStoppedV2TrapPrefix": {
+    "name": "xcmJmxJobStoppedV2TrapPrefix",
+    "oid": "1.3.6.1.4.1.253.8.83.2.5.0",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobStoppedV2Trap": {
+    "name": "xcmJmxJobStoppedV2Trap",
+    "oid": "1.3.6.1.4.1.253.8.83.2.5.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobState"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobStateReasons1"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobKOctetsProcessed"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobImpressionsCompleted"
+      }
+    ],
+    "status": "current",
+    "description": "This SMIv2 trap corresponds to IPP 'job-stopped' event.",
+    "reference": "See: Section 5.3.2 'notify-events' in [IPP-NOT]."
+  },
+  "xcmJmxJobConfigV1Enterprise": {
+    "name": "xcmJmxJobConfigV1Enterprise",
+    "oid": "1.3.6.1.4.1.253.8.83.2.6",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "The value of the enterprise-specific OID in an SNMPv1 trap for a Job config changed event sent by this managed system."
+  },
+  "xcmJmxJobConfigV2TrapPrefix": {
+    "name": "xcmJmxJobConfigV2TrapPrefix",
+    "oid": "1.3.6.1.4.1.253.8.83.2.6.0",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobConfigV2Trap": {
+    "name": "xcmJmxJobConfigV2Trap",
+    "oid": "1.3.6.1.4.1.253.8.83.2.6.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobState"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobStateReasons1"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmNumberOfInterveningJobs"
+      }
+    ],
+    "status": "current",
+    "description": "This SMIv2 trap corresponds to IPP 'job-config-changed' event.",
+    "reference": "See: Section 5.3.2 'notify-events' in [IPP-NOT]."
+  },
+  "xcmJmxJobProgressV1Enterprise": {
+    "name": "xcmJmxJobProgressV1Enterprise",
+    "oid": "1.3.6.1.4.1.253.8.83.2.7",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "The value of the enterprise-specific OID in an SNMPv1 trap for a Job progress event sent by this managed system."
+  },
+  "xcmJmxJobProgressV2TrapPrefix": {
+    "name": "xcmJmxJobProgressV2TrapPrefix",
+    "oid": "1.3.6.1.4.1.253.8.83.2.7.0",
+    "class": "objectidentity"
+  },
+  "xcmJmxJobProgressV2Trap": {
+    "name": "xcmJmxJobProgressV2Trap",
+    "oid": "1.3.6.1.4.1.253.8.83.2.7.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobKOctetsPerCopyRequested"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobKOctetsProcessed"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobImpressionsPerCopyRequested"
+      },
+      {
+        "module": "Job-Monitoring-MIB",
+        "object": "jmJobImpressionsCompleted"
+      }
+    ],
+    "status": "current",
+    "description": "This SMIv2 trap corresponds to an IPP 'job-progress' event.",
+    "reference": "See: Section 5.3.2 'notify-events' in [IPP-NOT]."
+  },
+  "xcmJmxMIBConformance": {
+    "name": "xcmJmxMIBConformance",
+    "oid": "1.3.6.1.4.1.253.8.83.3",
+    "class": "objectidentity"
+  },
+  "xcmJmxMIBCompliance": {
+    "name": "xcmJmxMIBCompliance",
+    "oid": "1.3.6.1.4.1.253.8.83.3.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "xcmJmxGeneralGroup",
+        "module": "XEROX-JOB-MONITORING-EXT-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for agents that implement this Job Admin MIB."
+  },
+  "xcmJmxMIBObjectGroups": {
+    "name": "xcmJmxMIBObjectGroups",
+    "oid": "1.3.6.1.4.1.253.8.83.3.2",
+    "class": "objectidentity"
+  },
+  "xcmJmxGeneralGroup": {
+    "name": "xcmJmxGeneralGroup",
+    "oid": "1.3.6.1.4.1.253.8.83.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxGeneralGroupSupport"
+      },
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxGeneralJobCreatedCount"
+      },
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxGeneralJobCompletedCount"
+      },
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxGeneralJobOperationCount"
+      },
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxGeneralJobTrapCount"
+      }
+    ],
+    "status": "current",
+    "description": "The general group."
+  },
+  "xcmJmxJobAdminGroup": {
+    "name": "xcmJmxJobAdminGroup",
+    "oid": "1.3.6.1.4.1.253.8.83.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxJobAdminOperation"
+      },
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxJobAdminStatus"
+      },
+      {
+        "module": "XEROX-JOB-MONITORING-EXT-MIB",
+        "object": "xcmJmxJobAdminInProgress"
+      }
+    ],
+    "status": "current",
+    "description": "The job administration group."
+  },
+  "xcmJmxMIBTrapGroups": {
+    "name": "xcmJmxMIBTrapGroups",
+    "oid": "1.3.6.1.4.1.253.8.83.3.3",
+    "class": "objectidentity"
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/XEROX-JOB-MONITORING-EXT-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 22:39:22 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "XEROX-JOB-MONITORING-EXT-MIB"
+  }
+}

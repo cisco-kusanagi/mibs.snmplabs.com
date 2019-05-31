@@ -1,0 +1,942 @@
+{
+  "imports": {
+    "class": "imports",
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "NOTIFICATION-TYPE",
+      "Counter64",
+      "IpAddress",
+      "TimeTicks",
+      "Integer32",
+      "OBJECT-IDENTITY",
+      "OBJECT-TYPE",
+      "Counter32",
+      "MibIdentifier",
+      "Bits",
+      "zeroDotZero",
+      "Unsigned32",
+      "MODULE-IDENTITY",
+      "mib-2",
+      "iso",
+      "Gauge32"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "DateAndTime",
+      "TEXTUAL-CONVENTION",
+      "StorageType",
+      "VariablePointer",
+      "RowStatus"
+    ]
+  },
+  "schedMIB": {
+    "name": "schedMIB",
+    "oid": "1.3.6.1.2.1.63",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2002-01-07 00:00",
+        "description": "Revised version, published as RFC 3231. This revision introduces a new object type called schedTriggers. Created new conformance and compliance statements that take care of the new schedTriggers object. Several clarifications have been added to remove ambiguities that were discovered and reported by implementors."
+      },
+      {
+        "revision": "1998-11-17 18:00",
+        "description": "Initial version, published as RFC 2591."
+      }
+    ],
+    "lastupdated": "200201070000Z",
+    "organization": "IETF Distributed Management Working Group",
+    "contactinfo": "WG EMail: disman@dorothy.bmc.com Subscribe: disman-request@dorothy.bmc.com Chair: Randy Presuhn BMC Software, Inc. Postal: Office 1-3141 2141 North First Street San Jose, California 95131 USA EMail: rpresuhn@bmc.com Phone: +1 408 546-1006 Editor: David B. Levi Nortel Networks Postal: 4401 Great America Parkway Santa Clara, CA 95052-8185 USA EMail: dlevi@nortelnetworks.com Phone: +1 865 686 0432 Editor: Juergen Schoenwaelder TU Braunschweig Postal: Bueltenweg 74/75 38106 Braunschweig Germany EMail: schoenw@ibr.cs.tu-bs.de Phone: +49 531 391-3283",
+    "description": "This MIB module defines a MIB which provides mechanisms to schedule SNMP set operations periodically or at specific points in time."
+  },
+  "schedObjects": {
+    "name": "schedObjects",
+    "oid": "1.3.6.1.2.1.63.1",
+    "class": "objectidentity"
+  },
+  "schedNotifications": {
+    "name": "schedNotifications",
+    "oid": "1.3.6.1.2.1.63.2",
+    "class": "objectidentity"
+  },
+  "schedConformance": {
+    "name": "schedConformance",
+    "oid": "1.3.6.1.2.1.63.3",
+    "class": "objectidentity"
+  },
+  "SnmpPduErrorStatus": {
+    "name": "SnmpPduErrorStatus",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noResponse": -1,
+          "noError": 0,
+          "tooBig": 1,
+          "noSuchName": 2,
+          "badValue": 3,
+          "readOnly": 4,
+          "genErr": 5,
+          "noAccess": 6,
+          "wrongType": 7,
+          "wrongLength": 8,
+          "wrongEncoding": 9,
+          "wrongValue": 10,
+          "noCreation": 11,
+          "inconsistentValue": 12,
+          "resourceUnavailable": 13,
+          "commitFailed": 14,
+          "undoFailed": 15,
+          "authorizationError": 16,
+          "notWritable": 17,
+          "inconsistentName": 18
+        }
+      }
+    },
+    "status": "current",
+    "description": "This TC enumerates the SNMPv1 and SNMPv2 PDU error status codes as defined in RFC 1157 and RFC 1905. It also adds a pseudo error status code `noResponse' which indicates a timeout condition."
+  },
+  "schedLocalTime": {
+    "name": "schedLocalTime",
+    "oid": "1.3.6.1.2.1.63.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DateAndTime",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 11,
+            "max": 11
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The local time used by the scheduler. Schedules which refer to calendar time will use the local time indicated by this object. An implementation MUST return all 11 bytes of the DateAndTime textual-convention so that a manager may retrieve the offset from GMT time."
+  },
+  "schedTable": {
+    "name": "schedTable",
+    "oid": "1.3.6.1.2.1.63.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table defines scheduled actions triggered by SNMP set operations."
+  },
+  "schedEntry": {
+    "name": "schedEntry",
+    "oid": "1.3.6.1.2.1.63.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedOwner",
+        "implied": 0
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describing a particular scheduled action. Unless noted otherwise, writable objects of this row can be modified independent of the current value of schedRowStatus, schedAdminStatus and schedOperStatus. In particular, it is legal to modify schedInterval and the objects in the schedCalendarGroup when schedRowStatus is active and schedAdminStatus and schedOperStatus are both enabled."
+  },
+  "schedOwner": {
+    "name": "schedOwner",
+    "oid": "1.3.6.1.2.1.63.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The owner of this scheduling entry. The exact semantics of this string are subject to the security policy defined by the security administrator."
+  },
+  "schedName": {
+    "name": "schedName",
+    "oid": "1.3.6.1.2.1.63.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The locally-unique, administratively assigned name for this scheduling entry. This object allows a schedOwner to have multiple entries in the schedTable."
+  },
+  "schedDescr": {
+    "name": "schedDescr",
+    "oid": "1.3.6.1.2.1.63.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The human readable description of the purpose of this scheduling entry."
+  },
+  "schedInterval": {
+    "name": "schedInterval",
+    "oid": "1.3.6.1.2.1.63.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The number of seconds between two action invocations of a periodic scheduler. Implementations must guarantee that action invocations will not occur before at least schedInterval seconds have passed. The scheduler must ignore all periodic schedules that have a schedInterval value of 0. A periodic schedule with a scheduling interval of 0 seconds will therefore never invoke an action. Implementations may be forced to delay invocations in the face of local constraints. A scheduled management function should therefore not rely on the accuracy provided by the scheduler implementation. Note that implementations which maintain a list of pending activations must re-calculate them when this object is changed."
+  },
+  "schedWeekDay": {
+    "name": "schedWeekDay",
+    "oid": "1.3.6.1.2.1.63.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "sunday": 0,
+        "monday": 1,
+        "tuesday": 2,
+        "wednesday": 3,
+        "thursday": 4,
+        "friday": 5,
+        "saturday": 6
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The set of weekdays on which the scheduled action should take place. Setting multiple bits will include several weekdays in the set of possible weekdays for this schedule. Setting all bits will cause the scheduler to ignore the weekday. Note that implementations which maintain a list of pending activations must re-calculate them when this object is changed."
+  },
+  "schedMonth": {
+    "name": "schedMonth",
+    "oid": "1.3.6.1.2.1.63.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "january": 0,
+        "february": 1,
+        "march": 2,
+        "april": 3,
+        "may": 4,
+        "june": 5,
+        "july": 6,
+        "august": 7,
+        "september": 8,
+        "october": 9,
+        "november": 10,
+        "december": 11
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The set of months during which the scheduled action should take place. Setting multiple bits will include several months in the set of possible months for this schedule. Setting all bits will cause the scheduler to ignore the month. Note that implementations which maintain a list of pending activations must re-calculate them when this object is changed."
+  },
+  "schedDay": {
+    "name": "schedDay",
+    "oid": "1.3.6.1.2.1.63.1.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "d1": 0,
+        "d2": 1,
+        "d3": 2,
+        "d4": 3,
+        "d5": 4,
+        "d6": 5,
+        "d7": 6,
+        "d8": 7,
+        "d9": 8,
+        "d10": 9,
+        "d11": 10,
+        "d12": 11,
+        "d13": 12,
+        "d14": 13,
+        "d15": 14,
+        "d16": 15,
+        "d17": 16,
+        "d18": 17,
+        "d19": 18,
+        "d20": 19,
+        "d21": 20,
+        "d22": 21,
+        "d23": 22,
+        "d24": 23,
+        "d25": 24,
+        "d26": 25,
+        "d27": 26,
+        "d28": 27,
+        "d29": 28,
+        "d30": 29,
+        "d31": 30,
+        "r1": 31,
+        "r2": 32,
+        "r3": 33,
+        "r4": 34,
+        "r5": 35,
+        "r6": 36,
+        "r7": 37,
+        "r8": 38,
+        "r9": 39,
+        "r10": 40,
+        "r11": 41,
+        "r12": 42,
+        "r13": 43,
+        "r14": 44,
+        "r15": 45,
+        "r16": 46,
+        "r17": 47,
+        "r18": 48,
+        "r19": 49,
+        "r20": 50,
+        "r21": 51,
+        "r22": 52,
+        "r23": 53,
+        "r24": 54,
+        "r25": 55,
+        "r26": 56,
+        "r27": 57,
+        "r28": 58,
+        "r29": 59,
+        "r30": 60,
+        "r31": 61
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The set of days in a month on which a scheduled action should take place. There are two sets of bits one can use to define the day within a month: Enumerations starting with the letter 'd' indicate a day in a month relative to the first day of a month. The first day of the month can therefore be specified by setting the bit d1(0) and d31(30) means the last day of a month with 31 days. Enumerations starting with the letter 'r' indicate a day in a month in reverse order, relative to the last day of a month. The last day in the month can therefore be specified by setting the bit r1(31) and r31(61) means the first day of a month with 31 days. Setting multiple bits will include several days in the set of possible days for this schedule. Setting all bits will cause the scheduler to ignore the day within a month. Setting all bits starting with the letter 'd' or the letter 'r' will also cause the scheduler to ignore the day within a month. Note that implementations which maintain a list of pending activations must re-calculate them when this object is changed."
+  },
+  "schedHour": {
+    "name": "schedHour",
+    "oid": "1.3.6.1.2.1.63.1.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "h0": 0,
+        "h1": 1,
+        "h2": 2,
+        "h3": 3,
+        "h4": 4,
+        "h5": 5,
+        "h6": 6,
+        "h7": 7,
+        "h8": 8,
+        "h9": 9,
+        "h10": 10,
+        "h11": 11,
+        "h12": 12,
+        "h13": 13,
+        "h14": 14,
+        "h15": 15,
+        "h16": 16,
+        "h17": 17,
+        "h18": 18,
+        "h19": 19,
+        "h20": 20,
+        "h21": 21,
+        "h22": 22,
+        "h23": 23
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The set of hours within a day during which the scheduled action should take place. Note that implementations which maintain a list of pending activations must re-calculate them when this object is changed."
+  },
+  "schedMinute": {
+    "name": "schedMinute",
+    "oid": "1.3.6.1.2.1.63.1.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "m0": 0,
+        "m1": 1,
+        "m2": 2,
+        "m3": 3,
+        "m4": 4,
+        "m5": 5,
+        "m6": 6,
+        "m7": 7,
+        "m8": 8,
+        "m9": 9,
+        "m10": 10,
+        "m11": 11,
+        "m12": 12,
+        "m13": 13,
+        "m14": 14,
+        "m15": 15,
+        "m16": 16,
+        "m17": 17,
+        "m18": 18,
+        "m19": 19,
+        "m20": 20,
+        "m21": 21,
+        "m22": 22,
+        "m23": 23,
+        "m24": 24,
+        "m25": 25,
+        "m26": 26,
+        "m27": 27,
+        "m28": 28,
+        "m29": 29,
+        "m30": 30,
+        "m31": 31,
+        "m32": 32,
+        "m33": 33,
+        "m34": 34,
+        "m35": 35,
+        "m36": 36,
+        "m37": 37,
+        "m38": 38,
+        "m39": 39,
+        "m40": 40,
+        "m41": 41,
+        "m42": 42,
+        "m43": 43,
+        "m44": 44,
+        "m45": 45,
+        "m46": 46,
+        "m47": 47,
+        "m48": 48,
+        "m49": 49,
+        "m50": 50,
+        "m51": 51,
+        "m52": 52,
+        "m53": 53,
+        "m54": 54,
+        "m55": 55,
+        "m56": 56,
+        "m57": 57,
+        "m58": 58,
+        "m59": 59
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The set of minutes within an hour when the scheduled action should take place. Note that implementations which maintain a list of pending activations must re-calculate them when this object is changed."
+  },
+  "schedContextName": {
+    "name": "schedContextName",
+    "oid": "1.3.6.1.2.1.63.1.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The context which contains the local MIB variable pointed to by schedVariable."
+  },
+  "schedVariable": {
+    "name": "schedVariable",
+    "oid": "1.3.6.1.2.1.63.1.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VariablePointer",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "(0, 0)",
+        "format": "oid"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "An object identifier pointing to a local MIB variable which resolves to an ASN.1 primitive type of INTEGER."
+  },
+  "schedValue": {
+    "name": "schedValue",
+    "oid": "1.3.6.1.2.1.63.1.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The value which is written to the MIB object pointed to by schedVariable when the scheduler invokes an action. The implementation shall enforce the use of access control rules when performing the set operation on schedVariable. This is accomplished by calling the isAccessAllowed abstract service interface as defined in RFC 2571. Note that an implementation may choose to issue an SNMP Set message to the SNMP engine and leave the access control decision to the normal message processing procedure."
+  },
+  "schedType": {
+    "name": "schedType",
+    "oid": "1.3.6.1.2.1.63.1.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "periodic": 1,
+          "calendar": 2,
+          "oneshot": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "periodic",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The type of this schedule. The value periodic(1) indicates that this entry specifies a periodic schedule. A periodic schedule is defined by the value of schedInterval. The values of schedWeekDay, schedMonth, schedDay, schedHour and schedMinute are ignored. The value calendar(2) indicates that this entry describes a calendar schedule. A calendar schedule is defined by the values of schedWeekDay, schedMonth, schedDay, schedHour and schedMinute. The value of schedInterval is ignored. A calendar schedule will trigger on all local times that satisfy the bits set in schedWeekDay, schedMonth, schedDay, schedHour and schedMinute. The value oneshot(3) indicates that this entry describes a one-shot schedule. A one-shot schedule is similar to a calendar schedule with the additional feature that it disables itself by changing in the `finished' schedOperStatus once the schedule triggers an action. Note that implementations which maintain a list of pending activations must re-calculate them when this object is changed."
+  },
+  "schedAdminStatus": {
+    "name": "schedAdminStatus",
+    "oid": "1.3.6.1.2.1.63.1.2.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enabled": 1,
+          "disabled": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "disabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The desired state of the schedule."
+  },
+  "schedOperStatus": {
+    "name": "schedOperStatus",
+    "oid": "1.3.6.1.2.1.63.1.2.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enabled": 1,
+          "disabled": 2,
+          "finished": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current operational state of this schedule. The state enabled(1) indicates this entry is active and that the scheduler will invoke actions at appropriate times. The disabled(2) state indicates that this entry is currently inactive and ignored by the scheduler. The finished(3) state indicates that the schedule has ended. Schedules in the finished(3) state are ignored by the scheduler. A one-shot schedule enters the finished(3) state when it deactivates itself. Note that the operational state must not be enabled(1) when the schedRowStatus is not active."
+  },
+  "schedFailures": {
+    "name": "schedFailures",
+    "oid": "1.3.6.1.2.1.63.1.2.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This variable counts the number of failures while invoking the scheduled action. This counter at most increments once for a triggered action."
+  },
+  "schedLastFailure": {
+    "name": "schedLastFailure",
+    "oid": "1.3.6.1.2.1.63.1.2.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpPduErrorStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "noError",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The most recent error that occurred during the invocation of a scheduled action. The value noError(0) is returned if no errors have occurred yet."
+  },
+  "schedLastFailed": {
+    "name": "schedLastFailed",
+    "oid": "1.3.6.1.2.1.63.1.2.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DateAndTime",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "0000000000000000",
+        "format": "hex"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The date and time when the most recent failure occurred. The value '0000000000000000'H is returned if no failure occurred since the last re-initialization of the scheduler."
+  },
+  "schedStorageType": {
+    "name": "schedStorageType",
+    "oid": "1.3.6.1.2.1.63.1.2.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "volatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines whether this scheduled action is kept in volatile storage and lost upon reboot or if this row is backed up by non-volatile or permanent storage. Conceptual rows having the value `permanent' must allow write access to the columnar objects schedDescr, schedInterval, schedContextName, schedVariable, schedValue, and schedAdminStatus. If an implementation supports the schedCalendarGroup, write access must be also allowed to the columnar objects schedWeekDay, schedMonth, schedDay, schedHour, schedMinute."
+  },
+  "schedRowStatus": {
+    "name": "schedRowStatus",
+    "oid": "1.3.6.1.2.1.63.1.2.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this scheduled action. A control that allows entries to be added and removed from this table. Note that the operational state must change to enabled when the administrative state is enabled and the row status changes to active(1). Attempts to destroy(6) a row or to set a row notInService(2) while the operational state is enabled result in inconsistentValue errors. The value of this object has no effect on whether other objects in this conceptual row can be modified."
+  },
+  "schedTriggers": {
+    "name": "schedTriggers",
+    "oid": "1.3.6.1.2.1.63.1.2.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This variable counts the number of attempts (either successful or failed) to invoke the scheduled action."
+  },
+  "schedTraps": {
+    "name": "schedTraps",
+    "oid": "1.3.6.1.2.1.63.2.0",
+    "class": "objectidentity"
+  },
+  "schedActionFailure": {
+    "name": "schedActionFailure",
+    "oid": "1.3.6.1.2.1.63.2.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedLastFailure"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedLastFailed"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is generated whenever the invocation of a scheduled action fails."
+  },
+  "schedCompliances": {
+    "name": "schedCompliances",
+    "oid": "1.3.6.1.2.1.63.3.1",
+    "class": "objectidentity"
+  },
+  "schedGroups": {
+    "name": "schedGroups",
+    "oid": "1.3.6.1.2.1.63.3.2",
+    "class": "objectidentity"
+  },
+  "schedCompliance2": {
+    "name": "schedCompliance2",
+    "oid": "1.3.6.1.2.1.63.3.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "schedGroup2",
+        "module": "DISMAN-SCHEDULE-MIB"
+      },
+      {
+        "object": "schedNotificationsGroup",
+        "module": "DISMAN-SCHEDULE-MIB"
+      },
+      {
+        "object": "schedCalendarGroup",
+        "module": "DISMAN-SCHEDULE-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for SNMP entities which implement the scheduling MIB."
+  },
+  "schedGroup2": {
+    "name": "schedGroup2",
+    "oid": "1.3.6.1.2.1.63.3.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedDescr"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedInterval"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedContextName"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedVariable"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedValue"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedType"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedAdminStatus"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedOperStatus"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedFailures"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedLastFailure"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedLastFailed"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedStorageType"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedRowStatus"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedTriggers"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing scheduling capabilities."
+  },
+  "schedCalendarGroup": {
+    "name": "schedCalendarGroup",
+    "oid": "1.3.6.1.2.1.63.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedLocalTime"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedWeekDay"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedMonth"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedDay"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedHour"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedMinute"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing calendar based schedules."
+  },
+  "schedNotificationsGroup": {
+    "name": "schedNotificationsGroup",
+    "oid": "1.3.6.1.2.1.63.3.2.3",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedActionFailure"
+      }
+    ],
+    "status": "current",
+    "description": "The notifications emitted by the scheduler."
+  },
+  "schedCompliance": {
+    "name": "schedCompliance",
+    "oid": "1.3.6.1.2.1.63.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "schedGroup",
+        "module": "DISMAN-SCHEDULE-MIB"
+      },
+      {
+        "object": "schedNotificationsGroup",
+        "module": "DISMAN-SCHEDULE-MIB"
+      },
+      {
+        "object": "schedCalendarGroup",
+        "module": "DISMAN-SCHEDULE-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for SNMP entities which implement the scheduling MIB."
+  },
+  "schedGroup": {
+    "name": "schedGroup",
+    "oid": "1.3.6.1.2.1.63.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedDescr"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedInterval"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedContextName"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedVariable"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedValue"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedType"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedAdminStatus"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedOperStatus"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedFailures"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedLastFailure"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedLastFailed"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedStorageType"
+      },
+      {
+        "module": "DISMAN-SCHEDULE-MIB",
+        "object": "schedRowStatus"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects providing scheduling capabilities."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/DISMAN-SCHEDULE-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 14:57:58 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "DISMAN-SCHEDULE-MIB"
+  }
+}

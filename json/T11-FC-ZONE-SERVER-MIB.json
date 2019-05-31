@@ -1,0 +1,2635 @@
+{
+  "imports": {
+    "class": "imports",
+    "FC-MGMT-MIB": [
+      "FcDomainIdOrZero",
+      "fcmInstanceIndex",
+      "FcNameIdOrZero",
+      "fcmSwitchIndex"
+    ],
+    "IF-MIB": [
+      "ifIndex"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Unsigned32",
+      "TimeTicks",
+      "OBJECT-TYPE",
+      "NOTIFICATION-TYPE",
+      "Bits",
+      "Gauge32",
+      "MODULE-IDENTITY",
+      "Integer32",
+      "OBJECT-IDENTITY",
+      "MibIdentifier",
+      "mib-2",
+      "iso",
+      "Counter32",
+      "IpAddress",
+      "Counter64"
+    ],
+    "SNMPv2-TC": [
+      "RowStatus",
+      "DisplayString",
+      "TimeStamp",
+      "TruthValue",
+      "TEXTUAL-CONVENTION",
+      "StorageType"
+    ],
+    "T11-FC-FABRIC-ADDR-MGR-MIB": [
+      "t11FamLocalSwitchWwn"
+    ],
+    "T11-FC-NAME-SERVER-MIB": [
+      "T11NsGs4RejectReasonCode"
+    ],
+    "T11-TC-MIB": [
+      "T11FabricIndex"
+    ]
+  },
+  "t11ZoneServerMIB": {
+    "name": "t11ZoneServerMIB",
+    "oid": "1.3.6.1.2.1.160",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2007-06-27 00:00",
+        "description": "Initial version of this MIB module, published as RFC 4936."
+      }
+    ],
+    "lastupdated": "200706270000Z",
+    "organization": "For the initial versions, T11. For later versions, the IETF's IMSS Working Group.",
+    "contactinfo": " Claudio DeSanti Cisco Systems, Inc. 170 West Tasman Drive San Jose, CA 95134 USA EMail: cds@cisco.com Keith McCloghrie Cisco Systems, Inc. 170 West Tasman Drive San Jose, CA 95134 USA EMail: kzm@cisco.com",
+    "description": "The MIB module for the management of Fibre Channel Zoning Servers, both for Basic Zoning Management and for Enhanced Zoning Management, as defined in the FC-GS-5 specification. FC-GS-5 defines (in-band) management operations for manipulating the Zone Set Database, some for use in Basic mode (e.g., 'Add Zone Set (AZS)', etc.), and some for use in Enhanced mode (e.g., Create Zone Set (CZS)', etc.). When Enhanced Zoning Management is in use, FC-GS-5 requires that these in-band management operations be rejected unless they are issued within the context of a GS-5 server session. The use of a server session ensures serialized access to the Zoning Database since the Fabric lock for the Zone Server must be obtained as a part of establishing the server session to the Zone Server. Thus, if and when this MIB is used for Enhanced Zoning Management, SNMP SetRequests that request the modification of zoning definitions must be serialized with respect to the GS-5 requests to modify the Zoning Database. This is achieved by requiring that an SNMP management application must first obtain the Fabric lock for the Zone Server before attempting to modify any zoning definitions. The companion T11-FC-FABRIC-LOCK-MIB module is defined as a means of obtaining the Fabric lock for the Zone Server (or any other server). In Enhanced Zoning Management, a Zone Server keeps track of changes requested in the zoning definitions, but does not update its Zone Set Database unless there is (and until there is) a 'commit' operation. To model this behavior, this MIB module assumes that a Zone Server (in Enhanced mode) takes a snapshot of its Zone Set Database as and when the Fabric lock (for the Zone Server application) is obtained; this snapshot is used to create what is herein called the 'copy' database. It is this 'copy' database that is then updated by SNMP SetRequests (while the Fabric is locked). If and when a 'commit' operation is requested (while the Fabric is still locked), the 'copy' database is then used to overwrite the previously committed contents of the Zone Set Database, and the new Zone Set Database is distributed to all other switches in the Fabric. When the lock is released, any changes made that were not 'committed' are discarded. When this MIB is used for Basic Zoning Management, the same set of MIB objects as used for Enhanced mode are used to make changes to the Database of a Zone Server on a particular switch, but the changes take immediate effect at that switch without an explicit commit. The distribution of those changes to Zone Servers on other switches in the Fabric is subsequently requested through the use of a separate set of MIB objects. The management information specified in this MIB module includes the Zoning Database for each of one or more Fibre Channel Fabrics. A Zoning Database is a combination of the Fabric's Zone Set Database and its Active Zone Set. The Active Zone Set is the Zone Set currently enforced by the Fabric; a Zone Set Database is a database of the Zone Sets available to be activated within a Fabric. All the MIB objects representing a Zone Set Database are modifiable at any time (irrespective of the value of any RowStatus object), whereas all objects representing the Active Zone Set are always read-only (except to deactivate it and/or activate a different one). Copyright (C) The IETF Trust (2007). This version of this MIB module is part of RFC 4936; see the RFC itself for full legal notices."
+  },
+  "t11ZsMIBObjects": {
+    "name": "t11ZsMIBObjects",
+    "oid": "1.3.6.1.2.1.160.1",
+    "class": "objectidentity"
+  },
+  "t11ZsMIBConformance": {
+    "name": "t11ZsMIBConformance",
+    "oid": "1.3.6.1.2.1.160.2",
+    "class": "objectidentity"
+  },
+  "t11ZsMIBNotifications": {
+    "name": "t11ZsMIBNotifications",
+    "oid": "1.3.6.1.2.1.160.0",
+    "class": "objectidentity"
+  },
+  "t11ZsConfiguration": {
+    "name": "t11ZsConfiguration",
+    "oid": "1.3.6.1.2.1.160.1.1",
+    "class": "objectidentity"
+  },
+  "t11ZsStatistics": {
+    "name": "t11ZsStatistics",
+    "oid": "1.3.6.1.2.1.160.1.2",
+    "class": "objectidentity"
+  },
+  "T11ZsZoneMemberType": {
+    "name": "T11ZsZoneMemberType",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "displayhint": "x",
+    "status": "current",
+    "description": "Represents the addressing mechanism by which a member is identified: 01 - N_Port_Name 02 - Domain_ID and physical port 03 - N_Port_ID 04 - Node_Name 05 - Alias Name 06 - F_Port_Name E0-FF (hex) - Vendor Specific. ",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.8.3.6."
+  },
+  "T11ZsRejectReasonExplanation": {
+    "name": "T11ZsRejectReasonExplanation",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "noAdditionalExplanation": 2,
+          "zonesNotSupported": 3,
+          "zoneSetNameUnknown": 4,
+          "noZoneSetActive": 5,
+          "zoneNameUnknown": 6,
+          "zoneStateUnknown": 7,
+          "incorrectPayloadLen": 8,
+          "tooLargeZoneSet": 9,
+          "deactivateZoneSetFailed": 10,
+          "reqNotSupported": 11,
+          "capabilityNotSupported": 12,
+          "zoneMemberIDTypeNotSupp": 13,
+          "invalidZoneSetDefinition": 14,
+          "enhancedZoningCmdsNotSupported": 15,
+          "zoneSetExists": 16,
+          "zoneExists": 17,
+          "aliasExists": 18,
+          "zoneSetUnknown": 19,
+          "zoneUnknown": 20,
+          "aliasUnknown": 21,
+          "zoneAliasTypeUnknown": 22,
+          "unableEnhancedMode": 23,
+          "basicZoningCmdsNotSupported": 24,
+          "zoneAttribObjectExists": 25,
+          "zoneAttribObjectUnknown": 26,
+          "requestInProcess": 27,
+          "cmitInProcess": 28,
+          "hardEnforcementFailed": 29,
+          "unresolvedReferences": 30,
+          "consistencyChecksFailed": 31
+        }
+      }
+    },
+    "status": "current",
+    "description": "The reason code explanation when rejecting a Zone Server request: 'other' - e.g., a reason code assigned too recently to be included in this version of this MIB 'noAdditionalExplanation' - there is no additional explanation 'zonesNotSupported' - Zones are not supported 'zoneSetNameUnknown' - Zone Set name is not known 'noZoneSetActive' - no Zone Set is currently active 'zoneNameUnknown' - Zone name is unknown 'zoneStateUnknown' - state of the Zone is not known 'incorrectPayloadLen' - payload length is not correct 'tooLargeZoneSet' - Zone Set is larger than permitted size 'deactivateZoneSetFailed' - deactivation of Zone Set failed 'reqNotSupported' - request is not supported 'capabilityNotSupported' - capability is not supported 'zoneMemberIDTypeNotSupp' - Zone Member Identifier Type is not supported 'invalidZoneSetDefinition' - Zone Set definition is invalid 'enhancedZoningCmdsNotSupported' - Enhanced Zoning commands are not supported 'zoneSetExists' - Zone Set already exists 'zoneExists' - Zone already exists 'aliasExists' - Zone Alias already exists 'zoneSetUnknown' - Zone Set unknown 'zoneUnknown' - Zone unknown 'aliasUnknown' - Zone Alias unknown 'zoneAliasTypeUnknown' - unknown Zone attribute type 'unableEnhancedMode' - Fabric unable to work in Enhanced Mode 'basicZoningCmdsNotSupported' - Basic Zoning commands are not supported 'zoneAttribObjectExists' - Zone attribute object already exists 'zoneAttribObjectUnknown' - Zone attribute object unknown 'requestInProcess' - request in process 'cmitInProcess' - CMIT in process 'hardEnforcementFailed' - hard enforcement failed 'unresolvedReferences' - unresolved references in the Zone Set Database 'consistencyChecksFailed' - consistency checks failed.",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.9."
+  },
+  "T11ZoningName": {
+    "name": "T11ZoningName",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "This datatype is a refinement of an SnmpAdminString, and is used to represent a name stored in a Fibre Channel Zoning Data Structure. The value begins with an ASCII letter (upper or lower case) followed by zero or more characters from the set: lower case letters, upper case letters, numbers, and the symbols ($-^_). The value does not include fill bytes.",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.8.1."
+  },
+  "t11ZsServerTable": {
+    "name": "t11ZsServerTable",
+    "oid": "1.3.6.1.2.1.160.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table containing information about the Zone Servers on each Fabric in one or more switches, and providing the capability to perform operations on their Zone Server databases."
+  },
+  "t11ZsServerEntry": {
+    "name": "t11ZsServerEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry contains information specific to a Zone Server for a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). The persistence across reboots of writable values in a row of this table is given by the instance of t11ZsServerDatabaseStorageType in that row."
+  },
+  "t11ZsServerFabricIndex": {
+    "name": "t11ZsServerFabricIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11FabricIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique index value that uniquely identifies a particular Fabric."
+  },
+  "t11ZsServerCapabilityObject": {
+    "name": "t11ZsServerCapabilityObject",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "enhancedMode": 0,
+        "zoneSetDb": 1,
+        "activateDirect": 2,
+        "hardZoning": 3
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, section 6.1.23.4.4",
+    "status": "current",
+    "description": "This bitmap represents the capability of the switch on this Fabric: 'enhancedMode' - able to support enhanced Zoning mode of operation. 'zoneSetDb' - able to support maintaining of a Zone Set Database. 'activateDirect' - able to support the Activate Direct command. 'hardZoning' - able to support Hard Zoning."
+  },
+  "t11ZsServerDatabaseStorageType": {
+    "name": "t11ZsServerDatabaseStorageType",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "nonVolatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the memory realization, on a particular switch, of the Zone Set database for a particular Fabric. Specifically, each row in the following tables: t11ZsSetTable t11ZsZoneTable t11ZsSetZoneTable t11ZsAliasTable t11ZsZoneMemberTable t11ZsAttribBlockTable t11ZsAttribTable has a StorageType as specified by the instance of this object that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex. The value of this object is also used to indicate the persistence across reboots of writable values in its row of the t11ZsServerTable, as well as the corresponding row in the t11ZsNotifyControlTable. If an instance of this object has the value 'permanent(4)', the Zone Set database for the given Fabric on the given switch is not required to be writeable."
+  },
+  "t11ZsServerDistribute": {
+    "name": "t11ZsServerDistribute",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noop": 1,
+          "zoneSetDb": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, section 6.1.19.1.",
+    "status": "current",
+    "description": "This object can be set only in Basic mode. When set to the value 'zoneSetDb', it requests that the Zone Set database of a particular switch for a particular Fabric be distributed to every other switch in that Fabric, e.g., by using Stage Fabric Configuration Update (SFC) and Update Fabric Configuration (UFC) requests. Setting this object to 'noop' has no effect. When read, the value of this object is always 'noop'. When the corresponding instance of t11ZsServerOperationMode has the value 'enhanced', or when the corresponding instance of t11ZsZoneSetResult has the value 'inProgress', it is inconsistent to try to set the value of this object."
+  },
+  "t11ZsServerCommit": {
+    "name": "t11ZsServerCommit",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "commitZoneChanges": 1,
+          "noop": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.10.2.",
+    "status": "current",
+    "description": "This object is only used in Enhanced mode. In Enhanced mode, it can only be modified when the Fabric lock for the Zone Server on the particular Fabric has been obtained for use by SNMP SetRequests, and even then, only by the SNMP entity identified by the value of corresponding instance of t11FLockInitiator. Setting the object requests an action: commitZoneChanges - requests that the changes made within this session to the Zone Set Database be committed. noop - requests nothing. When read, the value is always 'noop'."
+  },
+  "t11ZsServerResult": {
+    "name": "t11ZsServerResult",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "inProgress": 2,
+          "success": 3,
+          "rejectFailure": 4,
+          "otherFailure": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.10.2.3.",
+    "status": "current",
+    "description": "In Basic mode, this object indicates the status/result of the last distribution of the Zone Set database that was invoked via the corresponding instance of t11ZsZoneSetDistribute, e.g., the status/result of Stage Fabric Configuration Update (SFC) request(s) used to implement the setting of t11ZsZoneSetDistribute. In Enhanced mode, this object indicates the status/result of the last commit of changes to the Zone Set database that was invoked via the corresponding instance of t11ZsServerCommit. 'none' - no distribution/commit invoked via the corresponding instance of t11ZsZoneSetDistribute (Basic mode) or t11ZsServerCommit (Enhanced mode). 'inProgress' - distribution/commit is still in progress. 'success' - distribution/commit completed successfully. 'rejectFailure' - distribution/commit failed due to an SW_RJT. 'otherFailure' - distribution/commit failed for some other reason. When the value is 'rejectFailure', the corresponding instances of t11ZsServerReasonCode, t11ZsServerReasonCodeExp and t11ZsServerReasonVendorCode contain the reason codes. "
+  },
+  "t11ZsServerReasonCode": {
+    "name": "t11ZsServerReasonCode",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11NsGs4RejectReasonCode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, section 6.1.3 and tables 4, 5, and 6.",
+    "status": "current",
+    "description": "When the corresponding instance of t11ZsZoneSetResult has the value 'rejectFailure', this object contains the rejection's reason code. When the corresponding instance of t11ZsServerResult has a value other than 'rejectFailure', this object should contain the value 'none'."
+  },
+  "t11ZsServerReasonCodeExp": {
+    "name": "t11ZsServerReasonCodeExp",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 1
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, section 6.1.3 and tables 4, 5, and 6.",
+    "status": "current",
+    "description": "When the corresponding instance of t11ZsZoneSetResult has the value 'rejectFailure', this object contains the rejection's reason code explanation. When the corresponding instance of t11ZsServerResult has a value other than 'rejectFailure', this object should contain the zero-length string."
+  },
+  "t11ZsServerReasonVendorCode": {
+    "name": "t11ZsServerReasonVendorCode",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 1
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, section 6.1.3 and tables 4, 5, and 6.",
+    "status": "current",
+    "description": "When the corresponding instance of t11ZsZoneSetResult has the value 'rejectFailure', this object contains the rejection's reason vendor-specific code. When the corresponding instance of t11ZsServerResult has a value other than 'rejectFailure', this object should contain the zero-length string."
+  },
+  "t11ZsServerLastChange": {
+    "name": "t11ZsServerLastChange",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime at the time of the last change (creation, modification, or deletion) to the Zone Set database for the Zone Server for a particular Fabric. If said Zone Set database has not changed since the last re-initialization of the local network management system, then this object will contain a zero value."
+  },
+  "t11ZsServerHardZoning": {
+    "name": "t11ZsServerHardZoning",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.10.3.2.",
+    "status": "current",
+    "description": "This object indicates whether this switch, if and when it is in Basic mode, enforces Hard Zoning on this Fabric."
+  },
+  "t11ZsServerReadFromDatabase": {
+    "name": "t11ZsServerReadFromDatabase",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "committedDB": 1,
+          "copyDB": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "committedDB",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "In Enhanced mode, this object specifies whether subsequent SNMP Responses (generated by the local SNMP agent) to operations that read the configuration of Zone Sets, Zones, Members, Aliases and Attributes will reflect the values stored in the current (committed) Zone Set database, or those stored in the 'copy' database. In Basic mode, the value of this object is always 'committedDB' (since there is no 'copy' database in Basic mode). In SNMP agents that don't support write access to the Zone Set database, this object is always 'committedDB' (since the copy database, if it were to exist, would be identical)."
+  },
+  "t11ZsServerOperationMode": {
+    "name": "t11ZsServerOperationMode",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "basic": 1,
+          "enhanced": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "basic",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, sections 6.4.10.1.1 and 6.4.10.1.2.",
+    "status": "current",
+    "description": "The operational mode of the Zone Server. Setting this object to 'enhanced' is a request that the mode of operation of the Zone Server be Enhanced mode, which is only possible if all devices in the Fibre Channel Fabric are capable of working in Enhanced mode. If not, the request will fail and the corresponding value of t11ZsServerChangeModeResult will so indicate. Setting this object to 'basic' is a request that the mode of operation of the Zone Server be Basic mode. However, such a set may fail while operating in Enhanced mode, since FC-GS-5 makes no provision for changing (back) to Basic mode. Note that setting this object does not cause or require that the Fabric lock for the Zone Server be obtained. However, when this object has the value 'enhanced', any SNMP SetRequests that attempt to modify the copy database cannot be successful if the Fabric lock has not been obtained or has since been released."
+  },
+  "t11ZsServerChangeModeResult": {
+    "name": "t11ZsServerChangeModeResult",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "success": 1,
+          "failure": 2,
+          "inProgress": 3,
+          "none": 4
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "When this object has the value of 'success' or 'failure', the value indicates the outcome of the most recent request, invoked via t11ZsServerOperationMode, to change the mode of operation of the Zone Server. When such a request is in progress, this object has the value 'inProgress'. Prior to the first such request, the value of this object is 'none'."
+  },
+  "t11ZsServerDefaultZoneSetting": {
+    "name": "t11ZsServerDefaultZoneSetting",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "permit": 1,
+          "deny": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "deny",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.10.1.1.",
+    "status": "current",
+    "description": "This object controls the Enhanced Zoning flag that governs the behavior of the Default Zone on this Fabric. If this object is set to 'permit', then the members of the Default Zone on this Fabric can communicate with each other. If this object is set to 'deny', then the members of the Default Zone on this Fabric cannot communicate with each other."
+  },
+  "t11ZsServerMergeControlSetting": {
+    "name": "t11ZsServerMergeControlSetting",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "allow": 1,
+          "restrict": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "allow",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.10.1.1.",
+    "status": "current",
+    "description": "This object controls the Enhanced Zoning flag that indicates the Merge Control Setting for this Fabric: 'allow' - a switch may join the Fabric only if its Zoning Database is able to merge with the Fabric's Zoning Database. 'restrict' - a switch may join the Fabric only if its Zoning Database is equal to the Fabric's Zoning Database."
+  },
+  "t11ZsServerDefZoneBroadcast": {
+    "name": "t11ZsServerDefZoneBroadcast",
+    "oid": "1.3.6.1.2.1.160.1.1.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.7.2.2.",
+    "status": "current",
+    "description": "This object controls an Enhanced Zoning capability: it indicates whether Broadcast Zoning is enabled on the Default Zone on this Fabric. If this object is set to 'true', then it is enabled. If this object is set to 'false', then it is disabled. If broadcast Zoning is enabled on a Default Zone, then broadcast frames generated by a member in that Default Zone will be restricted to members in that Default Zone."
+  },
+  "t11ZsSetTable": {
+    "name": "t11ZsSetTable",
+    "oid": "1.3.6.1.2.1.160.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table containing information on every Zone Set in the Zone Set database of the Zone Servers on each Fabric in one or more switches. In Enhanced mode, changes to a database made via this table are always made to the 'copy' database, but values read from this table reflect the contents of either the 'copy' database or the current (committed) database as indicated by the corresponding value of t11ZsServerReadFromDatabase."
+  },
+  "t11ZsSetEntry": {
+    "name": "t11ZsSetEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsSetIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry contains information about a Zone Set in the Zone Set database of a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). A Zone Set can be created in an existing Zone Set database, and can contain zero or more existing Zones. As and when new Zones are created (as rows in the t11ZsZoneTable), they can be added to a Zone Set by creating an entry for each in the t11ZsSetZoneTable. Deleting a row from this table deletes the Zone Set from the Zone Set database maintained by the Zone Server, but does not otherwise affect the Zone Server. The StorageType of a row in this table is specified by the instance of t11ZsServerDatabaseStorageType that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex."
+  },
+  "t11ZsSetIndex": {
+    "name": "t11ZsSetIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The index of a Zone Set. This object uniquely identifies a Zone Set in the Zone Set database for a particular Fabric on a particular switch."
+  },
+  "t11ZsSetName": {
+    "name": "t11ZsSetName",
+    "oid": "1.3.6.1.2.1.160.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZoningName",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The name of this Zone Set. The t11ZsSetName should be unique within a Fabric. The Zone Set can be renamed at any time (i.e., even when the row in an active state) by setting this object to a new value."
+  },
+  "t11ZsSetRowStatus": {
+    "name": "t11ZsSetRowStatus",
+    "oid": "1.3.6.1.2.1.160.1.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row. This object cannot be set to 'active' unless the corresponding value of t11ZsSetName is unique within the Fabric's Zone Server database on this switch."
+  },
+  "t11ZsZoneTable": {
+    "name": "t11ZsZoneTable",
+    "oid": "1.3.6.1.2.1.160.1.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table gives information on all the Zones in the Zone Set database of the Zone Servers on each Fabric in one or more switches. In Enhanced mode, changes to a database made via this table are always made to the 'copy' database, but values read from this table reflect the contents of either the 'copy' database or the current (committed) database as indicated by the corresponding value of t11ZsServerReadFromDatabase."
+  },
+  "t11ZsZoneEntry": {
+    "name": "t11ZsZoneEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry contains information about a Zone in the Zone Set database of a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). A Zone can be created in an existing Zone Set database, by first creating an entry in this table, and then adding members to it by creating entries in the t11ZsZoneMemberTable. The StorageType of a row in this table is specified by the instance of t11ZsServerDatabaseStorageType that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex."
+  },
+  "t11ZsZoneIndex": {
+    "name": "t11ZsZoneIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index value that uniquely identifies this Zone within a particular Fabric's Zone Set database on a particular switch."
+  },
+  "t11ZsZoneName": {
+    "name": "t11ZsZoneName",
+    "oid": "1.3.6.1.2.1.160.1.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZoningName",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The name of this Zone. The t11ZsZoneName should be unique within a Fabric. The Zone can be renamed by setting this object to a new value."
+  },
+  "t11ZsZoneAttribBlock": {
+    "name": "t11ZsZoneAttribBlock",
+    "oid": "1.3.6.1.2.1.160.1.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the index value of the Zone Attribute Block that contains the Attributes of this Zone. In Enhanced mode, a value of zero indicates this Zone has no Zone Attributes. In Basic mode, this object always has the value of zero."
+  },
+  "t11ZsZoneRowStatus": {
+    "name": "t11ZsZoneRowStatus",
+    "oid": "1.3.6.1.2.1.160.1.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row. This object cannot be set to 'active' unless the corresponding value of t11ZsZoneName is unique within the Fabric's Zone Server database on this switch."
+  },
+  "t11ZsSetZoneTable": {
+    "name": "t11ZsSetZoneTable",
+    "oid": "1.3.6.1.2.1.160.1.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies which Zones belong to which Zone Sets in the Zone Set database of the Zone Servers on each Fabric in one or more switches."
+  },
+  "t11ZsSetZoneEntry": {
+    "name": "t11ZsSetZoneEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsSetIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry specifies that a particular Zone (identified by the value of t11ZsZoneIndex) is one of the Zones that form a particular Zone Set (identified by the value of t11ZsSetIndex) in the Zone Set database of a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). When a row in this table exists, it references one row in the t11ZsSetTable and one row in the t11ZsZoneTable. The agent must ensure that both such rows when referenced by an active row in this table, do exist and have a status of 'active', either by refusing to create new rows in this table, or by automatically deleting rows in this table. An 'active' row in this table references one row in the t11ZsSetTable and one in the t11ZsZoneTable. The agent must ensure that all such referenced rows exist with a status of 'active', either by refusing to create new active rows in this table, or by automatically deleting any rows in this table that reference a deleted row. The StorageType of a row in this table is specified by the instance of t11ZsServerDatabaseStorageType that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex."
+  },
+  "t11ZsSetZoneRowStatus": {
+    "name": "t11ZsSetZoneRowStatus",
+    "oid": "1.3.6.1.2.1.160.1.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row."
+  },
+  "t11ZsAliasTable": {
+    "name": "t11ZsAliasTable",
+    "oid": "1.3.6.1.2.1.160.1.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains information about the Zone Aliases in the Zone Set database of the Zone Servers on each Fabric in one or more switches. In Enhanced mode, changes to a database made via this table are always made to the 'copy' database, but values read from this table reflect the contents of either the 'copy' database or the current (committed) database as indicated by the corresponding value of t11ZsServerReadFromDatabase."
+  },
+  "t11ZsAliasEntry": {
+    "name": "t11ZsAliasEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAliasIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry contains information about a Zone Alias in the Zone Set database of a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). A Zone Member is added to a Zone Alias by creating an entry in the t11ZsZoneMemberTable pointing to a row of this table via t11ZsAliasIndex, i.e.,: - t11ZsZoneMemberParentType = 'alias', - t11ZsZoneMemberParentIndex = Alias's t11ZsAliasIndex, - t11ZsZoneMemberFormat != '05 - Alias Name', and - t11ZsZoneMemberID = Member's identifier. A Zone Alias is added to a Zone by creating an entry in the t11ZsZoneMemberTable pointing to a row of this table via t11ZsAliasName, i.e.,: - t11ZsZoneMemberParentType = 'zone', and - t11ZsZoneMemberParentIndex = Zone's t11ZsZoneIndex, - t11ZsZoneMemberFormat = '05 - Alias Name', - t11ZsZoneMemberID = Alias's t11ZsAliasName. The StorageType of a row in this table is specified by the instance of t11ZsServerDatabaseStorageType that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex."
+  },
+  "t11ZsAliasIndex": {
+    "name": "t11ZsAliasIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index value which uniquely identifies this Zone Alias within the Zone Set database of a particular Fabric on a particular switch."
+  },
+  "t11ZsAliasName": {
+    "name": "t11ZsAliasName",
+    "oid": "1.3.6.1.2.1.160.1.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZoningName",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The name of this Zone Alias. The name of the Zone Alias should be unique within a Fabric. The Zone Alias can be renamed by setting this object to a new value if and when it is not in a Zone, i.e., if and only if the current name is not the value of any t11ZsZoneMemberID in the same Zone Set database."
+  },
+  "t11ZsAliasRowStatus": {
+    "name": "t11ZsAliasRowStatus",
+    "oid": "1.3.6.1.2.1.160.1.1.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row. This object cannot be set to 'active' unless the corresponding value of t11ZsAliasName is unique within the Fabric's Zone Server database on this switch."
+  },
+  "t11ZsZoneMemberTable": {
+    "name": "t11ZsZoneMemberTable",
+    "oid": "1.3.6.1.2.1.160.1.1.6",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains all members of a Zone/Zone Alias and information about those members in the Zone Set database of the Zone Servers on each Fabric in one or more switches. In Enhanced mode, changes to a database made via this table are always made to the 'copy' database, but values read from this table reflect the contents of either the 'copy' database or the current (committed) database as indicated by the corresponding value of t11ZsServerReadFromDatabase."
+  },
+  "t11ZsZoneMemberEntry": {
+    "name": "t11ZsZoneMemberEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.6.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneMemberParentType",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneMemberParentIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneMemberIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents the relationship between a member and (one of) its 'parent(s)', i.e., a Zone or Zone Alias to which the member belongs, within a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). A Zone member (other than an alias) is added to a Zone by creating an entry in this table having: - t11ZsZoneMemberParentType = 'zone', and - t11ZsZoneMemberParentIndex = Zone's t11ZsZoneIndex, - t11ZsZoneMemberFormat != '05 - Alias Name', - t11ZsZoneMemberID = Member's identifier. An 'active' row in this table references rows in other tables. The agent must ensure that all such referenced rows exist with a status of 'active', either by refusing to create new active rows in this table, or by automatically deleting any rows in this table that reference a deleted row. The StorageType of a row in this table is specified by the instance of t11ZsServerDatabaseStorageType that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex."
+  },
+  "t11ZsZoneMemberParentType": {
+    "name": "t11ZsZoneMemberParentType",
+    "oid": "1.3.6.1.2.1.160.1.1.6.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "zone": 1,
+          "alias": 2
+        }
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object determines whether this member belongs to a Zone or Zone Alias."
+  },
+  "t11ZsZoneMemberParentIndex": {
+    "name": "t11ZsZoneMemberParentIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.6.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object contains the index value of the Zone or Zone Alias to which this member belongs. If the value of the corresponding instance of t11ZsZoneMemberParentType is 'zone', then this object will contain the value of the t11ZsZoneIndex object of the Zone to which this member belongs. If the value of the corresponding instance of t11ZsZoneMemberParentType is 'alias', then this object will contain the value of the t11ZsAliasIndex object of the Zone Alias to which this member belongs."
+  },
+  "t11ZsZoneMemberIndex": {
+    "name": "t11ZsZoneMemberIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.6.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index value that uniquely identifies this Zone Member amongst all Zone Members in the Zone Set database of a particular Fabric on a particular switch."
+  },
+  "t11ZsZoneMemberFormat": {
+    "name": "t11ZsZoneMemberFormat",
+    "oid": "1.3.6.1.2.1.160.1.1.6.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZsZoneMemberType",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object identifies the format of the Zone/Zone Alias member's identifier contained in t11ZsZoneMemberID. This object cannot be modified while the corresponding value of t11ZsZoneMemberRowStatus object is 'active'."
+  },
+  "t11ZsZoneMemberID": {
+    "name": "t11ZsZoneMemberID",
+    "oid": "1.3.6.1.2.1.160.1.1.6.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object contains the Member Identifier of the Zone or Alias. The interpretation of this object depends on the value of the corresponding instance of t11ZsZoneMemberFormat: - if t11ZsZoneMemberFormat is 'N_Port_Name', then this object contains an N_Port_Name. - if t11ZsZoneMemberFormat is 'Domain_ID and physical port', then this object contains a 4-octet value in network byte order. The first octet is zero, the second octet contains the Domain_ID, and the last 2 octets contain the physical port number. - if t11ZsZoneMemberFormat is 'N_Port_ID', then this object contains the 3-octet Nx_Port FC_ID. - if t11ZsZoneMemberFormat is 'Alias Name', then this object contains the value of t11ZsAliasName for some Alias in the same Zone Set database. - if t11ZsZoneMemberFormat is 'Node_Name', then this object contains an 8-octet Node_Name. - if t11ZsZoneMemberFormat is 'F_Port_Name', then this object contains an 8-octet F_Port_Name. - if t11ZsZoneMemberFormat is one of the 'Vendor Specific' values, then this object contains a value of 1 to 255 octets in a format defined by the relevant vendor. This object cannot be modified while the corresponding value of t11ZsZoneMemberRowStatus object is 'active'."
+  },
+  "t11ZsZoneMemberRowStatus": {
+    "name": "t11ZsZoneMemberRowStatus",
+    "oid": "1.3.6.1.2.1.160.1.1.6.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row. The corresponding instances of t11ZsZoneMemberID and t11ZsZoneMemberFormat objects must be set before or concurrently with setting this object to 'active'."
+  },
+  "t11ZsAttribBlockTable": {
+    "name": "t11ZsAttribBlockTable",
+    "oid": "1.3.6.1.2.1.160.1.1.7",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table gives information on all the Zone Attributes in the Zone Set database of the Zone Servers on each Fabric in one or more switches. In Enhanced mode, changes to a database made via this table are always made to the 'copy' database, but values read from this table reflect the contents of either the 'copy' database or the current (committed) database as indicated by the corresponding value of t11ZsServerReadFromDatabase."
+  },
+  "t11ZsAttribBlockEntry": {
+    "name": "t11ZsAttribBlockEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.7.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAttribBlockIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry contains information about a Zone Attribute Block (of Zone Attributes) in the Zone Set database of a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). An 'active' row in this table references a row in the t11ZsAttribBlockTable. The agent must ensure that the referenced rows exists with a status of 'active', either by refusing to create new active rows in this table, or by automatically deleting any rows in this table that reference a deleted row. The StorageType of a row in this table is specified by the instance of t11ZsServerDatabaseStorageType that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex."
+  },
+  "t11ZsAttribBlockIndex": {
+    "name": "t11ZsAttribBlockIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.7.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index value that uniquely identifies this Zone Attribute within the Zone Set database of a particular Fabric on a particular switch."
+  },
+  "t11ZsAttribBlockName": {
+    "name": "t11ZsAttribBlockName",
+    "oid": "1.3.6.1.2.1.160.1.1.7.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZoningName",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The name of this Zone Attribute Block, which should be unique within the Fabric."
+  },
+  "t11ZsAttribBlockRowStatus": {
+    "name": "t11ZsAttribBlockRowStatus",
+    "oid": "1.3.6.1.2.1.160.1.1.7.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row."
+  },
+  "t11ZsAttribTable": {
+    "name": "t11ZsAttribTable",
+    "oid": "1.3.6.1.2.1.160.1.1.8",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table gives information on the Zone Attributes within the Zone Attribute Blocks in the Zone Set database of the Zone Servers on each Fabric in one or more switches. In Enhanced mode, changes to a database made via this table are always made to the 'copy' database, but values read from this table reflect the contents of either the 'copy' database or the current (committed) database as indicated by the corresponding value of t11ZsServerReadFromDatabase."
+  },
+  "t11ZsAttribEntry": {
+    "name": "t11ZsAttribEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.8.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAttribBlockIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAttribIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry contains information about a Zone Attribute in a Zone Attribute Block (identified by t11ZsAttribBlockIndex) in the Zone Set database of a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). An entry in this table cannot be created prior to its associated entry in the t11ZsAttribBlockTable. The StorageType of a row in this table is specified by the instance of t11ZsServerDatabaseStorageType that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex."
+  },
+  "t11ZsAttribIndex": {
+    "name": "t11ZsAttribIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.8.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index value that uniquely identifies this Zone Attribute within its Zone Attribute Block in the Zone Set database of a particular Fabric on a particular switch."
+  },
+  "t11ZsAttribType": {
+    "name": "t11ZsAttribType",
+    "oid": "1.3.6.1.2.1.160.1.1.8.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.8.3.8, Table 249.",
+    "status": "current",
+    "description": "The type of attribute: 0001 - Protocol 0002 - Broadcast Zone 0003 - Hard Zone 00E0 (hex) - Vendor Specific."
+  },
+  "t11ZsAttribValue": {
+    "name": "t11ZsAttribValue",
+    "oid": "1.3.6.1.2.1.160.1.1.8.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 4,
+            "max": 252
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.8.3.8.",
+    "status": "current",
+    "description": "The value of the attribute, formatted as specified in FC-GS-5 for the type given by the corresponding instance of t11ZsAttribType. Note that FC-GS-5 requires that the length of this value is a multiple of 4 bytes."
+  },
+  "t11ZsAttribRowStatus": {
+    "name": "t11ZsAttribRowStatus",
+    "oid": "1.3.6.1.2.1.160.1.1.8.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row."
+  },
+  "t11ZsActivateTable": {
+    "name": "t11ZsActivateTable",
+    "oid": "1.3.6.1.2.1.160.1.1.9",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table provides a mechanism to allow a Zone Set to be activated on a Fabric."
+  },
+  "t11ZsActivateEntry": {
+    "name": "t11ZsActivateEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.9.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry reflects the state of the activation of a Zone Set by a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex) on a particular Fabric (identified by the value of t11ZsServerFabricIndex)."
+  },
+  "t11ZsActivateRequest": {
+    "name": "t11ZsActivateRequest",
+    "oid": "1.3.6.1.2.1.160.1.1.9.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Setting this object to a value is a request for a Zone Set to be activated on the Fabric that is represented by this row. The Zone Set to be activated is the one for which t11ZsSetIndex has the same value. If a Zone Set is already active on a Fabric when a request is made to activate a different one on that Fabric, then the existing Zone Set is automatically deactivated and the specified Zone Set is activated in its place. The value of this object when read is always 0."
+  },
+  "t11ZsActivateDeactivate": {
+    "name": "t11ZsActivateDeactivate",
+    "oid": "1.3.6.1.2.1.160.1.1.9.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "deactivate": 1,
+          "noop": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Setting this object to 'deactivate' is a request to deactivate the currently active Zone Set on a Fabric. Note that the deactivation of the active Zone Set allows all ports to communicate or no ports to communicate, depending on the current Default Zone behavior. No action is taken if this object is set to 'noop'. When read, the value of this object is always 'noop'."
+  },
+  "t11ZsActivateResult": {
+    "name": "t11ZsActivateResult",
+    "oid": "1.3.6.1.2.1.160.1.1.9.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "activateSuccess": 1,
+          "activateFailure": 2,
+          "deactivateSuccess": 3,
+          "deactivateFailure": 4,
+          "inProgress": 5,
+          "none": 6
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the outcome of the most recent activation/deactivation using this entry. When the value of this object is 'inProgress', the values of the corresponding instances of t11ZsActivateRequest and t11ZsActivateDeactivate cannot be modified. The value 'none' indicates activation/deactivation has not been attempted since the last restart of the management system."
+  },
+  "t11ZsActivateFailCause": {
+    "name": "t11ZsActivateFailCause",
+    "oid": "1.3.6.1.2.1.160.1.1.9.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A textual message indicating the reason for the most recent failure of a Zone Set activation or deactivation, or the zero-length string if no information is available (e.g., because the corresponding instance of t11ZsActivateResult has the value 'none'). When the corresponding instance of t11ZsActivateResult is either 'activateFailure' or 'deactivateFailure', the value of this object indicates the reason for that failure."
+  },
+  "t11ZsActivateFailDomainId": {
+    "name": "t11ZsActivateFailDomainId",
+    "oid": "1.3.6.1.2.1.160.1.1.9.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FcDomainIdOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "If the failure cause (as indicated by t11ZsSetFailCause) was specific to a particular device, this object contains the Domain_ID of that device. Otherwise, this object contains zero."
+  },
+  "t11ZsActiveTable": {
+    "name": "t11ZsActiveTable",
+    "oid": "1.3.6.1.2.1.160.1.1.10",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table containing information on the currently enforced/active Zone Set on each Fabric. An active Zone Set cannot be modified. This table will be empty when no Zone Set is activated."
+  },
+  "t11ZsActiveEntry": {
+    "name": "t11ZsActiveEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.10.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents an active Zone Set of a particular Fabric (identified by the value of t11ZsServerFabricIndex), according to a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex)."
+  },
+  "t11ZsActiveZoneSetName": {
+    "name": "t11ZsActiveZoneSetName",
+    "oid": "1.3.6.1.2.1.160.1.1.10.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZoningName",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The name of this Zone Set on this Fabric."
+  },
+  "t11ZsActiveActivateTime": {
+    "name": "t11ZsActiveActivateTime",
+    "oid": "1.3.6.1.2.1.160.1.1.10.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime at which this entry was most recently activated. If this row was activated prior to the last re-initialization of the local network management system, then this object will contain a zero value."
+  },
+  "t11ZsActiveZoneTable": {
+    "name": "t11ZsActiveZoneTable",
+    "oid": "1.3.6.1.2.1.160.1.1.11",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains all the Zones that are present in the active Zone Sets on all Fabrics."
+  },
+  "t11ZsActiveZoneEntry": {
+    "name": "t11ZsActiveZoneEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.11.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents a Zone in the active Zone Set of a particular Fabric (identified by the value of t11ZsServerFabricIndex), according to a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex)."
+  },
+  "t11ZsActiveZoneIndex": {
+    "name": "t11ZsActiveZoneIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.11.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index value that uniquely identifies this Zone within the active Zone Set on a particular Fabric."
+  },
+  "t11ZsActiveZoneName": {
+    "name": "t11ZsActiveZoneName",
+    "oid": "1.3.6.1.2.1.160.1.1.11.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZoningName",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The name of this Zone."
+  },
+  "t11ZsActiveZoneBroadcastZoning": {
+    "name": "t11ZsActiveZoneBroadcastZoning",
+    "oid": "1.3.6.1.2.1.160.1.1.11.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether broadcast Zoning is enabled on this Zone. If broadcast Zoning is enabled, then broadcast frames generated by a member in this Zone will be restricted to members in this Zone. This object is only instantiated in Enhanced mode."
+  },
+  "t11ZsActiveZoneHardZoning": {
+    "name": "t11ZsActiveZoneHardZoning",
+    "oid": "1.3.6.1.2.1.160.1.1.11.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether hard Zoning is enabled on this Zone. This object is only instantiated in Enhanced mode."
+  },
+  "t11ZsActiveZoneMemberTable": {
+    "name": "t11ZsActiveZoneMemberTable",
+    "oid": "1.3.6.1.2.1.160.1.1.12",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains all members of all Zones within the active Zone Set on any Fabric."
+  },
+  "t11ZsActiveZoneMemberEntry": {
+    "name": "t11ZsActiveZoneMemberEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.12.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneMemberIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents a member of a Zone in the active Zone Set of a particular Fabric (identified by the value t11ZsServerFabricIndex), according to a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex)."
+  },
+  "t11ZsActiveZoneMemberIndex": {
+    "name": "t11ZsActiveZoneMemberIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.12.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index value that uniquely identifies this member amongst the members of a particular Zone in the active Zone Set on a particular Fabric."
+  },
+  "t11ZsActiveZoneMemberFormat": {
+    "name": "t11ZsActiveZoneMemberFormat",
+    "oid": "1.3.6.1.2.1.160.1.1.12.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZsZoneMemberType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object identifies the identifier format of the corresponding instance of t11ZsActiveZoneMemberID."
+  },
+  "t11ZsActiveZoneMemberID": {
+    "name": "t11ZsActiveZoneMemberID",
+    "oid": "1.3.6.1.2.1.160.1.1.12.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This value of this object identifies the member using the format specified in the corresponding instance of t11ZsActiveZoneMemberFormat."
+  },
+  "t11ZsActiveAttribTable": {
+    "name": "t11ZsActiveAttribTable",
+    "oid": "1.3.6.1.2.1.160.1.1.13",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains information about some of the Attributes of the Zones within the active Zone Set on each Fabric. This table contains all the types of attributes that might apply zero, one, or more times to a Zone. Attributes that apply once and only to a Zone are specified in the t11ZsActiveZoneTable. This table will always be empty in Basic mode. It will also be empty if there are no Zones in any active Zone Set having any of the applicable types of attributes."
+  },
+  "t11ZsActiveAttribEntry": {
+    "name": "t11ZsActiveAttribEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.13.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveAttribIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry contains an Attribute of a particular Zone in the active Zone Set of a particular Fabric (identified by the value of t11ZsServerFabricIndex), according to a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex)."
+  },
+  "t11ZsActiveAttribIndex": {
+    "name": "t11ZsActiveAttribIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.13.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index value that uniquely identifies this attribute amongst the other attributes for a particular Zone in the active Zone Set on a particular Fabric."
+  },
+  "t11ZsActiveAttribType": {
+    "name": "t11ZsActiveAttribType",
+    "oid": "1.3.6.1.2.1.160.1.1.13.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.8.3.8, Table 249.",
+    "status": "current",
+    "description": "The type of attribute: 0001 - Protocol 00E0 (hex) - Vendor Specific Note that type 2 (Hard) and type 3 (Broadcast) do not need to be represented here, because they are represented by t11ZsActiveZoneBroadcastZoning and t11ZsActiveZoneHardZoning."
+  },
+  "t11ZsActiveAttribValue": {
+    "name": "t11ZsActiveAttribValue",
+    "oid": "1.3.6.1.2.1.160.1.1.13.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 252
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Generic Services-5 (FC-GS-5), ANSI INCITS 427-2007, section 6.4.8.3.8.",
+    "status": "current",
+    "description": "The value of the attribute, formatted according to its type as indicated by the corresponding instance of t11ZsActiveAttribType. As specified in FC-GS-5, the length of an attribute value is at least 4 bytes, and if necessary, the value is appended with zero bytes so that the length is a multiple of 4. For a Vendor-Specific attribute value, the first 8 bytes contain the T10 Vendor ID as described in FC-GS-5."
+  },
+  "t11ZsStatsTable": {
+    "name": "t11ZsStatsTable",
+    "oid": "1.3.6.1.2.1.160.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of statistics maintained by Zone Servers."
+  },
+  "t11ZsStatsEntry": {
+    "name": "t11ZsStatsEntry",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A set of statistics for a Zone Server on a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex)."
+  },
+  "t11ZsOutMergeRequests": {
+    "name": "t11ZsOutMergeRequests",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Merge Request Frames sent by this Zone Server to other Zone Servers in the same Fabric. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsInMergeAccepts": {
+    "name": "t11ZsInMergeAccepts",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Merge Accept Frames received by this Zone Server from other Zone Servers in the same Fabric. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsInMergeRequests": {
+    "name": "t11ZsInMergeRequests",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Merge Request Frames received by this Zone Server from other Zone Servers in the same Fabric. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsOutMergeAccepts": {
+    "name": "t11ZsOutMergeAccepts",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Merge Accept Frames sent by this Zone Server to other Zone Servers in the same Fabric. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsOutChangeRequests": {
+    "name": "t11ZsOutChangeRequests",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, sections 10.6 and 13.",
+    "status": "current",
+    "description": "The number of change requests sent (via the Fabric Management Session Protocol) by this Zone Server to other Zone Servers in the same Fabric. This includes Acquire Change Authorization requests, Stage Fabric Config Update requests, Update Fabric Config requests and Release Change Authorization requests. It also includes the corresponding types of requests defined by the Enhanced Commit Service. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsInChangeAccepts": {
+    "name": "t11ZsInChangeAccepts",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, sections 10.6 and 13.",
+    "status": "current",
+    "description": "The number of SW_ACC messages received from other Zone Servers in the same Fabric (according to the Fabric Management Session Protocol) in response to change requests by this Zone Server. This includes SW_ACC messages received in response to Acquire Change Authorization requests, to Stage Fabric Config Update requests, to Update Fabric Config requests, and to Release Change Authorization requests. It also includes responses to the corresponding types of requests defined for the Enhanced Commit Service. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsInChangeRequests": {
+    "name": "t11ZsInChangeRequests",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, sections 10.6 and 13.",
+    "status": "current",
+    "description": "The number of change requests received (via the Fabric Management Session Protocol) by this Zone Server from other Zone Servers in the same Fabric. This includes Acquire Change Authorization requests, Stage Fabric Config Update requests, Update Fabric Config requests and Release Change Authorization requests. It also includes the corresponding types of requests defined by the Enhanced Commit Service. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsOutChangeAccepts": {
+    "name": "t11ZsOutChangeAccepts",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "Fibre Channel - Switch Fabric-4 (FC-SW-4), ANSI INCITS 418-2006, April 2006, sections 10.6 and 13.",
+    "status": "current",
+    "description": "The number of SW_ACC messages sent by this Zone Server (according to the Fabric Management Session Protocol) in response to change requests from other Zone Servers in the same Fabric. This includes SW_ACC messages sent in response to Acquire Change Authorization requests, to Stage Fabric Config Update requests, to Update Fabric Config requests and to Release Change Authorization requests. It also includes responses to the corresponding types of requests defined for the Enhanced Commit Service. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsInZsRequests": {
+    "name": "t11ZsInZsRequests",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Zone Server requests received by this Zone Server on this Fabric, both those received in Basic mode and in Enhanced mode. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsOutZsRejects": {
+    "name": "t11ZsOutZsRejects",
+    "oid": "1.3.6.1.2.1.160.1.2.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Zone Server requests rejected by this Zone Server on this Fabric, both those rejected in Basic mode and in Enhanced mode. This counter has no discontinuities other than those that all Counter32s have when sysUpTime=0."
+  },
+  "t11ZsNotifyControlTable": {
+    "name": "t11ZsNotifyControlTable",
+    "oid": "1.3.6.1.2.1.160.1.1.14",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of control information for notifications generated due to Zone Server events."
+  },
+  "t11ZsNotifyControlEntry": {
+    "name": "t11ZsNotifyControlEntry",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmInstanceIndex",
+        "implied": 0
+      },
+      {
+        "module": "FC-MGMT-MIB",
+        "object": "fcmSwitchIndex",
+        "implied": 0
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerFabricIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry contains notification control information specific to a Zone Server for a particular Fabric (identified by the value of t11ZsServerFabricIndex) on a particular switch (identified by values of fcmInstanceIndex and fcmSwitchIndex). The persistence across reboots of writable values in a row of this table is specified by the instance of t11ZsServerDatabaseStorageType that is INDEXed by the same values of fcmInstanceIndex, fcmSwitchIndex, and t11ZsServerFabricIndex."
+  },
+  "t11ZsNotifyRequestRejectEnable": {
+    "name": "t11ZsNotifyRequestRejectEnable",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether t11ZsRequestRejectNotify notifications should be generated by the Zone Server for this Fabric."
+  },
+  "t11ZsNotifyMergeFailureEnable": {
+    "name": "t11ZsNotifyMergeFailureEnable",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether t11ZsMergeFailureNotify notifications should be generated by the Zone Server for this Fabric."
+  },
+  "t11ZsNotifyMergeSuccessEnable": {
+    "name": "t11ZsNotifyMergeSuccessEnable",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether t11ZsMergeSuccessNotify notifications should be generated by the Zone Server for this Fabric."
+  },
+  "t11ZsNotifyDefZoneChangeEnable": {
+    "name": "t11ZsNotifyDefZoneChangeEnable",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether t11ZsDefZoneChangeNotify notifications should be generated by the Zone Server for this Fabric."
+  },
+  "t11ZsNotifyActivateEnable": {
+    "name": "t11ZsNotifyActivateEnable",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether t11ZsActivateNotify notifications should be generated by the Zone Server for this Fabric."
+  },
+  "t11ZsRejectCtCommandString": {
+    "name": "t11ZsRejectCtCommandString",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The binary content of the Zone Server request, formatted as an octet string (in network byte order) containing the Common Transport Information Unit (CT_IU), as described in Table 2 of FC-GS-5 (including the preamble), which was most recently rejected by the Fabric Configuration Server for this Fabric. This object contains the zero-length string if and when the CT-IU's content is unavailable. When the length of this object is 255 octets, it contains the first 255 octets of the CT-IU (in network byte order)."
+  },
+  "t11ZsRejectRequestSource": {
+    "name": "t11ZsRejectRequestSource",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FcNameIdOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The WWN that was the source of the CT_IU contained in the corresponding instance of t11ZsRejectCtCommandString."
+  },
+  "t11ZsRejectReasonCode": {
+    "name": "t11ZsRejectReasonCode",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11NsGs4RejectReasonCode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The reason code corresponding to the most recent rejection of a request by the Zone Server for this Fabric."
+  },
+  "t11ZsRejectReasonCodeExp": {
+    "name": "t11ZsRejectReasonCodeExp",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "T11ZsRejectReasonExplanation",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "When the value of t11ZsRejectReasonCode is 'Unable to perform command request', this object contains the corresponding reason code explanation."
+  },
+  "t11ZsRejectReasonVendorCode": {
+    "name": "t11ZsRejectReasonVendorCode",
+    "oid": "1.3.6.1.2.1.160.1.1.14.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 1
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "When the value of t11ZsRejectReasonCode is 'Vendor Specific Error', this object contains the corresponding vendor-specific reason code."
+  },
+  "t11ZsFabricIndex": {
+    "name": "t11ZsFabricIndex",
+    "oid": "1.3.6.1.2.1.160.1.1.15",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4096
+          }
+        ]
+      }
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object contains either a value of T11FabricIndex to identify the Fabric on which some occurrence has caused a notification to be generated, or it has the value 4096 to indicate all applicable Fabrics."
+  },
+  "t11ZsRequestRejectNotify": {
+    "name": "t11ZsRequestRejectNotify",
+    "oid": "1.3.6.1.2.1.160.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "T11-FC-FABRIC-ADDR-MGR-MIB",
+        "object": "t11FamLocalSwitchWwn"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectRequestSource"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectCtCommandString"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectReasonCode"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectReasonCodeExp"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectReasonVendorCode"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is generated whenever a Zone Server (indicated by the value of t11FamLocalSwitchWwn) rejects a request. The value of t11ZsRejectCtCommandString indicates the rejected request, and the values of t11ZsRejectReasonCode, t11ZsRejectReasonCodeExp and t11ZsRejectReasonVendorCode indicate the reason for the rejection. The value of t11ZsRequestClient indicates the source of the request."
+  },
+  "t11ZsMergeFailureNotify": {
+    "name": "t11ZsMergeFailureNotify",
+    "oid": "1.3.6.1.2.1.160.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsFabricIndex"
+      }
+    ],
+    "status": "current",
+    "description": "This notification indicates that a Zone merge failure has occurred on the Fabric indicated by the value of t11ZsFabricIndex, on the interface indicated by the value of ifIndex. If multiple Virtual Fabrics are configured on an interface, and all have a Zone merge failure at the same time, then just one notification is generated and t11ZsFabricIndex has the value 4096."
+  },
+  "t11ZsMergeSuccessNotify": {
+    "name": "t11ZsMergeSuccessNotify",
+    "oid": "1.3.6.1.2.1.160.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsFabricIndex"
+      }
+    ],
+    "status": "current",
+    "description": "This notification indicates that a successful Zone merge has occurred on the Fabric indicated by the value of t11ZsFabricIndex, on the interface indicated by the value of ifIndex. If multiple Virtual Fabrics are configured on an interface, and all have a successful Zone Merge at the same time, then just one notification is generated and t11ZsFabricIndex has the value 4096."
+  },
+  "t11ZsDefZoneChangeNotify": {
+    "name": "t11ZsDefZoneChangeNotify",
+    "oid": "1.3.6.1.2.1.160.0.4",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerDefaultZoneSetting"
+      }
+    ],
+    "status": "current",
+    "description": "This notification indicates that the value of a Default Zone Setting has changed. The value of t11ZsServerDefaultZoneSetting contains the value after the change."
+  },
+  "t11ZsActivateNotify": {
+    "name": "t11ZsActivateNotify",
+    "oid": "1.3.6.1.2.1.160.0.5",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "T11-FC-FABRIC-ADDR-MGR-MIB",
+        "object": "t11FamLocalSwitchWwn"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActivateResult"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is generated whenever a switch (indicated by the value of t11FamLocalSwitchWwn) activates/deactivates a Zone Set on a Fabric. The t11ZsActivateResult object denotes the outcome of the activation/deactivation."
+  },
+  "t11ZsMIBCompliances": {
+    "name": "t11ZsMIBCompliances",
+    "oid": "1.3.6.1.2.1.160.2.1",
+    "class": "objectidentity"
+  },
+  "t11ZsMIBGroups": {
+    "name": "t11ZsMIBGroups",
+    "oid": "1.3.6.1.2.1.160.2.2",
+    "class": "objectidentity"
+  },
+  "t11ZsMIBCompliance": {
+    "name": "t11ZsMIBCompliance",
+    "oid": "1.3.6.1.2.1.160.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "t11ZsBasicGroup",
+        "module": "T11-FC-ZONE-SERVER-MIB"
+      },
+      {
+        "object": "t11ZsNotificationControlGroup",
+        "module": "T11-FC-ZONE-SERVER-MIB"
+      },
+      {
+        "object": "t11ZsNotificationGroup",
+        "module": "T11-FC-ZONE-SERVER-MIB"
+      },
+      {
+        "object": "t11ZsEnhancedModeGroup",
+        "module": "T11-FC-ZONE-SERVER-MIB"
+      },
+      {
+        "object": "t11ZsActivateGroup",
+        "module": "T11-FC-ZONE-SERVER-MIB"
+      },
+      {
+        "object": "t11ZsStatisticsGroup",
+        "module": "T11-FC-ZONE-SERVER-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities that implement the Zone Server."
+  },
+  "t11ZsBasicGroup": {
+    "name": "t11ZsBasicGroup",
+    "oid": "1.3.6.1.2.1.160.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerCapabilityObject"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerDatabaseStorageType"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerDistribute"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerResult"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerReasonCode"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerReasonCodeExp"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerReasonVendorCode"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerLastChange"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerHardZoning"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerReadFromDatabase"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerOperationMode"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsSetName"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsSetRowStatus"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneName"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneAttribBlock"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneRowStatus"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsSetZoneRowStatus"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneMemberFormat"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneMemberID"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsZoneMemberRowStatus"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneSetName"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveActivateTime"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneName"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneMemberFormat"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneMemberID"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for displaying and updating the Zone configuration of a Zone Server capable of operating in Basic mode."
+  },
+  "t11ZsEnhancedModeGroup": {
+    "name": "t11ZsEnhancedModeGroup",
+    "oid": "1.3.6.1.2.1.160.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerCommit"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerChangeModeResult"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerDefaultZoneSetting"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerMergeControlSetting"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsServerDefZoneBroadcast"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAliasName"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAliasRowStatus"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAttribBlockName"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAttribBlockRowStatus"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAttribType"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAttribValue"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsAttribRowStatus"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneBroadcastZoning"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveZoneHardZoning"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveAttribType"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActiveAttribValue"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of additional objects for displaying and updating the Zone configuration of a Zone Server capable of operating in Enhanced mode."
+  },
+  "t11ZsStatisticsGroup": {
+    "name": "t11ZsStatisticsGroup",
+    "oid": "1.3.6.1.2.1.160.2.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsOutMergeRequests"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsInMergeAccepts"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsInMergeRequests"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsOutMergeAccepts"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsOutChangeRequests"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsInChangeAccepts"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsInChangeRequests"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsOutChangeAccepts"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsInZsRequests"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsOutZsRejects"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for collecting Zone Server statistics information."
+  },
+  "t11ZsNotificationControlGroup": {
+    "name": "t11ZsNotificationControlGroup",
+    "oid": "1.3.6.1.2.1.160.2.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsNotifyRequestRejectEnable"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsNotifyMergeFailureEnable"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsNotifyMergeSuccessEnable"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsNotifyDefZoneChangeEnable"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsNotifyActivateEnable"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectCtCommandString"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectRequestSource"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectReasonCode"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectReasonCodeExp"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRejectReasonVendorCode"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsFabricIndex"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notification control and notification information objects for monitoring Zone Server request rejection and Zone merge failures."
+  },
+  "t11ZsActivateGroup": {
+    "name": "t11ZsActivateGroup",
+    "oid": "1.3.6.1.2.1.160.2.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActivateRequest"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActivateDeactivate"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActivateResult"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActivateFailCause"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActivateFailDomainId"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects that allow a Zone Set to be activated via SNMP SetRequests and provide the status and result of such an activation."
+  },
+  "t11ZsNotificationGroup": {
+    "name": "t11ZsNotificationGroup",
+    "oid": "1.3.6.1.2.1.160.2.2.6",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsRequestRejectNotify"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsMergeFailureNotify"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsMergeSuccessNotify"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsDefZoneChangeNotify"
+      },
+      {
+        "module": "T11-FC-ZONE-SERVER-MIB",
+        "object": "t11ZsActivateNotify"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notification(s) for monitoring Zone Server request rejection, Zone merge failures and successes, and Default Zoning behavioral changes."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/T11-FC-ZONE-SERVER-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 19:12:56 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "T11-FC-ZONE-SERVER-MIB"
+  }
+}

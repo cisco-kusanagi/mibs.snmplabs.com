@@ -1,0 +1,859 @@
+{
+  "imports": {
+    "class": "imports",
+    "Fore-Common-MIB": [
+      "software",
+      "EntryStatus"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "TimeTicks",
+      "OBJECT-TYPE",
+      "Integer32",
+      "MODULE-IDENTITY",
+      "Bits",
+      "NOTIFICATION-TYPE",
+      "OBJECT-IDENTITY",
+      "MibIdentifier",
+      "iso",
+      "Gauge32",
+      "IpAddress",
+      "Unsigned32",
+      "Counter64",
+      "Counter32"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "DisplayString"
+    ]
+  },
+  "crGroup": {
+    "name": "crGroup",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1",
+    "class": "moduleidentity",
+    "lastupdated": "9911050000Z",
+    "organization": "FORE",
+    "contactinfo": " Postal: FORE Systems Inc. 1000 FORE Drive Warrendale, PA 15086-7502 Tel: +1 724 742 6900 Email: nm_mibs@fore.com Web: http://www.fore.com",
+    "description": "Fore call recording mib."
+  },
+  "crXfrGroup": {
+    "name": "crXfrGroup",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1",
+    "class": "objectidentity"
+  },
+  "crConfGroup": {
+    "name": "crConfGroup",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2",
+    "class": "objectidentity"
+  },
+  "crStatsGroup": {
+    "name": "crStatsGroup",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.3",
+    "class": "objectidentity"
+  },
+  "perfConfGroup": {
+    "name": "perfConfGroup",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.4",
+    "class": "objectidentity"
+  },
+  "crFilterGroup": {
+    "name": "crFilterGroup",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5",
+    "class": "objectidentity"
+  },
+  "CrXfrTrapStatus": {
+    "name": "CrXfrTrapStatus",
+    "class": "type",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "crXfrNoError": 1,
+          "crXfrNoResponseFromServer": 2,
+          "crXfrAccessViolation": 3,
+          "crXfrDiskFullorAllocationExceeded": 4,
+          "crXfrOtherError": 5
+        }
+      }
+    }
+  },
+  "crXfrTable": {
+    "name": "crXfrTable",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": " A table of feature-specific information pertaining to Callrecord transfers."
+  },
+  "crXfrEntry": {
+    "name": "crXfrEntry",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "Fore-Callrecord-MIB",
+        "object": "crXfrIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": " A table entry containing information for Callrecord transfers from the switch(fabric) for a particular feature."
+  },
+  "crXfrIndex": {
+    "name": "crXfrIndex",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "callrecord": 1,
+          "performance": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The index for a particular feature within the crXfrTable."
+  },
+  "crXfrPrimaryUrl": {
+    "name": "crXfrPrimaryUrl",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This is the specification of the Primary URL for callrecord transfers. The URL is in the form: //<ip-address>[:port][<pathname>[<filename>]] This includes the IP address host to contact, and optionally the port on that host, the directory on that host to put the data into and the filename. The pathname and filename are each strings of characters with the following special tokens: Token Description _____ _______________________________________________________ %T SwitchType - identifies the type of switch. eg `vss' for Vector %N SwitchNumber - `SerialNumber.SwitchIndex' for a non-enclosure switch(fabric) or `EnclosureNumber.SwitchIndex' of a multi-fabric switch within an enclosure. The SwitchIndex is the slot number of the fabric within the enclosure(starting at 0). In the case of a non-enclosure switch, the SwitchIndex is always 0. %I SwitchIP - switch's IP address eg `169.144.1.90' %D DateTime - formatted as `YYMMDDhhmm'. %R RecordingInterval - elapsed time in minutes. %C CRType - identifies the contents of the file. - `account' for callrecord data - `stats' for Performance data %F FileStatus - status of the file. - `co' for file that switch(fabric) is currently writing to - `cc' for file that switch(fabric) has completed writing to If the pathname is not specified, the default file is transferred to the login directory specified by crXfrUserid. The following string will be used as the default filename in the case where the URL ends with a `/'(i.e. without any filename): %T_%C.%D.%R.%N.%F If multiple switches are to write to the same location, the pathname or filename should contain either a %I or a %N token. A %D token in the filename portion will separate each RecordingInterval worth of data into a different file with the name being the time the file was created. The following example would record every switch type and switch IP into a separate directory with a file at each RecordingInterval: //169.144.1.5/usr/auditlog/%T/%I/%D Given a Work Group switch with an IP address of 169.44.4.4, this would produce files in the following directory tree structure: /usr/auditlog/ASX200WG/169.44.4.4/9608252355 If the filename specified is not made up of the above tokens, then it is used as a prefix to the default filename. If the file transfer attempt fails, the switch will generate a trap and attempt a transfer to crXfrSecondaryUrl. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval."
+  },
+  "crXfrSecondaryUrl": {
+    "name": "crXfrSecondaryUrl",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This is the specification of the Secondary URL for callrecord transfers. The URL is in the form: //<ip-address>[:port][<pathname>[<filename>]] Please refer to the crXfrPrimaryUrl for more details. This URL is to be used only if the transfer to crXfrPrimaryUrl is not successful. If the file transfer attempt to this URL also fails, the switch will generate a trap. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval."
+  },
+  "crXfrRecordingInterval": {
+    "name": "crXfrRecordingInterval",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 5,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The interval (in minutes) at which the the relevant information is transferred to the host. The default setting will be 5 minutes. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval."
+  },
+  "crXfrUserId": {
+    "name": "crXfrUserId",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "obsolete",
+    "description": "The userid to be used for the data transfer sessions to the primary and secondary data servers. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval."
+  },
+  "crXfrPassword": {
+    "name": "crXfrPassword",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "obsolete",
+    "description": "The password to be used for the data transfer sessions to the primary and secondary data servers. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval. Note this object is write-only and reading it will result in implementation-specific results."
+  },
+  "crXfrTransferStatus": {
+    "name": "crXfrTransferStatus",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "primaryInProgress": 1,
+          "secondaryInProgress": 2,
+          "primarySucceeded": 3,
+          "secondarySucceeded": 4,
+          "bothFailed": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A message describing the status of the current file transfer. If the data transfer is not successful, refer to the crXfrPrimaryTrapStatus or crXfrSecondaryTrapStatus."
+  },
+  "crXfrStatusText": {
+    "name": "crXfrStatusText",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A message describing the status of the last file transfer."
+  },
+  "crXfrPrimaryTrapStatus": {
+    "name": "crXfrPrimaryTrapStatus",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CrXfrTrapStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The trap status of the file transfer to the primary URL. The trap status will be set to `crXfrNoError' at the start of the data transfer process and if the condition persists, a trap will be generated and the crXfrPrimaryTrapStatus updated to reflect the error condition."
+  },
+  "crXfrSecondaryTrapStatus": {
+    "name": "crXfrSecondaryTrapStatus",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CrXfrTrapStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The trap status of the file transfer to the secondary URL. The trap status will be set to `crXfrNoError' at the start of the data transfer process and if the condition persists, a trap will be generated and the crXfrSecondaryTrapStatus updated to reflect the error condition."
+  },
+  "crXfrPrimaryXfrFailed": {
+    "name": "crXfrPrimaryXfrFailed",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of failed data transfers to the primary data server"
+  },
+  "crXfrSecondaryXfrFailed": {
+    "name": "crXfrSecondaryXfrFailed",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of failed data transfers to the secondary data server"
+  },
+  "crXfrEntryStatus": {
+    "name": "crXfrEntryStatus",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "EntryStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this entry in the crXfr table."
+  },
+  "crXfrPrimaryUserId": {
+    "name": "crXfrPrimaryUserId",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The userid to be used for the data transfer session to the primary data server. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval."
+  },
+  "crXfrPrimaryPassword": {
+    "name": "crXfrPrimaryPassword",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The password to be used for the data transfer session to the primary data server. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval. Note this object is write-only and reading it will result in implementation-specific results."
+  },
+  "crXfrSecondaryUserId": {
+    "name": "crXfrSecondaryUserId",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The userid to be used for the data transfer session to the secondary data server. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval."
+  },
+  "crXfrSecondaryPassword": {
+    "name": "crXfrSecondaryPassword",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.1.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The password to be used for the data transfer session to the secondary data server. If crAdminStatus is `on' and this value is changed, the change goes into effect at the next aligned crXfrRecordingInterval. Note this object is write-only and reading it will result in implementation-specific results."
+  },
+  "crAdminStatus": {
+    "name": "crAdminStatus",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "off": 1,
+          "on": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Specifies whether Callrecord is On or Off. By default, it is set to Off. If it is changed, the change takes effect immediately. "
+  },
+  "crMemoryAllocated": {
+    "name": "crMemoryAllocated",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "obsolete",
+    "description": "A percentage specifying what portion of the mainheap (connection or user space) is to be reserved for Callrecords. The default setting will be 15%. This variable can be set to any value between 1% and 50%. Configuration of this value will affect memory available to signaling, routing and may result in increased call blocking. Engineering information will be provided as part of the deployment procedures. A change in this MIB value will be effective only after the next Callrecord initialization. (i.e. when the crAdminStatus changes from `off' to `on' the switch(fabric) is rebooted)"
+  },
+  "crMemOflowAction": {
+    "name": "crMemOflowAction",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "rejectCall": 1,
+          "dontRecordCall": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This specifies the action that the switch(fabric) should take if the memory allocated for Callrecord runs out. rejectCall(1) specifies that the call should be rejected. dontRecordCall(2) specifies that the call should be allowed with no callrecord being generated for that call. The default setting will be rejectCall(1). If it is changed, the change takes effect immediately. "
+  },
+  "crAdminMinRecords": {
+    "name": "crAdminMinRecords",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This specifies the minimum number of call records which will be stored in the pool memory. Specifying a value of 0 implies that the default value for this variable will be set. "
+  },
+  "crAdminMaxRecords": {
+    "name": "crAdminMaxRecords",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This specifies the maximum number of call records which could be stored in the pool memory. A value of 0 implies that the Call Records pool size is only limited by the amount of memory in the system. "
+  },
+  "crOperRecords": {
+    "name": "crOperRecords",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This specifies the number of call records which are currently stored in the pool memory."
+  },
+  "crAdminMinDTBs": {
+    "name": "crAdminMinDTBs",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This specifies the minimum number of data transfer buffers which will be stored in the pool memory. Specifying a value of 0 implies that the default value for this variable will be set. "
+  },
+  "crAdminMaxDTBs": {
+    "name": "crAdminMaxDTBs",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This specifies the maximum number of data transfer buffers which could be stored in the pool memory. A value of 0 implies that the DTB pool size is only limited by the amount of memory in the system. "
+  },
+  "crOperDTBs": {
+    "name": "crOperDTBs",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This specifies the number of data transfer buffers which are currently stored in the pool memory."
+  },
+  "crOperStatus": {
+    "name": "crOperStatus",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "off": 1,
+          "on": 2,
+          "shutting-down": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Specifies whether Callrecord is Operationally active, inactive or is in the processs of shutting down. Shutting sown occurs when call recording has been administratively disabled but is currently in the midst of an ftp transfer."
+  },
+  "crCounterCollectionInterval": {
+    "name": "crCounterCollectionInterval",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.2.11",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The interval (in seconds) at which the relevant hardware counters will be collected and maintained. These counter values will be transferred to the host at every crXfrRecordingInterval minutes. The default setting will be the value configured for crXfrRecordingInterval in seconds. Valid values for this variable would range from 10 seconds to crXfrRecordingInterval value in seconds. Modifying this value is only applicable for the ASX 4000 platform. Setting this value to greater than the crXfrRecordingInterval value in seconds implies that hardware counters will only be collected every crXfrRecordingInterval minutes. If crAdminStatus is on and this value is changed, the change goes into effect at the next crCounterCollectionInterval."
+  },
+  "crCallsRejected": {
+    "name": "crCallsRejected",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.3.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of calls rejected due to failure to allocate a callrecord."
+  },
+  "crCallsNotRecorded": {
+    "name": "crCallsNotRecorded",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.3.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of calls accepted even when there was a failure to allocate a callrecord."
+  },
+  "crCallsOpened": {
+    "name": "crCallsOpened",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.3.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of calls for which a `start' callrecord was successfully generated."
+  },
+  "crIntervalsSkipped": {
+    "name": "crIntervalsSkipped",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.3.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of skipped data transfers due to preceding data transfers not complete within the recording interval"
+  },
+  "crTermCallsLost": {
+    "name": "crTermCallsLost",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.3.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of terminated callrecords lost due to failure to allocate a data transfer buffer"
+  },
+  "crUpTime": {
+    "name": "crUpTime",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.3.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The time in hundredths of a second since Callrecord has been on at the primary, secondary or both sides. This value along with the counters are reset when the crAdminStatus is modified."
+  },
+  "crCurrentCallsRecorded": {
+    "name": "crCurrentCallsRecorded",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.3.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The total number of calls currently being recorded."
+  },
+  "perfAdminStatus": {
+    "name": "perfAdminStatus",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.4.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "off": 1,
+          "on": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Specifies whether performance monitoring is On or Off. By default, it is set to Off. If it is changed, the change takes effect immediately. "
+  },
+  "crFilterTable": {
+    "name": "crFilterTable",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": " A table of filters for which call records are to be generated."
+  },
+  "crFilterEntry": {
+    "name": "crFilterEntry",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "Fore-Callrecord-MIB",
+        "object": "crFilterPort",
+        "implied": 0
+      },
+      {
+        "module": "Fore-Callrecord-MIB",
+        "object": "crFilterVpi",
+        "implied": 0
+      },
+      {
+        "module": "Fore-Callrecord-MIB",
+        "object": "crFilterVci",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": " A table entry containing a filter for applying to call recording."
+  },
+  "crFilterPort": {
+    "name": "crFilterPort",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The Port index for a particular feature within the crFilterTable is to be set.A Value of 16777215 signifies ANY PORT. "
+  },
+  "crFilterVpi": {
+    "name": "crFilterVpi",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The Vpi index for a particular feature within the crFilterTable is to be set.A Value of 16777215 signifies ANY VPI. However the ANY VPI value can only be used if the port specified is ANY PORT. "
+  },
+  "crFilterVci": {
+    "name": "crFilterVci",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The Vci index for a particular feature within the crFilterTable is to be set. A Value of 16777215 signifies ANY VCI. However the value of ANY VCI can only be used if the port specified is ANY PORT and the vpi specified is ANY VPI. "
+  },
+  "crFilterPVCSupport": {
+    "name": "crFilterPVCSupport",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "on": 1,
+          "off": 2,
+          "unspecified": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies if PVCs on this interface are to be recorded. "
+  },
+  "crFilterPVPSupport": {
+    "name": "crFilterPVPSupport",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "on": 1,
+          "off": 2,
+          "unspecified": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies if PVPs on this interface are to be recorded. "
+  },
+  "crFilterSVCSupport": {
+    "name": "crFilterSVCSupport",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "on": 1,
+          "off": 2,
+          "unspecified": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies if SVCs on this interface are to be recorded. "
+  },
+  "crFilterSVPSupport": {
+    "name": "crFilterSVPSupport",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "on": 1,
+          "off": 2,
+          "unspecified": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies if SVPs on this interface are to be recorded. "
+  },
+  "crFilterSPVCSupport": {
+    "name": "crFilterSPVCSupport",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "on": 1,
+          "off": 2,
+          "unspecified": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies if SPVCs on this interface are to be recorded. "
+  },
+  "crFilterSPVPSupport": {
+    "name": "crFilterSPVPSupport",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "on": 1,
+          "off": 2,
+          "unspecified": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies if SPVPs on this interface are to be recorded. "
+  },
+  "crFilterFailedCallSupport": {
+    "name": "crFilterFailedCallSupport",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "on": 1,
+          "off": 2,
+          "unspecified": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies if Failed Calls on this interface are to be recorded. "
+  },
+  "crFilterEntryStatus": {
+    "name": "crFilterEntryStatus",
+    "oid": "1.3.6.1.4.1.326.2.2.2.3.1.5.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "EntryStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The SNMP status of this Expansion entry."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/Fore-Callrecord-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 18:51:55 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "Fore-Callrecord-MIB"
+  }
+}

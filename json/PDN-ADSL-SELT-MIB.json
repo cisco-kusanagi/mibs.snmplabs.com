@@ -1,0 +1,593 @@
+{
+  "imports": {
+    "class": "imports",
+    "IF-MIB": [
+      "ifIndex"
+    ],
+    "PDN-HEADER-MIB": [
+      "pdn-interfaces"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "MibIdentifier",
+      "Counter64",
+      "iso",
+      "NOTIFICATION-TYPE",
+      "OBJECT-TYPE",
+      "Integer32",
+      "Unsigned32",
+      "TimeTicks",
+      "MODULE-IDENTITY",
+      "Gauge32",
+      "OBJECT-IDENTITY",
+      "IpAddress",
+      "Counter32",
+      "Bits"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "DisplayString"
+    ]
+  },
+  "pdnAdslSeltMIB": {
+    "name": "pdnAdslSeltMIB",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2005-03-28 00:00",
+        "description": "Added clearResults(4) to pdnAdslSeltCmd to allow an entry in the pdnAdslSeltLcTable or the pdnAdslSeltLnfTable to be removed. Added resultsCleared(5) to pdnAdslSeltStatus to indicate that clearResults(4) have been executed."
+      },
+      {
+        "revision": "2005-03-10 00:00",
+        "description": "Added notStarted(4) to pdnAdslSeltStatus. This solves the problem of what to return when the pdnAdslSeltTable is walked prior to a test being run on an interface."
+      },
+      {
+        "revision": "2004-12-02 00:00",
+        "description": "Initial release."
+      }
+    ],
+    "lastupdated": "200403280000Z",
+    "organization": "Paradyne Networks MIB Working Group Other information about group editing the MIB",
+    "contactinfo": "Paradyne Networks, Inc. 8545 126th Avenue North Largo, FL 33733 www.paradyne.com General Comments to: mibwg_team@paradyne.com Editors Jesus Pinto, Clay Sikes",
+    "description": "This MIB module defines a portion of the management information base (MIB) for managing configuration and monitoring results of SELT (Single Ended Line Test) tests over ADSL interfaces. At the time this MIB was defined, the IETF ADSL MIB Working does not have any work on the 'standard' MIBs planned and/or has not produced a schedule to address G.SELT needs. As a result, these objects may be a `temporary' solution until MIBs/Objects are defined meet the needs of ADSL SELT testing. ===================================================================== == == == Copyright (C) 2005 Paradyne Corporation. == == == ====================================================================="
+  },
+  "pdnAdslSeltNotifications": {
+    "name": "pdnAdslSeltNotifications",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.0",
+    "class": "objectidentity"
+  },
+  "pdnAdslSeltObjects": {
+    "name": "pdnAdslSeltObjects",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1",
+    "class": "objectidentity"
+  },
+  "pdnAdslSeltAFNs": {
+    "name": "pdnAdslSeltAFNs",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.2",
+    "class": "objectidentity"
+  },
+  "pdnAdslSeltConformance": {
+    "name": "pdnAdslSeltConformance",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3",
+    "class": "objectidentity"
+  },
+  "PdnSeltTypes": {
+    "name": "PdnSeltTypes",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "loopCharacterization": 1,
+          "loopNoiseFloor": 2
+        }
+      }
+    },
+    "status": "current",
+    "description": "This textual convention defines the SELT test types available for configuration."
+  },
+  "pdnAdslSeltWireSize": {
+    "name": "pdnAdslSeltWireSize",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "awg": 1,
+          "metric": 2,
+          "metricJapan": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object permits the selection of the metric unit to be used when reporting SELT test results. (i.e for AWG results are in feet and for metric/metricJapan results are in meters). This configuration parameter applies to all the SELT tests run in the device. "
+  },
+  "pdnAdslSeltTable": {
+    "name": "pdnAdslSeltTable",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table allows initiation/termination of SELT Tests."
+  },
+  "pdnAdslSeltEntry": {
+    "name": "pdnAdslSeltEntry",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents an instance of a SELT test currently running or ever run (since last system reset) on an ADSL interface. There should be entries in this table for every active running tests and test that are in the process of being stopped or have terminated already. There should be no entries for ADSL interfaces that have not run a test since last since reset; thus, the agent should return NO_SUCH_NAME for those cases. "
+  },
+  "pdnAdslSeltType": {
+    "name": "pdnAdslSeltType",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PdnSeltTypes",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object is used to specify the SELT test type that will be initiated. If a SELT Test is already running on the ADSL interface, writing to this object is prohibited by the agent until the previous test is completed or terminated. "
+  },
+  "pdnAdslSeltCmd": {
+    "name": "pdnAdslSeltCmd",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noOp": 1,
+          "start": 2,
+          "stop": 3,
+          "clearResults": 4
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object corresponds to the list of test operations that can be performed. The possible values are noOp(1), start(2), stop(3), or clearResults(4). Reading this object will always return the value 'noOp (1)'. If SELT test is already running on an ADSL interface, the only possible test command is 'stop (1)'. The clearResults(4) command clears test results by removing and entry in the pdnAdslSeltLcTable or the pdnAdslSeltLnfTable. After the execution of this command, the appropriate value for pdnAdslSeltStatus would be resultsCleared(5). "
+  },
+  "pdnAdslSeltStatus": {
+    "name": "pdnAdslSeltStatus",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inProgress": 1,
+          "stoppedInProgress": 2,
+          "complete": 3,
+          "notStarted": 4,
+          "resultsCleared": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides status about any SELT test running or ever run (since last reset) on an ADSL interface. This object can be read by NMS managers to determine the status of a test; that is: inProgress (1) - if the test is currently running. stoppedInProgress (2) - if a request to stop the test is still in progress. complete (3) - if the test has been run at least once since system reset and has completed. notStarted (4) - if the test has not been run on this interface since last system reset. resultsCleared (5) - if the entry in the test results table, Lc or Lnf, was removed as the result of the execution of the clearResults(4) pdnAdslSeltCmd. "
+  },
+  "pdnAdslSeltDuration": {
+    "name": "pdnAdslSeltDuration",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object provides the approximate time in Seconds that the SELT test measurement will take. This object should return 0 if no test is actively running on the ADSL interface specified. "
+  },
+  "pdnAdslSeltTimeLeft": {
+    "name": "pdnAdslSeltTimeLeft",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the approximate time left in Seconds for the test running on this ADSL interface. This object should return 0 if no test is actively running on the ADSL interface specified. "
+  },
+  "pdnAdslSeltLcTable": {
+    "name": "pdnAdslSeltLcTable",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table post results for loop characterization tests completed. "
+  },
+  "pdnAdslSeltLcEntry": {
+    "name": "pdnAdslSeltLcEntry",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltLcSegmentIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents the results of a loop characterization test performed over an ADSL interface. "
+  },
+  "pdnAdslSeltLcSegmentIndex": {
+    "name": "pdnAdslSeltLcSegmentIndex",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 9
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates the index of the segment being reported. From no segments to a possible of 10 segments could be identified in the loop topology. "
+  },
+  "pdnAdslSeltLcSegmentLength": {
+    "name": "pdnAdslSeltLcSegmentLength",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65534
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates an estimate of the segment Length being reported "
+  },
+  "pdnAdslSeltLcSegmentGauge": {
+    "name": "pdnAdslSeltLcSegmentGauge",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "awg26": 2,
+          "awg24": 3,
+          "awg22": 4,
+          "awg19": 5,
+          "metric32": 10,
+          "metric40": 11,
+          "metric50": 12,
+          "metric63": 13,
+          "metric90": 14,
+          "metricJapan32": 20,
+          "metricJapan40": 21,
+          "metricJapan50": 22,
+          "metricJapan65": 23,
+          "metricJapan90": 24
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the estimated Gauge of the segment being reported. The gauge reported back is based on the pdnAdslSeltWireSizeWireSize configuration parameter passed when the test is started. "
+  },
+  "pdnAdslSeltLcSegmentType": {
+    "name": "pdnAdslSeltLcSegmentType",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "notPresent": 1,
+          "inline": 2,
+          "bridgeTap": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the segment type being reported. "
+  },
+  "pdnAdslSeltLnfTable": {
+    "name": "pdnAdslSeltLnfTable",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table post results for loop noise floor tests completed. "
+  },
+  "pdnAdslSeltLnfEntry": {
+    "name": "pdnAdslSeltLnfEntry",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltLnfSubCarrierIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents the results of a Loop Noise Floor test performed over an ADSL interface. "
+  },
+  "pdnAdslSeltLnfSubCarrierIndex": {
+    "name": "pdnAdslSeltLnfSubCarrierIndex",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 63
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Identifies a row in the table based on a subcarrier. The subcarrier index ranges from 0 to NSCus-1 (NSC is Number of Subcarriers) as specified in G.997.1 where NSCus is the higher subcarrier that can be transmitted in the upstream direction. Please refer to the corresponding ITU recommendation for specific values of NSCus. The `ADSL Values for NSC' comment above lists those recommendations."
+  },
+  "pdnAdslSeltLnfPeakPsd": {
+    "name": "pdnAdslSeltLnfPeakPsd",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65534
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the peak Psd of the tone indicated by the sub-carrier index. The value returned by the agent for this object is expressed in units of 1/256 dBm. "
+  },
+  "pdnAdslSeltLnfTotalPsd": {
+    "name": "pdnAdslSeltLnfTotalPsd",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65534
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total Psd of the tone indicated by the sub-carrier index. The value returned by the agent for this object is expressed in units of 1/256 dBm. "
+  },
+  "pdnAdslSeltLnfSignalPsd": {
+    "name": "pdnAdslSeltLnfSignalPsd",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.1.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65534
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the signal Psd of the tone indicated by the sub-carrier index. The value returned by the agent for this object is expressed in units of 1/256 dBm. "
+  },
+  "pdnAdslSeltCompliances": {
+    "name": "pdnAdslSeltCompliances",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.1",
+    "class": "objectidentity"
+  },
+  "pdnAdslSeltGroups": {
+    "name": "pdnAdslSeltGroups",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.2",
+    "class": "objectidentity"
+  },
+  "pdnAdslSeltMIBCompliance": {
+    "name": "pdnAdslSeltMIBCompliance",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "pdnAdslSeltGroup",
+        "module": "PDN-ADSL-SELT-MIB"
+      },
+      {
+        "object": "pdnAdslSeltLcGroup",
+        "module": "PDN-ADSL-SELT-MIB"
+      },
+      {
+        "object": "pdnAdslSeltLnfGroup",
+        "module": "PDN-ADSL-SELT-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for the entities which implement the pdnAdslSeltMIB."
+  },
+  "pdnAdslSeltObjGroups": {
+    "name": "pdnAdslSeltObjGroups",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.2.1",
+    "class": "objectidentity"
+  },
+  "pdnAdslSeltAfnGroups": {
+    "name": "pdnAdslSeltAfnGroups",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.2.2",
+    "class": "objectidentity"
+  },
+  "pdnAdslSeltNtfyGroups": {
+    "name": "pdnAdslSeltNtfyGroups",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.2.3",
+    "class": "objectidentity"
+  },
+  "pdnAdslSeltGroup": {
+    "name": "pdnAdslSeltGroup",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.2.1.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltCmd"
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltStatus"
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltWireSize"
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltDuration"
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltTimeLeft"
+      }
+    ],
+    "status": "current",
+    "description": "General configuration of SELT tests."
+  },
+  "pdnAdslSeltLcGroup": {
+    "name": "pdnAdslSeltLcGroup",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.2.1.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltLcSegmentLength"
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltLcSegmentGauge"
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltLcSegmentType"
+      }
+    ],
+    "status": "current",
+    "description": "Objects related to results posted for Loop Characterization Test."
+  },
+  "pdnAdslSeltLnfGroup": {
+    "name": "pdnAdslSeltLnfGroup",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.6.31.3.2.1.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltLnfPeakPsd"
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltLnfTotalPsd"
+      },
+      {
+        "module": "PDN-ADSL-SELT-MIB",
+        "object": "pdnAdslSeltLnfSignalPsd"
+      }
+    ],
+    "status": "current",
+    "description": "Objects related to results posted for Loop Signal Floor Test."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/PDN-ADSL-SELT-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 20:56:40 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "PDN-ADSL-SELT-MIB"
+  }
+}

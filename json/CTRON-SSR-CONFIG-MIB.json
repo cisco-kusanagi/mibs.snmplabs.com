@@ -1,0 +1,371 @@
+{
+  "imports": {
+    "class": "imports",
+    "CTRON-SSR-SMI-MIB": [
+      "ssrMibs"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "IpAddress",
+      "TimeTicks",
+      "Integer32",
+      "Counter64",
+      "OBJECT-IDENTITY",
+      "MODULE-IDENTITY",
+      "OBJECT-TYPE",
+      "Gauge32",
+      "Unsigned32",
+      "MibIdentifier",
+      "NOTIFICATION-TYPE",
+      "Bits",
+      "iso",
+      "Counter32"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TruthValue",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "ssrConfigMIB": {
+    "name": "ssrConfigMIB",
+    "oid": "1.3.6.1.4.1.52.2501.1.230",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2000-07-15 00:00",
+        "description": "Revision #3. Update contact information for Enterasys Networks as this mib is found on the Riverstione RS product line as well as Enterasys SSR product line."
+      },
+      {
+        "revision": "2000-02-20 00:00",
+        "description": "Revision #2. add two objects to obtain current prom and firmware version."
+      },
+      {
+        "revision": "1998-08-17 00:00",
+        "description": "Revision #1. Provide startup configuration file retrieval, startup log and append new commands."
+      }
+    ],
+    "lastupdated": "200007150000Z",
+    "organization": "Cabletron Systems, Inc",
+    "contactinfo": "Enterasys Networks 35 Industrial Way, P.O. Box 5005 Rochester, NH 03867-0505 (603) 332-9400 support@enterasys.com http://www.enterasys.com",
+    "description": "This mib module defines an SNMP API to manage SmartSwitch Router configuration files and system images"
+  },
+  "SSRErrorCode": {
+    "name": "SSRErrorCode",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noStatus": 1,
+          "timeout": 2,
+          "networkError": 3,
+          "noSpace": 4,
+          "invalidConfig": 5,
+          "commandCompleted": 6,
+          "internalError": 7,
+          "tftpServerError": 8
+        }
+      }
+    },
+    "status": "current",
+    "description": "A unique value, greater than zero defining the operation completion status."
+  },
+  "cfgGroup": {
+    "name": "cfgGroup",
+    "oid": "1.3.6.1.4.1.52.2501.1.231",
+    "class": "objectidentity"
+  },
+  "cfgTransferOp": {
+    "name": "cfgTransferOp",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noop": 1,
+          "sendConfigToAgent": 2,
+          "receiveConfigFromAgent": 3,
+          "receiveBootlogFromAgent": 4
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Tranfer operation to be performed. Configuration files are ASCII NVT text files describing the operation of the shelf. Send operations use tftp to transfer a file from the manager to agent. Receive operations use tftp to transfer the file from the agent to the manager. Default value is no operation or noop."
+  },
+  "cfgManagerAddress": {
+    "name": "cfgManagerAddress",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The IPv4 address of the Manager to be used by the agent for for cfgTransferOp operations. Default value is 0.0.0.0. Address must be a unicast address that is reachable from the agent and no firewalls/acls preventing tftp datagrams from being transferred."
+  },
+  "cfgFileName": {
+    "name": "cfgFileName",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The file name to be retrieved from the tftp server at host cfgManagerAddress or to be written to. Default value is blank. Length of filename string must not exceed 255 alpha-numeric characters, no spaces in filenames."
+  },
+  "cfgActivateTransfer": {
+    "name": "cfgActivateTransfer",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Activate the file transfer operation with a value of True(1) or stop it with False(2). Poll cfgTransferStatus for current status. Default value is False. cfgFileName, cfgManagerAddress and cfgTransferOp must be valid prior to setting this object to True. This object is equivalent to the CLI command: copy tftp-server to startup if cfgRequestOp == sendConfig"
+  },
+  "cfgTransferStatus": {
+    "name": "cfgTransferStatus",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "idle": 1,
+          "sending": 2,
+          "receiving": 3,
+          "transferComplete": 4,
+          "error": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current status of the transfer task. Default state is idle. sending indicates a file transfer (agent->mgr) in progress. receiving indicates sending a file from Manager to agent. transferComplete indicates a successful transfer. error indicates a failed transfer. See cfgLastError to diagnose why the transfer failed."
+  },
+  "cfgActivateFile": {
+    "name": "cfgActivateFile",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Once a transfer to the SmartSwitchRouter is complete, Set this object to True to activate the new configuration. If activateConfigFile operation was successful, this object performs the CLI equivalent to these commands: negate all existing commands, copy scratchpad to active, copy scratchpad to startup"
+  },
+  "cfgLastError": {
+    "name": "cfgLastError",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SSRErrorCode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A reason code for the last transfer operation. Poll this value when doing sets against cfgMakeActive for config files obtain status."
+  },
+  "cfgLastErrorReason": {
+    "name": "cfgLastErrorReason",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A string representation of cfgLastError which may contain addtional details."
+  },
+  "cfgActiveImageVersion": {
+    "name": "cfgActiveImageVersion",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Version string of the current image executing on this control module. This is the same description as the system show version command. example: 1.1.0.0"
+  },
+  "cfgActiveImageBootLocation": {
+    "name": "cfgActiveImageBootLocation",
+    "oid": "1.3.6.1.4.1.52.2501.1.231.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The URL location string from whence the current image was loaded. example: slot0:boot/ssr8.tar.gz/"
+  },
+  "configConformance": {
+    "name": "configConformance",
+    "oid": "1.3.6.1.4.1.52.2501.1.230.3",
+    "class": "objectidentity"
+  },
+  "configCompliances": {
+    "name": "configCompliances",
+    "oid": "1.3.6.1.4.1.52.2501.1.230.3.1",
+    "class": "objectidentity"
+  },
+  "configGroups": {
+    "name": "configGroups",
+    "oid": "1.3.6.1.4.1.52.2501.1.230.3.2",
+    "class": "objectidentity"
+  },
+  "configCompliance": {
+    "name": "configCompliance",
+    "oid": "1.3.6.1.4.1.52.2501.1.230.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "configGroup10",
+        "module": "CTRON-SSR-CONFIG-MIB"
+      }
+    ],
+    "status": "obsolete",
+    "description": "The compliance statement for SNMP entities which implement the SmartSwitch Router Config Management MIB."
+  },
+  "configCompliance2": {
+    "name": "configCompliance2",
+    "oid": "1.3.6.1.4.1.52.2501.1.230.3.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "configGroup20",
+        "module": "CTRON-SSR-CONFIG-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for SNMP entities which implement the SmartSwitch Router Config Management MIB."
+  },
+  "configGroup10": {
+    "name": "configGroup10",
+    "oid": "1.3.6.1.4.1.52.2501.1.230.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgTransferOp"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgManagerAddress"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgFileName"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgActivateTransfer"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgTransferStatus"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgActivateFile"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgLastError"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgLastErrorReason"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The collection of objects which are used to represent version 1.0 file transfer operations in the SmartSwitch Router."
+  },
+  "configGroup20": {
+    "name": "configGroup20",
+    "oid": "1.3.6.1.4.1.52.2501.1.230.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgTransferOp"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgManagerAddress"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgFileName"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgActivateTransfer"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgTransferStatus"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgActivateFile"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgLastError"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgLastErrorReason"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgActiveImageVersion"
+      },
+      {
+        "module": "CTRON-SSR-CONFIG-MIB",
+        "object": "cfgActiveImageBootLocation"
+      }
+    ],
+    "status": "current",
+    "description": "The collection of objects which are used to represent version 2.0 configuration operations in the SmartSwitch Router version."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CTRON-SSR-CONFIG-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:36:31 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CTRON-SSR-CONFIG-MIB"
+  }
+}

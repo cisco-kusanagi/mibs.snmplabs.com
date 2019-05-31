@@ -1,0 +1,1692 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-MIB": [
+      "sysUpTime"
+    ],
+    "SNMPv2-SMI": [
+      "TimeTicks",
+      "Counter64",
+      "MODULE-IDENTITY",
+      "OBJECT-IDENTITY",
+      "iso",
+      "Integer32",
+      "Unsigned32",
+      "Bits",
+      "NOTIFICATION-TYPE",
+      "Gauge32",
+      "OBJECT-TYPE",
+      "IpAddress",
+      "Counter32",
+      "MibIdentifier"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "TimeInterval",
+      "TimeStamp",
+      "DateAndTime",
+      "TruthValue"
+    ]
+  },
+  "ciscoRFMIB": {
+    "name": "ciscoRFMIB",
+    "oid": "1.3.6.1.4.1.9.9.176",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2008-03-18 00:00",
+        "description": "Added a new state standbyWarm. This state will be used in RPR plus mode."
+      },
+      {
+        "revision": "2005-09-01 00:00",
+        "description": "Added a new textual convention : RFClientStatus. Added the cRFStatusRFClientTable which contains information about all the clients registered with the Redundancy Facility (RF)."
+      },
+      {
+        "revision": "2004-04-01 00:00",
+        "description": "Added the new states, systemReset, loadVersionSwitchover and runVersionSwitchover. The unset state has been removed and the init state will represent the absense of the ISSU process. Updated the object cRFStatusIssuState to cRFStatusIssuStateRev1 as the ISSU states have been revised. Added new object, cRFStatusIssuFromVersion and cRFStatusIssuToVersion which represent the from and the to versions of IOS that are involved in the upgrade process. The object ciscoRFIssuStateObjGroup was changed to ciscoRFIssuStateObjGroupRev1 to accomodate these new objects."
+      },
+      {
+        "revision": "2004-02-04 00:00",
+        "description": "Added ciscoRFIssuStateNotifGroup and ciscoRFIssuStateObjGroup that represent the notification group and the object group that represents the ISSU state of the system."
+      },
+      {
+        "revision": "2003-10-02 00:00",
+        "description": "Changed the description for ciscoRFProgressionNotif"
+      },
+      {
+        "revision": "2002-01-07 00:00",
+        "description": "Added the following object in cRFStatus: cRFStatusRFModeCapsTable Added the following object in cRFCfg: cRFCfgRedundancyOperMode Updated description of following object in cRFCfg: cRFCfgRedundancyMode"
+      },
+      {
+        "revision": "2001-07-20 00:00",
+        "description": "Added new sub-group cRFHistory Added new table cRFHistorySwitchOverTable which maintains the history of switchovers. Also added objects: cRFStatusFailoverTime cRFStatusPeerStandByEntryTime cRFHistoryTableMaxLength cRFHistoryColdStarts cRFHistoryStandByAvailTime Added textual convention: RFUnitIdentifier."
+      },
+      {
+        "revision": "2001-06-26 00:00",
+        "description": "Changed terminology: 'split-mode' is now 'maintenance-mode' Added textual convention: RFMode Deprecated object: cRFCfgSplitMode Added objects: cRFCfgMaintenanceMode cRFCfgRedundancyMode cRFCfgRedundancyModeDescr Added enumeration values: noAction(0) to RFAction activeExtraload(15) to RFState activeHandback(16) to RFState Added new transition state to ciscoRFProgressionNotif: activeExtraload Update compliance and conformance statements"
+      },
+      {
+        "revision": "2001-04-03 09:45",
+        "description": "The initial revision of this MIB."
+      }
+    ],
+    "lastupdated": "200803180000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 West Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-rf-mib@cisco.com",
+    "description": "This MIB provides configuration control and status for the Redundancy Framework (RF) subsystem. RF provides a mechanism for logical redundancy of software functionality and is designed to support 1:1 redundancy on processor cards. RF is not intended to solve all redundancy schemes. Nor is RF designed to support redundant hardware, such as power supplies. Redundancy is concerned with the duplication of data elements and software functions to provide an alternative in case of failure. It is a key component to meeting 99.999% availability requirements for Class 5 carrier solutions. In the scope of this MIB definition, peer software elements are redundant and redundant software elements are peers."
+  },
+  "RFState": {
+    "name": "RFState",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "notKnown": 1,
+          "disabled": 2,
+          "initialization": 3,
+          "negotiation": 4,
+          "standbyCold": 5,
+          "standbyColdConfig": 6,
+          "standbyColdFileSys": 7,
+          "standbyColdBulk": 8,
+          "standbyHot": 9,
+          "activeFast": 10,
+          "activeDrain": 11,
+          "activePreconfig": 12,
+          "activePostconfig": 13,
+          "active": 14,
+          "activeExtraload": 15,
+          "activeHandback": 16,
+          "standbyWarm": 17
+        }
+      }
+    },
+    "status": "current",
+    "description": "The current state of the RF subsystem. notKnown - state is unknown disabled - RF is not operational on this unit initialization - establish necessary system services negotiation - peer unit discovery and negotiation standbyCold - client notification on standby unit *standbyColdConfig - standby configuration is updated from active configuration *standbyColdFileSys - standby file system (FS) is updated from the active FS *standbyColdBulk - clients sync data from active to standby standbyHot - incremental client data sync continues. This unit is ready to take over activity. activeFast - call maintenance efforts during a SWACT activeDrain - client clean-up phase activePreconfig - unit is active but has not read its configuration activePostconfig - unit is active and is post-processing its configuration active - unit is active and processing calls activeExtraload - unit is active and processing calls for all feature boards in the system activeHandback - unit is active, processing calls and is in the process of handing some resources to the other unit in the system standbyWarm - unit is ready when using RPR+ mode * Sub-state of 'standbyCold'"
+  },
+  "RFMode": {
+    "name": "RFMode",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "nonRedundant": 1,
+          "staticLoadShareNonRedundant": 2,
+          "dynamicLoadShareNonRedundant": 3,
+          "staticLoadShareRedundant": 4,
+          "dynamicLoadShareRedundant": 5,
+          "coldStandbyRedundant": 6,
+          "warmStandbyRedundant": 7,
+          "hotStandbyRedundant": 8
+        }
+      }
+    },
+    "status": "current",
+    "description": "The characterization of the redundancy subsystem. nonRedundant - the system is not redundant. staticLoadShareNonRedundant - the system is *not* redundant but is load sharing. The load sharing is *not* based on operational load (i.e. number of calls, etc). dynamicLoadShareNonRedundant - the system is *not* redundant but is load sharing. Load sharing is based on operational load. staticLoadShareRedundant - the system is redundant and is load sharing. The load sharing is *not* based on operational load. dynamicLoadShareRedundant - the system is redundant and is load sharing. Load sharing is based on operational load. coldStandbyRedundant - the system is redundant but the redundant peer unit is not fully initialized and is not able to retain established calls. warmStandbyRedundant - the system is redundant and the redundant peer unit is immediately able to handle new calls. The redundant unit is unable to retain established calls. hotStandbyRedundant - the system is redundant and the redundant peer unit is able to 'instantaneously' retain established calls and immediately able to handle new calls."
+  },
+  "RFAction": {
+    "name": "RFAction",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noAction": 0,
+          "reloadPeer": 1,
+          "reloadShelf": 2,
+          "switchActivity": 3,
+          "forceSwitchActivity": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": "Administrative commands to invoke in the RF subsystem. noAction - no action (do nothing) reloadPeer - reset the redundant peer unit reloadShelf - reset the entire shelf switchActivity - safely SWACT to peer unit and go standby forceSwitchActivity - switch activity; ignoring pre-conditions, system warnings and safety checks. When the value is set to 'noAction' no operation is performed. When read, the value 'noAction' is always returned."
+  },
+  "RFSwactReasonType": {
+    "name": "RFSwactReasonType",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unsupported": 1,
+          "none": 2,
+          "notKnown": 3,
+          "userInitiated": 4,
+          "userForced": 5,
+          "activeUnitFailed": 6,
+          "activeUnitRemoved": 7
+        }
+      }
+    },
+    "status": "current",
+    "description": "Reason codes for the switch of activity from an active redundant unit to its standby peer unit. unsupported - the 'reason code' is an unsupported feature none - no SWACT has occurred notKnown - reason is unknown userInitiated - a safe, manual SWACT was initiated by user userForced - a manual SWACT was forced by user; ignoring pre-conditions, warnings and safety checks activeUnitFailed - active unit failure caused an auto SWACT activeUnitRemoved - active unit removal caused an auto SWACT"
+  },
+  "RFUnitIdentifier": {
+    "name": "RFUnitIdentifier",
+    "class": "textualconvention",
+    "type": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "A unique identifier for Active/Standby unit."
+  },
+  "RFIssuState": {
+    "name": "RFIssuState",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unset": 0,
+          "init": 1,
+          "loadVersion": 2,
+          "runVersion": 3,
+          "commitVersion": 4
+        }
+      }
+    },
+    "status": "deprecated",
+    "description": "ISSU state represents the current system state. unset - unset state; if the system is booted from tftp or from ROMMON such that the image is not the first in BOOT init - init state; the first ISSU state that the system will move to after the unset state, when the ISSU process has just been kicked off. The first CLI that is executed to make this happen is the loadversion CLI. loadVersion - Once the loadversion CLI has been executed, the state of the system is changed to reflect this, and this state is called the loadVersion state. The boot variable on the Standby is updated to point to the new image that the Standby needs to load and then it is reset. runVersion - runVersion state; When the system is in the loadversion state, the Active is running the old image and the Standby is running the new image. When the runversion CLI is executed, a switchover occurs, and the Standby running the new image takes over as the Active. The state of the system at this stage is updated to runversion. commitVersion - in the runversion state, the Active is running the new image, and the Standby is running the old image. When the user is satisfied with the functioning of the system, they execute the commitversion CLI, which will prepend the boot variable on the Standby with the new image, and then the Standby is reset. After this, the Standby comes up with the new image, and the state of the system is updated to reflect the commitVersion state."
+  },
+  "RFIssuStateRev1": {
+    "name": "RFIssuStateRev1",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "init": 0,
+          "systemReset": 1,
+          "loadVersion": 3,
+          "loadVersionSwitchover": 4,
+          "runVersion": 6,
+          "runVersionSwitchover": 7,
+          "commitVersion": 9
+        }
+      }
+    },
+    "status": "current",
+    "description": "ISSU state represents the current system state. init - This state represents the initial state of the system. The ISSU process is not running at this stage. The only CLI for ISSU process that can be executed in this state is the loadversion CLI. systemReset - If a system reset occurs, or the abortversion CLI is executed, the state of the system is pushed to this state. loadVersion - When the Standby signs in after the loadversion CLI is executed, the state of the system is changed to loadVersion. loadVersionSwitchover - If a switchover occurs in the loadVersion state, by the user, or because the Active crashes, the new state of the system will be loadVersionSwitchover. It is analogous to the runVersion state, except that the runversion CLI was not executed. runVersion - When the Standby signs in after executing the runversion CLI, the state of the system is changed to runVersion. runVersionSwitchover - if a switchover occurs while the system is in the runVersion state, the new state will be called runVersionSwitchover. It is analogous to the loadVersion state. commitVersion - When the Standby signs in after the commitversion CLI is executed, the state of the system is changed to commitVersion."
+  },
+  "RFClientStatus": {
+    "name": "RFClientStatus",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noStatus": 1,
+          "clientNotRedundant": 2,
+          "clientRedundancyInProgress": 3,
+          "clientRedundant": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": "The status of a RF client before, during and after switchover. noStatus - No status information is available for this client. clientNotRedundant - Client is active. But there is no redundancy to this client. This could be because there is no standby or the client cannot claim that the standby client can take over without losing data or traffic during a switchover. clientRedundancyInProgress - The client is trying to sync all data to standby and achieve redundancy. clientRedundant - The client is redundant and ready for switchover. The client can safely claim that there is no data or traffic loss if there is a switchover."
+  },
+  "ciscoRFMIBObjects": {
+    "name": "ciscoRFMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.176.1",
+    "class": "objectidentity"
+  },
+  "cRFStatus": {
+    "name": "cRFStatus",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1",
+    "class": "objectidentity"
+  },
+  "cRFCfg": {
+    "name": "cRFCfg",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2",
+    "class": "objectidentity"
+  },
+  "cRFHistory": {
+    "name": "cRFHistory",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3",
+    "class": "objectidentity"
+  },
+  "cRFClient": {
+    "name": "cRFClient",
+    "oid": "1.3.6.1.4.1.9.9.176.1.4",
+    "class": "objectidentity"
+  },
+  "cRFStatusUnitId": {
+    "name": "cRFStatusUnitId",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFUnitIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A unique identifier for this redundant unit. This identifier is implementation-specific but the method for selecting the id must remain consistent throughout the redundant system. Some example identifiers include: slot id, physical or logical entity id, or a unique id assigned internally by the RF subsystem."
+  },
+  "cRFStatusUnitState": {
+    "name": "cRFStatusUnitState",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFState",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current state of RF on this unit."
+  },
+  "cRFStatusPeerUnitId": {
+    "name": "cRFStatusPeerUnitId",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFUnitIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A unique identifier for the redundant peer unit. This identifier is implementation-specific but the method for selecting the id must remain consistent throughout the redundant system. Some example identifiers include: slot id, physical or logical entity id, or a unique id assigned internally by the RF subsystem."
+  },
+  "cRFStatusPeerUnitState": {
+    "name": "cRFStatusPeerUnitState",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFState",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current state of RF on the peer unit."
+  },
+  "cRFStatusPrimaryMode": {
+    "name": "cRFStatusPrimaryMode",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates whether this is the primary redundant unit or not. If this unit is the primary unit, this object is true. If this unit is the secondary unit, this object is false. Note that the terms 'primary/secondary' are not synonymous with the terms 'active/standby'. At any given time, the primary unit may be the active unit, or the primary unit may be the standby unit. Likewise, the secondary unit, at any given time, may be the active unit, or the secondary unit may be the standby unit. The primary unit is given a higher priority or precedence over the secondary unit. In a race condition (usually at initialization time) or any situation where the redundant units are unable to successfully negotiate activity between themselves, the primary unit will always become the active unit and the secondary unit will fall back to standby. Only one redundant unit can be the primary unit at any given time. The algorithm for determining the primary unit is system dependent, such as 'the redundant unit with the lower numeric unit id is always the primary unit.'"
+  },
+  "cRFStatusDuplexMode": {
+    "name": "cRFStatusDuplexMode",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates whether the redundant peer unit has been detected or not. If the redundant peer unit is detected, this object is true. If the redundant peer unit is not detected, this object is false."
+  },
+  "cRFStatusManualSwactInhibit": {
+    "name": "cRFStatusManualSwactInhibit",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates whether a manual switch of activity is permitted. If a manual switch of activity is allowed, this object is false. If a manual switch of activity is not allowed, this object is true. Note that the value of this object is the inverse of the status of manual SWACTs. This object does not indicate whether a switch of activity is or has occurred. This object only indicates if the user-controllable capability is enabled or not. A switch of activity is the event in which the standby redundant unit becomes active and the previously active unit becomes standby."
+  },
+  "cRFStatusLastSwactReasonCode": {
+    "name": "cRFStatusLastSwactReasonCode",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFSwactReasonType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The reason for the last switch of activity."
+  },
+  "cRFStatusFailoverTime": {
+    "name": "cRFStatusFailoverTime",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when the primary redundant unit took over as active. The value of this object will be 0 till the first switchover."
+  },
+  "cRFStatusPeerStandByEntryTime": {
+    "name": "cRFStatusPeerStandByEntryTime",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when the peer redundant unit entered the standbyHot state. The value will be 0 on system initialization."
+  },
+  "cRFStatusRFModeCapsTable": {
+    "name": "cRFStatusRFModeCapsTable",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.11",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table containing a list of redundancy modes that can be supported on the device."
+  },
+  "cRFStatusRFModeCapsEntry": {
+    "name": "cRFStatusRFModeCapsEntry",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.11.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusRFModeCapsMode",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry containing the device implementation specific terminology associated with the redundancy mode that can be supported on the device."
+  },
+  "cRFStatusRFModeCapsMode": {
+    "name": "cRFStatusRFModeCapsMode",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.11.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFMode",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The redundancy mode that can be supported on the device."
+  },
+  "cRFStatusRFModeCapsModeDescr": {
+    "name": "cRFStatusRFModeCapsModeDescr",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.11.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The description of the device implementation specific terminology associated with its supported redundancy mode."
+  },
+  "cRFStatusIssuState": {
+    "name": "cRFStatusIssuState",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.12",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFIssuState",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The current ISSU state of the system."
+  },
+  "cRFStatusIssuStateRev1": {
+    "name": "cRFStatusIssuStateRev1",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.13",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFIssuStateRev1",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current ISSU state of the system."
+  },
+  "cRFStatusIssuFromVersion": {
+    "name": "cRFStatusIssuFromVersion",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.14",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The IOS version from with the user is upgrading"
+  },
+  "cRFStatusIssuToVersion": {
+    "name": "cRFStatusIssuToVersion",
+    "oid": "1.3.6.1.4.1.9.9.176.1.1.15",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The IOS version to with the user is upgrading"
+  },
+  "cRFStatusRFClientTable": {
+    "name": "cRFStatusRFClientTable",
+    "oid": "1.3.6.1.4.1.9.9.176.1.4.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains a list of RF clients that are registered on the device. RF clients are applications that have registered with the Redundancy Facility (RF) to receive RF events and notifications. The purpose of RF clients is to synchronize any relevant data with the standby unit."
+  },
+  "cRFStatusRFClientEntry": {
+    "name": "cRFStatusRFClientEntry",
+    "oid": "1.3.6.1.4.1.9.9.176.1.4.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusRFClientID",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry containing information on various clients registered with the Redundancy Facility (RF). Entries in this table are always created by the system. An entry is created in this table when a redundancy aware application registers with the Redundancy Facility. The entry is destroyed when that application deregisters from the Redundancy Facility."
+  },
+  "cRFStatusRFClientID": {
+    "name": "cRFStatusRFClientID",
+    "oid": "1.3.6.1.4.1.9.9.176.1.4.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique identifier for the client which registered with the Redundancy Facility."
+  },
+  "cRFStatusRFClientDescr": {
+    "name": "cRFStatusRFClientDescr",
+    "oid": "1.3.6.1.4.1.9.9.176.1.4.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The description of the client which has registered with the Redundancy Facility."
+  },
+  "cRFStatusRFClientSeq": {
+    "name": "cRFStatusRFClientSeq",
+    "oid": "1.3.6.1.4.1.9.9.176.1.4.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The sequence number of the client. The system assigns the sequence numbers based on the order of registration of the Redundancy Facility clients. This is used for deciding order of RF events sent to clients."
+  },
+  "cRFStatusRFClientRedTime": {
+    "name": "cRFStatusRFClientRedTime",
+    "oid": "1.3.6.1.4.1.9.9.176.1.4.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Time taken for this client to become Redundant. This value is meaningful when the value of cRFStatusRFClientStatus is not 'noStatus'."
+  },
+  "cRFStatusRFClientStatus": {
+    "name": "cRFStatusRFClientStatus",
+    "oid": "1.3.6.1.4.1.9.9.176.1.4.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFClientStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides the status of the Redundancy Facility client."
+  },
+  "cRFCfgSplitMode": {
+    "name": "cRFCfgSplitMode",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "deprecated",
+    "description": "Indicates whether redundant units may communicate synchronization messages with each other. If communication is not permitted, this object is set to true. If communication is permitted, this object is set to false. In split mode (true), the active unit will not communicate with the standby unit. The standby unit progression will not occur. When split mode is disabled (false), the standby unit is reset to recover. Split mode (true) is useful for maintenance operations."
+  },
+  "cRFCfgKeepaliveThresh": {
+    "name": "cRFCfgKeepaliveThresh",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "On platforms that support keep-alives, the keep-alive threshold value designates the number of lost keep-alives tolerated before a failure condition is declared. If this occurs, a SWACT notification is sent. On platforms that do not support keep-alives, this object has no purpose or effect."
+  },
+  "cRFCfgKeepaliveThreshMin": {
+    "name": "cRFCfgKeepaliveThreshMin",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum acceptable value for the cRFCfgKeepaliveThresh object."
+  },
+  "cRFCfgKeepaliveThreshMax": {
+    "name": "cRFCfgKeepaliveThreshMax",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum acceptable value for the cRFCfgKeepaliveThresh object."
+  },
+  "cRFCfgKeepaliveTimer": {
+    "name": "cRFCfgKeepaliveTimer",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "On platforms that support keep-alives, the keep-alive timer value is used to guard against lost keep-alives. The RF subsystem expects to receive a keep-alive within this period. If a keep-alive is not received within this time period, a SWACT notification is sent. On platforms that do not support keep-alives, this object has no purpose or effect."
+  },
+  "cRFCfgKeepaliveTimerMin": {
+    "name": "cRFCfgKeepaliveTimerMin",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum acceptable value for the cRFCfgKeepaliveTimer object."
+  },
+  "cRFCfgKeepaliveTimerMax": {
+    "name": "cRFCfgKeepaliveTimerMax",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum acceptable value for the cRFCfgKeepaliveTimer object."
+  },
+  "cRFCfgNotifTimer": {
+    "name": "cRFCfgNotifTimer",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Note that the term 'notification' here refers to an RF notification and not an SNMP notification. As the standby unit progresses to the 'standbyHot' state, asynchronous messages are sent from the active unit to the standby unit which must then be acknowledged by the standby unit. If the active unit receives the acknowledgement during the time period specified by this object, progression proceeds as normal. If the timer expires and an acknowledgement was not received by the active unit, a switch of activity occurs."
+  },
+  "cRFCfgNotifTimerMin": {
+    "name": "cRFCfgNotifTimerMin",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum acceptable value for the cRFCfgNotifTimer object."
+  },
+  "cRFCfgNotifTimerMax": {
+    "name": "cRFCfgNotifTimerMax",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum acceptable value for the cRFCfgNotifTimer object."
+  },
+  "cRFCfgAdminAction": {
+    "name": "cRFCfgAdminAction",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.11",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFAction",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This variable is set to invoke RF subsystem action commands. The commands are useful for maintenance and software upgrade activities."
+  },
+  "cRFCfgNotifsEnabled": {
+    "name": "cRFCfgNotifsEnabled",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.12",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Allows enabling/disabling of RF subsystem notifications."
+  },
+  "cRFCfgMaintenanceMode": {
+    "name": "cRFCfgMaintenanceMode",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.13",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates whether redundant units may communicate synchronization messages with each other. If communication is not permitted, this object is set to 'true'. If communication is permitted, this object is set to 'false'. If the value of this object is 'true', the redundant system is considered to be in a maintenance mode of operation. If the value of this object is 'false', the redundant system is considered to be in a normal (non-maintenance) mode of operation. In maintenance mode (true), the active unit will not communicate with the standby unit. The standby unit progression will not occur. When maintenance mode is disabled (false), the standby unit is reset to recover. Maintenance mode (true) is useful for maintenance-type operations."
+  },
+  "cRFCfgRedundancyMode": {
+    "name": "cRFCfgRedundancyMode",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.14",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFMode",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates the redundancy mode configured on the device."
+  },
+  "cRFCfgRedundancyModeDescr": {
+    "name": "cRFCfgRedundancyModeDescr",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.15",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Further clarifies or describes the redundancy mode indicated by cRFCfgRedundancyMode. Implementation-specific terminology associated with the current redundancy mode may be presented here."
+  },
+  "cRFCfgRedundancyOperMode": {
+    "name": "cRFCfgRedundancyOperMode",
+    "oid": "1.3.6.1.4.1.9.9.176.1.2.16",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFMode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicate the operational redundancy mode of the device."
+  },
+  "cRFHistoryTableMaxLength": {
+    "name": "cRFHistoryTableMaxLength",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 50
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 10,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Maximum number of entries permissible in the history table. A value of 0 will result in no history being maintained."
+  },
+  "cRFHistorySwitchOverTable": {
+    "name": "cRFHistorySwitchOverTable",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table that tracks the history of all switchovers that have occurred since system initialization. The maximum number of entries permissible in this table is defined by cRFHistoryTableMaxLength. When the number of entries in the table reaches the maximum limit, the next entry would replace the oldest existing entry in the table."
+  },
+  "cRFHistorySwitchOverEntry": {
+    "name": "cRFHistorySwitchOverEntry",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFHistorySwitchOverIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The entries in this table contain the switchover information. Each entry in the table is indexed by cRFHistorySwitchOverIndex. The index wraps around to 1 after reaching the maximum value."
+  },
+  "cRFHistorySwitchOverIndex": {
+    "name": "cRFHistorySwitchOverIndex",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A monotonically increasing integer for the purpose of indexing history table. After reaching maximum value, it wraps around to 1."
+  },
+  "cRFHistoryPrevActiveUnitId": {
+    "name": "cRFHistoryPrevActiveUnitId",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFUnitIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the primary redundant unit that went down."
+  },
+  "cRFHistoryCurrActiveUnitId": {
+    "name": "cRFHistoryCurrActiveUnitId",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFUnitIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the secondary redundant unit that took over as active."
+  },
+  "cRFHistorySwitchOverReason": {
+    "name": "cRFHistorySwitchOverReason",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RFSwactReasonType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the reason for the switchover."
+  },
+  "cRFHistorySwactTime": {
+    "name": "cRFHistorySwactTime",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DateAndTime",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the Date & Time when switchover occurred."
+  },
+  "cRFHistoryColdStarts": {
+    "name": "cRFHistoryColdStarts",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the number of system cold starts. This includes the number of system cold starts due to switchover failure and the number of manual restarts."
+  },
+  "cRFHistoryStandByAvailTime": {
+    "name": "cRFHistoryStandByAvailTime",
+    "oid": "1.3.6.1.4.1.9.9.176.1.3.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeInterval",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the cumulative time that a standby redundant unit has been available since last system initialization."
+  },
+  "ciscoRFMIBNotificationsPrefix": {
+    "name": "ciscoRFMIBNotificationsPrefix",
+    "oid": "1.3.6.1.4.1.9.9.176.2",
+    "class": "objectidentity"
+  },
+  "ciscoRFMIBNotifications": {
+    "name": "ciscoRFMIBNotifications",
+    "oid": "1.3.6.1.4.1.9.9.176.2.0",
+    "class": "objectidentity"
+  },
+  "ciscoRFSwactNotif": {
+    "name": "ciscoRFSwactNotif",
+    "oid": "1.3.6.1.4.1.9.9.176.2.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitId"
+      },
+      {
+        "module": "SNMPv2-MIB",
+        "object": "sysUpTime"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusLastSwactReasonCode"
+      }
+    ],
+    "status": "current",
+    "description": "A SWACT notification is sent by the newly active redundant unit whenever a switch of activity occurs. In the case where a SWACT event may be indistinguishable from a reset event, a network management station should use this notification to differentiate the activity. sysUpTime is the same sysUpTime defined in the RFC-1213 MIB."
+  },
+  "ciscoRFProgressionNotif": {
+    "name": "ciscoRFProgressionNotif",
+    "oid": "1.3.6.1.4.1.9.9.176.2.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitState"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPeerUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPeerUnitState"
+      }
+    ],
+    "status": "current",
+    "description": "A progression notification is sent by the active redundant unit whenever its RF state changes or the RF state of the peer unit changes. To avoid a flurry of notifications for all state transitions, notifications will only be sent for transitions to the following RF states: disabled (for the peer state) standbyCold standbyHot active activeExtraload"
+  },
+  "ciscoRFIssuStateNotif": {
+    "name": "ciscoRFIssuStateNotif",
+    "oid": "1.3.6.1.4.1.9.9.176.2.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitState"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusIssuState"
+      }
+    ],
+    "status": "deprecated",
+    "description": "An ISSU notification to indicate the new state of the system."
+  },
+  "ciscoRFIssuStateNotifRev1": {
+    "name": "ciscoRFIssuStateNotifRev1",
+    "oid": "1.3.6.1.4.1.9.9.176.2.0.4",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusIssuStateRev1"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusIssuFromVersion"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusIssuToVersion"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusLastSwactReasonCode"
+      }
+    ],
+    "status": "current",
+    "description": "An ISSU notification to indicate the new state of the system."
+  },
+  "ciscoRFMIBConformance": {
+    "name": "ciscoRFMIBConformance",
+    "oid": "1.3.6.1.4.1.9.9.176.3",
+    "class": "objectidentity"
+  },
+  "ciscoRFMIBCompliances": {
+    "name": "ciscoRFMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.176.3.1",
+    "class": "objectidentity"
+  },
+  "ciscoRFMIBGroups": {
+    "name": "ciscoRFMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2",
+    "class": "objectidentity"
+  },
+  "ciscoRFMIBCompliance": {
+    "name": "ciscoRFMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.176.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoRFStatusGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFNotifGroup",
+        "module": "CISCO-RF-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco RF MIB."
+  },
+  "ciscoRFMIBComplianceRev1": {
+    "name": "ciscoRFMIBComplianceRev1",
+    "oid": "1.3.6.1.4.1.9.9.176.3.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoRFStatusGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFNotifGroup",
+        "module": "CISCO-RF-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco RF MIB"
+  },
+  "ciscoRFMIBComplianceRev2": {
+    "name": "ciscoRFMIBComplianceRev2",
+    "oid": "1.3.6.1.4.1.9.9.176.3.1.3",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoRFStatusGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFNotifGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFHistoryGroup",
+        "module": "CISCO-RF-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco RF MIB."
+  },
+  "ciscoRFMIBComplianceRev3": {
+    "name": "ciscoRFMIBComplianceRev3",
+    "oid": "1.3.6.1.4.1.9.9.176.3.1.4",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoRFStatusGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFNotifGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFHistoryGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigRFOperModeGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFStatusRFModeCapsGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFIssuStateNotifGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFIssuStateObjGroup",
+        "module": "CISCO-RF-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco RF MIB."
+  },
+  "ciscoRFMIBComplianceRev4": {
+    "name": "ciscoRFMIBComplianceRev4",
+    "oid": "1.3.6.1.4.1.9.9.176.3.1.5",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoRFStatusGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFNotifGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFHistoryGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigRFOperModeGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFStatusRFModeCapsGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFIssuStateNotifGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFIssuStateObjGroupRev1",
+        "module": "CISCO-RF-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco RF MIB."
+  },
+  "ciscoRFMIBComplianceRev5": {
+    "name": "ciscoRFMIBComplianceRev5",
+    "oid": "1.3.6.1.4.1.9.9.176.3.1.6",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoRFStatusGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFNotifGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFHistoryGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFConfigRFOperModeGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFStatusRFModeCapsGroup",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFIssuStateNotifGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFIssuStateObjGroupRev1",
+        "module": "CISCO-RF-MIB"
+      },
+      {
+        "object": "ciscoRFStatusClientGroup",
+        "module": "CISCO-RF-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities which implement the Cisco RF MIB."
+  },
+  "ciscoRFStatusGroup": {
+    "name": "ciscoRFStatusGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitState"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPeerUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPeerUnitState"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPrimaryMode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusDuplexMode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusManualSwactInhibit"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusLastSwactReasonCode"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The collection of global RF status objects."
+  },
+  "ciscoRFConfigGroup": {
+    "name": "ciscoRFConfigGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgSplitMode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveThresh"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveThreshMin"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveThreshMax"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveTimer"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveTimerMin"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveTimerMax"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgNotifTimer"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgNotifTimerMin"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgNotifTimerMax"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgAdminAction"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgNotifsEnabled"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgRedundancyMode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgRedundancyModeDescr"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The collection of RF configuration objects."
+  },
+  "ciscoRFNotifGroup": {
+    "name": "ciscoRFNotifGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.3",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "ciscoRFSwactNotif"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "ciscoRFProgressionNotif"
+      }
+    ],
+    "status": "current",
+    "description": "The collection of notifications used to indicate RF state information."
+  },
+  "ciscoRFConfigGroupRev1": {
+    "name": "ciscoRFConfigGroupRev1",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveThresh"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveThreshMin"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveThreshMax"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveTimer"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveTimerMin"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgKeepaliveTimerMax"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgNotifTimer"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgNotifTimerMin"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgNotifTimerMax"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgAdminAction"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgNotifsEnabled"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgMaintenanceMode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgRedundancyMode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgRedundancyModeDescr"
+      }
+    ],
+    "status": "current",
+    "description": "The collection of RF configuration objects."
+  },
+  "ciscoRFStatusGroupRev1": {
+    "name": "ciscoRFStatusGroupRev1",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusUnitState"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPeerUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPeerUnitState"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPrimaryMode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusDuplexMode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusManualSwactInhibit"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusLastSwactReasonCode"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusFailoverTime"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusPeerStandByEntryTime"
+      }
+    ],
+    "status": "current",
+    "description": "The collection of global RF Status objects."
+  },
+  "ciscoRFHistoryGroup": {
+    "name": "ciscoRFHistoryGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFHistoryPrevActiveUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFHistoryCurrActiveUnitId"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFHistorySwitchOverReason"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFHistorySwactTime"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFHistoryColdStarts"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFHistoryStandByAvailTime"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFHistoryTableMaxLength"
+      }
+    ],
+    "status": "current",
+    "description": "The collection of RF History objects."
+  },
+  "ciscoRFConfigRFOperModeGroup": {
+    "name": "ciscoRFConfigRFOperModeGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFCfgRedundancyOperMode"
+      }
+    ],
+    "status": "current",
+    "description": "An optional group with a collection of objects providing the information of the operational redundancy mode on the device."
+  },
+  "ciscoRFStatusRFModeCapsGroup": {
+    "name": "ciscoRFStatusRFModeCapsGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.8",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusRFModeCapsModeDescr"
+      }
+    ],
+    "status": "current",
+    "description": "An optional group with a collection of objects providing the information of redundancy mode capability on the device."
+  },
+  "ciscoRFIssuStateNotifGroup": {
+    "name": "ciscoRFIssuStateNotifGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.9",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "ciscoRFIssuStateNotif"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The collection of notifications used to indicate ISSU state of the system."
+  },
+  "ciscoRFIssuStateNotifGroupRev1": {
+    "name": "ciscoRFIssuStateNotifGroupRev1",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.10",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "ciscoRFIssuStateNotifRev1"
+      }
+    ],
+    "status": "current",
+    "description": "The collection of notifications used to indicate ISSU state of the system."
+  },
+  "ciscoRFIssuStateObjGroup": {
+    "name": "ciscoRFIssuStateObjGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.11",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusIssuState"
+      }
+    ],
+    "status": "deprecated",
+    "description": "An optional group with a collection of objects providing the information on the current ISSU state of the system."
+  },
+  "ciscoRFIssuStateObjGroupRev1": {
+    "name": "ciscoRFIssuStateObjGroupRev1",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.12",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusIssuStateRev1"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusIssuFromVersion"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusIssuToVersion"
+      }
+    ],
+    "status": "current",
+    "description": "An optional group with a collection of objects providing the information on the current ISSU state of the system."
+  },
+  "ciscoRFStatusClientGroup": {
+    "name": "ciscoRFStatusClientGroup",
+    "oid": "1.3.6.1.4.1.9.9.176.3.2.13",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusRFClientDescr"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusRFClientSeq"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusRFClientRedTime"
+      },
+      {
+        "module": "CISCO-RF-MIB",
+        "object": "cRFStatusRFClientStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A group of objects providing information regarding the various clients registered with the RF."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-RF-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:09:32 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-RF-MIB"
+  }
+}

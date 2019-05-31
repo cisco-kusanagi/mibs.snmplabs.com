@@ -1,0 +1,2288 @@
+{
+  "imports": {
+    "class": "imports",
+    "ENTITY-MIB": [
+      "entPhysicalIndex"
+    ],
+    "IF-MIB": [
+      "ifIndex",
+      "InterfaceIndexOrZero"
+    ],
+    "RIVERSTONE-SMI-MIB": [
+      "riverstoneMibs"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "MibIdentifier",
+      "iso",
+      "Counter32",
+      "Unsigned32",
+      "Bits",
+      "IpAddress",
+      "MODULE-IDENTITY",
+      "OBJECT-TYPE",
+      "Integer32",
+      "NOTIFICATION-TYPE",
+      "TimeTicks",
+      "Counter64",
+      "OBJECT-IDENTITY",
+      "Gauge32"
+    ],
+    "SNMPv2-TC": [
+      "TruthValue",
+      "StorageType",
+      "RowStatus",
+      "TEXTUAL-CONVENTION",
+      "DisplayString"
+    ]
+  },
+  "rsRateLimitMIB": {
+    "name": "rsRateLimitMIB",
+    "oid": "1.3.6.1.4.1.5567.2.25",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2002-10-10 00:00",
+        "description": "Second revision. Added more types and tables for Layer 2 rate limiting features and deprecated some invalid values."
+      },
+      {
+        "revision": "2001-07-06 00:00",
+        "description": "First version."
+      }
+    ],
+    "lastupdated": "200210100000Z",
+    "organization": "Riverstone Networks, Inc",
+    "contactinfo": "Riverstone Networks, Inc 5200 Great America Parkway Santa Clara CA USA 95054 PHONE:+1 408.878.6500 EMAIL: nms-eng@riverstonenet.com WEB: http://www.riverstonenet.com",
+    "description": "This mib module defines the Riverstone Networks enterpise MIB for rate limit module. http://www.riverstonenet.com/products. Copyright (C) Riverstone Networks, Inc 2000"
+  },
+  "RsRateLimit": {
+    "name": "RsRateLimit",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "status": "current",
+    "description": "Rate limit on the selected traffic flow is specified using this data type. For RS Platform, this value can be set from 3000..1000000000 bits per second on all line cards."
+  },
+  "RsBurst": {
+    "name": "RsBurst",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "status": "current",
+    "description": "Burst traffic rate on the selected traffic flow is specified using this data type. For RS platform, the valid range is 10,000..1000000000 bits per second. This is used for dual token bucket meter or Burst Safe(TM) meter"
+  },
+  "RsAdminStatus": {
+    "name": "RsAdminStatus",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enabled": 1,
+          "disabled": 2
+        }
+      }
+    },
+    "status": "current",
+    "description": "Specifies the administrative status enabled or disabled"
+  },
+  "RsDistAmong": {
+    "name": "RsDistAmong",
+    "class": "textualconvention",
+    "type": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 10
+          }
+        ]
+      }
+    },
+    "status": "deprecated",
+    "description": "Distribute the unused 'bandwidth' among n number of flows, keeping a minimum specified bandwidth For example if the Software based AggregateRate is 10,000,000 MinBandwidth is 500,000 for each flow and Number of flows is 'n =15' leftOverBandwidth = AggregateRate -(n * MinBandwidth) 'leftOverBandwidth' is distributed among RsDistAmong number of flows. RsDistAmong is 5 leftOverBandwidth = 10,000,000 - (15 * 500,000) = 2,500,000 5 flows among 15 will get an extra 2,500,000/5 = 500000 bps ",
+    "reference": "Refer Riverstone Networks white paper entitled 'An Overview on Rate Limiting' http://www.riverstonenet.com/technology/rate.shtml"
+  },
+  "RsMeterType": {
+    "name": "RsMeterType",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "perFlow": 1,
+          "softwareFlowAggregate": 2,
+          "hardwareFlowAggregate": 3,
+          "perPort": 4,
+          "burstsafe": 5,
+          "l2": 6
+        }
+      }
+    },
+    "status": "current",
+    "description": "The type of meter service. The value perFlow(1) indicates that this entry specifies a per L3 flow rate limit. softwareFlowAggregate(2) indicates that this entry specifies a software based rate limit aggregate. This is deprecated. hardwareFlowAggregate(3) indicates that this entry specifies a hardware based flow aggregation rate limit perPort(4) indicates that this entry specifies a port-level rate limit service. burstsafe(5) indicates that this entry specifies a dual bucket rate limit. l2(6) indicates that this entry specifies a layer 2 rate limit service. ",
+    "reference": "Refer Riverstone Networks white paper entitled 'An Overview on Rate Limiting' http://www.riverstonenet.com/technology/rate.shtml"
+  },
+  "RsMeterInterval": {
+    "name": "RsMeterInterval",
+    "class": "textualconvention",
+    "type": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 10
+          }
+        ]
+      }
+    },
+    "status": "deprecated",
+    "description": "RS rate limiting is based on credit bucket scheme. A bucket is filled with certain number of credits, and credits are deducted over a given time period. When the time period is expired, the bucket is filled again with the same number of credits. This TC can be used to select time period. This feature does not allow user to specify the period in 'seconds' but a set of numbers from 0 to 10 only. ",
+    "reference": "Refer Riverstone Networks white paper entitled 'An Overview on Rate Limiting' http://www.riverstonenet.com/technology/rate.shtml"
+  },
+  "RsLabel": {
+    "name": "RsLabel",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 30
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": " ASCII character which are Letters,Digits and Under Scores Strings beginning with Digits and Underscores are not allowed "
+  },
+  "RsTOS": {
+    "name": "RsTOS",
+    "class": "textualconvention",
+    "type": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "In IPv4 its the TOS byte of IP packet header. Unsigned integer value which can be mapped to TOS or DSCP depending on the associated rate limit action type"
+  },
+  "RsIfDirection": {
+    "name": "RsIfDirection",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inbound": 1,
+          "outbound": 2,
+          "both": 3,
+          "unknown": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": " Specifies a direction of data travel on interface. 'inbound' traffic is operated on during reception from the interface, while 'outbound' traffic is operated on prior to transmission on the interface. 'both' traffic is operated during both reception and prior to transmission on the interface. "
+  },
+  "RsAction": {
+    "name": "RsAction",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noAction": 1,
+          "dropPackets": 2,
+          "setPriorityLow": 3,
+          "setPriorityMedium": 4,
+          "setPriorityHigh": 5,
+          "lowerPriority": 6,
+          "lowerPriorityExceptControl": 7,
+          "tosRewrite": 8,
+          "tosRewriteAndLowerPriority": 9,
+          "tosPrecedenceRewrite": 10,
+          "tosPrecedenceRewriteAndLowerPriority": 11,
+          "markPackets": 12
+        }
+      }
+    },
+    "status": "current",
+    "description": "Different actions allowed on the RS switch router Can be associated with rsTBMeterTable, or rsPortRLTable for rate limit purposes Note: not all the actions may be applicable to all the modules "
+  },
+  "rsRateLimitNotifications": {
+    "name": "rsRateLimitNotifications",
+    "oid": "1.3.6.1.4.1.5567.2.25.0",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "Group for Rate Limit related Notifications"
+  },
+  "rsTBMeter": {
+    "name": "rsTBMeter",
+    "oid": "1.3.6.1.4.1.5567.2.25.5",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "Token Bucket Meter Table and associated objects",
+    "reference": "Refer Riverstone Networks white paper 'An Overview of RateLimiting' for more details"
+  },
+  "rsTBMeterApply": {
+    "name": "rsTBMeterApply",
+    "oid": "1.3.6.1.4.1.5567.2.25.10",
+    "class": "objectidentity",
+    "status": "current",
+    "description": " Meter Apply table and associated objects",
+    "reference": "Refer Riverstone Networks white paper 'An Overview of RateLimiting' for more details"
+  },
+  "rsTBMeterApplyMonitor": {
+    "name": "rsTBMeterApplyMonitor",
+    "oid": "1.3.6.1.4.1.5567.2.25.15",
+    "class": "objectidentity",
+    "status": "current",
+    "description": " Group of token bucket rate limit monitor objects "
+  },
+  "rsPortRateLimit": {
+    "name": "rsPortRateLimit",
+    "oid": "1.3.6.1.4.1.5567.2.25.20",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "Input and Output Port based rate limit tables",
+    "reference": "Refer Riverstone Networks white paper 'An Overview of RateLimiting' for more details"
+  },
+  "rsPortRLMonitor": {
+    "name": "rsPortRLMonitor",
+    "oid": "1.3.6.1.4.1.5567.2.25.25",
+    "class": "objectidentity",
+    "status": "current",
+    "description": " Group of port based rate limit monitor objects "
+  },
+  "rsL2RateLimit": {
+    "name": "rsL2RateLimit",
+    "oid": "1.3.6.1.4.1.5567.2.25.26",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "L2 based rate limit tables"
+  },
+  "rsL2RLMonitor": {
+    "name": "rsL2RLMonitor",
+    "oid": "1.3.6.1.4.1.5567.2.25.29",
+    "class": "objectidentity",
+    "status": "current",
+    "description": " Group of l2 based rate limit monitor objects "
+  },
+  "rsRateLimitModes": {
+    "name": "rsRateLimitModes",
+    "oid": "1.3.6.1.4.1.5567.2.25.30",
+    "class": "objectidentity",
+    "status": "current",
+    "description": " Group of rate limit mode configuration on RS platform "
+  },
+  "rsRateLimitGroups": {
+    "name": "rsRateLimitGroups",
+    "oid": "1.3.6.1.4.1.5567.2.25.33",
+    "class": "objectidentity",
+    "status": "current",
+    "description": " All different kinds of groupings used in RS rate limiting"
+  },
+  "rsRateLimitConformance": {
+    "name": "rsRateLimitConformance",
+    "oid": "1.3.6.1.4.1.5567.2.25.35",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "rate limit conformance group "
+  },
+  "rsTBMeterLastChanged": {
+    "name": "rsTBMeterLastChanged",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The value of sysUpTime when last SET operation succeeds on this table. "
+  },
+  "rsTBMeterCount": {
+    "name": "rsTBMeterCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Total number of entries in the table "
+  },
+  "rsTBMeterErrorMessage": {
+    "name": "rsTBMeterErrorMessage",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Description of the error caused from the last SET operation that failed on this table"
+  },
+  "rsTBMeterTable": {
+    "name": "rsTBMeterTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Token bucket service entry table"
+  },
+  "rsTBMeterEntry": {
+    "name": "rsTBMeterEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A record containing a token bucket service parameters. A new row can be created by setting the appropriate value in the table entry with RowStatus to CreateAndGo. The columns in this table are modifiable when the state of entry RowStatus is equal to 'NotInService' or 'NotReady'"
+  },
+  "rsTBMeterId": {
+    "name": "rsTBMeterId",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The administratively assigned name to this Meter entry. This name must be unique across the rate-limit module including port based rate limit module Note: name must be unique across the RS platform ratelimit module "
+  },
+  "rsTBMeterType": {
+    "name": "rsTBMeterType",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsMeterType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "perFlow",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The type of meter service. The value perFlow(1) indicates that this entry specifies a per L3 flow rate limit. For this type the rsTBMeterRate can take a value between 3000 and 1000000000. Agent must ignore the value in the following fields while validating the row: rsTBMeterBurst RsBurst, rsTBMeterBurstFailAction RsAction, rsTBMeterBurstFailActionRewrite RsTOS, -- rsTBMeterMinimumBandwidth RsRateLimit, -- rsTBMeterDistributeAmong RsDistAmong, softwareFlowAggregate(2) value is deprecated. -- softwareFlowAggregate(2) indicates that this -- entry specifies a software based rate limit aggregate. -- Agent must ignore the value in the following fields while -- validating the row: -- -- rsTBMeterBurst RsBurst, -- rsTBMeterBurstFailAction RsAction, -- rsTBMeterBurstFailActionRewrite RsTOS, hardwareFlowAggregate(3) indicates that this entry specifies a hardware based flow aggregation rate limit For this type the rsTBMeterRate can take a value between 0 and 1000000000. Agent must ignore the value in the following fields while validating the row: rsTBMeterBurst RsBurst, rsTBMeterBurstFailAction RsAction, rsTBMeterBurstFailActionRewrite RsTOS, -- rsTBMeterMinimumBandwidth RsRateLimit, -- rsTBMeterDistributeAmong RsDistAmong, perPort(4) indicates that this entry specifies a port-level rate limit service. For this type the rsTBMeterRate can take a value between 3000 and 1000000000 in outbound direction and between 0 and 1000000000 in inbound direction. Agent must ignore the value in the following fields while validating the row: rsTBMeterBurst RsBurst, rsTBMeterBurstFailAction RsAction, rsTBMeterBurstFailActionRewrite RsTOS, -- rsTBMeterMinimumBandwidth RsRateLimit, -- rsTBMeterDistributeAmong RsDistAmong, burstsafe(5) indicates that this entry specifies a dual bucket rate limit. For this type the rsTBMeterRate can take a value between 10000 and 1000000000. Agent must ignore the value in the following fields while validating the row: -- rsTBMeterMinimumBandwidth RsRateLimit, -- rsTBMeterDistributeAmong RsDistAmong, l2(6) indicates that this entry specifies a layer 2 rate limit. For this type the rsTBMeterRate can take a value between 0 and 1000000000. Agent must ignore the value in the following fields while validating the row: rsTBMeterBurst RsBurst, rsTBMeterBurstFailAction RsAction, rsTBMeterBurstFailActionRewrite RsTOS, "
+  },
+  "rsTBMeterRate": {
+    "name": "rsTBMeterRate",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsRateLimit",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 3000,
+        "format": "decimal"
+      }
+    },
+    "units": "bps",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Token Bucket rate in bits per second. Refer to the Description of rsTBMeterType for acceptable values. "
+  },
+  "rsTBMeterBurst": {
+    "name": "rsTBMeterBurst",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsBurst",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 10000,
+        "format": "decimal"
+      }
+    },
+    "units": "bps",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": " The burst traffic rate (size) supported. This attribute is used only when rsTBMeterType is set to burstsafe(5) For RS platform rate ranges from 10000 to 1000000000. "
+  },
+  "rsTBMeterInterval": {
+    "name": "rsTBMeterInterval",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsMeterInterval",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "reference": "Refer Riverstone Networks white paper 'An Overview of RateLimiting' for more details",
+    "status": "deprecated",
+    "description": " The time interval used with the token bucket. "
+  },
+  "rsTBMeterFailAction": {
+    "name": "rsTBMeterFailAction",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAction",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": " The fail action to take when the traffic rate exceeds rsTBMeterRate. If the Action value indicates TOS rewrite or TOS Precedence rewrite, appropriate rewrite value should be in rsTBMeterFailActionRewrite. "
+  },
+  "rsTBMeterFailActionRewrite": {
+    "name": "rsTBMeterFailActionRewrite",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsTOS",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": " TOS or TOS Precedence rewrite when the traffic exceeds rsTBMeterRate. rsTBMeterFailAction indicates this object value either TOS or TOS Precedence The object is ignored by agent if rsTBMeterFailAction does not indicate rewrite option. "
+  },
+  "rsTBMeterBurstFailAction": {
+    "name": "rsTBMeterBurstFailAction",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAction",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": " The fail action to take when the traffic rate exceeds rsTBMeterBurst. If the Action value indicates TOS rewrite or TOS Precedence rewrite, appropriate rewrite value should be in rsTBMeterBurstFailActionRewrite. "
+  },
+  "rsTBMeterBurstFailActionRewrite": {
+    "name": "rsTBMeterBurstFailActionRewrite",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsTOS",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": " TOS or TOS Precedence rewrite when the traffic exceeds rsTBMeterBurst, rsTBMeterBurstFailAction indicates this object value either TOS or TOS Precedence The object is ignored by agent if rsTBMeterBurstFailAction does not indicate rewrite option. "
+  },
+  "rsTBMeterMinimumBandwidth": {
+    "name": "rsTBMeterMinimumBandwidth",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsRateLimit",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 3000,
+        "format": "decimal"
+      }
+    },
+    "units": "bps",
+    "maxaccess": "read-create",
+    "status": "deprecated",
+    "description": "The minimum bandwidth to allocate for each flow when rsTBMeterType is 'softwareFlowAggreage' For RS platform rate ranges from 3000 to 1000000000. "
+  },
+  "rsTBMeterDistributeAmong": {
+    "name": "rsTBMeterDistributeAmong",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsDistAmong",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "deprecated",
+    "description": "The rate-limit module allocates the minimum specified bandwidth to each matching flow,and the leftover bandwidth of rsTBMeterAccessRate will be distributed among these number of flow."
+  },
+  "rsTBMeterStorageType": {
+    "name": "rsTBMeterStorageType",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "volatile": 2,
+          "nonVolatile": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "volatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specify if entry should be persistent or not. "
+  },
+  "rsTBMeterStatus": {
+    "name": "rsTBMeterStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.5.4.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The RowStatus variable controls the activation, deactivation, or deletion of a meter. Writable variable may not be modified when the row is active. "
+  },
+  "rsTBMeterApplyLastChanged": {
+    "name": "rsTBMeterApplyLastChanged",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when last SET operation succeeds on this table"
+  },
+  "rsTBMeterApplyCount": {
+    "name": "rsTBMeterApplyCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current number of entries in rsTBMeterApplyTable "
+  },
+  "rsTBMeterApplyErrorMessage": {
+    "name": "rsTBMeterApplyErrorMessage",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Description of the error of the last SET operations to fail on this table"
+  },
+  "rsTBMeterApplyMasterAdminStatus": {
+    "name": "rsTBMeterApplyMasterAdminStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAdminStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": " This object enables or disables all the entries in rsTBMeterApplyTable. This behaves like master fuse and do not change individual states of each row. User must check the state of this object before he tries to enable the state of entry. "
+  },
+  "rsTBMeterApplyTable": {
+    "name": "rsTBMeterApplyTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table associates rate limits with interfaces. In particular, a profile from the rsTBMeter table with name rsTBMeterId2 is applied on certain IP interfaces and ports specified by ifIndex with classifier specified by rsTBMeterApplyAclName "
+  },
+  "rsTBMeterApplyEntry": {
+    "name": "rsTBMeterApplyEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyDirection",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyAclName",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterId2",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "'ifIndex' is imported from IF-MIB. For RS platform, this value must point to an entry that has ifType of IP interface(126) ethernetCsmacd(6) L4 bridging MUST be enabled on the port before creating the entry. To enable/disable the L4 bridging state on a particular port use VLAN-EXTENSION-MIB module. The columns in this table are modifiable when the state of rsTBMeterApplyStatus equal to NotInService, NotReady. "
+  },
+  "rsTBMeterApplyDirection": {
+    "name": "rsTBMeterApplyDirection",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsIfDirection",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inbound": 1,
+          "outbound": 2
+        }
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Interface traffic direction. "
+  },
+  "rsTBMeterApplyAclName": {
+    "name": "rsTBMeterApplyAclName",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Access Control List name or Classifier Name, Must exist on the underlying system before activation. "
+  },
+  "rsTBMeterId2": {
+    "name": "rsTBMeterId2",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The meter id from rsTBMeterEntry.rsTBMeterId. rsTBMeterId must be an active row in rsTBMeterTable. "
+  },
+  "rsTBMeterApplyOwner": {
+    "name": "rsTBMeterApplyOwner",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The owner of this rate limit apply entry. The exact semantics of this string are subject to the security policy defined by the security administrator. If this entry was created via Command Line Interface, this will be set to 'monitor' "
+  },
+  "rsTBMeterApplyAdminStatus": {
+    "name": "rsTBMeterApplyAdminStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAdminStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The desired state of the rate limit entry."
+  },
+  "rsTBMeterApplyStorageType": {
+    "name": "rsTBMeterApplyStorageType",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "volatile": 2,
+          "nonVolatile": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "volatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specify if entry should be persistent or not."
+  },
+  "rsTBMeterApplyStatus": {
+    "name": "rsTBMeterApplyStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.10.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Allows to create a new row and modify or destroy an existing row in the manner described in the definition of the RowStatus textual convention "
+  },
+  "rsPortRLLastChanged": {
+    "name": "rsPortRLLastChanged",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when last SET operation succeeds on this table"
+  },
+  "rsPortRLCount": {
+    "name": "rsPortRLCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current number of entries in rsPortRLTable "
+  },
+  "rsPortRLErrorMessage": {
+    "name": "rsPortRLErrorMessage",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Description of the error caused when the last SET operation failed on this table"
+  },
+  "rsPortRLMasterAdminStatus": {
+    "name": "rsPortRLMasterAdminStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAdminStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": " This object enables or disables all the entries in rsPortRLTable. This behaves like master fuse and do not change individual states of each row. User must check the state of this object before he tries to enable the state of an entry in rsPortRLTAble. "
+  },
+  "rsPortRLTable": {
+    "name": "rsPortRLTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An entry which allows to create port based ratelimit service and to activate it on a physical port"
+  },
+  "rsPortRLEntry": {
+    "name": "rsPortRLEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLDirection",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLMeterId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "'ifIndex' is imported from IF-MIB, which carries an index for physical port. For RS platform, this value must point to an entry that has ifType of ethernetCsmacd(6). The columns in this table are modifiable when the state of rsPortRLStatus equal to NotInService, NotReady. "
+  },
+  "rsPortRLDirection": {
+    "name": "rsPortRLDirection",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsIfDirection",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inbound": 1,
+          "outbound": 2
+        }
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Input/Output direction to apply rate limit on a port "
+  },
+  "rsPortRLMeterId": {
+    "name": "rsPortRLMeterId",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Administratively assigned name to port based rate limit entry Note: name must be unique across the RS platform ratelimit module "
+  },
+  "rsPortRLOwner": {
+    "name": "rsPortRLOwner",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The owner of this entry. The exact semantics of this string are subject to the security policy defined by the security administrator."
+  },
+  "rsPortRLRate": {
+    "name": "rsPortRLRate",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsRateLimit",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 3000,
+        "format": "decimal"
+      }
+    },
+    "units": "bps",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Rate to limit port traffic to. For RS platform rate ranges from 3000 to 1000000000. "
+  },
+  "rsPortRLFailAction": {
+    "name": "rsPortRLFailAction",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAction",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": " The action to take when the traffic rate exceeds rsPortRLRate. If the Action value indicates TOS rewrite or TOS Precedence rewrite, appropriate rewrite value should be in rsPortRLFailActionRewrite. "
+  },
+  "rsPortRLFailActionRewrite": {
+    "name": "rsPortRLFailActionRewrite",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsTOS",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": " TOS or TOS Precedence rewrite when the traffic exceeds rsPortRLRate. rsPortRLFailAction indicates this object value either TOS or TOS Precedence The object is ignored by agent if rsPortRLFailAction does not indicate rewrite option. "
+  },
+  "rsPortRLInterval": {
+    "name": "rsPortRLInterval",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsMeterInterval",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "reference": "Refer Riverstone Networks white paper 'An Overview of RateLimiting' for more details",
+    "status": "deprecated",
+    "description": " The time interval used with the token bucket. "
+  },
+  "rsPortRLAdminStatus": {
+    "name": "rsPortRLAdminStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAdminStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The desired state of the rate limit entry."
+  },
+  "rsPortRLStorageType": {
+    "name": "rsPortRLStorageType",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "volatile": 2,
+          "nonVolatile": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "volatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specify if entry should be persistent or not. "
+  },
+  "rsPortRLStatus": {
+    "name": "rsPortRLStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.20.5.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": " Allows to create a new row and modify or destroy an existing row in the manner described in the definition of the RowStatus textual convention "
+  },
+  "rsL2RLApplyLastChanged": {
+    "name": "rsL2RLApplyLastChanged",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when last SET operation succeeds on this table"
+  },
+  "rsL2RLApplyCount": {
+    "name": "rsL2RLApplyCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current number of entries in rsL2RLApplyTable "
+  },
+  "rsL2RLApplyErrorMessage": {
+    "name": "rsL2RLApplyErrorMessage",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Description of the error of the last SET operations to fail on this table"
+  },
+  "rsL2RLApplyMasterAdminStatus": {
+    "name": "rsL2RLApplyMasterAdminStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAdminStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": " This object enables or disables all the entries in rsL2RLApplyTable. This behaves like master fuse and do not change individual states of each row. User must check the state of this object before he tries to enable the state of entry. "
+  },
+  "rsL2RLApplyTable": {
+    "name": "rsL2RLApplyTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table associates rate limits with port / portgroups / filter / filtergroups. In particular, a profile from the rsTBMeter table with name rsTBMeterId is applied on certain ports specified by ifIndex or the port groups specified with rsL2RLApplyPortGroupName with filter specified by rsL2RLApplyFilterName or the filter groups specified with the rsL2RLApplyFilterName or the classifier mentioned in the entry. "
+  },
+  "rsL2RLApplyEntry": {
+    "name": "rsL2RLApplyEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterId",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyDirection",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyIfIndex",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyPortGroupName",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyFilterName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "'ifIndex' is imported from IF-MIB. For RS platform, this value must point to an entry that has ifType of ethernetCsmacd(6) The columns in this table are modifiable when the state of rsL2RLApplyStatus equal to NotInService, NotReady. "
+  },
+  "rsL2RLApplyDirection": {
+    "name": "rsL2RLApplyDirection",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsIfDirection",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inbound": 1,
+          "outbound": 2
+        }
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Interface traffic direction. "
+  },
+  "rsL2RLApplyIfIndex": {
+    "name": "rsL2RLApplyIfIndex",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "When the service is applied on a single port, this value should be the ifIndex of the port where the service is applied. If it is applied on a group of ports, this value should be zero. If it is nonZero, the rsL2RLApplyPortGroupName should be a zero length octet string."
+  },
+  "rsL2RLApplyPortGroupName": {
+    "name": "rsL2RLApplyPortGroupName",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object identifies one or more rows in the rsRLPortGroupTable, when it of length nonzero. In this case the rsL2RLApplyIfIndex should be zero. If the service is applied on a single port, this object is supposed to be a zero length octet string."
+  },
+  "rsL2RLApplyFilterName": {
+    "name": "rsL2RLApplyFilterName",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Filter name or Classifier Name, Must exist on the underlying system before activation. If rsL2RLIsFilterGroup is set to true, then this name specifies the filter group name. The actual filters associated to this entry are specified in rsRLFilterGroupTable. If both filter and port groups are present, this value should be same as the rsL2RLApplyPortGroupName. "
+  },
+  "rsL2RLIsFilterGroup": {
+    "name": "rsL2RLIsFilterGroup",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "When this value is set to true, then rsL2RLApplyFilterName specifies the group of filters mentioned in the rsRLFilterGroupTable. If set to false, the rsL2RLApplyFilterName specifies the filter name associated with the service."
+  },
+  "rsL2RLApplyOnePGrouping": {
+    "name": "rsL2RLApplyOnePGrouping",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 0,
+          "other": 1,
+          "group1": 2,
+          "group2": 3,
+          "group3": 4,
+          "group4": 5
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the 802.1p priority groupings for which this service is to be applied. Currently, 4 different groups can be constructed and those priorities which are not in any groups is put under other category."
+  },
+  "rsL2RLApplyOwner": {
+    "name": "rsL2RLApplyOwner",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The owner of this rate limit apply entry. The exact semantics of this string are subject to the security policy defined by the security administrator. If this entry was created via Command Line Interface, this will be set to 'monitor' "
+  },
+  "rsL2RLApplyAdminStatus": {
+    "name": "rsL2RLApplyAdminStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAdminStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The desired state of the rate limit entry."
+  },
+  "rsL2RLApplyStorageType": {
+    "name": "rsL2RLApplyStorageType",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "volatile": 2,
+          "nonVolatile": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "volatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specify if entry should be persistent or not."
+  },
+  "rsL2RLApplyStatus": {
+    "name": "rsL2RLApplyStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.26.5.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Allows to create a new row and modify or destroy an existing row in the manner described in the definition of the RowStatus textual convention "
+  },
+  "rsRLModeLastChanged": {
+    "name": "rsRLModeLastChanged",
+    "oid": "1.3.6.1.4.1.5567.2.25.30.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when last SET operation succeeds on this table"
+  },
+  "rsRLModeTable": {
+    "name": "rsRLModeTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.30.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Entry of rate limit mode and input port ratelimit state The rows in this table are created dynamically by inserting line cards in their respective slots of the underlying system. When a slot/module is activated resulting entry in this table will have the default operating modes. Essentially the ratelimit mode and input port ratelimit status value. Certain SET operation on this entry might fail if the underlying hardware does not support the mode. "
+  },
+  "rsRLModeEntry": {
+    "name": "rsRLModeEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.30.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": " A record containing ratelimt mode on given module/slot. The columns in this entry are modifiable. This is indexed by entPhysicalIndex whose entPhysicalClass == module(9). "
+  },
+  "rsRLModeType": {
+    "name": "rsRLModeType",
+    "oid": "1.3.6.1.4.1.5567.2.25.30.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "flowMode": 1,
+          "aggregateMode": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": " Type of rate limit modes supported on this slot Value is writable only when rsRLModeCapabilityBits has rlMode(0) set to '1'. The table below relates the ratelimit type supported in each Mode. +---------------------+----------+--------------+ |RsMeterType | flowMode | aggregateMode| +---------------------+----------+--------------+ |perFlow(1) | X | | |softFlowAgg(2) | X | | |hardFlowAgg(3) | | X | |perPort(4) -input | | X | |perPort(4) -output | X | X | +---------------------+----------+--------------+ X indicates supported. "
+  },
+  "rsRLModeInputPortStatus": {
+    "name": "rsRLModeInputPortStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.30.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsAdminStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": " Input Port RateLimit status on this slot. Value is writable only when rsRLModeCapabilityBits has rlInputPortRateLimit set to '1'. "
+  },
+  "rsRLModeCapabilityBits": {
+    "name": "rsRLModeCapabilityBits",
+    "oid": "1.3.6.1.4.1.5567.2.25.30.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "rlMode": 0,
+        "rlInputPortRateLimit": 1
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Specifies the Module capability. rlMode(0) if set to 1 indicates the Module supports the Flow or Aggregate mode. rlInputPortRateLimit(1) if set to 1 indicates the Module supports input port based rate limiting. "
+  },
+  "rsRLModeEntryLastChanged": {
+    "name": "rsRLModeEntryLastChanged",
+    "oid": "1.3.6.1.4.1.5567.2.25.30.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when last SET operation succeeds on this entry"
+  },
+  "rsRLModeStorageType": {
+    "name": "rsRLModeStorageType",
+    "oid": "1.3.6.1.4.1.5567.2.25.30.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "volatile": 2,
+          "nonVolatile": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "volatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": " Storage type for this entry. "
+  },
+  "rsRLPortGroupLastChanged": {
+    "name": "rsRLPortGroupLastChanged",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when last SET operation succeeds on this table"
+  },
+  "rsRLPortGroupTable": {
+    "name": "rsRLPortGroupTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is to associate one or more ports as a group."
+  },
+  "rsRLPortGroupEntry": {
+    "name": "rsRLPortGroupEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLPortGroupName",
+        "implied": 0
+      },
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": " A record containing group name and ifIndex."
+  },
+  "rsRLPortGroupName": {
+    "name": "rsRLPortGroupName",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The administratively assigned name to this PortGroup entry. "
+  },
+  "rsRLPortGroupStorageType": {
+    "name": "rsRLPortGroupStorageType",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "volatile": 2,
+          "nonVolatile": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Storage type for this entry. The value of this entry will be the same as the one specified in the row of rsL2RLApplyTable where this group is used. If none of the entries use this group, then the storage type will be volatile. "
+  },
+  "rsRLPortGroupStatus": {
+    "name": "rsRLPortGroupStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Allows to create a new row and modify or destroy an existing row in the manner described in the definition of the RowStatus textual convention "
+  },
+  "rsRLFilterGroupLastChanged": {
+    "name": "rsRLFilterGroupLastChanged",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when last SET operation succeeds on this table"
+  },
+  "rsRLFilterGroupTable": {
+    "name": "rsRLFilterGroupTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is to associate one or more ports as a group."
+  },
+  "rsRLFilterGroupEntry": {
+    "name": "rsRLFilterGroupEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLFilterGroupName",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLFilterName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": " A record containing group name and filter name."
+  },
+  "rsRLFilterGroupName": {
+    "name": "rsRLFilterGroupName",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The administratively assigned name to this FilterGroup entry. "
+  },
+  "rsRLFilterName": {
+    "name": "rsRLFilterName",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsLabel",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The name of the filter part of this group. "
+  },
+  "rsRLFilterGroupStorageType": {
+    "name": "rsRLFilterGroupStorageType",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "volatile": 2,
+          "nonVolatile": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Storage type for this entry. The value of this entry will be the same as the one specified in the row of rsL2RLApplyTable where this group is used. If none of the entries use this group, then the storage type will be volatile. "
+  },
+  "rsRLFilterGroupStatus": {
+    "name": "rsRLFilterGroupStatus",
+    "oid": "1.3.6.1.4.1.5567.2.25.33.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Allows to create a new row and modify or destroy an existing row in the manner described in the definition of the RowStatus textual convention "
+  },
+  "rsTBMeterMonitorTable": {
+    "name": "rsTBMeterMonitorTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.15.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": " Table which carries exceed count for each token bucket meter applied on Access Control List. "
+  },
+  "rsTBMeterMonitorEntry": {
+    "name": "rsTBMeterMonitorEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.15.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "rsTBMeterMonitorEntry",
+      "module": "RIVERSTONE-RATELIMIT-MIB",
+      "object": "rsTBMeterApplyEntry"
+    },
+    "status": "current",
+    "description": " This is a read only table of exceed count for each token bucket entry applied on Access Contol List. "
+  },
+  "rsTBMeterExceedByteCount": {
+    "name": "rsTBMeterExceedByteCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.15.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Total number of bytes exceeded as a result of traffic rate limiting on a particular rsTBMeterApplyEntry entry. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of rsTBMeterCounterDiscontinuityTime. "
+  },
+  "rsTBMeterCounterDiscontinuityTime": {
+    "name": "rsTBMeterCounterDiscontinuityTime",
+    "oid": "1.3.6.1.4.1.5567.2.25.15.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime on the most recent occasion at which this counters suffered a discontinuity. If no such discontinuities have occurred since the last re- initialization of the local management subsystem, then this object contains a zero value."
+  },
+  "rsTBMeterExceedPacketCount": {
+    "name": "rsTBMeterExceedPacketCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.15.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Total number of packets exceeded the specified traffic rate limiting on a particular rsTBMeterApplyEntry entry. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of rsTBMeterCounterDiscontinuityTime. "
+  },
+  "rsTBMeterExceedBurstPacketCount": {
+    "name": "rsTBMeterExceedBurstPacketCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.15.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Total number of packets exceeded the specified burst rate on a particular rsTBMeterApplyEntry entry. This is object is valid only when the rsTBMeterType is burstsafe(5) in the row referred by the rsTBMeterId2 in the rsTBMeterTable. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of rsTBMeterCounterDiscontinuityTime. "
+  },
+  "rsPortRLMonitorTable": {
+    "name": "rsPortRLMonitorTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.25.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": " Table which carries exceed count for each token bucket meter applied on the port based ones. "
+  },
+  "rsPortRLMonitorEntry": {
+    "name": "rsPortRLMonitorEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.25.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "rsPortRLMonitorEntry",
+      "module": "RIVERSTONE-RATELIMIT-MIB",
+      "object": "rsPortRLEntry"
+    },
+    "status": "current",
+    "description": " This is a read only table of exceed count for each token bucket entry applied the port based ones. "
+  },
+  "rsPortRLExceedByteCount": {
+    "name": "rsPortRLExceedByteCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.25.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Total number of bytes exceeded as a result of traffic rate limiting on a particular rsPortRLEntry entry. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of rsPortRLCounterDiscontinuityTime. "
+  },
+  "rsPortRLCounterDiscontinuityTime": {
+    "name": "rsPortRLCounterDiscontinuityTime",
+    "oid": "1.3.6.1.4.1.5567.2.25.25.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime on the most recent occasion at which this counters suffered a discontinuity. If no such discontinuities have occurred since the last re- initialization of the local management subsystem, then this object contains a zero value."
+  },
+  "rsPortRLExceedPacketCount": {
+    "name": "rsPortRLExceedPacketCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.25.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Total number of packets that exceeded the specified traffic rate limiting on a particular rsPortRLEntry entry. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of rsPortRLCounterDiscontinuityTime. "
+  },
+  "rsL2RLMonitorTable": {
+    "name": "rsL2RLMonitorTable",
+    "oid": "1.3.6.1.4.1.5567.2.25.29.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": " Table which carries exceed count for each token bucket meter applied on L2 Filter or Filter Group. "
+  },
+  "rsL2RLMonitorEntry": {
+    "name": "rsL2RLMonitorEntry",
+    "oid": "1.3.6.1.4.1.5567.2.25.29.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "rsL2RLMonitorEntry",
+      "module": "RIVERSTONE-RATELIMIT-MIB",
+      "object": "rsL2RLApplyEntry"
+    },
+    "status": "current",
+    "description": " This is a read only table of exceed count for each token bucket entry applied on L2 Filter or Filter Groups. "
+  },
+  "rsL2RLExceedByteCount": {
+    "name": "rsL2RLExceedByteCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.29.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Total number of bytes that exceeded the specified traffic rate limiting on a particular rsL2RLApplyEntry entry. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of rsL2RLCounterDiscontinuityTime. "
+  },
+  "rsL2RLExceedPacketCount": {
+    "name": "rsL2RLExceedPacketCount",
+    "oid": "1.3.6.1.4.1.5567.2.25.29.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " Total number of packets that exceeded the specified traffic rate limiting on a particular rsL2RLApplyEntry entry. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of rsL2RLCounterDiscontinuityTime. "
+  },
+  "rsL2RLCounterDiscontinuityTime": {
+    "name": "rsL2RLCounterDiscontinuityTime",
+    "oid": "1.3.6.1.4.1.5567.2.25.29.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime on the most recent occasion at which this counters suffered a discontinuity. If no such discontinuities have occurred since the last re- initialization of the local management subsystem, then this object contains a zero value."
+  },
+  "rsRateLimitCompliances": {
+    "name": "rsRateLimitCompliances",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.1",
+    "class": "objectidentity"
+  },
+  "rsRateLimitGroup": {
+    "name": "rsRateLimitGroup",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2",
+    "class": "objectidentity"
+  },
+  "rsRateLimitComplianceV2": {
+    "name": "rsRateLimitComplianceV2",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "rsRateLimitGroup1",
+        "module": "RIVERSTONE-RATELIMIT-MIB"
+      },
+      {
+        "object": "rsRateLimitGroup2",
+        "module": "RIVERSTONE-RATELIMIT-MIB"
+      },
+      {
+        "object": "rsRateLimitGroup6",
+        "module": "RIVERSTONE-RATELIMIT-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "rsRateLimitGroup1 and rsRateLimitGroup2 is mandatory for implementation of this MIB. This compliance is deprecated and replaced by rsRateLimitComplianceV2"
+  },
+  "rsRateLimitCompliance": {
+    "name": "rsRateLimitCompliance",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "rsRateLimitGroup1",
+        "module": "RIVERSTONE-RATELIMIT-MIB"
+      },
+      {
+        "object": "rsRateLimitGroup2",
+        "module": "RIVERSTONE-RATELIMIT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "rsRateLimitGroup1 and rsRateLimitGroup2 is mandatory for implementation of this MIB. This compliance is deprecated and replaced by rsRateLimitComplianceV2"
+  },
+  "rsRateLimitGroup1": {
+    "name": "rsRateLimitGroup1",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterLastChanged"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterErrorMessage"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterType"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterRate"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterBurst"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterFailAction"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterFailActionRewrite"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterBurstFailActionRewrite"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterStorageType"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyLastChanged"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyErrorMessage"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyMasterAdminStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyOwner"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyAdminStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyStorageType"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterApplyStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A set of managed objects that make up version 0.1 of the RS rate limit MIB Group."
+  },
+  "rsRateLimitGroup2": {
+    "name": "rsRateLimitGroup2",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLLastChanged"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLErrorMessage"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLMasterAdminStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLOwner"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLRate"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLFailAction"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLFailActionRewrite"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLAdminStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLStorageType"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A set of managed objects that make up version 0.1 of the RS rate limit MIB Group for port based rate limiting."
+  },
+  "rsRateLimitGroup3": {
+    "name": "rsRateLimitGroup3",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLModeLastChanged"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLModeType"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLModeCapabilityBits"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLModeInputPortStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLModeEntryLastChanged"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLModeStorageType"
+      }
+    ],
+    "status": "current",
+    "description": "This group is mandatory for all RS platforms that support port or interface based rate limits"
+  },
+  "rsRateLimitGroup4": {
+    "name": "rsRateLimitGroup4",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterBurstFailAction"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterMinimumBandwidth"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterDistributeAmong"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterInterval"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLInterval"
+      }
+    ],
+    "status": "deprecated",
+    "description": "This optional group applies to RS Product line that supports dual rate token bucket metering (aka Burst Safe (tm) This group is replaced by rsRateLimitGroup4V2"
+  },
+  "rsRateLimitGroup5": {
+    "name": "rsRateLimitGroup5",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterExceedByteCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterCounterDiscontinuityTime"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLExceedByteCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLCounterDiscontinuityTime"
+      }
+    ],
+    "status": "deprecated",
+    "description": " Optional Group of rate limit monitor objects. This group is replaced by rsRateLimitGroup5V2. "
+  },
+  "rsRateLimitGroup4V2": {
+    "name": "rsRateLimitGroup4V2",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterBurstFailAction"
+      }
+    ],
+    "status": "current",
+    "description": "This optional group applies to RS Product line that supports dual rate token bucket metering (aka Burst Safe (tm)"
+  },
+  "rsRateLimitGroup5V2": {
+    "name": "rsRateLimitGroup5V2",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterExceedByteCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterExceedPacketCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterCounterDiscontinuityTime"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsTBMeterExceedBurstPacketCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLExceedByteCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLExceedPacketCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsPortRLCounterDiscontinuityTime"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLExceedByteCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLExceedPacketCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLCounterDiscontinuityTime"
+      }
+    ],
+    "status": "current",
+    "description": " Optional Group of rate limit monitor objects "
+  },
+  "rsRateLimitGroup6": {
+    "name": "rsRateLimitGroup6",
+    "oid": "1.3.6.1.4.1.5567.2.25.35.2.8",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyLastChanged"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyCount"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyErrorMessage"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyMasterAdminStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLIsFilterGroup"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyOnePGrouping"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyOwner"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyAdminStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyStorageType"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsL2RLApplyStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLFilterGroupLastChanged"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLPortGroupStorageType"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLPortGroupStatus"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLPortGroupLastChanged"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLFilterGroupStorageType"
+      },
+      {
+        "module": "RIVERSTONE-RATELIMIT-MIB",
+        "object": "rsRLFilterGroupStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A set of managed objects that make up version 0.2 of the RS rate limit MIB Group for l2 based rate limiting."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/RIVERSTONE-RATELIMIT-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 21:20:25 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "RIVERSTONE-RATELIMIT-MIB"
+  }
+}

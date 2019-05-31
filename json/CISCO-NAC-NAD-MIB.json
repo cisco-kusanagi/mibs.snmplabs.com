@@ -1,0 +1,2481 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-NAC-TC-MIB": [
+      "CnnEouState",
+      "CnnEouPostureToken",
+      "CnnEouDeviceType",
+      "CnnEouAuthType",
+      "CnnEouPostureTokenString"
+    ],
+    "CISCO-POLICY-GROUP-MIB": [
+      "CpgPolicyNameOrEmpty"
+    ],
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "CISCO-TC": [
+      "CiscoURLString"
+    ],
+    "IF-MIB": [
+      "InterfaceIndexOrZero",
+      "ifIndex",
+      "InterfaceIndex"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddressPrefixLength",
+      "InetAddressType",
+      "InetPortNumber",
+      "InetAddress"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Bits",
+      "OBJECT-IDENTITY",
+      "OBJECT-TYPE",
+      "Counter64",
+      "TimeTicks",
+      "MODULE-IDENTITY",
+      "iso",
+      "NOTIFICATION-TYPE",
+      "IpAddress",
+      "Counter32",
+      "Gauge32",
+      "MibIdentifier",
+      "Unsigned32",
+      "Integer32"
+    ],
+    "SNMPv2-TC": [
+      "MacAddress",
+      "TruthValue",
+      "StorageType",
+      "TEXTUAL-CONVENTION",
+      "DisplayString",
+      "RowStatus",
+      "TimeStamp"
+    ]
+  },
+  "ciscoNacNadMIB": {
+    "name": "ciscoNacNadMIB",
+    "oid": "1.3.6.1.4.1.9.9.484",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2008-06-23 00:00",
+        "description": "Added following enumerations to the object cnnEouIfTimeoutGlobalConfig - maxRetry(5), - clientless(6), - ipStationId(7). Added the following objects to cnnEouIfConfigTable - cnnEouIfAllowClientless, - cnnEouIfAllowIpStationId Added the following objects to cnnEouHostResultTable - cnnEouHostResultUrlRedirectAcl, - cnnEouHostResultTagName, - cnnEouHostResultAuditSessionId, - cnnEouHostResultAaaFailPolicy Added following OBJECT-GROUPs - ciscoNacNadRevalidateConfigGrp, - ciscoNacNadEouHostGroup1, - ciscoNacNadEouIfExtGroup. Added ciscoNacNadMIBCompliance4 MODULE-COMPLIANCE."
+      },
+      {
+        "revision": "2007-11-12 00:00",
+        "description": "Add cnnEouIfIpDevTrackConfigGrp MIB group."
+      },
+      {
+        "revision": "2007-02-23 00:00",
+        "description": "Move all the TEXTUAL-CONVENTION to CISCO-NAC-TC-MIB; Modify cnnEouHostValidateAction object to add the following enum values: initializePostureTokenStr(23), revalidatePostureTokenStr(24), noRevalidatePostureTokenStr(25) to deprecate the following enum values: initializePostureToken(8), revalidatePostureToken(15), noRevalidatePostureToken(22) Modify cnnEouHostQueryMask object to add postureTokenString(9) enum value to deprecate postureToken(7) enum value Add the following objects: cnnEouHostValidatePostureTokenStr, cnnEouHostQueryPostureTokenStr, cnnEouHostResultPostureTokenStr, to deprecate the following objects: cnnEouHostValidatePostureToken, cnnEouHostQueryPostureToken, cnnEouHostResultPostureToken Add ciscoNacNadEouHostGroup to deprecate ciscoNacNadEouHostGrp Add the following MIB groups: ciscoNacNadEouIfAaaFailPolicyGrp cnnIpDeviceTrackingConfigGrp cnnEouCriticalRecoveryDelayGrp"
+      },
+      {
+        "revision": "2005-06-28 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200806230000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-nac@cisco.com, cs-lan-switch-snmp@cisco.com",
+    "description": "This MIB module is for the configuration of a Network Access Device (NAD) on the Cisco Network Admission Control (NAC) system. EndPoint -------------- NAD ------- AAA ------ PVS (SecurApp) EAPoUDP/802.1x RADIUS HCAP (Plugin) (PA) Cisco NAC system The Cisco Network Admission Control (NAC) security solution offers a systems approach to customers for ensuring endpoint device compliancy and vulnerability checks prior to production access to the network. Cisco refers to these compliancy checks as posture validations. The intent of this systems approach is to prevent the spread of works, viruses, and rogue applications across the network. This systems approach requires integration with third party end point security applications, as well as endpoint security servers. The Network Access Device (NAD) enforces network access control privileges by controlling which endpoint devices have access to network destinations and services reachable through that NAD. Endpoint devices that do not have the PA installed, enabled, or cannot otherwise respond to the NAD posture challenges are considered non-responsive hosts. Upon recognition of an incoming endpoint device at L2 or L3, the NAD issues a challenge to the endpoint device for posture credentials. Endpoint devices with a PA will recognize the challenge and respond with the necessary posture credentials. The NAD acts as a relay agent between the endpoint device and AAA server for all messages in the posture validation exchange. Once the validation is complete, the NAD enforces the access policy profile downloaded from the AAA Server, e.g. (i) provide full access (ii) deny all access through the NAD restrict access (quarantine) or (iii) some intermediate level of network access restriction or quarantine. Between posture revalidations, the NAD may issue periodic status queries to determine that the each endpoint device using the NAD is still the same device that was first postured, and that the endpoint device's posture credentials have not changed. This mechanism is a challenge response protocol that does not involve the AAA Server nor does it require the posture plugins to resend any credentials. It is used to trigger a full posture revalidation with the AAA Server when the endpoint device's credentials have changed (e.g. to revalidate the host endpoint device after remediation), or a new host endpoint device connects with a previously authorized IP address. The NAD supports a local exception list based on IP, MAC address or device type so that certain endpoint devices can bypass the posture validation process based on system administrator configuration. Also, the NAD may be configured to query the AAA server for access policies associated with endpoint devices that do not have a Posture Agent installed, clientless host endpoint devices. Posture Validation occurs when a NAC-enabled network access device (NAC) detects an endpoint device attempting to connect or use its network resources and it issues the endpoint device a posture challenge. An endpoint device with a resident posture agent will respond to the challenge with sets of posture credentials from one or more posture plugins which can detail the state of the various hardware and software components on the endpoint device. The posture agent response is forwarded by the network access device to an AAA server which may in turn delegate parts of the decision to posture validation server. Evaluation of the credentials against posture validation policies results in an authorization decision or posture token, representing the endpoint device's relative compliance to the network compliance policy. The AAA server then sends the respective network access profile to the network access device for enforcement of the endpoint device authorization. The Cisco Technology consists of the following: Endpoint Device - Any host attempting to connect or use the resource of a network. - e.g., a personal computer, personal data digital assistant, or data server, or other network attached device. NAD - Network Access Device that enforces network access control policies through layer 2 or layer 3 challenge-responses with a network enabled Endpoint device. PC - Posture Credentials that describe the state of an application and/or operating system that is running on an endpoint device at the time a layer 2 or layer 3 challenge response is issued by a NAD. PP - Posture Plugin. A module implemented by an application or agent provider that is responsible for supplying the relevant posture credentials for the application or agent. PA - Posture Agent. Host agent software that serves as a broker on the host for aggregating credential from potentially multiple posture plugins and communicating with the network. CTA - Cisco Trust Agent. Cisco's implementation of the posture agent. EAP - Extensible Authentication Protocol. An extension to PPP. EOU - Extensible Authentication Protocol over UDP. ACS/AAA - Cisco Secure Access Control Server. The primary authorization server that is the network policy decision point and is extended to support posture validation. PVS - Posture Validation Server. UCT - Un Conditional Transition. Clientless - Client without Cisco Posture Agent. Tag - Tag is a policy specifier which is mapped to a policy template based on specific rules. The Tag allows network administrators to define enforcement policies on local device and have a RADIUS server specify the policy Template to be enforced."
+  },
+  "ciscoNacNadMIBNotifs": {
+    "name": "ciscoNacNadMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.484.0",
+    "class": "objectidentity"
+  },
+  "ciscoNacNadMIBObjects": {
+    "name": "ciscoNacNadMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.484.1",
+    "class": "objectidentity"
+  },
+  "ciscoNacNadMIBConformance": {
+    "name": "ciscoNacNadMIBConformance",
+    "oid": "1.3.6.1.4.1.9.9.484.2",
+    "class": "objectidentity"
+  },
+  "cnnEouGlobalObjects": {
+    "name": "cnnEouGlobalObjects",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1",
+    "class": "objectidentity"
+  },
+  "cnnEouAuthorizeLists": {
+    "name": "cnnEouAuthorizeLists",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2",
+    "class": "objectidentity"
+  },
+  "cnnEouIfMIBObjects": {
+    "name": "cnnEouIfMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3",
+    "class": "objectidentity"
+  },
+  "cnnEouHostMIBObjects": {
+    "name": "cnnEouHostMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4",
+    "class": "objectidentity"
+  },
+  "cnnIpDeviceTrackingObjects": {
+    "name": "cnnIpDeviceTrackingObjects",
+    "oid": "1.3.6.1.4.1.9.9.484.1.5",
+    "class": "objectidentity"
+  },
+  "cnnEouVersion": {
+    "name": "cnnEouVersion",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The version of EOU in use on the local system. Value zero indicates the version can not be determined."
+  },
+  "cnnEouEnabled": {
+    "name": "cnnEouEnabled",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates whether the posture validation via EOU is globally enabled or disabled in the device."
+  },
+  "cnnEouAllowClientless": {
+    "name": "cnnEouAllowClientless",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates whether to allow authentication of clientless hosts (system that does not run Cisco Trust Agent)."
+  },
+  "cnnEouAllowIpStationId": {
+    "name": "cnnEouAllowIpStationId",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "It indicates whether to send the host IP address in the calling station ID field of RADIUS request."
+  },
+  "cnnEouLoggingEnabled": {
+    "name": "cnnEouLoggingEnabled",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "To enable or disable EOU system logging events. Set to 'true' to enable syslog message at an informational level (syslog level 6)."
+  },
+  "cnnEouMaxRetry": {
+    "name": "cnnEouMaxRetry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The number of maximum retry attempts for EOU."
+  },
+  "cnnEouPort": {
+    "name": "cnnEouPort",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The UDP port for EOU. The port cannot conflict with other UDP application."
+  },
+  "cnnEouRateLimit": {
+    "name": "cnnEouRateLimit",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The number of clients that can be simultaneously validated. Set the rate limit to 0 (zero), rate limiting will be turned off. If the rate limit is set to 100 and there are 101 clients, validation will not occur until one drop off."
+  },
+  "cnnEouTimeoutAAA": {
+    "name": "cnnEouTimeoutAAA",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Timeout period used by NAD with AAA (Authentication, Authorization and Accounting."
+  },
+  "cnnEouTimeoutHoldPeriod": {
+    "name": "cnnEouTimeoutHoldPeriod",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Length of time that can elapse before the client sessions are purged from the system due to client inactivity."
+  },
+  "cnnEouTimeoutRetransmit": {
+    "name": "cnnEouTimeoutRetransmit",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.11",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The timeout period for the EOU message retransmitted."
+  },
+  "cnnEouTimeoutRevalidation": {
+    "name": "cnnEouTimeoutRevalidation",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.12",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The timeout period for the revalidation. Setting this object to 0 will globally disable periodic revalidation on this device."
+  },
+  "cnnEouTimeoutStatusQuery": {
+    "name": "cnnEouTimeoutStatusQuery",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.13",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The timeout period for the status query after revalidation."
+  },
+  "cnnEouCriticalRecoveryDelay": {
+    "name": "cnnEouCriticalRecoveryDelay",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.14",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the EOU critical recovery delay time for the device. A value of zero indicates that critical recovery delay feature is disabled."
+  },
+  "cnnEouRevalidationEnabled": {
+    "name": "cnnEouRevalidationEnabled",
+    "oid": "1.3.6.1.4.1.9.9.484.1.1.15",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Indicates whether the EOU revalidation is globally enabled or disabled in the device."
+  },
+  "cnnIpDeviceTrackingEnabled": {
+    "name": "cnnIpDeviceTrackingEnabled",
+    "oid": "1.3.6.1.4.1.9.9.484.1.5.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Specifies whether the IP device tracking feature is globally enabled or disabled on this device."
+  },
+  "cnnIpDeviceTrackingProbeCount": {
+    "name": "cnnIpDeviceTrackingProbeCount",
+    "oid": "1.3.6.1.4.1.9.9.484.1.5.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Specifies the number of times that this device sends the ARP probe to an IP device before removing the IP device from the IP device tracking table."
+  },
+  "cnnIpDeviceTrackingProbeInterval": {
+    "name": "cnnIpDeviceTrackingProbeInterval",
+    "oid": "1.3.6.1.4.1.9.9.484.1.5.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Specifies the number of the seconds that this device waits before resending the ARP probe."
+  },
+  "cnnEouIfIpDevTrackConfigTable": {
+    "name": "cnnEouIfIpDevTrackConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.484.1.5.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of IP Device Tracking configuration for EOU interfaces in the system."
+  },
+  "cnnEouIfIpDevTrackConfigEntry": {
+    "name": "cnnEouIfIpDevTrackConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.5.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A set of EOU IP Device Tracking configuration information on an EOU interface."
+  },
+  "cnnEouIfIpDevTrackEnabled": {
+    "name": "cnnEouIfIpDevTrackEnabled",
+    "oid": "1.3.6.1.4.1.9.9.484.1.5.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Specifies if IP Device Tracking feature is enabled on this interface."
+  },
+  "cnnEouAuthIpTable": {
+    "name": "cnnEouAuthIpTable",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A list of statically authorized IP devices in the system."
+  },
+  "cnnEouAuthIpEntry": {
+    "name": "cnnEouAuthIpEntry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthIpAddrType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthIpAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry containing the associated policy information of the statically authorized IP device. An entry can be created, or deleted by using cnnEouAuthIpRowStatus. Each statically authorized IP device is associated with a policy. By creating, deleting or modifying an entry in this table, users can add, delete or modify a policy for a particular statically authorized IP device. In order to add the statically authorized IP device into exception-list and associate with the specific policy, user has to create an entry for the device."
+  },
+  "cnnEouAuthIpAddrType": {
+    "name": "cnnEouAuthIpAddrType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The type of Internet address by which the statically authorized IP device is reachable."
+  },
+  "cnnEouAuthIpAddr": {
+    "name": "cnnEouAuthIpAddr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Internet address for the statically authorized IP device. The type of this address is determined by the value of the cnnEouAuthIpAddrType object."
+  },
+  "cnnEouAuthIpAddrMask": {
+    "name": "cnnEouAuthIpAddrMask",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressPrefixLength",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Using 'inverse mask' to support IP wildcards. The mask used with the source IP address will specify what traffic is exempted from EAP validation. e.g. cnnEouAuthIpAddr: 10.0.0.0 cnnEouAuthIpAddrMask: 0.255.255.255 This exempts any IP in the subnet at 10.x.x.x from posture validation. cnnEouAuthIpAddr: 10.1.2.1 cnnEouAuthIpAddrMask: 0.0.0.0 This exempts host IP 10.1.2.1 from posture validation. cnnEouAuthIpAddr: 10.0.0.0 cnnEouAuthIpAddrMask: 255.255.255.255 Mask value of 255.255.255.255 will exempt ALL hosts from posture validation."
+  },
+  "cnnEouAuthIpPolicy": {
+    "name": "cnnEouAuthIpPolicy",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The policy associate with the statically authorized IP device. The policy needs to be present in the policy-database before an statically authorized IP device can be associated to it."
+  },
+  "cnnEouAuthIpStorageType": {
+    "name": "cnnEouAuthIpStorageType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "nonVolatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The storage type for this conceptual row."
+  },
+  "cnnEouAuthIpRowStatus": {
+    "name": "cnnEouAuthIpRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row. To create an entry, users set the value of this object to 'createAndGo'. The transition from 'active' to 'notInService' may not be supported. A row may be deleted by setting the RowStatus to 'destroy'. Once a row becomes active, values within the row cannot be modified, except by deleting and re-creating the row."
+  },
+  "cnnEouAuthMacTable": {
+    "name": "cnnEouAuthMacTable",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A list of static authorized devices identified by MAC address."
+  },
+  "cnnEouAuthMacEntry": {
+    "name": "cnnEouAuthMacEntry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthMacAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry containing the associated policy information of the statically authorized device identified by MAC address. The entry is created, and deleted by using cnnEouAuthMacRowStatus."
+  },
+  "cnnEouAuthMacAddr": {
+    "name": "cnnEouAuthMacAddr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The MAC address of the static authorized device."
+  },
+  "cnnEouAuthMacAddrMask": {
+    "name": "cnnEouAuthMacAddrMask",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Using 'inverse mask' support MAC wildcards. The mask used with the source MAC address will specify what traffic is exempted from EAP validation. e.g. cnnEouAuthMacAddr: 00:0d:bc:ef:eb:bd cnnEouAuthMacAddrMask: 00:00:ff:ff:ff:ff This exempts any MAC in the range 00:0d:00:00:00:00 from posture validation. cnnEouAuthMacAddr: 00:0d:bc:ef:eb:bd cnnEouAuthMacAddrMask: 00:00:00:00:00:00 This exempts specific MAC 00:0d:bc:ef:eb:bd from posture validation. cnnEouAuthMacAddr: 00:0d:bc:ef:eb:bd cnnEouAuthMacAddrMask: ff:ff:ff:ff:ff:ff This exempts all MAC address from posture validation."
+  },
+  "cnnEouAuthMacPolicy": {
+    "name": "cnnEouAuthMacPolicy",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The policy associate with the statically authorized device identified by MAC address. The policy needs to be present in the policy-database before an device can be associated to it."
+  },
+  "cnnEouAuthMacStorageType": {
+    "name": "cnnEouAuthMacStorageType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "nonVolatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The storage type for this conceptual row."
+  },
+  "cnnEouAuthMacRowStatus": {
+    "name": "cnnEouAuthMacRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row. To create an entry, users set the value of this object to 'createAndGo'. The transition from 'active' to 'notInService' may not be supported. A row may be deleted by setting the RowStatus to 'destroy'. Once a row becomes active, values within the row cannot be modified, except by deleting and re-creating the row."
+  },
+  "cnnEouAuthDeviceTypeTable": {
+    "name": "cnnEouAuthDeviceTypeTable",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A list of static authorized devices indexed by device type."
+  },
+  "cnnEouAuthDeviceTypeEntry": {
+    "name": "cnnEouAuthDeviceTypeEntry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthDeviceType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry containing the information of the static authorized device indexed by device type."
+  },
+  "cnnEouAuthDeviceType": {
+    "name": "cnnEouAuthDeviceType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouDeviceType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The static authorize device type."
+  },
+  "cnnEouAuthDeviceTypeStorageType": {
+    "name": "cnnEouAuthDeviceTypeStorageType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StorageType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "nonVolatile",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The storage type for this conceptual row."
+  },
+  "cnnEouAuthDeviceTypeRowStatus": {
+    "name": "cnnEouAuthDeviceTypeRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.484.1.2.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used to create or delete an entry in the cnnEouAuthDeviceTypeTable. A row may be created using the 'CreateAndGo' option. A row may be deleted by setting the RowStatus to 'destroy'. Once a row becomes active, values within the row cannot be modified, except by deleting and re-creating the row."
+  },
+  "cnnEouIfConfigTable": {
+    "name": "cnnEouIfConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A list of EOU configurations for the EOU capable interfaces."
+  },
+  "cnnEouIfConfigEntry": {
+    "name": "cnnEouIfConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry containing the EOU configuration information for a particular EOU capable interface."
+  },
+  "cnnEouIfAdminStatus": {
+    "name": "cnnEouIfAdminStatus",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "auto": 1,
+          "disabled": 2,
+          "bypass": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Setting this object to 'auto' means the Posture Validation via EOU ability at this interface would be enabled if a end point device is found. If the value of this object is 'disabled' then the interface will act as it would if it had no posture validation via EOU ability. Setting this object to 'bypass' allows the host connected to this interface this interface to bypass the Posture Validation and directly download the host network access policy from AAA server."
+  },
+  "cnnEouIfMaxRetry": {
+    "name": "cnnEouIfMaxRetry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The maximum number of retry by EOU for this interface."
+  },
+  "cnnEouIfValidateAction": {
+    "name": "cnnEouIfValidateAction",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "initialize": 2,
+          "revalidate": 3,
+          "noRevalidate": 4
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An EOU validate action to the devices associated with the interface. This object always has the value 'none' when read. none(1) no operation is performed. initialize(2) Manually initiates reauthentication of all the endpoint devices associated with the interface. revalidate(3) Revalidate EOU posture credentials of the devices associated with a specify interface. noRevalidate(4) Disable the revalidation of all the device associated with the interface."
+  },
+  "cnnEouIfTimeoutGlobalConfig": {
+    "name": "cnnEouIfTimeoutGlobalConfig",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "aaa": 0,
+        "holdPeriod": 1,
+        "retransmit": 2,
+        "revalidation": 3,
+        "statusQuery": 4,
+        "maxRetry": 5,
+        "clientless": 6,
+        "ipStationId": 7
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object indicates whether the timeout configurations on this interface are based on the corresponding global timeout configurations or not. aaa(0) If this bit is set, the value of cnnEouIfTimeoutAAA is based on the value of cnnEouTimeoutAAA. holdPeriod(1) If this bit is set, the value of cnnEouIfTimeoutHoldPeriod is based on the value of cnnEouTimeoutHoldPeriod. retransmit(2) If this bit is set, the value of cnnEouIfTimeoutRetransmit is based on the value of cnnEouTimeoutRetransmit. revalidation(3) If this bit is set, the value of cnnEouIfTimeoutRevalidation is based on the value of cnnEouTimeoutRevalidation. statusQuery(4) If this bit is set, the value of cnnEouIfTimeoutStatusQuery is based on the value of cnnEouTimeoutStatusQuery. maxRetry(5) If this bit is set, the value of cnnEouIfMaxRetry is based on the value of cnnEouMaxRetry. clientless(6) If this bit is set, the value of cnnEouIfAllowClientless is based on the value of cnnEouAllowClientless. ipStationId(7) If this bit is set, the value of cnnEouIfAllowIpStationId is based on the value of cnnEouAllowIpStationId. If a bit is not set, the value of the corresponding object in the same conceptual row is not based on its corresponding global object. If users configure object which is covered by cnnEouIfTimeoutGlobalConfig in the same conceptual row while the corresponding bit is set, the corresponding bit will be unset in order to reflect that such configuration is not from its corresponding global object."
+  },
+  "cnnEouIfTimeoutAAA": {
+    "name": "cnnEouIfTimeoutAAA",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The timeout period used by EOU for the AAA server connection on this interface."
+  },
+  "cnnEouIfTimeoutHoldPeriod": {
+    "name": "cnnEouIfTimeoutHoldPeriod",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The hold period of this interface. The hold period is the length of the time that can elapse before the client session entries are purged from the system due to client inactivity."
+  },
+  "cnnEouIfTimeoutRetransmit": {
+    "name": "cnnEouIfTimeoutRetransmit",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The timeout period for the EOU message retransmitted at this interface."
+  },
+  "cnnEouIfTimeoutRevalidation": {
+    "name": "cnnEouIfTimeoutRevalidation",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The timeout period for the revalidation at this interface. Setting this object to 0 will disable periodic revalidation on this device."
+  },
+  "cnnEouIfTimeoutStatusQuery": {
+    "name": "cnnEouIfTimeoutStatusQuery",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The timeout period for the status query after revalidation at this interface."
+  },
+  "cnnEouIfAaaFailPolicy": {
+    "name": "cnnEouIfAaaFailPolicy",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CpgPolicyNameOrEmpty",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Specified the name of the policy template to be applied when cnnEouHostResultState is 'aaaFail'. The specified policy name must exist in cpgPolicyTable if it is not empty string."
+  },
+  "cnnEouIfAllowClientless": {
+    "name": "cnnEouIfAllowClientless",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether to allow authentication of clientless hosts (system that does not run Cisco Trust Agent) on the interface."
+  },
+  "cnnEouIfAllowIpStationId": {
+    "name": "cnnEouIfAllowIpStationId",
+    "oid": "1.3.6.1.4.1.9.9.484.1.3.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether to send the host IP address in the calling station ID field of RADIUS request for hosts on the interface."
+  },
+  "cnnEouHostValidateAction": {
+    "name": "cnnEouHostValidateAction",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "initializeAll": 2,
+          "initializeAuthClientless": 3,
+          "initializeAuthEap": 4,
+          "initializeAuthStatic": 5,
+          "initializeIp": 6,
+          "initializeMac": 7,
+          "initializePostureToken": 8,
+          "revalidateAll": 9,
+          "revalidateAuthClientless": 10,
+          "revalidateAuthEap": 11,
+          "revalidateAuthStatic": 12,
+          "revalidateIp": 13,
+          "revalidateMac": 14,
+          "revalidatePostureToken": 15,
+          "noRevalidateAll": 16,
+          "noRevalidateAuthClientless": 17,
+          "noRevalidateAuthEap": 18,
+          "noRevalidateAuthStatic": 19,
+          "noRevalidateIp": 20,
+          "noRevalidateMac": 21,
+          "noRevalidatePostureToken": 22,
+          "initializePostureTokenStr": 23,
+          "revalidatePostureTokenStr": 24,
+          "noRevalidatePostureTokenStr": 25
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An EOU validate action to the devices. Initialize: When a device is initialized, all previous state information about that host is deleted and the admission control process for that host will start with no state. Revalidate: When a host is revalidated, state information about that host is retained so that the host still has its' normal access during the revalidation process. This object always has the value 'none' when read. none(1) - no operation is performed. initializeAll(2) - to manually initiates reauthentication of all endpoint devices on the system. initializeAuthClientless(3) - to manually initiates reauthentication of all clientless endpoint devices. initializeAuthEap(4) - to manually initiates reauthentication of all the endpoint devices authorized by Extensive Authentication Protocol. initializeAuthStatic(5) - to manually initiates reauthentication of all the statically authorized endpoint devices. initializeIp(6) - to manually initiates reauthentication of a specific IP device. The value in cnnEouHostValidateIpAddrType and cnnEouHostValidateIpAddr are used by this operation. initializeMac(7) - to manually initiates reauthentication of the endpoint device identified by MAC address. The value in cnnEouHostValidateMacAddr is used by this operation. initializePostureToken(8) - to manually initiates reauthentication of the endpoint device(s) with a specify posture token assigned. The value in cnnEouHostValidatePostureToken is used by this operation. This enumerated integer is deprecated and replaced by initializePostureTokenStr. revalidateAll(9) - to revalidate EOU posture credentials of all devices on the system. revalidateAuthClientless(10) - to revalidate EOU posture credentials of all clientless devices on the system. revalidateAuthEap(11) - to revalidate EOU posture credentials of the devices authorized by EAP on the system. revalidateAuthStatic(12) - to revalidate EOU posture credentials of all statically authorized devices on the system. revalidateIp(13) - to revalidates EOU posture credentials of a specific IP device. The value in cnnEouHostValidateIpAddrType and cnnEouHostValidateIpAddr are used by this operation. revalidateMac(14) - to revalidates EOU posture credentials of a specific device identified by MAC address. The value in cnnEouHostValidateMacAddr is used by this operation. revalidatePostureToken(15) - to enable revalidates EOU posture credentials of the devices with the specific posture token assigned. The value in cnnEouHostValidatePostureToken is used by this operation. This enumerated integer is deprecated and replaced by revalidatePostureTokenStr. noRevalidateAll(16) - to disable revalidation of all devices on the system. noRevalidateAuthClientless(17) - to disable the revalidation of all clientless devices on the system. noRevalidateAuthEap(18) - to disable the revalidation of all devices authorized by EAP on the system. noRevalidateAuthStatic(19) - to disable the revalidation of all statically authorized devices on the system. noRevalidateIp(20) - to disable the revalidation of the specific IP device. The value in cnnEouHostValidateIpAddrType and cnnEouHostValidateIpAddr are used by this operation. noRevalidateMac(21) - to disable the revalidation of the specific device identified by MAC address. The value in cnnEouHostValidateMacAddr is used by this operation. noRevalidatePostureToken(22) - to disable the revalidation of all device with the specific posture token assigned. The value in cnnEouHostValidatePostureToken is used by this operation. This enumerated integer is deprecated and replaced by noRevalidatePostureTokenStr. initializePostureTokenStr(23) - to manually initiates reauthentication of the endpoint device(s) with a specify posture token assigned. The value in cnnEouHostValidatePostureTokenStr is used by this operation. revalidatePostureTokenStr(24) - to enable revalidates EOU posture credentials of the devices with the specific posture token assigned. The value in cnnEouHostValidatePostureTokenStr is used by this operation. noRevalidatePostureTokenStr(25) - to disable the revalidation of all device with the specific posture token assigned. The value in cnnEouHostValidatePostureTokenStr is used by this operation."
+  },
+  "cnnEouHostValidateIpAddrType": {
+    "name": "cnnEouHostValidateIpAddrType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The type of Internet address for a detected host."
+  },
+  "cnnEouHostValidateIpAddr": {
+    "name": "cnnEouHostValidateIpAddr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The Internet address for a detected host. The type of this address is determined by the value of the cnnEouHostValidateIpAddrType."
+  },
+  "cnnEouHostValidateMacAddr": {
+    "name": "cnnEouHostValidateMacAddr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The Mac address for a detected host."
+  },
+  "cnnEouHostValidatePostureToken": {
+    "name": "cnnEouHostValidatePostureToken",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouPostureToken",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "deprecated",
+    "description": "Type of posture token for a detected host. This object is deprecated and replaced by cnnEouHostValidatePostureTokenStr."
+  },
+  "cnnEouHostMaxQueries": {
+    "name": "cnnEouHostMaxQueries",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Maximum number of query entries allowed to be outstanding at any time, in the cnnEouHostQueryTable."
+  },
+  "cnnEouHostQueryTable": {
+    "name": "cnnEouHostQueryTable",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A control table used to query the client host by specifying retrieval criteria for the EOU information. Each row instance in the table represents a query with its parameters. The resulting data for each instance of a query in this table is returned in the cnnHostQueryResultTable. The maximum number of entries (rows) in this table cannot exceed the value of cnnEouHostMaxQueries object."
+  },
+  "cnnEouHostQueryEntry": {
+    "name": "cnnEouHostQueryEntry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row of the cnnEouHostQueryTable used to setup retrieval criteria to search for the EOU hosts on the system. The actual search is started by setting the value of cnnEouHostQueryStatus to 'active'. Once a row becomes active, values within the row cannot be modified, except by deleting and re-creating the row."
+  },
+  "cnnEouHostQueryIndex": {
+    "name": "cnnEouHostQueryIndex",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An arbitrary integer in the range of 1 to cnnEouHostMaxQueries to identify this control query."
+  },
+  "cnnEouHostQueryMask": {
+    "name": "cnnEouHostQueryMask",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "authenClientless": 1,
+          "authenEap": 2,
+          "authenStatic": 3,
+          "interface": 4,
+          "ip": 5,
+          "mac": 6,
+          "postureToken": 7,
+          "all": 8,
+          "postureTokenString": 9
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "all",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Setting each value causes the appropriate action: authenClientless(1) - causes the creation of row(s) in the cnnHostQueryResultTable corresponding to the current EOU information for the clientless host(s) on the system. authenEap(2) - causes the creation of row(s) in the cnnHostQueryResultTable corresponding to the current EOU information for the hosts authorized by EAP on the system. authenStatic(3) - causes the creation of row(s) in the cnnHostQueryResultTable corresponding to the current EOU information for the statically authorized hosts on the system. interface(4) - causes the creation of row(s) in the cnnHostQueryResultTable corresponding to the current EOU information for the endpoint devices connected to the interface specified in cnnEouHostQueryInterface. ip(5) - causes the creation of row(s) in the cnnHostQueryResultTable corresponding to the current EOU information for the IP hosts specified in cnnEouHostQueryIpAddrType and cnnEouHostQueryIpAddr. mac(6) - causes the creation of row(s) in the cnnHostQueryResultTable corresponding to the current EOU information for the hosts matching the mac address specified in cnnEouHostQueryMacAddr. postureToken(7) - causes the creation of row(s) in the cnnHostQueryResultTable corresponding to the current EOU information for the hosts assigned posture token specified in cnnEouHostQueryPostureToken. This enumerated integer is deprecated and replaced by postureTokenString. all(8) - returns all rows corresponding to all the detected hosts in the system. postureTokenString(9) - causes the creation of row(s) in the cnnHostQueryResultTable corresponding to the current EOU information for the hosts assigned posture token string specified in cnnEouHostQueryPostureTokenStr."
+  },
+  "cnnEouHostQueryInterface": {
+    "name": "cnnEouHostQueryInterface",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "reference": "RFC 2863, ifIndex",
+    "status": "current",
+    "description": "An index value that uniquely identifies an interface where the end point device is connected. The interface identified by a particular value of this index is the same interface as identified by the same value of ifIndex."
+  },
+  "cnnEouHostQueryIpAddrType": {
+    "name": "cnnEouHostQueryIpAddrType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "ipv4",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The internet address type for the queried host."
+  },
+  "cnnEouHostQueryIpAddr": {
+    "name": "cnnEouHostQueryIpAddr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "00000000",
+        "format": "hex"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The Internet address for the queried host. The type of this address is determined by the value of the cnnEouHostQueryIpAddrType. If the 'ip' option of cnnEouHostQueryMask is selected, an appropriate IP address type is assigned to cnnEouHostQueryIpAddrType, and an appropriate IP address is assigned to cnnEouHostQueryIpAddr then only the IP host with the specified address will be containing in the result table."
+  },
+  "cnnEouHostQueryMacAddr": {
+    "name": "cnnEouHostQueryMacAddr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "000000000000",
+        "format": "hex"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The Mac address for the queried host. If the 'mac' option of cnnEouHostQueryMask is selected, an appropriate MAC address is assigned to this object then only the host with the specified MAC address will be containing in the result table."
+  },
+  "cnnEouHostQueryPostureToken": {
+    "name": "cnnEouHostQueryPostureToken",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouPostureToken",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "healthy",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "deprecated",
+    "description": "The assigned posture token for the queried host. If the 'postureToken' option of cnnEouHostQueryMask is selected, an appropriate posture token is assigned to this object then only the host with the specified posture token will be containing in the result table. This object is deprecated and replaced by cnnEouHostQueryPostureTokenStr."
+  },
+  "cnnEouHostQuerySkipNHosts": {
+    "name": "cnnEouHostQuerySkipNHosts",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The number of searched detected hosts to be skipped before storing any host in cnnEouHostResultTable. This object can be used along with cnnEouHostQueryTotalHosts object to skip previously found hosts by setting the variable equal to the number of the associated rows in cnnEouHostResultTable, and only query the remaining hosts in the table. Note that due to the dynamical nature of the EOU, the queried hosts may be missed or repeated by setting this object."
+  },
+  "cnnEouHostQueryMaxResultRows": {
+    "name": "cnnEouHostQueryMaxResultRows",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This is the maximum number of rows in the cnnEouHostResultTable, resulting from this query. A value of zero (0) indicates no limit rows in cnnEouHostResultTable, resulting from this query."
+  },
+  "cnnEouHostQueryTotalHosts": {
+    "name": "cnnEouHostQueryTotalHosts",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": -1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicating the total number of the hosts matching the query criterion. -1 - Either the query has not been started or the agent is still processing this query instance. It is the default value when the row is instantiated. 0..2147483647 - The search has ended and this is the number of host matching the query criterion."
+  },
+  "cnnEouHostQueryRows": {
+    "name": "cnnEouHostQueryRows",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": -1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicating the status of the query by following values: -1 - Either the query has not been started or the agent is still processing this query instance. It is the default value when the row is instantiated. 0..2147483647 - The search has ended and this is the number of rows in the cnnEouHostResultTable, resulting from this query."
+  },
+  "cnnEouHostQueryCreateTime": {
+    "name": "cnnEouHostQueryCreateTime",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Time when this query was last set to active."
+  },
+  "cnnEouHostQueryStatus": {
+    "name": "cnnEouHostQueryStatus",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status object used to manage rows in this table. When set to 'createAndGo', the query is initiated. The completion of the query is indicated by the value of cnnEouHostQueryRows as soon as it becomes greater than or equal to 0. Once a row becomes active, values within the row cannot be modified, except by deleting and re-creating it."
+  },
+  "cnnEouHostQueryPostureTokenStr": {
+    "name": "cnnEouHostQueryPostureTokenStr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.7.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouPostureTokenString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The assigned posture token string for the queried host. If the 'postureTokenString' option of cnnEouHostQueryMask is selected, an appropriate posture token string is assigned to this object then only the host with the specified posture token string will be containing in the result table."
+  },
+  "cnnEouHostResultTable": {
+    "name": "cnnEouHostResultTable",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table containing current detected host information corresponding to all the completed queries set up in the cnnEouHostQueryTable, that were detected in the device. The query result will not become available until the current search completes."
+  },
+  "cnnEouHostResultEntry": {
+    "name": "cnnEouHostResultEntry",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row of cnnEouHostResultTable, containing posture validation information of an detected host that matches the search criteria set in the corresponding row of cnnEouHostQueryTable."
+  },
+  "cnnEouHostResultIndex": {
+    "name": "cnnEouHostResultIndex",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A number which uniquely identifies a result entry matching a particular query."
+  },
+  "cnnEouHostResultAssocIf": {
+    "name": "cnnEouHostResultAssocIf",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "RFC 2863, ifIndex",
+    "status": "current",
+    "description": "An index value that uniquely identifies an interface where the end point device is currently connected. The interface identified by a particular value of this index is the same interface as identified by the same value of ifIndex."
+  },
+  "cnnEouHostResultIpAddrType": {
+    "name": "cnnEouHostResultIpAddrType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The type of Internet address by which the detected host is reachable."
+  },
+  "cnnEouHostResultIpAddr": {
+    "name": "cnnEouHostResultIpAddr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The internet address for the detected host. The type of this address is determined by the value of the cnnEouHostResultIpAddrType object."
+  },
+  "cnnEouHostResultMacAddr": {
+    "name": "cnnEouHostResultMacAddr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates The MAC address of the detected host."
+  },
+  "cnnEouHostResultAuthType": {
+    "name": "cnnEouHostResultAuthType",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouAuthType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the authentication type used in the posture validation process for this detected host."
+  },
+  "cnnEouHostResultPostureToken": {
+    "name": "cnnEouHostResultPostureToken",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouPostureToken",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "Indicates the posture token of the detected host. During the posture validation process, the host will be placed into a particular category and have a token assigned to it. This assignment will depend on the state of the software that is resident on the host. The host will have specific right to access network based on the token assigned. This object is deprecated and replaced by cnnEouHostResultPostureTokenStr"
+  },
+  "cnnEouHostResultAge": {
+    "name": "cnnEouHostResultAge",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "minutes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the length of time, in minutes, that host has been connected."
+  },
+  "cnnEouHostResultUrlRedir": {
+    "name": "cnnEouHostResultUrlRedir",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoURLString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the URL(Web page) where the latest Anti-Virus file can be downloaded or upgraded, if the detected host fails the credential validation then it may require remediation."
+  },
+  "cnnEouHostResultAclName": {
+    "name": "cnnEouHostResultAclName",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The mapped ACL to this detected host. A character string for an ACL (Access Control List) name. Valid characters are a-z, A-Z, 0-9, ,'#', '-', '_' and '.'. Some devices may require that an ACL name contains at least one non-numeric character. ACL name is case sensitive."
+  },
+  "cnnEouHostResultStatusQryPeriod": {
+    "name": "cnnEouHostResultStatusQryPeriod",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The timeout period, in seconds, for the status query after revalidation at this interface."
+  },
+  "cnnEouHostResultRevalidatePeriod": {
+    "name": "cnnEouHostResultRevalidatePeriod",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The timeout period, in second, for the revalidation at this interface."
+  },
+  "cnnEouHostResultState": {
+    "name": "cnnEouHostResultState",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouState",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the current EOU state of this detected host."
+  },
+  "cnnEouHostResultPostureTokenStr": {
+    "name": "cnnEouHostResultPostureTokenStr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouPostureTokenString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the posture token string of the detected host. During the posture validation process, the host will be placed into a particular category and have a token assigned to it. This assignment will depend on the state of the software that is resident on the host. The host will have specific right to access network based on the token assigned."
+  },
+  "cnnEouHostResultUrlRedirectAcl": {
+    "name": "cnnEouHostResultUrlRedirectAcl",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the name of the access control list(ACL) for URL redirection. Any ingress HTTP from the host that matches this ACL will be subjected to redirection to the URL (Web page) specified in cnnEouHostResultUrlRedir."
+  },
+  "cnnEouHostResultTagName": {
+    "name": "cnnEouHostResultTagName",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the tag which is received as a policy response from the ACS server for the detected host."
+  },
+  "cnnEouHostResultAuditSessionId": {
+    "name": "cnnEouHostResultAuditSessionId",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object uniquely identifies a host session. Session ID is included in access requests to AAA server and in Web requests to Audit server."
+  },
+  "cnnEouHostResultAaaFailPolicy": {
+    "name": "cnnEouHostResultAaaFailPolicy",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.8.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the name of policy template to be applied when EouHostResultState is 'aaaFail'."
+  },
+  "cnnEouHostValidatePostureTokenStr": {
+    "name": "cnnEouHostValidatePostureTokenStr",
+    "oid": "1.3.6.1.4.1.9.9.484.1.4.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CnnEouPostureTokenString",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Posture token string for a detected host."
+  },
+  "ciscoNacNadMIBCompliances": {
+    "name": "ciscoNacNadMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.484.2.1",
+    "class": "objectidentity"
+  },
+  "ciscoNacNadMIBGroups": {
+    "name": "ciscoNacNadMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2",
+    "class": "objectidentity"
+  },
+  "ciscoNacNadMIBCompliance": {
+    "name": "ciscoNacNadMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.484.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoNacNadEouGlobalGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthIpGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfConfigGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfTimeoutGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfMaxRetryGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouRateLimitGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfAdminGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthMacGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthDeviceTypeGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostAgeGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostUrlRedir",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostAclGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for the CISCO-NAC-NAD-MIB. OBJECT cnnEouAuthIpAddrType SYNTAX InetAddressType { ipv4(1) } DESCRIPTION An implementation is only required to support IPv4 addresses."
+  },
+  "ciscoNacNadMIBCompliance2": {
+    "name": "ciscoNacNadMIBCompliance2",
+    "oid": "1.3.6.1.4.1.9.9.484.2.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoNacNadEouGlobalGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthIpGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfConfigGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfTimeoutGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfMaxRetryGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouRateLimitGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfAdminGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthMacGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthDeviceTypeGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostAgeGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostUrlRedir",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostAclGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfAaaFailPolicyGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "cnnIpDeviceTrackingConfigGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "cnnEouCriticalRecoveryDelayGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for the CISCO-NAC-NAD-MIB. OBJECT cnnEouAuthIpAddrType SYNTAX InetAddressType { ipv4(1) } DESCRIPTION An implementation is only required to support IPv4 addresses."
+  },
+  "ciscoNacNadMIBCompliance3": {
+    "name": "ciscoNacNadMIBCompliance3",
+    "oid": "1.3.6.1.4.1.9.9.484.2.1.3",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoNacNadEouGlobalGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthIpGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfConfigGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfTimeoutGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfMaxRetryGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouRateLimitGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfAdminGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthMacGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthDeviceTypeGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostAgeGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostUrlRedir",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostAclGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfAaaFailPolicyGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "cnnIpDeviceTrackingConfigGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "cnnEouCriticalRecoveryDelayGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "cnnEouIfIpDevTrackConfigGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for the CISCO-NAC-NAD-MIB. OBJECT cnnEouAuthIpAddrType SYNTAX InetAddressType { ipv4(1) } DESCRIPTION An implementation is only required to support IPv4 addresses."
+  },
+  "ciscoNacNadMIBCompliance4": {
+    "name": "ciscoNacNadMIBCompliance4",
+    "oid": "1.3.6.1.4.1.9.9.484.2.1.4",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoNacNadEouGlobalGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthIpGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfConfigGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfTimeoutGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfMaxRetryGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouRateLimitGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfAdminGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthMacGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouAuthDeviceTypeGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostAgeGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostUrlRedir",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostAclGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfAaaFailPolicyGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "cnnIpDeviceTrackingConfigGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "cnnEouCriticalRecoveryDelayGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "cnnEouIfIpDevTrackConfigGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadRevalidateConfigGrp",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouHostGroup1",
+        "module": "CISCO-NAC-NAD-MIB"
+      },
+      {
+        "object": "ciscoNacNadEouIfExtGroup",
+        "module": "CISCO-NAC-NAD-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for the CISCO-NAC-NAD-MIB. OBJECT cnnEouAuthIpAddrType SYNTAX InetAddressType { ipv4(1) } DESCRIPTION An implementation is only required to support IPv4 addresses."
+  },
+  "ciscoNacNadEouGlobalGroup": {
+    "name": "ciscoNacNadEouGlobalGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouVersion"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouEnabled"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAllowClientless"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAllowIpStationId"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouLoggingEnabled"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouMaxRetry"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouPort"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouTimeoutAAA"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouTimeoutHoldPeriod"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouTimeoutRetransmit"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouTimeoutRevalidation"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouTimeoutStatusQuery"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the global configuration on the NAD."
+  },
+  "ciscoNacNadEouAuthIpGroup": {
+    "name": "ciscoNacNadEouAuthIpGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthIpAddrMask"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthIpPolicy"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthIpStorageType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthIpRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the configuration for the static authorization IP device with policy associated."
+  },
+  "ciscoNacNadEouAuthMacGroup": {
+    "name": "ciscoNacNadEouAuthMacGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthMacAddrMask"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthMacPolicy"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthMacStorageType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthMacRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the configuration for the static authorization MAC device with policy associated."
+  },
+  "ciscoNacNadEouAuthDeviceTypeGrp": {
+    "name": "ciscoNacNadEouAuthDeviceTypeGrp",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthDeviceTypeStorageType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouAuthDeviceTypeRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the configuration for the static authorization device identified by device type."
+  },
+  "ciscoNacNadEouIfConfigGroup": {
+    "name": "ciscoNacNadEouIfConfigGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfValidateAction"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the interface configuration on the NAD."
+  },
+  "ciscoNacNadEouHostGroup": {
+    "name": "ciscoNacNadEouHostGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidateAction"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidateIpAddrType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidateIpAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidateMacAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidatePostureToken"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostMaxQueries"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryMask"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryInterface"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryIpAddrType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryIpAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryMacAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryPostureToken"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQuerySkipNHosts"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryMaxResultRows"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryTotalHosts"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryRows"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryCreateTime"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryStatus"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultAssocIf"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultIpAddrType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultIpAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultMacAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultAuthType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultPostureToken"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultStatusQryPeriod"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultRevalidatePeriod"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultState"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects providing the host configuration on the NAD."
+  },
+  "ciscoNacNadEouIfTimeoutGroup": {
+    "name": "ciscoNacNadEouIfTimeoutGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfTimeoutGlobalConfig"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfTimeoutAAA"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfTimeoutHoldPeriod"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfTimeoutRetransmit"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfTimeoutRevalidation"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfTimeoutStatusQuery"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the timeout configuration on the interface."
+  },
+  "ciscoNacNadEouIfMaxRetryGroup": {
+    "name": "ciscoNacNadEouIfMaxRetryGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.8",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfMaxRetry"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the max-retry configuration on the interface."
+  },
+  "ciscoNacNadEouRateLimitGroup": {
+    "name": "ciscoNacNadEouRateLimitGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.9",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouRateLimit"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the rate limit configuration."
+  },
+  "ciscoNacNadEouIfAdminGroup": {
+    "name": "ciscoNacNadEouIfAdminGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.10",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfAdminStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the administrative configuration on the interfaces."
+  },
+  "ciscoNacNadEouHostAgeGroup": {
+    "name": "ciscoNacNadEouHostAgeGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.11",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultAge"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the age information on the interface."
+  },
+  "ciscoNacNadEouHostUrlRedir": {
+    "name": "ciscoNacNadEouHostUrlRedir",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.12",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultUrlRedir"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the redirect URL information on the interface."
+  },
+  "ciscoNacNadEouHostAclGroup": {
+    "name": "ciscoNacNadEouHostAclGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.13",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultAclName"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the ACL(Access Control List) information on the interface."
+  },
+  "ciscoNacNadEouIfAaaFailPolicyGrp": {
+    "name": "ciscoNacNadEouIfAaaFailPolicyGrp",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.14",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfAaaFailPolicy"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the AAA failed policy for the interface."
+  },
+  "ciscoNacNadEouHostGrp": {
+    "name": "ciscoNacNadEouHostGrp",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.15",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidateAction"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidateIpAddrType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidateIpAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidateMacAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostValidatePostureTokenStr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostMaxQueries"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryMask"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryInterface"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryIpAddrType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryIpAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryMacAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryPostureTokenStr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQuerySkipNHosts"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryMaxResultRows"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryTotalHosts"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryRows"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryCreateTime"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostQueryStatus"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultAssocIf"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultIpAddrType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultIpAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultMacAddr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultAuthType"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultPostureTokenStr"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultStatusQryPeriod"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultRevalidatePeriod"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultState"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the host configuration on the NAD."
+  },
+  "cnnIpDeviceTrackingConfigGrp": {
+    "name": "cnnIpDeviceTrackingConfigGrp",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.16",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnIpDeviceTrackingEnabled"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnIpDeviceTrackingProbeCount"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnIpDeviceTrackingProbeInterval"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing IP device tracking for the device."
+  },
+  "cnnEouCriticalRecoveryDelayGrp": {
+    "name": "cnnEouCriticalRecoveryDelayGrp",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.17",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouCriticalRecoveryDelay"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing critical recovery delay for the device."
+  },
+  "cnnEouIfIpDevTrackConfigGrp": {
+    "name": "cnnEouIfIpDevTrackConfigGrp",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.18",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfIpDevTrackEnabled"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing EOU IP device tracking per interface in the device."
+  },
+  "ciscoNacNadRevalidateConfigGrp": {
+    "name": "ciscoNacNadRevalidateConfigGrp",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.19",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouRevalidationEnabled"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the globally configuration for the system."
+  },
+  "ciscoNacNadEouHostGroup1": {
+    "name": "ciscoNacNadEouHostGroup1",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.20",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultUrlRedirectAcl"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultTagName"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultAuditSessionId"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouHostResultAaaFailPolicy"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the host extension configuration on the NAD."
+  },
+  "ciscoNacNadEouIfExtGroup": {
+    "name": "ciscoNacNadEouIfExtGroup",
+    "oid": "1.3.6.1.4.1.9.9.484.2.2.21",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfAllowClientless"
+      },
+      {
+        "module": "CISCO-NAC-NAD-MIB",
+        "object": "cnnEouIfAllowIpStationId"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing the interface extension configuration on the NAD."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-NAC-NAD-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:12:18 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-NAC-NAD-MIB"
+  }
+}

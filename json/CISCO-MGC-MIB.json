@@ -1,0 +1,835 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-MEDIA-GATEWAY-MIB": [
+      "cmgwSignalProtocolIndex",
+      "cmgwIndex"
+    ],
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "CISCO-TC": [
+      "CiscoPort"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddress",
+      "InetAddressType"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "OBJECT-IDENTITY",
+      "IpAddress",
+      "Gauge32",
+      "Counter64",
+      "MibIdentifier",
+      "Unsigned32",
+      "MODULE-IDENTITY",
+      "Bits",
+      "Integer32",
+      "iso",
+      "Counter32",
+      "TimeTicks",
+      "NOTIFICATION-TYPE",
+      "OBJECT-TYPE"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "RowStatus",
+      "TruthValue"
+    ]
+  },
+  "ciscoMgcMIB": {
+    "name": "ciscoMgcMIB",
+    "oid": "1.3.6.1.4.1.9.9.321",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2003-04-18 00:00",
+        "description": "Initial version of the MIB"
+      }
+    ],
+    "lastupdated": "200304180000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": " Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-voice-gateway@cisco.com",
+    "description": "This MIB is used to support MGC(call agent) and MGC Group configuration. The MGC or MGC group configuration is performed under a specific gateway(cmgwIndex). The call agent is an external element (outside of gateway) with call control intelligence to control call connection in gateway. The protocols used for communication between voice gateway and call agent included SGCP, MGCP, ... Multiple IP addresses can be associated with one call agent. An MGC group is a logical grouping of several MGCs into one group. MGC redundancy is used to support multi call agent for one gateway. With MGC redundancy, a voice gateway can send gateway-initiated-commands to the next MGC in the MGC group if it fails to receive response from any IP address(es) associated to the current MGC. To use MGC redundancy in gateway: Step 1: add individual entry (in any order) for profile MGC Step 2: make association between the entries 1 IP with MGC 2 MGC with MGC group 1/2 protocol with MGC group 3 MGC group with profile or MGC group with gateway Only if a MGC group at least is associated with one profile or gateway, then the MGC group can be used, otherwise the MGC group is useless. To delete the following entries, it is needed to do de-association first: profile MGC When do de-association, the order is opposite to that of association. "
+  },
+  "cMgcMibNotifications": {
+    "name": "cMgcMibNotifications",
+    "oid": "1.3.6.1.4.1.9.9.321.0",
+    "class": "objectidentity"
+  },
+  "cMgcMibObjects": {
+    "name": "cMgcMibObjects",
+    "oid": "1.3.6.1.4.1.9.9.321.1",
+    "class": "objectidentity"
+  },
+  "cMgcConfig": {
+    "name": "cMgcConfig",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1",
+    "class": "objectidentity"
+  },
+  "cMgcGroupConfig": {
+    "name": "cMgcGroupConfig",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2",
+    "class": "objectidentity"
+  },
+  "CMgcGroupIndex": {
+    "name": "CMgcGroupIndex",
+    "class": "textualconvention",
+    "type": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 12
+          }
+        ]
+      }
+    },
+    "displayhint": "d",
+    "status": "current",
+    "description": "A unique value, greater than zero which is used to identify index of MGC group."
+  },
+  "CMgcGroupIndexOrZero": {
+    "name": "CMgcGroupIndexOrZero",
+    "class": "textualconvention",
+    "type": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 12
+          }
+        ]
+      }
+    },
+    "displayhint": "d",
+    "status": "current",
+    "description": "This textual convention is used to indicate association between profile or gateway and MGC group. The value, greater than zero which is used to identify index of MGC group (same as CMgcGroupIndex) which is associated with profile or gateway. The mapping between MGC group and profile or gateway is 1 to N. The value, equal to zero which means there is no association between profile or gateway and MGC group."
+  },
+  "cMgcConfigTable": {
+    "name": "cMgcConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is used for configuring MGC related parameters."
+  },
+  "cMgcConfigEntry": {
+    "name": "cMgcConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIA-GATEWAY-MIB",
+        "object": "cmgwIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents a call agent(MGC). Each entry in this table should have a unique domain name representing a call agent. Adding/deleting entry in this table is controlled by 'cMediaGwDomainNameConfigTable' of CISCO-MEDIA-GATEWAY-MIB: 1. Entry creation An entry in this table is created when its associated entry in the 'cMediaGwDomainNameConfigTable' is created with the value of 'mgc(3)' in the cmgwConfigDomainNameEntity object. The 'cmgwConfigDomainName' of the associated entry in the 'cMediaGwDomainNameConfigTable' will be taken as 'cMgcDomainName' of the new entry. 2. Entry deletion An entry of this table is deleted when its associated entry in 'cMediaGwDomainNameConfigTable' is deleted. "
+  },
+  "cMgcIndex": {
+    "name": "cMgcIndex",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique index to identify each MGC which will communicate with this media gateway. "
+  },
+  "cMgcDomainName": {
+    "name": "cMgcDomainName",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object contains the same name as the one in the 'cMgcDomainName object' of the associated entry in 'cMediaGwDomainNameConfigTable'. "
+  },
+  "cMgcNumMgcGroups": {
+    "name": "cMgcNumMgcGroups",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object is used to indicate number of MGC group with which this MGC associated. The value zero means this MGC is not associated with any MGC Group. If this value greater than zero, then the MGC entry can not be deleted. "
+  },
+  "cMgcNumIP": {
+    "name": "cMgcNumIP",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object is used to indicate number of IP addresses are associated with this MGC. The value zero means there is no IP address associated with this MGC. The MGC can not be deleted if the value of this object is non-zero and cMgcResolution is configured to 'internalOnly'. "
+  },
+  "cMgcResolution": {
+    "name": "cMgcResolution",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "internalOnly": 1,
+          "externalOnly": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "internalOnly",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object determines the kind of resolution to be applied for this MGC. 'internalOnly' means that the gateway will not try to resolve the IP address for this domain name using external DNS name server. 'externalOnly' means the IP address for this domain name will be resolved externally using DNS name server. The request to change from 'internalOnly' to 'externalOnly' will be rejected if the DNS name server is not available for gateway. The IP addresses related to the same MGC should have the same cMgcResolution. The value of the MGC associated objects in the cMgcIpConfigTable can not be modified by NMS if the value of cMgcResolution for the MGC is 'externalOnly'. The following are the behavior of changing the value of this object. [1] changing the value from 'externalOnly' to 'internalOnly' 1) precondition MGC is not associated with any MGC group (value of cMgcNumMgcGroups is zero). 2) behavior If the value of this object is changed successfully, all existing IP addresses in cMgcIpConfigTable that are associated to the MGC will be removed automatically. Note that MGW can't communicate with MGC if NMS does not add static IP address into cMgcIpConfigTable for the MGC. [2] changing the value from 'internalOnly' to 'externalOnly' 1) precondition All MGC associated statically configured IP addresses must be removed from cMgcIpConfigTable by NMS before setting 'externalOnly' value to this object. An inconsistentValue error is generated for setting 'externalOnly' value if the MGC associated IP addresses are not removed. 2) behavior After successfully setting 'externalOnly' value to this object, the MGC domain name will be resolved by MGW software using external DNS name server and the resulting IP addresses will be added to cMgcIpConfigTable automatically. "
+  },
+  "cMgcIpConfigTable": {
+    "name": "cMgcIpConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains MGC related IP addresses. MGC index(cMgcIndex) is a part of index of this table, so IP address in this table is automatically associated with the MGC. Multiple IP addresses can be associated with the same MGC. Under the same MGC (cMgcIndex is same) all IP addresses are equivalent. all IP addresses will share the same domain name: 'cMgcDomainName' in cMgcConfigTable. "
+  },
+  "cMgcIpConfigEntry": {
+    "name": "cMgcIpConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIA-GATEWAY-MIB",
+        "object": "cmgwIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcIpIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents an IP address which is associated with the MGC(cMgcIndex). When cMgcResolution is configured to 'externalOnly', user cannot add/delete/modify any entry. "
+  },
+  "cMgcIpIndex": {
+    "name": "cMgcIpIndex",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique index to identify the address of a specific MGC. The MGC is represented by cMgcIndex. "
+  },
+  "cMgcIpAddressType": {
+    "name": "cMgcIpAddressType",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "ipv4",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is the IP address type for cMgcIpAddress."
+  },
+  "cMgcIpAddress": {
+    "name": "cMgcIpAddress",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents the configured IP address. After adding the entry, this object can not be modified. "
+  },
+  "cMgcIpPreference": {
+    "name": "cMgcIpPreference",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents preference of the cMgcIpAddress in the given MGC. The lower the number the higher the preference. i.e. 1 will have higher preference than 2. IF more than one IP have the same preference, gateway will select them one by one. "
+  },
+  "cMgcIpRowStatus": {
+    "name": "cMgcIpRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.321.1.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used to create/modify/delete entry. In order to delete an entry, following conditions need to be met: 1. The MGC to which this IP address is being added, should be existing. 2. The MGC's resolution (cMgcResolution) should be 'internal only'. 3. the mandatory object is cMgcIpAddress After the IP address added to the MGC the related 'cMgcNumIP' in MGC table will be incremented by 1. In order to delete an entry, following conditions need to be met: 1. The MGC's resolution (cMgcResolution) should be 'internal only'. 2. The IP address should not be the only one in the MGC while the MGC is associated with MGC group. This means if the value of 'cMgcNumIP' is equal to 1 and the value of 'cMgcNumMgcGroups' is non-zero, this IP address is the only one associated with the MGC and it is possible that this IP address is also the only one associated with MGC group. Therefore this IP address can not be deleted. After deleting the IP address from the MGC the related 'cMgcNumIP' in MGC table will be decremented by 1. "
+  },
+  "cMgcGrpParamTable": {
+    "name": "cMgcGrpParamTable",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table containing information about MGC group related profile/protocol association and parameters."
+  },
+  "cMgcGrpParamEntry": {
+    "name": "cMgcGrpParamEntry",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIA-GATEWAY-MIB",
+        "object": "cmgwIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Entry of cMgcGrpParamTable. Each entry includes the information shared by a group of MGC"
+  },
+  "cMgcGrpIndex": {
+    "name": "cMgcGrpIndex",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CMgcGroupIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique index to identify a MGC group. "
+  },
+  "cMgcGrpNumMgc": {
+    "name": "cMgcGrpNumMgc",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 128
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object is used to indicate number of MGCs to be associated with this MGC Group. The value zero means there is no MGC in the MGC Group. When the entry create, this value is set to 0. Adding/deleting MGC to/from MGC group is through cMgcGrpTable. After a MGC added/deleted to/from this MGC group, the value of this object will be incremented/decremented by 1. If the value of this object is zero, it is not allowed to associate this MGC group with any profile or gateway. "
+  },
+  "cMgcGrpAssociationInfo": {
+    "name": "cMgcGrpAssociationInfo",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the association between MGC group and profile/gateway with bitmap format. It is 1:N mapping, e.g., each profile or gateway can only have one MGC group, but one MGC group can be associated with multi profile and gateway. The possible bit positions used in the bitmap are listed as follows: Bit profile/gateway value --------------------------------------------------------------- 0 profile 1 0: the MGC group is not associated with it 1: the MGC group is associated with it 1 profile 2 0: the MGC group is not associated with it 1: the MGC group is associated with it 2 profile 3 0: the MGC group is not associated with it 1: the MGC group is associated with it 3 profile 4 0: the MGC group is not associated with it 1: the MGC group is associated with it ... ... 30 profile 31 0: the MGC group is not associated with it 1: the MGC group is associated with it 31 gateway 0: the MGC group is not associated with it 1: the MGC group is associated with it The value zero means the MGC Group is not associated with any profile or gateway. "
+  },
+  "cMgcGrpNumProtocol": {
+    "name": "cMgcGrpNumProtocol",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 128
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object is used to indicate number of protocols associated with this MGC group. The value zero means there is no protocol associated with this MGC group. When the entry create, this object is set to 0. The association between protocol and MGC group is configured via cMgcGrpProtocolTable. After a protocol is associated/de-associated with this MGC group, this object will be incremented/decremented by 1. If this object is zero, it is not allowed to associate the MGC group with any profile or gateway. "
+  },
+  "cMgcGrpStateChangeNtfy": {
+    "name": "cMgcGrpStateChangeNtfy",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object enables or disables sending gateway state change notifications to call agent. "
+  },
+  "cMgcGrpTable": {
+    "name": "cMgcGrpTable",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table represents the association of MGCs and MGC group. Each MGC group consists of one or more MGCs and each MGC can belong to one or more MGC groups. Therefore it is an N to N mapping. "
+  },
+  "cMgcGrpEntry": {
+    "name": "cMgcGrpEntry",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIA-GATEWAY-MIB",
+        "object": "cmgwIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The entry is represented an association of a MGC with a MGC group. "
+  },
+  "cMgcGrpMgcPreference": {
+    "name": "cMgcGrpMgcPreference",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 12
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The preference of the MGC in the MGC group. The lower the number the higher the preference. i.e. 1 will have higher preference than 2."
+  },
+  "cMgcGrpMgcUdpPort": {
+    "name": "cMgcGrpMgcUdpPort",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoPort",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The UDP port of the MGC in the MGC group. The zero means there is no specific UDP port, the UDP port in the protocol table will be used. "
+  },
+  "cMgcGrpRowStatus": {
+    "name": "cMgcGrpRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used to create a new row or modify or delete an existing row in this table. In order to add an MGC to a MGC group, the following conditions need to be met: 1. the MGC and the MGC group should be existing 2. at least one IP address is associated with the MGC if the MGC is configured for internal resolution. After the MGC added to the MGC group, the related cMgcGrpNumMgc will be incremented by 1. cMgcNumMgcGroups will be incremented by 1. In order to delete an MGC from MGC group, the following conditions need to be met: The MGC is not the only MGC associated with the MGC group if the MGC group is associated with gateway or one or more profiles. After the MGC added to the MGC group, the related cMgcGrpNumMgc will be decremented by 1. cMgcNumMgcGroups will be decremented by 1. "
+  },
+  "cMgcGrpProtocolTable": {
+    "name": "cMgcGrpProtocolTable",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "cMgcGrpProtocolTable is used to add protocol to MGC group. This table is designed to support multi protocol for MGC group. The MGC group to protocol is N to N mapping. "
+  },
+  "cMgcGrpProtocolEntry": {
+    "name": "cMgcGrpProtocolEntry",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIA-GATEWAY-MIB",
+        "object": "cmgwIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIA-GATEWAY-MIB",
+        "object": "cmgwSignalProtocolIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Entry of cMgcGrpProtocolTable. "
+  },
+  "cMgcGrpProtocolPreference": {
+    "name": "cMgcGrpProtocolPreference",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The preference of the Protocol in the MGC group. The lower the number the higher the preference. i.e. 1 will have higher preference than 2. When gateway does not know which protocol is used by a call agent the preference is used to make the decision. But if gateway knows which protocol used by a call agent, gateway will use that protocol (as long as the protocol is added to the MGC group, irrespective of the preference) to communicate with the call agent. For example: when gateway return a call agent message, gateway will use the protocol which used by the call agent to send the message. "
+  },
+  "cMgcGrpProtocolRowStatus": {
+    "name": "cMgcGrpProtocolRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.321.1.2.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object is used to create a new row or modify or delete an existing row in this table. In order to add a protocol to MGC group, the following condition need to be met: Both the protocol and the MGC group should be existing After the protocol added to the MGC group, the related cMgcGrpNumProtocol will be incremented by 1. In order to delete a protocol from MGC group, the following condition need to be met: The protocol to be deleted should not be the only one in the MGC group when the MGC group is used by a gateway or a profile. This means if the value of cMgcGrpNumProtocol is equal to 1 and the value of cMgcGrpAssociationInfo is non-zero, this protocol is the only one associated with the MGC group which is still in use by gateways or some profiles. Therefore this protocol can not be deleted. After the protocol deleted from the MGC group, the related cMgcGrpNumProtocol will be decremented by 1. "
+  },
+  "cMgcMIBConformance": {
+    "name": "cMgcMIBConformance",
+    "oid": "1.3.6.1.4.1.9.9.321.2",
+    "class": "objectidentity"
+  },
+  "cMgcMIBCompliances": {
+    "name": "cMgcMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.321.2.1",
+    "class": "objectidentity"
+  },
+  "cMgcMIBGroups": {
+    "name": "cMgcMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.321.2.2",
+    "class": "objectidentity"
+  },
+  "cMgcMIBCompliance": {
+    "name": "cMgcMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.321.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cMgcMIBGroup",
+        "module": "CISCO-MGC-MIB"
+      },
+      {
+        "object": "cMgcIpMIBGroup",
+        "module": "CISCO-MGC-MIB"
+      },
+      {
+        "object": "cMgcGrpParamGroup",
+        "module": "CISCO-MGC-MIB"
+      },
+      {
+        "object": "cMgcGrpGroup",
+        "module": "CISCO-MGC-MIB"
+      },
+      {
+        "object": "cMgcGrpProtocolGroup",
+        "module": "CISCO-MGC-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "Compliance statement for CISCO-MGC-MIB."
+  },
+  "cMgcMIBGroup": {
+    "name": "cMgcMIBGroup",
+    "oid": "1.3.6.1.4.1.9.9.321.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcDomainName"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcNumMgcGroups"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcNumIP"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcResolution"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing per MGC basis configuration information."
+  },
+  "cMgcIpMIBGroup": {
+    "name": "cMgcIpMIBGroup",
+    "oid": "1.3.6.1.4.1.9.9.321.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcIpAddress"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcIpAddressType"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcIpPreference"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcIpRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing IP (in MGC) configuration information."
+  },
+  "cMgcGrpParamGroup": {
+    "name": "cMgcGrpParamGroup",
+    "oid": "1.3.6.1.4.1.9.9.321.2.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpNumMgc"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpAssociationInfo"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpNumProtocol"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpStateChangeNtfy"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing per MGC group configuration information."
+  },
+  "cMgcGrpGroup": {
+    "name": "cMgcGrpGroup",
+    "oid": "1.3.6.1.4.1.9.9.321.2.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpMgcPreference"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpMgcUdpPort"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing MGC (in MGC group) configuration information. "
+  },
+  "cMgcGrpProtocolGroup": {
+    "name": "cMgcGrpProtocolGroup",
+    "oid": "1.3.6.1.4.1.9.9.321.2.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpProtocolPreference"
+      },
+      {
+        "module": "CISCO-MGC-MIB",
+        "object": "cMgcGrpProtocolRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing Protocol (in MGC group) configuration information."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-MGC-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:56:26 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-MGC-MIB"
+  }
+}

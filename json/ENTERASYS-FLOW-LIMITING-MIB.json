@@ -1,0 +1,1203 @@
+{
+  "imports": {
+    "class": "imports",
+    "ENTERASYS-MIB-NAMES": [
+      "etsysModules"
+    ],
+    "IF-MIB": [
+      "ifIndex",
+      "ifName"
+    ],
+    "P-BRIDGE-MIB": [
+      "EnabledStatus"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "NOTIFICATION-TYPE",
+      "Gauge32",
+      "Integer32",
+      "Unsigned32",
+      "iso",
+      "TimeTicks",
+      "Bits",
+      "Counter64",
+      "OBJECT-IDENTITY",
+      "MibIdentifier",
+      "Counter32",
+      "IpAddress",
+      "OBJECT-TYPE",
+      "MODULE-IDENTITY"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TruthValue",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "etsysFlowLimitingMIB": {
+    "name": "etsysFlowLimitingMIB",
+    "oid": "1.3.6.1.4.1.5624.1.2.43",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2004-07-26 19:16",
+        "description": "Added the ifName object to all of the Notifications."
+      },
+      {
+        "revision": "2004-02-05 14:49",
+        "description": "Added the etsysFlowLimitingIntfFlowProcessingLayer object to indicate the highest OSI layer at which flows are processed."
+      },
+      {
+        "revision": "2004-01-27 18:56",
+        "description": "Added additional descriptive text to the FlowLmtIntfClass textual convention and modified, enhanced, or corrected the description clauses for a number of other objects."
+      },
+      {
+        "revision": "2003-11-20 18:34",
+        "description": "The initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200407261916Z",
+    "organization": "Enterasys Networks, Inc",
+    "contactinfo": "Postal: Enterasys Networks 50 Minuteman Rd. Andover, MA 01810-1008 USA Phone: +1 978 684 1000 E-mail: support@enterasys.com WWW: http://www.enterasys.com",
+    "description": "This MIB module defines the portion of the SNMP enterprise MIBs under Enterasys Networks' enterprise OID pertaining to the Flow Limiting feature."
+  },
+  "FlowLmtIntfClass": {
+    "name": "FlowLmtIntfClass",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "userPort": 1,
+          "serverPort": 2,
+          "aggregatedUserPort": 3,
+          "interSwitchLink": 4,
+          "unspecified": 5
+        }
+      }
+    },
+    "status": "current",
+    "description": "The classes of interfaces, or ports, available under the Flow Limiting feature. userPort A port with a single user (workstation, PC, etc.) attached to it. serverPort A port with a server attached to it. This class may encompass a wide range of server types from a small workgroup print server to an enterprise exchange server. Alternately, an administrator may choose to configure an interface with a small print server as a userPort since their flow setup needs may be similar to that of a user port. aggregatedUserPort A port likely to have multiple end stations attached either through a wireless access point or an unmanaged low cost hub or switch. It is expected that this class may also be used instead of interSwitchLink when switches are interconnected using a lower speed link. interSwitchLink A port that is used as a high-speed interconnect between two intelligent switches or routers. Unspecified A port in which nothing can be assumed about its intended use. These classes are only guides. The classes can be configured with any limits, and any interface can associated with any class."
+  },
+  "FlowLmtIntfAction": {
+    "name": "FlowLmtIntfAction",
+    "class": "textualconvention",
+    "type": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "generateNotification": 0,
+        "dropExcessFlows": 1,
+        "createDiscardFlows": 2,
+        "disableInterface": 3
+      }
+    },
+    "status": "current",
+    "description": "The possible actions that the Flow Limiting feature can take when flow activity exceeds the associated action limits. generateNotification(0) - Generate the respective SNMP notification. dropExcessFlows(1) - Drop flow setup requests in excess of the configured limit and discard the associated packets. The use of this option could cause the entity to repetitively process setup requests for the dropped flows. The process of dropping flow setup requests and their associated packets could cause end stations attached to this interface to behave in an indeterminate manner. The use of this option may also prevent the entity from being able to count additional flows and from reaching any additional configured limit. createDiscardFlows(2) - Create discard flows and discard the associated packets. The use of this option could cause end stations attached to this interface to behave in an indeterminate manner. disableInterface(3) - Operationally disable the interface, ifOperStatus for the interface MUST go into the 'down' state, and MUST remain in that state until the associated etsysFlowLimitingIntfStatus is set to operational, the Flow Limiting feature is disabled, or the entity is reset. The 'generateNotification(0)' will always be performed if it is a selected action, is globally enabled, and does not exceed the global rate limit for such notifications. It MUST be generated in such a way that the information in the notification indicates the condition on the interface after any other indicated action has been taken. If one or more other actions are selected only the one with the highest precedence will be taken. The order of precedence, from highest to lowest, of the actions are 'disableInterface', 'createDiscardFlows', and finally 'dropExcessFlows'. If etsysFlowLimitingSystemInterfaceShutdown is disabled the selected action with the next highest precedence will be taken."
+  },
+  "FlowLmtIntfLayer": {
+    "name": "FlowLmtIntfLayer",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "l2": 2,
+          "l3": 3,
+          "l4": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": "A shorthand listing of OSI layers that may be used in processing flows on an interface."
+  },
+  "etsysFlowLimitingObjects": {
+    "name": "etsysFlowLimitingObjects",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1",
+    "class": "objectidentity"
+  },
+  "etsysFlowLimitingSystemBranch": {
+    "name": "etsysFlowLimitingSystemBranch",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.1",
+    "class": "objectidentity"
+  },
+  "etsysFlowLimitingClassBranch": {
+    "name": "etsysFlowLimitingClassBranch",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2",
+    "class": "objectidentity"
+  },
+  "etsysFlowLimitingInterfaceBranch": {
+    "name": "etsysFlowLimitingInterfaceBranch",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3",
+    "class": "objectidentity"
+  },
+  "etsysFlowLimitingNotificationBranch": {
+    "name": "etsysFlowLimitingNotificationBranch",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0",
+    "class": "objectidentity"
+  },
+  "etsysFlowLimitingSystemState": {
+    "name": "etsysFlowLimitingSystemState",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "EnabledStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "disabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The current state of the active part of the Flow Limiting feature. enabled (1) - All aspects of Flow Limiting are operational. disabled (2) - Flow Limiting is configurable but no actions are taken, no notifications are generated and no interfaces will be disabled. All statistical information is still gathered and available. When this object is set to disabled the Flow Limiting feature MUST release its control on all interfaces. Any interfaces that had been operationally held in the 'down' state MUST be allowed to attain their currently correct operational state. Any flows created by the Flow Limiting feature MUST be removed. Maintaining the value of this object across agent reboots is REQUIRED."
+  },
+  "etsysFlowLimitingSystemSnmpNotifications": {
+    "name": "etsysFlowLimitingSystemSnmpNotifications",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "EnabledStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The current state of the SNMP Notification functionality in the Flow Limiting feature. enabled (1) - Flow Limiting will generate SNMP Notifications for flow counts and setup rates that exceed the configured limits. The Flow Limiting feature MUST be enabled for SNMP Notifications to be generated. disabled (2) - Flow Limiting will not generate SNMP Notifications under any conditions. A notification is generated when a value is first detected above its respective configured limit. That notification MUST NOT be generated again until the respective value has transitioned through its respective limit in both directions. Agents are not required to generate SNMP Notifications for conditions that exist when this object is set to enabled. SNMP Notifications MAY only be generated after additional flow setups are detected that exceed the configured limits on that interface. Maintaining the value of this object across agent reboots is REQUIRED."
+  },
+  "etsysFlowLimitingSystemInterfaceShutdown": {
+    "name": "etsysFlowLimitingSystemInterfaceShutdown",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "EnabledStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "disabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The current state of the interface shutdown functionality in the Flow Limiting feature. enabled (1) - Flow Limiting will shutdown an interface when the conditions on that interface exceed the configured values, one of the specified actions is to disable the interface, and the Flow Limiting feature is enabled. disabled (2) - Flow Limiting will not shutdown any interface under any conditions. When this object is set to disabled the Flow Limiting feature MUST release its control on all interfaces. Any interfaces that had been operationally held in the 'down' state MUST be allowed to attain their currently correct operational state. Agents are not required to shutdown interfaces for conditions that exist when this object is set to enabled. Interfaces MAY only be shutdown after additional flow setups are detected that exceed the configured limits on that interface. Maintaining the value of this object across agent reboots is REQUIRED."
+  },
+  "etsysFlowLimitingSystemNotificationInterval": {
+    "name": "etsysFlowLimitingSystemNotificationInterval",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 120,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The number of seconds to wait before generating another notification of the same type for the same interface. This allows notification generation to be throttled in the case of a flow counter or rate that is repeatedly transitioning across a threshold. A value of zero indicates that the entity should not suppress any notifications related to the Flow Limiting feature. Maintaining the value of this object across agent reboots is REQUIRED."
+  },
+  "etsysFlowLimitingSystemClearStats": {
+    "name": "etsysFlowLimitingSystemClearStats",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When set to true(1) the following objects in all rows of the etsysFlowLimitingInterfaceTable MUST be set to zero: etsysFlowLimitingIntfFlowCountMaxTime etsysFlowLimitingIntfFlowCountEvents etsysFlowLimitingIntfSetupRateMax etsysFlowLimitingIntfSetupRateMaxTime etsysFlowLimitingIntfSetupRateCurrent etsysFlowLimitingIntfSetupRateEvents and the etsysFlowLimitingIntfFlowCountMax objects MUST be set to the value of their respective etsysFlowLimitingIntfFlowCountCurrent objects. Setting this object to false(2) will have no effect. When read this object will always return false(2). Maintaining the value of this object across agent reboots is NOT RECOMMENDED."
+  },
+  "etsysFlowLimitingSystemMaxSupportedFlowCount": {
+    "name": "etsysFlowLimitingSystemMaxSupportedFlowCount",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "units": "flows",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum number of flows supported on this entity."
+  },
+  "etsysFlowLimitingSystemMaxSupportedSetupRate": {
+    "name": "etsysFlowLimitingSystemMaxSupportedSetupRate",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.1.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "units": "flows/second",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum flow setup rate supported on this entity."
+  },
+  "etsysFlowLimitingClassTable": {
+    "name": "etsysFlowLimitingClassTable",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Provides for the configuration of the Flow Limiting features various interface classes. Maintaining the value of the objects in this table across agent reboots is REQUIRED."
+  },
+  "etsysFlowLimitingClassEntry": {
+    "name": "etsysFlowLimitingClassEntry",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingClassType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Provides an override to the default thresholds configured for the interface class corresponding to the row. This table MUST be populated with default values that are reasonable for the entity. The default values for all leaves in the 'unspecified' class MUST be zero."
+  },
+  "etsysFlowLimitingClassType": {
+    "name": "etsysFlowLimitingClassType",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowLmtIntfClass",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The class of interface that this row represents."
+  },
+  "etsysFlowLimitingClassFlowCountActionLimit1": {
+    "name": "etsysFlowLimitingClassFlowCountActionLimit1",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "units": "flows",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When the number of active flows on an associated interface reaches this level the Flow Limiting feature will invoke the action(s) specified by the etsysFlowLimitingClassFlowCountActionTaken1 object. A value of zero indicates that this limit is disabled. While this limit is disabled the associated action MUST NOT be taken."
+  },
+  "etsysFlowLimitingClassFlowCountActionTaken1": {
+    "name": "etsysFlowLimitingClassFlowCountActionTaken1",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowLmtIntfAction",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The action(s) to be taken on an associated interface when the number of active flows on that interface reach the value of etsysFlowLimitingClassFlowCountActionLimit1."
+  },
+  "etsysFlowLimitingClassFlowCountActionLimit2": {
+    "name": "etsysFlowLimitingClassFlowCountActionLimit2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "units": "flows",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When the number of active flows on an associated interface reaches this level the Flow Limiting feature will invoke the action(s) specified by the etsysFlowLimitingClassFlowCountActionTaken2 object. A value of zero indicates that this limit is disabled. While this limit is disabled the associated action MUST NOT be taken."
+  },
+  "etsysFlowLimitingClassFlowCountActionTaken2": {
+    "name": "etsysFlowLimitingClassFlowCountActionTaken2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowLmtIntfAction",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The action(s) to be taken on an associated interface when the number of active flows on that interface reach the value of etsysFlowLimitingClassFlowCountActionLimit2."
+  },
+  "etsysFlowLimitingClassSetupRateNotifyLimit": {
+    "name": "etsysFlowLimitingClassSetupRateNotifyLimit",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "units": "flows/second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The flow setup rate on an associated interface at which the Flow Limiting feature will generate an etsysFlowlimitingSetupRateNotifyLimit notification. A value of zero indicates that this limit is disabled. While this limit is disabled the associated notification MUST NOT be generated."
+  },
+  "etsysFlowLimitingClassSetupRateActionLimit": {
+    "name": "etsysFlowLimitingClassSetupRateActionLimit",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "units": "flows/second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The flow setup rate on an associated interface at which the Flow Limiting feature will invoke the action(s) specified by the etsysFlowLimitingClassSetupRateActionTaken object. A value of zero indicates that this limit is disabled. While this limit is disabled the associated action MUST NOT be taken."
+  },
+  "etsysFlowLimitingClassSetupRateActionTaken": {
+    "name": "etsysFlowLimitingClassSetupRateActionTaken",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.2.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowLmtIntfAction",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The action(s) to be taken on an associated interface when the flow setup rate on that interface reachs the value of the etsysFlowLimitingClassSetupRateActionLimit object."
+  },
+  "etsysFlowLimitingInterfaceTable": {
+    "name": "etsysFlowLimitingInterfaceTable",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table that provides for the configuration, status, and statistics related to, the Flow Limiting feature on a per interface basis."
+  },
+  "etsysFlowLimitingInterfaceEntry": {
+    "name": "etsysFlowLimitingInterfaceEntry",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The configuration, status, and statistics related to, the Flow Limiting feature for an individual interface."
+  },
+  "etsysFlowLimitingIntfClassType": {
+    "name": "etsysFlowLimitingIntfClassType",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowLmtIntfClass",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "unspecified",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The Flow Limiting interface class associated with this interface. The class defines the flow limits and actions to be taken when those limits are exceeded. When the value of this object changes and flow limiting is currently enabled, both globally and on this interface, the agent MUST perform the following steps prior to enforcing the new limits: 1) If the interface had been operationally held in the 'down' state due to prior flow conditions it MUST be allowed to attain its currently correct operational state. 2) Any flows created by the Flow Limiting feature for this interface must be removed. 3) The respective etsysFlowLimitingIntfFlowCountEvents and etsysFlowLimitingIntfSetupRateEvents objects MUST be set to zero. 4) etsysFlowLimitingIntfStatus and etsysFlowLimitingIntfReason MUST be set to operational(1) and noAction(1) respectively. Maintaining the value of this object across agent reboots is REQUIRED."
+  },
+  "etsysFlowLimitingIntfFlowLimitingState": {
+    "name": "etsysFlowLimitingIntfFlowLimitingState",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "EnabledStatus",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The enable state of Flow Limiting on this interface. Setting this object to disabled(2) will disable the active part of the Flow Limiting feature as defined for the etsysFlowLimitingSystemState object on this interface. When the value of this object changes from enabled(1) to disabled(2) the agent MUST: 1) Release its control on this interface. If it had been operationally held in the 'down' state it MUST be allowed to attain its currently correct operational state. 2) Remove any flows created by the Flow Limiting feature for this interface. 3) The respective etsysFlowLimitingIntfFlowCountEvents and etsysFlowLimitingIntfSetupRateEvents objects MUST be set to zero. 4) etsysFlowLimitingIntfStatus and etsysFlowLimitingIntfReason MUST be set to operational(1) and noAction(1) respectively. Maintaining the value of this object across agent reboots is REQUIRED."
+  },
+  "etsysFlowLimitingIntfStatus": {
+    "name": "etsysFlowLimitingIntfStatus",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "operational": 1,
+          "disabled": 2,
+          "droppingExcessFlows": 3,
+          "creatingDiscardFlows": 4
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The current status of the interface with respect to Flow Limiting. A read of operational(1) indicates that the Flow Limiting feature has not taken any action to operationally limit this interface. A read of disabled(2) indicates that the Flow Limiting feature has taken action to operationally disable this interface due to ... A read of droppingExcessFlows(3) indicates that this interface ... A read of creatingDiscardFlows(4) indicates that this interface ... Setting this object to operational(1) when it is disabled(2) will cause Flow Limiting to release it's control that is keeping this interface operationally disabled. Any other write of this object will have no effect. Maintaining the value of this object across agent reboots is NOT RECOMMENDED."
+  },
+  "etsysFlowLimitingIntfReason": {
+    "name": "etsysFlowLimitingIntfReason",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noAction": 1,
+          "flowCount": 2,
+          "setupRate": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The reason the last action was taken on this interface by the Flow Limiting feature. Maintaining the value of this object across agent reboots is NOT RECOMMENDED."
+  },
+  "etsysFlowLimitingIntfClearStats": {
+    "name": "etsysFlowLimitingIntfClearStats",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When set to true(1) the following objects in this row MUST be set to zero: etsysFlowLimitingIntfFlowCountMaxTime etsysFlowLimitingIntfFlowCountEvents etsysFlowLimitingIntfSetupRateMax etsysFlowLimitingIntfSetupRateMaxTime etsysFlowLimitingIntfSetupRateCurrent etsysFlowLimitingIntfSetupRateEvents and the etsysFlowLimitingIntfFlowCountMax object MUST be set to the value of the etsysFlowLimitingIntfFlowCountCurrent object. Setting this object to false(2) will have no effect. When read this object will always return false(2)."
+  },
+  "etsysFlowLimitingIntfFlowCountCurrent": {
+    "name": "etsysFlowLimitingIntfFlowCountCurrent",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "flows",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current number of flows active on this interface. This information is always available and current."
+  },
+  "etsysFlowLimitingIntfFlowCountMax": {
+    "name": "etsysFlowLimitingIntfFlowCountMax",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "flows",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum number of flows that have been active on this interface since the last agent reset. This information is always available and current."
+  },
+  "etsysFlowLimitingIntfFlowCountMaxTime": {
+    "name": "etsysFlowLimitingIntfFlowCountMaxTime",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The TimeTicks since the maximum number of flows was recorded. This information is always available and current."
+  },
+  "etsysFlowLimitingIntfFlowCountEvents": {
+    "name": "etsysFlowLimitingIntfFlowCountEvents",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times that the number of flows on this interface exceeded any associated limit."
+  },
+  "etsysFlowLimitingIntfSetupRateCurrent": {
+    "name": "etsysFlowLimitingIntfSetupRateCurrent",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "flows/second",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current flow setup rate on this interface. This information is always available and current."
+  },
+  "etsysFlowLimitingIntfSetupRateMax": {
+    "name": "etsysFlowLimitingIntfSetupRateMax",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "flows/second",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum flow setup rate on this interface since the last agent reset. This information is always available and current."
+  },
+  "etsysFlowLimitingIntfSetupRateMaxTime": {
+    "name": "etsysFlowLimitingIntfSetupRateMaxTime",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The TimeTicks since the maximum flow setup rate was recorded. This information is always available and current."
+  },
+  "etsysFlowLimitingIntfSetupRateEvents": {
+    "name": "etsysFlowLimitingIntfSetupRateEvents",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times that the setup rate on this interface exceeded any associated limit."
+  },
+  "etsysFlowLimitingIntfFlowProcessingLayer": {
+    "name": "etsysFlowLimitingIntfFlowProcessingLayer",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.3.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowLmtIntfLayer",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The highest OSI layer at which flows are processed. This is used to give an indication of how much detail is contained in the flows created on the interface. An interface reporting that flows being processed at L4 will create flows that have information from L2, L3, and L4. In general, interfaces reporting processing at L4 would be expected to have a higher number of flows than interfaces reporting processing at L2 assuming all else equal."
+  },
+  "etsysFlowlimitingFlowCountActionLimit1": {
+    "name": "etsysFlowlimitingFlowCountActionLimit1",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfStatus"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowCountCurrent"
+      }
+    ],
+    "status": "deprecated",
+    "description": "An etsysFlowlimitingFlowCountActionLimit1 notification indicates that the number of flows on the interface has exceeded the currently configured limit in the associated etsysFlowLimitingClassFlowCountActionLimit1 for the interface."
+  },
+  "etsysFlowlimitingFlowCountActionLimit2": {
+    "name": "etsysFlowlimitingFlowCountActionLimit2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfStatus"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowCountCurrent"
+      }
+    ],
+    "status": "deprecated",
+    "description": "An etsysFlowlimitingFlowCountActionLimit2 notification indicates that the number of flows on the interface has exceeded the currently configured limit in the associated etsysFlowLimitingClassFlowCountActionLimit2 for the interface."
+  },
+  "etsysFlowLimitingSetupRateNotifyLimit": {
+    "name": "etsysFlowLimitingSetupRateNotifyLimit",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfSetupRateCurrent"
+      }
+    ],
+    "status": "deprecated",
+    "description": "An etsysFlowLimitingSetupRateNotifyLimit notification indicates that the flow setup rate on the interface has exceeded the currently configured limit for generating a notification."
+  },
+  "etsysFlowLimitingSetupRateActionLimit": {
+    "name": "etsysFlowLimitingSetupRateActionLimit",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0.4",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfStatus"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfSetupRateCurrent"
+      }
+    ],
+    "status": "deprecated",
+    "description": "An etsysFlowLimitingSetupRateExceeded notification indicates that the flow setup rate on the interface has exceeded the currently configured limit for taking an action."
+  },
+  "etsysFlowlimitingFlowCountActionLimit1V2": {
+    "name": "etsysFlowlimitingFlowCountActionLimit1V2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0.5",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "IF-MIB",
+        "object": "ifName"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfStatus"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowCountCurrent"
+      }
+    ],
+    "status": "current",
+    "description": "An etsysFlowlimitingFlowCountActionLimit1 notification indicates that the number of flows on the interface has exceeded the currently configured limit in the associated etsysFlowLimitingClassFlowCountActionLimit1 for the interface."
+  },
+  "etsysFlowlimitingFlowCountActionLimit2V2": {
+    "name": "etsysFlowlimitingFlowCountActionLimit2V2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0.6",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "IF-MIB",
+        "object": "ifName"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfStatus"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowCountCurrent"
+      }
+    ],
+    "status": "current",
+    "description": "An etsysFlowlimitingFlowCountActionLimit2 notification indicates that the number of flows on the interface has exceeded the currently configured limit in the associated etsysFlowLimitingClassFlowCountActionLimit2 for the interface."
+  },
+  "etsysFlowLimitingSetupRateNotifyLimitV2": {
+    "name": "etsysFlowLimitingSetupRateNotifyLimitV2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0.7",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "IF-MIB",
+        "object": "ifName"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfSetupRateCurrent"
+      }
+    ],
+    "status": "current",
+    "description": "An etsysFlowLimitingSetupRateNotifyLimit notification indicates that the flow setup rate on the interface has exceeded the currently configured limit for generating a notification."
+  },
+  "etsysFlowLimitingSetupRateActionLimitV2": {
+    "name": "etsysFlowLimitingSetupRateActionLimitV2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.1.0.8",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "IF-MIB",
+        "object": "ifName"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfStatus"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfSetupRateCurrent"
+      }
+    ],
+    "status": "current",
+    "description": "An etsysFlowLimitingSetupRateExceeded notification indicates that the flow setup rate on the interface has exceeded the currently configured limit for taking an action."
+  },
+  "etsysFlowLimitingConformance": {
+    "name": "etsysFlowLimitingConformance",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2",
+    "class": "objectidentity"
+  },
+  "etsysFlowLimitingGroups": {
+    "name": "etsysFlowLimitingGroups",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1",
+    "class": "objectidentity"
+  },
+  "etsysFlowLimitingCompliances": {
+    "name": "etsysFlowLimitingCompliances",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.2",
+    "class": "objectidentity"
+  },
+  "etsysFlowLimitingSystemGroup": {
+    "name": "etsysFlowLimitingSystemGroup",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSystemState"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSystemSnmpNotifications"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSystemInterfaceShutdown"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSystemNotificationInterval"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSystemClearStats"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSystemMaxSupportedFlowCount"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSystemMaxSupportedSetupRate"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing global configuration, statistics, and status for the Flow Limiting feature."
+  },
+  "etsysFlowLimitingInterfaceGroup": {
+    "name": "etsysFlowLimitingInterfaceGroup",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfClassType"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowLimitingState"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfStatus"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfReason"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfClearStats"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects providing interface based configuration and status of the Flow Limiting feature."
+  },
+  "etsysFlowLimitingFlowCountGroup": {
+    "name": "etsysFlowLimitingFlowCountGroup",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingClassFlowCountActionLimit1"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingClassFlowCountActionTaken1"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingClassFlowCountActionLimit2"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingClassFlowCountActionTaken2"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowCountMax"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowCountMaxTime"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowCountCurrent"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowCountEvents"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects related to understanding and limiting the number of flows on individual interfaces."
+  },
+  "etsysFlowLimitingSetupRateGroup": {
+    "name": "etsysFlowLimitingSetupRateGroup",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingClassSetupRateNotifyLimit"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingClassSetupRateActionLimit"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingClassSetupRateActionTaken"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfSetupRateMax"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfSetupRateMaxTime"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfSetupRateCurrent"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfSetupRateEvents"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects related to understanding and limiting interface flow setup rates on individual interfaces."
+  },
+  "etsysFlowLimitingFlowCountNotificationGroup": {
+    "name": "etsysFlowLimitingFlowCountNotificationGroup",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.5",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowlimitingFlowCountActionLimit1"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowlimitingFlowCountActionLimit2"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of notifications related to the number of flows on individual interfaces."
+  },
+  "etsysFlowLimitingSetupRateNotificationGroup": {
+    "name": "etsysFlowLimitingSetupRateNotificationGroup",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.6",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSetupRateNotifyLimit"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSetupRateActionLimit"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of notifications related to flow setup rates on individual interfaces."
+  },
+  "etsysFlowLimitingInterfaceGroupV2": {
+    "name": "etsysFlowLimitingInterfaceGroupV2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfClassType"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowLimitingState"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfStatus"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfReason"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfClearStats"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingIntfFlowProcessingLayer"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing interface based configuration and status of the Flow Limiting feature."
+  },
+  "etsysFlowLimitingFlowCountNotificationGroupV2": {
+    "name": "etsysFlowLimitingFlowCountNotificationGroupV2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.8",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowlimitingFlowCountActionLimit1V2"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowlimitingFlowCountActionLimit2V2"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notifications related to the number of flows on individual interfaces."
+  },
+  "etsysFlowLimitingSetupRateNotificationGroupV2": {
+    "name": "etsysFlowLimitingSetupRateNotificationGroupV2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.1.9",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSetupRateNotifyLimitV2"
+      },
+      {
+        "module": "ENTERASYS-FLOW-LIMITING-MIB",
+        "object": "etsysFlowLimitingSetupRateActionLimitV2"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notifications related to flow setup rates on individual interfaces."
+  },
+  "etsysFlowLimitingCompliance": {
+    "name": "etsysFlowLimitingCompliance",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.2.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "etsysFlowLimitingSystemGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingInterfaceGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingFlowCountGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingFlowCountNotificationGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingSetupRateGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingSetupRateNotificationGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for devices that support Flow Limiting."
+  },
+  "etsysFlowLimitingComplianceV2": {
+    "name": "etsysFlowLimitingComplianceV2",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.2.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "etsysFlowLimitingSystemGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingInterfaceGroupV2",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingFlowCountGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingFlowCountNotificationGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingSetupRateGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingSetupRateNotificationGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for devices that support Flow Limiting."
+  },
+  "etsysFlowLimitingComplianceV3": {
+    "name": "etsysFlowLimitingComplianceV3",
+    "oid": "1.3.6.1.4.1.5624.1.2.43.2.2.3",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "etsysFlowLimitingSystemGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingInterfaceGroupV2",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingFlowCountGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingFlowCountNotificationGroupV2",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingSetupRateGroup",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      },
+      {
+        "object": "etsysFlowLimitingSetupRateNotificationGroupV2",
+        "module": "ENTERASYS-FLOW-LIMITING-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for devices that support Flow Limiting."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/ENTERASYS-FLOW-LIMITING-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 18:27:11 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "ENTERASYS-FLOW-LIMITING-MIB"
+  }
+}

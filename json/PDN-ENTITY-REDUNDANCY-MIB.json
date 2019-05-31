@@ -1,0 +1,545 @@
+{
+  "imports": {
+    "class": "imports",
+    "ENTITY-MIB": [
+      "entPhysicalIndex"
+    ],
+    "PDN-HEADER-MIB": [
+      "pdnEntityRedundancy"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "MibIdentifier",
+      "Gauge32",
+      "Counter64",
+      "Integer32",
+      "NOTIFICATION-TYPE",
+      "TimeTicks",
+      "Unsigned32",
+      "MODULE-IDENTITY",
+      "Counter32",
+      "Bits",
+      "IpAddress",
+      "OBJECT-TYPE",
+      "OBJECT-IDENTITY",
+      "iso"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "DisplayString"
+    ]
+  },
+  "pdnEntRedunMIB": {
+    "name": "pdnEntRedunMIB",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2003-07-25 13:00",
+        "description": "J. Pinto - Added pdnRedunGeneralNotificationEnable. - Modified DESCRIPTION for pdnRedunNotificationEnable. "
+      },
+      {
+        "revision": "2003-05-22 10:00",
+        "description": "J. Pinto - Fixed spelling name of this mib in line#1 "
+      },
+      {
+        "revision": "2003-05-04 17:00",
+        "description": "J. Pinto - Removed the word non-critical from the PdnRedunStates. - Added pdnYCableSelection scalar object. - Added pdnRedunGeneralStatusAlarm scalar object. - Modified PdnRedunAlarmStatus TEXTUAL-CONVENTION. - Added traps for new alarm conditions. "
+      },
+      {
+        "revision": "2003-03-03 15:00",
+        "description": "J. Pinto - Modified PdnRedunCmd Textual Convention to add a new forceswitch command."
+      }
+    ],
+    "lastupdated": "200301121100Z",
+    "organization": "Paradyne Corporation MIB Working Group",
+    "contactinfo": " Paradyne Networks Inc. Postal: 8545, 126th Ave. N. Largo, FL 33779 US Editor: Jesus Pinto Email: mibwg_team@eng.paradyne.com",
+    "description": "This management information module supports the objects to be used for redundancy of entities."
+  },
+  "PdnRedunStates": {
+    "name": "PdnRedunStates",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "activeState": 1,
+          "activeAlarmState": 2,
+          "standbyState": 3,
+          "standbyAlarmState": 4
+        }
+      }
+    },
+    "status": "current",
+    "description": "This textual Convention describes the valid states relevant to the redundancy feature that an entity module can be. The possibles states are: activeState ----------- the module is currently performing its main functions in the system, including communicating with other modules, monitoring the operation of itself and other standby modules. activeAlarmState ---------------- the same as an activeState except an Alarm condition has been detected on the module. standbyState ------------ the module is primarily in a dormant state until an event is triggered that requires its activation. While in this state, the module only performs background tests to verify that its hardware is operating properly and monitor the active module for proper operation. standbyAlarmState ---------------- the same as an standbyState except a Alarm condition has been detected on the module."
+  },
+  "PdnRedunCmd": {
+    "name": "PdnRedunCmd",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noCmd": 1,
+          "switch": 2,
+          "forcedswitch": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "This list of commands allows an user to perform actions on the redundancy entities. The commands are: noCmd ----- This value should be returned by a read request when no previous command has been issue. This value may not be used in a write operation. A wrongValue error shall be returned in this case. switch ------ This is the *Normal* switch. shall be directed to an entity in the Active, Active/Alarm, Standby or Standby/Alarm state. Will cause an entity and its redundant mate to switch roles unless the Standby entity is in a failed state or redundancy is disabled. A switch shall result in the Active or Active/Alarm entity going into a Standby or Standby/Alarm state and the Standby or Standby/Alarm entity going into the Active or Active/Alarm state. forceswitch ----------- This is the *Forced* switch. shall be directed to an entity in the Active, Active/Alarm, Standby or Standby/Alarm state. Will cause an entity and its redundant mate to switch roles regardless of the state of the entities or if redundancy is enabled. A switch shall result in the Active or Active/Alarm entity going into a Standby or Standby/Alarm state and the Standby or Standby/Alarm entity going into the Active or Active/Alarm state."
+  },
+  "PdnRedunAlarmStatus": {
+    "name": "PdnRedunAlarmStatus",
+    "class": "textualconvention",
+    "type": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "noAlarm": 0,
+        "linkDefect": 1,
+        "hwFailure": 2,
+        "hwMissing": 3,
+        "hwIncompatible": 4,
+        "fwIncompatible": 5,
+        "cfgIncompatible": 6
+      }
+    },
+    "status": "current",
+    "description": "This textual convention lists the possibles alarm status. The status are: noAlarm --------------------------- This is the normal status when there is no alarm condition. linkDefect ---------------------------- This alarm is detected when there is an abnormal condition in the link (e.g., LOS, LOF, etc.) of this redundant unit. hwFailure ---------------------------- This alarm is detected when there is a hardware failure on this redundant unit. hwMissing ---------------------------- This alarm is detected when there is an expected piece of hw that is missing on this redundant unit. hwIncompatible ---------------------------- This alarm is detected when the modules in a redundancy configuration present hardware incompatibilities. fwIncompatible ---------------------------- This alarm is detected when the modules in a redundancy configuration present firmware incompatibilities. cfgIncompatible ----------------------------- This alarm is detected when the modules in a redundancy configuration present configuration incompatibilities."
+  },
+  "PdnRedunGeneralAlarmStatus": {
+    "name": "PdnRedunGeneralAlarmStatus",
+    "class": "textualconvention",
+    "type": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "noAlarm": 0,
+        "noActiveModule": 1,
+        "standbyAlarmOrReset": 2
+      }
+    },
+    "status": "current",
+    "description": "This textual convention lists the possibles alarm status that are general to the redundancy feature; which are not associated to a particular redundant module. The status are: noAlarm --------------------------- This is the Normal status with no General alarm condition. noActiveModule --------------------------- This alarm is detected when no module is in the Active State. standbyAlarmOrReset ---------------------------- This alarm is detected when on of the modules configured for redundancy is either in the Standby-Alarm or Reset Test state. "
+  },
+  "pdnEntityRedundancyMIBObjects": {
+    "name": "pdnEntityRedundancyMIBObjects",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1",
+    "class": "objectidentity"
+  },
+  "pdnEntityRedundancyNotifications": {
+    "name": "pdnEntityRedundancyNotifications",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2",
+    "class": "objectidentity"
+  },
+  "pdnEntityRedundancyConformance": {
+    "name": "pdnEntityRedundancyConformance",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.3",
+    "class": "objectidentity"
+  },
+  "pdnEntityRedundancySelection": {
+    "name": "pdnEntityRedundancySelection",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enabled": 1,
+          "disabled": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object is used to enable or disable the redundancy feature on this device."
+  },
+  "pdnYCableSelection": {
+    "name": "pdnYCableSelection",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enabled": 1,
+          "disabled": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object is used to configure the Y-cable presence used for tx and rx of data between the redundant units. When the selection is enabled (1), it indicates that the tx and rx signals of each redundant unit are sharing a single common pair to tx and rx data to the network. When the selection is disable (2), it indicates that the tx and rx signals of each redundant unit has a separate (independant) pair to tx and rx data to the network. "
+  },
+  "pdnRedunGeneralAlarmStatus": {
+    "name": "pdnRedunGeneralAlarmStatus",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PdnRedunGeneralAlarmStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides status of any General Alarm detected by the redundancy feature. "
+  },
+  "pdnRedunGeneralNotificationEnable": {
+    "name": "pdnRedunGeneralNotificationEnable",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PdnRedunGeneralAlarmStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object provides the ability to enable and disable the following general notifications: o pdnRedunEventNoActiveModule o pdnRedunEventStandbyAlarmOrReset "
+  },
+  "pdnRedunCmdTable": {
+    "name": "pdnRedunCmdTable",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains one row per entity module being used for redundancy."
+  },
+  "pdnRedunCmdEntry": {
+    "name": "pdnRedunCmdEntry",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Commands that can be performed on a particular entity module used for redundancy."
+  },
+  "pdnRedunCommand": {
+    "name": "pdnRedunCommand",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PdnRedunCmd",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object allows users to command an entity module, configured for redundancy to perform an action such as switch (2). Reading this object should return the last command issued on this interface or noCmd (1) if no command has been issued since last reset."
+  },
+  "pdnRedunStatusTable": {
+    "name": "pdnRedunStatusTable",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains configuration and status information related to events in entity modules used for redundancy."
+  },
+  "pdnRedunStatusEntry": {
+    "name": "pdnRedunStatusEntry",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ENTITY-MIB",
+        "object": "entPhysicalIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Configuration and Status information for a particular entity module used for redundancy."
+  },
+  "pdnRedunEntityState": {
+    "name": "pdnRedunEntityState",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PdnRedunStates",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object is used to display the current state on an entity that is used for redundancy."
+  },
+  "pdnRedunAlarmStatus": {
+    "name": "pdnRedunAlarmStatus",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PdnRedunAlarmStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object provides status of any Alarm detected in a redundant entity."
+  },
+  "pdnRedunNotificationEnable": {
+    "name": "pdnRedunNotificationEnable",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.1.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PdnRedunAlarmStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object provides the ability to enable and disable the following notifications: o pdnRedunEventHwIncompatible o pdnRedunEventFwIncompatible o pdnRedunEventCfgIncompatible o pdnRedunEventLinkDefect o pdnRedunEventHwFailure o pdnRedunEventHwMissingHwFailure "
+  },
+  "pdnRedunNotificationsPrefix": {
+    "name": "pdnRedunNotificationsPrefix",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0",
+    "class": "objectidentity"
+  },
+  "pdnRedunEventNoActiveModule": {
+    "name": "pdnRedunEventNoActiveModule",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunGeneralAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be issued when no module is in the Active State."
+  },
+  "pdnRedunEventHwIncompatible": {
+    "name": "pdnRedunEventHwIncompatible",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be issued when the modules in a redundancy configuration present hardware incompatibilities."
+  },
+  "pdnRedunEventStandbyAlarmOrReset": {
+    "name": "pdnRedunEventStandbyAlarmOrReset",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunGeneralAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be issued when one of the modules configured for redundancy is either in the Standby/Alarm or Reset Test state."
+  },
+  "pdnRedunEventFwIncompatible": {
+    "name": "pdnRedunEventFwIncompatible",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0.4",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be issued when the modules in a redundancy configuration present firmware incompatibilities."
+  },
+  "pdnRedunEventCfgIncompatible": {
+    "name": "pdnRedunEventCfgIncompatible",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0.5",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be issued when the modules in a redundancy configuration present configuration incompatibilities."
+  },
+  "pdnRedunEventLinkDefect": {
+    "name": "pdnRedunEventLinkDefect",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0.6",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be issued when a module in a redundancy configuration has a link condition."
+  },
+  "pdnRedunEventHwFailure": {
+    "name": "pdnRedunEventHwFailure",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0.7",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be issued when a module in a redundancy configuration has a hardware failure condition."
+  },
+  "pdnRedunEventHwMissingHwFailure": {
+    "name": "pdnRedunEventHwMissingHwFailure",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.2.0.8",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be issued when a module in a redundancy configuration is expecting a piece of hw to be used for redundancy which can not be found or is not operational. "
+  },
+  "pdnEntityRedundancyCompliances": {
+    "name": "pdnEntityRedundancyCompliances",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.3.1",
+    "class": "objectidentity"
+  },
+  "pdnEntityRedundancyGroups": {
+    "name": "pdnEntityRedundancyGroups",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.3.2",
+    "class": "objectidentity"
+  },
+  "pdnEntityRedundancyCompliance": {
+    "name": "pdnEntityRedundancyCompliance",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "pdnRedundancyGeneralGroup",
+        "module": "PDN-ENTITY-REDUNDANCY-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for SNMP entities which manage the configuration parameters on entities used for redundancy."
+  },
+  "pdnRedundancyGeneralGroup": {
+    "name": "pdnRedundancyGeneralGroup",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnEntityRedundancySelection"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnYCableSelection"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunGeneralAlarmStatus"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunGeneralNotificationEnable"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of general configuration objects for the entity redundancy implementation."
+  },
+  "pdnEntityRedundancyOptGroup": {
+    "name": "pdnEntityRedundancyOptGroup",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunCommand"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunNotificationEnable"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEntityState"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunAlarmStatus"
+      }
+    ],
+    "status": "current",
+    "description": " A collection of configuration objects applicable to redundancy implementations."
+  },
+  "pdnEntityRedundancyEventGroup": {
+    "name": "pdnEntityRedundancyEventGroup",
+    "oid": "1.3.6.1.4.1.1795.2.24.2.41.1.3.2.3",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEventNoActiveModule"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEventHwIncompatible"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEventStandbyAlarmOrReset"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEventFwIncompatible"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEventCfgIncompatible"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEventLinkDefect"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEventHwFailure"
+      },
+      {
+        "module": "PDN-ENTITY-REDUNDANCY-MIB",
+        "object": "pdnRedunEventHwMissingHwFailure"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of redundancy notifications."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/PDN-ENTITY-REDUNDANCY-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 20:57:30 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "PDN-ENTITY-REDUNDANCY-MIB"
+  }
+}

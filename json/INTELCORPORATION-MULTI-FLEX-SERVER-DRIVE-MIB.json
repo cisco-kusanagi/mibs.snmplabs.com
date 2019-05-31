@@ -1,0 +1,966 @@
+{
+  "imports": {
+    "class": "imports",
+    "INTELCORPORATION-MULTI-FLEX-SERVER-MIB": [
+      "chassis"
+    ],
+    "INTELCORPORATION-MULTI-FLEX-SERVER-REG": [
+      "regModule",
+      "groups"
+    ],
+    "INTELCORPORATION-MULTI-FLEX-SERVER-TC": [
+      "Index",
+      "PowerLedStates",
+      "Presence",
+      "PresenceLedStates",
+      "Power",
+      "INT32withException",
+      "FaultLedStates",
+      "FeatureSet",
+      "IdromBinary16"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "OBJECT-IDENTITY",
+      "Counter32",
+      "MibIdentifier",
+      "Integer32",
+      "NOTIFICATION-TYPE",
+      "Unsigned32",
+      "MODULE-IDENTITY",
+      "OBJECT-TYPE",
+      "iso",
+      "Gauge32",
+      "IpAddress",
+      "Bits",
+      "TimeTicks",
+      "Counter64"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "multiFlexServerDrivesMibModule": {
+    "name": "multiFlexServerDrivesMibModule",
+    "oid": "1.3.6.1.4.1.343.2.19.1.1.1.15",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2007-08-16 12:00",
+        "description": "Fixed up minor errors causing some managers grief (ommission or addition of commas in lists) Corrected a few entries that were marked as read-write when they should have been read-only"
+      },
+      {
+        "revision": "2007-07-20 16:45",
+        "description": "Minor edit to make MIB SMIv2 compliant Dropped driveBackplaneBmcFirmwareVersion as there is no BMC for the drive backplane"
+      },
+      {
+        "revision": "2007-06-07 20:30",
+        "description": "Added the IdromBinary16 to represent the asset tag, part number, and serial number fields within the IDROM fields."
+      },
+      {
+        "revision": "2007-06-07 13:30",
+        "description": "Corrected maximum/nominal IDROM parameters and comments"
+      },
+      {
+        "revision": "2007-05-30 17:00",
+        "description": "Added enumeration for exceptions Added missing Presence column to sharedDriveTable"
+      },
+      {
+        "revision": "2007-04-18 19:05",
+        "description": "Moved the trees and chassis nodes around to accomodate the unique power supply characteristics"
+      },
+      {
+        "revision": "2007-04-09 15:45",
+        "description": "Moved driveBackplane IDROM data to sharedDrives tree from storage tree where it makes more logical sense Relocated both tables after the driveBackplane tree"
+      },
+      {
+        "revision": "2007-04-09 15:30",
+        "description": "Dropped sDriveAlias"
+      },
+      {
+        "revision": "2007-03-27 11:30",
+        "description": "Renamed all references of Array to StoragePool"
+      },
+      {
+        "revision": "2007-03-14 11:30",
+        "description": "Renamed all references of Disk to Drive Dropped redundant sDriveIndex (moved and replaced it with sDriveSlotNumber)"
+      },
+      {
+        "revision": "2007-03-06 10:30",
+        "description": "Changed Mask representation from an Opaque to a DisplayString at the request of the architects such that it now is an ASCII representation of bit string reflecting the presence with the left most 'bit' being bit 1 and max* bits being represented."
+      },
+      {
+        "revision": "2007-02-22 17:00",
+        "description": "Renamed MIB file and updated internal relevance to formal product name Multi-Flex Server"
+      },
+      {
+        "revision": "2006-12-28 17:30",
+        "description": "Corrected sharedDiskStatsTable INDEX to AUGMENTS."
+      },
+      {
+        "revision": "2006-12-05 10:30",
+        "description": "Updated several object types to reflect changes in the OEM objects. sDiskArrayID Integer32 -> INTEGER sDiskSequenceNumber Integer32 -> INTEGER sDiskDriveType DisplayString -> INTEGER Cleaned up some illegal character usage to make it SMIv2 compliant. Renamed all of the *Transfered to *Transferred Renumbered sharedDiskStatsTable to match OEM's."
+      },
+      {
+        "revision": "2006-11-27 15:30",
+        "description": "Removed nolonger supported SATA & SAS drive feature tables Renumbered Stats from { sharedDisks 4 } to { sharedDisks 2 }"
+      },
+      {
+        "revision": "2006-11-20 13:30",
+        "description": "Replaced sharedDisksStats table index with sDiskIndex to be consistent with the rest of the tables. All tables are indexed by the drive ID"
+      },
+      {
+        "revision": "2006-11-07 11:30",
+        "description": "Consolodated use of Presence datatype and changed 'chassis' to 'chassis'"
+      },
+      {
+        "revision": "2006-10-02 10:24",
+        "description": "Partitioned off and created as it's own module"
+      }
+    ],
+    "lastupdated": "200708161200Z",
+    "organization": "Intel Corporation",
+    "contactinfo": "Brian Kurle Intel Corporation JF5-2-C3 Tel: 503-712-5032 E-Mail: brianx.j.kurle@intel.com",
+    "description": "Shared Disks Module of the Multi-Flex Server"
+  },
+  "maxSharedDrives": {
+    "name": "maxSharedDrives",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.15",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Maximum number of Shared Drives possible in this chassis"
+  },
+  "numOfSharedDrives": {
+    "name": "numOfSharedDrives",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.25",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of Shared Drives in the system"
+  },
+  "sDrivePresenceMask": {
+    "name": "sDrivePresenceMask",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.35",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "ASCII representation of bit string reflecting the presence of the shared drives with the left most 'bit' being bit 1 and maxSharedDrives bits being represented. Thus, '11001111111111' would express that all the shared drives (of fourteen shared drives) are present with exception of drives 3 & 4"
+  },
+  "sharedDrives": {
+    "name": "sharedDrives",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "Container for Shared Drive specific information as well as all components logically contained within."
+  },
+  "driveBackplane": {
+    "name": "driveBackplane",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "IDROM information from the Drive Backplane"
+  },
+  "driveBackplaneVendor": {
+    "name": "driveBackplaneVendor",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Device manufacturer"
+  },
+  "driveBackplaneMfgDate": {
+    "name": "driveBackplaneMfgDate",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Manufacture date/time"
+  },
+  "driveBackplaneDeviceName": {
+    "name": "driveBackplaneDeviceName",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Device Name"
+  },
+  "driveBackplanePart": {
+    "name": "driveBackplanePart",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IdromBinary16",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Device Part Number"
+  },
+  "driveBackplaneSerialNo": {
+    "name": "driveBackplaneSerialNo",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IdromBinary16",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Device Serial Number"
+  },
+  "driveBackplaneMaximumPower": {
+    "name": "driveBackplaneMaximumPower",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Power",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Static maximum power generation / consumption (in watts): <0 - Negative numbers indicate device consumes power (in watts) >0 - Positive numbers indicate device generates power (in watts) 0 - Device is passive (does not not consume or generate power) -1 - Maximum power generation/consumption not known or specified"
+  },
+  "driveBackplaneNominalPower": {
+    "name": "driveBackplaneNominalPower",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Power",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Static Nominal power generation / consumption (in watts): <0 - Negative numbers indicate device consumes power (in watts) >0 - Positive numbers indicate device generates power (in watts) 0 - Device is passive (does not not consume or generate power) -1 - Nominal power generation/consumption not known or specified"
+  },
+  "driveBackplaneAssetTag": {
+    "name": "driveBackplaneAssetTag",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.1.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IdromBinary16",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Asset Tag # of device"
+  },
+  "sharedDriveTable": {
+    "name": "sharedDriveTable",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Each row describes a shared drive in the chassis"
+  },
+  "sharedDriveEntry": {
+    "name": "sharedDriveEntry",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveSlotNumber",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The parameters of a physical drive."
+  },
+  "sDriveSlotNumber": {
+    "name": "sDriveSlotNumber",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Index",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The slot number on the enclosure where the drive is located (drive ID)"
+  },
+  "sDrivePresence": {
+    "name": "sDrivePresence",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Presence",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "column used to flag the existence of a particular FRU"
+  },
+  "sDriveInterface": {
+    "name": "sDriveInterface",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Drive Interface of the physical drive."
+  },
+  "sDriveModelNumber": {
+    "name": "sDriveModelNumber",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Model Number of the physical drive."
+  },
+  "sDriveSerialNumber": {
+    "name": "sDriveSerialNumber",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Serial Number of the physical drive."
+  },
+  "sDriveFirmwareVersion": {
+    "name": "sDriveFirmwareVersion",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Firmware Version of the physical drive."
+  },
+  "sDriveProtocolVersion": {
+    "name": "sDriveProtocolVersion",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Protocol Version of the physical drive."
+  },
+  "sDriveOperationalStatus": {
+    "name": "sDriveOperationalStatus",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Operational Status of the physical drive."
+  },
+  "sDriveCondition": {
+    "name": "sDriveCondition",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The condition of the physical drive, e.g. PFA."
+  },
+  "sDriveOperation": {
+    "name": "sDriveOperation",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current operation on the physical drive, e.g. mediapatrolling, migrating."
+  },
+  "sDriveConfiguration": {
+    "name": "sDriveConfiguration",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The configuration on the physical drive, e.g. array %d seqno %d, or dedicated spare."
+  },
+  "sDriveStoragePoolID": {
+    "name": "sDriveStoragePoolID",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "notApplicable": -32,
+          "unknown": -16,
+          "unavailable": -1,
+          "notavailable": 256
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The drive array id, if the physical drive is part of a drive array; the spare id, if the drive is a spare."
+  },
+  "sDriveSequenceNumber": {
+    "name": "sDriveSequenceNumber",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "notApplicable": -32,
+          "unknown": -16,
+          "unavailable": -1
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The sequence number of the drive in the drive array. Valid only when the drive is part of a drive array."
+  },
+  "sDriveEnclosureID": {
+    "name": "sDriveEnclosureID",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INT32withException",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The id of the enclosure to which the drive is inserted."
+  },
+  "sDriveBlockSize": {
+    "name": "sDriveBlockSize",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INT32withException",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The Block Size in bytes of the physical drive."
+  },
+  "sDrivePhysicalCapacity": {
+    "name": "sDrivePhysicalCapacity",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The Physical Size in bytes of the physical drive."
+  },
+  "sDriveConfigurableCapacity": {
+    "name": "sDriveConfigurableCapacity",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " The Configurable Size in bytes of the physical drive."
+  },
+  "sDriveUsedCapacity": {
+    "name": "sDriveUsedCapacity",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Used Size in bytes of the physical drive."
+  },
+  "sDriveType": {
+    "name": "sDriveType",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.2.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "notApplicable": -32,
+          "unknown": -16,
+          "unavailable": -1,
+          "sata": 1,
+          "sas": 4
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The type of the physical drive. e.g. SATA or SAS"
+  },
+  "sharedDriveStatsTable": {
+    "name": "sharedDriveStatsTable",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of Physical Drive Statistics (augments sharedDriveTable)"
+  },
+  "sharedDriveStatsEntry": {
+    "name": "sharedDriveStatsEntry",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "sharedDriveStatsEntry",
+      "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+      "object": "sharedDriveEntry"
+    },
+    "status": "current",
+    "description": "The statistics of a physical drive since its last reset or statistics rest."
+  },
+  "sDriveStatsDataTransferred": {
+    "name": "sDriveStatsDataTransferred",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of bytes of data transfered to and from the controller."
+  },
+  "sDriveStatsReadDataTransferred": {
+    "name": "sDriveStatsReadDataTransferred",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of bytes of data transfered from the controller."
+  },
+  "sDriveStatsWriteDataTransferred": {
+    "name": "sDriveStatsWriteDataTransferred",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of bytes of data transfered to the controller."
+  },
+  "sDriveStatsNumOfErrors": {
+    "name": "sDriveStatsNumOfErrors",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of errors."
+  },
+  "sDriveStatsNumOfNonRWErrors": {
+    "name": "sDriveStatsNumOfNonRWErrors",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of non-RW errors."
+  },
+  "sDriveStatsNumOfReadErrors": {
+    "name": "sDriveStatsNumOfReadErrors",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of Read errors."
+  },
+  "sDriveStatsNumOfWriteErrors": {
+    "name": "sDriveStatsNumOfWriteErrors",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of Write errors."
+  },
+  "sDriveStatsNumOfIORequests": {
+    "name": "sDriveStatsNumOfIORequests",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of IO requests."
+  },
+  "sDriveStatsNumOfNonRWRequests": {
+    "name": "sDriveStatsNumOfNonRWRequests",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of non-RW requests."
+  },
+  "sDriveStatsNumOfReadRequests": {
+    "name": "sDriveStatsNumOfReadRequests",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of read requests."
+  },
+  "sDriveStatsNumOfWriteRequests": {
+    "name": "sDriveStatsNumOfWriteRequests",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of write requests."
+  },
+  "sDriveStatsStartTime": {
+    "name": "sDriveStatsStartTime",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time when the statistics date starts to accumulate since last statistics reset."
+  },
+  "sDriveStatsCollectionTime": {
+    "name": "sDriveStatsCollectionTime",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.10.205.3.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time when the statistics data was collected or updated last time."
+  },
+  "sDriveGroup": {
+    "name": "sDriveGroup",
+    "oid": "1.3.6.1.4.1.343.2.19.1.2.2.2.15",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "maxSharedDrives"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "numOfSharedDrives"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDrivePresenceMask"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "driveBackplaneVendor"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "driveBackplaneMfgDate"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "driveBackplaneDeviceName"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "driveBackplanePart"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "driveBackplaneSerialNo"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "driveBackplaneMaximumPower"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "driveBackplaneNominalPower"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "driveBackplaneAssetTag"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveSlotNumber"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDrivePresence"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveInterface"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveModelNumber"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveSerialNumber"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveFirmwareVersion"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveProtocolVersion"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveOperationalStatus"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveCondition"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveOperation"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveConfiguration"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStoragePoolID"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveSequenceNumber"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveEnclosureID"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveBlockSize"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDrivePhysicalCapacity"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveConfigurableCapacity"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveUsedCapacity"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveType"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsDataTransferred"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsReadDataTransferred"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsWriteDataTransferred"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsNumOfErrors"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsNumOfNonRWErrors"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsNumOfReadErrors"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsNumOfWriteErrors"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsNumOfIORequests"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsNumOfNonRWRequests"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsNumOfReadRequests"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsNumOfWriteRequests"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsStartTime"
+      },
+      {
+        "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+        "object": "sDriveStatsCollectionTime"
+      }
+    ],
+    "status": "current",
+    "description": "Description."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 20:05:35 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "INTELCORPORATION-MULTI-FLEX-SERVER-DRIVE-MIB"
+  }
+}

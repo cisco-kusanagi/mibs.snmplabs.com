@@ -1,0 +1,1437 @@
+{
+  "imports": {
+    "class": "imports",
+    "RMON-MIB": [
+      "OwnerString"
+    ],
+    "RMON2-MIB": [
+      "protocolDirEntry",
+      "protocolDirLocalIndex",
+      "DataSource"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Unsigned32",
+      "NOTIFICATION-TYPE",
+      "Counter64",
+      "OBJECT-IDENTITY",
+      "Counter32",
+      "iso",
+      "MODULE-IDENTITY",
+      "OBJECT-TYPE",
+      "MibIdentifier",
+      "Gauge32",
+      "enterprises",
+      "Integer32",
+      "TimeTicks",
+      "IpAddress",
+      "Bits"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TimeStamp",
+      "RowStatus",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "art": {
+    "name": "art",
+    "oid": "1.3.6.1.4.1.141.2.1.5",
+    "class": "moduleidentity",
+    "lastupdated": "9910050000Z",
+    "organization": "NetScout Systems, Inc.",
+    "contactinfo": "Albin Warth Postal: NetScout Systems, Inc. 4 Technology Park Drive Westford, MA 01886 Phone: +1 978 614 4306 Email: albin@netscout.com",
+    "description": "The MIB module for Application Response Time measurement."
+  },
+  "frontier": {
+    "name": "frontier",
+    "oid": "1.3.6.1.4.1.141",
+    "class": "objectidentity"
+  },
+  "mibdoc2": {
+    "name": "mibdoc2",
+    "oid": "1.3.6.1.4.1.141.2",
+    "class": "objectidentity"
+  },
+  "netscout2": {
+    "name": "netscout2",
+    "oid": "1.3.6.1.4.1.141.2.1",
+    "class": "objectidentity"
+  },
+  "protocolDir2Table": {
+    "name": "protocolDir2Table",
+    "oid": "1.3.6.1.4.1.141.2.1.5.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Contains the ART augmentations to RMON-2."
+  },
+  "protocolDir2Entry": {
+    "name": "protocolDir2Entry",
+    "oid": "1.3.6.1.4.1.141.2.1.5.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "protocolDir2Entry",
+      "module": "ART-MIB",
+      "object": "protocolDirEntry"
+    },
+    "status": "current",
+    "description": "Contains the ART augmentations to RMON-2."
+  },
+  "protocolDir2ArtConfig": {
+    "name": "protocolDir2ArtConfig",
+    "oid": "1.3.6.1.4.1.141.2.1.5.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "notSupported": 1,
+          "supportedOff": 2,
+          "supportedOn": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object describes and configures the probe's support for application response time monitoring for the protocol. When the probe creates entries in this table for all protocols that it understands, it will set the entry to notSupported(1) if it doesn't have the capability to track application response time for this protocol. If the value of this object is supportedOff(2), the probe supports tracking of application response time, but is configured to not track response time for any control entries or data sources. If the value of this object is supportedOn(3), the probe supports tracking of application response time for this protocol, and will allow creation of entries in the artControlTable for the associated protocol. Whenever this value changes from supportedOn(3) to supportedOff(2), the probe shall delete all related entries in the artTable and artSummaryTable."
+  },
+  "artControlTable": {
+    "name": "artControlTable",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the data sources (typically, probe interfaces) for which application response time collection is enabled, and additionally controls the generation of ART reports in the artTable and artSummaryTable."
+  },
+  "artControlEntry": {
+    "name": "artControlEntry",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ART-MIB",
+        "object": "artControlIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the artControlTable. Creation of a row enables ART collection and report generation for the corresponding data source. The artControlRspTime{1..6} objects are used to categorize the request-response pairs observed during an ART sample interval. The NMS is responsible to ensure that: artControlRspTime1 <= artControlRspTime2 artControlRspTime2 <= artControlRspTime3 artControlRspTime3 <= artControlRspTime4 artControlRspTime4 <= artControlRspTime5 artControlRspTime5 <= artControlRspTime6 and that: artControlRspTime6 <= artControlRspTimeout If these relationships do not hold, the probe rejects any attempt to set the artControlStatus object to active(1). Suggested default values for the time ranges are: artControlRspTime1 25 milliseconds artControlRspTime2 50 milliseconds artControlRspTime3 100 milliseconds artControlRspTime4 200 milliseconds artControlRspTime5 400 milliseconds artControlRspTime6 800 milliseconds The table is implicitly indexed by data source, using the DataSource identifier corresponding to the data source."
+  },
+  "artControlIndex": {
+    "name": "artControlIndex",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique index for this artControlEntry."
+  },
+  "artControlDataSource": {
+    "name": "artControlDataSource",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DataSource",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The source of data for application response-time collection, i.e., the data source (typically, a probe interface) for which ART statistics are to be collected and reports generated. This object shall not be modified if the associated artControlStatus is equal to active(1)."
+  },
+  "artControlTimeRemaining": {
+    "name": "artControlTimeRemaining",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 86400
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The number of seconds remaining in the current report interval. When this value reaches zero, the probe deletes any existing reports for the associated data source, creates a new report corresponding to the just-expired interval, copies the current value of artControlDuration to this object, and starts a new collection interval. The value of this object is latched in artControlDuration whenever it is written to using SNMP, allowing automatic restart of collection using the same duration. If this object is overwritten while the associated artStatus is equal to active(1), the current collection for the associated data source is abandoned, and a new collection started using the new interval. Setting this value to 0 abandons current collection and disables report generation for the associated data source. (This is not recommended -- better to delete the row.) The probe should delay the initial countdown of this object in order to align report intervals to 12:00 AM UTC."
+  },
+  "artControlDuration": {
+    "name": "artControlDuration",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 86400
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object is used to latch the value of artTimeRemaining for automatic collection restart at the end of a collection interval."
+  },
+  "artControlRspTime1": {
+    "name": "artControlRspTime1",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The first of six time values used to categorize the response times observed during the report interval. This object may not be changed while artControlStatus is set to active(1)."
+  },
+  "artControlRspTime2": {
+    "name": "artControlRspTime2",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The second of six time values used to categorize the response times observed during the report interval. This object may not be changed while artControlStatus is set to active(1)."
+  },
+  "artControlRspTime3": {
+    "name": "artControlRspTime3",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The third of six time values used to categorize the response times observed during the report interval. This object may not be changed while artControlStatus is set to active(1)."
+  },
+  "artControlRspTime4": {
+    "name": "artControlRspTime4",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The fourth of six time values used to categorize the response times observed during the report interval. This object may not be changed while artControlStatus is set to active(1)."
+  },
+  "artControlRspTime5": {
+    "name": "artControlRspTime5",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The fifth of six time values used to categorize the response times observed during the report interval. This object may not be changed while artControlStatus is set to active(1)."
+  },
+  "artControlRspTime6": {
+    "name": "artControlRspTime6",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The sixth of six time values used to categorize the response times observed during the report interval. This object may not be changed while artControlStatus is set to active(1)."
+  },
+  "artControlRspTimeout": {
+    "name": "artControlRspTimeout",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The maximum interval that the probe will wait for a server response to a client request. Requests older than this value are abandoned, and counted as artTimeouts in the artTable and as artSummaryTimeouts in the artSummaryTable. This object may not be changed while artControlStatus is set to active(1)."
+  },
+  "artControlRptStartTime": {
+    "name": "artControlRptStartTime",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time at which collection of the currently available reports was started."
+  },
+  "artControlRequestedSize": {
+    "name": "artControlRequestedSize",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": -1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The maximum number of report rows to be generated in the artTable for the associated data source. If set to -1, the maximum number of report rows shall be determined by the probe based on available resources."
+  },
+  "artControlGrantedSize": {
+    "name": "artControlGrantedSize",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum number of report rows in the artTable granted by the probe for the associated data source. The value of this object may be less than the requested size."
+  },
+  "artControlGeneratedRpts": {
+    "name": "artControlGeneratedRpts",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of report sets that have been generated by this entry. The NMS may use this value to poll for the availability of a new report set. It may also sample this value before and after a sweep of the artTable or artSummaryTable in order to verify that a new report set was not generated during the sweep."
+  },
+  "artControlDroppedFrames": {
+    "name": "artControlDroppedFrames",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of frames which were received by the probe and therefore not accounted for in the *StatsDropEvents, but for which the probe chose not to count for this entry for whatever reason. Most often, this event occurs when the probe is out of some resources and decides to shed load from this collection. This count does not include packets that were not counted because they had MAC-layer errors. Note that, unlike the dropEvents counter, this number is the exact number of frames dropped."
+  },
+  "artControlOwner": {
+    "name": "artControlOwner",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OwnerString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The entity that configured this entry and is therefore using the resources assigned to it."
+  },
+  "artControlStatus": {
+    "name": "artControlStatus",
+    "oid": "1.3.6.1.4.1.141.2.1.5.2.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this control table entry. An entry must not exist in the active state unless all objects in the entry have an appropriate value. If this object is not equal to active(1), all associated entries in the artTable and artSummaryTable shall be deleted."
+  },
+  "artTable": {
+    "name": "artTable",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table provides sets of application response time reports. Each row of the table corresponds to a report. Existing reports are deleted by the probe at the expiration of each sampling period, and replaced with new reports for the just-ended period. Generation of reports is controlled using the objects in the artControlTable. The maximum number of report rows in this table is the sum of each of the artControlGrantedSize object values in the artControlTable. Note that this table is shared by all data sources, although reports are generated independently for each data source."
+  },
+  "artEntry": {
+    "name": "artEntry",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ART-MIB",
+        "object": "artControlIndex",
+        "implied": 0
+      },
+      {
+        "module": "RMON2-MIB",
+        "object": "protocolDirLocalIndex",
+        "implied": 0
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artServerAddress",
+        "implied": 0
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artClientAddress",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the artTable. Each row corresponds to an application response time report for an individual {data source, application-protocol, client, server} quadruple. Rows are created and deleted by the probe, and all objects are read-only to the NMS. Rows are indexed (in effect) by data source, application protocol identifier, server address, and client address. Note that only the client and server address index components correspond to objects in the table."
+  },
+  "artServerAddress": {
+    "name": "artServerAddress",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The address of the server. This is identified as an octet string with specific semantics and length as identified by the protocolDirLocalIndex component of the index."
+  },
+  "artClientAddress": {
+    "name": "artClientAddress",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The address of the client. This is identified as an octet string with specific semantics and length as identified by the protocolDirLocalIndex component of the index."
+  },
+  "artAvgRspTime": {
+    "name": "artAvgRspTime",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The average response time, in milliseconds, observed during the report interval. Specification of milliseconds as the time units does not require the probe to maintain one-millisecond time granularity. Response time is measured as the number of milliseconds, as observed by the probe, between the final packet of an application-layer request PDU from client to server and the first packet of a response PDU from server client. This object is the arithmetical mean of the individual response times observed during the interval. Only server responses that the probe has successfully paired with client requests are included in the calculation. Additional semantics of 'response time' may depend on the application being monitored."
+  },
+  "artMinRspTime": {
+    "name": "artMinRspTime",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum response time, in milliseconds, observed during the report interval. This object is the minimum value of the individual response times observed during the interval. Only server responses that the probe has successfully paired with client requests are included in the calculation."
+  },
+  "artMaxRspTime": {
+    "name": "artMaxRspTime",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum response time, in milliseconds, observed during the report interval. This object is the maximum value of the individual response times observed during the interval. Only server responses that the probe has successfully paired with client requests are included in the calculation. The probe should use wait for for artControlRspTimeout milliseconds before abandoning the wait for a server response."
+  },
+  "artTotalResponses": {
+    "name": "artTotalResponses",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of client requests that have been successfully paired with a corresponding server response during the report interval. Requests that have been timed-out by the probe are not counted by this object."
+  },
+  "artRsps1": {
+    "name": "artRsps1",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The first of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required less than artRspTime1 milliseconds."
+  },
+  "artRsps2": {
+    "name": "artRsps2",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The second of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artRspTime1 milliseconds but less than artRspTime2 milliseconds."
+  },
+  "artRsps3": {
+    "name": "artRsps3",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The third of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artRspTime2 milliseconds but less than artRspTime3 milliseconds."
+  },
+  "artRsps4": {
+    "name": "artRsps4",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The fourth of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artRspTime3 milliseconds but less than artRspTime4 milliseconds."
+  },
+  "artRsps5": {
+    "name": "artRsps5",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The fifth of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artRspTime4 milliseconds but less than artRspTime5 milliseconds."
+  },
+  "artRsps6": {
+    "name": "artRsps6",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The sixth of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artRspTime5 milliseconds but less than artRspTime6 milliseconds."
+  },
+  "artRsps7": {
+    "name": "artRsps7",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The seventh of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artRspTime6"
+  },
+  "artClientOctets": {
+    "name": "artClientOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of octets observed in client requests during the report interval. If the application-layer PDU has been fragmented into multiple packets, all octets in each of the packets are included in this count."
+  },
+  "artClientOverflowOctets": {
+    "name": "artClientOverflowOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times the associated artClientOctets counter has overflowed."
+  },
+  "artClientHCOctets": {
+    "name": "artClientHCOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The high-capacity version of artClientOctets."
+  },
+  "artServerOctets": {
+    "name": "artServerOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of octets in server responses during the report interval. If the application-layer PDU has been fragmented into multiple packets, all octets in each of the packets are included in this count."
+  },
+  "artServerOverflowOctets": {
+    "name": "artServerOverflowOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times the associated artServerOctets counter has overflowed."
+  },
+  "artServerHCOctets": {
+    "name": "artServerHCOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The high-capacity version of artServerOctets."
+  },
+  "artRetries": {
+    "name": "artRetries",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This total number of application-layer client retries observed during the report interval."
+  },
+  "artTimeouts": {
+    "name": "artTimeouts",
+    "oid": "1.3.6.1.4.1.141.2.1.5.3.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times the probe has timed-out a client request while waiting for a server response during the report interval. Timeouts may occur due to server congestion or failure, network congestion or failure, or probe congestion."
+  },
+  "artSummaryTable": {
+    "name": "artSummaryTable",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table provides sets of application response time summary reports. Each row of the table corresponds to a report. Existing reports are deleted by the probe at the expiration of each sampling period, and replaced with new reports for the just-ended period. Generation of reports is controlled using the objects in the artControlTable. Note that this table is shared by all probe data sources, although reports are generated independently for each data source."
+  },
+  "artSummaryEntry": {
+    "name": "artSummaryEntry",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ART-MIB",
+        "object": "artControlIndex",
+        "implied": 0
+      },
+      {
+        "module": "RMON2-MIB",
+        "object": "protocolDirLocalIndex",
+        "implied": 0
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryServerAddress",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the artSummaryTable. Each row corresponds to an application response time report for an individual {data source, application-protocol, server} triple. Values in the each row correspond to the summary of response time information of all clients of the associated server, whereas the rows in the artTable contain detailed information for {data source, application- protocol, client, server} quadruples. Rows are created and deleted by the probe, and all objects are read-only to the NMS. Rows are indexed (in effect) by data source, application protocol identifier, and server address. Note that only the server address index component corresponds to an object in the table."
+  },
+  "artSummaryServerAddress": {
+    "name": "artSummaryServerAddress",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The address of the server. This is identified as an octet string with specific semantics and length as identified by the protocolDirLocalIndex component of the index."
+  },
+  "artSummaryClients": {
+    "name": "artSummaryClients",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of clients of this server for which requests were successfully paired with server responses during the report interval."
+  },
+  "artSummaryAvgRspTime": {
+    "name": "artSummaryAvgRspTime",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The average response time, in milliseconds, observed during the report interval. Specification of milliseconds as the time units does not require the probe to maintain one-millisecond time granularity. Response time is measured as the number of milliseconds, as observed by the probe, between the final packet of an application-layer request PDU from client to server and the first packet of a response PDU from server client. This object is the arithmetical mean of the individual response times observed during the interval. Only server responses that the probe has successfully paired with client requests are included in the calculation. Additional semantics of 'response time' may depend on the application being monitored."
+  },
+  "artSummaryMinRspTime": {
+    "name": "artSummaryMinRspTime",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The minimum response time, in milliseconds, observed during the report interval. This object is the minimum value of the individual response times observed during the interval. Only server responses that the probe has successfully paired with client requests are included in the calculation."
+  },
+  "artSummaryMaxRspTime": {
+    "name": "artSummaryMaxRspTime",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The maximum response time, in milliseconds, observed during the report interval. This object is the maximum value of the individual response times observed during the interval. Only server responses that the probe has successfully paired with client requests are included in the calculation. The probe should use a reasonable timeout period before abandoning the wait for a server response."
+  },
+  "artSummaryTotalResponses": {
+    "name": "artSummaryTotalResponses",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of client requests that have been successfully paired with a corresponding server response during the report interval. Requests that have been timed-out by the probe are not counted by this object."
+  },
+  "artSummaryRsps1": {
+    "name": "artSummaryRsps1",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The first of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required less than artControlRspTime1 milliseconds."
+  },
+  "artSummaryRsps2": {
+    "name": "artSummaryRsps2",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The second of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artControlRspTime1 milliseconds but less than artControlRspTime2 milliseconds."
+  },
+  "artSummaryRsps3": {
+    "name": "artSummaryRsps3",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The third of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artControlRspTime2 milliseconds but less than artControlRspTime3 milliseconds."
+  },
+  "artSummaryRsps4": {
+    "name": "artSummaryRsps4",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The fourth of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artControlRspTime3 milliseconds but less than artControlRspTime4 milliseconds."
+  },
+  "artSummaryRsps5": {
+    "name": "artSummaryRsps5",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The fifth of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artControlRspTime4 milliseconds but less than artControlRspTime5 milliseconds."
+  },
+  "artSummaryRsps6": {
+    "name": "artSummaryRsps6",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The sixth of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artControlRspTime5 milliseconds but less than artControlRspTime6 milliseconds."
+  },
+  "artSummaryRsps7": {
+    "name": "artSummaryRsps7",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The seventh of seven counters used to categorize the response times observed during the report interval. This object is a count of responses that required at least artControlRspTime6"
+  },
+  "artSummaryClientOctets": {
+    "name": "artSummaryClientOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of octets observed in client requests during the report interval. If the application-layer PDU has been fragmented into multiple packets, all octets in each of the packets are included in this count."
+  },
+  "artSummaryClientOverflowOctets": {
+    "name": "artSummaryClientOverflowOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times the associated artClientOctets counter has overflowed."
+  },
+  "artSummaryClientHCOctets": {
+    "name": "artSummaryClientHCOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The high-capacity version of artSummaryClientOctets."
+  },
+  "artSummaryServerOctets": {
+    "name": "artSummaryServerOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of octets in server responses during the report interval. If the application-layer PDU has been fragmented into multiple packets, all octets in each of the packets are included in this count."
+  },
+  "artSummaryServerOverflowOctets": {
+    "name": "artSummaryServerOverflowOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times the associated artSummaryServerOctets counter has overflowed."
+  },
+  "artSummaryServerHCOctets": {
+    "name": "artSummaryServerHCOctets",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The high-capacity version of artSummaryServerOctets."
+  },
+  "artSummaryRetries": {
+    "name": "artSummaryRetries",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This total number of application-layer client retries observed during the report interval."
+  },
+  "artSummaryTimeouts": {
+    "name": "artSummaryTimeouts",
+    "oid": "1.3.6.1.4.1.141.2.1.5.5.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times the probe has timed-out a client request while waiting for a server response during the report interval. Timeouts may occur due to server congestion or failure, network congestion or failure, or probe congestion."
+  },
+  "artConformance": {
+    "name": "artConformance",
+    "oid": "1.3.6.1.4.1.141.2.1.5.4",
+    "class": "objectidentity"
+  },
+  "artMIBCompliances": {
+    "name": "artMIBCompliances",
+    "oid": "1.3.6.1.4.1.141.2.1.5.4.1",
+    "class": "objectidentity"
+  },
+  "artMIBGroups": {
+    "name": "artMIBGroups",
+    "oid": "1.3.6.1.4.1.141.2.1.5.4.2",
+    "class": "objectidentity"
+  },
+  "artMIBCompliance": {
+    "name": "artMIBCompliance",
+    "oid": "1.3.6.1.4.1.141.2.1.5.4.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "artGroup",
+        "module": "ART-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "Describes the requirements for conformance to the ART MIB."
+  },
+  "artGroup": {
+    "name": "artGroup",
+    "oid": "1.3.6.1.4.1.141.2.1.5.4.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "ART-MIB",
+        "object": "protocolDir2ArtConfig"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlDataSource"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlTimeRemaining"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlDuration"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRspTime1"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRspTime2"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRspTime3"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRspTime4"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRspTime5"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRspTime6"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRspTimeout"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRptStartTime"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlRequestedSize"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlGrantedSize"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlGeneratedRpts"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlDroppedFrames"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlOwner"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artControlStatus"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artAvgRspTime"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artMinRspTime"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artMaxRspTime"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artTotalResponses"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artRsps1"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artRsps2"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artRsps3"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artRsps4"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artRsps5"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artRsps6"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artRsps7"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artClientOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artClientOverflowOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artClientHCOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artServerOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artServerOverflowOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artServerHCOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artRetries"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artTimeouts"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryClients"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryAvgRspTime"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryMinRspTime"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryMaxRspTime"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryTotalResponses"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryRsps1"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryRsps2"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryRsps3"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryRsps4"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryRsps5"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryRsps6"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryRsps7"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryClientOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryClientOverflowOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryClientHCOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryServerOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryServerOverflowOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryServerHCOctets"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryRetries"
+      },
+      {
+        "module": "ART-MIB",
+        "object": "artSummaryTimeouts"
+      }
+    ],
+    "status": "current",
+    "description": "This group adds application response time measurement to RMON-2."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/ART-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:25:40 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "ART-MIB"
+  }
+}

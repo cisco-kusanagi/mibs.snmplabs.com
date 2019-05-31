@@ -1,0 +1,1580 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddress",
+      "InetAddressType"
+    ],
+    "MPLS-TE-STD-MIB": [
+      "mplsTunnelInstance",
+      "mplsTunnelARHopListIndex",
+      "mplsTunnelIndex",
+      "mplsTunnelEgressLSRId",
+      "mplsTunnelAdminStatus",
+      "mplsTunnelOperStatus",
+      "mplsTunnelName",
+      "mplsTunnelIngressLSRId"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Integer32",
+      "MibIdentifier",
+      "OBJECT-TYPE",
+      "TimeTicks",
+      "Gauge32",
+      "MODULE-IDENTITY",
+      "Counter32",
+      "Counter64",
+      "Unsigned32",
+      "IpAddress",
+      "Bits",
+      "iso",
+      "NOTIFICATION-TYPE",
+      "OBJECT-IDENTITY"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "cmplsTeStdExtMIB": {
+    "name": "cmplsTeStdExtMIB",
+    "oid": "1.3.6.1.4.1.9.9.738",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2016-08-05 00:00",
+        "description": "Added a new table cmplsTunnelLoadshareTable. Added a new scalar object cmplsTeLoadshareBalance. Added new values to cmplsTunnelReoptReason. Added a new object cmplsTeFailReasonRev which deprecates cmplsTeFailReason. Updated cmplsTeFailReason description and MIN-ACCESS in complaince. Added new value frrSoftPreemption to cmplsTunnelPreemptionType. Deprecated the complaince cmplsTeStdExtMIBComplianceRev3 and group cmplsTeStdExtMIBFailTeTrapObjectsGroup. Added new complaince cmplsTeStdExtMIBComplianceRev4 and groups cmplsTeStdExtMIBFailTeTrapObjectsGroupRev1 and cmplsTeStdExtMIBLoadShareObjectsGroup."
+      },
+      {
+        "revision": "2012-02-22 00:00",
+        "description": "Add preferredTreeExists to cmplsTunnelReooptReason"
+      },
+      {
+        "revision": "2011-10-04 00:00",
+        "description": "Added cmplsTeBringupFail trap"
+      },
+      {
+        "revision": "2011-01-07 00:00",
+        "description": "Added softPreemption to the enum cmplsTunnelReoptReason."
+      },
+      {
+        "revision": "2010-10-20 00:00",
+        "description": "added cmplsTunnelReRoutePendingClearReason to be sent along the notification cmplsTunnelReRoutePendingClear"
+      },
+      {
+        "revision": "2010-09-23 00:00",
+        "description": "New traps and related objects definitions."
+      },
+      {
+        "revision": "2010-05-27 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "201608050000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-snmp@cisco.com",
+    "description": "This MIB module contains Cisco specific managed object definitions for MPLS Traffic Engineering (TE), not contained in MPLS-TE-STD-MIB. The auto bandwidth feature enables MPLS TE Tunnels to adapt automatically their bandwidth to their actual load."
+  },
+  "CmplsTeTunnelDiag": {
+    "name": "CmplsTeTunnelDiag",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknonw": 1,
+          "bfdSessionBringupTimeout": 2
+        }
+      }
+    },
+    "status": "current",
+    "description": "A common TE diagnostic code - unknown: failure reason unknown - bfdSessionBringupTimeout: BFD session failed to come up before timeout"
+  },
+  "CmplsTunnelBWPercent": {
+    "name": "CmplsTunnelBWPercent",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 100
+          }
+        ]
+      }
+    },
+    "displayhint": "d",
+    "status": "current",
+    "description": "A fraction of the bandwidth expressed in percentage."
+  },
+  "cmplsTeStdExtMIBNotifs": {
+    "name": "cmplsTeStdExtMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.738.0",
+    "class": "objectidentity"
+  },
+  "cmplsTeStdExtMIBObjects": {
+    "name": "cmplsTeStdExtMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.738.1",
+    "class": "objectidentity"
+  },
+  "cmplsTeStdExtMIBConform": {
+    "name": "cmplsTeStdExtMIBConform",
+    "oid": "1.3.6.1.4.1.9.9.738.2",
+    "class": "objectidentity"
+  },
+  "cmplsTunnelAutoBWTable": {
+    "name": "cmplsTunnelAutoBWTable",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is used in order to manage auto bandwidth data. This table is sparse dependent on the mplsTunnelTable. An entry in this table exists for each mplsTunnelEntry with a mplsTunnelRole of 'head' or 'headTail'. Each row contains auto-bandwidth data for the tunnel identified by the indexes defined later. An entry is created as soon as a 'head' or 'headTail' MPLS TE tunnel is configured in the system."
+  },
+  "cmplsTunnelAutoBWEntry": {
+    "name": "cmplsTunnelAutoBWEntry",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelIndex",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelInstance",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelIngressLSRId",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelEgressLSRId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in cmplsTunnelAutoBWTable. There is an entry in this table for each MPLS-TE tunnel with mplsTunnelRole equals to 'head' or 'headTail'."
+  },
+  "cmplsTunnelAutoBWStatus": {
+    "name": "cmplsTunnelAutoBWStatus",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "autoBWDisabled": 1,
+          "autoBWEnabled": 2,
+          "autoBWCollectOnlyMode": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "autoBWDisabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the operational status [or mode] of the auto bandwidth algorithm: - autoBWDisabled: The auto-bandwidth algorithm is not running; - autoBWEnabled: The auto-bandwidth algorithm is running; - autoBWCollectOnlyMode: The auto-bandwidth algorithm is running, but the bandwidth applications are disabled;"
+  },
+  "cmplsTunnelAutoBWMin": {
+    "name": "cmplsTunnelAutoBWMin",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kbps",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the minimum bandwidth that the auto-bandwidth algorithm can apply to a tunnel when the adjustment threshold is overcome. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWMax": {
+    "name": "cmplsTunnelAutoBWMax",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 100,
+        "format": "decimal"
+      }
+    },
+    "units": "kbps",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the maximum bandwidth that the auto-bandwidth algorithm can apply to a tunnel when the adjustment threshold is overcome. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWAdjThreshPercs": {
+    "name": "cmplsTunnelAutoBWAdjThreshPercs",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CmplsTunnelBWPercent",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 10,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the adjustment threshold percentage that needs to be overcome in order to trigger a new bandwidth application. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWAdjThreshBW": {
+    "name": "cmplsTunnelAutoBWAdjThreshBW",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 10,
+        "format": "decimal"
+      }
+    },
+    "units": "kbps",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the adjustment threshold bandwidth that needs to be overcome in order to trigger a new bandwidth application. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWOverflowThreshPercs": {
+    "name": "cmplsTunnelAutoBWOverflowThreshPercs",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CmplsTunnelBWPercent",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 10,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the adjustment threshold percentage that needs to be overcome in order to trigger an overflow occurrence. If the application period has not completed when a cmplsTunnelAutoBWOverflowLimit overflow has occurred, a new bandwidth will be applied. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWOverflowThreshBW": {
+    "name": "cmplsTunnelAutoBWOverflowThreshBW",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 10,
+        "format": "decimal"
+      }
+    },
+    "units": "kbps",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the adjustment threshold bandwidth that needs to be overcome in order to trigger an overflow occurrence. If the application period has not completed when a cmplsTunnelAutoBWOverflowLimit overflow has occurred, a new bandwidth will be applied. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWOverflowLimit": {
+    "name": "cmplsTunnelAutoBWOverflowLimit",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the number of consecutive collections exceeding overflow threshold. If the application period has not completed when a cmplsTunnelAutoBWOverflowLimit overflow has occurred, a new bandwidth will be applied. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWUnderflowThreshPercs": {
+    "name": "cmplsTunnelAutoBWUnderflowThreshPercs",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CmplsTunnelBWPercent",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 10,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the adjustment threshold percentage that needs to be overcome in order to trigger an underflow occurrence. If the application period has not completed when a cmplsTunnelAutoBWUnderflowLimit underflow has occurred, a new bandwidth will be applied. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWUnderflowThreshBW": {
+    "name": "cmplsTunnelAutoBWUnderflowThreshBW",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "units": "kbps",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the adjustment threshold bandwidth that needs to be overcome in order to trigger an underflow occurrence. If the application period has not completed when a cmplsTunnelAutoBWUnderflowLimit underflow has occurred, a new bandwidth will be applied. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWUnderflowLimit": {
+    "name": "cmplsTunnelAutoBWUnderflowLimit",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the number of consecutive collections under the underflow threshold. If the application period has not completed when a cmplsTunnelAutoBWUnderflowLimit underflow has occurred, a new bandwidth will be applied. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWApplicationFrequency": {
+    "name": "cmplsTunnelAutoBWApplicationFrequency",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 300,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the bandwidth application period. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWCollectionFrequency": {
+    "name": "cmplsTunnelAutoBWCollectionFrequency",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 300,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the sampling period for data rates. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWLastAppliedBW": {
+    "name": "cmplsTunnelAutoBWLastAppliedBW",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kbps",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the last bandwidth applied by the auto-bandwidth algorithm. It will be set to zero if no bandwidth has been applied yet. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWApplications": {
+    "name": "cmplsTunnelAutoBWApplications",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of auto bandwidths applied. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWLastApplicationTrigger": {
+    "name": "cmplsTunnelAutoBWLastApplicationTrigger",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "applicationNone": 1,
+          "applicationPeriodic": 2,
+          "applicationManual": 3,
+          "applicationOverflow": 4,
+          "applicationUnderflow": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the trigger reason for the last bandwidth application. If mplsTunnelInstance is zero this object will be set to 'applicationNone'. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWOverflowApplications": {
+    "name": "cmplsTunnelAutoBWOverflowApplications",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of bandwidth applications due to overflow occurrences. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWOverflowOccurrences": {
+    "name": "cmplsTunnelAutoBWOverflowOccurrences",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of overflow occurrences since last application period. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWUnderflowApplications": {
+    "name": "cmplsTunnelAutoBWUnderflowApplications",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of bandwidth applications due to underflow occurrences. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWUnderflowOccurrences": {
+    "name": "cmplsTunnelAutoBWUnderflowOccurrences",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of underflow occurrences since last application period. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWUnderflowHighestBW": {
+    "name": "cmplsTunnelAutoBWUnderflowHighestBW",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "kbps",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the highest sample collected during an underflow sequence. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWRequested": {
+    "name": "cmplsTunnelAutoBWRequested",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.22",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kpbs",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the bandwidth requested by the auto-bandwidth algorithm. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWSignaled": {
+    "name": "cmplsTunnelAutoBWSignaled",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.23",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kpbs",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the bandwidth signaled by the auto-bandwidth algorithm. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWCollectOnlyRequested": {
+    "name": "cmplsTunnelAutoBWCollectOnlyRequested",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.24",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kpbs",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the bandwidth that would have been requested by the auto-bandwidth algorithm if the auto-bandwidth functionality was enabled. If the collect only mode is enabled, the bandwidth change request will not be executed. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWHighest": {
+    "name": "cmplsTunnelAutoBWHighest",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.25",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kpbs",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the highest bandwidth sampled by the auto-bandwidth algorithm. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWCollectedSamples": {
+    "name": "cmplsTunnelAutoBWCollectedSamples",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.26",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the samples collected since the last auto-bandwidth application. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWJitter": {
+    "name": "cmplsTunnelAutoBWJitter",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.27",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the auto-bandwidth application jitter. Jitter is the extra time to be added to the application interval the first time the auto bandwidth is applied. If mplsTunnelInstance is zero this object will be set to zero. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTunnelAutoBWAppRejectReason": {
+    "name": "cmplsTunnelAutoBWAppRejectReason",
+    "oid": "1.3.6.1.4.1.9.9.738.1.1.1.28",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "applicationAllowed": 1,
+          "autoBWDisabled": 2,
+          "tunnelIsDown": 3,
+          "tunnelIsFRR": 4,
+          "tunnelIsBackup": 5,
+          "tunnelIsLockDown": 6
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the reason for the bandwidth application rejection. This object value is not aplicable if cmplsTunnelAutoBWStatus is 'autoBWDisabled'."
+  },
+  "cmplsTeTunnelReasonTable": {
+    "name": "cmplsTeTunnelReasonTable",
+    "oid": "1.3.6.1.4.1.9.9.738.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is used in order to indicate the causes for the notifications."
+  },
+  "cmplsTeTunnelReasonEntry": {
+    "name": "cmplsTeTunnelReasonEntry",
+    "oid": "1.3.6.1.4.1.9.9.738.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelIndex",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelInstance",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelIngressLSRId",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelEgressLSRId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in cmplsTunnelReasonTable."
+  },
+  "cmplsTunnelReoptReason": {
+    "name": "cmplsTunnelReoptReason",
+    "oid": "1.3.6.1.4.1.9.9.738.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "periodicTimerExpiry": 2,
+          "bandwidthCLIChange": 3,
+          "bandwidthOverflow": 4,
+          "bandwidthUnderflow": 5,
+          "bandwidthAdjustment": 6,
+          "fastReRoute": 7,
+          "cliRequest": 8,
+          "metricTypeChange": 9,
+          "preferredPathExists": 10,
+          "poSwitchoverTrigger": 11,
+          "bandwidthChange": 12,
+          "autoBandwidth": 13,
+          "remergeError": 14,
+          "dueToMaximumMetric": 15,
+          "pathProtectionSwitchover": 16,
+          "iEPEnableReoptimization": 17,
+          "affinityPathVerificationFail": 18,
+          "softPreemption": 19,
+          "preferredTreeExists": 20,
+          "costLimitPathVerificationFail": 21,
+          "linkupReopt": 22,
+          "iEPChange": 23,
+          "poChange": 24,
+          "destChange": 25,
+          "bfdSessionTypeChange": 26
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "unknown",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object indicates the reason of the tunnel reoptimization: - unknown: the reason is not known - periodicTimerExpiry: Periodic Reoptimization - bandwidthCLIChange: the tunnel bandwidth has been changed from CLI - bandwidthOverflow: an auto-bandwidth overflow occurred - bandwidthUnderflow: an auto-bandwidth underflow occured - bandwidthAdjustment: an auto-bandwidth application occured - fastReRoute: a fast re-route occured - cliRequest: User-triggerred - metricTypeChange: tunnel metric type has been changed from CLI - preferredPathExists: preferred-path-exists message received from a downstream node - poSwitchoverTrigger: User-requested path-option switchover - bandwidthChange: bandwidth change - autoBandwidth: Auto Bandwidth - remergeError: Remerge Error - dueToMaximumMetric: Reoptimization due to receiving an LSA with MAX metric - pathProtectionSwitchover: Path Protection Switchover - iEPEnableReoptimization: IEP Enable Reoptimization - affinityPathVerificationFail: Affinity path verification failure - softPreemption: soft preemption (see RFC 5712) - preferredTreeExists: preferred-tree-exists message received from a downstream node - costLimitPathVerificationFail: Cost Limit path verification failure - linkupReopt: link state up - iEPChangeReoptimization: inuse explicit-path change - poChangeReoptimization: inuse path-option change - bfdSessionTypeChange: a bfd session type change occured This object is intended to be included in the trap mplsTunnelReoptimized defined in MPLS-TE-STD-MIB."
+  },
+  "cmplsTunnelInsuffBWFailedOperation": {
+    "name": "cmplsTunnelInsuffBWFailedOperation",
+    "oid": "1.3.6.1.4.1.9.9.738.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "failedToSetup": 2,
+          "failedToReoptimize": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "unknown",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object indicates whether the tunnel could not be setup or reoptimized because of insufficient bandwidth: - unknown: the reason is not known - failedToSetup: insufficient bandwidth during initial setup - failedToReoptimize: insufficient bandwidth during reoptimization"
+  },
+  "cmplsTunnelPreemptionType": {
+    "name": "cmplsTunnelPreemptionType",
+    "oid": "1.3.6.1.4.1.9.9.738.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "hardPreemption": 2,
+          "softPreemption": 3,
+          "frrSoftPreemption": 4
+        }
+      }
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object indicates LSP Preemption type of this LSP: - unknown: the type is not known - hardPreemption: the preempted LSP resources are freed immediately; the LSP is broken immediately and the traffic is disrupted. - softPreemption: the resources release pending on the reoptimization of this LSP. The head of the LSP reroutes the traffic before the LSP is broken. - frrSoftPreemption: similar to softPreemption. In this case the traffic of the soft preempted LSP is switched to the backup. See: Farrel, A., Interim Report on MPLS Pre-emption, draft-farrel-mpls-preemption-interim-00.txt, work in progress"
+  },
+  "cmplsTunnelPreemptionLinkAddrType": {
+    "name": "cmplsTunnelPreemptionLinkAddrType",
+    "oid": "1.3.6.1.4.1.9.9.738.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object indicates the address type of the link where the preemption occurs - another, higher priority LSP is being admitted on this link and there is not enough bandwidth for it causing this LSP to be preempted (removed) from this link: - unknown: the object cmplsTunnelPreemptionLinkAddr does not contain any address - ipv4: the object cmplsTunnelPreemptionLinkAddr contains the IPv4 address - ipv6: the object cmplsTunnelPreemptionLinkAddr contains the IPv6 address"
+  },
+  "cmplsTunnelPreemptionLinkAddr": {
+    "name": "cmplsTunnelPreemptionLinkAddr",
+    "oid": "1.3.6.1.4.1.9.9.738.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object indicates the address of the link where the preemption occurs - another, higher priority LSP is being admitted on this link and there is not enough bandwidth for it causing this LSP to be preempted (removed) from this link."
+  },
+  "cmplsTunnelReRoutePendingClearReason": {
+    "name": "cmplsTunnelReRoutePendingClearReason",
+    "oid": "1.3.6.1.4.1.9.9.738.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "reoptimized": 2,
+          "reinstated": 3
+        }
+      }
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object indicates the reason why the tunnel is not longer in the reroute pending state: - unknown: the reason is unknown - reoptimized: the tunnel has been reoptimized - reinstated: the tunnel has been reinstated"
+  },
+  "cmplsTeTunnelFailReasonTable": {
+    "name": "cmplsTeTunnelFailReasonTable",
+    "oid": "1.3.6.1.4.1.9.9.738.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is used in order to indicate the causes for the MPLS TE tunnel failure notifications."
+  },
+  "cmplsTeTunnelFailReasonEntry": {
+    "name": "cmplsTeTunnelFailReasonEntry",
+    "oid": "1.3.6.1.4.1.9.9.738.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelIndex",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelInstance",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelIngressLSRId",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelEgressLSRId",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelARHopListIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in the cmplsTeTunnelFailReasonTable."
+  },
+  "cmplsTeFailReasonType": {
+    "name": "cmplsTeFailReasonType",
+    "oid": "1.3.6.1.4.1.9.9.738.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "bfd": 2,
+          "generalTe": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the type (category) of fail reason."
+  },
+  "cmplsTeFailReason": {
+    "name": "cmplsTeFailReason",
+    "oid": "1.3.6.1.4.1.9.9.738.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "This object indicates specific fail reason value based on the fail reason type indicated by cmplsTeFailReasonType. Fail Reason Type Fail Reason Value Type ---------------- ----------------------- bfd(2) CiscoBfdDiag generalTe(3) CmplsTeTunnelDiag This object is replaced by cmplsTeFailReasonRev"
+  },
+  "cmplsTeFailReasonRev": {
+    "name": "cmplsTeFailReasonRev",
+    "oid": "1.3.6.1.4.1.9.9.738.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noDiagnostic": 0,
+          "controlDetectionTimeExpired": 1,
+          "echoFunctionFailed": 2,
+          "neighborSignaledSessionDown": 3,
+          "forwardingPlaneReset": 4,
+          "pathDown": 5,
+          "concatenatedPathDown": 6,
+          "administrativelyDown": 7,
+          "reverseConcatenatedPathDown": 8,
+          "unknown": 9,
+          "bfdSessionBringupTimeout": 21
+        }
+      }
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object provieds more deails on fail reason. cmplsTeFailReason values for reasonType bfd(2) mirror the CiscoBfdDiag values: - noDiagnostic No bfd diagnostic info - controlDetectionTimeExpired Control Detection Timer Expired - echoFunctionFailed Echo Function Failed - neighborSignaledSessionDown Neighbor Signaled Session Down - forwardingPlaneReset Forwarding Plane Reset - pathDown Path Down - concatenatedPathDown Concatenated Path Down - administrativelyDown Administratively Down - reverseConcatenatedPathDown Reverse Concatenated Path Down - unknown Unknown error code cmplsTeFailReason values for reasonType generalTe(3) mirror the CmplsTeTunnelDiag values: - unknown Unknown error code - bfdSessionBringupTimeout bfd session failed to come up before timeout"
+  },
+  "cmplsTunnelLoadshareTable": {
+    "name": "cmplsTunnelLoadshareTable",
+    "oid": "1.3.6.1.4.1.9.9.738.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is used in order to manage load data."
+  },
+  "cmplsTunnelLoadshareEntry": {
+    "name": "cmplsTunnelLoadshareEntry",
+    "oid": "1.3.6.1.4.1.9.9.738.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelIndex",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelInstance",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelIngressLSRId",
+        "implied": 0
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelEgressLSRId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A conceptual row in cmplsTunnelLoadshareTable. There is an entry in this table for each MPLS-TE tunnel."
+  },
+  "cmplsTunnelLoadShare": {
+    "name": "cmplsTunnelLoadShare",
+    "oid": "1.3.6.1.4.1.9.9.738.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object indicates the Load-share as defined by the bandwidth attribute (default) or explicitly configured using the load-share command under tunnel configuration."
+  },
+  "cmplsTeStdExtMIBObjectsGlobal": {
+    "name": "cmplsTeStdExtMIBObjectsGlobal",
+    "oid": "1.3.6.1.4.1.9.9.738.1.5",
+    "class": "objectidentity"
+  },
+  "cmplsTeLoadshareBalance": {
+    "name": "cmplsTeLoadshareBalance",
+    "oid": "1.3.6.1.4.1.9.9.738.1.5.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "equal": 0,
+          "unequal": 1
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "equal",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object indicates if the load-share balance is equal or unequal."
+  },
+  "cmplsTunnelPreempt": {
+    "name": "cmplsTunnelPreempt",
+    "oid": "1.3.6.1.4.1.9.9.738.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelAdminStatus"
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelOperStatus"
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelName"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionType"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionLinkAddrType"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionLinkAddr"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is generated when a MPLS TE tunnel is preempted."
+  },
+  "cmplsTunnelInsuffBW": {
+    "name": "cmplsTunnelInsuffBW",
+    "oid": "1.3.6.1.4.1.9.9.738.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelAdminStatus"
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelOperStatus"
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelName"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelInsuffBWFailedOperation"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is generated when a MPLS TE tunnel could not be setup or reoptimized."
+  },
+  "cmplsTunnelReRoutePending": {
+    "name": "cmplsTunnelReRoutePending",
+    "oid": "1.3.6.1.4.1.9.9.738.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelAdminStatus"
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelOperStatus"
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelName"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is generated when re-route is required for the tunnel."
+  },
+  "cmplsTunnelReRoutePendingClear": {
+    "name": "cmplsTunnelReRoutePendingClear",
+    "oid": "1.3.6.1.4.1.9.9.738.0.4",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelAdminStatus"
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelOperStatus"
+      },
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelName"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelReRoutePendingClearReason"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is generated when tunnel no longer needs to be re-routed."
+  },
+  "cmplsTunnelBringupFail": {
+    "name": "cmplsTunnelBringupFail",
+    "oid": "1.3.6.1.4.1.9.9.738.0.5",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "MPLS-TE-STD-MIB",
+        "object": "mplsTunnelName"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTeFailReasonType"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is generated when MPLS TE tunnel failed to come up"
+  },
+  "cmplsTeStdExtMIBCompliances": {
+    "name": "cmplsTeStdExtMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.738.2.1",
+    "class": "objectidentity"
+  },
+  "cmplsTeStdExtMIBGroups": {
+    "name": "cmplsTeStdExtMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2",
+    "class": "objectidentity"
+  },
+  "cmplsTeStdExtMIBCompliance": {
+    "name": "cmplsTeStdExtMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.738.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cmplsTeStdExtMIBAutoBWOptionalGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBAutoBWObjectGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "This is the main compliance statement for the MIB."
+  },
+  "cmplsTeStdExtMIBCompliancesRev1": {
+    "name": "cmplsTeStdExtMIBCompliancesRev1",
+    "oid": "1.3.6.1.4.1.9.9.738.2.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cmplsTeStdExtMIBAutoBWOptionalGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBAutoBWObjectGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBTrapGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBTrapObjectsGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "This is the main compliance statement for the MIB. Adding the extended traps."
+  },
+  "cmplsTeStdExtMIBComplianceRev2": {
+    "name": "cmplsTeStdExtMIBComplianceRev2",
+    "oid": "1.3.6.1.4.1.9.9.738.2.1.3",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cmplsTeStdExtMIBAutoBWOptionalGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBAutoBWObjectGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBTrapGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBTrapObjectsGroupRev1",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "This is the main compliance statement for the MIB"
+  },
+  "cmplsTeStdExtMIBComplianceRev3": {
+    "name": "cmplsTeStdExtMIBComplianceRev3",
+    "oid": "1.3.6.1.4.1.9.9.738.2.1.4",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cmplsTeStdExtMIBAutoBWOptionalGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBAutoBWObjectGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBTrapGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBTrapObjectsGroupRev1",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBFailTeTrapGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBFailTeTrapObjectsGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "This is the main compliance statement for the MIB"
+  },
+  "cmplsTeStdExtMIBComplianceRev4": {
+    "name": "cmplsTeStdExtMIBComplianceRev4",
+    "oid": "1.3.6.1.4.1.9.9.738.2.1.5",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cmplsTeStdExtMIBAutoBWOptionalGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBAutoBWObjectGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBTrapGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBTrapObjectsGroupRev1",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBFailTeTrapGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBFailTeTrapObjectsGroupRev1",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      },
+      {
+        "object": "cmplsTeStdExtMIBLoadShareObjectsGroup",
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "This is the main compliance statement for the MIB"
+  },
+  "cmplsTeStdExtMIBAutoBWObjectGroup": {
+    "name": "cmplsTeStdExtMIBAutoBWObjectGroup",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWStatus"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWMin"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWMax"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWAdjThreshPercs"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWAdjThreshBW"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWApplicationFrequency"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWCollectionFrequency"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWLastAppliedBW"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWApplications"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWLastApplicationTrigger"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWOverflowApplications"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWOverflowOccurrences"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWUnderflowApplications"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWUnderflowOccurrences"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWUnderflowHighestBW"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWRequested"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWSignaled"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWCollectOnlyRequested"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWHighest"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWCollectedSamples"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWAppRejectReason"
+      }
+    ],
+    "status": "current",
+    "description": "This contains the main MPLS TE extensions groups."
+  },
+  "cmplsTeStdExtMIBAutoBWOptionalGroup": {
+    "name": "cmplsTeStdExtMIBAutoBWOptionalGroup",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWOverflowThreshPercs"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWOverflowThreshBW"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWOverflowLimit"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWUnderflowThreshPercs"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWUnderflowThreshBW"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWUnderflowLimit"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelAutoBWJitter"
+      }
+    ],
+    "status": "current",
+    "description": "This contains the optional MPLS TE extensions groups."
+  },
+  "cmplsTeStdExtMIBTrapObjectsGroup": {
+    "name": "cmplsTeStdExtMIBTrapObjectsGroup",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelReoptReason"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelInsuffBWFailedOperation"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionType"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionLinkAddrType"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionLinkAddr"
+      }
+    ],
+    "status": "deprecated",
+    "description": "This contains the MPLS TE extended traps objects. This object is replaced by cmplsTeStdExtMIBTrapObjectsGroupRev1"
+  },
+  "cmplsTeStdExtMIBTrapObjectsGroupRev1": {
+    "name": "cmplsTeStdExtMIBTrapObjectsGroupRev1",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelReoptReason"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelInsuffBWFailedOperation"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionType"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionLinkAddrType"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreemptionLinkAddr"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelReRoutePendingClearReason"
+      }
+    ],
+    "status": "current",
+    "description": "This contains the optional MPLS TE extensions groups."
+  },
+  "cmplsTeStdExtMIBTrapGroup": {
+    "name": "cmplsTeStdExtMIBTrapGroup",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.5",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelPreempt"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelInsuffBW"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelReRoutePending"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelReRoutePendingClear"
+      }
+    ],
+    "status": "current",
+    "description": "This contains the MPLS TE extended traps."
+  },
+  "cmplsTeStdExtMIBFailTeTrapGroup": {
+    "name": "cmplsTeStdExtMIBFailTeTrapGroup",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.6",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelBringupFail"
+      }
+    ],
+    "status": "current",
+    "description": "This contains the MPLS TE extended traps related to BFD over TE LSP."
+  },
+  "cmplsTeStdExtMIBFailTeTrapObjectsGroup": {
+    "name": "cmplsTeStdExtMIBFailTeTrapObjectsGroup",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTeFailReasonType"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTeFailReason"
+      }
+    ],
+    "status": "deprecated",
+    "description": "This contains the MPLS TE extended traps objects related to BFD over TE LSP. This object is replaced by cmplsTeStdExtMIBFailTeTrapObjectsGroupRev1"
+  },
+  "cmplsTeStdExtMIBLoadShareObjectsGroup": {
+    "name": "cmplsTeStdExtMIBLoadShareObjectsGroup",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.8",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTunnelLoadShare"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTeLoadshareBalance"
+      }
+    ],
+    "status": "current",
+    "description": "This contains the MPLS TE extended objects related to TE loadshare."
+  },
+  "cmplsTeStdExtMIBFailTeTrapObjectsGroupRev1": {
+    "name": "cmplsTeStdExtMIBFailTeTrapObjectsGroupRev1",
+    "oid": "1.3.6.1.4.1.9.9.738.2.2.9",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTeFailReasonType"
+      },
+      {
+        "module": "CISCO-MPLS-TE-STD-EXT-MIB",
+        "object": "cmplsTeFailReasonRev"
+      }
+    ],
+    "status": "current",
+    "description": "This contains the MPLS TE extended traps objects related to BFD over TE LSP."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-MPLS-TE-STD-EXT-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:12:06 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-MPLS-TE-STD-EXT-MIB"
+  }
+}

@@ -1,0 +1,814 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "IF-MIB": [
+      "InterfaceIndexOrZero"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddress",
+      "InetAddressType",
+      "InetPortNumber"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Integer32",
+      "Bits",
+      "Unsigned32",
+      "Counter32",
+      "OBJECT-IDENTITY",
+      "Counter64",
+      "MibIdentifier",
+      "iso",
+      "IpAddress",
+      "Gauge32",
+      "MODULE-IDENTITY",
+      "OBJECT-TYPE",
+      "NOTIFICATION-TYPE",
+      "TimeTicks"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "DateAndTime",
+      "TruthValue",
+      "DisplayString",
+      "RowStatus"
+    ]
+  },
+  "ciscoCableMeteringMIB": {
+    "name": "ciscoCableMeteringMIB",
+    "oid": "1.3.6.1.4.1.9.9.424",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2009-10-13 00:00",
+        "description": "Added a new enum type ipdr to ccmtrCollectionType."
+      },
+      {
+        "revision": "2009-05-18 00:00",
+        "description": "Deprecated ccmtrCollectionInterval. Deprecated ciscoCableMeteringCompliance and added ciscoCableMeteringComplianceRev1 to replace it. Deprecated ccmtrMeteringObjGroup. Added the following new objects: ccmtrCollectionSrcIfIndex ccmtrCollectionRevInterval ccmtrCollectionDataPerSession ccmtrCollectionDataTimer Added the following new OBJECT-GROUP: ccmtrMeteringObjGroupRev1 ccmtrMeteringSrcIntfObjGroup ccmtrMeteringRateCtrlObjGroup"
+      },
+      {
+        "revision": "2004-03-30 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200910130000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: Cisco Systems 170 West Tasman Drive San Jose, CA 95134 U.S.A. Phone: +1 800 553-NETS E-mail: cs-ubr@cisco.com",
+    "description": "This is the MIB module for Usage Based Metering for the DOCSIS-compliant Cable Modem Termination Systems (CMTS). Usage Based Metering is a software feature provided in the CMTS so that cable operators can perform subscriber account management and metering in a uniform and consistent manner. It involves the implementation of Subscriber Account Management Interface Specification (SAMIS) as defined by DOCSIS-OSSI specification. Usage-Based Metering is essential in the processing of bills based on services rendered to and consumed by paying subscribers. The SAMIS specification focuses primarily on bandwidth centric usage-based metering scenarios. The DOCSIS 1.1 RFI specification provides a mechanism for a Cable Modem (CM) to register with its Cable Modem Termination System (CMTS) and to configure itself based on external Quality of Service (QoS) parameters when it is powered up or reset. The principal mechanism for providing enhanced QoS is to classify packets traversing the RF MAC interface into a Service Flow. A Service Flow is a unidirectional flow of packets that is provided a particular Quality of Service. The mediation system can then rate the charges differently for each of the Service Flow traffic counts based on its Service Class. Thus, the mediation system obtains from the CMTS the traffic counts for each named Service Flow (identified by SFID) that a subscribers CM uses during the metering data collection interval. The Usage Based Metering requirement is that the CMTS must be able to provide formatted Subscriber Usage Metering Records for all subscribers attached to the CMTS, on demand to an external collection system. Optionally, the metering records can be stored locally so that it is available via ftp to the external collection server. The CMTS provides two configuration options to handle the export of metering data. Local : Store the record locally on the CMTS after collection. The metering system should then(operating at its own schedule) take the file out of the CMTS and is also responsible for deletion of the local file on the CMTS. The deletion of the file is an indication to the metering collector to start construction of the new metering record which will then be written to the local filesystem and the cycle continues. Streaming: Stream the records to an external collection system as they get generated. The time interval in which the record will be generated is configurable at the CMTS. A secure and reliable stream is used to transport the metering record out of the CMTS. In case the connection to external metering system is not possible, CMTS will retry establishing channel for a max specified times. The MIB allows for configuration of the parameters that control the metering record collection like interval, amount of metering information required, location or IP address of the collection server, and metering filename. In addition it provides for some important notificatons to the NMS to indicate the success/failure of the metering collection."
+  },
+  "CcmtrStatus": {
+    "name": "CcmtrStatus",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "success": 2,
+          "deviceFull": 3,
+          "writeError": 4,
+          "fileNotExist": 5,
+          "connectionTimeout": 6,
+          "dataIncomplete": 7
+        }
+      }
+    },
+    "status": "current",
+    "description": "The CcmtrStatus is used to indicate success or failure status that occurred during the process of writing the metering records to the non-volatile memory device or during streaming them to an external mediation or collection server It has the following defined values: - 'unknown', indicates other reasons for failure of write/stream of the metering records . - 'success', indicates that write of the metering file or streaming to the collection server was successful. - 'deviceFull', indicates that there is not enough space on the non-volatile memory device for writing the metering record file. - 'writeError', indicates that there was a write error when trying to write the metering record file or stream to the collection server. - 'fileNotExist', indicates that the metering file has not yet been created for access by the collection server. - 'connectionTimeout', indicates a failure to connect to the collection server. - 'dataIncomplete', indicates that there was a failure during write or streaming and that the metering record might be incomplete."
+  },
+  "CcmtrCollectionServer": {
+    "name": "CcmtrCollectionServer",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "primary": 1,
+          "secondary": 2
+        }
+      }
+    },
+    "status": "current",
+    "description": "The CcmtrCollectionServer is used to indicate the type of the collection server. It has the following defined values: - 'primary', indicates that the collection server is primary and will be the first server to which streaming will be attempted. - 'secondary', indicates that the collection server is secondary and that it will be used only if streaming to the primary server failed."
+  },
+  "ciscoCableMeteringMIBNotifs": {
+    "name": "ciscoCableMeteringMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.424.0",
+    "class": "objectidentity"
+  },
+  "ciscoCableMeteringMIBObjects": {
+    "name": "ciscoCableMeteringMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.424.1",
+    "class": "objectidentity"
+  },
+  "ccmtrMeteringConfig": {
+    "name": "ccmtrMeteringConfig",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1",
+    "class": "objectidentity"
+  },
+  "ccmtrMetering": {
+    "name": "ccmtrMetering",
+    "oid": "1.3.6.1.4.1.9.9.424.1.2",
+    "class": "objectidentity"
+  },
+  "ccmtrCollectionType": {
+    "name": "ccmtrCollectionType",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "local": 2,
+          "stream": 3,
+          "ipdr": 4
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Current method of export for metering data. The enumerations are: none(1) : Metering collection has not been enabled. local(2) : Store the collected metering records locally on the CMTS. stream(3) : Stream the metering records to an external collection or mediation server. ipdr(4) : Stream the metering records to an ipdr (Internet Proticol Detail Record)collector."
+  },
+  "ccmtrCollectionFilesystem": {
+    "name": "ccmtrCollectionFilesystem",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 80
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The filesystem where metering records are to be stored. This object makes sense only if ccmtrCollectionType object is local which indicates that the metering records are to be stored in the local filesystem. When ccmtrCollectionType is 'stream' this object will retain its set value though it will not be used."
+  },
+  "ccmtrCollectionTable": {
+    "name": "ccmtrCollectionTable",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is used only if ccmtrCollectionType object is stream which indicates that the metering records are to be streamed to an external collection server. It contains IP address information of the collection server. In addition it contains other configurable parameters like interval, retries etc needed for streaming the metering records."
+  },
+  "ccmtrCollectionEntry": {
+    "name": "ccmtrCollectionEntry",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionID",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A set of IP attributes of the mediation or collection server and configuration parameters for streaming the metering records. An entry in this table exists for each configured mediation or collection server."
+  },
+  "ccmtrCollectionID": {
+    "name": "ccmtrCollectionID",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CcmtrCollectionServer",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Identification of a IP address and port number associated with the mediation or collection server. The ccmtrCollectionID is used in determining the order of the IP address, port number to which the streaming will take place. The primary represents the first collection server and secondary represents the second collection server if streaming to the primary failed for any reason. Thus primary entry must be created before the secondary."
+  },
+  "ccmtrCollectionIpAddrType": {
+    "name": "ccmtrCollectionIpAddrType",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "ipv4",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The type of internet address of ccmtrCollectionIpAddress."
+  },
+  "ccmtrCollectionIpAddress": {
+    "name": "ccmtrCollectionIpAddress",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The IP address of the collection server. It will be of type as referred by ccmtrCollectionIpAddrType. The ccmtrCollectionPort should be also valid along with ccmtrCollectionIpAddress for a row to be created. The primary collection server IP address represented by ccmtrCollectionID equal to 1 must be created before the secondary collection server IP address."
+  },
+  "ccmtrCollectionPort": {
+    "name": "ccmtrCollectionPort",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The port number of the collection server. This port number chosen should not be any of the well defined ports. The ccmtrCollectionIpAddress should be also valid along with ccmtrCollectionPort for a row to be created. The primary collection server port represented by ccmtrCollectionID equal to 1 must be created before the secondary collection server port."
+  },
+  "ccmtrCollectionRowStatus": {
+    "name": "ccmtrCollectionRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Controls and reflects the status of rows in this table. It can use used for creation, modifying and deleting entries in this table. The ccmtrCollectionPort should also be valid along with ccmtrCollectionIpAddress for a row to be created. The ccmtrCollectionID 1 represents the primary collection server and ccmtrCollectionID 2 represents the secondary collection server. Thus ccmtrCollectionID of 1 must be created before the ccmtrCollectionID of 2."
+  },
+  "ccmtrCollectionInterval": {
+    "name": "ccmtrCollectionInterval",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 15,
+            "max": 1440
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 30,
+        "format": "decimal"
+      }
+    },
+    "units": "minutes",
+    "maxaccess": "read-write",
+    "status": "deprecated",
+    "description": "The interval in which the metering information is collected. This object makes sense only if ccmtrCollectionType object is stream which indicates that the metering records are to be streamed to an external collection server. This object is deprecated and replaced by ccmtrCollectionRevInterval. While retrieving the value of ccmtrCollectionInterval, the minimum value of 15 will be returned if the value of ccmtrCollectionRevInterval is lower than 15."
+  },
+  "ccmtrCollectionRetries": {
+    "name": "ccmtrCollectionRetries",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 5
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The number of retries to stream the metering records to the external collection server before an error is flagged. This object makes sense only if ccmtrCollectionType object is stream which indicates that the metering records are to be streamed to an external collection server."
+  },
+  "ccmtrCollectionSecure": {
+    "name": "ccmtrCollectionSecure",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An indication of whether the streaming to the collection server should be secure or not. The value of true indicates that the streaming will be secure and false indicates non-secure. However the secure option is available only if the image on the CMTS allows for security. This object makes sense only if ccmtrCollectionType object is stream which indicates that the metering records are to be streamed to an external collection server."
+  },
+  "ccmtrCollectionCpeList": {
+    "name": "ccmtrCollectionCpeList",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An indication if one would like the metering records to contain the CPE(Customer premises equipment) IP addresses. This option is provided to improve performance. By default, this object is true which means the CPE information will always be present."
+  },
+  "ccmtrCollectionAggregate": {
+    "name": "ccmtrCollectionAggregate",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An indication if one would like only aggregate Service Flow information per Cable Modem to be recorded. In this case the record will have a SFID of 0 and a blank Service Class Name. The distinction between upstream and downstream will however be maintained. The counters present in the metering records in this case will be the aggregate. i.e., sum of all upstream/downstream service flows. By default, this object is false which means that the metering records will contain service flow counter information for all service flows per CM."
+  },
+  "ccmtrCollectionSrcIfIndex": {
+    "name": "ccmtrCollectionSrcIfIndex",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The ifIndex of the interface which will be used as the source interface for the billing packets. When ccmtrCollectionType is 'local', the IP address of this source interface will be used as the CMTS IP address in the billing packets. When ccmtrCollectionType is 'stream', the source IP address of the billing packets as well as the CMTS IP address in billing packets will be changed to the IP address of this interface. In both the cases, the mac address of the source interface would be used in the billing packet headers. A value of zero on this object indicates that the source interface is not specifically configured and the system will determine the source interface to use for billing packets dynamically. This object can only be set when ccmtrCollectionType is either 'local' or 'stream'."
+  },
+  "ccmtrCollectionRevInterval": {
+    "name": "ccmtrCollectionRevInterval",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 30,
+        "format": "decimal"
+      }
+    },
+    "units": "minutes",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The interval at which the metering information is collected. This object is of significance only if ccmtrCollectionType object is 'stream' which indicates that the metering records are to be streamed to an external collection server."
+  },
+  "ccmtrCollectionDataPerSession": {
+    "name": "ccmtrCollectionDataPerSession",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.11",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 3,
+            "max": 30
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 5,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the number of service flow data that would be collected at a Cable linecard in one session. ccmtrCollectionDataPerSession together with ccmtrCollectionDataTimer aims to control as well as throttle the rate of export of the service flow data from the Cable linecard to the Route Processor. This means that a Cable linecard would collect ccmtrCollectionDataPerSession number of service flow data and then pause for ccmtrCollectionDataTimer before resuming collection. The cable linecard to route processor throttling in turn affects the time to export all of the service flow data from the CMTS to a collection server. Time to export (minutes) = (total flows in system * ccmtrCollectionDataTimer) / (ccmtrCollectionDataPerSession * 1000 * 60) This object cannot be modified during data export from the CMTS to a collection server."
+  },
+  "ccmtrCollectionDataTimer": {
+    "name": "ccmtrCollectionDataTimer",
+    "oid": "1.3.6.1.4.1.9.9.424.1.1.12",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 8,
+            "max": 500
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 100,
+        "format": "decimal"
+      }
+    },
+    "units": "milliseconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the time interval before the start of the next session of service flow data collection at a Cable linecard. After collection of ccmtrCollectionDataPerSession service flow data at a Cable linecard, the linecard would resume collection only after an interval of ccmtrCollectionDataTimer milliseconds. This object cannot be modified during data export from the CMTS to a collection server."
+  },
+  "ccmtrCollectionStatus": {
+    "name": "ccmtrCollectionStatus",
+    "oid": "1.3.6.1.4.1.9.9.424.1.2.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CcmtrStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The status of the last metering data export. It indicates the success or failure of writing the metering record file or streaming the record to the collection server."
+  },
+  "ccmtrCollectionDestination": {
+    "name": "ccmtrCollectionDestination",
+    "oid": "1.3.6.1.4.1.9.9.424.1.2.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 80
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "It represents the name of the file that is created to store the metering record or the IP address and port number to which the metering information was streamed in both the success and failure scenerios. In the case of local storage it is the filename generated as the CMTS host name followed by the timestamp when the file was created. The file will be stored in the filesystem as specified in ccmtrCollectionFilesystem. In the case of streaming it is the IP address and port number in the format IPADDRESS:PORT# to which the last streaming took place."
+  },
+  "ccmtrCollectionTimestamp": {
+    "name": "ccmtrCollectionTimestamp",
+    "oid": "1.3.6.1.4.1.9.9.424.1.2.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DateAndTime",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time when the last metering record was exported successfully or with some failure."
+  },
+  "ccmtrMeteringNotifEnable": {
+    "name": "ccmtrMeteringNotifEnable",
+    "oid": "1.3.6.1.4.1.9.9.424.1.2.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An indication of whether the notifications associated with metering are enabled or disabled. true indicates the notification is enabled and false indicates the notification is disabled."
+  },
+  "ccmtrCollectionNotification": {
+    "name": "ccmtrCollectionNotification",
+    "oid": "1.3.6.1.4.1.9.9.424.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionStatus"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionDestination"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionTimestamp"
+      }
+    ],
+    "status": "current",
+    "description": "A notification that is sent to indicate the success or failure in creating the metering record file or streaming it to the collection server. ccmtrCollectionStatus represents the success or failure of the export. ccmtrCollectionDestination and ccmtrCollectionTimestamp represent the destinaton and timestamp of the export in both the success and failure scenerios. The receipt of this notification is an indication to the collection server that the file can be accessed via ftp or any file transfer protocol in the case of local storage."
+  },
+  "ciscoCableMeteringMIBConformance": {
+    "name": "ciscoCableMeteringMIBConformance",
+    "oid": "1.3.6.1.4.1.9.9.424.3",
+    "class": "objectidentity"
+  },
+  "ciscoCableMeteringMIBCompliances": {
+    "name": "ciscoCableMeteringMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.424.3.1",
+    "class": "objectidentity"
+  },
+  "ciscoCableMeteringMIBGroups": {
+    "name": "ciscoCableMeteringMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.424.3.2",
+    "class": "objectidentity"
+  },
+  "ciscoCableMeteringCompliance": {
+    "name": "ciscoCableMeteringCompliance",
+    "oid": "1.3.6.1.4.1.9.9.424.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ccmtrMeteringObjGroup",
+        "module": "CISCO-CABLE-METERING-MIB"
+      },
+      {
+        "object": "ccmtrMeteringNotifCtrlGroup",
+        "module": "CISCO-CABLE-METERING-MIB"
+      },
+      {
+        "object": "ccmtrMeteringNotifGroup",
+        "module": "CISCO-CABLE-METERING-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for CMTS devices that implement the Usage Based Metering feature. This compliance is deprecated by ciscoCableMeteringComplianceRev1."
+  },
+  "ciscoCableMeteringComplianceRev1": {
+    "name": "ciscoCableMeteringComplianceRev1",
+    "oid": "1.3.6.1.4.1.9.9.424.3.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ccmtrMeteringNotifCtrlGroup",
+        "module": "CISCO-CABLE-METERING-MIB"
+      },
+      {
+        "object": "ccmtrMeteringNotifGroup",
+        "module": "CISCO-CABLE-METERING-MIB"
+      },
+      {
+        "object": "ccmtrMeteringObjGroupRev1",
+        "module": "CISCO-CABLE-METERING-MIB"
+      },
+      {
+        "object": "ccmtrMeteringSrcIntfObjGroup",
+        "module": "CISCO-CABLE-METERING-MIB"
+      },
+      {
+        "object": "ccmtrMeteringRateCtrlObjGroup",
+        "module": "CISCO-CABLE-METERING-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for CMTS devices that implement the Usage Based Metering feature."
+  },
+  "ccmtrMeteringObjGroup": {
+    "name": "ccmtrMeteringObjGroup",
+    "oid": "1.3.6.1.4.1.9.9.424.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionType"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionFilesystem"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionIpAddrType"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionIpAddress"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionPort"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionInterval"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionRetries"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionSecure"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionRowStatus"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionCpeList"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionAggregate"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionStatus"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionDestination"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionTimestamp"
+      }
+    ],
+    "status": "deprecated",
+    "description": "Group of objects implemented in CMTS providing for usage based metering configuration and notification information. This group is deprecated by ccmtrMeteringObjGroupRev1."
+  },
+  "ccmtrMeteringNotifCtrlGroup": {
+    "name": "ccmtrMeteringNotifCtrlGroup",
+    "oid": "1.3.6.1.4.1.9.9.424.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrMeteringNotifEnable"
+      }
+    ],
+    "status": "current",
+    "description": "The notification control which a CISCO-CABLE-METERING-MIB is required to implement."
+  },
+  "ccmtrMeteringNotifGroup": {
+    "name": "ccmtrMeteringNotifGroup",
+    "oid": "1.3.6.1.4.1.9.9.424.3.2.3",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionNotification"
+      }
+    ],
+    "status": "current",
+    "description": "The notification which a CISCO-CABLE-METERING-MIB is required to implement."
+  },
+  "ccmtrMeteringObjGroupRev1": {
+    "name": "ccmtrMeteringObjGroupRev1",
+    "oid": "1.3.6.1.4.1.9.9.424.3.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionType"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionFilesystem"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionIpAddrType"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionIpAddress"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionPort"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionRowStatus"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionRetries"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionSecure"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionCpeList"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionAggregate"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionRevInterval"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionStatus"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionDestination"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionTimestamp"
+      }
+    ],
+    "status": "current",
+    "description": "Group of objects implemented in CMTS providing for usage based metering configuration and notification information."
+  },
+  "ccmtrMeteringSrcIntfObjGroup": {
+    "name": "ccmtrMeteringSrcIntfObjGroup",
+    "oid": "1.3.6.1.4.1.9.9.424.3.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionSrcIfIndex"
+      }
+    ],
+    "status": "current",
+    "description": "Group of objects implemented in CMTS to define the source interface for the billing packets."
+  },
+  "ccmtrMeteringRateCtrlObjGroup": {
+    "name": "ccmtrMeteringRateCtrlObjGroup",
+    "oid": "1.3.6.1.4.1.9.9.424.3.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionDataPerSession"
+      },
+      {
+        "module": "CISCO-CABLE-METERING-MIB",
+        "object": "ccmtrCollectionDataTimer"
+      }
+    ],
+    "status": "current",
+    "description": "Group of objects implemented in CMTS to control as well as throttle the rate of export of the service flow data."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-CABLE-METERING-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:55:54 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-CABLE-METERING-MIB"
+  }
+}

@@ -1,0 +1,3654 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-FLOW-MONITOR-TC-MIB": [
+      "FlowMetricValue"
+    ],
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "IF-MIB": [
+      "InterfaceIndexOrZero"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetPortNumber",
+      "InetAddress",
+      "InetAddressType"
+    ],
+    "Q-BRIDGE-MIB": [
+      "VlanId"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Integer32",
+      "Gauge32",
+      "Counter64",
+      "MODULE-IDENTITY",
+      "iso",
+      "IpAddress",
+      "Unsigned32",
+      "Counter32",
+      "OBJECT-IDENTITY",
+      "MibIdentifier",
+      "TimeTicks",
+      "OBJECT-TYPE",
+      "NOTIFICATION-TYPE",
+      "Bits"
+    ],
+    "SNMPv2-TC": [
+      "TruthValue",
+      "TEXTUAL-CONVENTION",
+      "DisplayString",
+      "RowStatus",
+      "TimeStamp"
+    ]
+  },
+  "ciscoMediatraceMIB": {
+    "name": "ciscoMediatraceMIB",
+    "oid": "1.3.6.1.4.1.9.9.800",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2012-08-23 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "201208230000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-mediatrace@cisco.com",
+    "description": "Mediatrace helps to isolate and troubleshoot network degradation problems by enabling a network administrator to discover an Internet Protocol (IP) flow's path, dynamically enable monitoring capabilities on the nodes along the path, and collect information on a hop-by-hop basis. This information includes, among other things, flow statistics, and utilization information for incoming and outgoing interfaces, CPUs, and memory, as well as any changes to IP routes. This information can be retrieved by configuring Cisco Mediatrace to start a recurring monitoring session at a specific time and on specific days. The session can be configured to specify which metrics to collect, and how frequently they are collected. The hops along the path are automatically discovered as part of the operation. This module defines a MIB for the features of configuring Mediatrace sessions and obtain statistics data for a particular hop at a specific time. INITIATOR/RESPONDER ==================== At the top level, this MIB module describes the initiator and responder roles for the device. The scalar objects corresponding to each role are used to enable and set parameters like maximum sessions supported, IP address used for enabling the initiator,etc. Some of the scalar objects are used to obtain information about a particular role for the device. At a time the device supports a single initiator and/or single responder. The following scalar objects are used for enabling the initiator, +---------> cMTInitiatorEnable +---------> cMTInitiatorSourceInterface +---------> cMTInitiatorSourceAddressType +---------> cMTInitiatorSourceAddress +---------> cMTInitiatorMaxSessions In addition to the above objects, the following objects are used for obtaining information about the initiator role on the device, +---------> cMTInitiatorSoftwareVersionMajor +---------> cMTInitiatorSoftwareVersionMinor +---------> cMTInitiatorProtocolVersionMajor +---------> cMTInitiatorProtocolVersionMinor +---------> cMTInitiatorConfiguredSessions +---------> cMTInitiatorPendingSessions +---------> cMTInitiatorInactiveSessions +---------> cMTInitiatorActiveSessions The following scalar objects are used for enabling the responder, +---------> cMTResponderEnable +---------> cMTResponderMaxSessions In addition to the above objects, the following object is used for obtaining information about the responder role on the device, +---------> cMTResponderActiveSessions CONTROL TABLES =============== At the next level, this MIB module describes the entities - path specifier, flow specifier, session params and profile. This section also includes the session and scheduling entities. Each row in the cMTSessionTable corresponds to a single session. The session is a container and hence the path specifier, flow specifier, session params and profile objects for each session point to the corresponding entities in the cMTPathSpecifierTable, cMTFlowSpecifierTable, cMTSessionParamsTable, cMTMediaMonitorProfileTable and cMTSystemProfileTable tables. o cMTPathSpecifierTable - describes path specifiers. o cMTFlowSpecifierTable - describes flow specifiers. o cMTSessionParamsTable - describes session params entities. o cMTMediaMonitorProfileTable - describes media monitor profile. o cMTSystemProfileTable - describes system profiles. The cMTSessionTable has a sparse dependent relationship with each of these tables, as there exist situations when data from those tables may not be used for a particular session, including : 1) The session using system profile does not need flow specifier. 2) The session using media monitor profile may not need optional flow specifier. 3) The session may only use one of the two profiles, system or media monitor. o cMTSessionTable - describes sessions. o cMTScheduleTable - describes scheduling entities for the sessions. The cMTScheduleTable has sparse dependent relationship on the cMTSessionTable, as there exist situations when the a session is not available for scheduling, including - a session is created but is not yet scheduled. +----------------------+ | cMTPathSpecifierTable| | | +-----------------------------+ | cMTPathSpecifierName = ps1 | +-----------------------------+ | | +-----------------------------+ | cMTPathSpecifierName = ps2 | +-----------------------------+ : : : : +-----------------------------+ | cMTPathSpecifierName = ps6 | +-----------------------------+ | | +----------------------+ +----------------------+ | cMTFlowSpecifierTable| | | +-----------------------------+ | cMTFlowSpecifierName = fs1 | +-----------------------------+ | | +-----------------------------+ | cMTFlowSpecifierName = fs2 | +-----------------------------+ : : : : +-----------------------------+ | cMTFlowSpecifierName = fs6 | +-----------------------------+ | | +----------------------+ +-------------------------+ +----------------------+ | cMTSessionTable | | cMTSessionParamsTable| | | | | +-------------------------------------+ +--------------------------+ | cMTSessionNumber = 1 | |cMTSessionParamsName = sp1| | +---------------------------------+ | +--------------------------+ | |cMTSessionPathSpecifierName = ps1| | | | | +---------------------------------+ | +--------------------------+ | | |cMTSessionParamsName = sp2| | +---------------------------------+ | +--------------------------+ | |cMTSessionParamName = sp1 | | : : | +---------------------------------+ | : : | | +--------------------------+ | +---------------------------------+ | |cMTSessionParamsName = sp5| | |cMTSessionProfileName = rtp1 | | +--------------------------+ | +---------------------------------+ | | | | | +-----------------------+ | +---------------------------------+ | | |cMTSessionFlowSpecifierName = fs1| | | +---------------------------------+ | | | | +---------------------------------+ | | |cMTSessionTraceRouteEnabled = T | | | +---------------------------------+ | | | +-------------------------------------+ | | | | +-------------------------------------+ | cMTSessionNumber = 2 | | +---------------------------------+ | +---------------------------+ | |cMTSessionPathSpecifierName = ps2| | |cMTMediaMonitorProfileTable| | +---------------------------------+ | | | | | +-----------------------------+ | +---------------------------------+ | |cMTMediaMonitorProfileName | | |cMTSessionParamName = sp5 | | | =rtp1 | | +---------------------------------+ | +-----------------------------+ | | | | | +---------------------------------+ | +-----------------------------+ | |cMTSessionProfileName = intf1 | | |cMTMediaMonitorProfileName | | +---------------------------------+ | | =rtp1 | | | +-----------------------------+ | +---------------------------------+ | : : | |cMTSessionTraceRouteEnabled = T | | : : | +---------------------------------+ | +-----------------------------+ | | |cMTMediaMonitorProfileName | +-------------------------------------+ | =tcp1 | : : +-----------------------------+ : : | | +-------------------------------------+ +---------------------------+ | cMTSessionNumber = 10 | | +---------------------------------+ | | |cMTSessionPathSpecifierName = ps1| | | +---------------------------------+ | | | | +---------------------------------+ | | |cMTSessionParamName = sp1 | | | +---------------------------------+ | | | | +---------------------------------+ | | |cMTSessionProfileName = tcp1 | | | +---------------------------------+ | | | | +---------------------------------+ | | |cMTSessionTraceRouteEnabled = T | | | +---------------------------------+ | | | +-------------------------------------+ | | | | +-------------------------+ +----------------------+ | cMTSystemProfileTable| | | +-----------------------------+ | cMTSystemProfileName = intf1| +-----------------------------+ | | +-----------------------------+ | cMTSystemProfileName = cpu1 | +-----------------------------+ : : : : +-----------------------------+ | cMTSystemProfileName = intf2| +-----------------------------+ | | +----------------------+ DEFINITIONS =============== Mediatrace Initiator - This is the entity that supports creation of periodic sessions using global session id. Initiator can send request, collects the responses to those request and processes them for reporting. Henceforth, it will be referred as initiator. Mediatrace Responder - This is the entity that queries local database and features to obtain information based on the request sent by the Initiator as part of a session. The collected information is sent as response to the initiator to match the session. Henceforth, it will be referred as responder. Meta-data - Meta information about the flow not contained in the data packet. Examples of such information are global session id, multi party session id, type of application that is generating this flow e.g., telepresence. Meta-data global session identifier - it is one of the meta-data attributes which uniquely identifies a flow globally and is used to query the meta-data database for obtaining the corresponding 5-tuple (destination address, destination port, source address, source port and IP protocol) for path specifier or flow specifier. Path - This specifies the route taken by the Mediatrace request for a particular session. This can be specified in terms of single or multiple 5-tuple parameters - destination address, destination port, source address, source port and IP protocol. Gateway address and VLAN are required in cases where the path starts from network element without IP address. This is specified using path specifier entity. Path Specifier - The path specifier is generally specified using complete or partial 5-tuple (destination address, destination port, source address, source port and IP protocol) for Layer 3 initiator. Gateway and VLAN ID are required for a Layer 2 initiator. It can also use the meta-data Global session Id to specify the 5-tuple. A single row corresponds to a path specifier which is created or destroyed when a path specifier is added or removed. Each path specifier entry is uniquely identified by cMTPathSpecifierName. Examples of a path specifier are as follows, path-specifier (ps1)+-------> destination address (10.10.10.2) +-------> destination port (12344) +-------> source address (10.10.12.2) +-------> source port (12567) +-------> IP protocol (UDP) +-------> gateway (10.10.11.2) +-------> VLAN ID (601) path-specifier (ps2)+-------> meta-data global identifier (345123456) Flow - A unidirectional stream of packets conforming to a classifier. For example, packets having a particular source IP address, destination IP address, protocol type, source port number, and destination port number. This is specified using a flow specifier entity. Flow Specifier - The flow specifier is generally specified using complete or partial 5-tuple (destination address, destination port, source address, source port and IP protocol). It can also use the meta-data Global session Id to specify the 5-tuple. A single row corresponds to a flow specifier which is created or destroyed when a flow specifier is added or removed. Each flow specifier entry is uniquely identified by cMTFlowSpecifierName. Examples of a flow specifier is as follows, flow-specifier (fs1)+-------> destination address(10.11.10.2) +-------> destination port (12344) +-------> source address (10.11.12.2) +-------> source port (12567) +-------> IP protocol (UDP) flow-specifier (fs2)+-------> meta-data global identifier (345123456) Metric - It defines a measurement that reflects the quality of a traffic flow or a resource on a hop or along the path e.g. number of packets for a flow, memory utilization on a hop, number of dropped packets on an interface, etc. Metric-list - It defines logical grouping of related metrics e.g. Metric-list CPU has 1% and 2% CPU utilization metric, Metric-list interface has ingress interface speed, egress interface speed, etc. Profile - It defines the set of metric-lists to be collected from the devices along the path. It can also include additional parameters which are required for collecting the metric e.g., sampling interval (also referred as monitor interval), etc. A Profile can include a set of related metric-lists along with related configuration parameters. The metrics could be the media monitoring (also referred as performance monitoring) metrics such as jitter, packet loss, bit rate etc., or system resource utilization metrics or interface counters. Two profiles, System profile and Media Monitoring (Performance Monitoring) Profile are supported. The different profiles, metric-lists and metrics are listed below, +-----> Profile +---> Metric-list +--------> one min CPU utilization | System | CPU | | | +--------> five min CPU utilization | | | +---> Metric-list +-----> memory utilization Memory | | | +---> Metric-list +------> octets input at ingress | Interface | | +------> octets output at egress | |------> packets received with error | | at ingress | +------> packets with error at egress | +------> packets discarded at ingress | +------> packets discarded at egress | +------> ingress interface speed | +------> egress interface speed | +--> Profile +--> Metric-list +--> Common +--> loss of Media Monitor | TCP | IP | measurement confidence | | metrics | | | +--> media stop event occurred | | +--> IP packet drop count | | +--> IP byte count | | +--> IP byte rate | | +--> IP DSCP | | +--> IP TTL | | +--> IP protocol | | +---> media byte | | count | | | +--> TCP +--> TCP connect round trip | specific | delay | metrics | | +--> TCP lost event count | +--> Metric-list +--> Common +--> loss of measurement RTP | IP | confidence | metrics | | +--> media stop event occurred | +--> IP packet drop count | +--> IP byte count | +--> IP byte rate | +--> IP DSCP | +--> IP TTL | +--> IP protocol | +---> media byte count | +--> RTP +--> RTP inter arrival jitter specific | delay metrics | +--> RTP packets lost +--> RTP packets expected +--> RTP packets lost event | count +---> RTP loss percent Examples of the profiles are as follows, profile system - metric-list interface (sys1) profile media-monitor - metric-list rtp (rtp1) +-------> monitor interval (60 seconds) Session parameter Profile - These correspond to the various parameters related to session such as frequency of data collection, timeout for request, etc. These are specified using the session params entity. This is the entity that executes via a conceptual session/schedule control row and populates a conceptual statistics row. Example session parameter profile is as follows, Session-params (sp1)+-------> response timeout (10 seconds) +-------> frequency (60 seconds) +-------> history data sets (2) +-------> route change reaction time (10 seconds) +-------> inactivity timeout (180 seconds) Session - The session is a grouping of various configurable entities such as profiles, session parameters and path specifiers. Flow specifier is optional and required for media monitor profile only. Once these parameters for a mediatrace session are defined through these entities, they are combined into a mediatrace session. Example of sessions are as follows, session (1) +--------> path-specifier (ps1) +--------> session-params (sp1) +--------> profile system (sys1) metric-list interface session (2) +--------> path-specifier (ps1) +--------> session-params (sp2) +--------> profile media-monitor (rtp1) | metric-list rtp +--------> flow-specifier (fs1) A session cycles through various states in its lifetime. The different states are, Active state : A session is said to be in active state when it is requesting and collecting data from the responders. Inactive state : A session becomes inactive when it is either stopped by unscheduling or life expires. In this state it will no longer collect or request data. Pending state: A session is in pending state when the session is created but not yet scheduled to be active. Based on the state and history of a session it can be classified as configured or scheduled session. Configured session : A session which is created and is in pending or inactive state is called a configured session. It can also be a newly created session which has not been scheduled (made active) yet. Scheduled session : A session which is in active state or pending state which is already requesting and collecting data or has set a time in future to start requesting or collecting data. Responder: The responder is in active state when it is able to process the requests from the initiator, collect the data locally and send the Response back to the initiator. Reachability Address: It is the address of the interface on a responder which is used to send the response to the initiator. Statistics row - This conceptual row is indexed based on the session index, session life index, bucket number and hop information (Hop address type and Hop address). This identifies the statistics for a particular session with specific life, at a particular time and for a specific hop."
+  },
+  "CiscoNTPTimeStamp": {
+    "name": "CiscoNTPTimeStamp",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 8,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "displayhint": "4d.4d",
+    "status": "current",
+    "description": "CiscoNTP timestamps are represented as a 64-bit unsigned fixed-point number, in seconds relative to 00:00 on 1 January 1900. The integer part is in the first 32 bits and the fraction part is in the last 32 bits.",
+    "reference": "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992, Section 3.1"
+  },
+  "CiscoMediatraceSupportProtocol": {
+    "name": "CiscoMediatraceSupportProtocol",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "tcp": 6,
+          "udp": 17
+        }
+      }
+    },
+    "status": "current",
+    "description": "Represents different types of layer 3 protocols supported by by Mediatrace for path and flow specification. Currently two protocols - TCP and UDP are supported."
+  },
+  "CiscoMediatraceDiscoveryProtocol": {
+    "name": "CiscoMediatraceDiscoveryProtocol",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "rsvp": 46
+        }
+      }
+    },
+    "status": "current",
+    "description": "Represents different types of protocols used by Mediatrace to discover the path based on the path specifier."
+  },
+  "ciscoMediatraceMIBNotifs": {
+    "name": "ciscoMediatraceMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.800.0",
+    "class": "objectidentity"
+  },
+  "ciscoMediatraceMIBObjects": {
+    "name": "ciscoMediatraceMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.800.1",
+    "class": "objectidentity"
+  },
+  "ciscoMediatraceMIBConform": {
+    "name": "ciscoMediatraceMIBConform",
+    "oid": "1.3.6.1.4.1.9.9.800.2",
+    "class": "objectidentity"
+  },
+  "cMTCtrl": {
+    "name": "cMTCtrl",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1",
+    "class": "objectidentity"
+  },
+  "cMTStats": {
+    "name": "cMTStats",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2",
+    "class": "objectidentity"
+  },
+  "cMTInitiatorEnable": {
+    "name": "cMTInitiatorEnable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the whether the Mediatrace initiator is enabled on the network element."
+  },
+  "cMTInitiatorSourceInterface": {
+    "name": "cMTInitiatorSourceInterface",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the interface whose IP or IPv6 address will be used as initiator address. The Initiator address is used by layer 2 mediatrace responder to unicast the response message to initiator. This address is also reachability address for mediatrace hop 0. The value of this object should be set to ifIndex value of the desired interface from the ifTable."
+  },
+  "cMTInitiatorSourceAddressType": {
+    "name": "cMTInitiatorSourceAddressType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Address type (IP or IPv6) of the initiator address specified in cMTInitiatorSourceAddress object. The value should be set to unknown (0) if source interface object is non zero."
+  },
+  "cMTInitiatorSourceAddress": {
+    "name": "cMTInitiatorSourceAddress",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the IP address used by the initiator when obtaining the reachability address from a downstream responder."
+  },
+  "cMTInitiatorMaxSessions": {
+    "name": "cMTInitiatorMaxSessions",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the maximum number of mediatrace sessions that can be active simultaneously on the initiator."
+  },
+  "cMTInitiatorSoftwareVersionMajor": {
+    "name": "cMTInitiatorSoftwareVersionMajor",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the major version number of Mediatrace application."
+  },
+  "cMTInitiatorSoftwareVersionMinor": {
+    "name": "cMTInitiatorSoftwareVersionMinor",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the minor version number of Mediatrace application."
+  },
+  "cMTInitiatorProtocolVersionMajor": {
+    "name": "cMTInitiatorProtocolVersionMajor",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the major version number of Mediatrace protocol."
+  },
+  "cMTInitiatorProtocolVersionMinor": {
+    "name": "cMTInitiatorProtocolVersionMinor",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the minor version number of Mediatrace protocol."
+  },
+  "cMTInitiatorConfiguredSessions": {
+    "name": "cMTInitiatorConfiguredSessions",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.11",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates number of mediatrace sessions configured. The session may or may not be active."
+  },
+  "cMTInitiatorPendingSessions": {
+    "name": "cMTInitiatorPendingSessions",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.12",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current number of sessions in pending state on the initiator."
+  },
+  "cMTInitiatorInactiveSessions": {
+    "name": "cMTInitiatorInactiveSessions",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.13",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current number of sessions in inactive state on the initiator."
+  },
+  "cMTInitiatorActiveSessions": {
+    "name": "cMTInitiatorActiveSessions",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.14",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current number of sessions in active state on the initiator."
+  },
+  "cMTResponderEnable": {
+    "name": "cMTResponderEnable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.15",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the whether the Mediatrace responder is enabled. If set to 'true' the responder will be enabled. If set to false then mediatrace responder process will be stopped and the device will no longer be discovered as mediatrace capable hop along the flow path."
+  },
+  "cMTResponderMaxSessions": {
+    "name": "cMTResponderMaxSessions",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.16",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the maximum number of sessions that a responder can accept from initiator."
+  },
+  "cMTResponderActiveSessions": {
+    "name": "cMTResponderActiveSessions",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.17",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "sessions",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current number of sessions that are in active state on the responder."
+  },
+  "cMTFlowSpecifierTable": {
+    "name": "cMTFlowSpecifierTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the flow specifiers contained by the device."
+  },
+  "cMTFlowSpecifierEntry": {
+    "name": "cMTFlowSpecifierEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry represents a flow specifier which can be associated with a Mediatrace session contained by the cMTSessionTable. Each entry is uniquely identified by name specified by cMTFlowSpecifierName object. A row created in this table will be shown in 'show running' command and it will not be saved into non-volatile memory."
+  },
+  "cMTFlowSpecifierName": {
+    "name": "cMTFlowSpecifierName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique identifier for the flow specifier."
+  },
+  "cMTFlowSpecifierRowStatus": {
+    "name": "cMTFlowSpecifierRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the status of the flow specifier. Only CreateAndGo and active status is supported. The following columns must be valid before activating the flow specifier: - cMTFlowSpecifierDestAddrType and cMTFlowSpecifierDestAddr OR - cMTFlowSpecifierMetadataGlobalId All other objects can assume default values. Once the flow specifier is activated no column can be modified. Setting this object to 'delete' will destroy the flow specifier. The flow specifier can be deleted only if it is not attached to any session."
+  },
+  "cMTFlowSpecifierMetadataGlobalId": {
+    "name": "cMTFlowSpecifierMetadataGlobalId",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the meta-data Global ID of the flow specifier. Maximum of 24 characters can be specified for this field."
+  },
+  "cMTFlowSpecifierDestAddrType": {
+    "name": "cMTFlowSpecifierDestAddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTFlowSpecifierDestAddr."
+  },
+  "cMTFlowSpecifierDestAddr": {
+    "name": "cMTFlowSpecifierDestAddr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Address of the destination of the flow to be monitored."
+  },
+  "cMTFlowSpecifierDestPort": {
+    "name": "cMTFlowSpecifierDestPort",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the destination port for the flow."
+  },
+  "cMTFlowSpecifierSourceAddrType": {
+    "name": "cMTFlowSpecifierSourceAddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTFlowSpecifierSourceAddr."
+  },
+  "cMTFlowSpecifierSourceAddr": {
+    "name": "cMTFlowSpecifierSourceAddr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the source address for the flow to be monitored."
+  },
+  "cMTFlowSpecifierSourcePort": {
+    "name": "cMTFlowSpecifierSourcePort",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the source port for the flow."
+  },
+  "cMTFlowSpecifierIpProtocol": {
+    "name": "cMTFlowSpecifierIpProtocol",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.18.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoMediatraceSupportProtocol",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "udp",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This is transport protocol type for the flow. Flow of this type between specified source and and destination will be monitored."
+  },
+  "cMTPathSpecifierTable": {
+    "name": "cMTPathSpecifierTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the path specifiers contained by the device."
+  },
+  "cMTPathSpecifierEntry": {
+    "name": "cMTPathSpecifierEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "This entry defines path specifier that can be used in mediatrace session. Each entry is uniquely identified by name specified by cMTPathSpecifierName object. A row created in this table will be shown in 'show running' command and it will not be saved into non-volatile memory."
+  },
+  "cMTPathSpecifierName": {
+    "name": "cMTPathSpecifierName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique identifier for the path specifier."
+  },
+  "cMTPathSpecifierRowStatus": {
+    "name": "cMTPathSpecifierRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the status of the path specifier. Only CreateAndGo and active status is supported. The following columns must be valid before activating the path specifier: - cMTPathSpecifierDestAddrType and cMTPathSpecifierDestAddr OR - cMTPathSpecifierMetadataGlobalId All other objects can assume default values. Once the path specifier is activated no column can be modified. Setting this object to 'delete' will destroy the path specifier. The path specifier can be deleted only if it is not attached to any session."
+  },
+  "cMTPathSpecifierMetadataGlobalId": {
+    "name": "cMTPathSpecifierMetadataGlobalId",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Metadata global session id can be used as path specifier. This object should be populated when this is desired. Mediatrace software will query the Metadata database for five tuple to be used for establishing the path."
+  },
+  "cMTPathSpecifierDestAddrType": {
+    "name": "cMTPathSpecifierDestAddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTPathSpecifierDestAddr."
+  },
+  "cMTPathSpecifierDestAddr": {
+    "name": "cMTPathSpecifierDestAddr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the destination address for the path specifier."
+  },
+  "cMTPathSpecifierDestPort": {
+    "name": "cMTPathSpecifierDestPort",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the destination port for the path specifier."
+  },
+  "cMTPathSpecifierSourceAddrType": {
+    "name": "cMTPathSpecifierSourceAddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTFlowSpecifierSourceAddr."
+  },
+  "cMTPathSpecifierSourceAddr": {
+    "name": "cMTPathSpecifierSourceAddr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the source address for the path specifier."
+  },
+  "cMTPathSpecifierSourcePort": {
+    "name": "cMTPathSpecifierSourcePort",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the source port for the path specifier."
+  },
+  "cMTPathSpecifierProtocolForDiscovery": {
+    "name": "cMTPathSpecifierProtocolForDiscovery",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoMediatraceDiscoveryProtocol",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "rsvp",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the protocol used for path discovery on Mediatrace. Currently, only RSVP is used by default."
+  },
+  "cMTPathSpecifierGatewayAddrType": {
+    "name": "cMTPathSpecifierGatewayAddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTPathSpecifierGatewayAddr."
+  },
+  "cMTPathSpecifierGatewayAddr": {
+    "name": "cMTPathSpecifierGatewayAddr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "When the mediatrace session is originated on layer-2 switch the address of gateway is required to establish the session. This object specifies address of this gateway."
+  },
+  "cMTPathSpecifierGatewayVlanId": {
+    "name": "cMTPathSpecifierGatewayVlanId",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VlanId",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4094
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the Vlan ID associated with the gateway for path specifier."
+  },
+  "cMTPathSpecifierIpProtocol": {
+    "name": "cMTPathSpecifierIpProtocol",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.19.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoMediatraceSupportProtocol",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "udp",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies which metrics are monitored for a path specifier. Currently, only TCP and UDP are supported."
+  },
+  "cMTSessionParamsTable": {
+    "name": "cMTSessionParamsTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is collection of session parameter profiles."
+  },
+  "cMTSessionParamsEntry": {
+    "name": "cMTSessionParamsEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionParamsName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry represents session parameters that can be associated with a Mediatrace session contained by the cMTSessionTable. Each entry is uniquely identified by name specified by cMTSessionParamsName object. A row created in this table will be shown in 'show running' command and it will not be saved into non-volatile memory."
+  },
+  "cMTSessionParamsName": {
+    "name": "cMTSessionParamsName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies the name of this set of session parameters."
+  },
+  "cMTSessionParamsRowStatus": {
+    "name": "cMTSessionParamsRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the status of the session parameters. Only CreateAndGo and active status is supported. In order for this object to become active cMTSessionParamsName must be defined. The value of cMTSessionParamsInactivityTimeout needs to be at least 3 times of the value of cMTSessionParamsFrequency. All other objects assume the default value. Once the session parameters is activated no column can be modified. Setting this object to 'delete' will destroy the session parameters. The session parameters can be deleted only if it is not attached to any session."
+  },
+  "cMTSessionParamsResponseTimeout": {
+    "name": "cMTSessionParamsResponseTimeout",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the amount of time a session should wait for the responses after sending out a Mediatrace request. The initiator will discard any responses to a particular request after this timeout."
+  },
+  "cMTSessionParamsFrequency": {
+    "name": "cMTSessionParamsFrequency",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 10,
+            "max": 3600
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 120,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Duration between two successive data fetch requests."
+  },
+  "cMTSessionParamsInactivityTimeout": {
+    "name": "cMTSessionParamsInactivityTimeout",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 10800
+          }
+        ]
+      }
+    },
+    "units": "sconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the interval that the responder wait without any requests from the initiator before removing a particular session. The inactivity timeout needs to be at least 3 times of the session frequency."
+  },
+  "cMTSessionParamsHistoryBuckets": {
+    "name": "cMTSessionParamsHistoryBuckets",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 10
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 3,
+        "format": "decimal"
+      }
+    },
+    "units": "buckets",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the number of buckets of statistics retained. Each bucket will contain complete set of metrics collected for all hops in one iteration."
+  },
+  "cMTSessionParamsRouteChangeReactiontime": {
+    "name": "cMTSessionParamsRouteChangeReactiontime",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.20.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 60
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the amount of time the initiator should wait after receiving the first route change, before reacting to further route change notifications. Range is from 0 to 60."
+  },
+  "cMTMediaMonitorProfileTable": {
+    "name": "cMTMediaMonitorProfileTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the media monitor profiles configured on the device."
+  },
+  "cMTMediaMonitorProfileEntry": {
+    "name": "cMTMediaMonitorProfileEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTMediaMonitorProfileName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry represents a media monitor profile that can be associated with a Mediatrace session contained by the cMTSessionTable. The entry is uniquely identified by cMTMediaMonitorProfileName. A row created in this table will be shown in 'show running' command and it will not be saved into non-volatile memory."
+  },
+  "cMTMediaMonitorProfileName": {
+    "name": "cMTMediaMonitorProfileName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies the name of the Mediatrace media monitor profile."
+  },
+  "cMTMediaMonitorProfileRowStatus": {
+    "name": "cMTMediaMonitorProfileRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the status of the media monitor profile. Only CreateAndGo and active status is supported. In order for this object to become active cMTMediaMonitorProfileName must be defined. All other objects assume the default value. Once the media monitor profile is activated no column can be modified. Setting this object to 'delete' will destroy the media monitor. The media monitor profile can be deleted only if it is not attached to any session."
+  },
+  "cMTMediaMonitorProfileMetric": {
+    "name": "cMTMediaMonitorProfileMetric",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "rtp": 1,
+          "tcp": 2
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the type of metrics group to be collected in addition to basic IP metrics. Specify value as RTP if metrics from 'Metric-List RTP' are desired and 'TCP' if metrics in 'Metric-List TCP' is desired."
+  },
+  "cMTMediaMonitorProfileInterval": {
+    "name": "cMTMediaMonitorProfileInterval",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 10,
+            "max": 120
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the sampling interval for the media monitor profile."
+  },
+  "cMTMediaMonitorProfileRtpMaxDropout": {
+    "name": "cMTMediaMonitorProfileRtpMaxDropout",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 10,
+        "format": "decimal"
+      }
+    },
+    "units": "packets",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the maximum number of dropouts allowed when sampling RTP monitoring metrics."
+  },
+  "cMTMediaMonitorProfileRtpMaxReorder": {
+    "name": "cMTMediaMonitorProfileRtpMaxReorder",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 5,
+        "format": "decimal"
+      }
+    },
+    "units": "packets",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the maximum number of reorders allowed when sampling RTP monitoring metrics."
+  },
+  "cMTMediaMonitorProfileRtpMinimalSequential": {
+    "name": "cMTMediaMonitorProfileRtpMinimalSequential",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.21.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 2,
+            "max": 10
+          }
+        ]
+      }
+    },
+    "units": "packets",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the minimum number of sequental packets required to identify a stream as being an RTP flow."
+  },
+  "cMTSystemProfileTable": {
+    "name": "cMTSystemProfileTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.22",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the system profiles configured on the device."
+  },
+  "cMTSystemProfileEntry": {
+    "name": "cMTSystemProfileEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.22.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSystemProfileName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry represents a system profile that can be associated with a Mediatrace session contained by the cMTSessionTable. Each entry is uniquely identified by name specified by cMTSystemProfileName object. A row created in this table will be shown in 'show running' command and it will not be saved into non-volatile memory."
+  },
+  "cMTSystemProfileName": {
+    "name": "cMTSystemProfileName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.22.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies the name of the Mediatrace system profile."
+  },
+  "cMTSystemProfileRowStatus": {
+    "name": "cMTSystemProfileRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.22.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the status of the system profile. Only CreateAndGo and active status is supported. In order for this object to become active cMTSystemProfileName must be defined. All other objects assume the default value. Once the system profile is activated no column can be modified. Setting this object to 'delete' will destroy the system profile. The system prifile can be deleted only if it is not attached to any session."
+  },
+  "cMTSystemProfileMetric": {
+    "name": "cMTSystemProfileMetric",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.22.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "interface": 1,
+          "cpu": 2,
+          "memory": 3
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the type of metrics group to be collected in addition to basic IP metrics. Specify 'interface' if metrics from 'Metric-List-Interface' are desired. Specify 'cpu' if metrics in 'Metric-List-CPU' is desired. Specify 'memory' if metrics in 'Metric-List-Memory' is desired."
+  },
+  "cMTSessionTable": {
+    "name": "cMTSessionTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the Mediatrace sessions configured on the device."
+  },
+  "cMTSessionEntry": {
+    "name": "cMTSessionEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      }
+    ],
+    "reference": "An entry in cMTSessionTable",
+    "status": "current",
+    "description": "A list of objects that define specific configuration for the session of Mediatrace. The entry is uniquely identified by cMTSessionNumber. A row created in this table will be shown in 'show running' command and it will not be saved into non-volatile memory."
+  },
+  "cMTSessionNumber": {
+    "name": "cMTSessionNumber",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies an arbitrary integer-value that uniquely identifies a Mediatrace session."
+  },
+  "cMTSessionRowStatus": {
+    "name": "cMTSessionRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object indicates the status of Mediatrace session. Only CreateAndGo and active status is supported. Following columns must be specified in order to activate the session: - cMTSessionPathSpecifierName - cMTSessionProfileName All other objects can assume default values. None of the properties of session can be modified once it is in 'active' state. Setting the value of 'destroy' for this object will delete the session. The session can be deleted only if the corresponding schedule (row in cMTScheduleTable ) not exist."
+  },
+  "cMTSessionPathSpecifierName": {
+    "name": "cMTSessionPathSpecifierName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the name of the Mediatrace path specifier profile associated with the session."
+  },
+  "cMTSessionParamName": {
+    "name": "cMTSessionParamName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the name of Mediatrace session parameter associated with the session."
+  },
+  "cMTSessionProfileName": {
+    "name": "cMTSessionProfileName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the name of the Mediatrace metric profile associated with the session."
+  },
+  "cMTSessionFlowSpecifierName": {
+    "name": "cMTSessionFlowSpecifierName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the name of the Mediatrace flow specifier profile associated with the session. Flow specifier is not required if system profile is attached to the session. In this case, media monitor profile is attached to the session. Flow specifier is optional and the 5-tuple from the path-specifier is used instead."
+  },
+  "cMTSessionTraceRouteEnabled": {
+    "name": "cMTSessionTraceRouteEnabled",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.23.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies if traceroute is enabled for this session."
+  },
+  "cMTScheduleTable": {
+    "name": "cMTScheduleTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.24",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of Mediatrace scheduling specific definitions. Each entry in this table schedules a cMTSessionEntry created via the cMTSessionTable object."
+  },
+  "cMTScheduleEntry": {
+    "name": "cMTScheduleEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.24.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      }
+    ],
+    "reference": "An entry in cMTScheduleTable",
+    "status": "current",
+    "description": "A list of objects that define specific configuration for the scheduling of Mediatrace operations. A row is created when a session is scheduled to make it active. Likewise, a row is destroyed when the session is unscheduled. A row created in this table will be shown in 'show running' command and it will not be saved into non-volatile memory."
+  },
+  "cMTScheduleRowStatus": {
+    "name": "cMTScheduleRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.24.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This objects specifies the status of Mediatrace session schedule. Only CreateAndGo and destroy operations are permitted on the row. All objects can assume default values. The schedule start time (column cMTScheduleStartTime) must be specified in order to activate the schedule. Once activated none of the properties of the schedule can be changed. The schedule can be destroyed any time by setting the value of this object to 'destroy'. Destroying the schedule will stop the Mediatrace session but the session will not be destroyed."
+  },
+  "cMTScheduleStartTime": {
+    "name": "cMTScheduleStartTime",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.24.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the start time of the scheduled session."
+  },
+  "cMTScheduleLife": {
+    "name": "cMTScheduleLife",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.24.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 3600,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the duration of the session in seconds."
+  },
+  "cMTScheduleEntryAgeout": {
+    "name": "cMTScheduleEntryAgeout",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.24.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2073600
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 3600,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies the amount of time after which mediatrace session entry will be removed once the life of session is over and session is inactive."
+  },
+  "cMTScheduleRecurring": {
+    "name": "cMTScheduleRecurring",
+    "oid": "1.3.6.1.4.1.9.9.800.1.1.24.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies whether the schedule is recurring schedule. This object can be used when a periodic session is to be executed everyday at certain time and for certain life."
+  },
+  "cMTPathTable": {
+    "name": "cMTPathTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "List of paths discovered by a mediatrace session."
+  },
+  "cMTPathEntry": {
+    "name": "cMTPathEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionLifeNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTBucketNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopNumber",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in cMTPathTable represents a Mediatrace path discovered by a session. This table contains information about the hops (Mediatrace or non-Mediatrace) discovered during a specific request. The Path table is used to find the hop address (Address type - IPv4 or IPv6 and Address) and hop type (currently Mediatrace or Traceroute) to use as index for other statistics tables. A row is created when a Mediatrace scheduled session discovers a path to the specified destination during a request. Likewise, a row is destroyed when the path is no longer avilable. A single row corresponds to a Mediatrace path discovered for a session and is uniquely identified by cMTSessionNumber, cMTSessionLifeNumber, cMTBucketNumber and cMTPathHopNumber. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTSessionLifeNumber": {
+    "name": "cMTSessionLifeNumber",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 2
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies a life for a conceptual statistics row. For a particular value of cMTSessionLifeNumber, the agent assigns the first value of 0 to the current (latest) life, with 1 being the next latest and so on. The sequence keeps incrementing, despite older (lower) values being removed from the table."
+  },
+  "cMTBucketNumber": {
+    "name": "cMTBucketNumber",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 10
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object is index of the list of statistics buckets stored. A statistics bucket corresponds to data collected from each hop in one run of the periodic mediatrace session. Bucket with Index value of 0 is the bucket for latest completed run. Index 1 is one run prior to latest completed run, index 2 is two runs prior to latest completed run, and so on."
+  },
+  "cMTPathHopNumber": {
+    "name": "cMTPathHopNumber",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies the hop number for a Mediatrace Path. This hop can be either Mediatrace or Non-Mediatrace node. The hop number is relative to the initiator with 0 being used to identify initiator itself, 1 for next farther node, etc. This hop number is always unique i.e., two hops cannot have same hop number."
+  },
+  "cMTPathHopAddrType": {
+    "name": "cMTPathHopAddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTPathHopAddrType."
+  },
+  "cMTPathHopAddr": {
+    "name": "cMTPathHopAddr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates IP Address type of the hop on a Mediatrace Path."
+  },
+  "cMTPathHopType": {
+    "name": "cMTPathHopType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "mediatrace": 1,
+          "traceroute": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the type of the hop on a Mediatrace path. Currently, only two types are present - mediatrace(1) and traceroute(2). A hop is of type 'mediatrace' if it is discovered by only mediatrace or by both mediatrace and trace-route. The hop is 'trace route' if it is discovered by trace route only."
+  },
+  "cMTPathHopAlternate1AddrType": {
+    "name": "cMTPathHopAlternate1AddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTPathHopAlternate1AddrType."
+  },
+  "cMTPathHopAlternate1Addr": {
+    "name": "cMTPathHopAlternate1Addr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the IP Address of the first alternate hop on a traceroute path."
+  },
+  "cMTPathHopAlternate2AddrType": {
+    "name": "cMTPathHopAlternate2AddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTPathHopAlternate2AddrType."
+  },
+  "cMTPathHopAlternate2Addr": {
+    "name": "cMTPathHopAlternate2Addr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the IP Address of the second alternate hop on a traceroute path."
+  },
+  "cMTPathHopAlternate3AddrType": {
+    "name": "cMTPathHopAlternate3AddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTPathHopAlternate3AddrType."
+  },
+  "cMTPathHopAlternate3Addr": {
+    "name": "cMTPathHopAlternate3Addr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the IP Address of the third alternate hop on a traceroute path."
+  },
+  "cMTHopStatsTable": {
+    "name": "cMTHopStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An entry in cMTHopStatsTable represents a hop on the path associated to a Mediatrace session. This table contains information about particular hop (Mediatrace or non-Mediatrace) such as the address, type of hop, etc. A single row corresponds to a hop on the Mediatrace path discovered for a session and is uniquely identified by cMTSessionNumber, cMTSessionLifeNumber, cMTBucketNumber,cMTHopStatsAddrType and cMTHopStatsAddr. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTHopStatsEntry": {
+    "name": "cMTHopStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionLifeNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTBucketNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddrType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in cMTHopStatsTable"
+  },
+  "cMTHopStatsMaskBitmaps": {
+    "name": "cMTHopStatsMaskBitmaps",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "mediatraceTtlUnsupported": 0,
+        "mediatraceTtlUncollected": 1,
+        "collectionStatsUnsupported": 2,
+        "collectionStatsUncollected": 3,
+        "ingressInterfaceUnsupported": 4,
+        "ingressInterfaceUncollected": 5,
+        "egressInterfaceUnsupported": 6,
+        "egressInterfaceUncollected": 7
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of these statistics fields in the table are supported. It also indicates if the statistics data are collected. There are 2 bits for each corresponding field."
+  },
+  "cMTHopStatsAddrType": {
+    "name": "cMTHopStatsAddrType",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies the type of IP address specified by the corresponding instance of cMTHopStatsAddr."
+  },
+  "cMTHopStatsAddr": {
+    "name": "cMTHopStatsAddr",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object specifies the IP Address of the hop on a Mediatrace Path. This value is obtained from CMTPathHopAddr in cMTPathTable."
+  },
+  "cMTHopStatsName": {
+    "name": "cMTHopStatsName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the name for this hop. This can be either the hostname or the IP address for the hop."
+  },
+  "cMTHopStatsMediatraceTtl": {
+    "name": "cMTHopStatsMediatraceTtl",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "J. Postel, 'Internet Protocol', RFC-791, September 1981. J. Deering and R. Hinden, 'Internet Protocol, Version 6 (IPv6) Specification', RFC-2460, December 1998.",
+    "status": "current",
+    "description": "This object indicates the hop limit of the corresponding traffic flow. If version 4 of the IP carries the traffic flow, then the value of this column corresponds to the 'Time to Live' field of the IP header contained by packets in the Mediatrace request. If version 6 of the IP carries the traffic flow, then the value of this column corresponds to the 'Hop Limit' field of the IP header contained by packets in the Mediatrace request."
+  },
+  "cMTHopStatsCollectionStatus": {
+    "name": "cMTHopStatsCollectionStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "success": 1,
+          "notSuccess": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the operational status of data being collected on the hop for a specific session: 'success' The hop is actively collecting and responding with data. 'notsuccess' The hop is not collecting or responding with data."
+  },
+  "cMTHopStatsIngressInterface": {
+    "name": "cMTHopStatsIngressInterface",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the interface on the responder that receives the Mediatrace request from the initiator."
+  },
+  "cMTHopStatsEgressInterface": {
+    "name": "cMTHopStatsEgressInterface",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the interface on the responder which is used to forward the Mediatrace request from the initiator towards destination in the path specifier. Value of 'None' will be shown if the destination address in path specifier terminates on this hop."
+  },
+  "cMTTraceRouteTable": {
+    "name": "cMTTraceRouteTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the hops discovered by traceroute executed from the initiator. These are the hops which are on media flow path but on which mediatrace is not enabled or is not supported."
+  },
+  "cMTTraceRouteEntry": {
+    "name": "cMTTraceRouteEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionLifeNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTBucketNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddrType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in cMTTraceRouteTable represents a Traceroute hop on the path associated to a Mediatrace session. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTTraceRouteHopNumber": {
+    "name": "cMTTraceRouteHopNumber",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the hop number of Traceroute host relative to the Initiator. It start with 1 and increments as we go farther from the Initiator."
+  },
+  "cMTTraceRouteHopRtt": {
+    "name": "cMTTraceRouteHopRtt",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates RTT. The time it takes for a packet to get to a hop and back, displayed in milliseconds. (ms)."
+  },
+  "cMTSessionStatusTable": {
+    "name": "cMTSessionStatusTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains aggregate data maintained by Mediatrace for session status."
+  },
+  "cMTSessionStatusEntry": {
+    "name": "cMTSessionStatusEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in cMTSessionStatusTable represents information about a Mediatrace session. This table contains information about particular session such as global session identifier, operation state and time to live. A single row corresponds to status of a Mediatrace session and is uniquely identified by cMTSessionNumber. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTSessionStatusBitmaps": {
+    "name": "cMTSessionStatusBitmaps",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "globalSessionIdUusupport": 0,
+        "globalSessionIdUncollected": 1,
+        "operationStateUusupport": 2,
+        "operationStateUncollected": 3,
+        "operationTimeToLiveUusupport": 4,
+        "operationTimeToLiveUncollected": 5
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of these statistics fields in the table are supported. It also indicates if the statistics are collected. There are 2 bits for each field."
+  },
+  "cMTSessionStatusGlobalSessionId": {
+    "name": "cMTSessionStatusGlobalSessionId",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a globally unique Id to identify a session throughout the network."
+  },
+  "cMTSessionStatusOperationState": {
+    "name": "cMTSessionStatusOperationState",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "pending": 1,
+          "active": 2,
+          "inactive": 3,
+          "sleep": 4
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the operation status of the session. pending - Session is not currently active. active - Session is in active state. inactive - Session is not active but it has not aged out. sleep - Session is in sleep state."
+  },
+  "cMTSessionStatusOperationTimeToLive": {
+    "name": "cMTSessionStatusOperationTimeToLive",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates how long the session operation will last."
+  },
+  "cMTSessionRequestStatsTable": {
+    "name": "cMTSessionRequestStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains aggregate data maintained by Mediatrace for session request status."
+  },
+  "cMTSessionRequestStatsEntry": {
+    "name": "cMTSessionRequestStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionLifeNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTBucketNumber",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in cMTSessionRequestStatsTable represents status for each request for a particular session. A single row corresponds to a request sent by a particular Mediatrace session and is uniquely identified by cMTSessionNumber, cMTSessionLifeNumber and cMTBucketNumber. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTSessionRequestStatsBitmaps": {
+    "name": "cMTSessionRequestStatsBitmaps",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "requestTimestampUnsupport": 0,
+        "requestTimestampUncollected": 1,
+        "requestStatusUnsupport": 2,
+        "requestStatusUncollected": 3,
+        "tracerouteStatusUnsupport": 4,
+        "tracerouteStatusUncollected": 5,
+        "routeIndexUnsupport": 6,
+        "routeIndexUncollected": 7,
+        "numberOfMediatraceHopsUnsupport": 8,
+        "numberOfMediatraceHopsUncollected": 9,
+        "numberOfNonMediatraceHopsUnsupport": 10,
+        "numberOfNonMediatraceHopsUncollected": 11,
+        "numberOfValidHopsUnsupport": 12,
+        "numberOfValidHopsUncollected": 13,
+        "numberOfErrorHopsUnsupport": 14,
+        "numberOfErrorHopsUncollected": 15,
+        "numberOfNoDataRecordHopsUnsupport": 16,
+        "numberOfNoDataRecordHopsUncollected": 17,
+        "metaGlobalIdUnsupport": 18,
+        "metaGlobalIdUncollected": 19,
+        "metaMultiPartySessionIdUnsupport": 20,
+        "metaMultiPartySessionIdUncollected": 21,
+        "metaAppNameUnsupport": 22,
+        "metaAppNameUncollected": 23
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of these stats fields in the table are supported. It also indicates if the stats data are collected. There are 2 bits for each corresponding field."
+  },
+  "cMTSessionRequestStatsRequestTimestamp": {
+    "name": "cMTSessionRequestStatsRequestTimestamp",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of request time when the request was sent our by the initiator for this particular session."
+  },
+  "cMTSessionRequestStatsRequestStatus": {
+    "name": "cMTSessionRequestStatsRequestStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "completed": 1,
+          "notCompleted": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the status of request for the session."
+  },
+  "cMTSessionRequestStatsTracerouteStatus": {
+    "name": "cMTSessionRequestStatsTracerouteStatus",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "completed": 1,
+          "notCompleted": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the status of traceroute for the session."
+  },
+  "cMTSessionRequestStatsRouteIndex": {
+    "name": "cMTSessionRequestStatsRouteIndex",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the route index for the session request. It signifies the number of times a route has changed for a particular session. 0 signifies no route change."
+  },
+  "cMTSessionRequestStatsNumberOfMediatraceHops": {
+    "name": "cMTSessionRequestStatsNumberOfMediatraceHops",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of Mediatrace hops in the path."
+  },
+  "cMTSessionRequestStatsNumberOfNonMediatraceHops": {
+    "name": "cMTSessionRequestStatsNumberOfNonMediatraceHops",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of non-Mediatrace hops in the path."
+  },
+  "cMTSessionRequestStatsNumberOfValidHops": {
+    "name": "cMTSessionRequestStatsNumberOfValidHops",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of hops with valid data report."
+  },
+  "cMTSessionRequestStatsNumberOfErrorHops": {
+    "name": "cMTSessionRequestStatsNumberOfErrorHops",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of hops with error report. These hops are not able to return the statistics due to some issue."
+  },
+  "cMTSessionRequestStatsNumberOfNoDataRecordHops": {
+    "name": "cMTSessionRequestStatsNumberOfNoDataRecordHops",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of hops with no data record."
+  },
+  "cMTSessionRequestStatsMDGlobalId": {
+    "name": "cMTSessionRequestStatsMDGlobalId",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the meta-data global Id for this session."
+  },
+  "cMTSessionRequestStatsMDMultiPartySessionId": {
+    "name": "cMTSessionRequestStatsMDMultiPartySessionId",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the meta-data Multi Party Session Id for this session."
+  },
+  "cMTSessionRequestStatsMDAppName": {
+    "name": "cMTSessionRequestStatsMDAppName",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.5.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the meta-data AppName for this session."
+  },
+  "cMTCommonMetricStatsTable": {
+    "name": "cMTCommonMetricStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains the list of entries representing common IP metrics values for a particular mediatrace session on particular hop."
+  },
+  "cMTCommonMetricStatsEntry": {
+    "name": "cMTCommonMetricStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionLifeNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTBucketNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddrType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in cMTCommonMetricStatsTable represents common media monitor profile information of a hop on the path associated to a Mediatrace session such as flow sampling time stamp, packets dropped, IP TTL, etc. The devices creates a row in the cMTCommonMetricStatsTable when a Mediatrace session starts collecting a traffic metrics data and has been configured to compute common IP metrics. Likewise, the device destroys a row in the cMTCommonMetricStatsTable when the corresponding Mediatrace session has ceased collecting the traffic metrics data (e.g., when a scheduled session has timed out). A single row corresponds to a common media monitor profile information of a hop on the path discovered for a session and is uniquely identified by cMTSessionNumber, cMTSessionLifeNumber, cMTBucketNumber,cMTHopStatsAddrType and cMTHopStatsAddr. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTCommonMetricsBitmaps": {
+    "name": "cMTCommonMetricsBitmaps",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "flowSamplingStartTimeUnsupported": 0,
+        "flowSamplingStartTimeUncollected": 1,
+        "ipPktDroppedUnsupported": 2,
+        "ipPktDroppedUncollected": 3,
+        "ipPktCountUnsupported": 4,
+        "ipPktCountUncollected": 5,
+        "ipOctetsUnsupported": 6,
+        "ipOctetsUncollected": 7,
+        "ipByteRateUnsupported": 8,
+        "ipByteRateUncollected": 9,
+        "ipDscpUnsupported": 10,
+        "ipDscpUncollected": 11,
+        "ipTtlUnsupported": 12,
+        "ipTtlUncollected": 13,
+        "flowCounterUnsupported": 14,
+        "flowCounterUncollected": 15,
+        "flowDirectionUnsupported": 16,
+        "flowDirectionUncollected": 17,
+        "lossMeasurementUnsupported": 18,
+        "lossMeasurementUncollected": 19,
+        "mediaStopOccurredUnsupported": 20,
+        "mediaStopOccurredUncollected": 21,
+        "routeForwardUnsupported": 22,
+        "routeForwardUncollected": 23,
+        "ipProtocolUnsupported": 24,
+        "ipProtocolUncollected": 25
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of these stats fields in the table are supported. It also indicates if the stats data are collected. There are 2 bits for each field."
+  },
+  "cMTCommonMetricsFlowSamplingStartTime": {
+    "name": "cMTCommonMetricsFlowSamplingStartTime",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoNTPTimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object defines the the timestamp when the statistics were collected on the responder."
+  },
+  "cMTCommonMetricsIpPktDropped": {
+    "name": "cMTCommonMetricsIpPktDropped",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates number of packet drops observed on the flow being monitored on this hop from flow sampling start time in window of 'sample interval' length."
+  },
+  "cMTCommonMetricsIpOctets": {
+    "name": "cMTCommonMetricsIpOctets",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "octets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total number of octets contained by the packets processed by the Mediatrace request for the corresponding traffic flow."
+  },
+  "cMTCommonMetricsIpPktCount": {
+    "name": "cMTCommonMetricsIpPktCount",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total number of packets processed by the Mediatrace request for the corresponding traffic flow."
+  },
+  "cMTCommonMetricsIpByteRate": {
+    "name": "cMTCommonMetricsIpByteRate",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "packets per second",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the average packet rate at which the Mediatrace request is processing data for the corresponding traffic flow. This value is cumulative over the lifetime of the traffic flow."
+  },
+  "cMTCommonMetricsIpDscp": {
+    "name": "cMTCommonMetricsIpDscp",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the DSCP value of the corresponding traffic flow. If version 4 of the IP carries the traffic flow, then the value of this column corresponds to the DSCP part of 'Type of Service' field of the IP header contained by packets in the traffic flow. If version 6 of the IP carries the traffic flow, then the value of this column corresponds to DSCP part of the 'Traffic Class' field of the IP header contained by packets in the traffic flow."
+  },
+  "cMTCommonMetricsIpTtl": {
+    "name": "cMTCommonMetricsIpTtl",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "J. Postel, 'Internet Protocol', RFC-791, September 1981. J. Deering and R. Hinden, 'Internet Protocol, Version 6 (IPv6) Specification', RFC-2460, December 1998.",
+    "status": "current",
+    "description": "This object indicates the hop limit of the corresponding traffic flow. If version 4 of the IP carries the traffic flow, then the value of this column corresponds to the 'Time to Live' field of the IP header contained by packets in the Mediatrace request. If version 6 of the IP carries the traffic flow, then the value of this column corresponds to the 'Hop Limit' field of the IP header contained by packets in the Mediatrace request."
+  },
+  "cMTCommonMetricsFlowCounter": {
+    "name": "cMTCommonMetricsFlowCounter",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of traffic flows currently monitored by the Mediatrace request."
+  },
+  "cMTCommonMetricsFlowDirection": {
+    "name": "cMTCommonMetricsFlowDirection",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "ingress": 2,
+          "egress": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the direction of the traffic flow where the data is monitored : 'unknown' The SNMP entity does not know the direction of the traffic flow at the point data is collected. 'ingress' Data is collected at the point where the traffic flow enters the devices 'egress' Data is colected at the point where the traffic flow leaves the device."
+  },
+  "cMTCommonMetricsLossMeasurement": {
+    "name": "cMTCommonMetricsLossMeasurement",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "true": 1,
+          "false": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the loss measurement."
+  },
+  "cMTCommonMetricsMediaStopOccurred": {
+    "name": "cMTCommonMetricsMediaStopOccurred",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "true": 1,
+          "false": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the media stop occurred."
+  },
+  "cMTCommonMetricsRouteForward": {
+    "name": "cMTCommonMetricsRouteForward",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates routing or forwarding status i.e. whether the packet is forwarded or dropped for the flow."
+  },
+  "cMTCommonMetricsIpProtocol": {
+    "name": "cMTCommonMetricsIpProtocol",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.6.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoMediatraceSupportProtocol",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This table contains entry to specify the media Metric-list for the particular Mmediatrace session on the hop."
+  },
+  "cMTRtpMetricStatsTable": {
+    "name": "cMTRtpMetricStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains aggregate data maintained by Mediatrace for traffic flows for which it is computing RTP metrics."
+  },
+  "cMTRtpMetricStatsEntry": {
+    "name": "cMTRtpMetricStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "cMTRtpMetricStatsEntry",
+      "module": "CISCO-MEDIATRACE-MIB",
+      "object": "cMTCommonMetricStatsEntry"
+    },
+    "status": "current",
+    "description": "An entry in cMTRtpMetricStatsTable represents RTP related information of a hop on the path associated to a Mediatrace session such as bit rate, octets, etc. The devices creates a row in the cMTRtpMetricStatsTable when a Mediatrace session starts collecting a traffic metrics data and has been configured to compute RTP metrics for the same traffic metrics data. Likewise, the device destroys a row in the cMTRtpMetricStatsTable when the corresponding Mediatrace session has ceased collecting the traffic metrics data (e.g., when a scheduled session has timed out). A single row corresponds to a RTP information of a hop on the path discovered for a Mediatrace session and is uniquely identified by cMTSessionNumber, cMTSessionLifeNumber, cMTBucketNumber,cMTHopStatsAddrType and cMTHopStatsAddr. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTRtpMetricsBitmaps": {
+    "name": "cMTRtpMetricsBitmaps",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "bitRateunSupport": 0,
+        "bitRateunCollected": 1,
+        "octetsunSupport": 2,
+        "octetsunCollected": 3,
+        "pktsunSupport": 4,
+        "pktsunCollected": 5,
+        "jitterunSupport": 6,
+        "jitterunCollected": 7,
+        "lostPktsunSupport": 8,
+        "lostPktsunCollected": 9,
+        "expectedPktsunSupport": 10,
+        "expectedPktsunCollected": 11,
+        "lostPktEventsunSupport": 12,
+        "lostPktEventsunCollected": 13,
+        "losspercentUnsupport": 14,
+        "losspercentUncollected": 15
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of these statistics fields in the table are supported. It also indicates if the stats data are collected. There are 2 bits for each field."
+  },
+  "cMTRtpMetricsBitRate": {
+    "name": "cMTRtpMetricsBitRate",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the average bit rate at which the corresponding Mediatrace request is processing data for the corresponding traffic flow. This value is cumulative over the lifetime of the traffic flow."
+  },
+  "cMTRtpMetricsOctets": {
+    "name": "cMTRtpMetricsOctets",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total number of octets contained by the packets processed by the Mediatrace request for the corresponding traffic flow."
+  },
+  "cMTRtpMetricsPkts": {
+    "name": "cMTRtpMetricsPkts",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total number of packets processed by the corresponding Mediatrace request for the corresponding traffic flow."
+  },
+  "cMTRtpMetricsJitter": {
+    "name": "cMTRtpMetricsJitter",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetricValue",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the inter-arrival jitter for the traffic flow."
+  },
+  "cMTRtpMetricsLostPkts": {
+    "name": "cMTRtpMetricsLostPkts",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of RTP packets lost for the traffic flow."
+  },
+  "cMTRtpMetricsExpectedPkts": {
+    "name": "cMTRtpMetricsExpectedPkts",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of RTP packets expected for the traffic flow."
+  },
+  "cMTRtpMetricsLostPktEvents": {
+    "name": "cMTRtpMetricsLostPktEvents",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of packet loss events observed by the Mediatrace request for the corresponding traffic flow."
+  },
+  "cMTRtpMetricsLossPercent": {
+    "name": "cMTRtpMetricsLossPercent",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.7.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 100
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the percentage of packages are lost per ten thousand packets in a traffic flow."
+  },
+  "cMTTcpMetricStatsTable": {
+    "name": "cMTTcpMetricStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.8",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains aggregate data maintained by Mediatrace for traffic flows for which it is computing TCP metrics."
+  },
+  "cMTTcpMetricStatsEntry": {
+    "name": "cMTTcpMetricStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.8.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "cMTTcpMetricStatsEntry",
+      "module": "CISCO-MEDIATRACE-MIB",
+      "object": "cMTCommonMetricStatsEntry"
+    },
+    "status": "current",
+    "description": "An entry in cMTTcpMetricStatsTable represents TCP information of a hop on the path associated to a Mediatrace session such as byte count, round trip delay, etc. The devices creates a row in the cMTTcpMetricStatsTable when a Mediatrace session starts collecting a traffic metrics data and has been configured to compute TCP metrics for the same traffic metrics data. Likewise, the device destroys a row in the cMTTcpMetricStatsTable when the corresponding Mediatrace session has ceased collecting the traffic metrics data (e.g., when a scheduled session has timed out). A single row corresponds to TCP information of a hop on the path discovered for a Mediatrace session and is uniquely identified by cMTSessionNumber, cMTSessionLifeNumber, cMTBucketNumber,cMTHopStatsAddrType and cMTHopStatsAddr. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTTcpMetricBitmaps": {
+    "name": "cMTTcpMetricBitmaps",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.8.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "mediaByteCountUnsupport": 0,
+        "mediaByteCountUncollected": 1,
+        "connectRoundTripDelayUnsupport": 2,
+        "connectRoundTripDelayUncollected": 3,
+        "lostEventCountUnsupport": 4,
+        "lostEventCountUncollected": 5
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of these stats fields in the table are supported. It also indicates if the stats data are collected. There are 2 bits for each field."
+  },
+  "cMTTcpMetricMediaByteCount": {
+    "name": "cMTTcpMetricMediaByteCount",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.8.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetricValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of bytes for the packets observed by the Mediatrace session for the corresponding flow."
+  },
+  "cMTTcpMetricConnectRoundTripDelay": {
+    "name": "cMTTcpMetricConnectRoundTripDelay",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.8.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the round trip time for the packets observed by the Mediatrace session for the corresponding flow. The round trip time is defined as the length of time it takes for a TCP segment transmission and receipt of acknowledgement. This object indicates the connect round trip delay."
+  },
+  "cMTTcpMetricLostEventCount": {
+    "name": "cMTTcpMetricLostEventCount",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.8.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of packets lost for the traffic flow."
+  },
+  "cMTSystemMetricStatsTable": {
+    "name": "cMTSystemMetricStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.9",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A list of objects which accumulate the system metrics results of a particular node for that path."
+  },
+  "cMTSystemMetricStatsEntry": {
+    "name": "cMTSystemMetricStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.9.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionLifeNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTBucketNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddrType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in cMTSystemMetricStatsTable represents CPU or memory utilization information of a hop on the path associated to a Mediatrace session such as five minutes CPU utilization, memory utilization, etc. The devices creates a row in the cMTSystemMetricStatsTable when a Mediatrace session starts collecting a system metrics data and has been configured to compute system metrics. Likewise, the device destroys a row in the cMTSystemMetricStatsTable when the corresponding Mediatrace session has ceased collecting the system metrics data (e.g., when a scheduled session has timed out). A single row corresponds to a CPU or memory utilization information of a hop on the path discovered for a Mediatrace session and is uniquely identified by cMTSessionNumber, cMTSessionLifeNumber, cMTBucketNumber,cMTHopStatsAddrType and cMTHopStatsAddr. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTSystemMetricBitmaps": {
+    "name": "cMTSystemMetricBitmaps",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.9.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "cpuOneMinuteUtilizationUnsupport": 0,
+        "cpuOneMinuteUtilizationUncollected": 1,
+        "cpuFiveMinutesUtilizationUnsupport": 2,
+        "cpuFiveMinutesUtilizationUncollected": 3,
+        "memoryMetricsUnsupport": 4,
+        "memoryMetricsUncollected": 5
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of these stats fields in the table are supported. It also indicates if the stats data are collected. There are 2 bits for each field."
+  },
+  "cMTSystemMetricCpuOneMinuteUtilization": {
+    "name": "cMTSystemMetricCpuOneMinuteUtilization",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.9.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 100
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the overall CPU busy percentage in the last 1 minute period for the network element"
+  },
+  "cMTSystemMetricCpuFiveMinutesUtilization": {
+    "name": "cMTSystemMetricCpuFiveMinutesUtilization",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.9.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 100
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the overall CPU busy percentage in the last 5 minute period for the network element"
+  },
+  "cMTSystemMetricMemoryUtilization": {
+    "name": "cMTSystemMetricMemoryUtilization",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.9.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 100
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the overall memory usage percentage for the node."
+  },
+  "cMTInterfaceMetricStatsTable": {
+    "name": "cMTInterfaceMetricStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains aggregate data of interface information for the network nodes."
+  },
+  "cMTInterfaceMetricStatsEntry": {
+    "name": "cMTInterfaceMetricStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionLifeNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTBucketNumber",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddrType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in cMTInterfaceMetricStatsTable represents interface information of a hop on the path associated to a Mediatrace session such as ingress interface speed, egress interface speed, etc. The devices creates a row in the cMTInterfaceMetricStatsTable when a Mediatrace session starts collecting an interface metrics data and has been configured to compute interface metrics. Likewise, the device destroys a row in the cMTInterfaceMetricStatsTable when the corresponding Mediatrace session has ceased collecting the interface metrics data (e.g., when a scheduled session has timed out). A single row corresponds to a interface information of a hop on the path discovered for a session and is uniquely identified by cMTSessionNumber, cMTSessionLifeNumber, cMTBucketNumber, cMTHopStatsAddrType and cMTHopStatsAddr. The created rows are destroyed when the device undergoes a restart."
+  },
+  "cMTInterfaceBitmaps": {
+    "name": "cMTInterfaceBitmaps",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "inSpeedUnsupport": 0,
+        "inSpeedUncollected": 1,
+        "outSpeedUnsupport": 2,
+        "outSpeedUncollected": 3,
+        "outDiscardsUnsupport": 4,
+        "outDiscardsUncollected": 5,
+        "inDiscardsUnsupport": 6,
+        "inDiscardsUncollected": 7,
+        "outErrorsUnsupport": 8,
+        "outErrorsUncollected": 9,
+        "inErrorsUnsupport": 10,
+        "inErrorsUncollected": 11,
+        "outOctetsUnsupport": 12,
+        "outOctetsUncollected": 13,
+        "inOctetsUnsupport": 14,
+        "inOctetsUncollected": 15
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of these stats fields in the table are supported. It also indicates if the stats data are collected. There are 2 bits for each field."
+  },
+  "cMTInterfaceOutSpeed": {
+    "name": "cMTInterfaceOutSpeed",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the egress interface's current bandwidth in bits per second. For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. Currently bandwidth above the maximum value 4,294,967,295 is not supported and it will show the maximum for this condition."
+  },
+  "cMTInterfaceInSpeed": {
+    "name": "cMTInterfaceInSpeed",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates an estimate of the ingress interface's current bandwidth in bits per second. Currently bandwidth above the maximum value 4,294,967,295 is not supported and it will show the maximum for this condition."
+  },
+  "cMTInterfaceOutDiscards": {
+    "name": "cMTInterfaceOutDiscards",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of outbound packets which were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space."
+  },
+  "cMTInterfaceInDiscards": {
+    "name": "cMTInterfaceInDiscards",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime."
+  },
+  "cMTInterfaceOutErrors": {
+    "name": "cMTInterfaceOutErrors",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the error packet number. For packet-oriented interfaces, the number of outbound packets that could not be transmitted because of errors. For character-oriented or fixed-length interfaces, the number of outbound transmission units that could not be transmitted because of errors. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime."
+  },
+  "cMTInterfaceInErrors": {
+    "name": "cMTInterfaceInErrors",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the error packet number. For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime."
+  },
+  "cMTInterfaceOutOctets": {
+    "name": "cMTInterfaceOutOctets",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime."
+  },
+  "cMTInterfaceInOctets": {
+    "name": "cMTInterfaceInOctets",
+    "oid": "1.3.6.1.4.1.9.9.800.1.2.10.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total number of octets received on the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime."
+  },
+  "ciscoMediatraceMIBCompliances": {
+    "name": "ciscoMediatraceMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.800.2.1",
+    "class": "objectidentity"
+  },
+  "ciscoMediatraceMIBGroups": {
+    "name": "ciscoMediatraceMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.800.2.2",
+    "class": "objectidentity"
+  },
+  "ciscoMediatraceMIBCompliance": {
+    "name": "ciscoMediatraceMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.800.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoMediatraceMIBMainObjectGroup",
+        "module": "CISCO-MEDIATRACE-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "This is a default module-compliance containing default object groups."
+  },
+  "ciscoMediatraceMIBMainObjectGroup": {
+    "name": "ciscoMediatraceMIBMainObjectGroup",
+    "oid": "1.3.6.1.4.1.9.9.800.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierRowStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierDestAddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierDestAddr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierDestPort"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierSourceAddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierSourceAddr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierSourcePort"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierIpProtocol"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierRowStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierDestAddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierDestAddr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierDestPort"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierSourceAddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierSourceAddr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierSourcePort"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierProtocolForDiscovery"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierGatewayAddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierGatewayAddr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierGatewayVlanId"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierIpProtocol"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionParamsResponseTimeout"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionParamsFrequency"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionParamsHistoryBuckets"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionParamsInactivityTimeout"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionParamsRouteChangeReactiontime"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionParamsRowStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionPathSpecifierName"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTMediaMonitorProfileRtpMaxDropout"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTMediaMonitorProfileRtpMaxReorder"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTMediaMonitorProfileRtpMinimalSequential"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTMediaMonitorProfileInterval"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTMediaMonitorProfileRowStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionFlowSpecifierName"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionParamName"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionProfileName"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsRouteIndex"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsTracerouteStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRowStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTScheduleLife"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTScheduleStartTime"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTScheduleEntryAgeout"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTScheduleRowStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSystemProfileMetric"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSystemProfileRowStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsMediatraceTtl"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsName"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsCollectionStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsIngressInterface"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsEgressInterface"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopAddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopAddr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopAlternate1AddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopAlternate1Addr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopAlternate2AddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopAlternate2Addr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopAlternate3AddrType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathHopAlternate3Addr"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTTraceRouteHopNumber"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTTraceRouteHopRtt"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsRequestTimestamp"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsRequestStatus"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsNumberOfMediatraceHops"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsNumberOfValidHops"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsNumberOfErrorHops"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsNumberOfNoDataRecordHops"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsNumberOfNonMediatraceHops"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsIpPktDropped"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsIpOctets"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsIpPktCount"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsIpByteRate"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsIpDscp"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsIpTtl"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsFlowCounter"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsFlowDirection"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsLossMeasurement"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsMediaStopOccurred"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsRouteForward"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsIpProtocol"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsBitRate"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsOctets"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsPkts"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsJitter"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsLostPkts"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsExpectedPkts"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsLostPktEvents"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsLossPercent"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTTcpMetricMediaByteCount"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTTcpMetricConnectRoundTripDelay"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTTcpMetricLostEventCount"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSystemMetricCpuOneMinuteUtilization"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSystemMetricCpuFiveMinutesUtilization"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSystemMetricMemoryUtilization"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceOutSpeed"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceInSpeed"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceOutDiscards"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceInDiscards"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceOutErrors"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceInErrors"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceOutOctets"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceInOctets"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTMediaMonitorProfileMetric"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionTraceRouteEnabled"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTScheduleRecurring"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTFlowSpecifierMetadataGlobalId"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTPathSpecifierMetadataGlobalId"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTHopStatsMaskBitmaps"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionStatusBitmaps"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsBitmaps"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTRtpMetricsBitmaps"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTTcpMetricBitmaps"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSystemMetricBitmaps"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInterfaceBitmaps"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionStatusOperationState"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionStatusOperationTimeToLive"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionStatusGlobalSessionId"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsBitmaps"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsMDGlobalId"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsMDMultiPartySessionId"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTSessionRequestStatsMDAppName"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorEnable"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorSourceInterface"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorSourceAddressType"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorSourceAddress"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorMaxSessions"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorSoftwareVersionMajor"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorProtocolVersionMajor"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorConfiguredSessions"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorPendingSessions"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorInactiveSessions"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorActiveSessions"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTResponderEnable"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTResponderMaxSessions"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTResponderActiveSessions"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorSoftwareVersionMinor"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTInitiatorProtocolVersionMinor"
+      },
+      {
+        "module": "CISCO-MEDIATRACE-MIB",
+        "object": "cMTCommonMetricsFlowSamplingStartTime"
+      }
+    ],
+    "status": "current",
+    "description": "The is a object group."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-MEDIATRACE-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:10:59 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-MEDIATRACE-MIB"
+  }
+}

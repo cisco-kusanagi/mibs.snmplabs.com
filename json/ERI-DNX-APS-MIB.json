@@ -1,0 +1,520 @@
+{
+  "imports": {
+    "class": "imports",
+    "ERI-DNX-SMC-MIB": [
+      "utilities",
+      "FunctionSwitch",
+      "trapSequence",
+      "OneByteField",
+      "dnxTrapEnterprise",
+      "NestSlotAddress",
+      "DataSwitch"
+    ],
+    "ERI-ROOT-SMI": [
+      "eriMibs"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "TimeTicks",
+      "Counter32",
+      "Bits",
+      "Counter64",
+      "IpAddress",
+      "Gauge32",
+      "MibIdentifier",
+      "Integer32",
+      "iso",
+      "OBJECT-IDENTITY",
+      "MODULE-IDENTITY",
+      "NOTIFICATION-TYPE",
+      "Unsigned32",
+      "OBJECT-TYPE"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "DisplayString"
+    ]
+  },
+  "eriDNXApsMIB": {
+    "name": "eriDNXApsMIB",
+    "oid": "1.3.6.1.4.1.644.3.13",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2002-05-14 00:00",
+        "description": "Nevio Poljak - eri_DnxNest MIB Rev 01.0a Added new enumeration err-invalid-aps-command (408) to apsSwitchCmdStatus field. Fixes Bug #3617."
+      },
+      {
+        "revision": "2002-04-29 00:00",
+        "description": "Nevio Poljak - Release 14.2 Converted to SMIv2 format."
+      },
+      {
+        "revision": "2002-04-12 00:00",
+        "description": "Nevio Poljak for Release 14.1 Initial Release of this MIB."
+      }
+    ],
+    "lastupdated": "200205140000Z",
+    "organization": "Eastern Research, Inc.",
+    "contactinfo": "Customer Service Postal: Eastern Research, Inc. 225 Executive Drive Moorestown, NJ 08057 Phone: +1-800-337-4374 Email: support@erinc.com",
+    "description": "The ERI Enterprise MIB Module for the Automatic Protection Switching."
+  },
+  "dnxAPS": {
+    "name": "dnxAPS",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2",
+    "class": "objectidentity"
+  },
+  "ApsSwitchRequestCode": {
+    "name": "ApsSwitchRequestCode",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noRequest": 0,
+          "doNotRevert": 1,
+          "reverseRequest": 2,
+          "manualSwitch": 8,
+          "signalDegradeLow": 10,
+          "signalDegradeHigh": 11,
+          "signalFailureLow": 12,
+          "signalFailureHigh": 13,
+          "forceSwitch": 14,
+          "lockout": 15,
+          "clearRequest": 31
+        }
+      }
+    },
+    "status": "current",
+    "description": "The APS switch Request codes are used to perform protection switch actions. "
+  },
+  "apsConfigTable": {
+    "name": "apsConfigTable",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This is the APS Configuration table which consists of an entry for each STM1/STM1X or OC3/OC3X card in the system. The total number of entries depends on the number of STM1/OC3 cards in the Node. Changes to the APS Configuration must be made on a record or row by row basis. This means that any use of the Set command on writable fields must include the apsCfgCmdStatus field with a value of 'update' as the last variable in the SET PDU."
+  },
+  "apsConfigEntry": {
+    "name": "apsConfigEntry",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ERI-DNX-APS-MIB",
+        "object": "apsCfgAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The conceptual row of the APS Configuration table. A row in this table cannot be added or deleted, only modified using the apsCfgCmdStatus field with a value of 'update' as the last variable in the SET PDU. The apsCfgCmdStatus field must be included as the last variable in a SET PDU for the action to take effect. If the apsCfgCmdStatus is missing from the SET PDU, the GET RESPONSE will contain the SNMP error status of 'genErr' for and an error index equal to the last variable."
+  },
+  "apsCfgAddr": {
+    "name": "apsCfgAddr",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "NestSlotAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This number uniquely identifies Nest/Slot configured location of the APS Device card. The format is represented using an IP address syntax (4 byte string). Note that the maximum valid slot number will vary depending on the specified Nest type: DNX11 or DNX4. The 1st byte represents the Nest Number (0-7) The 2nd byte represents the Slot Number (1-11) The 3rd byte is reserved for future use The 4th byte is reserved for future use "
+  },
+  "apsCfgResource": {
+    "name": "apsCfgResource",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Uniquely identifies an APS Device in the system. This number is provided as key to allow the manager to map this entry to a corresponding Resource Table entry."
+  },
+  "apsCfgCardType": {
+    "name": "apsCfgCardType",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "stm1": 0,
+          "oc3": 1,
+          "stm1X": 2,
+          "oc3X": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the APS Device as an STM1, OC3, STM1X, or OC3X module."
+  },
+  "apsCfgSfThreshold": {
+    "name": "apsCfgSfThreshold",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 3,
+            "max": 5
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The configured Signal Failure Threshold. The negated value of this number is used as the exponent of 10 for computing the threshold value for the Bit Error Rate(BER). For example, a value of 5 indicates a BER threshold of 10^-5."
+  },
+  "apsCfgSdThreshold": {
+    "name": "apsCfgSdThreshold",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 5,
+            "max": 9
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The configured Signal Degrade Threshold. The negated value of this number is used as the exponent of 10 for computing the threshold value for the Bit Error Rate(BER). For example, a value of 5 indicates a BER threshold of 10^-5."
+  },
+  "apsCfgRdiSfCriteria": {
+    "name": "apsCfgRdiSfCriteria",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FunctionSwitch",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Enables or Disables switchover on Remote Defect Indication."
+  },
+  "apsCfgCmdStatus": {
+    "name": "apsCfgCmdStatus",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "ready-for-command": 0,
+          "update-config": 1,
+          "update-successful": 101,
+          "err-general-aps-config-error": 400,
+          "err-invalid-asp-threshold": 401,
+          "err-invalid-rdi-criteria": 402,
+          "err-invalid-aps-dev-command": 403,
+          "err-aps-not-applicable": 404,
+          "err-data-locked-by-another-user": 450,
+          "err-snmp-parse-failed": 500,
+          "err-invalid-snmp-type": 501,
+          "err-invalid-snmp-var-size": 502
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The command status for this link configuration row/record. The value used in a SET will be replaced by a response value in the GET RESPONSE indicating success or failure. Default Response State used in GET RESPONSE Command ready-for-command (0) initial default status for a row APS Cfg Commands used in SET Command (1..199) update-config(1), Change existing APS Configuration APS Cfg Response States used in GET RESPONSE Command (100..199) update-successful (201) Device data has been successfully changed APS Config Error Codes used in GET RESPONSE Command (400..799) err-general-aps-config-error (400) Unknown APS configuration error occurred err-invalid-asp-threshold (401) Unrecognized APS SD or SF threshold number err-invalid-rdi-criteria (402) Unrecognized APS RDI setting err-invalid-aps-dev-command (403) Unrecognized APS device command-action err-aps-not-applicable (404) APS cannot be configured for this device err-data-locked-by-another-user (450) Another administrative user is making changes to this part of the system via a terminal session. Check Event Log for user name. err-snmp-parse-failed (500) Agent could not parse variable err-invalid-snmp-type (501) Variable ASN type does not match Agent defined type err-invalid-snmp-var-size (502) Variable size is too big"
+  },
+  "apsStatusTable": {
+    "name": "apsStatusTable",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This is the APS Status table which consists of an entry for each STM1/STM1X or OC3/OC3X card in the system. The total number of entries depends on the number of STM1/OC3 cards in the Node. Changes to the APS Configuration must be made on a record or row by row basis. This means that any use of the Set command on writable fields must include the apsCfgCmdStatus field with a value of 'update' as the last variable in the SET PDU."
+  },
+  "apsStatusEntry": {
+    "name": "apsStatusEntry",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "ERI-DNX-APS-MIB",
+        "object": "apsStatusAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "The conceptual row of the APS Status table. A row in this table cannot be added or deleted, only modified using the apsCfgCmdStatus field with a value of 'update' as the last variable in the SET PDU. The apsCfgCmdStatus field must be included as the last variable in a SET PDU for the action to take effect. If the apsCfgCmdStatus is missing from the SET PDU, the GET RESPONSE will contain the SNMP error status of 'genErr' for and an error index equal to the last variable."
+  },
+  "apsStatusAddr": {
+    "name": "apsStatusAddr",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "NestSlotAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This number uniquely identifies Nest/Slot configured location of the APS Device card. The format is represented using an IP address syntax (4 byte string). Note that the maximum valid slot number will vary depending on the specified Nest type: DNX11 or DNX4. The 1st byte represents the Nest Number (0-7) The 2nd byte represents the Slot Number (1-11) The 3rd byte is reserved for future use The 4th byte is reserved for future use "
+  },
+  "apsStatusResource": {
+    "name": "apsStatusResource",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Uniquely identifies an APS Device in the system. This number is provided as key to allow the manager to map this entry to a corresponding Resource Table entry."
+  },
+  "apsStatusCardType": {
+    "name": "apsStatusCardType",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "stm1Working": 1,
+          "stm1Protection": 2,
+          "oc3Working": 3,
+          "oc3Protection": 4,
+          "stm1XWorking": 5,
+          "stm1XProtection": 6,
+          "oc3XWorking": 7,
+          "oc3XProtection": 8
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the Type of APS Device module."
+  },
+  "apsStatusCardState": {
+    "name": "apsStatusCardState",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "standby": 1,
+          "online": 2,
+          "offline": 3,
+          "defective": 4,
+          "busError": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the current APS Device Card State."
+  },
+  "apsRedundancyState": {
+    "name": "apsRedundancyState",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "detected": 0,
+          "notDetected": 1,
+          "failed": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the current APS Device Redundancy State."
+  },
+  "apsSignalFailure": {
+    "name": "apsSignalFailure",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DataSwitch",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the current APS SF State."
+  },
+  "apsSignalDegrade": {
+    "name": "apsSignalDegrade",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DataSwitch",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the current APS SD State."
+  },
+  "apsLineRxK1Byte": {
+    "name": "apsLineRxK1Byte",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OneByteField",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Displays the SONET K1 byte APS protocol field. Bits are numbered from left to right. Bits 1-4 of the K1 byte indicate a request. 1111 Lockout of Protection 1110 Forced Switch 1101 SF - High Priority 1100 SF - Low Priority 1011 SD - High Priority 1010 SD - Low Priority 1001 not used 1000 Manual Switch 0111 not used 0110 Wait-to-Restore 0101 not used 0100 Exercise 0011 not used 0010 Reverse Request 0001 Do Not Revert 0000 No Request Bits 5-8 of the K1 byte indicate the channel associated with the request defined in bits 1-4. 0000 is the Null channel. 1-14 are working channels. 15 is the extra traffic channel "
+  },
+  "apsLineRxK2Byte": {
+    "name": "apsLineRxK2Byte",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OneByteField",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Displays the SONET K2 byte APS protocol field. Bits are numbered from left to right. Bits 1-4 of the K2 byte indicate a channel. The channel is defined with the same syntax as K1 Bits 5-8. 0000 is the Null channel. 1-14 are working channels. 15 is the extra traffic channel Bit 5 of the K2 byte indicates the architecture. 0 if the architecture is 1+1 1 if the architecture is 1:n Bits 6-8 of the K2 byte indicates the mode. 000 - 011 are reserved for future use 100 indicates the mode is unidirectional 101 indicates the mode is bidirectional 110 RDI-L 111 AIS-L "
+  },
+  "apsSysRxReqCode": {
+    "name": "apsSysRxReqCode",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "ApsSwitchRequestCode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the last APS Protocol Request received by this APS Device."
+  },
+  "apsSysTxReqCode": {
+    "name": "apsSysTxReqCode",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "ApsSwitchRequestCode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the last User APS Protocol Pending Request transmitted by this APS Device."
+  },
+  "apsUserPendingReq": {
+    "name": "apsUserPendingReq",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "ApsSwitchRequestCode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Identifies the current User APS Protocol Pending Request."
+  },
+  "apsSwitchCmdStatus": {
+    "name": "apsSwitchCmdStatus",
+    "oid": "1.3.6.1.4.1.644.2.4.1.12.2.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "readyForRequest": 0,
+          "manualSwitchReq": 8,
+          "forceSwitchReq": 14,
+          "clearRequest": 31,
+          "manual-successful": 108,
+          "force-successful": 114,
+          "clear-successful": 131,
+          "err-gen-aps-req-error": 400,
+          "err-invalid-aps-card-type": 402,
+          "err-field-cannot-be-set": 406,
+          "err-invalid-aps-command": 408,
+          "err-snmp-parse-failed": 500,
+          "err-invalid-snmp-type": 501,
+          "err-invalid-snmp-var-size": 502
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This is the command/status value for the APS Status Row. The value used in a SET will be replaced by a response value in the GET RESPONSE indicating success or failure. These commands can only be SET in the Working APS Device. Default Response State used in GET RESPONSE Command readyForRequest (0) initial default status for a row APS Requests used in SET Command (1..99) manualSwitchReq (8) Manually Switches the specified working device to the protection device. forceSwitchReq (14) Switches the specified working device to the protection device. clearRequest (31) Clears all of the switch commands for the specified APS device. Response States used in GET RESPONSE Command (100..199) manual-successful (108) Manual Switch command has been successfully processed force-successful (114) Forced Switch command has been successfully processed clear-successful (131) Switch commands been successfully cleared Error Codes used in GET RESPONSE Command (400..799) err-gen-aps-req-error (400) Unknown APS request error occurred err-invalid-aps-card-type (402) Requests cannot be processed by the protection card err-field-cannot-be-set (406) Read-only field was included in SET request err-invalid-aps-command (408) Invalid APS request err-snmp-parse-failed (500) Agent could not parse variable err-invalid-snmp-type (501) Variable ASN type does not match Agent defined type err-invalid-snmp-var-size (502) Variable size is too big"
+  },
+  "apsConfigTrap": {
+    "name": "apsConfigTrap",
+    "oid": "1.3.6.1.4.1.644.2.4.0.11",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "ERI-DNX-SMC-MIB",
+        "object": "trapSequence"
+      },
+      {
+        "module": "ERI-DNX-APS-MIB",
+        "object": "apsCfgAddr"
+      },
+      {
+        "module": "ERI-DNX-APS-MIB",
+        "object": "apsCfgCmdStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This trap is used to notify a NMS that a user has updated the configuration for a given APS Device entry."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/ERI-DNX-APS-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 18:30:51 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "ERI-DNX-APS-MIB"
+  }
+}

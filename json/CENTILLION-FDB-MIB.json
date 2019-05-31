@@ -1,0 +1,602 @@
+{
+  "imports": {
+    "class": "imports",
+    "CENTILLION-ROOT-MIB": [
+      "BitField",
+      "StatusIndicator",
+      "CardId",
+      "PortId",
+      "sysConfig"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Bits",
+      "MibIdentifier",
+      "Unsigned32",
+      "IpAddress",
+      "Counter32",
+      "Integer32",
+      "Counter64",
+      "OBJECT-TYPE",
+      "NOTIFICATION-TYPE",
+      "Gauge32",
+      "OBJECT-IDENTITY",
+      "TimeTicks",
+      "iso",
+      "MODULE-IDENTITY"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "PhysAddress"
+    ]
+  },
+  "FdbTypeId": {
+    "name": "FdbTypeId",
+    "class": "type",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "token-ring": 2,
+          "ethernet": 3,
+          "route-descriptor": 4
+        }
+      }
+    }
+  },
+  "VlanId": {
+    "name": "VlanId",
+    "class": "type",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4095
+          }
+        ]
+      }
+    }
+  },
+  "fdbGroup": {
+    "name": "fdbGroup",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22",
+    "class": "objectidentity"
+  },
+  "fdbRemoteAgingTimer": {
+    "name": "fdbRemoteAgingTimer",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 10,
+            "max": 1000000
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The timeout period in seconds for aging out dynamically learned remote (off-ring) stations. The default value is 300 seconds."
+  },
+  "fdbTableFlush": {
+    "name": "fdbTableFlush",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 4
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When read, this object returns a zero length string. If set, the octets describe which stations to flush. All 4 octets must be specified. The encoding of the octet string follows: octet 1: the fdb type identifier to flush, unknown (1) indicates flush any fdb type. octet 2: 0x0 to flush remote stations 0x1 to flush local stations 0x2 to flush all stations octet 3: the card number to flush, a value of 0xff will flush all cards. octet 4: the port number to flush, a value of 0xff will flush all ports."
+  },
+  "fdbTable": {
+    "name": "fdbTable",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "deprecated",
+    "description": "This table contains fdb information for each station known to the system, one entry per station. Static stations may be created by setting fdbStatus to be valid. The index of fdbStatus will contains infomation on the station type, stationAddress, stationCard and stationPort. Entries may be subsequently modified by setting the appropriate object for the entry. Entries are deleted by clearing stationInUse."
+  },
+  "fdbEntry": {
+    "name": "fdbEntry",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "fdbType",
+        "implied": 0
+      },
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "fdbAddress",
+        "implied": 0
+      },
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "fdbCard",
+        "implied": 0
+      },
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "fdbPort",
+        "implied": 0
+      }
+    ],
+    "status": "deprecated",
+    "description": "An list of station information for each station known to the system. Static stations may be configured by properly specifying at least the fdbType, fdbAddress, fdbCard and fdbPort."
+  },
+  "fdbType": {
+    "name": "fdbType",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FdbTypeId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The type of the station. Station address are represented in the canonical form as specified by their type."
+  },
+  "fdbAddress": {
+    "name": "fdbAddress",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PhysAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The fdbs physical address. The physical address is represented in the canonical form according to the corresponding stationType. If the entry is a route-descriptor type, then the physical address is in the form of ring-ring-bridge."
+  },
+  "fdbCard": {
+    "name": "fdbCard",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CardId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The card number through which this station is reached."
+  },
+  "fdbPort": {
+    "name": "fdbPort",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PortId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The interface through which this station is reached."
+  },
+  "fdbIfIndex": {
+    "name": "fdbIfIndex",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The interface through which this station is reached. The value for this object identifies the instance of the ifIndex object defined in MIB-II. If no such entry exists, the value 0 may be returned."
+  },
+  "fdbStatus": {
+    "name": "fdbStatus",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StatusIndicator",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "deprecated",
+    "description": "This indicates the validity of the station. Stations are added by supplying the required objects as index of fdbStatus, and setting the status to valid. Static stations may be deleted by setting this object to invalid."
+  },
+  "fdbLocal": {
+    "name": "fdbLocal",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "BitField",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "deprecated",
+    "description": "If set, this object indicates the station is attached to a ring that is directly attached to the token ring port. This object does not apply to Ethernet stations."
+  },
+  "fdbStatic": {
+    "name": "fdbStatic",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "BitField",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "Fdb is static if this bit is set."
+  },
+  "fdbDuplicate": {
+    "name": "fdbDuplicate",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "BitField",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "Indicates that another fdb with the same address was learned from a different card and port."
+  },
+  "fdbRIFPath": {
+    "name": "fdbRIFPath",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.3.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 28
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "deprecated",
+    "description": "The RIF path to the station. The RIF Path is specified as being sourced from the system, as read from left-to-right. A RIF path is valid only for objects whose stationType is token-ring. The value may be a zero length string."
+  },
+  "fdbSSTable": {
+    "name": "fdbSSTable",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains the list of user defined static stations. All the objects in this table are read-only and are intended to aid reading static station configuration."
+  },
+  "fdbSSEntry": {
+    "name": "fdbSSEntry",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "fdbSSIndex",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "This is an entry in the fdbSSTable which is indexed by fdbSSIndex. Adding to the static station list is done via fdbTable. All objects here are read-only."
+  },
+  "fdbSSIndex": {
+    "name": "fdbSSIndex",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This is the index to the static station table."
+  },
+  "fdbSSType": {
+    "name": "fdbSSType",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FdbTypeId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This represents the media type for this static station."
+  },
+  "fdbSSAddress": {
+    "name": "fdbSSAddress",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PhysAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This is the MAC address for this static station."
+  },
+  "fdbSSCard": {
+    "name": "fdbSSCard",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CardId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This is the card where this station station is."
+  },
+  "fdbSSPort": {
+    "name": "fdbSSPort",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PortId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This is the port where this station station is."
+  },
+  "fdbSSVlanId": {
+    "name": "fdbSSVlanId",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.4.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VlanId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This is a vlan id of a vlan to which this static station belongs to."
+  },
+  "cnfdbTable": {
+    "name": "cnfdbTable",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains fdb information for each station known to the system, one entry per station per vlan. Static stations may be created by setting fdbStatus to be valid. The index of fdbStatus will contains infomation on the station type, stationAddress, stationCard, stationPort and vlanId. Entries may be subsequently modified by setting the appropriate object for the entry. Entries are deleted by clearing stationInUse. Basically, this table is identical with the fdbTable except with fdbVlanId being introduced"
+  },
+  "cnfdbEntry": {
+    "name": "cnfdbEntry",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "cnfdbType",
+        "implied": 0
+      },
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "cnfdbAddress",
+        "implied": 0
+      },
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "cnfdbCard",
+        "implied": 0
+      },
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "cnfdbPort",
+        "implied": 0
+      },
+      {
+        "module": "CENTILLION-FDB-MIB",
+        "object": "cnfdbVlanId",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "An list of station information for each station per vlan known to the system. Static stations may be configured by properly specifying at least the cnfdbType, cnfdbAddress, cnfdbCard, cnfdbPort and cnfdbVlanId."
+  },
+  "cnfdbType": {
+    "name": "cnfdbType",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FdbTypeId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The type of the station. Station address are represented in the canonical form as specified by their type."
+  },
+  "cnfdbAddress": {
+    "name": "cnfdbAddress",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PhysAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The fdbs physical address. The physical address is represented in the canonical form according to the corresponding stationType. If the entry is a route-descriptor type, then the physical address is in the form of ring-ring-bridge."
+  },
+  "cnfdbCard": {
+    "name": "cnfdbCard",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CardId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The card number through which this station is reached."
+  },
+  "cnfdbPort": {
+    "name": "cnfdbPort",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PortId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The interface through which this station is reached."
+  },
+  "cnfdbVlanId": {
+    "name": "cnfdbVlanId",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VlanId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The vlan ID through which this station is reached."
+  },
+  "cnfdbIfIndex": {
+    "name": "cnfdbIfIndex",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The interface through which this station is reached. The value for this object identifies the instance of the ifIndex object defined in MIB-II. If no such entry exists, the value 0 may be returned."
+  },
+  "cnfdbStatus": {
+    "name": "cnfdbStatus",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "StatusIndicator",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This indicates the validity of the station. Stations are added by supplying the required objects as index of fdbStatus, and setting the status to valid. Static stations may be deleted by setting this object to invalid."
+  },
+  "cnfdbLocal": {
+    "name": "cnfdbLocal",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "BitField",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "If set, this object indicates the station is attached to a ring that is directly attached to the token ring port. This object does not apply to Ethernet stations."
+  },
+  "cnfdbStatic": {
+    "name": "cnfdbStatic",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "BitField",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Fdb is static if this bit is set."
+  },
+  "cnfdbDuplicate": {
+    "name": "cnfdbDuplicate",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "BitField",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates that another fdb with the same address was learned from a different card and port."
+  },
+  "cnfdbRIFPath": {
+    "name": "cnfdbRIFPath",
+    "oid": "1.3.6.1.4.1.930.2.1.2.22.5.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 28
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The RIF path to the station. The RIF Path is specified as being sourced from the system, as read from left-to-right. A RIF path is valid only for objects whose stationType is token-ring. The value may be a zero length string."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CENTILLION-FDB-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:51:40 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CENTILLION-FDB-MIB"
+  }
+}

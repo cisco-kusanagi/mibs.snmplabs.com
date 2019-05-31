@@ -1,0 +1,1115 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "IF-MIB": [
+      "ifIndex"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Bits",
+      "OBJECT-IDENTITY",
+      "Integer32",
+      "TimeTicks",
+      "Counter32",
+      "MibIdentifier",
+      "NOTIFICATION-TYPE",
+      "Counter64",
+      "OBJECT-TYPE",
+      "Gauge32",
+      "IpAddress",
+      "iso",
+      "Unsigned32",
+      "MODULE-IDENTITY"
+    ],
+    "SNMPv2-TC": [
+      "RowStatus",
+      "MacAddress",
+      "TruthValue",
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "DateAndTime"
+    ]
+  },
+  "ciscoCableQosMonitorMIB": {
+    "name": "ciscoCableQosMonitorMIB",
+    "oid": "1.3.6.1.4.1.9.9.341",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2004-02-20 00:00",
+        "description": "Added objects in ccqmCmtsEnforceRuleTable to support DOCSIS1.1, DOCSIS2.0 modems and peak/off-peak monitoring. The objects are: ccqmCmtsEnfRuleAvgRate, ccqmCmtsEnfRuleDocsVer, ccqmCmtsEnfRuleRegSerClassName, ccqmCmtsEnfRuleEnfSerClassName, ccqmCmtsEnfRuleMonType, ccqmCmtsEnfRuleFirstPeakTime, ccqmCmtsEnfRuleFirstDuration, ccqmCmtsEnfRuleFirstAvgRate, ccqmCmtsEnfRuleSecondPeakTime, ccqmCmtsEnfRuleSecondDuration, ccqmCmtsEnfRuleSecondAvgRate, ccqmCmtsEnfRuleOffPeakDuration, ccqmCmtsEnfRuleOffPeakAvgRate Added ccqmCmtsIfBwUtilTable to provide thresholds for downstream/upstream bandwidth utilization. Removed ccqmCmtsEnfRuleByteCount which was obsoleted."
+      },
+      {
+        "revision": "2003-04-03 00:00",
+        "description": "Changed ranges of few objects."
+      },
+      {
+        "revision": "2003-03-04 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200402200000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": " Cisco Systems Customer Service Postal: Cisco Systems 170 West Tasman Drive San Jose, CA 95134 U.S.A. Phone: +1 800 553-NETS E-mail: cs-ubr@cisco.com",
+    "description": "This is the MIB module for subscriber QoS monitoring for DOCSIS-compliant Cable Modem Termination Systems (CMTS). Several subscriber behavior can be monitored: 1. When the subscriber requests for more resources than as defined by its QoS parameter set. In this case, though requested for more rate-limiting happens in the CMTS, hence, the subscriber will get only as much resources as defined by its registered QoS parameter set. In this mib, QoS parameter set refers to QoS profiles for 1.0 modems and refer to service class names for 1.1 and 2.0 modems. 2. When the subscriber continuously utilizes the resources to the upper limit or very near to the upper limit as defined by its QoS parameter set. 3. When the subscriber sometimes or never utilizes the resources as defined by the upper limit of the QoS parameter set. In the first two cases, we need to monitor the subscribers as upstream/downstream is a shared medium, and if all subscribers start consuming resources as per their peak rate, or a percentage of it, CMTS will be hard pressed for resources. So, even though such subscribers are using resources within the limits as defined by their QoS parameter set, from the CMTS point of view, they are over consuming. Through out this MIB, we refer to this behavior of subscribers as over consumption of resources and such subscribers will be the violating subscribers. The subscriber QoS Monitoring is a software feature provided on the CMTS so that the CMTS may identify such subscribers who over consume resources based on their QoS parameter set, report them to a management entity, and automatically mitigate the problem where possible. This is done by penalizing the violating subscribers by changing their QoS parameter set to enforced QoS parameter set. The MIB allows to create enforce rules which are used to determine the over consumption of resources. The enforce rule contains monitoring and enforced QoS parameter set. The subscribers who over consume their bandwidth are flagged and NMS notified of all such violations. The MIB also provides a unified view of all over-consuming subscribers."
+  },
+  "CCQMRuleDirection": {
+    "name": "CCQMRuleDirection",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "upstream": 1,
+          "downstream": 2,
+          "bidirection": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "The CCQMRuleDirection is used to indicate the direction to which the enforce rule applies to. It has the following defined values: - 'upstream', is used for an enforce rule in the direction from subscriber to CMTS - 'downstream', is used for an enforce rule in the direction from CMTS to the subscriber. - 'bidirection', which can mean neither upstream or downstream but a combined enforce rule. "
+  },
+  "ciscoCableQosMonitorMIBObjects": {
+    "name": "ciscoCableQosMonitorMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.341.1",
+    "class": "objectidentity"
+  },
+  "ccqmEnforceRuleObjects": {
+    "name": "ccqmEnforceRuleObjects",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1",
+    "class": "objectidentity"
+  },
+  "ccqmRuleViolateObjects": {
+    "name": "ccqmRuleViolateObjects",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2",
+    "class": "objectidentity"
+  },
+  "ccqmRuleIfBwUtilObjects": {
+    "name": "ccqmRuleIfBwUtilObjects",
+    "oid": "1.3.6.1.4.1.9.9.341.1.3",
+    "class": "objectidentity"
+  },
+  "ccqmCmtsEnforceRuleTable": {
+    "name": "ccqmCmtsEnforceRuleTable",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains the attributes of the QoS enforce rules present on the CMTS. These enforce rules define the criteria for identifying subscribers who over consume resources. This could be as simple as bytes transmitted over the last monitoring duration and checked at a rate equal to the sample rate. In the sliding window concept used, the monitoring duration is the size of the window. This window slides by an amount that is equal to the sample rate. At every sample rate the bytes transmitted in the time equal to a monitoring duration is checked. If this is found to be larger than the threshold limit which is calculated by multiplying the defined average rate by the monitoring duration per monitoring duration, the subscriber is flagged as over consuming. Else the monitoring will continue. For example let the monitoring duration be 360 minutes and sample rate be 30 minutes. If the average rate is 2kbits/sec then every 30 minutes we check if the bytes transmitted in the last 360 minutes exceeded 5.4Mbytes bytes. If so, the subscriber is over consuming. The enforce rule has a one to one mapping to QoS profiles in case of DOCSIS1.0 (and DOCSIS1.0+ modems) and to service class names in case of DOCSIS1.1 and DOCSIS2.0 modems. It defines the registered QoS parameter set and an enforced QoS parameter set be applied if found to be violating the registered QoS parameter set. The enforce rule also defines a penalty period for which the enforced QoS parameter set will be applied. The registered QoS parameter set will be restored when the penalty period expires. The monitoring can be of two types: 1) Legacy/Basic monitoring: There is only one threshold and one monitoring-duration and the monitoring-duration can be more than one day and within a day there is no distinction among hours as peak or offpeak hours. An example would be: monitoring duration : 2 days Average rate : 2kbits/sec 2) Peak-offPeak monitoring: A maximum of two peak durations can be defined with in a day and the remaining hours are treated as off-peak and the monitoring will happen during these offpeak hours if the offpeak duration and threhold are defined. The monitoring-duration and threshold for all three, first peak, second peak and offpeak can be different. Here, the monitoring duration for any of the peaks or offpeak cannot be more than a day. An example when both peaks and offpeak are defined is: First peak: monitoring duration: Between 6am to 9am i.e., 3hours Average rate : 2kbits/sec Second peak: monitoring duration: Between 6pm to 10pm i.e., 4hrs Average rate : 3kbits/sec Off peak: Remaining hours in the day i.e., 12 midnight to 6:00am, 9am to 6pm and 10pm to 12mignight. monitoring duration: 2 hours Average rate : 1kbits/sec."
+  },
+  "ccqmCmtsEnforceRuleEntry": {
+    "name": "ccqmCmtsEnforceRuleEntry",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A set of attributes of a enforce rule on the CMTS. One entry exists for each QoS enforce rule. It is indexed by ccqmCmtsEnfRuleName as each enforce rule is associated with a unique name. The user can define the legacy/basic monitoring as: Suppose, the duration is 2 hours and the average rate is 2kbits/sec, so the following object would be need to set: ccqmCmtsEnfRuleMonType = 1 (Basic) ccqmCmtsEnfRuleMonDuration = 120 (minutes) ccqmCmtsEnfRuleAvgRate = 2 (kbits/sec) Consider the example of setting the following peak-offpeak monitoring: First peak time: Morning 6:00am to 9:00am. Average rate is 2kbits/sec. Second peak time: Evening 6:00pm to 10:00pm. Average rate is 3kbits/sec. Offpeak time: The remaining time i.e., 12:00 midnight to 6:00am and from 9:00am to 6:00pm and 10:00pm to 12:00 midnight would constitute the offpeak time. Let us assume the monitoring-duration is 2 hours and the average rate is 1kbits/sec. And so the relevant objects would look like: ccqmCmtsEnfRuleMonType = 2 (peakOffPeak) ccqmCmtsEnfRuleFirstPeakTime = 6 (0600 hours) ccqmCmtsEnfRuleFirstDuration = 180 min (3 hours) ccqmCmtsEnfRuleFirstAvgRate = 2 (kbits/sec) ccqmCmtsEnfRuleSecondPeakTime = 18 (1800 hours) ccqmCmtsEnfRuleSecondDuration = 240 min (4 hours) ccqmCmtsEnfRuleSecondAvgRate = 3 (kbits/sec) ccqmCmtsEnfRuleOffPeakDuration = 160 min (2 hours) ccqmCmtsEnfRuleOffPeakAvgRate = 1 (kbits/sec)."
+  },
+  "ccqmCmtsEnfRuleName": {
+    "name": "ccqmCmtsEnfRuleName",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 15
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The name of the enforce rule."
+  },
+  "ccqmCmtsEnfRuleRegQoS": {
+    "name": "ccqmCmtsEnfRuleRegQoS",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 16383
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "reference": "docsIfQosProfIndex from draft-ietf-ipcdn-docs-rfmibv2-05.txt",
+    "status": "current",
+    "description": "This object represents a pointer to the object describing the quality of service attributes associated with the registered service of the subscriber. For DOCSIS1.0 (DOCSIS1.0+) subscribers it is the index in the docsIfQosProfileTable. If no associated entry in docsIfQosProfileTable exists, this object returns a value of zero. Similarly this object can be set to 0 to indicate no entry in the docsIfQosProfileTable associated with this QoS profile. This object is applicable for DOCSIS1.0 (and DOCSIS1.0+) modems and it can be set only when ccqmCmtsEnfRuleDocsVer is set to docsis10(2). This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleEnfQos": {
+    "name": "ccqmCmtsEnfRuleEnfQos",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 16383
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "reference": "docsIfQosProfIndex from draft-ietf-ipcdn-docs-rfmibv2-05.txt",
+    "status": "current",
+    "description": "This object represents a pointer to the object describing the quality of service attributes associated with the registered service of the subscriber. For DOCSIS1.0 (and DOCSIS1.0+) subscribers it is the index in the docsIfQosProfileTable. If no associated entry in docsIfQosProfileTable exists, this object returns a value of zero. Similarly this object can be set to 0 to indicate no entry in the docsIfQosProfileTable associated with this QoS profile. This object is applicable for DOCSIS1.0 (and DOCSIS1.0+) modems and it can be set only when ccqmCmtsEnfRuleDocsVer is set to docsis10(2). This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleMonDuration": {
+    "name": "ccqmCmtsEnfRuleMonDuration",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 10,
+            "max": 44640
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 360,
+        "format": "decimal"
+      }
+    },
+    "units": "minutes",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents the duration for which subscribers would be monitored to determine if they were over consuming resources. This object can be set only when ccqmCmtsEnfRuleMonType is set to basic(1). If peak-offpeak monitoring is enabled i.e., ccqmCmtsEnfRuleMonType and is set to peakOffPeak (2) this object when polled would return the duration value valid at that time of the day and 0 if no monitoring is taking place at that time. Both ccqmCmtsEnfRuleMonDuration and ccqmCmtsEnfRuleAvgRate need to be set before legacy/basic monitoring can be started. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleSampleRate": {
+    "name": "ccqmCmtsEnfRuleSampleRate",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "minutes",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents the interval at which a decision would be made to check if the subscriber over consumed his resources based on the subscriber usage in the past duration. Since the duration can range between 10 minutes to 30 days hence the range of sample rate would change accordingly too. Some empirical calculations for the same are: The maximum memory to be used per line card for STM is 10 MBytes. The maximum number of modems that can be supported is 6000 per line card. Now, per sample memory consumption is 8 bytes hence approximately, the maximum number of samples that can be allowed are 10 * 10 ^ 6 / (6 * 10 ^ 3 * 2 * 8) ~ 100 Hence, given the duration the sample rate would be calculated as duration / 100 = sample rate only if the duration happens to be more than 1440. For cases when the duration is less than 1440, the sample rate range would be between 10 to 30. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRulePenaltyPeriod": {
+    "name": "ccqmCmtsEnfRulePenaltyPeriod",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 10080
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 10080,
+        "format": "decimal"
+      }
+    },
+    "units": "minutes",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents the period in which the enforced QoS parameter set will be in effect from the time of detection. When the time as defined by this object expires, the registered QoS parameter set would be restored. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleByteCount": {
+    "name": "ccqmCmtsEnfRuleByteCount",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "1000 bytes",
+    "maxaccess": "read-create",
+    "status": "obsolete",
+    "description": "The number of kbytes that the subscriber can transmit in the monitoring duration as indicated by ccqmCmtsEnfRuleMonDuration before being flagged as over consuming. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleDirection": {
+    "name": "ccqmCmtsEnfRuleDirection",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CCQMRuleDirection",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies if the average rate specified by ccqmCmtsEnfRuleAvgRate is for the upstream/downstream direction. Setting to bidirection(3) is not permitted. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleAutoEnforce": {
+    "name": "ccqmCmtsEnfRuleAutoEnforce",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "If the ccqmCmtsEnfRuleAutoEnforce is TRUE, the enforced QoS parameter set as specified by ccqmCmtsEnfRuleEnfQos for DOCSIS1.0 (and DOCSIS1.0+) modems or ccqmCmtsEnfRuleEnfSerClassName for DOCSIS1.1 and DOCSIS2.0 modems will be automatically enforced when an over consuming subscriber is detected. Otherwise the change should be done manually. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleRowStatus": {
+    "name": "ccqmCmtsEnfRuleRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The object controls and reflects the status of rows in this table. All row status values are supported. The status of the row needs to be changed from active(1) to notInService(2) in cases when any of the enforce rule objects need to be changed. If there is any monitoring associated with this enforce rule ongoing at this time, it as well as all the statistics collected over the sample rate and monitoring duration will be cleared when the row status is changed from active(1) to notInService(2). The monitoring will start again only when the row status is changed to active(1)."
+  },
+  "ccqmCmtsEnfRuleAvgRate": {
+    "name": "ccqmCmtsEnfRuleAvgRate",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kbits/sec",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the rate at which the subscriber is allowed to consume for the monitoring duration. So, if this rate is defined to be 2kbits/sec and the monitoring duration is set to be 120 minutes, then every sample period the subscribers consumption in the last monitoring duration would be compared against 1.8Mbytes. This object can be set only when ccqmCmtsEnfRuleMonType is set to basic(1) else when polled it will return the rate valid at that time of the day and 0 if no monitoring is taking place at that time."
+  },
+  "ccqmCmtsEnfRuleDocsVer": {
+    "name": "ccqmCmtsEnfRuleDocsVer",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "others": 1,
+          "docsis10": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "docsis10",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This defines the DOCSIS version of the modems that the enforce rule would be applicable to. If it is set to docsis10(2) then only ccqmCmtsEnfRuleRegQoS and ccqmCmtsEnfRuleEnfQoS can be set and if previously ccqmCmtsEnfRuleRegSerClassName and ccqmCmtsEnfRuleEnfSerClassName were set, they will be reset to NULL and if it set to others(1) then only ccqmCmtsEnfRuleRegSerClassName and ccqmCmtsEnfRuleEnfSerClassName can be set and if previously ccqmCmtsEnfRuleRegQoS and ccqmCmtsEnfRuleEnfQoS were set they will be reset to 0."
+  },
+  "ccqmCmtsEnfRuleRegSerClassName": {
+    "name": "ccqmCmtsEnfRuleRegSerClassName",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 16
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents a pointer to the object describing the quality of service attributes associated with the registered service of the subscriber. For DOCSIS1.1 and DOCSIS2.0 subscribers it is same as docsQosParamSetServiceClassName in docsQosParamSetTable. This object is applicable for DOCSIS1.1 and DOCSIS2.0 modems and it can be set only when ccqmCmtsEnfRuleDocsVer is set to others(1). This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleEnfSerClassName": {
+    "name": "ccqmCmtsEnfRuleEnfSerClassName",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 16
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents a pointer to the object describing the quality of service attributes associated with the registered service of the subscriber. For DOCSIS1.1 and DOCSIS2.0 subscribers it is same as docsQosParamSetServiceClassName in docsQosParamSetTable. This object is applicable only for DOCSIS1.1 modems and DOCSIS2.0 and it can be set only when ccqmCmtsEnfRuleDocsVer is set to others(1). This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleMonType": {
+    "name": "ccqmCmtsEnfRuleMonType",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "basic": 1,
+          "peakOffPeak": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "basic",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the monitoring type. If it is set to basic(1), then ccqmCmtsEnfRuleMonDuration and ccqmCmtsEnfRuleAvgRate are used to define the monitoring and if the peak-offpeak objects were set before, they will all be reset to 0 and if the user sets this object to peakOffPeak(2) the peak-offpeak objects are used to define the monitoring and ccqmCmtsEnfRuleMonDuration and ccqmCmtsEnfRuleAvgRate, if set before, will be reset to 0."
+  },
+  "ccqmCmtsEnfRuleFirstPeakTime": {
+    "name": "ccqmCmtsEnfRuleFirstPeakTime",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 23
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The user can define two peak times and the remaining hours will be treated as offpeak and the monitoring will happen for these offpeak hours if ccqmCmtsEnfRuleOffPeakDuration and ccqmCmtsEnfRuleOffPeakAvgRate are defined. The first peak parameters are defined using ccqmCmtsEnfRuleFirstPeakTime, ccqmCmtsEnfRuleFirstDuration and ccqmCmtsEnfRuleFirstAvgRate objects while the second peak parameters can be defined using ccqmCmtsEnfRuleSecondPeakTime, ccqmCmtsEnfRuleSecondDuration and ccqmCmtsEnfRuleSecondAvgRate. Each peak time has an associated average rate and a duration for which that average rate holds good. Defining the first peak is mandatory, though defining the second peak and offpeak is not mandatory. Both these peak times should be defined such that they don't overlap and the first peak time has to be an earlier time than the second peak time. User would need to use 24 hour clock for setting this. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleFirstDuration": {
+    "name": "ccqmCmtsEnfRuleFirstDuration",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 60,
+            "max": 1440
+          }
+        ]
+      }
+    },
+    "units": "minutes",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the duration for which the first peak time would be applicable. When ccqmCmtsEnfRuleMonDuration is polled during first peak, it will return this value. The ccqmCmtsEnfRuleFirstPeakTime has to be defined before defining this object else it will be taken to start from 0. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleFirstAvgRate": {
+    "name": "ccqmCmtsEnfRuleFirstAvgRate",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kbits/sec",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the rate at which the subscriber is allowed to consume during the first peak duration. The ccqmCmtsEnfRuleFirstDuration has to be defined before defining this value. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleSecondPeakTime": {
+    "name": "ccqmCmtsEnfRuleSecondPeakTime",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 23
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The user can define two peak times in a day. The second peak is defined using ccqmCmtsEnfRuleSecondPeakTime, ccqmCmtsEnfRuleSecondDuration and ccqmCmtsEnfRuleSecondThreshold objects while the first peak is defined using ccqmCmtsEnfRuleFirstPeakTime, ccqmCmtsEnfRuleFirstDuration and ccqmCmtsEnfRuleFirstDuration. For the remaining hours in the day, the off-peak monitoring would happen if both ccqmCmtsEnfRuleOffPeakDuration and ccqmCmtsEnfRuleOffPeakThreshold are defined. Defining the first peak is mandatory, though defining the second peak and offpeak is not mandatory. Both these peak times should be defined such that they don't overlap and the first peak time has to be an earlier time than the second peak time. ccqmCmtsEnfRuleSecondDuration can be set to 0 to indicate that the second peak monitoring no longer needs to be performed. The first peak has to be defined before defining the second peak time. User would need to use 24 hour clock for setting this. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleSecondDuration": {
+    "name": "ccqmCmtsEnfRuleSecondDuration",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 1380
+          }
+        ]
+      }
+    },
+    "units": "minutes",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the duration for which the second peak time would be applicable. When ccqmCmtsEnfRuleMonDuration is polled during second peak, it will return this value. It can be set to 0 to indicate that the second peak monitoring no longer needs to be performed. The ccqmCmtsEnfRuleSecondPeakTime has to be defined before defining this object. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleSecondAvgRate": {
+    "name": "ccqmCmtsEnfRuleSecondAvgRate",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kbits/sec",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the rate at which the subscriber is allowed to consume during the second peak duration. The ccqmCmtsEnfRuleSecondDuration has to be defined before defining this value. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleOffPeakDuration": {
+    "name": "ccqmCmtsEnfRuleOffPeakDuration",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.22",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 1380
+          }
+        ]
+      }
+    },
+    "units": "minutes",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the monitoring-duration that would be applicable for the offpeak times of the day. The off peak times are the times during the day when none of the first peak and second peak times are defined. If this object is set, when ccqmCmtsEnfRuleMonDuration is polled during offpeak times, it would return this value. Since only defining the first peak is mandatory, and defining second peak and off peak are optional the monitoring combinations during the day could be: 1) Only first peak 2) First peak and second peak 3) First peak and off peak 4) All three i.e., first peak, second peak and off peak. It can be set to 0 to indicate that the offpeak monitoring no longer needs to be performed. The first peak parameters have to be defined before defining this object. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmCmtsEnfRuleOffPeakAvgRate": {
+    "name": "ccqmCmtsEnfRuleOffPeakAvgRate",
+    "oid": "1.3.6.1.4.1.9.9.341.1.1.1.1.23",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kbits/sec",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the rate at which the subscriber is allowed to consume during the off-peak duration. The ccqmCmtsEnfRuleOffPeakDuration has to be defined before defining this value. This object cannot be changed when ccqmCmtsEnfRuleRowStatus is active(1)."
+  },
+  "ccqmEnfRuleViolateTable": {
+    "name": "ccqmEnfRuleViolateTable",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains information of the subscribers who violated their enforce rule over the monitoring duration. In the sliding window concept used, the monitoring duration is the size of the window. This window slides by an amount that is equal to the sample rate. At every sample rate the bytes transmitted in the time equal to a monitoring duration is checked. If this is found to be larger than the defined byte count limit per monitoring duration, the subscriber is flagged as over consuming or to have violated his enforce rule. This table has entries for each of these violating subscribers. In case the violating subscriber has a enforced QoS parameter set, the QoS parameter set for such subscribers will be changed to the enforced QoS parameter set for the penalty time. When the penalty time expires, the subscriber gets his registered QoS parameter set restored and will no longer appear in this table but will be monitored. "
+  },
+  "ccqmEnfRuleViolateEntry": {
+    "name": "ccqmEnfRuleViolateEntry",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateID",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A set of attributes of a subscriber who violated his enforce rule in the monitoring period. An entry in this table exists for each subscriber who over-consumed resources based on his configured QoS parameter set. However those subscribers who have an enforced QoS parameter set associated with their enforce rule, will be removed from this table once their penalty time expires. An entry in this table can exist for ifEntry with an ifType of docsCableMaclayer(127)."
+  },
+  "ccqmEnfRuleViolateID": {
+    "name": "ccqmEnfRuleViolateID",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index assigned to the service flow by the CMTS. This represents an internal service flow ID."
+  },
+  "ccqmEnfRuleViolateMacAddr": {
+    "name": "ccqmEnfRuleViolateMacAddr",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "MAC address of this subscriber. If the subscriber has multiple MAC addresses, this is the MAC address associated with the Cable interface."
+  },
+  "ccqmEnfRuleViolateRuleName": {
+    "name": "ccqmEnfRuleViolateRuleName",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 15
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A pointer to the enforce rule associated with this subscriber. It provides for referencing the enforce rule to determine the QoS monitoring parameters. This is same as ccqmCmtsEnfRuleName for the corresponding enforce rule in ccqmCmtsEnforceRuleTable."
+  },
+  "ccqmEnfRuleViolateByteCount": {
+    "name": "ccqmEnfRuleViolateByteCount",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "kbytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total kbytes consumed by the subscriber in the monitoring duration as specified in the corresponding enforce rule object ccqmCmtsEnfRuleMonDuration. If the monitoring is restarted due to change in enforce rule or any other circumstance this count will be reset."
+  },
+  "ccqmEnfRuleViolateLastDetectTime": {
+    "name": "ccqmEnfRuleViolateLastDetectTime",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DateAndTime",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time at which the subscriber was found to have violated his enforce rule and the time from which the enforced QoS parameter set, if any, was in effect. "
+  },
+  "ccqmEnfRuleViolatePenaltyExpTime": {
+    "name": "ccqmEnfRuleViolatePenaltyExpTime",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DateAndTime",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time when the original QoS parameter set will be restored for this violating subscriber. If there was no enforced QoS parameter set configured for this subscriber this object returns 0."
+  },
+  "ccqmCmtsIfBwUtilTable": {
+    "name": "ccqmCmtsIfBwUtilTable",
+    "oid": "1.3.6.1.4.1.9.9.341.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains the attributes which define the bandwidth utilization thresholds for the upstream and downstream interfaces and when the load on these interfaces exceeds the upper threshold, the monitoring of the associated modems service flows starts, and it stops when the interface utilization drops below the lower threshold. For the monitoring to start, there should be appropriate enforce-rules defined. In case no thresholds are defined, by default the monitoring of modems would take place if the appropriate enforce-rules are present."
+  },
+  "ccqmCmtsIfBwUtilEntry": {
+    "name": "ccqmCmtsIfBwUtilEntry",
+    "oid": "1.3.6.1.4.1.9.9.341.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "IF-MIB",
+        "object": "ifIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "A set of attributes to provide additional level of control for monitoring modems. It is indexed by the ifIndex of upstream/downstream interface, thus, only docsCableDownstreamInterface(128) and docsCableUpstreamInterface(129) are allowed to be configured."
+  },
+  "ccqmCmtsIfBwUtilUpThreshold": {
+    "name": "ccqmCmtsIfBwUtilUpThreshold",
+    "oid": "1.3.6.1.4.1.9.9.341.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 99
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 80,
+        "format": "decimal"
+      }
+    },
+    "units": "percent",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the upper threshold for the interface bandwidth utilization and when interface bandwidth utilization exceeds this threshold, monitoring of the appropriate modem's service flow will start if there is an asociated enforce-rule present. This object can't be set to a value lower than ccqmCmtsIfBwUtilLoThreshold."
+  },
+  "ccqmCmtsIfBwUtilLoThreshold": {
+    "name": "ccqmCmtsIfBwUtilLoThreshold",
+    "oid": "1.3.6.1.4.1.9.9.341.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 99
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 40,
+        "format": "decimal"
+      }
+    },
+    "units": "percent",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object defines the lower threshold for the interface bandwidth utilization and when interface bandwidth utilization drops below this threshold, the monitoring of the appropriate modem's service flow will stop. This object can't be set to a value higher than ccqmCmtsIfBwUtilUpThreshold."
+  },
+  "ccqmCmtsIfBwUtilRowStatus": {
+    "name": "ccqmCmtsIfBwUtilRowStatus",
+    "oid": "1.3.6.1.4.1.9.9.341.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The object controls and reflects the status of rows in this table. create-and-wait is not supported. The objects can be changed even when the row status is active(1)."
+  },
+  "ccqmEnfRuleViolateNotifEnable": {
+    "name": "ccqmEnfRuleViolateNotifEnable",
+    "oid": "1.3.6.1.4.1.9.9.341.1.2.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An indication of whether the ccqmEnfRuleViolateNotification is enabled or disabled."
+  },
+  "ccqmMIBNotificationsPrefix": {
+    "name": "ccqmMIBNotificationsPrefix",
+    "oid": "1.3.6.1.4.1.9.9.341.2",
+    "class": "objectidentity"
+  },
+  "ccqmMIBNotifications": {
+    "name": "ccqmMIBNotifications",
+    "oid": "1.3.6.1.4.1.9.9.341.2.0",
+    "class": "objectidentity"
+  },
+  "ccqmEnfRuleViolateNotification": {
+    "name": "ccqmEnfRuleViolateNotification",
+    "oid": "1.3.6.1.4.1.9.9.341.2.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateMacAddr"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateRuleName"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolatePenaltyExpTime"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateByteCount"
+      }
+    ],
+    "status": "current",
+    "description": "A notification that is sent when the subscriber if found to have violated his enforce rule. This indicates that this subscriber was found to be over consuming resources. If the enforce rule associated with this subscriber has a enforced QoS parameter set configured, the trap also indicates that the QoS parameter set of this subscriber are changed to the enforced QoS parameter set. "
+  },
+  "ccqmMIBConformance": {
+    "name": "ccqmMIBConformance",
+    "oid": "1.3.6.1.4.1.9.9.341.3",
+    "class": "objectidentity"
+  },
+  "ccqmMIBCompliances": {
+    "name": "ccqmMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.341.3.1",
+    "class": "objectidentity"
+  },
+  "ccqmMIBGroups": {
+    "name": "ccqmMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.341.3.2",
+    "class": "objectidentity"
+  },
+  "ccqmCompliance": {
+    "name": "ccqmCompliance",
+    "oid": "1.3.6.1.4.1.9.9.341.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ccqmEnfRuleGroup",
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB"
+      },
+      {
+        "object": "ccqmEnfRuleViolateGroup",
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB"
+      },
+      {
+        "object": "ccqmEnfRuleViolateNotifGroup",
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB"
+      }
+    ],
+    "status": "obsolete",
+    "description": "The compliance statement for CMTS devices that implement the Qos Monitoring feature. "
+  },
+  "ccqmComplianceRev1": {
+    "name": "ccqmComplianceRev1",
+    "oid": "1.3.6.1.4.1.9.9.341.3.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ccqmEnfRuleGroupRev1",
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB"
+      },
+      {
+        "object": "ccqmEnfRuleViolateGroup",
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB"
+      },
+      {
+        "object": "ccqmCmtsRuleIfBwUtilGroup",
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB"
+      },
+      {
+        "object": "ccqmEnfRuleViolateNotifGroup",
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for CMTS devices that implement the Qos Monitoring feature. "
+  },
+  "ccqmEnfRuleGroup": {
+    "name": "ccqmEnfRuleGroup",
+    "oid": "1.3.6.1.4.1.9.9.341.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleRegQoS"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleEnfQos"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleMonDuration"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleSampleRate"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRulePenaltyPeriod"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleByteCount"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleDirection"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleAutoEnforce"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleRowStatus"
+      }
+    ],
+    "status": "obsolete",
+    "description": "Group of objects implemented in CMTS providing enforce rule and QoS monitoring information. "
+  },
+  "ccqmEnfRuleViolateGroup": {
+    "name": "ccqmEnfRuleViolateGroup",
+    "oid": "1.3.6.1.4.1.9.9.341.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateRuleName"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateMacAddr"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateByteCount"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateLastDetectTime"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolatePenaltyExpTime"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateNotifEnable"
+      }
+    ],
+    "status": "current",
+    "description": "Group of objects implemented in CMTS providing information of enforce rule violations. "
+  },
+  "ccqmEnfRuleViolateNotifGroup": {
+    "name": "ccqmEnfRuleViolateNotifGroup",
+    "oid": "1.3.6.1.4.1.9.9.341.3.2.3",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmEnfRuleViolateNotification"
+      }
+    ],
+    "status": "current",
+    "description": "The notification which a CISCO-CABLE-QOS-MONITOR-MIB is required to implement."
+  },
+  "ccqmEnfRuleGroupRev1": {
+    "name": "ccqmEnfRuleGroupRev1",
+    "oid": "1.3.6.1.4.1.9.9.341.3.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleRegQoS"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleEnfQos"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleMonDuration"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleSampleRate"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRulePenaltyPeriod"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleDirection"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleAutoEnforce"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleRowStatus"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleAvgRate"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleDocsVer"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleRegSerClassName"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleEnfSerClassName"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleMonType"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleFirstPeakTime"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleFirstDuration"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleFirstAvgRate"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleSecondPeakTime"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleSecondDuration"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleSecondAvgRate"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleOffPeakDuration"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsEnfRuleOffPeakAvgRate"
+      }
+    ],
+    "status": "current",
+    "description": "Group of objects implemented in CMTS providing enforce rule and QoS monitoring information. "
+  },
+  "ccqmCmtsRuleIfBwUtilGroup": {
+    "name": "ccqmCmtsRuleIfBwUtilGroup",
+    "oid": "1.3.6.1.4.1.9.9.341.3.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsIfBwUtilUpThreshold"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsIfBwUtilLoThreshold"
+      },
+      {
+        "module": "CISCO-CABLE-QOS-MONITOR-MIB",
+        "object": "ccqmCmtsIfBwUtilRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "Group of objects implemented in CMTS providing information of interface utilization thresholds. "
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-CABLE-QOS-MONITOR-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:55:56 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-CABLE-QOS-MONITOR-MIB"
+  }
+}

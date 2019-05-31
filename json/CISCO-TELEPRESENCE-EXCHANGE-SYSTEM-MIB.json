@@ -1,0 +1,2867 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "CISCO-SYSLOG-MIB": [
+      "SyslogSeverity"
+    ],
+    "CISCO-TC": [
+      "CiscoPort"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddressType",
+      "InetAddress"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Bits",
+      "Counter64",
+      "MODULE-IDENTITY",
+      "Integer32",
+      "MibIdentifier",
+      "Unsigned32",
+      "iso",
+      "OBJECT-IDENTITY",
+      "TimeTicks",
+      "IpAddress",
+      "NOTIFICATION-TYPE",
+      "Counter32",
+      "OBJECT-TYPE",
+      "Gauge32"
+    ],
+    "SNMPv2-TC": [
+      "TruthValue",
+      "TimeStamp",
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "ciscoTelepresenceExchangeSystemMIB": {
+    "name": "ciscoTelepresenceExchangeSystemMIB",
+    "oid": "1.3.6.1.4.1.9.9.758",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2011-01-13 00:00",
+        "description": "Initial version of this MIB module"
+      }
+    ],
+    "lastupdated": "201101130000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-txbu-snmp@cisco.com",
+    "description": "The main purpose of this MIB is to provide product component level configuration, status, statistics, events, and alarm notifications for the Cisco TelePresence Exchange System (CTX System). A network management entity can use this MIB to: - Discover cluster nodes - Discover resources and their configurations - Monitor status of all cluster nodes - Monitor status of resources - Monitor configuration status - Monitor license status - Monitor backup process status - Monitor scheduling allocation failures and port usage statistics - Monitor product level error events - Receive real time notifications for status change and error ********************************* System Overview ********************************* Cisco TelePresence Exchange System (CTX System) is a turnkey solution tailored to service providers who want to offer premium video collaboration services and TelePresence as a service to enterprise customers. The CTX System solution preserves the full TelePresence experience across enterprise and service provider boundaries, integrates with third party SD/HD video technology, and maximizes service and network value via tight integration with other Cisco video and unified collaboration products. The Cisco TelePresence Exchange is comprised of a variety of components in order to deliver a highly integrated video service platform that will meet the needs of the service provider. At the heart of the exchange is what we refer to as the core components that are standards based platforms containing custom software to deliver the majority of the systems services and functions. These core components are the Cisco TelePresence Exchange System. ********************************* System Components ********************************* The core components are broken down into three application functional areas; administration, call processing, and persistent data storage. Each application is run on a dedicated server. Each dedicated server has a backup server. For each CTX System there are six servers. The collection of servers are considered a cluster and the servers are considered nodes within the cluster. The below diagram illustrates the CTX System: Cisco TelePresence Exchange System (CTX System) /--------------------------------------------\\ | --------------- --------------- | | | Admin 1 | <----> | Admin 2 | | | --------------- --------------- | | | | | | --------------- --------------- | | | Call Engine 1 | <----> | Call Engine 2 | | | --------------- --------------- | | | | | | --------------- --------------- | | | Database 1 | <----> | Database 2 | | | --------------- --------------- | \\--------------------------------------------/ The overall system requires a number of other Cisco platforms to deliver an end-to-end solution. These other platforms are configured in the CTX System as resources. ********************************* Implementation ********************************* The administration servers provide management interfaces for the CTX System cluster nodes and for the resources configured. This MIB consolidates the configuration, status, alarms, errors, and statistics for all cluster nodes. Therefore this MIB will only be implemented on the admin servers. Each admin server can be polled independently or via a virtual IP address. Each admin server functions in an active/active mode with the same set of information. Hardware and operating system level information, such as CPU, memory, power supplies, fans, etc. remain accessible in hardware and operating system specific MIBS, such as HOST-RESOURCES-MIB, IF-MIB, ... ********************************* Configuration Tables and Linking ********************************* Configuration table hierarchal structure is as follows: ___ |- Cluster Nodes - CTX System devices | |- Service Providers - Logical grouping |-- Regions - Logical grouping | | | |--- Resources - General configs for resources | | that are common to all resources | | | |--- SIP Configs - SIP configurations such as | | SIP IP, port, and protocol | | | |--- Meeting Configs - Meeting configurations | | such as Min/Max meeting ID's | | | |--- Capacity Configs - Media port counts, | | large meeting support, etc. | |-- Organizations All configuration table entries have a globally unique key. No two keys will be the same within or across configuration tables. The intent is to allow network management applications to use these unique keys to link or join associated tables together. Configuration tables that have an association to another table will contain a key reference object. Multiple associations may exist, so the key reference will contain a number in the object name. This number indicates only that there are multiple associations. The reference key object name will have the appended syntax 'KeyRef1'. Optionally there maybe 'KeyRef2', etc. when multiple associations exist. Example of linking associated tables: REGION TABLE Entry: ctxRegionKey.1 = STRING: 8a960c882aa5cd64012aa5d3963b0028 ctxRegionName.1 = STRING: San Francisco ctxRegionDescr.1 = STRING: null ctxRegionServiceProviderKeyRef1.1 = STRING: 8a960c882aa5cd64012aa5d144730017 RESOURCE TABLE Entry: ctxResourceKey.1 = STRING: 8a960c882aca4db8012aca9bbdb401dd ctxResourceName.1 = STRING: abc-cuvcm ctxResourceDescr.1 = STRING: abc-cuvcm ctxResourceMgmtIPType.1 = INTEGER: ipv4(1) ctxResourceMgmtIPAddr.1 = STRING: 0.0.0.0 ctxResourceDeviceType.1 = INTEGER: cuvcm(9) ctxResourceRegionKeyRef1.1 = STRING: 8a960c882aa5cd64012aa5d3963b0028 For the above entry we can see that there is a ctxResourceRegionKeyRef1 that has the ctxRegionKey value for region 'San Francisco' . Therefore resource 'abc-cuvcm' is associated to region 'San Francisco' ********************************* Glossary ********************************* CTX System : Cisco TelePresence Exchange System Service Provider : A service provider is configured in the CTX System and serves as a logical grouping of configuration objects. Region : A region is defined as a set of 'like' resources in terms of network latency, jitter, quality of service, etc. Normally a region is a geographic area such as Americas, Europe, or Asia Pacific, but a region can be a smaller set of like resources such as East and West regions. Resource : A resource is server or network device that the CTX System includes in configuration to provide call signaling, media services, scheduling, or other function. Cluster Node: A cluster node is a server within the CTX System, such as admin server, call engine server, or database server. SIP Protocol: SIP protocol is the transport protocol used to exchange messages between user agents. The protocols are described in RFC3261. Port : Port is the media session port allocation, also referred to as screen E.164 : E.164 is an ITU-T recommendation for telephone numbers. Reference link http://www.itu.int/rec/T-REC-E.164/en Endpoint: End system TelePresence device CUCM : Cisco Unified Communications Manager SBC : Session Border Controller such as ASR-1000 CUBE(sp) CTMS : Cisco TelePresence Multipoint Switch CTS : Cisco TelePresence System endpoint CTS-MAN : Cisco TelePresence Manager CUVCM : Cisco Unified Videoconferencing Manager Media2 : Tandberg MSE 8510 blade TPS : Tandberg MSE 8710 blade VCS : Tandberg Video Communication Server TMS : Tandberg Management Suite XMLRPC : XML Remote Procedure Call protocol"
+  },
+  "CtxKeyId": {
+    "name": "CtxKeyId",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "displayhint": "4x-",
+    "status": "current",
+    "description": "A key id is a globally unique key across all database tables and entries. This key will persist upon restart and reboot. This key is generated by the CTX System when the entry is added to the database. The format of the key is a HEX string value. The value can be up to 32 hexadecimal characters."
+  },
+  "CtxIndex": {
+    "name": "CtxIndex",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "displayhint": "d",
+    "status": "current",
+    "description": "An arbitrary (system-assigned) index for each instance. If MIB index persistence is configured via the CTX System CLI interface, this index will persist upon restart and reboot. When an entry is removed, this index will be cleared but will not be reused unless MIB index persistence is disabled or if persistence cache is cleared via the CTX System CLI interface."
+  },
+  "CtxPorts": {
+    "name": "CtxPorts",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "displayhint": "d",
+    "status": "current",
+    "description": "A port is the media session port allocation for a resource. It is commonly referred to as a media video RTP stream for a multipoint switch and an audio RTP steam for ISDN/IVR. It is also known as a segment or screen. A Cisco TelePresence System 1000 uses one port while a Cisco TelePresence System 3000 uses 3 ports, one for each video screen."
+  },
+  "CtxClusterNodeTypes": {
+    "name": "CtxClusterNodeTypes",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "admin": 1,
+          "engine": 2,
+          "db": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "The types of cluster nodes. admin(1) - CTX System administrative server engine(2) - CTX System call processing engine server db(3) - CTX System database server"
+  },
+  "CtxHealthStates": {
+    "name": "CtxHealthStates",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "normal": 1,
+          "warning": 2,
+          "error": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "The CTX System high level status. normal(1) - Normal operational state warning(2) - The system is in a warning state. A warning state needs attention, but is not affecting the system or solution from functioning. A warning state could be generated a redundant server is down or if a configured resource is down but is not affecting current call processing. error(3) - Error state indicates that the system is not fully usable and that immediate attention is required. Example of a error state is if both call engine servers are down."
+  },
+  "CtxResourceOperState": {
+    "name": "CtxResourceOperState",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "operational": 1,
+          "disabled": 2,
+          "failed": 3,
+          "maintenance": 4,
+          "pending": 5,
+          "standby": 6,
+          "unreachable": 7
+        }
+      }
+    },
+    "status": "current",
+    "description": "The resource operational state. The operational state of a resource is determined by the CTX system configuration and proactive health probe monitoring of the resource. An example of a health check probe is a SIP Options Ping or XMLRPC ping. operational(1) - Resource is fully operational and is successfully passing health probe validation checks. disabled(2) - Resource has been administratively disabled. failed(3) - Resource has failed to respond to consecutive health check probes or has failed due to an application failure on the resource. IP connectivity failures are indicated by the unreachable state. maintenance(4) - Resource is currently in maintenance mode. In this state, the resource may be up or down. Probe monitoring is not active on a device in this state. pending(5) - Resource is currently pending a state transition. When a device is added and fully configured, the device will be put into pending state till the health check probes have successfully passed. When passed the state will change to either operational or failed. A device that is put into maintenance mode will go into pending state till all calls are cleared from that device. standby(6) - A resource device in this state is considered fully operational, but is currently the standby server/resource. unreachable(7) - A resource will be in this state if the IP connectivity to the device is not functioning."
+  },
+  "CtxSIPProtocolType": {
+    "name": "CtxSIPProtocolType",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "tcp": 1,
+          "udp": 2,
+          "tls": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "The SIP transport protocol in use. tcp(1) - connection oriented transport udp(2) - connectionless transport tls(3) - Secured connection oriented transport"
+  },
+  "CtxResourceType": {
+    "name": "CtxResourceType",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "ctms": 1,
+          "ivr": 2,
+          "sbc": 3,
+          "sip": 4,
+          "ctsmanager": 5,
+          "mseTps": 6,
+          "mseMedia2": 7,
+          "isdn": 8,
+          "cuvcm": 9,
+          "cucm": 10,
+          "vcs": 11,
+          "tms": 12
+        }
+      }
+    },
+    "status": "current",
+    "description": "The resource device object type. ctms(1) - Cisco TelePresence Multipoint Switch ivr(2) - Interactive Voice Response sbc(3) - Session Border Controller sip(4) - Generic SIP user agent ctsmanager(5) - CTS Manager mseTps(6) - Tandberg MSE 8710 blade mseMedia2(7) - Tandberg MSG 8510 blade isdn(8) - ISDN PSTN gateway cuvcm(9) - Cisco Unified Videoconferencing Manager cucm(10) - Cisco Unified Communications Manager vcs(11) - Tandberg Video Communication Server tms(12) - Tandberg Management Suite server"
+  },
+  "ciscoTelepresenceExchangeSystemMIBNotifs": {
+    "name": "ciscoTelepresenceExchangeSystemMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.758.0",
+    "class": "objectidentity"
+  },
+  "ciscoTelepresenceExchangeSystemMIBObjects": {
+    "name": "ciscoTelepresenceExchangeSystemMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.758.1",
+    "class": "objectidentity"
+  },
+  "ciscoTelepresenceExchangeSystemMIBConform": {
+    "name": "ciscoTelepresenceExchangeSystemMIBConform",
+    "oid": "1.3.6.1.4.1.9.9.758.7",
+    "class": "objectidentity"
+  },
+  "ctxConfigObjects": {
+    "name": "ctxConfigObjects",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1",
+    "class": "objectidentity"
+  },
+  "ctxSystemStatusObjects": {
+    "name": "ctxSystemStatusObjects",
+    "oid": "1.3.6.1.4.1.9.9.758.1.2",
+    "class": "objectidentity"
+  },
+  "ctxStatisticsObjects": {
+    "name": "ctxStatisticsObjects",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3",
+    "class": "objectidentity"
+  },
+  "ctxEventHistory": {
+    "name": "ctxEventHistory",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4",
+    "class": "objectidentity"
+  },
+  "ctxNotifyObjects": {
+    "name": "ctxNotifyObjects",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5",
+    "class": "objectidentity"
+  },
+  "ctxServiceProviderTable": {
+    "name": "ctxServiceProviderTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the configuration information for service providers as they are configured in the CTX System. Service provider entries provide a logical grouping of regions, organizations, and resources."
+  },
+  "ctxServiceProviderEntry": {
+    "name": "ctxServiceProviderEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxServiceProviderIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes a service provider entry as configured in the CTX System."
+  },
+  "ctxServiceProviderIndex": {
+    "name": "ctxServiceProviderIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Service provider snmp instance configuration index."
+  },
+  "ctxServiceProviderKey": {
+    "name": "ctxServiceProviderKey",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the service provider ID key."
+  },
+  "ctxServiceProviderName": {
+    "name": "ctxServiceProviderName",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the service provider name as configured in the CTX System."
+  },
+  "ctxServiceProviderDescr": {
+    "name": "ctxServiceProviderDescr",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the service provider description as configured in the CTX System."
+  },
+  "ctxServiceProviderHDNumber": {
+    "name": "ctxServiceProviderHDNumber",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the service provider help desk number. This number is normally in the e.164 format."
+  },
+  "ctxRegionTable": {
+    "name": "ctxRegionTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the configuration information for regions as they are configured in the CTX System. A region is defined as a set of 'like' resources in terms of network latency, jitter, quality of service, etc. Normally a region is a geographic area such as Americas, Europe, or Asia Pacific, but a region can be a smaller set of like resources such as East and West regions."
+  },
+  "ctxRegionEntry": {
+    "name": "ctxRegionEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes a region entry as configured in the CTX System."
+  },
+  "ctxRegionIndex": {
+    "name": "ctxRegionIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Region snmp instance configuration index."
+  },
+  "ctxRegionKey": {
+    "name": "ctxRegionKey",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the region entry ID key as generated by the CTX System when the entry entry was configured."
+  },
+  "ctxRegionName": {
+    "name": "ctxRegionName",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the region name as configured in the CTX System."
+  },
+  "ctxRegionDescr": {
+    "name": "ctxRegionDescr",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the region description as configured in the CTX System."
+  },
+  "ctxRegionServiceProviderKeyRef1": {
+    "name": "ctxRegionServiceProviderKeyRef1",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "ctxServiceProviderKey",
+    "status": "current",
+    "description": "This object references the ctxServiceProviderKey object from the ctxServiceProviderEntry table. This key matches the service provider key. This key provides an association reference to the service provider entry that is associated to this region entry. This object maybe null or empty if no reference is provided. See MIB description under 'Configuration Tables and Linking' for a detailed example."
+  },
+  "ctxOrganizationTable": {
+    "name": "ctxOrganizationTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the configuration information for an organization as they are configured in the CTX System. Organization entries provide a logical grouping of customer endpoints and resources."
+  },
+  "ctxOrganizationEntry": {
+    "name": "ctxOrganizationEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxOrganizationIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents an organization configuration entry as configured in the CTX system."
+  },
+  "ctxOrganizationIndex": {
+    "name": "ctxOrganizationIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Organization snmp instance configuration index."
+  },
+  "ctxOrganizationKey": {
+    "name": "ctxOrganizationKey",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the organization ID key as generated by the CTX System when the organization entry was configured."
+  },
+  "ctxOrganizationName": {
+    "name": "ctxOrganizationName",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the organization name as configured in the CTX System."
+  },
+  "ctxOrganizationDescr": {
+    "name": "ctxOrganizationDescr",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the organization description as configured in the CTX System."
+  },
+  "ctxOrganizationMaxPorts": {
+    "name": "ctxOrganizationMaxPorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxPorts",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the organization maximum ports for scheduled meetings. The value of 0 indicates undefined."
+  },
+  "ctxOrganizationDirectDial": {
+    "name": "ctxOrganizationDirectDial",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the organization direct dial enabled flag as configured in the CTX System. If direct dial calls are allowed, this value will be TRUE. If direct dial calls are not allowed, this value will be FALSE."
+  },
+  "ctxOrganizationServiceProviderKeyRef1": {
+    "name": "ctxOrganizationServiceProviderKeyRef1",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "ctxServiceProviderKey",
+    "status": "current",
+    "description": "This object references the ctxServiceProviderKey object from the ctxServiceProviderEntry table. This key matches the service provider key. This key provides an association reference to the service provider entry that is associated to this region entry. This object maybe null or empty if no reference is provided. See MIB description under 'Configuration Tables and Linking' for a detailed example."
+  },
+  "ctxResourceObjects": {
+    "name": "ctxResourceObjects",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4",
+    "class": "objectidentity"
+  },
+  "ctxResourceTable": {
+    "name": "ctxResourceTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the configuration information for resources as they are configured in the CTX System. A resource is server or network device that the CTX System includes in configuration to provide call signaling, media services, scheduling, or other function. A resource may have additional configuration items, such as ctxSipConfigTable. Each of the other ctxResourceObjects tables are indexed by this resource entry. If a resource has SIP configurations, there will be a entry in the ctxSipConfigEntry indexed by this ctxResourceIndex. |- Service Providers - Logical grouping |-- Regions - Logical grouping | | | |--- Resources - General configs for resources | | that are common to all resources | | | |--- SIP Configs - SIP configurations such as | | SIP IP, port, and protocol | | | |--- Meeting Configs - Meeting configurations | | such as Min/Max meeting ID's | | | |--- Capacity Configs - Media port counts, | | large meeting support, etc."
+  },
+  "ctxResourceEntry": {
+    "name": "ctxResourceEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents a resource configuration entry as configured in the CTX system."
+  },
+  "ctxResourceIndex": {
+    "name": "ctxResourceIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Resource snmp instance configuration index."
+  },
+  "ctxResourceKey": {
+    "name": "ctxResourceKey",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the resource ID key as generated by the CTX System when the resource entry was configured. This key is a globally unique across all configuration tables and entries. This key will persist upon restart and reboot."
+  },
+  "ctxResourceName": {
+    "name": "ctxResourceName",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the resource name as configured in the CTX System."
+  },
+  "ctxResourceDescr": {
+    "name": "ctxResourceDescr",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the resource configuration as configured in the CTX System."
+  },
+  "ctxResourceMgmtIPType": {
+    "name": "ctxResourceMgmtIPType",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the management IP address type for the resource as configured in the CTX System."
+  },
+  "ctxResourceMgmtIPAddr": {
+    "name": "ctxResourceMgmtIPAddr",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the management IP for the resource as configured in the CTX System. This IP address is used for provisioning, monitoring, and resource probes. The IP address 0.0.0.0 will be used if the resource does not have a management IP address configured."
+  },
+  "ctxResourceDeviceType": {
+    "name": "ctxResourceDeviceType",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxResourceType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the resource device type as configured in the CTX System."
+  },
+  "ctxResourceRegionKeyRef1": {
+    "name": "ctxResourceRegionKeyRef1",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "ctxRegionKey",
+    "status": "current",
+    "description": "This object references the ctxRegionKey object from the ctxRegionEntry table. This key matches the region key. This key provides an association reference to the region entry that is associated to this resource entry. This object maybe null or empty if no reference is provided. See MIB description under 'Configuration Tables and Linking' for a detailed example."
+  },
+  "ctxSipConfigTable": {
+    "name": "ctxSipConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the SIP configuration attributes for a resource. Only resources that have SIP attributes will have an entry in this table."
+  },
+  "ctxSipConfigEntry": {
+    "name": "ctxSipConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes the SIP attributes for a resource as configured in the CTX System. As described in ctxResourceTable description, this table is indexed by the ctxResourceIndex. Only entries that have SIP attributes will have an entry in this table."
+  },
+  "ctxSipIpType": {
+    "name": "ctxSipIpType",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the SIP IP address type for the resource as configured in the CTX System."
+  },
+  "ctxSipIpAddr": {
+    "name": "ctxSipIpAddr",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the SIP signaling IP for the resource as configured in the CTX System. This IP address is used for signaling and for SIP OPTION PING resource probes."
+  },
+  "ctxSipPort": {
+    "name": "ctxSipPort",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoPort",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the SIP port for the resource as configured in the CTX System."
+  },
+  "ctxSipTransportProto": {
+    "name": "ctxSipTransportProto",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxSIPProtocolType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the SIP transport protocol type as configured in the CTX System."
+  },
+  "ctxMediaCapacityConfigTable": {
+    "name": "ctxMediaCapacityConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the media capacity configuration attributes for a resource. Only resources that have media capacity attributes will have an entry in this table."
+  },
+  "ctxMediaCapacityConfigEntry": {
+    "name": "ctxMediaCapacityConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes the media capacity attributes for a resource as configured in the CTX System. As described in ctxResourceTable description, this table is indexed by the ctxResourceIndex. Only entries that have media capacity attributes will have an entry in this table."
+  },
+  "ctxMediaCapacityMaxPorts": {
+    "name": "ctxMediaCapacityMaxPorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxPorts",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the maximum port capacity for the resource as configured in the CTX System."
+  },
+  "ctxMediaCapacityLargeMeeting": {
+    "name": "ctxMediaCapacityLargeMeeting",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the large meeting reservation allowed option for the resource as configured in the CTX System."
+  },
+  "ctxMeetingConfigTable": {
+    "name": "ctxMeetingConfigTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the meeting configuration attributes for a resource. Only resources that have meeting attributes will have an entry in this table."
+  },
+  "ctxMeetingConfigEntry": {
+    "name": "ctxMeetingConfigEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes the meeting attributes for a resource as configured in the CTX System. As described in ctxResourceTable description, this table is indexed by the ctxResourceIndex. Only entries that have meeting attributes will have an entry in this table."
+  },
+  "ctxMeetingConfigStaticMinId": {
+    "name": "ctxMeetingConfigStaticMinId",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 15
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the vendor specific minimum static meeting ID as configured in the CTX System."
+  },
+  "ctxMeetingConfigStaticMaxId": {
+    "name": "ctxMeetingConfigStaticMaxId",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 15
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the vendor specific maximum static meeting ID as configured in the CTX System."
+  },
+  "ctxMeetingConfigInterOpMinId": {
+    "name": "ctxMeetingConfigInterOpMinId",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 15
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the vendor specific minimum interOp meeting ID as configured in the CTX System."
+  },
+  "ctxMeetingConfigInterOpMaxId": {
+    "name": "ctxMeetingConfigInterOpMaxId",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.4.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 15
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the vendor specific maximum interOp meeting ID as configured in the CTX System."
+  },
+  "ctxClusterNodeTable": {
+    "name": "ctxClusterNodeTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the configuration information for cluster nodes as they are configured in the CTX System. A cluster node is a server within the CTX System, such as admin server, call engine server, or database server."
+  },
+  "ctxClusterNodeEntry": {
+    "name": "ctxClusterNodeEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes a cluster node entry as configured in the CTX System."
+  },
+  "ctxClusterNodeIndex": {
+    "name": "ctxClusterNodeIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Cluster node snmp instance configuration index."
+  },
+  "ctxClusterNodeKey": {
+    "name": "ctxClusterNodeKey",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the cluster node ID key as generated by the CTX System when the cluster node entry was configured."
+  },
+  "ctxClusterNodeName": {
+    "name": "ctxClusterNodeName",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the cluster node name as configured in the CTX system."
+  },
+  "ctxClusterNodeHostName": {
+    "name": "ctxClusterNodeHostName",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the cluster node hostname as configured in the CTX System."
+  },
+  "ctxClusterNodeIPType": {
+    "name": "ctxClusterNodeIPType",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the cluster node IP address type as configured in the CTX System."
+  },
+  "ctxClusterNodeIPAddr": {
+    "name": "ctxClusterNodeIPAddr",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the cluster node IP address as configured in the CTX System."
+  },
+  "ctxClusterNodeClusterName": {
+    "name": "ctxClusterNodeClusterName",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the cluster node cluster name as configured in the CTX System."
+  },
+  "ctxClusterNodeType": {
+    "name": "ctxClusterNodeType",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxClusterNodeTypes",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the cluster node type as configured in the CTX System."
+  },
+  "ctxClusterNodeOperState": {
+    "name": "ctxClusterNodeOperState",
+    "oid": "1.3.6.1.4.1.9.9.758.1.1.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxResourceOperState",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the operational state of the cluster node. The operational state is set by the CTX System based on configuration and proactive monitoring of the cluster node. See the textual convention CtxResourceOperState for a detail description of the various states."
+  },
+  "ctxAdminServersStatus": {
+    "name": "ctxAdminServersStatus",
+    "oid": "1.3.6.1.4.1.9.9.758.1.2.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxHealthStates",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies an overall system health status state for the cluster admin server nodes. This state is an indicator of the CTX System functional health in terms of the admin functions. The ctxAdminServersStatusChg notification provides real-time alerts for when this state changes. A ctxNotifyMessage will detail the reason why the state changed."
+  },
+  "ctxCallEnginesStatus": {
+    "name": "ctxCallEnginesStatus",
+    "oid": "1.3.6.1.4.1.9.9.758.1.2.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxHealthStates",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies an overall system health status state for the cluster engine server nodes. This state is an indicator of the CTX System functional health in terms of the call processing engine functions. The ctxCallEnginesStatusChg notification provides real-time alerts for when this state changes. A ctxNotifyMessage will detail the reason why the state changed."
+  },
+  "ctxDatabaseServersStatus": {
+    "name": "ctxDatabaseServersStatus",
+    "oid": "1.3.6.1.4.1.9.9.758.1.2.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxHealthStates",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies an overall system health status state for the cluster database server nodes. This state is an indicator of the CTX System functional health in terms of the database server functions. The ctxDatabaseServersStatusChg notification provides real-time alerts for when this state changes. A ctxNotifyMessage will detail the reason why the state changed."
+  },
+  "ctxResourceStatus": {
+    "name": "ctxResourceStatus",
+    "oid": "1.3.6.1.4.1.9.9.758.1.2.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxHealthStates",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies an overall system health status state for the resources configured. This state is an indicator of the CTX System functional health in terms of the resource dependencies. The ctxResourceStatusChg notification provides real-time alerts for when this state changes. A ctxNotifyMessage will detail the reason why the state changed."
+  },
+  "ctxSystemConfigStatus": {
+    "name": "ctxSystemConfigStatus",
+    "oid": "1.3.6.1.4.1.9.9.758.1.2.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxHealthStates",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies an overall system health status state for the system configuration. This state is an indicator of the CTX System functional health in terms of the overall configuration. The ctxSystemConfigStatusChg notification provides real-time alerts for when this state changes. A ctxNotifyMessage will detail the reason why the state changed."
+  },
+  "ctxSystemBackupStatus": {
+    "name": "ctxSystemBackupStatus",
+    "oid": "1.3.6.1.4.1.9.9.758.1.2.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxHealthStates",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies an overall system health status state for the system backups. This state is an indicator of the CTX System functional health in terms of the overall system backups. The ctxBackupStatusChg notification provides real-time alerts for when this state changes. A ctxNotifyMessage will detail the reason why the state changed."
+  },
+  "ctxResourceStatsTable": {
+    "name": "ctxResourceStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the run-time resource statistics."
+  },
+  "ctxResourceStatsEntry": {
+    "name": "ctxResourceStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes an individual resource and statistics for it. This table is indexed by the ctxResourceIndex. All resources will have an entry in this table to define common resource statistics, such as operational state."
+  },
+  "ctxResourceOperState": {
+    "name": "ctxResourceOperState",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxResourceOperState",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the operational state of the resource. The operational state is set by the CTX System based on configuration and proactive monitoring of the resource. See the textual convention CtxResourceOperState for a detail description of the various states."
+  },
+  "ctxResourceUnavailTrans": {
+    "name": "ctxResourceUnavailTrans",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "occurrences",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies a counter that increments when the resource transitions to unreachable or failed state from another state. The management entity can use this to track the operational stability of the resource."
+  },
+  "ctxResourceUnavailDuration": {
+    "name": "ctxResourceUnavailDuration",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Defines the total time in seconds that the resource was in either the failed or unreachable states. This counter keeps track of time in seconds on how much the resource stays in the failed and unreachable states. The duration is accumulative from SNMP start time and will reset to zero when the snmp agent is restarted."
+  },
+  "ctxResourceCallSetupFailures": {
+    "name": "ctxResourceCallSetupFailures",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "occurrences",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies a counter that increments every time a call fails to be setup correctly to this resource. Miss-dialed numbers are excluded and not considered a failure."
+  },
+  "ctxAllocStatsTable": {
+    "name": "ctxAllocStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the run-time scheduling port allocation statistics."
+  },
+  "ctxAllocStatsEntry": {
+    "name": "ctxAllocStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes an individual resource and statistics for media port allocations. This table is indexed by the ctxResourceIndex. Only resources that require port allocations will have an entry in this table."
+  },
+  "ctxAllocActivePorts": {
+    "name": "ctxAllocActivePorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxPorts",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object identifies the active in-use ports for the resource."
+  },
+  "ctxAllocAvailPorts": {
+    "name": "ctxAllocAvailPorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxPorts",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object identifies the available ports for the resource."
+  },
+  "ctxAllocFailures": {
+    "name": "ctxAllocFailures",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "failures",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object increments when there are not enough port resources available to process the requested allocation or if there is an error allocating the ports."
+  },
+  "ctxAllocOutOfPorts": {
+    "name": "ctxAllocOutOfPorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "occurrences",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object increments when there are not enough port resources available to process the requested allocation."
+  },
+  "ctxRegionStatsTable": {
+    "name": "ctxRegionStatsTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the run-time statistics for regions for scheduling port allocations and call setup failures. This table is similar to the ctxAllocStatsTable table, except this table provides statistics per region for all resources."
+  },
+  "ctxRegionStatsEntry": {
+    "name": "ctxRegionStatsEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes statistics for a region. This table is indexed by the ctxRegionIndex."
+  },
+  "ctxRegionCallSetupFailures": {
+    "name": "ctxRegionCallSetupFailures",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "failures",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies a counter that increments every time a call fails to be setup correctly in this region. Mis-dialed numbers are excluded and not considered a failure."
+  },
+  "ctxAllocPoolActivePorts": {
+    "name": "ctxAllocPoolActivePorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxPorts",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object identifies the active in-use ports for the region."
+  },
+  "ctxAllocPoolAvailPorts": {
+    "name": "ctxAllocPoolAvailPorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxPorts",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object identifies the available ports for resources within the region."
+  },
+  "ctxAllocPoolAllocFailures": {
+    "name": "ctxAllocPoolAllocFailures",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "failures",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object increments when there are not enough port resources available to process the requested allocation or if there is an error allocating the port for the given region."
+  },
+  "ctxAllocPoolAllocOutOfPorts": {
+    "name": "ctxAllocPoolAllocOutOfPorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "occurrences",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object increments when there are not enough port resources available to process the requested allocation for the given region resource pool."
+  },
+  "ctxAllocPeakHistory": {
+    "name": "ctxAllocPeakHistory",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4",
+    "class": "objectidentity"
+  },
+  "ctxPeakHistMaxIntervals": {
+    "name": "ctxPeakHistMaxIntervals",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 5,
+            "max": 1440
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 96,
+        "format": "decimal"
+      }
+    },
+    "units": "intervals",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the number of time intervals kept in the history tables ctxPeakHistAllocTable and ctxPeakHistAllocPoolTable. The default is 96 intervals. 96 intervals at the ctxPeakHistIntTime default of 15 minutes stores peak values for 24 hours. A value of 0 will disable peak history tables from collecting data. The minimum value is 5 with a maximum of 1440. Changing this value will reset and clear both ctxPeakHistAllocTable and ctxPeakHistAllocPoolTable table entries."
+  },
+  "ctxPeakHistIntTime": {
+    "name": "ctxPeakHistIntTime",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 1440
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 15,
+        "format": "decimal"
+      }
+    },
+    "units": "minutes",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the time interval in minutes. Default is 15 minutes. The minimum interval time is 1 and the maximum is 1440 minutes. Changing this value will reset and clear both ctxPeakHistAllocTable and ctxPeakHistAllocPoolTable table entries."
+  },
+  "ctxPeakHistAllocTable": {
+    "name": "ctxPeakHistAllocTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the run-time peak statistics for resource port allocations. This table contains peak port allocations per resource for ctxHistMaxIntervals. The management entity can use this table to monitor the peak port allocations per interval. Setting ctxPeakHistMaxIntervals to 0 will disable this table and clear all entries in table."
+  },
+  "ctxPeakHistAllocEntry": {
+    "name": "ctxPeakHistAllocEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxPeakHistAllocIntIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes a single peak time interval per resource. This table is indexed by the ctxResourceIndex and ctxPeakHistAllocIntIndex. Only resources that have port allocations will have an entry in this table."
+  },
+  "ctxPeakHistAllocIntIndex": {
+    "name": "ctxPeakHistAllocIntIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A monotonically increasing integer which is incremented for every interval. Based on the allowed interval length the object will not wrap for life of Device. The intent of this object is to allow network management applications a mechanism that allows them to collect only those newly added interval. The network management application only needs to save the index of the last received interval and use it as a starting point when data is next collected from this table."
+  },
+  "ctxPeakHistAllocTS": {
+    "name": "ctxPeakHistAllocTS",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the start timestamp of the interval. The interval end time is this time plus the ctxPeakHistIntTime."
+  },
+  "ctxPeakHistAllocPorts": {
+    "name": "ctxPeakHistAllocPorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxPorts",
+      "class": "type"
+    },
+    "units": "ports",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the peak ports for the given interval. This is the maximum port count during the interval time period."
+  },
+  "ctxPeakHistAllocPoolTable": {
+    "name": "ctxPeakHistAllocPoolTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies the run-time peak port allocation statistics for all resources within a region. This table contains peak port allocations per region for ctxHistMaxIntervals. The management entity can use this table to monitor the peak port allocations per interval. Setting ctxPeakHistMaxIntervals to 0 will disable this table and clear all entries in table."
+  },
+  "ctxPeakHistAllocPoolEntry": {
+    "name": "ctxPeakHistAllocPoolEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxPeakHistAllocPoolIntIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry describes a single peak time interval per region. This table is indexed by the ctxRegionIndex and ctxPeakHistAllocPoolIntIndex."
+  },
+  "ctxPeakHistAllocPoolIntIndex": {
+    "name": "ctxPeakHistAllocPoolIntIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A monotonically increasing integer which is incremented for every interval. Based on the allowed interval length the object will not wrap for life of Device. The intent of this object is to allow network management applications a mechanism that allows them to collect only those newly added interval. The network management application only needs to save the index of the last received interval and use it as a starting point when data is next collected from this table."
+  },
+  "ctxPeakHistAllocPoolTS": {
+    "name": "ctxPeakHistAllocPoolTS",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the start timestamp of the interval. The interval end time is this time plus the ctxPeakHistIntTime."
+  },
+  "ctxPeakHistAllocPoolPorts": {
+    "name": "ctxPeakHistAllocPoolPorts",
+    "oid": "1.3.6.1.4.1.9.9.758.1.3.4.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxPorts",
+      "class": "type"
+    },
+    "units": "ports",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the peak ports for the given interval. This is the maximum port count during the interval time period."
+  },
+  "ctxErrorHistoryTableSize": {
+    "name": "ctxErrorHistoryTableSize",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 25,
+            "max": 2500
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 100,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the number of entries that the ctxErrorHistoryTable can contain. When the capacity of the ctxErrorHistoryTable is reached, the oldest entry in the table will be deleted in order to accommodate the new entry. A value of '0' disables the history table. The default value is set to 100 entries."
+  },
+  "ctxErrorHistoryMaxSeverity": {
+    "name": "ctxErrorHistoryMaxSeverity",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SyslogSeverity",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "notice",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Defines the maximum severity of the event messages that the history table will contain. The default is notice(5), which can be changed by setting the object."
+  },
+  "ctxErrorHistoryLastIndex": {
+    "name": "ctxErrorHistoryLastIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the value of the ctxErrorIndex object corresponding to the last entry added into the table. The management entity can use this object to determine if a new entry has been added into the ctxErrorHistoryTable."
+  },
+  "ctxErrorHistoryTable": {
+    "name": "ctxErrorHistoryTable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains a history of alarms and events generated by the CTX system. This table is a real-time history table of alarms and events for the CTX System. When the table reaches its capacity specified in ctxErrorHistoryTableSize, the agent will purge the oldest entry. The management entity can receive real-time events when an object is inserted into this table by configuring ctxErrorHistoryEventNotifyEnable to TRUE and receiving ctxErrorHistoryEvent notifications"
+  },
+  "ctxErrorHistoryEntry": {
+    "name": "ctxErrorHistoryEntry",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry is an event that was generated by the CTX System. Events can be traps that were sent and other log messages."
+  },
+  "ctxErrorIndex": {
+    "name": "ctxErrorIndex",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Error history snmp instance index."
+  },
+  "ctxErrorKey": {
+    "name": "ctxErrorKey",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CtxKeyId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the error history key id. A empty string maybe used if the key is not present."
+  },
+  "ctxErrorTimeStamp": {
+    "name": "ctxErrorTimeStamp",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the timestamp when the message or the notification is generated by the CTX system. The timestamp is UTC."
+  },
+  "ctxErrorSeverity": {
+    "name": "ctxErrorSeverity",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SyslogSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the severity for the given message."
+  },
+  "ctxErrorAppName": {
+    "name": "ctxErrorAppName",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 48
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the application name for the message. AppNames are documented in the CTX System user guide."
+  },
+  "ctxErrorAlarmId": {
+    "name": "ctxErrorAlarmId",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the alarm ID for the event as generated by the CTX System. Alarm ID's are documented in the CTX System user guide."
+  },
+  "ctxErrorAttrValStr": {
+    "name": "ctxErrorAttrValStr",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies an attribute value pair in the format of attr=value [attr=value ...]. This string is limited to 255 characters. If the attribute value string is larger than 255 characters, the string will be truncated to 254 characters and an '*' will be inserted as the 255th character as a way to indicate the message was truncated. Attributes and associated values are documented in the CTX System user guide."
+  },
+  "ctxErrorMessage": {
+    "name": "ctxErrorMessage",
+    "oid": "1.3.6.1.4.1.9.9.758.1.4.4.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the message text for the event. This string is limited to 255 characters. If the message string is larger than 255 characters, the string will be truncated to 254 characters and an '*' will be inserted as the 255th character as a way to indicate the message was truncated."
+  },
+  "ctxNotifyMessage": {
+    "name": "ctxNotifyMessage",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object specifies a message text for the notification that is sent. This message will indicate a short description detailing the cause for the trap. This is intended as value added information for operational support staff, such as value added information in a ticket that is generated for this trap. Event and trap de-duplication systems should ignore this varbind as this entry will vary. De-duplication should be performed on the other varbinds and should exclude both ctxNotifyMesssage and ctxNotifyState."
+  },
+  "ctxNotifyConfigObjects": {
+    "name": "ctxNotifyConfigObjects",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.2",
+    "class": "objectidentity"
+  },
+  "ctxStatusChangeNotifyEnable": {
+    "name": "ctxStatusChangeNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.2.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies if the status change traps should be enabled or disabled. Setting this to TRUE will enable the notifications. Setting this to FALSE will disable the notifications. Default is true/enabled. This object controls the generation of the following notifications: ciscoCTXSysAdminServersStatusChg, ciscoCTXSysDatabaseServersStatusChg, ciscoCTXSysCallEnginesStatusChg, ciscoCTXSysResourceStatusChg, ciscoCTXSysSystemConfigStatusChg, ciscoCTXSysSystemBackupStatusChg"
+  },
+  "ctxLicenseAlarmNotifyEnable": {
+    "name": "ctxLicenseAlarmNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.2.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies if the license alarm traps should be enabled or disabled. Setting this to TRUE will enable the notifications. Setting this to FALSE will disable the notifications. Default is true/enabled. This object controls the generation of the following notifications: ciscoCTXSysLicenseFailure"
+  },
+  "ctxAuthFailureNotifyEnable": {
+    "name": "ctxAuthFailureNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.2.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies if the authentication failure traps should be enabled or disabled. Setting this to TRUE will enable the notifications. Setting this to FALSE will disable the notifications. The default setting for authentication failures is FALSE/disabled in order to prevent unnecessary event flooding. This object controls the generation of the following notifications: ciscoCTXSysUserAuthFailure"
+  },
+  "ctxClusterNodeAlarmNotifyEnable": {
+    "name": "ctxClusterNodeAlarmNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.2.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies if the cluster node alarm traps should be enabled or disabled. Setting this to TRUE will enable the notifications. Setting this to FALSE will disable the notifications. Default is true/enabled. This object controls the generation of the following notifications: ciscoCTXSysClusterNodeDown, ciscoCTXSysClusterNodeUp"
+  },
+  "ctxResourceAlarmNotifyEnable": {
+    "name": "ctxResourceAlarmNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.2.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies if the resource alarm traps should be enabled or disabled. Setting this to TRUE will enable the notifications. Setting this to FALSE will disable the notifications. Default is true/enabled. This object controls the generation of the following notifications: ciscoCTXSysResourceDown, ciscoCTXSysResourceUp, ciscoCTXSysResourceAllocFailure"
+  },
+  "ctxCallFailureNotifyEnable": {
+    "name": "ctxCallFailureNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.2.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "true",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies if the call failure traps should be enabled or disabled. Setting this to TRUE will enable the notifications. Setting this to FALSE will disable the notifications. Default is true/enabled. This object controls the generation of the following notifications: ciscoCTXSysCallSetupFailure, ciscoCTXSysCallAbnormalDisconnect"
+  },
+  "ctxErrorHistoryEventNotifyEnable": {
+    "name": "ctxErrorHistoryEventNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.758.1.5.2.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies if the error event history traps should be enabled or disabled. Setting this to TRUE will enable the notifications. Setting this to FALSE will disable the notifications. Notifications and other error logs are logged in the error history table. Enabling this may cause duplication for events that are in duplicate of other notifications. This may be the desired behavior of the management system. Use ctxErrorHistoryMaxSeverity to specify the maximum severity level to be logged and sent via a notification. Sending error history notifications are disabled by default. This object controls the generation of the following notifications: ciscoCTXSysErrorHistoryEvent"
+  },
+  "ciscoCTXSysAdminServersStatusChg": {
+    "name": "ciscoCTXSysAdminServersStatusChg",
+    "oid": "1.3.6.1.4.1.9.9.758.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAdminServersStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when the ctxAdminServersStatus changes. ctxStatusChangeNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysDatabaseServersStatusChg": {
+    "name": "ciscoCTXSysDatabaseServersStatusChg",
+    "oid": "1.3.6.1.4.1.9.9.758.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxDatabaseServersStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when the ctxDatabaseServerStatus changes. ctxStatusChangeNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysCallEnginesStatusChg": {
+    "name": "ciscoCTXSysCallEnginesStatusChg",
+    "oid": "1.3.6.1.4.1.9.9.758.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxCallEnginesStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when the ctxCallEnginesStatus changes. ctxStatusChangeNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysResourceStatusChg": {
+    "name": "ciscoCTXSysResourceStatusChg",
+    "oid": "1.3.6.1.4.1.9.9.758.0.4",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when the ctxResourceStatus changes. ctxStatusChangeNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysSystemConfigStatusChg": {
+    "name": "ciscoCTXSysSystemConfigStatusChg",
+    "oid": "1.3.6.1.4.1.9.9.758.0.5",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxSystemConfigStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when the ctxSystemConfigStatus changes. ctxStatusChangeNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysSystemBackupStatusChg": {
+    "name": "ciscoCTXSysSystemBackupStatusChg",
+    "oid": "1.3.6.1.4.1.9.9.758.0.6",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxSystemBackupStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when the ctxSystemBackupStatus changes. ctxStatusChangeNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysLicenseFailure": {
+    "name": "ciscoCTXSysLicenseFailure",
+    "oid": "1.3.6.1.4.1.9.9.758.0.7",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent for the following license violation failures: 1. DEMO License Errors a. Warnings 5 days prior to Demo License expiration if the user has not installed a permanent license. b. Error message immediately after the Demo License expiration if the user has not installed a permanent license. 2. Volume Based Licensing Errors a. Warning message that the system is reaching the license capacity if using more than 75% of current licenses b. Error Message that the system is violating the current licensing capacity and will soon start rejecting the calls if using more than 100% and less than 150% of available licenses c. Error message that the system will reject calls if claiming more than 150% of available licenses. ctxLicenseAlarmNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysUserAuthFailure": {
+    "name": "ciscoCTXSysUserAuthFailure",
+    "oid": "1.3.6.1.4.1.9.9.758.0.8",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be sent when a user authentication failure results in CTX System. 1. User authentication errors while trying to log into the CTX System Admin UI. 2. User authentication errors while trying to log into the CTX System CLI. ctxAuthFailureNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysClusterNodeDown": {
+    "name": "ciscoCTXSysClusterNodeDown",
+    "oid": "1.3.6.1.4.1.9.9.758.0.9",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be sent when there is a network connectivity or probe monitor failure to the cluster node from the admin server. ctxClusterNodeAlarmNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysClusterNodeUp": {
+    "name": "ciscoCTXSysClusterNodeUp",
+    "oid": "1.3.6.1.4.1.9.9.758.0.10",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be sent when the cluster node connectivity is restored or when the probe monitor is successful in monitoring the node after being down. ctxClusterNodeAlarmNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysResourceDown": {
+    "name": "ciscoCTXSysResourceDown",
+    "oid": "1.3.6.1.4.1.9.9.758.0.11",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceDeviceType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be sent when there is a network connectivity or probe monitor failure to the resource. This can be a SIP OPTION PING, XMLRPC, or network connectivity failure. The ctxNotifyMessage will contain the failure details. ctxResourceAlarmNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysResourceUp": {
+    "name": "ciscoCTXSysResourceUp",
+    "oid": "1.3.6.1.4.1.9.9.758.0.12",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceDeviceType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be sent when the resource connectivity is restored or when the probe monitor is successful in monitoring the resource after being down. ctxResourceAlarmNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysResourceAllocFailure": {
+    "name": "ciscoCTXSysResourceAllocFailure",
+    "oid": "1.3.6.1.4.1.9.9.758.0.13",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceDeviceType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionKey"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be sent when a resource allocation failure occurs. ctxResourceAlarmNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysCallSetupFailure": {
+    "name": "ciscoCTXSysCallSetupFailure",
+    "oid": "1.3.6.1.4.1.9.9.758.0.14",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceDeviceType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be sent when there is a call setup/routing failure between the CTX System and a resource. The cause for the setup failure will be detailed in ctxNotifyMessage. ctxCallFailureNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysCallAbnormalDisconnect": {
+    "name": "ciscoCTXSysCallAbnormalDisconnect",
+    "oid": "1.3.6.1.4.1.9.9.758.0.15",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceDeviceType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification will be sent when there is an abnormal call disconnect. The call disconnect reason will be detailed in ctxNotifyMessage. ctxCallFailureNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoCTXSysErrorHistoryEvent": {
+    "name": "ciscoCTXSysErrorHistoryEvent",
+    "oid": "1.3.6.1.4.1.9.9.758.0.16",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorKey"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorSeverity"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorAppName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorAlarmId"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorAttrValStr"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorMessage"
+      }
+    ],
+    "status": "current",
+    "description": "This notification is sent when a new ctxErrorHistoryEntry is created. If the event being logged does not have an organization name, this varbind entry will be an empty string value. ctxErrorHistoryEventNotifyEnable controls whether this notification is sent or not."
+  },
+  "ciscoTelepresenceExchangeSystemMIBCompliances": {
+    "name": "ciscoTelepresenceExchangeSystemMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.758.7.1",
+    "class": "objectidentity"
+  },
+  "ciscoTelepresenceExchangeSystemMIBGroups": {
+    "name": "ciscoTelepresenceExchangeSystemMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.758.7.2",
+    "class": "objectidentity"
+  },
+  "ciscoTelepresenceExchangeSystemMIBModuleCompliance": {
+    "name": "ciscoTelepresenceExchangeSystemMIBModuleCompliance",
+    "oid": "1.3.6.1.4.1.9.9.758.7.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoTelepresenceExchangeSystemMIBStatusGroup",
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB"
+      },
+      {
+        "object": "ciscoTelepresenceExchangeSystemMIBConfigGroup",
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB"
+      },
+      {
+        "object": "ciscoTelepresenceExchangeSystemMIBNotfyObjectsGroup",
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB"
+      },
+      {
+        "object": "ciscoTelepresenceExchangeSystemMIBNotifyGroup",
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB"
+      },
+      {
+        "object": "ciscoTelepresenceExchangeSystemMIBErrorHistoryGroup",
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB"
+      },
+      {
+        "object": "ciscoTelePresenceExchangeSystemMIBStatsGroup",
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities which implement the Cisco Telepresence Exchange MIB."
+  },
+  "ciscoTelepresenceExchangeSystemMIBStatusGroup": {
+    "name": "ciscoTelepresenceExchangeSystemMIBStatusGroup",
+    "oid": "1.3.6.1.4.1.9.9.758.7.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAdminServersStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxCallEnginesStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxDatabaseServersStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxSystemConfigStatus"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxSystemBackupStatus"
+      }
+    ],
+    "status": "current",
+    "description": "CTX System status object group."
+  },
+  "ciscoTelepresenceExchangeSystemMIBConfigGroup": {
+    "name": "ciscoTelepresenceExchangeSystemMIBConfigGroup",
+    "oid": "1.3.6.1.4.1.9.9.758.7.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxServiceProviderName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxServiceProviderDescr"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxServiceProviderHDNumber"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionDescr"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxOrganizationName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxOrganizationDescr"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxOrganizationMaxPorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxOrganizationDirectDial"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceDescr"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceMgmtIPType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceMgmtIPAddr"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceDeviceType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxSipIpType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxSipIpAddr"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxSipPort"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxSipTransportProto"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxMediaCapacityMaxPorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxMediaCapacityLargeMeeting"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeHostName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeIPType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeIPAddr"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeClusterName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeType"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxServiceProviderKey"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionKey"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionServiceProviderKeyRef1"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxOrganizationKey"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxOrganizationServiceProviderKeyRef1"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceKey"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceRegionKeyRef1"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeOperState"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeKey"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxMeetingConfigStaticMinId"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxMeetingConfigStaticMaxId"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxMeetingConfigInterOpMinId"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxMeetingConfigInterOpMaxId"
+      }
+    ],
+    "status": "current",
+    "description": "CTX System configuration object group."
+  },
+  "ciscoTelePresenceExchangeSystemMIBStatsGroup": {
+    "name": "ciscoTelePresenceExchangeSystemMIBStatsGroup",
+    "oid": "1.3.6.1.4.1.9.9.758.7.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceUnavailTrans"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAllocActivePorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAllocAvailPorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAllocPoolActivePorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAllocPoolAvailPorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAllocFailures"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAllocPoolAllocFailures"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceCallSetupFailures"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxRegionCallSetupFailures"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAllocOutOfPorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAllocPoolAllocOutOfPorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceOperState"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceUnavailDuration"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxPeakHistMaxIntervals"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxPeakHistIntTime"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxPeakHistAllocTS"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxPeakHistAllocPorts"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxPeakHistAllocPoolTS"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxPeakHistAllocPoolPorts"
+      }
+    ],
+    "status": "current",
+    "description": "Statistics object group."
+  },
+  "ciscoTelepresenceExchangeSystemMIBNotfyObjectsGroup": {
+    "name": "ciscoTelepresenceExchangeSystemMIBNotfyObjectsGroup",
+    "oid": "1.3.6.1.4.1.9.9.758.7.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxNotifyMessage"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxStatusChangeNotifyEnable"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxLicenseAlarmNotifyEnable"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxAuthFailureNotifyEnable"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxClusterNodeAlarmNotifyEnable"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxResourceAlarmNotifyEnable"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxCallFailureNotifyEnable"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorHistoryEventNotifyEnable"
+      }
+    ],
+    "status": "current",
+    "description": "CTX System notify objects."
+  },
+  "ciscoTelepresenceExchangeSystemMIBErrorHistoryGroup": {
+    "name": "ciscoTelepresenceExchangeSystemMIBErrorHistoryGroup",
+    "oid": "1.3.6.1.4.1.9.9.758.7.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorHistoryTableSize"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorHistoryMaxSeverity"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorHistoryLastIndex"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorKey"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorTimeStamp"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorSeverity"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorMessage"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorAppName"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorAlarmId"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ctxErrorAttrValStr"
+      }
+    ],
+    "status": "current",
+    "description": "CTX System error history table objects."
+  },
+  "ciscoTelepresenceExchangeSystemMIBNotifyGroup": {
+    "name": "ciscoTelepresenceExchangeSystemMIBNotifyGroup",
+    "oid": "1.3.6.1.4.1.9.9.758.7.2.6",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysAdminServersStatusChg"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysDatabaseServersStatusChg"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysCallEnginesStatusChg"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysResourceStatusChg"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysSystemConfigStatusChg"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysSystemBackupStatusChg"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysLicenseFailure"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysUserAuthFailure"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysClusterNodeDown"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysResourceDown"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysCallSetupFailure"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysErrorHistoryEvent"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysCallAbnormalDisconnect"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysResourceAllocFailure"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysClusterNodeUp"
+      },
+      {
+        "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+        "object": "ciscoCTXSysResourceUp"
+      }
+    ],
+    "status": "current",
+    "description": "CTX System trap/notifications."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:19:08 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-TELEPRESENCE-EXCHANGE-SYSTEM-MIB"
+  }
+}

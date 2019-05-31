@@ -1,0 +1,656 @@
+{
+  "imports": {
+    "class": "imports",
+    "CTRON-OIDS": [
+      "cabletron"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "MODULE-IDENTITY",
+      "Integer32",
+      "Bits",
+      "Counter32",
+      "Gauge32",
+      "Unsigned32",
+      "TimeTicks",
+      "IpAddress",
+      "OBJECT-IDENTITY",
+      "OBJECT-TYPE",
+      "NOTIFICATION-TYPE",
+      "MibIdentifier",
+      "Counter64",
+      "iso"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "ctSSA": {
+    "name": "ctSSA",
+    "oid": "1.3.6.1.4.1.52.4497",
+    "class": "objectidentity"
+  },
+  "aapsLog": {
+    "name": "aapsLog",
+    "oid": "1.3.6.1.4.1.52.4497.9",
+    "class": "objectidentity"
+  },
+  "logWindow": {
+    "name": "logWindow",
+    "oid": "1.3.6.1.4.1.52.4497.9.1",
+    "class": "objectidentity"
+  },
+  "logWindowTable": {
+    "name": "logWindowTable",
+    "oid": "1.3.6.1.4.1.52.4497.9.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "Table of log entries"
+  },
+  "logWindowEntry": {
+    "name": "logWindowEntry",
+    "oid": "1.3.6.1.4.1.52.4497.9.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CTRON-SYSLOG",
+        "object": "ltIndex",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Entry of logWindow Table"
+  },
+  "ltIndex": {
+    "name": "ltIndex",
+    "oid": "1.3.6.1.4.1.52.4497.9.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Index (window position) of the entry in the current Log Snapshot."
+  },
+  "ltLogString": {
+    "name": "ltLogString",
+    "oid": "1.3.6.1.4.1.52.4497.9.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 80,
+            "max": 80
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "String describing the event in the format: Time(DD:HH:MM:SS) + Log Level(FREEZE/ERROR/CRITICAL/STATUS/INFO/DEBUG) + Log Client Name + Event String. Time is expressed as time since reset (not realtime). This will change to realtime in the next iteration of this MIB."
+  },
+  "ltWindowOperation": {
+    "name": "ltWindowOperation",
+    "oid": "1.3.6.1.4.1.52.4497.9.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "refresh": 2,
+          "pageUp": 3,
+          "pageDown": 4
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "refresh(2) redisplays the contents of the current window table. pageUp(3) moves the window one page up. pageDown(4) moves the window one page down."
+  },
+  "ltWindowReset": {
+    "name": "ltWindowReset",
+    "oid": "1.3.6.1.4.1.52.4497.9.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "toLogStart": 2,
+          "toLogEnd": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "By setting this object to one of the two available values moves the beginning of the next window to log start or end"
+  },
+  "ltClientMatchString": {
+    "name": "ltClientMatchString",
+    "oid": "1.3.6.1.4.1.52.4497.9.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 20,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Setting this object to a string value will filter out those clients that do not contain that string as a prefix (case sensitive)."
+  },
+  "ltEventMatchString": {
+    "name": "ltEventMatchString",
+    "oid": "1.3.6.1.4.1.52.4497.9.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 20,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Setting this object to a string value will filter out those logged events that do not contain that string within the log entry (case sensitive)."
+  },
+  "serverConfig": {
+    "name": "serverConfig",
+    "oid": "1.3.6.1.4.1.52.4497.9.2",
+    "class": "objectidentity"
+  },
+  "scAutoFreeze": {
+    "name": "scAutoFreeze",
+    "oid": "1.3.6.1.4.1.52.4497.9.2.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "After this value is enabled, the act of logging a FREEZE level message will prevent any additional messages from being logged. The logging process can continue when scAdminStatus is set to enableLogging(3)."
+  },
+  "scAdminStatus": {
+    "name": "scAdminStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.2.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disableLogging": 2,
+          "enableLogging": 3,
+          "reset": 5
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object controls the status of the message logging system and the log itself. Setting this object to disableLogging(2) will prevent any clients from appending messages to the log. EnableLogging(3) starts/resumes logging. Reset(5) initializes the log."
+  },
+  "scLastChange": {
+    "name": "scLastChange",
+    "oid": "1.3.6.1.4.1.52.4497.9.2.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The value of sysUpTime at the last change to scAdminStatus or scAutoFreeze."
+  },
+  "clientConfigTable": {
+    "name": "clientConfigTable",
+    "oid": "1.3.6.1.4.1.52.4497.9.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table provides the ability to configure which messages will be logged and which will be displayed on a per client basis."
+  },
+  "clientConfigEntry": {
+    "name": "clientConfigEntry",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CTRON-SYSLOG",
+        "object": "ccClientID",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Entry of the client table"
+  },
+  "ccClientID": {
+    "name": "ccClientID",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Unique ID of the client entry"
+  },
+  "ccClientName": {
+    "name": "ccClientName",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 32,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Name of the client"
+  },
+  "ccClientPersistent": {
+    "name": "ccClientPersistent",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When enabled, client settings in this table are persistent across resets."
+  },
+  "ccClientLogStatus": {
+    "name": "ccClientLogStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, this client does not append messages to the log."
+  },
+  "ccClientDisplayStatus": {
+    "name": "ccClientDisplayStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, this client's messages are not displayed in the log window. This does not prevent them from being logged."
+  },
+  "ccClientFreezeLogStatus": {
+    "name": "ccClientFreezeLogStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get appended to the log."
+  },
+  "ccClientFreezeDisplayStatus": {
+    "name": "ccClientFreezeDisplayStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get displayed in the log window."
+  },
+  "ccClientErrorLogStatus": {
+    "name": "ccClientErrorLogStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get appended to the log."
+  },
+  "ccClientErrorDisplayStatus": {
+    "name": "ccClientErrorDisplayStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get displayed in the log window."
+  },
+  "ccClientCriticalLogStatus": {
+    "name": "ccClientCriticalLogStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get appended to the log."
+  },
+  "ccClientCriticalDisplayStatus": {
+    "name": "ccClientCriticalDisplayStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get displayed in the log window."
+  },
+  "ccClientStatusLogStatus": {
+    "name": "ccClientStatusLogStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get appended to the log."
+  },
+  "ccClientStatusDisplayStatus": {
+    "name": "ccClientStatusDisplayStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get displayed in the log window."
+  },
+  "ccClientInfoLogStatus": {
+    "name": "ccClientInfoLogStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get appended to the log."
+  },
+  "ccClientInfoDisplayStatus": {
+    "name": "ccClientInfoDisplayStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get displayed in the log window."
+  },
+  "ccClientDebugLogStatus": {
+    "name": "ccClientDebugLogStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get appended to the log."
+  },
+  "ccClientDebugDisplayStatus": {
+    "name": "ccClientDebugDisplayStatus",
+    "oid": "1.3.6.1.4.1.52.4497.9.3.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 2,
+          "enabled": 3
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "When disabled, client's messages with this log level do not get displayed in the log window."
+  },
+  "recoveredLogTable": {
+    "name": "recoveredLogTable",
+    "oid": "1.3.6.1.4.1.52.4497.9.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "Table that contains a the last 100 entries in the log recorded before the last system shutdown, reset or a power failure."
+  },
+  "recoveredLogTableEntry": {
+    "name": "recoveredLogTableEntry",
+    "oid": "1.3.6.1.4.1.52.4497.9.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CTRON-SYSLOG",
+        "object": "rlIndex",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Entry of the recovered log table"
+  },
+  "rlIndex": {
+    "name": "rlIndex",
+    "oid": "1.3.6.1.4.1.52.4497.9.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Unique index of the recovered log entry. Entry with index 1 is the oldest entry in the log."
+  },
+  "rlLogString": {
+    "name": "rlLogString",
+    "oid": "1.3.6.1.4.1.52.4497.9.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 200,
+            "max": 200
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Event string of this entry."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CTRON-SYSLOG",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:36:46 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CTRON-SYSLOG"
+  }
+}
