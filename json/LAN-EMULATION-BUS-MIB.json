@@ -1,0 +1,925 @@
+{
+  "imports": {
+    "class": "imports",
+    "LAN-EMULATION-CLIENT-MIB": [
+      "VpiInteger",
+      "VciInteger",
+      "atmfLanEmulation"
+    ],
+    "LAN-EMULATION-ELAN-MIB": [
+      "TIMESTAMP",
+      "AtmLaneMask",
+      "IfIndexOrZero",
+      "Integer"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Counter32",
+      "MibIdentifier",
+      "TimeTicks",
+      "OBJECT-IDENTITY",
+      "OBJECT-TYPE",
+      "Bits",
+      "iso",
+      "Counter64",
+      "IpAddress",
+      "MODULE-IDENTITY",
+      "Unsigned32",
+      "Gauge32",
+      "NOTIFICATION-TYPE",
+      "Integer32"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "busMIB": {
+    "name": "busMIB",
+    "oid": "1.3.6.1.4.1.353.5.3.4",
+    "class": "objectidentity"
+  },
+  "RowStatus": {
+    "name": "RowStatus",
+    "class": "type",
+    "type": {
+      "type": "INTEGER",
+      "class": "type"
+    }
+  },
+  "AtmLaneAddress": {
+    "name": "AtmLaneAddress",
+    "class": "type",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 20,
+            "max": 20
+          }
+        ]
+      }
+    }
+  },
+  "busConfGroup": {
+    "name": "busConfGroup",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1",
+    "class": "objectidentity"
+  },
+  "busStatGroup": {
+    "name": "busStatGroup",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2",
+    "class": "objectidentity"
+  },
+  "busFaultGroup": {
+    "name": "busFaultGroup",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3",
+    "class": "objectidentity"
+  },
+  "busConfNextId": {
+    "name": "busConfNextId",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The next available BUS index. The value of this object can be used as the index by the network manager to create an entry in the busConfTable."
+  },
+  "busConfTable": {
+    "name": "busConfTable",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains all LAN Emulation Broadcast and Unknown Servers (BUS) this agent manages. The BUS handles data sent by an LE Client to the broadcast MAC address, all multicast traffic, and initial unicast frames which are sent by a LEC before the data direct target ATM address has been resolved. There can be multiple BUSs per ELAN, but a BUS can service only one ELAN."
+  },
+  "busConfEntry": {
+    "name": "busConfEntry",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busConfIndex",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Each entry in this table represents a BUS. The parameters in each entry apply to one emulated LAN served by one BUS. Object busRowStatus is required during row creation and deletion. Object busElanName is used to indicate the ELAN this BUS is servicing and is used to cross reference tables defined in the LAN Emulation Server MIB. Note that objects busAtmAddrSpec and busAtmAddrMask are used to configure the ATM address of a BUS. The BUS typically derives it's ATM address from the switch or the network and the actual ATM address used is indicated in the object busAtmAddrActual."
+  },
+  "busConfIndex": {
+    "name": "busConfIndex",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "A value which uniquely identifies a conceptual row in the busConfTable. If the conceptual row identified by this value of busConfIndex is recreated following an agent restart, the same value of busConfIndex must be used to identify the recreated row."
+  },
+  "busConfAtmAddrSpec": {
+    "name": "busConfAtmAddrSpec",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "AtmLaneAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "An ATM address specified by the network or local management that, with the ATM address mask, determines a portion of the ATM address that the BUS on the designated ATM interface will use to derive the actual ATM address from the network or ILMI. The derived ATM address is specified in the object busAtmAddrActual, which is used to receive multicast or broadcast traffic."
+  },
+  "busConfAtmAddrMask": {
+    "name": "busConfAtmAddrMask",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "AtmLaneMask",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+        "format": "hex"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The ATM address mask associated with the object busAtmAddrSpec. The value of the mask is an ATM address with the don't care portion set to zero and the valid ATM address portion set to one."
+  },
+  "busConfAtmAddrActual": {
+    "name": "busConfAtmAddrActual",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "AtmLaneAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": " The resultant ATM address in use by the BUS. This object is a product of the specified ATM address, mask and interaction with the network. This object is created by the agent."
+  },
+  "busConfElanName": {
+    "name": "busConfElanName",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The name of the ELAN this BUS is providing service to."
+  },
+  "busConfLastChange": {
+    "name": "busConfLastChange",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TIMESTAMP",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The value of the sysUpTime when this BUS has entered the state indicated by the object busConfOperStatus."
+  },
+  "busConfMaxFrameAge": {
+    "name": "busConfMaxFrameAge",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "LAN Emulation Over ATM Specification - version 1.0. S5.",
+    "status": "mandatory",
+    "description": "Time out period for a frame that has been received but not been transmitted by BUS to all relevant Multicast Send VCCs or Multicast Forward VCCs."
+  },
+  "busConfOperStatus": {
+    "name": "busConfOperStatus",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "up": 2,
+          "down": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The operational state of this BUS entry. When in 'up' state the BUS will forward LEC traffic. Any other state the BUS is not available for service and may release all the existing VCCs and refuse service to all clients."
+  },
+  "busConfAdminStatus": {
+    "name": "busConfAdminStatus",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "up": 2,
+          "down": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "up",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": " The desired state of the designated BUS as prescribed by the operator. The actions of the agent will, if at all possible, eventually result in the desired state being reflected in the busOperStatus."
+  },
+  "busConfRowStatus": {
+    "name": "busConfRowStatus",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "reference": "RFC 1443, [10] Textual Conventions for version 2 of the Simple Network Management Protocol (SNMPv2).",
+    "status": "mandatory",
+    "description": "This object is used to create or delete entries in the busConfTable."
+  },
+  "busVccTable": {
+    "name": "busVccTable",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains all the Multicast Forward VCCs used by the BUS to forward multicast traffic to the participating LECs. The Multicast Forward VCC can either be point-to-point or point-to- multipoint calls. This table is read only if SVCs are used and writable if PVCs are used."
+  },
+  "busVccEntry": {
+    "name": "busVccEntry",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busConfIndex",
+        "implied": 0
+      },
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busVccAtmIfIndex",
+        "implied": 0
+      },
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busVccMtFwdVpi",
+        "implied": 0
+      },
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busVccMtFwdVci",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Each entry in this table represents a Multicast Forward VCC of the BUS."
+  },
+  "busVccAtmIfIndex": {
+    "name": "busVccAtmIfIndex",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IfIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "The ATM interface which the Multicast Forward VCC is running on. This value must match an existing value in the ifTable. The value of this object is set to zero when the ATM interface is undefined."
+  },
+  "busVccMtFwdVpi": {
+    "name": "busVccMtFwdVpi",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VpiInteger",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "The VPI value of the Multicast Forward VCC. The object busVccAtmIfIndex, busVccMtFwdVci and the value of this object uniquely identfies a VCC within a ATM host."
+  },
+  "busVccMtFwdVci": {
+    "name": "busVccMtFwdVci",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VciInteger",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "The VCI value of the Multicast Forward VCC. The object busVccAtmIfIndex, busVccMtFwdVpi and the value of this object uniquely identfies a VCC within a ATM host."
+  },
+  "busVccRowStatus": {
+    "name": "busVccRowStatus",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "reference": "RFC 1443, [10] Textual Conventions for version 2 of the Simple Network Management Protocol (SNMPv2).",
+    "status": "mandatory",
+    "description": "This object is used to create or delete entries in the busConfTable."
+  },
+  "busLecTableLastChange": {
+    "name": "busLecTableLastChange",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TIMESTAMP",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The value of sysUpTime when an entry of the busLecTable was created/deleted."
+  },
+  "busLecTable": {
+    "name": "busLecTable",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": " This table contains the BUS and the actual LECs being serviced by the BUS. It can be used as the actual mapping between BUS and LEC. This table provides information for Multicast send VCCs between BUS and clients. Objects busLecMcastSendAtmIfIndex, busLecMcastSendVpi, and busLecMcstSendVci can only be modified if PVC is used."
+  },
+  "busLecEntry": {
+    "name": "busLecEntry",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busConfIndex",
+        "implied": 0
+      },
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busLecAtmAddr",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Each entry represents a BUS to LEC mapping."
+  },
+  "busLecAtmAddr": {
+    "name": "busLecAtmAddr",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "AtmLaneAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "The ATM address of the LEC. This is the primary ATM address of the LEC."
+  },
+  "busLecMcastSendAtmIfIndex": {
+    "name": "busLecMcastSendAtmIfIndex",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IfIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The ATM interface index this BUS uses for Multicast Send traffic. The value of this object has to exist in the ifTable in MIB II unless an internal connection is used. When an internal connection is used, this object is set to zero."
+  },
+  "busLecMcastSendVpi": {
+    "name": "busLecMcastSendVpi",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VpiInteger",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": " The virtual path identifier used to receive multicast traffic by this BUS."
+  },
+  "busLecMcastSendVci": {
+    "name": "busLecMcastSendVci",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VciInteger",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": " The virtual channel identifier used to receive multicast traffic by this BUS."
+  },
+  "busLecRowStatus": {
+    "name": "busLecRowStatus",
+    "oid": "1.3.6.1.4.1.353.5.3.4.1.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": " This object provides a way for the network manager to selectively remove a LE Client from the designated BUS. Or in a system where PVCs are used, this table is used to create Multicast Send VCCs between BUS and LEC."
+  },
+  "busStatTable": {
+    "name": "busStatTable",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains all counters the BUS maintain. This table is an extention to the busConfTable."
+  },
+  "busStatEntry": {
+    "name": "busStatEntry",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busConfIndex",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Each entry in this table contains a BUS and its counters."
+  },
+  "busStatInDiscards": {
+    "name": "busStatInDiscards",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": " The number of frames discarded due to resource error."
+  },
+  "busStatInOctets": {
+    "name": "busStatInOctets",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": " The number of octets that this BUS has received since its initialization."
+  },
+  "busStatInUcastFrms": {
+    "name": "busStatInUcastFrms",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": " The number of frames that the BUS has received which were unicast data frames and all control frames (i.e. they were flooded from the client)."
+  },
+  "busStatInMcastFrms": {
+    "name": "busStatInMcastFrms",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": " The number of frames that the BUS has received which were multicast frames."
+  },
+  "busStatFrmTimeOuts": {
+    "name": "busStatFrmTimeOuts",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": " The number of frames dropped by the BUS due to time out."
+  },
+  "busStatMcastSendRefused": {
+    "name": "busStatMcastSendRefused",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": " The number of multicast send VCCconnection setup attempts to the BUS which were refused."
+  },
+  "busStatMcastFwdFailure": {
+    "name": "busStatMcastFwdFailure",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": " The number of multicast forward VCCconnection setup attempts from the BUS which were unsuccessful for any reason."
+  },
+  "busLecStatTable": {
+    "name": "busLecStatTable",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains all LEC counters the BUS maintains. This table can also be used to retrieve all LECs a BUS is providing service to."
+  },
+  "busLecStatEntry": {
+    "name": "busLecStatEntry",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busConfIndex",
+        "implied": 0
+      },
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busLecAtmAddr",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Each entry in this table represents a LEC and its counters."
+  },
+  "busLecRecvs": {
+    "name": "busLecRecvs",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Number of Multicast, Broadcast and Unknown Forward requests received by the BUS from this LEC."
+  },
+  "busLecForwards": {
+    "name": "busLecForwards",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Number of Multicast, Broadcast and Unkown Forward requests forwarded by the BUS from this LEC. The value of this object indicate how many requests have been forwarded by the BUS."
+  },
+  "busLecDiscards": {
+    "name": "busLecDiscards",
+    "oid": "1.3.6.1.4.1.353.5.3.4.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Number of Multicast, Broadcast and Unkown Forward requests discarded by the BUS from this LEC. The value of this object indicate how many requests have been discarded by the BUS."
+  },
+  "busErrCtlTable": {
+    "name": "busErrCtlTable",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains error log control information of all BUS instances. This table is an extention to the busConfTable. It is used to enable or disable error logs for a particular BUS entry."
+  },
+  "busErrCtlEntry": {
+    "name": "busErrCtlEntry",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busConfIndex",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Each entry represents a BUS entry in the busConfTable."
+  },
+  "busErrCtlAdminStatus": {
+    "name": "busErrCtlAdminStatus",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enable": 1,
+          "disable": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object is used to enable/disable error logging for the BUS."
+  },
+  "busErrCtlOperStatus": {
+    "name": "busErrCtlOperStatus",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "active": 2,
+          "outOfRes": 3,
+          "failed": 4,
+          "disabled": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This object is used to indicate the result of a set operation to the object busErrCtlAdminStatus. If the error log was successfully started, it is in active(2) mode. Otherwise, it is set to either outOfRes(3) or failed(4) for the respective reasons."
+  },
+  "busErrCtlClearLog": {
+    "name": "busErrCtlClearLog",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noOp": 1,
+          "clear": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object is used to clear the error log entries associated with this BUS."
+  },
+  "busErrCtlMaxEntries": {
+    "name": "busErrCtlMaxEntries",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The maximum entries of the error log a BUS can support."
+  },
+  "busErrCtlLastEntry": {
+    "name": "busErrCtlLastEntry",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The index to the last entry in the error log table for this BUS."
+  },
+  "busErrLogTable": {
+    "name": "busErrLogTable",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains error logs of the BUS instances enabled in the busErrCtlTable. This table is indexed by the BUS instance index and an arbitrary integer uniquely identifies an error log."
+  },
+  "busErrLogEntry": {
+    "name": "busErrLogEntry",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busConfIndex",
+        "implied": 0
+      },
+      {
+        "module": "LAN-EMULATION-BUS-MIB",
+        "object": "busErrLogIndex",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Each entry represents aan error detected by the BUS."
+  },
+  "busErrLogIndex": {
+    "name": "busErrLogIndex",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "An arbitrary integer which uniquely identifies an error log entry. The first entry after reset or clearing the error log is an assigned value (2^32-1). Succeding entries are assigned with descending values consecutively. Entries after 1 are discarded.The enabling/disabling of the error log capability is done in the busErrCtlTable."
+  },
+  "busErrLogAtmAddr": {
+    "name": "busErrLogAtmAddr",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "AtmLaneAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The primary ATM address of the LE Client on whose Multicast Send VCC the error occured. The corresponding error code is specified in the object busErrLogErrCode."
+  },
+  "busErrLogErrCode": {
+    "name": "busErrLogErrCode",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "outOfRes": 1,
+          "badCtlFrame": 2,
+          "badDataFrame": 3,
+          "other": 4
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The Error code which indicates the cause of the error."
+  },
+  "busErrLogTime": {
+    "name": "busErrLogTime",
+    "oid": "1.3.6.1.4.1.353.5.3.4.3.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TIMESTAMP",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The sysUpTime when this entry was logged by the BUS."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/LAN-EMULATION-BUS-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 19:56:33 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "LAN-EMULATION-BUS-MIB"
+  }
+}

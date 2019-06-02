@@ -1,0 +1,409 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Counter32",
+      "Bits",
+      "Counter64",
+      "IpAddress",
+      "OBJECT-IDENTITY",
+      "MibIdentifier",
+      "MODULE-IDENTITY",
+      "Integer32",
+      "OBJECT-TYPE",
+      "NOTIFICATION-TYPE",
+      "Gauge32",
+      "iso",
+      "TimeTicks",
+      "Unsigned32"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "RowStatus"
+    ]
+  },
+  "ciscoImageCheckMIB": {
+    "name": "ciscoImageCheckMIB",
+    "oid": "1.3.6.1.4.1.9.9.99990",
+    "class": "moduleidentity",
+    "lastupdated": "200305150000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": " Cisco Systems Customer Service Postal: 170 W. Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-snmp@cisco.com",
+    "description": "Initial version of Image Check MIB."
+  },
+  "ciscoImageCheckMIBObjects": {
+    "name": "ciscoImageCheckMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.99990.1",
+    "class": "objectidentity"
+  },
+  "ciscoImageCheck": {
+    "name": "ciscoImageCheck",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1",
+    "class": "objectidentity"
+  },
+  "ciscoImageCheckOpTable": {
+    "name": "ciscoImageCheckOpTable",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of Image check operation entries. Each entry represents an Image check operation that has been initiated. "
+  },
+  "ciscoImageCheckOpEntry": {
+    "name": "ciscoImageCheckOpEntry",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImageCheckSerialNum",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An Image check operation entry. Each entry consists of an image name, current status of the check operation and a row status. A management station wishing to create an entry should first generate a pseudo-random serial number to be used as the index to this sparse table. The station should then create the associated instance of the row status object. It must also, create the associated instance of the image name. This image is checked for compatibility with the image already running on the active supervisor. Once the appropriate instances of all the mandatory objects have been created, either by an explicit SNMP set request or by default, the row status should be set to active to initiate the operation. Note that this entire procedure may be initiated via a single set request which specifies a row status of createAndGo. Once an operation has been activated, it cannot be stopped. Once the operation completes, the management station should retrieve the value of the status object and delete the entry. In order to prevent old entries from clogging the table, entries will be aged out, but an entry will never be deleted within 5 minutes of completing. "
+  },
+  "ciscoImageCheckSerialNum": {
+    "name": "ciscoImageCheckSerialNum",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 2147483647
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Object which specifies a unique entry in the table. A management station wishing to initiate a check operation should use a pseudo-random value for this object when creating or modifying an instance of a ciscoImageCheckOpEntry. "
+  },
+  "ciscoImageCheckImageName": {
+    "name": "ciscoImageCheckImageName",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Image file name that needs the verification. If the Image name is NULL then it is assumed that the image check is to be done with the image on standby supervisor. "
+  },
+  "ciscoImageCheckStatus": {
+    "name": "ciscoImageCheckStatus",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "inProgress": 2,
+          "inCompatLoose": 3,
+          "inCompatStrict": 4,
+          "compatible": 5,
+          "noStandby": 6,
+          "pssErr": 7,
+          "extractFail": 8,
+          "fileParseErr": 9,
+          "getIncompatErr": 10
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current status of the image check operation. If the status is inCompatLoose(3) or inCompatStrict(4), one can look at the detail reasons of incompatibilities by looking at ciscoImgChkResultsTable described below. If the status is compatible, then there is no need to look at the ciscoImgChkResultsTable. If the status is noStandby(6), pssErr(7), extractFail(8), fileParseErr(9) or getIncompatErr(10), there is some internal error in even starting the check compatibility process, and hence the ciscoImgChkResultsTable should not be read for any details. inProgress(2) - Image check is in progress inCompatLoose(3) - Loose incompatibility inCompatStrict(4) - Strict incompatibility compatible(5) - images are compatible noStandby(6) - standby supervisor is absent pssErr(7) - internal error extractFail(8) - Could not extract image fileParseErr(9) - Could not parse image getIncompatErr(10) - internal error in determining incompatibilities. "
+  },
+  "ciscoImageCheckEntryStatus": {
+    "name": "ciscoImageCheckEntryStatus",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this table entry."
+  },
+  "ciscoImgChkResultsTable": {
+    "name": "ciscoImgChkResultsTable",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the features and capabilities that are incompatible for the request that was made corresponding to the instance of ciscoImgChkFeatureIndex in the ciscoImageCheckOpTable."
+  },
+  "ciscoImgChkResultsEntry": {
+    "name": "ciscoImgChkResultsEntry",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImageCheckSerialNum",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImgChkFeatureIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImgChkCapabIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry of ciscoImgChkResultsTable. "
+  },
+  "ciscoImgChkFeatureIndex": {
+    "name": "ciscoImgChkFeatureIndex",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The index of the incompatible feature."
+  },
+  "ciscoImgChkCapabIndex": {
+    "name": "ciscoImgChkCapabIndex",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The index of the incompatible capability."
+  },
+  "ciscoImgChkFeatureName": {
+    "name": "ciscoImgChkFeatureName",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The name of the incompatible feature. The list of features is subject to implementation in a given software release. The current list of features is as follows - fspf - FSPF Routing Protocol Application fcmpls - Multi-Protocol Label Switching fib - FIB Manager flogi - F Port Server rscn - RSCN Module fcns - Name Server fcdomain - Domain Manager fc-tunnel - FC MPLS tunnel ipfc - Ipfc Manager ipconf - IP Configuration Manager ips - IPS Manager port - Port Manager port-channel - Port Channel Manager span - Switch Port Analyzer sysmgr-ver - System Manager version controller vrrp-cfg - VRRP Configuration vsan - VSAN manager zone - Zone Server "
+  },
+  "ciscoImgChkCapabilityName": {
+    "name": "ciscoImgChkCapabilityName",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The name of the incompatible capability. The list of capabilities is subject to implementation in a given software release. The current list of capabilities is as follows - CAP_FEATURE_SPAN_FCFWD_STBY_POP_ENABLED CAP_FEATURE_SPAN_IF_VSAN_SRC_MIX_NOT_ALLOWED CAP_FEATURE_SPAN_IF_SRC_VSAN_FILTER_NOT_ALLOWED CAP_FEATURE_SPAN_FC_TUNNEL_CFG CAP_FEATURE_SPAN_ST_PORT_CFG CAP_FEATURE_SPAN_FCIP_SRC_CFG CAP_FEATURE_SPAN_ISCSI_SRC_CFG CAP_FEATURE_ZS_READ_ONLY_ZONING CAP_FEATURE_ZS_LUN_ZONING CAP_FEATURE_PORT_MODE_ST_CFG CAP_FEATURE_FC_TUNNEL_CFG CAP_FEATURE_PORT_PERFORMANCE_BUF "
+  },
+  "ciscoImgChkCapabilityReq": {
+    "name": "ciscoImgChkCapabilityReq",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "strict": 1,
+          "loose": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Whether capability check is strict or loose. "
+  },
+  "ciscoImgChkInCompDescr": {
+    "name": "ciscoImgChkInCompDescr",
+    "oid": "1.3.6.1.4.1.9.9.99990.1.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Description of the incompatibilty. For example, if the name of the incompatibilty (the instance of ciscoImgChkCapabilityName) is CAP_FEATURE_ZS_READ_ONLY_ZONING, then the description will be - 'Zone Server - Read-only zoning configured'. For each incompatibility name that appears in ciscoImgChkCapabilityName, there will be a corresponding description described by the instance of this object. "
+  },
+  "ciscoImageCheckMIBConformance": {
+    "name": "ciscoImageCheckMIBConformance",
+    "oid": "1.3.6.1.4.1.9.9.99990.2",
+    "class": "objectidentity"
+  },
+  "ciscoImageCheckMIBCompliances": {
+    "name": "ciscoImageCheckMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.99990.2.1",
+    "class": "objectidentity"
+  },
+  "ciscoImageCheckMIBGroups": {
+    "name": "ciscoImageCheckMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.99990.2.2",
+    "class": "objectidentity"
+  },
+  "ciscoImageCheckMIBCompliance": {
+    "name": "ciscoImageCheckMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.99990.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoImageCheckOpGroup",
+        "module": "CISCO-IMAGE-CHECK-MIB"
+      },
+      {
+        "object": "ciscoImgChkResultsGroup",
+        "module": "CISCO-IMAGE-CHECK-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities which implement the CISCO-IMAGE-CHECK-MIB."
+  },
+  "ciscoImageCheckOpGroup": {
+    "name": "ciscoImageCheckOpGroup",
+    "oid": "1.3.6.1.4.1.9.9.99990.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImageCheckImageName"
+      },
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImageCheckStatus"
+      },
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImageCheckEntryStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for Image Check Operations group."
+  },
+  "ciscoImgChkResultsGroup": {
+    "name": "ciscoImgChkResultsGroup",
+    "oid": "1.3.6.1.4.1.9.9.99990.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImgChkFeatureName"
+      },
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImgChkCapabilityName"
+      },
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImgChkCapabilityReq"
+      },
+      {
+        "module": "CISCO-IMAGE-CHECK-MIB",
+        "object": "ciscoImgChkInCompDescr"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for Image check results group."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-IMAGE-CHECK-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:06:03 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-IMAGE-CHECK-MIB"
+  }
+}

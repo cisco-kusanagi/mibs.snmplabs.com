@@ -1,0 +1,1090 @@
+{
+  "imports": {
+    "class": "imports",
+    "FORCE10-SMI": [
+      "f10Mgmt"
+    ],
+    "IF-MIB": [
+      "InterfaceIndex"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddressType",
+      "InetAddress"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Gauge32",
+      "Integer32",
+      "TimeTicks",
+      "Bits",
+      "iso",
+      "MODULE-IDENTITY",
+      "OBJECT-TYPE",
+      "OBJECT-IDENTITY",
+      "Counter64",
+      "Counter32",
+      "MibIdentifier",
+      "NOTIFICATION-TYPE",
+      "Unsigned32",
+      "IpAddress"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "MacAddress",
+      "TimeInterval",
+      "DisplayString"
+    ]
+  },
+  "f10VirtualLinkTrunkMib": {
+    "name": "f10VirtualLinkTrunkMib",
+    "oid": "1.3.6.1.4.1.6027.3.17",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2012-11-28 00:00",
+        "description": " - Added new objects f10VLTPeerRouting, f10VLTPeerRoutingTimeout,f10VLTRemotePeerRouting in f10VirtualLinkTrunkTable - Added additional error reason peerRoutMismatch in f10VltErrorReason object"
+      },
+      {
+        "revision": "2012-05-21 00:00",
+        "description": "Added new object f10VLTCfgSysMacAddr in f10VirtualLinkTrunkTable"
+      },
+      {
+        "revision": "2012-05-14 00:00",
+        "description": "Re arranged MIB objects in the f10VirtualLinkTrunkTable to make it compatible with older version. Moved the newly added objects at the bottom"
+      },
+      {
+        "revision": "2012-04-02 00:00",
+        "description": "Re arrenged the f10VirtualLinkTrunkTable, additional objects are added. - f10VirtualLinkTrunkNotifications added to make notifications separate subtree from f10VirtualLinkTrunkMib. - f10VirtualLinkDetailsTable is added for VLT details. - f10VLTIclBwUsageExceed, f10VLTDomainConfigError new notifications are added. - Updated the corresponding conformance groups - Some indentation change"
+      },
+      {
+        "revision": "2011-05-06 00:00",
+        "description": "Modified MIB OID from 13 to 16."
+      },
+      {
+        "revision": "2011-03-14 00:00",
+        "description": "Initial draft of VLT MIB."
+      }
+    ],
+    "lastupdated": "201211280000Z",
+    "organization": "Dell Inc",
+    "contactinfo": "http://www.force10networks.com/support",
+    "description": "This MIB module provides information on Dual Brain Virtual Link Trunk(VLT) feature which is a control plane mechanism to provide Layer2 multipathing between access network devices (switches or servers) and the core network. VLT represents a single logical layer 2 domain from the view of downstream devices that have LAG bundles terminating on separate chassis in the virtual link trunk domain. However, the two VLT chassis are independent L2/L3 switches for devices in the upstream network. A sample of VLT scenario: --------------------------------------------------------------- | _______________ | | | Edge router | | | |_______________| | | / \\ | | / \\ | | VLT / \\ | | ____________/_______________________\\____________ . | | | _______/ Back Up Link \\_______ | /|\\| | | | |-------------------------| | | | | | | | | ------- | | | L3| | | | | S4810 |________| Inter |________| S4810 | |_____| | | | |________|Chassis|________| | | L2| | | | | | | Link | | | | | | | VLT port \\_____\\ ------- /____/VLT port\\|/| | |_____\\_____\\_________________________/____/_____| . | | \\ \\ -----------------/ / | | \\ \\----/------------ / | | \\ / \\ / | | \\ / \\ / | |Lag(active)<--- \\ / \\ /--->Lag(active) | | ___\\__/___________________\\_/______ | | | _______ Stacking ______ | | | | | S60 |--------------| S60 | | | | | |__\\____| |____/_| | | | |_____\\______________________/______| | | \\ /-->Nic teaming | | \\__________________/ | | | Nic1 Nic2 | | | | Server | | | |____________________| | --------------------------------------------------------------- Benefits of VLT are as follows: > Allows a single device to use LAG across two upstream devices > Eliminates Spanning Tree Protocol (STP) blocked ports > Provides a loop-free topology > Uses all available uplink bandwidth > Provides fast convergence if either the link or a device fails > Provides link-level resiliency > Assures high availability GLOSSARY AND ABBREVIATIONS VLT - Virtual Link Trunk The combined port channel between the VLT peer devices and the downstream device. VLT Peer device One of a pair of devices that are connected with the special port channel known as the chassis interconnect trunk. VLT Chassis Interconnect Trunk The link used to synchronize states between the VLT peer devices. VLT domain This domain includes both VLT peer devices, the VLT chassis interconnect trunk, and all of the port channels in the VLT connected to the downstream devices. VLT Backup link The backup link monitors the vitality of a VLT peer device. The backup trunk sends configurable, periodic heart beat messages between VLT peer devices. ICL Abbreviation for Chassis InterConnect Link."
+  },
+  "f10VirtualLinkTrunkObjects": {
+    "name": "f10VirtualLinkTrunkObjects",
+    "oid": "1.3.6.1.4.1.6027.3.17.1",
+    "class": "objectidentity"
+  },
+  "f10VirtualLinkTrunkNotifObjects": {
+    "name": "f10VirtualLinkTrunkNotifObjects",
+    "oid": "1.3.6.1.4.1.6027.3.17.2",
+    "class": "objectidentity"
+  },
+  "F10VLTMemberLinkStatus": {
+    "name": "F10VLTMemberLinkStatus",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "linkNotEstablished": 0,
+          "linkUp": 1,
+          "linkDown": 2,
+          "linkError": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "This defines the status of the link. The states are: linkNotEstablished - Initial State. linkUp - Link is established and the VLT operations specific to this link are up. linkDown - Communication with Peer is lost. linkError - Configuration incompatible."
+  },
+  "f10VirtualLinkTrunkTable": {
+    "name": "f10VirtualLinkTrunkTable",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table provides the information about Virtual Link Trunks. A row is added to the table when a VLT domain is configured in the device. A row is deleted from the table when the configured VLT domain is removed."
+  },
+  "f10VirtualLinkTrunkTableEntry": {
+    "name": "f10VirtualLinkTrunkTableEntry",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTDomainId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry represents information about the specific VLT domain."
+  },
+  "f10VLTDomainId": {
+    "name": "f10VLTDomainId",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This oject represents the Virtual Link Trunk Domain's id."
+  },
+  "f10VLTMacAddr": {
+    "name": "f10VLTMacAddr",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " This object represents the MAC Address value assigned to this Virtual Link Trunk domain."
+  },
+  "f10VLTPriority": {
+    "name": "f10VLTPriority",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 32768,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the Virtual Link Trunk domain's System Priority value."
+  },
+  "f10VLTIclIfIndex": {
+    "name": "f10VLTIclIfIndex",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the interface index of the link configured as the Inter Chassis Link for the Virtual Link Trunk domain."
+  },
+  "f10VLTRole": {
+    "name": "f10VLTRole",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "standAlone": 0,
+          "primary": 1,
+          "secondary": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the role of the device in the Virtual Link Trunk domain configured."
+  },
+  "f10VLTPeerStatus": {
+    "name": "f10VLTPeerStatus",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "notEstablished": 0,
+          "peerUp": 1,
+          "peerDown": 2,
+          "linkDown": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the status of the VLT Peer i.e whether it is active, or in disabled/errored state. notEstablished - set if ICL Link is either in notEstablished status or error status. peerUp - set if ICL Link is up. peerDown - set if both ICL link and Backup link are down linkDown - set if ICL link down and Backup link is up. "
+  },
+  "f10VLTIclStatus": {
+    "name": "f10VLTIclStatus",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "F10VLTMemberLinkStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the state of the IC link aggregation. linkNotEstablished - ICL Hello has not yet started.Initial State. linkUp - Hello protocol is established and the VLT operations are up. linkDown - Communication with Peer is lost. linkError - Communication with Peer is established but configuration incompatible."
+  },
+  "f10VLTHBeatStatus": {
+    "name": "f10VLTHBeatStatus",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "F10VLTMemberLinkStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the status of the heart beat link/backup link. linkNotEstablished - Heartbeat has not yet started. Initial stage. linkUp - Heartbeat started and Remote is Up. linkDown - Heartbeat lost. linkError - This indicates a configuration error."
+  },
+  "f10VLTBkUpIpAddrType": {
+    "name": "f10VLTBkUpIpAddrType",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the address family of the Backup link designated for the Virtual Link Trunk Domain."
+  },
+  "f10VLTBkUpIpAddr": {
+    "name": "f10VLTBkUpIpAddr",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the Ip address of the backup link."
+  },
+  "f10VLTBkUpInterval": {
+    "name": "f10VLTBkUpInterval",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeInterval",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 100,
+            "max": 500
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 100,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the time interval for the VLT heart-beat timer. "
+  },
+  "f10VLTRemoteMacAddr": {
+    "name": "f10VLTRemoteMacAddr",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the MAC Address of the Remote system that is part of the VLT Domain."
+  },
+  "f10VLTRemoteRolePriority": {
+    "name": "f10VLTRemoteRolePriority",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 32768,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the role priority of the Remote System that is part of the Virtual Link Trunk Domain."
+  },
+  "f10VLTUnitId": {
+    "name": "f10VLTUnitId",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the configured unit ID for the Virtual Link Trunk domain."
+  },
+  "f10VLTVersionMajor": {
+    "name": "f10VLTVersionMajor",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the major version of for the Virtual Link Trunk domain protocol running."
+  },
+  "f10VLTVersionMinor": {
+    "name": "f10VLTVersionMinor",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the minor version of for the Virtual Link Trunk domain protocol running."
+  },
+  "f10VLTRemoteUnitId": {
+    "name": "f10VLTRemoteUnitId",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the configured unit ID for the Virtual Link Trunk domain on the remote node."
+  },
+  "f10VLTRemoteVersionMajor": {
+    "name": "f10VLTRemoteVersionMajor",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the major version of for the Virtual Link Trunk domain protocol running on the remote node."
+  },
+  "f10VLTRemoteVersionMinor": {
+    "name": "f10VLTRemoteVersionMinor",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the minor version of for the Virtual Link Trunk domain protocol running on the remote node."
+  },
+  "f10VLTIclBwStatus": {
+    "name": "f10VLTIclBwStatus",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "belowthreshold": 0,
+          "abovethreshold": 1
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the status of the VLT ICL Bandwidth usage i.e whether it crosses threshold, or below threshold state. below-threshold - set if ICL Link BW usage is below 80% above-threshold - set if ICL link BW usage is above 80%. "
+  },
+  "f10VLTCfgSysMacAddr": {
+    "name": "f10VLTCfgSysMacAddr",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MacAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " This object represents the System MAC Address value configured the Virtual Link Trunk domain."
+  },
+  "f10VLTPeerRouting": {
+    "name": "f10VLTPeerRouting",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.22",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 0,
+          "enabled": 1
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the state of the VLT Peer routing i.e whether it is enabled or disabled."
+  },
+  "f10VLTPeerRoutingTimeout": {
+    "name": "f10VLTPeerRoutingTimeout",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.23",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeInterval",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the time interval for VLT peer-routing timer, which is configured for removing the local-da of the other peer in case of peer failure."
+  },
+  "f10VLTRemotePeerRouting": {
+    "name": "f10VLTRemotePeerRouting",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.1.1.24",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "disabled": 0,
+          "enabled": 1
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object represents the state of the VLT Peer routing configured on the remote peer node i.e whether it is enabled or disabled."
+  },
+  "f10VirtualLinkStatsTable": {
+    "name": "f10VirtualLinkStatsTable",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table provides the details of the statistical information on traffic traversing port channels to attached devices, Interchassis link, and backup link."
+  },
+  "f10VirtualLinkStatsTableEntry": {
+    "name": "f10VirtualLinkStatsTableEntry",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "f10VirtualLinkStatsTableEntry",
+      "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+      "object": "f10VirtualLinkTrunkTableEntry"
+    },
+    "status": "current",
+    "description": "Each entry is the device specific statistical information on traffic in the links in VLT domain."
+  },
+  "f10VLTStatNumHelloSent": {
+    "name": "f10VLTStatNumHelloSent",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The count of Hello Packets sent across the ICL for synchronization."
+  },
+  "f10VLTStatNumHelloRcvd": {
+    "name": "f10VLTStatNumHelloRcvd",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The count of Hello Packets received from the remote VLT through the ICL."
+  },
+  "f10VLTStatNumHbeatSent": {
+    "name": "f10VLTStatNumHbeatSent",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The count of periodic Keepalive messages sent by the VLT device to the peer."
+  },
+  "f10VLTStatNumHbeatRcvd": {
+    "name": "f10VLTStatNumHbeatRcvd",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The count of periodic Keepalive messages received by the VLT device from the peer."
+  },
+  "f10VLTStatNumDomainErrors": {
+    "name": "f10VLTStatNumDomainErrors",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The count of hello/heartbeat packets dropped by the VLT device which failed to match the device's VLT domain Id."
+  },
+  "f10VLTStatNumVersionErrors": {
+    "name": "f10VLTStatNumVersionErrors",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The count of hello/heartbeat packets dropped by the VLT device which failed to match the device's VLT message's version."
+  },
+  "f10VirtualLinkDetailsTable": {
+    "name": "f10VirtualLinkDetailsTable",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table provides the details of port channel information by traversing port channels to attached devices, peer port-channel ID, status and Active Vlans"
+  },
+  "f10VirtualLinkDetailsTableEntry": {
+    "name": "f10VirtualLinkDetailsTableEntry",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTDetailLocalLagID",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each entry is the port channel specific information on links between TOR and VLT domain."
+  },
+  "f10VLTDetailLocalLagID": {
+    "name": "f10VLTDetailLocalLagID",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Detail of the vlt local lag ID."
+  },
+  "f10VLTDetailPeerLagID": {
+    "name": "f10VLTDetailPeerLagID",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Detail of the vlt peer lag ID"
+  },
+  "f10VLTDetailLocalStatus": {
+    "name": "f10VLTDetailLocalStatus",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "down": 0,
+          "up": 1
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The interface operational status of the vlt local LAG ID"
+  },
+  "f10VLTDetailPeerStatus": {
+    "name": "f10VLTDetailPeerStatus",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "down": 0,
+          "up": 1
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The interface operational status of the vlt peer LAG ID."
+  },
+  "f10VLTErrorReason": {
+    "name": "f10VLTErrorReason",
+    "oid": "1.3.6.1.4.1.6027.3.17.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noError": 1,
+          "domainIdMismatch": 2,
+          "unitIdMismatch": 3,
+          "versionMismatch": 4,
+          "sysMacMismatch": 5,
+          "peerRoutingMismatch": 6
+        }
+      }
+    },
+    "maxaccess": "accessible-for-notify",
+    "status": "current",
+    "description": "This object represents the VLT domain config error,the possible errors are: noError - No Error. domainIdMismatch - local and remote vlt domain Id mismatch. unitIdMismatch - local or remote vlt Unit Id is Identical or not configured. versionMismatch - local and remote vlt version does not meet criteria for peer UP. sysMacMismatch - local and remote vlt system MAC mismatch. peerRoutingMismatch - local and remote vlt peer-routing config mismatch"
+  },
+  "f10VirtualLinkTrunkNotifications": {
+    "name": "f10VirtualLinkTrunkNotifications",
+    "oid": "1.3.6.1.4.1.6027.3.17.2.0",
+    "class": "objectidentity"
+  },
+  "f10VLTRoleChange": {
+    "name": "f10VLTRoleChange",
+    "oid": "1.3.6.1.4.1.6027.3.17.2.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRole"
+      }
+    ],
+    "status": "current",
+    "description": "The agent generates this norification to denote the change in role of the VLT device in the VLT domain. This notification carries the information about the new role. The possible roles are as follows: 1. StandAlone 2. Primary 3. Secondary"
+  },
+  "f10VLTIclStatusChange": {
+    "name": "f10VLTIclStatusChange",
+    "oid": "1.3.6.1.4.1.6027.3.17.2.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTIclStatus"
+      }
+    ],
+    "status": "current",
+    "description": "The agent generates this notification to denote the change in InterConnect Link Status.The notification contains information on the new ICL status. The possible states are as follows: 1. NotEstabished 2. LinkUp 3. LinkDown 4. LinkError"
+  },
+  "f10VLTPeerStatusChange": {
+    "name": "f10VLTPeerStatusChange",
+    "oid": "1.3.6.1.4.1.6027.3.17.2.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTPeerStatus"
+      }
+    ],
+    "status": "current",
+    "description": "The agent generates this notification to denote the change in Status of the Peer in the VLT domain. This notification contains information on the new status of the peer device. The possible states are as follows: 1. NotEstablished 2. PeerUp 3. PeerDown 4. LinkDown"
+  },
+  "f10VLTHBeatStatusChange": {
+    "name": "f10VLTHBeatStatusChange",
+    "oid": "1.3.6.1.4.1.6027.3.17.2.0.4",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTHBeatStatus"
+      }
+    ],
+    "status": "current",
+    "description": "The agent generates this notification to denote the change in Backup Link Status. The notification contains information on the new BackupLink Status. The possible states are as follows: 1. NotEstabished 2. LinkUp 3. LinkDown 4. LinkError"
+  },
+  "f10VLTIclBwUsageExceed": {
+    "name": "f10VLTIclBwUsageExceed",
+    "oid": "1.3.6.1.4.1.6027.3.17.2.0.5",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTIclIfIndex"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTIclBwStatus"
+      }
+    ],
+    "status": "current",
+    "description": "The IFM agent generates this notification to denote the change in Bandwidth usage of ICL Link, when it crosses the threshold above 80 %. The possible states are as follows: 0. Below threshold 1. Above threshold"
+  },
+  "f10VLTDomainConfigError": {
+    "name": "f10VLTDomainConfigError",
+    "oid": "1.3.6.1.4.1.6027.3.17.2.0.6",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTErrorReason"
+      }
+    ],
+    "status": "current",
+    "description": "The agent generates this notification to denote there is a error/conflict in the VLT domain config parameters (either locally or in remote node which prevent the peer up. The mismatch can be domain Id, unitId,version or system MAC. The notification contains information on the error/mismatch type."
+  },
+  "f10VirtualLinkTrunkConformance": {
+    "name": "f10VirtualLinkTrunkConformance",
+    "oid": "1.3.6.1.4.1.6027.3.17.3",
+    "class": "objectidentity"
+  },
+  "f10VirtualLinkTrunkCompliances": {
+    "name": "f10VirtualLinkTrunkCompliances",
+    "oid": "1.3.6.1.4.1.6027.3.17.3.1",
+    "class": "objectidentity"
+  },
+  "f10VirtualLinkTrunkGroups": {
+    "name": "f10VirtualLinkTrunkGroups",
+    "oid": "1.3.6.1.4.1.6027.3.17.3.2",
+    "class": "objectidentity"
+  },
+  "f10VirtualLinkTrunkCompliance": {
+    "name": "f10VirtualLinkTrunkCompliance",
+    "oid": "1.3.6.1.4.1.6027.3.17.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "f10VirtualLinkTrunkGroup",
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB"
+      },
+      {
+        "object": "f10VirtualLinkStatisticsGroup",
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB"
+      },
+      {
+        "object": "f10VirtualLinkNotificationGroup",
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB"
+      },
+      {
+        "object": "f10VirtualLinkDetailsTableGroup",
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for the Dell Networking OS Virtual Link Trunk MIB."
+  },
+  "f10VirtualLinkTrunkGroup": {
+    "name": "f10VirtualLinkTrunkGroup",
+    "oid": "1.3.6.1.4.1.6027.3.17.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTDomainId"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTMacAddr"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTPriority"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTIclIfIndex"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRole"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTPeerStatus"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTIclStatus"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTHBeatStatus"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTBkUpIpAddrType"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTBkUpIpAddr"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTBkUpInterval"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRemoteMacAddr"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRemoteRolePriority"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTUnitId"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTVersionMajor"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTVersionMinor"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRemoteUnitId"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRemoteVersionMajor"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRemoteVersionMinor"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTIclBwStatus"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTCfgSysMacAddr"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTPeerRouting"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTPeerRoutingTimeout"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRemotePeerRouting"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTErrorReason"
+      }
+    ],
+    "status": "current",
+    "description": "This group represents a collection of objects providing the overall VLT information."
+  },
+  "f10VirtualLinkStatisticsGroup": {
+    "name": "f10VirtualLinkStatisticsGroup",
+    "oid": "1.3.6.1.4.1.6027.3.17.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTStatNumHelloSent"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTStatNumHelloRcvd"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTStatNumHbeatSent"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTStatNumHbeatRcvd"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTStatNumDomainErrors"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTStatNumVersionErrors"
+      }
+    ],
+    "status": "current",
+    "description": "This group represents a collection of objects providing the overall statistical information on the VLT."
+  },
+  "f10VirtualLinkNotificationGroup": {
+    "name": "f10VirtualLinkNotificationGroup",
+    "oid": "1.3.6.1.4.1.6027.3.17.3.2.3",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTRoleChange"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTIclStatusChange"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTPeerStatusChange"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTHBeatStatusChange"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTIclBwUsageExceed"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTDomainConfigError"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notification objects for the Dell Networking OS VLT mib"
+  },
+  "f10VirtualLinkDetailsTableGroup": {
+    "name": "f10VirtualLinkDetailsTableGroup",
+    "oid": "1.3.6.1.4.1.6027.3.17.3.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTDetailLocalLagID"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTDetailPeerLagID"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTDetailLocalStatus"
+      },
+      {
+        "module": "F10-VIRTUAL-LINK-TRUNK-MIB",
+        "object": "f10VLTDetailPeerStatus"
+      }
+    ],
+    "status": "current",
+    "description": "This group represents a collection of objects providing the LAG details on the VLT."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/F10-VIRTUAL-LINK-TRUNK-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 18:41:06 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "F10-VIRTUAL-LINK-TRUNK-MIB"
+  }
+}

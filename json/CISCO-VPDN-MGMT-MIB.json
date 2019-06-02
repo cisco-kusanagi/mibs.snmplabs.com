@@ -1,0 +1,3453 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoExperiment"
+    ],
+    "IF-MIB": [
+      "InterfaceIndexOrZero"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddress",
+      "InetAddressType"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "OBJECT-IDENTITY",
+      "Gauge32",
+      "MODULE-IDENTITY",
+      "Counter64",
+      "TimeTicks",
+      "Unsigned32",
+      "IpAddress",
+      "Counter32",
+      "NOTIFICATION-TYPE",
+      "iso",
+      "MibIdentifier",
+      "Bits",
+      "Integer32",
+      "OBJECT-TYPE"
+    ],
+    "SNMPv2-TC": [
+      "TimeStamp",
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "TruthValue"
+    ]
+  },
+  "ciscoVpdnMgmtMIB": {
+    "name": "ciscoVpdnMgmtMIB",
+    "oid": "1.3.6.1.4.1.9.10.24",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2006-01-20 00:00",
+        "description": "Obsoleted the following deprecated L2F specific objects. These set of objects have been replaced by the corresponding multi-protocol objects since 1999-03-24. Obsoleted Objects Existing replacements ================= ===================== cvpdnTunnelTotal cvpdnSystemTable cvpdnSessionTotal cvpdnSystemTable cvpdnDeniedUsersTotal cvpdnSystemTable cvpdnTunnelTable cvpdnTunnelAttrTable cvpdnTunnelSessionTable cvpdnSessionAttrTable Deprecated the following objects and added corresponding InetAddressType/InetAddress compliant counterparts: Deprecated Objects Added Replacements ================== ================== cvpdnTunnelAttrLocalIpAddress cvpdnTunnelAttrLocalInetAddressType cvpdnTunnelAttrLocalInetAddress cvpdnTunnelAttrSourceIpAddress cvpdnTunnelAttrSourceInetAddressType cvpdnTunnelAttrSourceInetAddress cvpdnTunnelAttrRemoteIpAddress cvpdnTunnelAttrRemoteInetAddressType cvpdnTunnelAttrRemoteInetAddress cvpdnUnameToFailHistSourceIp cvpdnUnameToFailHistSourceInetType cvpdnUnameToFailHistSourceInetAddr cvpdnUnameToFailHistDestIp cvpdnUnameToFailHistDestInetType cvpdnUnameToFailHistDestInetAddr Added two new values, 'pwUp' and 'pwDown', for the existing object cvpdnNotifSessionEvent to support pseudowire status change event reporting. "
+      },
+      {
+        "revision": "2004-06-08 00:00",
+        "description": "Deprecated the cvpdnBundleEndpointType object since it's values did not align with the PPP protocol. This object was replaced by cvpdnBundleEndpointClass. "
+      },
+      {
+        "revision": "2004-04-02 00:00",
+        "description": "Added support for Multilink PPP VPDN information. Modified the cvpdnSessionAttrTable to add objects that specify the multilink PPP bundle to which a session belongs. Added scalar objects to hold the total number of multilink PPP bundles comprised of one, two, and more than two links. Added the cvpdnBundleTable that describes the PPP multilink bundle. Added the cvpdnChildBundleTable to expose the containment relationship between the multilink PPP bundle and the VPDN tunnel. "
+      },
+      {
+        "revision": "2002-07-08 00:00",
+        "description": "Added support for VPDN Template information. The template table reports the number of active sessions for each template. This number is the sum of active sessions for all VPDN groups associated with each template. "
+      },
+      {
+        "revision": "2002-05-17 00:00",
+        "description": "Changed cvpdnSessionAttrVirtualCircuitID to an Unsigned32 object. Also, moved Unsigned32 import to SNMPv2-SMI. "
+      },
+      {
+        "revision": "2002-04-02 00:00",
+        "description": "Added virtual circuit ID, packets dropped, and notification objects for WAN/IP support. "
+      },
+      {
+        "revision": "2000-01-12 00:00",
+        "description": "Added support for Point-to-Point Tunneling Protocol (PPTP). Changed object descriptions to use generic terms. "
+      },
+      {
+        "revision": "1999-03-24 00:00",
+        "description": "Added support for multiple tunnel protocols with these tables 1) cvpdnSystemTable 2) cvpdnTunnelAttrTable 3) cvpdnTunnelSessionAttrTable Deprecated objects and tables duplicated by the three new tables 1) cvpdnTunnelTotal, cvpdnSessionTotal, cvpdnDeniedUsersTotal 2) cvpdnTunnelTable 3) cvpdnTunnelSessionTable "
+      },
+      {
+        "revision": "1997-07-15 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200906160000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": " Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553-NETS E-mail: cs-vpdn@cisco.com",
+    "description": "The MIB module for VPDN. Overview of VPDN MIB MIB description This MIB is to support the Virtual Private Dialup Network (VPDN) feature of Cisco IOS. VPDN handles the forwarding of PPP links from an Internet Provider (ISP) to a Home Gateway. The VPDN MIB provides the operational information on Cisco's VPDN tunnelling implementation. The following entities are managed: 1) Global VPDN information 2) VPDN tunnel information 3) VPDN tunnel's user information 4) Failure history per user The following example configuration shows how the VPDN MIB returns VPDN information, from either CISCO A - Network Access Server (NAS) or CISCO B - Tunnel Server (TS). The User call is projected by either domain name or Dialed Number Identification Service (DNIS). The terms NAS and TS are generic terms refering to the VPDN systems. The following table shows the corresponding technology-specific terms. Network Access Server Tunnel Server ------------------------------ ------------------------- L2F Network Access Server (NAS) Home Gateway (HGW) L2TP L2TP Access Concentrator (LAC) L2TP Network Server (LNS) PPTP PPTP Access Concentrator (PAC) PPTP Network Server (PNS) (NAS) (TS) User ===== Cisco A ===== IP Network ===== Cisco B ===== Server | | +========== VPDN ==========+ 1) The VPDN global entry identifies the system wide VPDN information. 2) The VPDN tunnel table identifies the active VPDN tunnels on Cisco A and Cisco B. The table contains an entry for each active tunnel on the system. 3) The VPDN tunnel user table identifies the active users for each active tunnel on each system and provides relevant information for each user. 4) The VPDN failure history table identifies the last failure recorded per user and provides relevant information. "
+  },
+  "TunnelType": {
+    "name": "TunnelType",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "l2f": 1,
+          "l2tp": 2,
+          "pptp": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "The tunnel type. This is the tunnel protocol of a VPDN tunnel."
+  },
+  "EndpointClass": {
+    "name": "EndpointClass",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "local": 2,
+          "ipV4Address": 3,
+          "macAddress": 4,
+          "magicNumber": 5,
+          "phone": 6
+        }
+      }
+    },
+    "status": "current",
+    "description": "The endpoint discriminator class supplied by the remote peer in a PPP Multilink bundle. RFC 1990 defines the following classes: none: Class 0 - Null Class. No endpoint discriminator is being used. The endpoint discriminator should contain a SnmpAdminString (SIZE (0)) value. local: Class 1 - Locally Assigned Address. This class is defined to permit a local assignment in the case where use of one of the globally unique classes is not possible. The endpoint discriminator should contain a SnmpAdminString (SIZE(1..20)) value. ipV4Address: Class 2 - Internet Protocol (IP) Address. An address in this class contains an IP host address. The endpoint discriminator should contain a InetAddressIPv4 value. macAddress: Class 3 - IEEE 802.1 Globally Assigned MAC Address. An address in this class contains an IEEE 802.1 MAC address in canonical (802.3) format. The endpoint discriminator should contain a MacAddress value. magicNumber: Class 4 - PPP Magic-Number Block. This is not an address but a block of 1 to 5 concatenated 32 bit PPP Magic-Numbers. The endpoint discriminator should contain an OCTET STRING (SIZE (4|8|12|16| 20)) value. phone: Class 5 - Public Switched Network Directory Number. An address in this class contains an octet sequence as defined by I.331 (E.164) representing an international telephone directory number suitable for use to access the endpoint via the public switched telephone network. The endpoint discriminator should contain a SnmpAdminString (SIZE(1..15)) value.",
+    "reference": "The PPP Multilink Protocol (MP), RFC 1990, Section 5.1.3."
+  },
+  "ciscoVpdnMgmtMIBObjects": {
+    "name": "ciscoVpdnMgmtMIBObjects",
+    "oid": "1.3.6.1.4.1.9.10.24.1",
+    "class": "objectidentity"
+  },
+  "cvpdnSystemInfo": {
+    "name": "cvpdnSystemInfo",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1",
+    "class": "objectidentity"
+  },
+  "cvpdnTunnelInfo": {
+    "name": "cvpdnTunnelInfo",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2",
+    "class": "objectidentity"
+  },
+  "cvpdnTunnelSessionInfo": {
+    "name": "cvpdnTunnelSessionInfo",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3",
+    "class": "objectidentity"
+  },
+  "cvpdnUserToFailHistInfo": {
+    "name": "cvpdnUserToFailHistInfo",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4",
+    "class": "objectidentity"
+  },
+  "cvpdnTemplateInfo": {
+    "name": "cvpdnTemplateInfo",
+    "oid": "1.3.6.1.4.1.9.10.24.1.5",
+    "class": "objectidentity"
+  },
+  "cvpdnMultilinkInfo": {
+    "name": "cvpdnMultilinkInfo",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6",
+    "class": "objectidentity"
+  },
+  "cvpdnTunnelTotal": {
+    "name": "cvpdnTunnelTotal",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "tunnels",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The total number of VPDN tunnels that are currently active within this system."
+  },
+  "cvpdnSessionTotal": {
+    "name": "cvpdnSessionTotal",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "users",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The total number of active users in all the active VPDN tunnels within this system."
+  },
+  "cvpdnDeniedUsersTotal": {
+    "name": "cvpdnDeniedUsersTotal",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "attempts",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The total number of denied user attempts to all the active VPDN tunnels within this system."
+  },
+  "cvpdnSystemTable": {
+    "name": "cvpdnSystemTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of information about the VPDN system for all tunnel types."
+  },
+  "cvpdnSystemEntry": {
+    "name": "cvpdnSystemEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemTunnelType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in the table, containing information about a single type of VPDN tunnel."
+  },
+  "cvpdnSystemTunnelType": {
+    "name": "cvpdnSystemTunnelType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TunnelType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The tunnel type. This is the tunnel protocol."
+  },
+  "cvpdnSystemTunnelTotal": {
+    "name": "cvpdnSystemTunnelTotal",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "tunnels",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of VPDN tunnels that are currently active of this tunnel type."
+  },
+  "cvpdnSystemSessionTotal": {
+    "name": "cvpdnSystemSessionTotal",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "sessions",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of active sessions in all the active VPDN tunnels of this tunnel type."
+  },
+  "cvpdnSystemDeniedUsersTotal": {
+    "name": "cvpdnSystemDeniedUsersTotal",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "attempts",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of denied user attempts to all the VPDN tunnels of this tunnel type since last system re-initialization."
+  },
+  "cvpdnSystemInitialConnReq": {
+    "name": "cvpdnSystemInitialConnReq",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "attempts",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number tunnel connection attempts on all the VPDN tunnels of this tunnel type since last system re-initialization."
+  },
+  "cvpdnSystemSuccessConnReq": {
+    "name": "cvpdnSystemSuccessConnReq",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "attempts",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number tunnel Successful connection attempts in VPDN tunnels of this tunnel type since last system re-initialization."
+  },
+  "cvpdnSystemFailedConnReq": {
+    "name": "cvpdnSystemFailedConnReq",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.4.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "attempts",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number tunnel Failed connection attempts in VPDN tunnels of this tunnel type since last system re-initialization."
+  },
+  "cvpdnSystemNotifSessionEnabled": {
+    "name": "cvpdnSystemNotifSessionEnabled",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates whether Layer 2 VPN session notifications are enabled."
+  },
+  "cvpdnSystemClearSessions": {
+    "name": "cvpdnSystemClearSessions",
+    "oid": "1.3.6.1.4.1.9.10.24.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "all": 2,
+          "l2f": 3,
+          "l2tp": 4,
+          "pptp": 5
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Clears all the sessions in a given tunnel type. When reading this object, the value of 'none' will always be returned. When setting these values, the following operations will be performed: none: no operation. all: clears all the sessions in all the tunnels. l2f: clears all the L2F sessions. l2tp: clears all the L2TP sessions. pptp: clears all the PPTP sessions."
+  },
+  "cvpdnTunnelTable": {
+    "name": "cvpdnTunnelTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "obsolete",
+    "description": "Table of information about the active VPDN tunnels."
+  },
+  "cvpdnTunnelEntry": {
+    "name": "cvpdnTunnelEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelTunnelId",
+        "implied": 0
+      }
+    ],
+    "status": "obsolete",
+    "description": "An entry in the table, containing information about a single active VPDN tunnel."
+  },
+  "cvpdnTunnelTunnelId": {
+    "name": "cvpdnTunnelTunnelId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "obsolete",
+    "description": "The Tunnel ID of an active VPDN tunnel. If it is the instigator of the tunnel, the ID is the HGW/LNS tunnel ID, otherwise it is the NAS/LAC tunnel ID."
+  },
+  "cvpdnTunnelRemoteTunnelId": {
+    "name": "cvpdnTunnelRemoteTunnelId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The remote Tunnel ID of an active VPDN tunnel. If it is the instigator of the tunnel, the ID is the NAS/LAC tunnel ID, otherwise it is the HGW/LNS tunnel ID."
+  },
+  "cvpdnTunnelLocalName": {
+    "name": "cvpdnTunnelLocalName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The local name of an active VPDN tunnel. It will be the NAS/LAC name of the tunnel if the router serves as the NAS/LAC, or the HGW/LNS name of the tunnel if the system serves as the home gateway. Typically, the local name is the configured host name of the router."
+  },
+  "cvpdnTunnelRemoteName": {
+    "name": "cvpdnTunnelRemoteName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The remote name of an active VPDN tunnel. It will be the home gateway name of the tunnel if the system is a NAS/LAC, or the NAS/LAC name of the tunnel if the system serves as the home gateway."
+  },
+  "cvpdnTunnelRemoteEndpointName": {
+    "name": "cvpdnTunnelRemoteEndpointName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The remote end point name of an active VPDN tunnel. This name is either the domain name or the DNIS that this tunnel is projected with."
+  },
+  "cvpdnTunnelLocalInitConnection": {
+    "name": "cvpdnTunnelLocalInitConnection",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "This object indicates whether the tunnel was generated locally or not."
+  },
+  "cvpdnTunnelOrigCause": {
+    "name": "cvpdnTunnelOrigCause",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "domain": 1,
+          "dnis": 2,
+          "stack": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The cause which originated an active VPDN tunnel. The tunnel can be projected via domain name, DNIS or a stack group (SGBP)."
+  },
+  "cvpdnTunnelState": {
+    "name": "cvpdnTunnelState",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "opening": 2,
+          "open": 3,
+          "closing": 4
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The current state of an active VPDN tunnel. Each state code is explained below: unknown: The current state of the tunnel is unknown. opening: The tunnel has just been instigated and is pending for a remote end reply to complete the process. open: The tunnel is active. closing: The tunnel has just been shut down and is pending for the remote end to reply to complete the process."
+  },
+  "cvpdnTunnelActiveSessions": {
+    "name": "cvpdnTunnelActiveSessions",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "sessions",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The total number of active session currently in the tunnel."
+  },
+  "cvpdnTunnelDeniedUsers": {
+    "name": "cvpdnTunnelDeniedUsers",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "calls",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "A count of the accumulated total of denied users for the tunnel."
+  },
+  "cvpdnTunnelSoftshut": {
+    "name": "cvpdnTunnelSoftshut",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "A VPDN tunnel can be put into a soft shut state to prevent any new user session to be added. This object specifies whether this tunnel has been soft shut."
+  },
+  "cvpdnTunnelNetworkServiceType": {
+    "name": "cvpdnTunnelNetworkServiceType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "ip": 1
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The type of network service used in the active tunnel. For now it is IP only."
+  },
+  "cvpdnTunnelLocalIpAddress": {
+    "name": "cvpdnTunnelLocalIpAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The local IP address of the tunnel. This IP address is that of the interface at the local end of the tunnel."
+  },
+  "cvpdnTunnelSourceIpAddress": {
+    "name": "cvpdnTunnelSourceIpAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "The Stack Group Biding Protocol (SGBP), United States Patent 6073176",
+    "status": "obsolete",
+    "description": "The source IP address of the tunnel. This IP address is the user configurable IP address for Stack Group Biding Protocol (SGBP) via the CLI command: vpdn source-ip"
+  },
+  "cvpdnTunnelRemoteIpAddress": {
+    "name": "cvpdnTunnelRemoteIpAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The remote IP address of the tunnel. This IP address is that of the interface at the remote end of the tunnel."
+  },
+  "cvpdnTunnelAttrTable": {
+    "name": "cvpdnTunnelAttrTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of information about the active VPDN tunnels. An entry is added to the table when a new tunnel is initiated and removed from the table when the tunnel is terminated."
+  },
+  "cvpdnTunnelAttrEntry": {
+    "name": "cvpdnTunnelAttrEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemTunnelType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrTunnelId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in the table, containing information about a single active VPDN tunnel."
+  },
+  "cvpdnTunnelAttrTunnelId": {
+    "name": "cvpdnTunnelAttrTunnelId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Tunnel ID of an active VPDN tunnel. If this end is the instigator of the tunnel, the ID is the TS tunnel ID, otherwise it is the NAS tunnel ID. Two distinct tunnels with the same tunnel ID may exist, but with different tunnel types. "
+  },
+  "cvpdnTunnelAttrRemoteTunnelId": {
+    "name": "cvpdnTunnelAttrRemoteTunnelId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The remote Tunnel ID of an active VPDN tunnel. If this end is the instigator of the tunnel, the ID is the NAS tunnel ID, otherwise it is the TS tunnel ID."
+  },
+  "cvpdnTunnelAttrLocalName": {
+    "name": "cvpdnTunnelAttrLocalName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The local name of an active VPDN tunnel. It will be the NAS name of the tunnel if the system serves as the NAS, or the TS name of the tunnel if the system serves as the tunnel server. Typically, the local name is the configured host name of the system."
+  },
+  "cvpdnTunnelAttrRemoteName": {
+    "name": "cvpdnTunnelAttrRemoteName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The remote name of an active VPDN tunnel. It will be the tunnel server name of the tunnel if the system is a NAS, or the NAS name of the tunnel if the system serves as the tunnel server."
+  },
+  "cvpdnTunnelAttrRemoteEndpointName": {
+    "name": "cvpdnTunnelAttrRemoteEndpointName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The remote end point name of an active VPDN tunnel. This name is either the domain name or the DNIS that this tunnel is projected with."
+  },
+  "cvpdnTunnelAttrLocalInitConnection": {
+    "name": "cvpdnTunnelAttrLocalInitConnection",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the tunnel was originated locally or not. If it's true, the tunnel was originated locally."
+  },
+  "cvpdnTunnelAttrOrigCause": {
+    "name": "cvpdnTunnelAttrOrigCause",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "domain": 1,
+          "dnis": 2,
+          "stack": 3,
+          "xconnect": 4
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The cause which originated an active VPDN tunnel. The tunnel can be projected via domain name, DNIS, stack group, or L2 Xconnect."
+  },
+  "cvpdnTunnelAttrState": {
+    "name": "cvpdnTunnelAttrState",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "l2fOpening": 2,
+          "l2fOpenWait": 3,
+          "l2fOpen": 4,
+          "l2fClosing": 5,
+          "l2fCloseWait": 6,
+          "l2tpIdle": 7,
+          "l2tpWaitCtlReply": 8,
+          "l2tpEstablished": 9,
+          "l2tpShuttingDown": 10,
+          "l2tpNoSessionLeft": 11,
+          "pptpIdle": 12,
+          "pptpWaitConnect": 13,
+          "pptpWaitCtlRequest": 14,
+          "pptpWaitCtlReply": 15,
+          "pptpEstablished": 16,
+          "pptpWaitStopReply": 17,
+          "pptpTerminal": 18
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current state of an active VPDN tunnel. Tunnels of type l2f will have states with the 'l2f' prefix. Tunnels of type l2tp will have states with the 'l2tp' prefix. Tunnels of type pptp will have states with the 'pptp' prefix. Each state code is explained below: unknown: The current state of the tunnel is unknown. l2fOpening: The tunnel has just been initiated and is pending for a remote end reply to complete the process. l2fOpenWait: This end received a tunnel open request from the remote end and is waiting for the tunnel to be established. l2fOpen: The tunnel is active. l2fClosing: This end received a tunnel close request. l2fCloseWait: The tunnel has just been shut down and is pending for the remote end to reply to complete the process. l2tpIdle: No tunnel is initiated yet. l2tpWaitCtlReply: The tunnel has been initiated and is pending for a remote end reply to complete the process. l2tpEstablished: The tunnel is active. l2tpShuttingDown: The tunnel is in progress of shutting down. l2tpNoSessionLeft: There is no session left in the tunnel. pptpIdle: No tunnel is initiated yet. pptpWaitConnect: The tunnel is waiting for a TCP connection. pptpWaitCtlRequest: The tunnel has been initiated and is pending for a remote end request. pptpWaitCtlReply: The tunnel has been initiated and is pending for a remote end reply. pptpEstablished: The tunnel is active. pptpWaitStopReply: The tunnel is being shut down and is pending for a remote end reply. pptpTerminal: The tunnel has been shut down."
+  },
+  "cvpdnTunnelAttrActiveSessions": {
+    "name": "cvpdnTunnelAttrActiveSessions",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "sessions",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of active session currently in the tunnel."
+  },
+  "cvpdnTunnelAttrDeniedUsers": {
+    "name": "cvpdnTunnelAttrDeniedUsers",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "calls",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A count of the accumulated total of denied users for the tunnel."
+  },
+  "cvpdnTunnelAttrSoftshut": {
+    "name": "cvpdnTunnelAttrSoftshut",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A VPDN tunnel can be put into a soft shut state to prevent any new session to be added. This object specifies whether this tunnel has been soft shut. If its true, it has been soft shut."
+  },
+  "cvpdnTunnelAttrNetworkServiceType": {
+    "name": "cvpdnTunnelAttrNetworkServiceType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "ip": 1
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The type of network service used in the active tunnel."
+  },
+  "cvpdnTunnelAttrLocalIpAddress": {
+    "name": "cvpdnTunnelAttrLocalIpAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The local IP address of the tunnel. This IP address is that of the interface at the local end of the tunnel."
+  },
+  "cvpdnTunnelAttrSourceIpAddress": {
+    "name": "cvpdnTunnelAttrSourceIpAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "The Stack Group Biding Protocol (SGBP), United States Patent 6073176",
+    "status": "deprecated",
+    "description": "The source IP address of the tunnel. This IP address is the user configurable IP address for Stack Group Biding Protocol."
+  },
+  "cvpdnTunnelAttrRemoteIpAddress": {
+    "name": "cvpdnTunnelAttrRemoteIpAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The remote IP address of the tunnel. This IP address is that of the interface at the remote end of the tunnel."
+  },
+  "cvpdnTunnelAttrLocalInetAddressType": {
+    "name": "cvpdnTunnelAttrLocalInetAddressType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the type of address contained in cvpdnTunnelAttrLocalInetAddress"
+  },
+  "cvpdnTunnelAttrLocalInetAddress": {
+    "name": "cvpdnTunnelAttrLocalInetAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The local IP address of the tunnel. This IP address is that of the interface at the local end of the tunnel. The type of this address is determined by the value of cvpdnTunnelAttrLocalInetAddressType."
+  },
+  "cvpdnTunnelAttrSourceInetAddressType": {
+    "name": "cvpdnTunnelAttrSourceInetAddressType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the type of address contained in cvpdnTunnelAttrSourceInetAddress"
+  },
+  "cvpdnTunnelAttrSourceInetAddress": {
+    "name": "cvpdnTunnelAttrSourceInetAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "The Stack Group Biding Protocol (SGBP), United States Patent 6073176",
+    "status": "current",
+    "description": "The source IP address of the tunnel. This IP address is the user configurable IP address for Stack Group Biding Protocol. The type of this address is determined by the value of cvpdnTunnelAttrSourceInetAddressType."
+  },
+  "cvpdnTunnelAttrRemoteInetAddressType": {
+    "name": "cvpdnTunnelAttrRemoteInetAddressType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the type of address contained in cvpdnTunnelAttrRemoteInetAddress"
+  },
+  "cvpdnTunnelAttrRemoteInetAddress": {
+    "name": "cvpdnTunnelAttrRemoteInetAddress",
+    "oid": "1.3.6.1.4.1.9.10.24.1.2.2.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The remote IP address of the tunnel. This IP address is that of the interface at the remote end of the tunnel. The type of this address is determined by the value of cvpdnTunnelAttrRemoteInetAddressType."
+  },
+  "cvpdnTunnelSessionTable": {
+    "name": "cvpdnTunnelSessionTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "obsolete",
+    "description": "Table of information about individual user sessions within the active tunnels. Entry is added to the table when new user session is initiated and be removed from the table when the user session is terminated."
+  },
+  "cvpdnTunnelSessionEntry": {
+    "name": "cvpdnTunnelSessionEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelTunnelId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionId",
+        "implied": 0
+      }
+    ],
+    "status": "obsolete",
+    "description": "An entry in the table, containing information about a single user session within the tunnel."
+  },
+  "cvpdnTunnelSessionId": {
+    "name": "cvpdnTunnelSessionId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "obsolete",
+    "description": "The ID of an active VPDN tunnel user session."
+  },
+  "cvpdnTunnelSessionUserName": {
+    "name": "cvpdnTunnelSessionUserName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The name of the user of the user session."
+  },
+  "cvpdnTunnelSessionState": {
+    "name": "cvpdnTunnelSessionState",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "opening": 2,
+          "open": 3,
+          "closing": 4,
+          "waitingForTunnel": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The current state of an active user session. Each state code is explained below: unknown: The current state of the tunnel's session is unknown. opening: The user session has just been initiated through a tunnel and is pending for the remote end reply to complete the process. open: The user session is active. closing: The user session has just been closed and is pending for the remote end reply to complete the process. waitingForTunnel: The user session is in this state when the tunnel which this session is going through is still in CLOSED state. It waits for the tunnel to become OPEN before the session is allow to be fully established."
+  },
+  "cvpdnTunnelSessionCallDuration": {
+    "name": "cvpdnTunnelSessionCallDuration",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "This object specifies the call duration of the current active user session in value of system uptime."
+  },
+  "cvpdnTunnelSessionPacketsOut": {
+    "name": "cvpdnTunnelSessionPacketsOut",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The total number of output packets through this active user session."
+  },
+  "cvpdnTunnelSessionBytesOut": {
+    "name": "cvpdnTunnelSessionBytesOut",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The total number of output bytes through this active user session."
+  },
+  "cvpdnTunnelSessionPacketsIn": {
+    "name": "cvpdnTunnelSessionPacketsIn",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The total number of input packets through this active user session."
+  },
+  "cvpdnTunnelSessionBytesIn": {
+    "name": "cvpdnTunnelSessionBytesIn",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The total number of input bytes through this active user session."
+  },
+  "cvpdnTunnelSessionDeviceType": {
+    "name": "cvpdnTunnelSessionDeviceType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "asyncInternalModem": 2,
+          "async": 3,
+          "bchan": 4,
+          "sync": 5,
+          "virtualAccess": 6,
+          "xdsl": 7,
+          "cable": 8
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The type of physical devices that this user session is attached to for the local end of the tunnel. The meaning of each device type is explained below: other: Any device that has not been defined. asyncInternalModem: Modem Pool device of an access server. async: A regular asynchronous serial interface. sync: A regular synchronous serial interface. bchan: An ISDN call. xdsl: Future application with xDSL devices. cable: Future application with Cable modem devices."
+  },
+  "cvpdnTunnelSessionDeviceCallerId": {
+    "name": "cvpdnTunnelSessionDeviceCallerId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The incoming caller identification of the user. It is the originating number that called into the device that initiates the user session. This object can be empty since not all dial device can provide caller ID information."
+  },
+  "cvpdnTunnelSessionDevicePhyId": {
+    "name": "cvpdnTunnelSessionDevicePhyId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The device ID of the physical interface for the user session. The object is the the interface index which points to the ifTable. For virtual interface that is not in the ifTable, it will have zero value."
+  },
+  "cvpdnTunnelSessionMultilink": {
+    "name": "cvpdnTunnelSessionMultilink",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "This object indicates whether the session is part of a multilink or not."
+  },
+  "cvpdnTunnelSessionModemSlotIndex": {
+    "name": "cvpdnTunnelSessionModemSlotIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The Modem Pool database slot index if it is associated with this user session. Only a session with device of type asyncInternalModem will have a valid value for this object."
+  },
+  "cvpdnTunnelSessionModemPortIndex": {
+    "name": "cvpdnTunnelSessionModemPortIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The Modem Pool database port index if it is associated with this user session. Only a session with a device of type asyncInternalModem will have a valid value for this object."
+  },
+  "cvpdnTunnelSessionDS1SlotIndex": {
+    "name": "cvpdnTunnelSessionDS1SlotIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The DS1 database slot index if it is associated with this user session. Only a session with a device of type asyncInternalModem will have a valid value for this object."
+  },
+  "cvpdnTunnelSessionDS1PortIndex": {
+    "name": "cvpdnTunnelSessionDS1PortIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The DS1 database port index if it is associated with this user session. Only a session with a device of type asyncInternalModem will have a a valid value for this object."
+  },
+  "cvpdnTunnelSessionDS1ChannelIndex": {
+    "name": "cvpdnTunnelSessionDS1ChannelIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The DS1 database channel index if it is associated with this user session. Only a session over a device of type asyncInternalModem will have a valid value for this object."
+  },
+  "cvpdnTunnelSessionModemCallStartTime": {
+    "name": "cvpdnTunnelSessionModemCallStartTime",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "The start time of the current modem call. Only a session with a device of type asyncInternalModem will have a valid value for this object."
+  },
+  "cvpdnTunnelSessionModemCallStartIndex": {
+    "name": "cvpdnTunnelSessionModemCallStartIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.1.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "obsolete",
+    "description": "Arbitrary small integer to distinguish modem calls that occurred at the same time tick. Only session over device asyncInternalModem will have a valid value for this object."
+  },
+  "cvpdnSessionAttrTable": {
+    "name": "cvpdnSessionAttrTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of information about individual sessions within the active tunnels. An entry is added to the table when a new session is initiated and removed from the table when the session is terminated."
+  },
+  "cvpdnSessionAttrEntry": {
+    "name": "cvpdnSessionAttrEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemTunnelType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrTunnelId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrSessionId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in the table, containing information about a single session within the tunnel."
+  },
+  "cvpdnSessionAttrSessionId": {
+    "name": "cvpdnSessionAttrSessionId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The ID of an active VPDN session."
+  },
+  "cvpdnSessionAttrUserName": {
+    "name": "cvpdnSessionAttrUserName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The name of the user of the session."
+  },
+  "cvpdnSessionAttrState": {
+    "name": "cvpdnSessionAttrState",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "l2fOpening": 2,
+          "l2fOpen": 3,
+          "l2fCloseWait": 4,
+          "l2fWaitingForTunnel": 5,
+          "l2tpIdle": 6,
+          "l2tpWaitingTunnel": 7,
+          "l2tpWaitReply": 8,
+          "l2tpWaitConnect": 9,
+          "l2tpEstablished": 10,
+          "l2tpShuttingDown": 11,
+          "pptpWaitVAccess": 12,
+          "pptpPacEstablished": 13,
+          "pptpWaitTunnel": 14,
+          "pptpWaitOCRP": 15,
+          "pptpPnsEstablished": 16,
+          "pptpWaitCallDisc": 17,
+          "pptpTerminal": 18
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current state of a tunnel session. L2F tunnel sessions will have states with the 'l2f' prefix. L2TP tunnel sessions will have states with the 'l2tp' prefix. Each state code is explained below: unknown: The current state of the tunnel's session is unknown. l2fOpening: The session has just been initiated through a tunnel and is pending for the remote end reply to complete the process. l2fOpen: The session is active. l2fCloseWait: The session has just been closed and is pending for the remote end reply to complete the process. l2fWaitingForTunnel: The session is in this state when the tunnel which this session is going through is still in CLOSED state. It waits for the tunnel to become OPEN before the session is allowed to be fully established. l2tpIdle: No session is initiated yet. l2tpWaitingTunnel: The session is waiting for the tunnel to be established. l2tpWaitReply: The session has been initiated and is pending for the remote end reply to complete the process. l2tpWaitConnect: This end has acknowledged a connection request and is waiting for the remote end to connect. l2tpEstablished: The session is active. l2tpShuttingDown: The session is in progress of shutting down. pptpWaitVAccess: The session is waiting for the creation of a virtual access interface. pptpPacEstablished: The session is active. pptpWaitTunnel: The session is waiting for the tunnel to be established. pptpWaitOCRP: The session has been initiated and is pending for the remote end reply to complete the process. pptpPnsEstablished: The session is active. pptpWaitCallDisc: Session shutdown is in progress."
+  },
+  "cvpdnSessionAttrCallDuration": {
+    "name": "cvpdnSessionAttrCallDuration",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the call duration of the current active session."
+  },
+  "cvpdnSessionAttrPacketsOut": {
+    "name": "cvpdnSessionAttrPacketsOut",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of output packets through this active session."
+  },
+  "cvpdnSessionAttrBytesOut": {
+    "name": "cvpdnSessionAttrBytesOut",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of output bytes through this active session."
+  },
+  "cvpdnSessionAttrPacketsIn": {
+    "name": "cvpdnSessionAttrPacketsIn",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of input packets through this active session."
+  },
+  "cvpdnSessionAttrBytesIn": {
+    "name": "cvpdnSessionAttrBytesIn",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "bytes",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of input bytes through this active session."
+  },
+  "cvpdnSessionAttrDeviceType": {
+    "name": "cvpdnSessionAttrDeviceType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "asyncInternalModem": 2,
+          "async": 3,
+          "bchan": 4,
+          "sync": 5,
+          "virtualAccess": 6,
+          "xdsl": 7,
+          "cable": 8
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The type of physical devices that this session is attached to for the local end of the tunnel. The meaning of each device type is explained below: other: Any device that has not been defined. asyncInternalModem: Modem Pool device of an access server. async: A regular asynchronous serial interface. sync: A regular synchronous serial interface. bchan: An ISDN call. xdsl: xDSL interface. cable: cable modem interface."
+  },
+  "cvpdnSessionAttrDeviceCallerId": {
+    "name": "cvpdnSessionAttrDeviceCallerId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The incoming caller identification of the user. It is the originating number that called into the device that initiates the session. This object can be empty since not all dial devices can provide caller ID information."
+  },
+  "cvpdnSessionAttrDevicePhyId": {
+    "name": "cvpdnSessionAttrDevicePhyId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The device ID of the physical interface for the session. The object is the the interface index which points to the ifTable. For virtual interfaces that are not in the ifTable, the value will be zero."
+  },
+  "cvpdnSessionAttrMultilink": {
+    "name": "cvpdnSessionAttrMultilink",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the session is part of a multilink PPP bundle, even if there is only one link or session in the bundle. If it is multilink PPP, the value is true."
+  },
+  "cvpdnSessionAttrModemSlotIndex": {
+    "name": "cvpdnSessionAttrModemSlotIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Modem Pool database slot index if it is associated with this session. Only a session with device of type 'asyncInternalModem' will have a valid value for this object; otherwise, it is not instantiated."
+  },
+  "cvpdnSessionAttrModemPortIndex": {
+    "name": "cvpdnSessionAttrModemPortIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The Modem Pool database port index if it is associated with this session. Only a session with a device of type 'asyncInternalModem' will have a valid value for this object; otherwise, it is not instantiated."
+  },
+  "cvpdnSessionAttrDS1SlotIndex": {
+    "name": "cvpdnSessionAttrDS1SlotIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The DS1 database slot index if it is associated with this session. Only a session with a device of type 'asyncInternalModem' will have a valid value for this object; otherwise it is not instantiated."
+  },
+  "cvpdnSessionAttrDS1PortIndex": {
+    "name": "cvpdnSessionAttrDS1PortIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The DS1 database port index if it is associated with this session. Only a session with a device of type 'asyncInternalModem' will have a valid value for this object; otherwise it is not instantiated."
+  },
+  "cvpdnSessionAttrDS1ChannelIndex": {
+    "name": "cvpdnSessionAttrDS1ChannelIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The DS1 database channel index if it is associated with this session. Only a session over a device of type 'asyncInternalModem' will have a valid value for this object; otherwise it is not instantiated."
+  },
+  "cvpdnSessionAttrModemCallStartTime": {
+    "name": "cvpdnSessionAttrModemCallStartTime",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The start time of the current modem call. Only a session with a device of type 'asyncInternalModem' will have a valid value for this object; otherwise, it is not instantiated."
+  },
+  "cvpdnSessionAttrModemCallStartIndex": {
+    "name": "cvpdnSessionAttrModemCallStartIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Arbitrary small integer to distinguish modem calls that occurred at the same time tick. Only session over device 'asyncInternalModem' will have a valid value for this object; otherwise, it is not instantiated."
+  },
+  "cvpdnSessionAttrVirtualCircuitID": {
+    "name": "cvpdnSessionAttrVirtualCircuitID",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The virtual circuit ID of an active Layer 2 VPN session."
+  },
+  "cvpdnSessionAttrSentPktsDropped": {
+    "name": "cvpdnSessionAttrSentPktsDropped",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of dropped packets that could not be sent into this active session."
+  },
+  "cvpdnSessionAttrRecvPktsDropped": {
+    "name": "cvpdnSessionAttrRecvPktsDropped",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.22",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of dropped packets that were received from this active session."
+  },
+  "cvpdnSessionAttrMultilinkBundle": {
+    "name": "cvpdnSessionAttrMultilinkBundle",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.23",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the name of the multilink bundle to which this session belongs. The value of this object is only valid when the value of cvpdnSessionAttrMultilink is 'true'. If the value of cvpdnSessionAttrMultilink is 'false', then the value of this object will be the empty string."
+  },
+  "cvpdnSessionAttrMultilinkIfIndex": {
+    "name": "cvpdnSessionAttrMultilinkIfIndex",
+    "oid": "1.3.6.1.4.1.9.10.24.1.3.2.1.24",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the ifIndex of the multilink bundle to which this session belongs. The value of this object is only valid when the value of cvpdnSessionAttrMultilink is 'true'. If the value of cvpdnSessionAttrMultilink is 'false', then the value of this object will be zero."
+  },
+  "cvpdnUserToFailHistInfoTable": {
+    "name": "cvpdnUserToFailHistInfoTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of the record of failure objects which can be referenced by an user name. Only a name that has a valid item in the Cisco IOS VPDN failure history table will yield a valid entry in this table. The table has a maximum size of 50 entries. Only the newest 50 entries will be kept in the table."
+  },
+  "cvpdnUserToFailHistInfoEntry": {
+    "name": "cvpdnUserToFailHistInfoEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistUname",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistTunnelId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in the table, containing failure history relevant to an user name."
+  },
+  "cvpdnUnameToFailHistUname": {
+    "name": "cvpdnUnameToFailHistUname",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The user name for this failure entry."
+  },
+  "cvpdnUnameToFailHistTunnelId": {
+    "name": "cvpdnUnameToFailHistTunnelId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Tunnel ID for this failure entry. If it is the instigator of the tunnel, the ID is the TS tunnel ID, otherwise it is the NAS tunnel ID."
+  },
+  "cvpdnUnameToFailHistUserId": {
+    "name": "cvpdnUnameToFailHistUserId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The user ID of this failure entry."
+  },
+  "cvpdnUnameToFailHistLocalInitConn": {
+    "name": "cvpdnUnameToFailHistLocalInitConn",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the tunnel in which the failure occurred was generated locally or not."
+  },
+  "cvpdnUnameToFailHistLocalName": {
+    "name": "cvpdnUnameToFailHistLocalName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The local name of the VPDN tunnel in which the failure occurred. It will be the NAS name of the tunnel if the system serves as the NAS, or the TS name of the tunnel if the system serves as the tunnel server. The local name is the configured host name of the system. This object can be empty if the failure occurred prior to successful tunnel projection, thus no source name will be available."
+  },
+  "cvpdnUnameToFailHistRemoteName": {
+    "name": "cvpdnUnameToFailHistRemoteName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The remote name of the VPDN tunnel in which the failure occurred. It will be the tunnel server name of the tunnel if the system is a NAS, or the NAS name of the tunnel if the system serves as the tunnel server. This object can be empty if the failure occurred prior to successful tunnel projection, thus no source name will be available."
+  },
+  "cvpdnUnameToFailHistSourceIp": {
+    "name": "cvpdnUnameToFailHistSourceIp",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The source IP address of the tunnel in which the failure occurred. This IP address is that of the interface at the instigator end of the tunnel."
+  },
+  "cvpdnUnameToFailHistDestIp": {
+    "name": "cvpdnUnameToFailHistDestIp",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The destination IP address of the tunnel in which the failure occurred. This IP address is that of the interface at the receiver end of the tunnel."
+  },
+  "cvpdnUnameToFailHistCount": {
+    "name": "cvpdnUnameToFailHistCount",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "units": "failures",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object is incremented when multiple failures has been experienced by this user on this tunnel. Seeing a delta of >1 is an indication that the current failure record is the latest of a series of failures that has been recorded."
+  },
+  "cvpdnUnameToFailHistFailTime": {
+    "name": "cvpdnUnameToFailHistFailTime",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object specifies the time when the failure is occurred."
+  },
+  "cvpdnUnameToFailHistFailType": {
+    "name": "cvpdnUnameToFailHistFailType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The type of failure for the current failure record. It comes in a form of a an ASCII string which describes the type of failure."
+  },
+  "cvpdnUnameToFailHistFailReason": {
+    "name": "cvpdnUnameToFailHistFailReason",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The reason of failure for the current failure record."
+  },
+  "cvpdnUnameToFailHistSourceInetType": {
+    "name": "cvpdnUnameToFailHistSourceInetType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the type of address contained in cvpdnUnameToFailHistSourceInetAddr."
+  },
+  "cvpdnUnameToFailHistSourceInetAddr": {
+    "name": "cvpdnUnameToFailHistSourceInetAddr",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The source IP address of the tunnel in which the failure occurred. This IP address is that of the interface at the instigator end of the tunnel. The instigator end is the peer which initiates the tunnel estalishment. The type of this address is determined by the value of cvpdnUnameToFailHistSourceInetType."
+  },
+  "cvpdnUnameToFailHistDestInetType": {
+    "name": "cvpdnUnameToFailHistDestInetType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the type of address contained in cvpdnUnameToFailHistDestInetAddr."
+  },
+  "cvpdnUnameToFailHistDestInetAddr": {
+    "name": "cvpdnUnameToFailHistDestInetAddr",
+    "oid": "1.3.6.1.4.1.9.10.24.1.4.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The destination IP address of the tunnel in which the failure occurred. This IP address is that of the interface at the receiver end of the tunnel. The type of this address is determined by the value of cvpdnUnameToFailHistDestInetType."
+  },
+  "ciscoVpdnMgmtMIBNotifs": {
+    "name": "ciscoVpdnMgmtMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.10.24.0",
+    "class": "objectidentity"
+  },
+  "cvpdnNotifSessionID": {
+    "name": "cvpdnNotifSessionID",
+    "oid": "1.3.6.1.4.1.9.10.24.0.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object contains the local session ID of the L2X session for which this notification has been generated."
+  },
+  "cvpdnNotifSessionEvent": {
+    "name": "cvpdnNotifSessionEvent",
+    "oid": "1.3.6.1.4.1.9.10.24.0.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "up": 1,
+          "down": 2,
+          "pwUp": 3,
+          "pwDown": 4
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the event that generated the L2X session notification. The events are represented as follows: up: Session has come up. down: Session has gone down. pwUp: Pseudowire associated with this session has come up. pwDown: Pseudowire associated with this session has gone down. "
+  },
+  "cvpdnNotifSession": {
+    "name": "cvpdnNotifSession",
+    "oid": "1.3.6.1.4.1.9.10.24.0.3",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnNotifSessionID"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnNotifSessionEvent"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDevicePhyId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrVirtualCircuitID"
+      }
+    ],
+    "status": "current",
+    "description": "Conveys an event regarding the L2X session with the indicated session ID and Xconnect VCID."
+  },
+  "cvpdnTemplateTable": {
+    "name": "cvpdnTemplateTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.5.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of information about the VPDN templates. The VPDN template is a grouping mechanism that allows configuration settings to be shared among multiple VPDN groups. One such setting is a limit on the number of active sessions across all VPDN groups associated with the template. The template table allows customers to monitor template-wide information such as tracking the allocation of sessions across templates."
+  },
+  "cvpdnTemplateEntry": {
+    "name": "cvpdnTemplateEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.5.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTemplateName",
+        "implied": 1
+      }
+    ],
+    "status": "current",
+    "description": "An entry in the table, containing information about a single VPDN template."
+  },
+  "cvpdnTemplateName": {
+    "name": "cvpdnTemplateName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.5.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The name of the VPDN template."
+  },
+  "cvpdnTemplateActiveSessions": {
+    "name": "cvpdnTemplateActiveSessions",
+    "oid": "1.3.6.1.4.1.9.10.24.1.5.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "sessions",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of active session in all groups associated with the template."
+  },
+  "cvpdnBundlesWithOneLink": {
+    "name": "cvpdnBundlesWithOneLink",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of bundles comprised of a single link."
+  },
+  "cvpdnBundlesWithTwoLinks": {
+    "name": "cvpdnBundlesWithTwoLinks",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of bundles comprised of two links."
+  },
+  "cvpdnBundlesWithMoreThanTwoLinks": {
+    "name": "cvpdnBundlesWithMoreThanTwoLinks",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of bundles comprised of more than two links."
+  },
+  "cvpdnBundleTable": {
+    "name": "cvpdnBundleTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table that describes the multilink PPP attributes of the active VPDN sessions."
+  },
+  "cvpdnBundleEntry": {
+    "name": "cvpdnBundleEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in this table represents an active multilink PPP bundle that belongs to a VPDN tunnel."
+  },
+  "cvpdnBundleName": {
+    "name": "cvpdnBundleName",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The name of the multilink PPP bundle associated with a VPDN tunnel."
+  },
+  "cvpdnBundleLinkCount": {
+    "name": "cvpdnBundleLinkCount",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "links",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of active links in a multilink PPP bundle associated with a VPDN tunnel."
+  },
+  "cvpdnBundleEndpointType": {
+    "name": "cvpdnBundleEndpointType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "hostname": 2,
+          "string": 3,
+          "macAddress": 4,
+          "ipV4Address": 5,
+          "ipV6Address": 6,
+          "phone": 7,
+          "magicNumber": 8
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The multilink PPP bundle discriminator type associated with a VPDN tunnel. The value of this object represents the type of discriminator used in cvpdnBundleEndpoint. none: No endpoint discriminator was supplied, the default value is being used. hostname: The router's hostname is being used as discriminator. string: User specified string is being used as discriminator. macAddress: A MAC address as defined by the MacAddress textual convention is being used as discriminator. ipV4Address: An IP address as defined by the InetAddressIPv4 textual convention is being used as discriminator. ipV6Address: An IP address as defined by the InetAddressIPv6 textual convention is being used as discriminator. phone: The PSTN phone number is being used as discriminator. magicNumber: A magic number is being used as discriminator."
+  },
+  "cvpdnBundleEndpoint": {
+    "name": "cvpdnBundleEndpoint",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the discriminator used in this bundle that is associated with a VPDN tunnel."
+  },
+  "cvpdnBundlePeerIpAddrType": {
+    "name": "cvpdnBundlePeerIpAddrType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Indicates the type of address contained in cvpdnBundlePeerIpAddr."
+  },
+  "cvpdnBundlePeerIpAddr": {
+    "name": "cvpdnBundlePeerIpAddr",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The IP address of the multilink PPP peer in a VPDN tunnel."
+  },
+  "cvpdnBundleEndpointClass": {
+    "name": "cvpdnBundleEndpointClass",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.4.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "EndpointClass",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The multilink PPP bundle discriminator class associated with a VPDN tunnel. The value of this object represents the type of discriminator used in cvpdnBundleEndpoint."
+  },
+  "cvpdnBundleLastChanged": {
+    "name": "cvpdnBundleLastChanged",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of the sysUpTime object when the contents of cvpdnBundleTable last changed."
+  },
+  "cvpdnBundleChildTable": {
+    "name": "cvpdnBundleChildTable",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.6",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table that exposes the containment relationship between a multilink PPP bundle and a VPDN tunnel."
+  },
+  "cvpdnBundleChildEntry": {
+    "name": "cvpdnBundleChildEntry",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.6.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleName",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleChildTunnelType",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleChildTunnelId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleChildSessionId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in this table represents a session that belongs to a VPDN tunnel and to a multilink PPP bundle."
+  },
+  "cvpdnBundleChildTunnelType": {
+    "name": "cvpdnBundleChildTunnelType",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.6.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TunnelType",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The tunnel type. This is the tunnel protocol of an active VPDN session that is associated with a multilink PPP bundle."
+  },
+  "cvpdnBundleChildTunnelId": {
+    "name": "cvpdnBundleChildTunnelId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.6.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Tunnel ID of an active VPDN session that is associated with a multilink PPP bundle."
+  },
+  "cvpdnBundleChildSessionId": {
+    "name": "cvpdnBundleChildSessionId",
+    "oid": "1.3.6.1.4.1.9.10.24.1.6.6.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The ID of an active VPDN session that is associated with a multilink PPP bundle."
+  },
+  "ciscoVpdnMgmtMIBConformance": {
+    "name": "ciscoVpdnMgmtMIBConformance",
+    "oid": "1.3.6.1.4.1.9.10.24.3",
+    "class": "objectidentity"
+  },
+  "ciscoVpdnMgmtMIBCompliances": {
+    "name": "ciscoVpdnMgmtMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.10.24.3.1",
+    "class": "objectidentity"
+  },
+  "ciscoVpdnMgmtMIBGroups": {
+    "name": "ciscoVpdnMgmtMIBGroups",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2",
+    "class": "objectidentity"
+  },
+  "ciscoVpdnMgmtMIBCompliance": {
+    "name": "ciscoVpdnMgmtMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.10.24.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cvpdnSystemInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelSessionInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnUserToFailHistInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      }
+    ],
+    "status": "obsolete",
+    "description": "The compliance statement for entities which implement the Cisco VPDN Management MIB"
+  },
+  "ciscoVpdnMgmtMIBComplianceRev1": {
+    "name": "ciscoVpdnMgmtMIBComplianceRev1",
+    "oid": "1.3.6.1.4.1.9.10.24.3.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cvpdnSystemInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelSessionInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnUserToFailHistInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSystemGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelAttrGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSessionAttrGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      }
+    ],
+    "status": "obsolete",
+    "description": "The compliance statement for entities which implement the Cisco VPDN Management MIB"
+  },
+  "ciscoVpdnMgmtMIBComplianceRev2": {
+    "name": "ciscoVpdnMgmtMIBComplianceRev2",
+    "oid": "1.3.6.1.4.1.9.10.24.3.1.3",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cvpdnUserToFailHistInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSystemGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelAttrGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSessionAttrGroupRev1",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco VPDN Management MIB"
+  },
+  "ciscoVpdnMgmtMIBComplianceRev3": {
+    "name": "ciscoVpdnMgmtMIBComplianceRev3",
+    "oid": "1.3.6.1.4.1.9.10.24.3.1.4",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cvpdnUserToFailHistInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSystemGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelAttrGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSessionAttrGroupRev1",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTemplateGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnNotifEnabledGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSessionNotifGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnConfigGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnMultilinkGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco VPDN Management MIB"
+  },
+  "ciscoVpdnMgmtMIBComplianceRev4": {
+    "name": "ciscoVpdnMgmtMIBComplianceRev4",
+    "oid": "1.3.6.1.4.1.9.10.24.3.1.5",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cvpdnUserToFailHistInfoGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSystemGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelAttrGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSessionAttrGroupRev1",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTemplateGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnNotifEnabledGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSessionNotifGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnConfigGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnMultilinkGroupRev1",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco VPDN Management MIB"
+  },
+  "ciscoVpdnMgmtMIBComplianceRev5": {
+    "name": "ciscoVpdnMgmtMIBComplianceRev5",
+    "oid": "1.3.6.1.4.1.9.10.24.3.1.6",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cvpdnUserToFailHistInfoGroupRev1",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSystemGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTunnelAttrGroupRev1",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSessionAttrGroupRev1",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnTemplateGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnNotifEnabledGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnSessionNotifGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnConfigGroup",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      },
+      {
+        "object": "cvpdnMultilinkGroupRev1",
+        "module": "CISCO-VPDN-MGMT-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities which implement the Cisco VPDN Management MIB"
+  },
+  "cvpdnSystemInfoGroup": {
+    "name": "cvpdnSystemInfoGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelTotal"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionTotal"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnDeniedUsersTotal"
+      }
+    ],
+    "status": "obsolete",
+    "description": "A collection of objects providing VPDN system status information."
+  },
+  "cvpdnTunnelInfoGroup": {
+    "name": "cvpdnTunnelInfoGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelRemoteTunnelId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelLocalName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelRemoteName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelRemoteEndpointName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelLocalInitConnection"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelOrigCause"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelState"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelActiveSessions"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelDeniedUsers"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSoftshut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelNetworkServiceType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelLocalIpAddress"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSourceIpAddress"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelRemoteIpAddress"
+      }
+    ],
+    "status": "obsolete",
+    "description": "A collection of objects providing VPDN tunnel status information."
+  },
+  "cvpdnTunnelSessionInfoGroup": {
+    "name": "cvpdnTunnelSessionInfoGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionUserName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionState"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionCallDuration"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionPacketsOut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionBytesOut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionPacketsIn"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionBytesIn"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionDeviceType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionDeviceCallerId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionDevicePhyId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionMultilink"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionModemSlotIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionModemPortIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionDS1SlotIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionDS1PortIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionDS1ChannelIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionModemCallStartTime"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelSessionModemCallStartIndex"
+      }
+    ],
+    "status": "obsolete",
+    "description": "A collection of objects providing session information of VPDN tunnel."
+  },
+  "cvpdnUserToFailHistInfoGroup": {
+    "name": "cvpdnUserToFailHistInfoGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistUserId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistLocalInitConn"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistLocalName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistRemoteName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistSourceIp"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistDestIp"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistCount"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistFailTime"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistFailType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistFailReason"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects providing user failure information of VPDN system."
+  },
+  "cvpdnSystemGroup": {
+    "name": "cvpdnSystemGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemTunnelTotal"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemSessionTotal"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemDeniedUsersTotal"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemInitialConnReq"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemSuccessConnReq"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemFailedConnReq"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing VPDN system status information for multiple tunnel types."
+  },
+  "cvpdnTunnelAttrGroup": {
+    "name": "cvpdnTunnelAttrGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteTunnelId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrLocalName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteEndpointName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrLocalInitConnection"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrOrigCause"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrState"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrActiveSessions"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrDeniedUsers"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrSoftshut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrNetworkServiceType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrLocalIpAddress"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrSourceIpAddress"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteIpAddress"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects providing VPDN tunnel attribute information for multiple tunnel types."
+  },
+  "cvpdnSessionAttrGroup": {
+    "name": "cvpdnSessionAttrGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrUserName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrState"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrCallDuration"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrPacketsOut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrBytesOut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrPacketsIn"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrBytesIn"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDeviceType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDeviceCallerId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDevicePhyId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrMultilink"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrModemSlotIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrModemPortIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDS1SlotIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDS1PortIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDS1ChannelIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrModemCallStartTime"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrModemCallStartIndex"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects providing session attributed information for multiple tunnel types."
+  },
+  "cvpdnSessionAttrGroupRev1": {
+    "name": "cvpdnSessionAttrGroupRev1",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.8",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrUserName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrState"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrCallDuration"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrPacketsOut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrBytesOut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrPacketsIn"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrBytesIn"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDeviceType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDeviceCallerId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDevicePhyId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrMultilink"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrModemSlotIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrModemPortIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDS1SlotIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDS1PortIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrDS1ChannelIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrModemCallStartTime"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrModemCallStartIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrVirtualCircuitID"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrSentPktsDropped"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrRecvPktsDropped"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing session attributed information for multiple tunnel types."
+  },
+  "cvpdnNotifEnabledGroup": {
+    "name": "cvpdnNotifEnabledGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.9",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemNotifSessionEnabled"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnNotifSessionID"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnNotifSessionEvent"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects indicating whether Layer 2 VPN notifications are enabled."
+  },
+  "cvpdnSessionNotifGroup": {
+    "name": "cvpdnSessionNotifGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.10",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnNotifSession"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing basic Layer 2 VPN session notifications."
+  },
+  "cvpdnTemplateGroup": {
+    "name": "cvpdnTemplateGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.11",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTemplateActiveSessions"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing VPDN template information."
+  },
+  "cvpdnConfigGroup": {
+    "name": "cvpdnConfigGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.12",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSystemClearSessions"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing VPDN system configuration."
+  },
+  "cvpdnMultilinkGroup": {
+    "name": "cvpdnMultilinkGroup",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.13",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrMultilinkBundle"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrMultilinkIfIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlesWithOneLink"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlesWithTwoLinks"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlesWithMoreThanTwoLinks"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleLinkCount"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleEndpointType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleEndpoint"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlePeerIpAddrType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlePeerIpAddr"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleLastChanged"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleChildSessionId"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects providing information about PPP multilink bundles associates with a VPDN tunnel."
+  },
+  "cvpdnMultilinkGroupRev1": {
+    "name": "cvpdnMultilinkGroupRev1",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.14",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrMultilinkBundle"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnSessionAttrMultilinkIfIndex"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlesWithOneLink"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlesWithTwoLinks"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlesWithMoreThanTwoLinks"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleLinkCount"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleEndpoint"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlePeerIpAddrType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundlePeerIpAddr"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleLastChanged"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleChildSessionId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnBundleEndpointClass"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing information about PPP multilink bundles associates with a VPDN tunnel."
+  },
+  "cvpdnUserToFailHistInfoGroupRev1": {
+    "name": "cvpdnUserToFailHistInfoGroupRev1",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.15",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistUserId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistLocalInitConn"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistLocalName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistRemoteName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistCount"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistFailTime"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistFailType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistFailReason"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistSourceInetType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistSourceInetAddr"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistDestInetType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnUnameToFailHistDestInetAddr"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing user failure information of VPDN system."
+  },
+  "cvpdnTunnelAttrGroupRev1": {
+    "name": "cvpdnTunnelAttrGroupRev1",
+    "oid": "1.3.6.1.4.1.9.10.24.3.2.16",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteTunnelId"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrLocalName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteEndpointName"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrLocalInitConnection"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrOrigCause"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrState"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrActiveSessions"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrDeniedUsers"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrSoftshut"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrNetworkServiceType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrLocalInetAddressType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrLocalInetAddress"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrSourceInetAddressType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrSourceInetAddress"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteInetAddressType"
+      },
+      {
+        "module": "CISCO-VPDN-MGMT-MIB",
+        "object": "cvpdnTunnelAttrRemoteInetAddress"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing VPDN tunnel attribute information for multiple tunnel types."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-VPDN-MGMT-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:24:31 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-VPDN-MGMT-MIB"
+  }
+}

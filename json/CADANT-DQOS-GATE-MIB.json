@@ -1,0 +1,1547 @@
+{
+  "imports": {
+    "class": "imports",
+    "CADANT-CMTS-PACKETCABLE-MIB": [
+      "cadPCMibObjects"
+    ],
+    "CADANT-TC": [
+      "InetAddressIPv4or6"
+    ],
+    "DOCS-QOS3-MIB": [
+      "docsQosIfDirection"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "MibIdentifier",
+      "Unsigned32",
+      "IpAddress",
+      "NOTIFICATION-TYPE",
+      "OBJECT-TYPE",
+      "Bits",
+      "OBJECT-IDENTITY",
+      "TimeTicks",
+      "Integer32",
+      "MODULE-IDENTITY",
+      "Counter64",
+      "Counter32",
+      "iso",
+      "Gauge32"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TruthValue",
+      "RowStatus",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "cadDQoSMib": {
+    "name": "cadDQoSMib",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2001-08-09 00:00",
+        "description": " v1.0 August 9, 2001 Bill Hanks Original version"
+      },
+      {
+        "revision": "2003-01-07 00:00",
+        "description": " v1.1 January 7, 2003 Kathy Ashe Added service flow ID to gateEntry"
+      },
+      {
+        "revision": "2003-03-21 00:00",
+        "description": "Added new Tear Reason for associating a call to a new gate."
+      },
+      {
+        "revision": "2003-05-23 00:00",
+        "description": " v1.3 April 23, 2003 Ruth Kulhanek Added CCC ID to gateEntry."
+      },
+      {
+        "revision": "2004-01-19 00:00",
+        "description": " v1.4 January 19, 2004 Jeff Howe Added source IP to gateEntry."
+      },
+      {
+        "revision": "2004-02-11 00:00",
+        "description": " v1.5 February 11, 2004 Brian Barker Added QoS Descriptor Data to GateEntry."
+      },
+      {
+        "revision": "2005-09-30 00:00",
+        "description": "Fixed units on timers to match usage."
+      },
+      {
+        "revision": "2007-10-24 00:00",
+        "description": "Move from cadExperimental to cadPCMIB in the hierarchy"
+      }
+    ],
+    "lastupdated": "200710250000Z",
+    "organization": "Arris International, Inc.",
+    "contactinfo": "Arris Technical Support Postal: ARRIS E-Mail: support@arrisi.com",
+    "description": "This MIB Module supplies the management objects which are specific to the PacketCable DQoS Gate client of COPS. The objects for the management of the standard COPS protocol reside in RFC2940."
+  },
+  "CadDQoSSource": {
+    "name": "CadDQoSSource",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "snmp": 1,
+          "configurationFile": 2,
+          "externalDatabase": 3,
+          "other": 4,
+          "policyServer": 5,
+          "compiledIntoCode": 6
+        }
+      }
+    },
+    "status": "current",
+    "description": "The origin of the database entry"
+  },
+  "PCReasonCode": {
+    "name": "PCReasonCode",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noReason": -1,
+          "normal": 0,
+          "resourceReassignment": 1,
+          "reservationMaintFail": 2,
+          "deregistration": 3,
+          "timerT0Expiry": 4,
+          "timerT1Expiry": 5,
+          "timerT7Expiry": 6,
+          "timerT8Expiry": 7,
+          "newGateForFlows": 8,
+          "unspecified": 127
+        }
+      }
+    },
+    "status": "current",
+    "description": "The reason why a call is being torn down"
+  },
+  "SDPString": {
+    "name": "SDPString",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 1024
+          }
+        ]
+      }
+    },
+    "displayhint": "1024a",
+    "status": "current",
+    "description": "A large (up to 1024 octets) string containing Session Description protocol for the call. Uses the same semantics as DisplayString but allows a larger size to handle the sizes allowable by the SDP protocol (see RFC2327)."
+  },
+  "cadDQoSMibObjects": {
+    "name": "cadDQoSMibObjects",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1",
+    "class": "objectidentity"
+  },
+  "cadDQoSConfigBase": {
+    "name": "cadDQoSConfigBase",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1",
+    "class": "objectidentity"
+  },
+  "cadDQoSGateTable": {
+    "name": "cadDQoSGateTable",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of DQoS Gate Data"
+  },
+  "cadDQoSGateEntry": {
+    "name": "cadDQoSGateEntry",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "DOCS-QOS3-MIB",
+        "object": "docsQosIfDirection",
+        "implied": 0
+      },
+      {
+        "module": "CADANT-DQOS-GATE-MIB",
+        "object": "cadDQoSGateId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "This entry contains all of the data (except for the Authorized flow specs) for one Gate."
+  },
+  "cadDQoSGateId": {
+    "name": "cadDQoSGateId",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The GateID is 32 bit identifier that is allocated from the local space at the CMTS where the Gate resides. Up to two gates MAY share the same Gate-ID. Typically, a Gate-ID will identify a single upstream flow and a single downstream flow, and correspond to a single Multi-media session. All gates assigned the same Gate-ID by the CMTS MUST transition together through the cadDQoSGateState."
+  },
+  "cadDQoSGateSubscriberID": {
+    "name": "cadDQoSGateSubscriberID",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The Subscriber-ID identifies the subscriber (cable modem) for this service request. Its main use is to prevent various denial-of-service attacks."
+  },
+  "cadDQoSGateClassifierProtoID": {
+    "name": "cadDQoSGateClassifierProtoID",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "protocol ID (see http://www.iana.org/assignments/protocol-numbers) to match in the IP header for the classifier - 0 for no match"
+  },
+  "cadDQoSGateClassifierSrcIP": {
+    "name": "cadDQoSGateClassifierSrcIP",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Source IP Address to match in the IP header for the classifier"
+  },
+  "cadDQoSGateClassifierDestIP": {
+    "name": "cadDQoSGateClassifierDestIP",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Destination IP Address to match in the IP header for the classifier"
+  },
+  "cadDQoSGateClassifierSrcPort": {
+    "name": "cadDQoSGateClassifierSrcPort",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Source port number to match in the IP header for the classifier"
+  },
+  "cadDQoSGateClassifierDestPort": {
+    "name": "cadDQoSGateClassifierDestPort",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Source port number to match in the IP header for the classifier"
+  },
+  "cadDQoSMgmtGateCommitNotAllowed": {
+    "name": "cadDQoSMgmtGateCommitNotAllowed",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "If cadDQoSGateSource is policyServer(5), then when this field is TRUE, then the policy is in a transient state and the policy server does not wish for this policy to be committed as it currently exists. Typically, the policy server will amend this policy to be more complete and then set this flag to FALSE."
+  },
+  "cadDQoSGateAutoCommit": {
+    "name": "cadDQoSGateAutoCommit",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When this flag is set, resources are immediately activated upon reservation."
+  },
+  "cadDQoSGateResourceID": {
+    "name": "cadDQoSGateResourceID",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The Resource-ID is a local 32-bit identifier that is allocated at the CMTS where the Gate resides. Any number of gates MAY share a resource-ID, and therefore share a common set of resources, with the restriction that only one of these gates in each direction have resources committed."
+  },
+  "cadDQoSGateSessionClass": {
+    "name": "cadDQoSGateSessionClass",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unspecified": 0,
+          "normalVoIP": 1,
+          "emergency": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Session class identifies the proper admission control policy or parameters to be applied for this gate."
+  },
+  "cadDQoSGateDSField": {
+    "name": "cadDQoSGateDSField",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Access to the bandwidth and differentiated treatment is provided to packets with the appropriate encoding of bits in the field of the IP header specified for Differentiated Service. This is called the Diffserv code point (DSCP). The DS field also maintains backward compatibility with the present uses of the IP Precedence bits of the IPv4 TOS byte."
+  },
+  "cadDQoSGateTimerT7": {
+    "name": "cadDQoSGateTimerT7",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 60000
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 200,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The CMTS MUST set the Timeout for Admitted QoS Parameters for the service flow to the value specified by this timer. The timeout for Admitted QoS Parameters limits the period of time that the CMTS must hold resources for a service flow's Admitted QoS Parameter Set while they are in excess of its Active QoS Parameter Set. See Appendix C, section C.2.2.5.7 of the DOCSIS RFI for more details on the use of this timer. In order to allow the EMTA to refresh this timer, the CMTS MUST inform the EMTA of the Timeout for Admitted QoS Parameters value in the response (i.e. in the DSA-RSP) to the EMTA's reservation request. The recommended default value of this timer is 200 seconds."
+  },
+  "cadDQoSGateTimerT8": {
+    "name": "cadDQoSGateTimerT8",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 60000
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The CMTS MUST set the Timeout for Active QoS Parameters for the service flow to the value specified by this timer. The Timeout for Active QoS Parameters limits the period of time resources remain unused on an active service flow. See Appendix C, section C.2.2.5.6 of the DOCSIS RFI for more details on the use of this timer. In order to allow the EMTA to refresh this timer, the CMTS MUST inform the EMTA of the Timeout for Active QoS Parameters value in the response (i.e. in the DSA-RSP) to the EMTA's reservation request. The default value of this timer is 0, which instructs the CMTS not to poll for activity on the service flow."
+  },
+  "cadDQoSGateReserveRequest": {
+    "name": "cadDQoSGateReserveRequest",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.22",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Flag indicating that a reservation request has been received for this gate."
+  },
+  "cadDQoSGateCommited": {
+    "name": "cadDQoSGateCommited",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.23",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Flag indicating that a reservation request has been received for this gate."
+  },
+  "cadDQoSTearFlows": {
+    "name": "cadDQoSTearFlows",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.24",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "PCReasonCode",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "noReason",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Enumeration indicating whether the Flows for this Gate are to be torn down. If set to anything other than noReason by the CAM, then the flows have been torn down for the reason specified and the gate must update itself. If set to anything other than noReason by the gate state machine, then it is a command to the CAM to tear down and delete the flows."
+  },
+  "cadDQoSGateESPDupContent": {
+    "name": "cadDQoSGateESPDupContent",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.25",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "If set, CMTS MUST send a duplicate copy of all packets matching the classifier(s) for this gate to the DF-IP-Address-for-CCC."
+  },
+  "cadDQoSGateESPDfCCCIp": {
+    "name": "cadDQoSGateESPDfCCCIp",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.26",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "DF-IP-Address-for-CCC is the address of the Electronic Surveillance Delivery Function to whom the duplicated call content packets are to be sent."
+  },
+  "cadDQoSGateESPDfCCCPort": {
+    "name": "cadDQoSGateESPDfCCCPort",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.27",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "DF-Port-for-CCC is the port number of the Electronic Surveillance Delivery Function to whom the duplicated call content packets are to be sent."
+  },
+  "cadDQoSSFID": {
+    "name": "cadDQoSSFID",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.28",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Service flow ID for this gate ID and flow direction"
+  },
+  "cadDQoSGateESPCCCId": {
+    "name": "cadDQoSGateESPCCCId",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.29",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "CCC-ID is the call connection channel identifier to be used by the Elecronic Surveillance Delivery Function to correlate call content packets."
+  },
+  "cadDQoSGateESPSrcCCCIp": {
+    "name": "cadDQoSGateESPSrcCCCIp",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.30",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This is the source IP address of packets sent to the Electronic Surveillance Delivery Function to whom the duplicated call content packets are to be sent."
+  },
+  "cadDQoSGateServiceClassName": {
+    "name": "cadDQoSGateServiceClassName",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.31",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 15
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "reference": "SP-RFIv1.1-I05-000714, Appendix C.2.2.3.4",
+    "status": "current",
+    "description": "Service Class Name. DOCSIS specifies that the maximum size is 15 printable ASCII characters with a terminating zero. The terminating zero is not represented in this DisplayString syntax object."
+  },
+  "cadDQoSGateUsSFSchedType": {
+    "name": "cadDQoSGateUsSFSchedType",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.32",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Service Flows Scheduling Type (e.g. UGS)"
+  },
+  "cadDQoSGateUsNomGrantInterval": {
+    "name": "cadDQoSGateUsNomGrantInterval",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.33",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Nominal Grant Interval"
+  },
+  "cadDQoSGateUsTolGrantJitter": {
+    "name": "cadDQoSGateUsTolGrantJitter",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.34",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Tolerated Grant Jitter"
+  },
+  "cadDQoSGateUsGrantsPerInterval": {
+    "name": "cadDQoSGateUsGrantsPerInterval",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.35",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Grants Per Interval"
+  },
+  "cadDQoSGateUsUnsolitedGrantSize": {
+    "name": "cadDQoSGateUsUnsolitedGrantSize",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.36",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Unsolicited Grant Size"
+  },
+  "cadDQoSGateUsReqTransPolicy": {
+    "name": "cadDQoSGateUsReqTransPolicy",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.37",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Request Transmission Policy"
+  },
+  "cadDQoSGateUsNomPollingInterval": {
+    "name": "cadDQoSGateUsNomPollingInterval",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.38",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Nominal Polling Interval"
+  },
+  "cadDQoSGateUsTolPollJitter": {
+    "name": "cadDQoSGateUsTolPollJitter",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.39",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Tolerated Poll Jitter"
+  },
+  "cadDQoSGateUsIpToSOverride": {
+    "name": "cadDQoSGateUsIpToSOverride",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.40",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream IP Type Of Service Override"
+  },
+  "cadDQoSGateUsMaxConcatBurst": {
+    "name": "cadDQoSGateUsMaxConcatBurst",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.41",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Upstream Maximum Concatenated Burst"
+  },
+  "cadDQoSGateDsTrafficPriority": {
+    "name": "cadDQoSGateDsTrafficPriority",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.42",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Downstream Traffic Priority"
+  },
+  "cadDQoSGateDsMaxSustainedRate": {
+    "name": "cadDQoSGateDsMaxSustainedRate",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.43",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Downstream Maximum Sustained Traffic Rate"
+  },
+  "cadDQoSGateDsMaxTrafBurst": {
+    "name": "cadDQoSGateDsMaxTrafBurst",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.44",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Downstream Maximum Traffic Burst"
+  },
+  "cadDQoSGateDsMinReservedTrafRate": {
+    "name": "cadDQoSGateDsMinReservedTrafRate",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.45",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Downstream Minimum Reserved Traffic Rate"
+  },
+  "cadDQoSGateDsMinPacketSize": {
+    "name": "cadDQoSGateDsMinPacketSize",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.46",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Downstream Minimum Reserved Rate Packet Size"
+  },
+  "cadDQoSGateDsMaxLatency": {
+    "name": "cadDQoSGateDsMaxLatency",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.1.1.47",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Downstream Maximum Latency"
+  },
+  "cadDQoSMgmtGateTable": {
+    "name": "cadDQoSMgmtGateTable",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Table of DQoS Gate Data that is not needed on the CAM."
+  },
+  "cadDQoSMgmtGateEntry": {
+    "name": "cadDQoSMgmtGateEntry",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "DOCS-QOS3-MIB",
+        "object": "docsQosIfDirection",
+        "implied": 0
+      },
+      {
+        "module": "CADANT-DQOS-GATE-MIB",
+        "object": "cadDQoSGateId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "This entry contains all of the data (except for the Authorized flow specs) for one Gate."
+  },
+  "cadDQoSMgmtGateControllerIP": {
+    "name": "cadDQoSMgmtGateControllerIP",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "IP Address of the Gate Controller which sourced this gate. If gate was created from another source, this field is 0."
+  },
+  "cadDQoSMgmtGateRemoteGateIP": {
+    "name": "cadDQoSMgmtGateRemoteGateIP",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "IP Address for remote Gate coordinator"
+  },
+  "cadDQoSMgmtGateRemoteGatePort": {
+    "name": "cadDQoSMgmtGateRemoteGatePort",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Port number of remote Gate coordinator"
+  },
+  "cadDQoSMgmtGateRemoteGateNoRequireGateOpen": {
+    "name": "cadDQoSMgmtGateRemoteGateNoRequireGateOpen",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When this flag is set, the CMTS MUST not expect a Gate-Open message from a remote gate coordinator."
+  },
+  "cadDQoSMgmtGateRemoteGateNoSendGateOpen": {
+    "name": "cadDQoSMgmtGateRemoteGateNoSendGateOpen",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When this flag is set, the CMTS MUST not send a Gate-Open message to a remote gate coordinator."
+  },
+  "cadDQoSMgmtGateRemoteGateID": {
+    "name": "cadDQoSMgmtGateRemoteGateID",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Gate-ID used by remote gate coordinator."
+  },
+  "cadDQoSMgmtGateRemoteGateAlgorithm": {
+    "name": "cadDQoSMgmtGateRemoteGateAlgorithm",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "md5BasedMac": 100
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Authentication algorithm for Gate Coordination messages"
+  },
+  "cadDQoSMgmtGateRemoteGateSecurityKey": {
+    "name": "cadDQoSMgmtGateRemoteGateSecurityKey",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 128
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "A variable length key used in producing the authentication check in the gate coordination messages"
+  },
+  "cadDQoSMgmtGateEventGenPriRKSIP": {
+    "name": "cadDQoSMgmtGateEventGenPriRKSIP",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Primary-Record-Keeping-Server-IP-Address is the address of the record keeper to whom event records are sent."
+  },
+  "cadDQoSMgmtGateEventGenPriRKSPort": {
+    "name": "cadDQoSMgmtGateEventGenPriRKSPort",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Primary-Record-Keeping-Server-Port is the port number of the record keeper to whom event records are sent."
+  },
+  "cadDQoSMgmtGateEventGenBatchIndicator": {
+    "name": "cadDQoSMgmtGateEventGenBatchIndicator",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "If set, the CMTS MUST accumulate event records as part of a batch file and send to Record Keeping Server at periodic intervals. If clear, the CMTS MUST send the event records to the Record Keeping Server in real-time."
+  },
+  "cadDQoSMgmtGateEventGenSecRKSIP": {
+    "name": "cadDQoSMgmtGateEventGenSecRKSIP",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Secondary-Record-Keeping-Server-IP-Address is the address of the secondary record keeper to whom records are sent if the primary record keeping server is unavailable."
+  },
+  "cadDQoSMgmtGateEventGenSecRKSPort": {
+    "name": "cadDQoSMgmtGateEventGenSecRKSPort",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Secondary-Record-Keeping-Server-Port is the port number of the record keeper to whom event records are sent if the primary record keeping server is unavailable."
+  },
+  "cadDQoSMgmtGateEventGenBillCorrID": {
+    "name": "cadDQoSMgmtGateEventGenBillCorrID",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Billing-Correlation-ID is the identifier assigned by the CMS for all records related to this session."
+  },
+  "cadDQoSMgmtGateMediaConnCalledParty": {
+    "name": "cadDQoSMgmtGateMediaConnCalledParty",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "E.164 formatted address specifying the actual dialed digits of the number of the terminating party. This field is a space-padded ASCII character string."
+  },
+  "cadDQoSMgmtGateMediaConnRoutingNum": {
+    "name": "cadDQoSMgmtGateMediaConnRoutingNum",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "E.164 formatted address specifying the routable number of the terminating party. This field is a space-padded ASCII character string."
+  },
+  "cadDQoSMgmtGateMediaConnChargeNum": {
+    "name": "cadDQoSMgmtGateMediaConnChargeNum",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "E.164 formatted address specifying the number of the party to be charged. This field is a space-padded ASCII character string."
+  },
+  "cadDQoSMgmtGateMediaConnLocRouteNum": {
+    "name": "cadDQoSMgmtGateMediaConnLocRouteNum",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "E.164 formatted address for local number portability use. This field is a space-padded ASCII character string."
+  },
+  "cadDQoSMgmtGateESPDfCDCIP": {
+    "name": "cadDQoSMgmtGateESPDfCDCIP",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "DF-IP-Address-for-CDC is the IP address of the Electronic Surveillance Delivery Function to whom the duplicated event messages are to be sent."
+  },
+  "cadDQoSMgmtGateESPDfCDCPort": {
+    "name": "cadDQoSMgmtGateESPDfCDCPort",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "DF-Port-for-CDC is the port number of the Electronic Surveillance Delivery Function to whom the duplicated event messages are to be sent."
+  },
+  "cadDQoSMgmtGateESPDupEvent": {
+    "name": "cadDQoSMgmtGateESPDupEvent",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "If set, CMTS MUST send a duplicate copy of all event messages related to this gate (e.g. QoS-Start, QoS-Stop, and possibly Call-Answer and Call-Disconnect) to the DF-IP-Address-for-CDC."
+  },
+  "cadDQoSMgmtGateSDPStrings": {
+    "name": "cadDQoSMgmtGateSDPStrings",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.25",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SDPString",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "SDP-strings is the Session Description (SDP) of the upstream packet stream, followed by a NULL octet, followed by the Session Description (SDP) of the downstream packet stream. Sufficient padding of NULL octets is appended to make the total length a multiple of four octets."
+  },
+  "cadDQoSMgmtGateState": {
+    "name": "cadDQoSMgmtGateState",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.26",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "allocated": 1,
+          "authorized": 2,
+          "reserved": 3,
+          "remoteCommitted": 4,
+          "localCommitted": 5,
+          "committed": 6
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This is the current state of the Gate as defined in the Gate Transition Diagram of section 5.1.4 of [pkt-sp-dqos-i02-000818]. Allocated - The initial state of a gate created at the request of the GC Authorized - GC has authorized the flow with resource limits defined Reserved - Resources have been reserved for the flow Remote-Committed - Transient state in which remote CMTS has committed the gate and a Gate-Open message has been received by this CMTS Local-Committed - Transient state in which this CMTS has committed the resources for this gate Committed - Resources are being used"
+  },
+  "cadDQoSMgmtGateSource": {
+    "name": "cadDQoSMgmtGateSource",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.2.1.27",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CadDQoSSource",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object indicates how the policy reached the CMTS. Other means that it originated from a source not identified above."
+  },
+  "cadDQoSAuthFlowSpecTable": {
+    "name": "cadDQoSAuthFlowSpecTable",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The Authorized flow specification describes the envelope that the data flow is allowed to use. Issues such as subscribed level of service, account state, etc. are components that may affect the authorized envelope. There is a one-to-many mapping between Gates and authorized flow specifications. However, only one authorized flow spec may be in effect at a time for each Gate."
+  },
+  "cadDQoSAuthFlowSpecEntry": {
+    "name": "cadDQoSAuthFlowSpecEntry",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "DOCS-QOS3-MIB",
+        "object": "docsQosIfDirection",
+        "implied": 0
+      },
+      {
+        "module": "CADANT-DQOS-GATE-MIB",
+        "object": "cadDQoSGateId",
+        "implied": 0
+      },
+      {
+        "module": "CADANT-DQOS-GATE-MIB",
+        "object": "cadDQoSAuthFlowSpecIdx",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "This entry contains one row in the table."
+  },
+  "cadDQoSAuthFlowSpecIdx": {
+    "name": "cadDQoSAuthFlowSpecIdx",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Index of flow specification within Gate"
+  },
+  "cadDQoSAuthFlowSpecBucketDepthb": {
+    "name": "cadDQoSAuthFlowSpecBucketDepthb",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "octets",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Parameter 'b' in TSpec leaky bucket description. The token bucket size controls the maximum amount of data that the flow can send at the peak rate. More formally, if the token bucket size is 'b' and the token bucket rate is 'r', over any arbitrarily chosen interval T in the life of the flow, the amount of data that the flow sends cannot have exceeded b + (r * T) bytes. The bucket size limits how many credits the flow may store. When the bucket is full, new credits are discarded."
+  },
+  "cadDQoSAuthFlowSpecBucketRater": {
+    "name": "cadDQoSAuthFlowSpecBucketRater",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "bits per second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Parameter 'r' in TSpec leaky bucket description. The token bucket rate is the rate at which credits are placed into an imaginary token bucket. For each flow, a separate bucket is maintained. To send a packet over the flow, a host must remove a number of credits equal to the size of the packet from the token bucket. If there are not enough credits, the host must wait until enough credits accumulate in the bucket."
+  },
+  "cadDQoSAuthFlowSpecPeakRatep": {
+    "name": "cadDQoSAuthFlowSpecPeakRatep",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "bits per second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Parameter 'p' in TSpec leaky bucket description. The maximum transmission rate limits how fast packets may be sent back to back from the host. Consider that if the token bucket is full, it is possible for the flow to send a series of back-to-back packets equal to the size of the token bucket. At all times, 'p' MUST be greater than or equal to the token bucket rate, 'r'."
+  },
+  "cadDQoSAuthFlowSpecMinPolicedUnitm": {
+    "name": "cadDQoSAuthFlowSpecMinPolicedUnitm",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "octets",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Parameter 'm' in TSpec leaky bucket description. All IP datagrams less than size 'm' will be counted, when policed and tested for conformance to the TSpec, as being of size 'm'. This is the smallest size packet that the source will generate."
+  },
+  "cadDQoSAuthFlowSpecMaxPktSizeM": {
+    "name": "cadDQoSAuthFlowSpecMaxPktSizeM",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "octets",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Parameter 'M' in TSpec leaky bucket description. This is the maximum packet size (including IP and header layers) that can be generated by the source."
+  },
+  "cadDQoSAuthFlowSpecReservedRateR": {
+    "name": "cadDQoSAuthFlowSpecReservedRateR",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "bits per second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Parameter 'R' in RSpec. A service accepting an invocation request may be thought of as entering into a contract to provide the service described by the RSpec as long as the flow's traffic continues to be described by the TSpec. This is the policed, reserved transmission flow rate toward the destination."
+  },
+  "cadDQoSAuthFlowSpecSlackTermS": {
+    "name": "cadDQoSAuthFlowSpecSlackTermS",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "units": "microseconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Parameter 'S' in RSpec. This is the maximum amount of slack (in microseconds) that can be added to the inherent delay to produce an acceptable delay bound."
+  },
+  "cadDQoSAuthFlowSpecSubscriberID": {
+    "name": "cadDQoSAuthFlowSpecSubscriberID",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.3.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressIPv4or6",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The Subscriber-ID identifies the subscriber (cable modem) for this service request. Its main use is to prevent various denial-of-service attacks."
+  },
+  "cadDQoSTimerT0": {
+    "name": "cadDQoSTimerT0",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 60
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 30,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This timer is implemented in the CMTS in the Gate state machine, and limits the period of time that a gate may be allocated without the gate parameters being set. This enables the CMTS to recover the gate-ID resources when the Call Management System fails to complete the signaling sequence for a new session. The default value of this timer is 30 seconds. This timer has a range of 1 to 60 seconds."
+  },
+  "cadDQoSTimerT1": {
+    "name": "cadDQoSTimerT1",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 600
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 250,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This timer is implemented in the CMTS in the Gate state machine, and limits the period of time that may elapse between the authorization and a commit is performed. This timer is started whenever a Gate is established. This timer is reset whenever a Commit operation is performed on the resources authorized by the gate. Timer-T1 MUST be set to the value given in the GATE-SET message. If the value given in the GATE-SET message is zero, then Timer-T1 MUST be set to a provisionable default value. The default value of this timer is 250 seconds."
+  },
+  "cadDQoSTimerT2": {
+    "name": "cadDQoSTimerT2",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 60
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 2,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This timer is implemented in the CMTS in the Gate state machine, and limits the time in the transient states of gate coordination. This timer is long enough to accommodate loss and retransmission of Gate coordination messages, but is short enough to not allow significant theft of service. Timer-T2 MUST be set to the value given in the GATE-SET message. If the value given in the GATE-SET message is zero, then Timer-T2 MUST be set to a provisionable default value. The default value of this default is 2 seconds."
+  },
+  "cadDQoSTimerT3": {
+    "name": "cadDQoSTimerT3",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 5,
+            "max": 50
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 40,
+        "format": "decimal"
+      }
+    },
+    "units": "tenths of a second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This timer is implemented in the MTA or CMTS in the handling of RSVP reservations. It controls the total time that can elapse before the RSVP retransmit process gives up without receiving an acknowledgement in the presence of network loss. It is short enough to recover quickly from lost messages and not significantly impact the post-dial delay, but is long enough to allow the CMTS to acknowledge the request and all intermediate routers in the customer network. The default value of this timer is 4 seconds."
+  },
+  "cadDQoSTimerT4": {
+    "name": "cadDQoSTimerT4",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 10
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 5,
+        "format": "decimal"
+      }
+    },
+    "units": "tenths of a second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This timer is implemented in the MTA in the handling of COMMIT messages. It controls the retransmission of COMMIT messages that may have been lost by the network. It is short enough to recover quickly from lost commit requests and not significantly impact the post-pickup delay, but is long enough to allow processing of the COMMIT request at the CMTS. The default value of this timer is 500ms."
+  },
+  "cadDQoSTimerT5": {
+    "name": "cadDQoSTimerT5",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 10
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 5,
+        "format": "decimal"
+      }
+    },
+    "units": "tenths of a second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This timer is implemented in the CMTS (and CMTS-proxy) in the gate coordination processing. It controls the retransmission of GATE-OPEN and GATE-CLOSE messages that may have been lost by the network. It is short enough to recover quickly from lost gate coordination messages, but long enough to allow processing of the gate coordination message at the CMTS or CMTS-proxy. This timer interacts in the case of GATE-OPEN with Timer-T2, and SHOULD be significantly smaller than Timer-T2. The default value of this timer is 500ms."
+  },
+  "cadDQoSTimerT6": {
+    "name": "cadDQoSTimerT6",
+    "oid": "1.3.6.1.4.1.4998.1.1.115.1.2.1.1.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 10
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 5,
+        "format": "decimal"
+      }
+    },
+    "units": "tenths of a second",
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This timer is implemented in the MTA or CMTS in the handling of RSVP reservations. It controls the initial delay used by the RSVP retransmit procedure. The default value of this timer is 500ms."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CADANT-DQOS-GATE-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:49:42 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CADANT-DQOS-GATE-MIB"
+  }
+}

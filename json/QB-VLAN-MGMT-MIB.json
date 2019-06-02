@@ -1,0 +1,608 @@
+{
+  "imports": {
+    "class": "imports",
+    "IF-MIB": [
+      "ifIndex"
+    ],
+    "QB-DWS-MIB": [
+      "QbAtmAal5EncapsType"
+    ],
+    "QUANTUMBRIDGE-REG": [
+      "qbMibs"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "OBJECT-IDENTITY",
+      "TimeTicks",
+      "Counter32",
+      "iso",
+      "OBJECT-TYPE",
+      "Unsigned32",
+      "Bits",
+      "Gauge32",
+      "MibIdentifier",
+      "Integer32",
+      "NOTIFICATION-TYPE",
+      "MODULE-IDENTITY",
+      "Counter64",
+      "IpAddress"
+    ],
+    "SNMPv2-TC": [
+      "TruthValue",
+      "TEXTUAL-CONVENTION",
+      "DisplayString",
+      "RowStatus"
+    ]
+  },
+  "qbVlanMIB": {
+    "name": "qbVlanMIB",
+    "oid": "1.3.6.1.4.1.4323.2.15",
+    "class": "moduleidentity",
+    "lastupdated": "0107022155Z",
+    "organization": "Quantum Bridge",
+    "contactinfo": "mvaysman@quantumbridge.com",
+    "description": "This module defines objects for the management of QB's proprietary VLAN capability. This capability is based on Policing and Thresholding. The purpose of the QBVLAN function is to provide provisioning and monitoring of VLANs set up by the administrator."
+  },
+  "QbVlanPort": {
+    "name": "QbVlanPort",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 128
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "VLAN port range"
+  },
+  "VlanIndex": {
+    "name": "VlanIndex",
+    "class": "textualconvention",
+    "type": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "status": "current",
+    "description": "A value used to index per-VLAN tables: values of 0 and 4095 are not permitted; if the value is between 1 and 4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with global scope within a given bridged domain (see VlanId textual convention). If the value is greater than 4095 then it represents a VLAN with scope local to the particular agent, i.e. one without a global VLAN-ID assigned to it. Such VLANs are outside the scope of IEEE 802.1Q but it is convenient to be able to manage them in the same way using this MIB."
+  },
+  "qbVlanObjects": {
+    "name": "qbVlanObjects",
+    "oid": "1.3.6.1.4.1.4323.2.15.1",
+    "class": "objectidentity"
+  },
+  "qbVlanNotifications": {
+    "name": "qbVlanNotifications",
+    "oid": "1.3.6.1.4.1.4323.2.15.2",
+    "class": "objectidentity"
+  },
+  "qbVlanConformance": {
+    "name": "qbVlanConformance",
+    "oid": "1.3.6.1.4.1.4323.2.15.3",
+    "class": "objectidentity"
+  },
+  "qbVlanConfGroup": {
+    "name": "qbVlanConfGroup",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1",
+    "class": "objectidentity"
+  },
+  "qbNextFreeVlanIndex": {
+    "name": "qbNextFreeVlanIndex",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VlanIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This is the lowest unused vlan index for the system. The next available value for qbNextFreeVlanIndex of a local VLAN entry in qbVlanConfTableTable. This will report values >=4096 if a new Local VLAN may be created or else the value 0 if this is not possible."
+  },
+  "qbVlanNumVlans": {
+    "name": "qbVlanNumVlans",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of provisioned VLANs."
+  },
+  "qbVlanConfTableLastUpdate": {
+    "name": "qbVlanConfTableLastUpdate",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime at the time of the last creation, deletion or modification of an entry in the qbVlanConfTable. If the number of entries has been unchanged since the last re-initialization of the agent, then this object contains a zero value."
+  },
+  "qbVlanConfTable": {
+    "name": "qbVlanConfTable",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains the data pertaining to Vlans. The table contains configuration information for each VLAN configured into the device. All entries are permanent and will be restored after the device is reset."
+  },
+  "qbVlanConfEntry": {
+    "name": "qbVlanConfEntry",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanConfIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each row provides data for a single vlan."
+  },
+  "qbVlanConfIndex": {
+    "name": "qbVlanConfIndex",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VlanIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This is the Vlan index for this VLAN. If the value is between 1 and 4094, it represents an IEEE 802.1Q VLAN-ID with global scope within a given bridged domain (see VlanId textual convention). If the value is greater than 4095 then it represents a VLAN with scope local to the particular agent. Note that for Release 3.0 the qbVlanConfIndex value ranges between 1 and 4095."
+  },
+  "qbVlanConfName": {
+    "name": "qbVlanConfName",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This is the unique user name assigned to this VLAN."
+  },
+  "qbVlanConfSlot": {
+    "name": "qbVlanConfSlot",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This is the slot where this VLAN has been created."
+  },
+  "qbVlanConfNextPort": {
+    "name": "qbVlanConfNextPort",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "QbVlanPort",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This returns the lowest free VLAN port to be used."
+  },
+  "qbVlanConfRowstatus": {
+    "name": "qbVlanConfRowstatus",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.1.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The row status column for this Vlan. This OBJECT can be set to: createAndGo(4) destroy(6) The following values may be read: active(1) Setting this object to createAndGo(4) causes the agent to attempt to create and commit the row based on the contents of the objects in the row. If all necessary information is present in the row and the values are acceptable to the agent, the agent will change the status to active(1). If any of the necessary objects are not available, the agent will reject the creation request. Setting this object to destroy(6) will remove the corresponding entry in this table, and disable data traffic."
+  },
+  "qbVlanPortGroup": {
+    "name": "qbVlanPortGroup",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2",
+    "class": "objectidentity"
+  },
+  "qbVlanPortConfTableLastUpdate": {
+    "name": "qbVlanPortConfTableLastUpdate",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime at the time of the last creation, deletion or modification of an entry in the qbVlanConfTable. If the number of entries has been unchanged since the last re-initialization of the agent, then this object contains a zero value."
+  },
+  "qbVlanPortConfTable": {
+    "name": "qbVlanPortConfTable",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains the data pertaining to Vlan ports and their connections. The table contains per port control and status information for VLAN configuration in the device."
+  },
+  "qbVlanPortConfEntry": {
+    "name": "qbVlanPortConfEntry",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanConfIndex",
+        "implied": 0
+      },
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanPortConfPort",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each row provides data for a single vlan port."
+  },
+  "qbVlanPortConfPort": {
+    "name": "qbVlanPortConfPort",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "QbVlanPort",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This is the Vlan port for this connection end-point."
+  },
+  "qbVlanPortConfPolicing": {
+    "name": "qbVlanPortConfPolicing",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enable": 1,
+          "disable": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "disable",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The object is used to enable or disable policing policy on a given port."
+  },
+  "qbVlanPortConfEncapsulation": {
+    "name": "qbVlanPortConfEncapsulation",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "QbAtmAal5EncapsType",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "qbRoutedEncapsNoHdrNoFcs",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The type of data encapsulation used over the AAL5 SSCS layer. The definitions reference RFC 1483 Multiprotocol Encapsulation over ATM AAL5 and to the ATM Forum LAN Emulation specification."
+  },
+  "qbVlanPortConfAdmitFrameTypes": {
+    "name": "qbVlanPortConfAdmitFrameTypes",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "admitAll": 1,
+          "admitOnlyVlanTagged": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "admitAll",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When this is admitOnlyVlanTagged the device will discard any untagged frames or priority-tagged frames received on this port. When admitAll, untagged frames or priority-tagged frames received will be accepted and tagged with the VLAN id. This applies to the traffic from the GigE card to the backplane only."
+  },
+  "qbVlanPortConfTagging": {
+    "name": "qbVlanPortConfTagging",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enable": 1,
+          "dissable": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "enable",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "When this value is set to disable, the VLAN tags will be removed from the outgoing packets. This applies to the traffic from the GigE card to the backplane only."
+  },
+  "qbVlanPortStatsTable": {
+    "name": "qbVlanPortStatsTable",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains the statistics pertaining to connection end-points on a VLAN port."
+  },
+  "qbVlanPortStatsEntry": {
+    "name": "qbVlanPortStatsEntry",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "qbVlanPortStatsEntry",
+      "module": "QB-VLAN-MGMT-MIB",
+      "object": "qbVlanPortConfEntry"
+    },
+    "status": "current",
+    "description": "Each row provides stats data for a single VLAN port."
+  },
+  "qbVlanPortStatsAal5CRCErrors": {
+    "name": "qbVlanPortStatsAal5CRCErrors",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A count of the number of AAL5 CRC errors."
+  },
+  "qbVlanPortStatsAal5SarTimeouts": {
+    "name": "qbVlanPortStatsAal5SarTimeouts",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A count of the number of AAL5 SAR timeouts."
+  },
+  "qbVlanPortStatsAal5OversizeSDUs": {
+    "name": "qbVlanPortStatsAal5OversizeSDUs",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A count of the number of AAL5 oversized SDUs."
+  },
+  "qbVlanPortStatsAal5UpstreamPkts": {
+    "name": "qbVlanPortStatsAal5UpstreamPkts",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A count of the number of packets passed in the upstream direction. (i.e. from GigE card to backplane)"
+  },
+  "qbVlanPortStatsAal5DownstreamPkts": {
+    "name": "qbVlanPortStatsAal5DownstreamPkts",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A count of the number of packets passed in the downstream direction. (i.e. from the backplane to GigE card on this port) "
+  },
+  "qbVlanPortStatsAal5UpstreamOctets": {
+    "name": "qbVlanPortStatsAal5UpstreamOctets",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " A count of the number of octets passed in the upstream direction. (i.e. from GigE card to backplane)"
+  },
+  "qbVlanPortStatsAal5DownStreamOctets": {
+    "name": "qbVlanPortStatsAal5DownStreamOctets",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " A count of the number of octets passed in the downstream direction. (i.e. from the backplane to GigE card on this port) "
+  },
+  "qbVlanPortStatsUpstreamPktDiscards": {
+    "name": "qbVlanPortStatsUpstreamPktDiscards",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " A count of the number of packets discarded in the upstream direction. (i.e. from GigE card to backplane)"
+  },
+  "qbVlanPortStatsDownsteamPktDiscards": {
+    "name": "qbVlanPortStatsDownsteamPktDiscards",
+    "oid": "1.3.6.1.4.1.4323.2.15.1.2.3.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": " A count of the number of packets discarded in the downstream direction. (i.e. from the backplane to GigE card on this port) "
+  },
+  "qbVlanNotificationPrefix": {
+    "name": "qbVlanNotificationPrefix",
+    "oid": "1.3.6.1.4.1.4323.2.15.2.0",
+    "class": "objectidentity"
+  },
+  "qbVlanCompliances": {
+    "name": "qbVlanCompliances",
+    "oid": "1.3.6.1.4.1.4323.2.15.3.1",
+    "class": "objectidentity"
+  },
+  "qbVlanGroups": {
+    "name": "qbVlanGroups",
+    "oid": "1.3.6.1.4.1.4323.2.15.3.2",
+    "class": "objectidentity"
+  },
+  "qbVlanCompliance": {
+    "name": "qbVlanCompliance",
+    "oid": "1.3.6.1.4.1.4323.2.15.3.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "qbVlanClassGroup",
+        "module": "QB-VLAN-MGMT-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for all agents that support this MIB. A compliant agent implements all objects defined in this MIB."
+  },
+  "qbVlanGroupInfo": {
+    "name": "qbVlanGroupInfo",
+    "oid": "1.3.6.1.4.1.4323.2.15.3.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanConfName"
+      },
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanConfSlot"
+      },
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanConfNextPort"
+      },
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanConfRowstatus"
+      },
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanPortConfPolicing"
+      },
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanPortConfEncapsulation"
+      },
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanPortConfAdmitFrameTypes"
+      },
+      {
+        "module": "QB-VLAN-MGMT-MIB",
+        "object": "qbVlanPortConfTagging"
+      }
+    ],
+    "status": "current",
+    "description": "The set of all accessible objects in this MIB."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/QB-VLAN-MGMT-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 21:04:09 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "QB-VLAN-MGMT-MIB"
+  }
+}

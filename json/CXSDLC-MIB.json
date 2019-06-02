@@ -1,0 +1,1075 @@
+{
+  "imports": {
+    "class": "imports",
+    "CXProduct-SMI": [
+      "Alias",
+      "SapIndex",
+      "cxSDLC"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Gauge32",
+      "OBJECT-IDENTITY",
+      "TimeTicks",
+      "Counter64",
+      "Unsigned32",
+      "Counter32",
+      "OBJECT-TYPE",
+      "MODULE-IDENTITY",
+      "MibIdentifier",
+      "iso",
+      "Integer32",
+      "Bits",
+      "IpAddress",
+      "NOTIFICATION-TYPE"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "CuAddress": {
+    "name": "CuAddress",
+    "class": "type",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 254
+          }
+        ]
+      }
+    }
+  },
+  "sdlcSapTable": {
+    "name": "sdlcSapTable",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "reference": "Memotec Communications Inc.",
+    "status": "mandatory",
+    "description": "This table contains configuration information that is used to manage the SDLC interface. Each row in the table defines either an upper or lower SAP (service access point). SAPs permit SDLC to communicate with layers above (always SNALC) and below it in the protocol stack. The maximum number of rows in the table is limited by sdlcSapNumber, which is an integer in the range 1 to 8. Since SDLC upper and lower SAPs have a one-to-one relationship, this makes 4 upper and 4 lower SAPs available. Each pair control one physical SLDC link (via the BOP). The SLDC interface has two modes of operation: TIU (terminal interface unit) and HIU (host interface unit). - TIU mode is used when the SDLC SAP is connected to one or more SNA control units (secondary link stations) and their supported terminals. It emulates a primary link station. - HIU mode is used when the SLDC SAP is connected to a host. It communicates across a WAN link with the TIU, and locally with the host via SDLC. In communications with the host it emulates the control units (secondary link stations) connected to the TIU. The SDLC interface supports connections with a maximum of 64 link stations. These can be distributed in any combination across the supported physical links."
+  },
+  "sdlcSapEntry": {
+    "name": "sdlcSapEntry",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CXSDLC-MIB",
+        "object": "sdlcSapNumber",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Defines a row in the sdlcSapTable. Each row contains the objects which are used to define a service access point."
+  },
+  "sdlcSapNumber": {
+    "name": "sdlcSapNumber",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SapIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Identifies a SAP (service access point) in the sdlcSapTable. The table supports 8 SAPs. Numbers 1 to 4 are lower SAPs, and numbers 4 to 8 are upper SAPs. "
+  },
+  "sdlcSapRowStatus": {
+    "name": "sdlcSapRowStatus",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "invalid": 1,
+          "valid": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the status of the objects in a table row. Options: invalid (1): Row is flagged, after next reset the values will be disabled and the row will be deleted from the table. valid (2): Values are enabled. Configuration Changed: administrative and operative"
+  },
+  "sdlcSapType": {
+    "name": "sdlcSapType",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "lower": 1,
+          "upper": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the SAP (service access point) type: - 'lower' identifies a SAP leading to a physical SDLC port. This SAP must be bound to an upper BOP SAP. - 'upper' identifies a SAP acting as an internal inter-layer logical port. This SAP must be bound to a lower SNA Link Conversion SAP. Configuration Changed: administrative"
+  },
+  "sdlcSapCuType": {
+    "name": "sdlcSapCuType",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "terminalInterfaceUnit": 1,
+          "hostInterfaceUnit": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "terminalInterfaceUnit",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the SAP type: HIU or TIU. Options: terminalInterfaceUnit (1): The SAP type is a TIU, which means it is connected to one or more control units (secondary link stations). The TIU emulates a primary link station, which polls the attached control units. The SDLC interface can support a total of 64 control units across all TIU SAPs. hostInterfaceUnit (2): The SAP type is an HIU, which means it is connected to an SNA host (primary link station). The HIU emulates the control units connected to a TIU. It responds to polls issued by the host. Default Value: terminalInterfaceUnit (1) Configuration Changed: administrative"
+  },
+  "sdlcSapAlias": {
+    "name": "sdlcSapAlias",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Alias",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The textual name that identifies this SAP (service access point). Names must be unique for all SDLC SAPs. Range of Values: 1 -16 alphanumeric characters (first character must be a letter) Default Value: none Configuration Changed: administrative"
+  },
+  "sdlcSapCompanionAlias": {
+    "name": "sdlcSapCompanionAlias",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Alias",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The textual name of the BOP SAP that binds with this SDLC SAP. Names must be unique for each service access point. Range of Values: 1 -16 alphanumeric characters (first character must be a letter) Default Value: none Configuration Changed: administrative"
+  },
+  "sdlcSapSnalcRef": {
+    "name": "sdlcSapSnalcRef",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object applies only to lower SAPs (service access points). It indicates the sdlcSapNumber of the upper SDLC SAP that is associated with this lower SAP. Range of Values: 1 - 8 Default Value: none Configuration Changed: administrative"
+  },
+  "sdlcSapDuplex": {
+    "name": "sdlcSapDuplex",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "fullduplex": 1,
+          "halfduplex": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "fullduplex",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object applies only to lower SAPs (service access points). It determines if the SAP operates in full-duplex or half-duplex mode. Range of Values: fullduplex (1): The SAP operates in full duplex mode, allowing data to be transmitted is both directions at the same time (two-way simultaneous transmission). On the link, RTS is raised when DTR is raised. halfduplex (2): The SAP operates in half duplex mode, allowing data to be transmitted in both directions, but not at the same time (two-way alternate transmission). On the link, RTS is raised during transmission and dropped during reception. Default Value: fullduplex (1) Configuration Changed: administrative and operative"
+  },
+  "sdlcSapRaiseDtrOnConnectReq": {
+    "name": "sdlcSapRaiseDtrOnConnectReq",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "no": 1,
+          "yes": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "no",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines when the DTR signal is raised on the port connected to the SAP. Options: no (1): DTR is raised whether or not a connection request is received from the SNA link conversion layer. yes (2): When a connection request is received from the SNA link conversion layer, DTR is raised on the physical port the SAP is connected to. Default Value: no (1) Configuration Changed: administrative and operative"
+  },
+  "sdlcPollIntAfterAckTimer": {
+    "name": "sdlcPollIntAfterAckTimer",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object applies only to a service access point functioning as a TIU. Determines the length of time allowed to elapse between the reception of an acknowledgment to a poll and the transmission of the next poll. Certain control units require a delay in order to successfully respond to polls. Since multiple SDLC logical links may share the same SAP (i.e., multiple control units communicating on the same physical link), this timer applies globally to all logical links using this SAP. Range of Values: 1 - 250 (in tenths of a second), a value of 0 disables the timer Default Value: 0 Related Object: sdlcSapCuType Configuration Changed: administrative and operative"
+  },
+  "sdlcSapLineType": {
+    "name": "sdlcSapLineType",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "standard": 1,
+          "negotiable": 2,
+          "switched": 3,
+          "switched-negotiable": 4
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "negotiable",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the type of SDLC line supported by this SAP (service access point). When using an HIU and TIU in tandem, the settings for this object on both must match. Options: standard (1): Allows multiple CUs to be defined for this SAP. All frames received from attached devices must include the appropriate CU address. The general address (0xFF) is not supported. A standard line is also non negotiable. negotiable (2): Allows the CX900 to receive an XID without sending a poll to the attached device. The initial address of the XID coming from the device cannot be the general poll (0xFF). A negotiable line can support more than one device. switched (3): Allows the CX900 to receive an XID using the general poll address (0xFF). A switched line is not negotiable and can only support one attached device. switched-negotiable (4): Allows the CX900 to receive an XID using the general poll address (0xFF). The line is also negotiable and can only support one attached device per port. Default Value: negotiable (2) Configuration Changed: administrative and operative"
+  },
+  "sdlcSapControl": {
+    "name": "sdlcSapControl",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "clearStats": 1
+        }
+      }
+    },
+    "maxaccess": "write-only",
+    "status": "mandatory",
+    "description": "Clears all statistics for this service access point. Options: clearStats (1): Clear statistics. Default Value: none Configuration Changed: administrative and operative"
+  },
+  "sdlcSapOperationalMode": {
+    "name": "sdlcSapOperationalMode",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.30",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "offline": 1,
+          "online": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the state of this SAP (service access point). Options: offLine (1): Indicates that this SAP is not operational. onLine (2): Indicates that this SAP is operational."
+  },
+  "sdlcSapLinkStatus": {
+    "name": "sdlcSapLinkStatus",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.31",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "down": 1,
+          "up": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the physical state of this SAP (service access point) with respect to its associated BOP SAP (sdlcSapCompanionAlias). Options: down (1): Indicates that this SAP is not operational. up (2): Indicates that this SAP is operational."
+  },
+  "sdlcSapLinkChange": {
+    "name": "sdlcSapLinkChange",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.40",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of times that the physical link has been brought up."
+  },
+  "sdlcSapTxDataFrames": {
+    "name": "sdlcSapTxDataFrames",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.41",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of information frames sent by this SAP (service access point)."
+  },
+  "sdlcSapRxDataFrames": {
+    "name": "sdlcSapRxDataFrames",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.42",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of information frames received by this SAP (service access point)."
+  },
+  "sdlcSapConnectRequest": {
+    "name": "sdlcSapConnectRequest",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.43",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of connection requests generated by the SNA Link Conversion layer."
+  },
+  "sdlcSapDisconnectRequest": {
+    "name": "sdlcSapDisconnectRequest",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.44",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of connection clears generated by the SNA Link Conversion layer."
+  },
+  "sdlcSapDisconnectIndication": {
+    "name": "sdlcSapDisconnectIndication",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.1.1.45",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of connection clears sent to the SNA Link Conversion layer."
+  },
+  "sdlcCuTable": {
+    "name": "sdlcCuTable",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "This table contains configuration for the control units associated with SDLC SAPs. Each row identifies one control unit."
+  },
+  "sdlcCuEntry": {
+    "name": "sdlcCuEntry",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CXSDLC-MIB",
+        "object": "sdlcCuSap",
+        "implied": 0
+      },
+      {
+        "module": "CXSDLC-MIB",
+        "object": "sdlcCuId",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "Defines a row in the sdlcCuTable. Each row contains the objects which define one control unit (link station). Up to 64 link stations are supported across all SAPs. If the row is associated with a TIU SAP, then it defines the parameters used to communicate with an actual control unit (secondary link station). If the row is associated with an HIU SAP, then it defines the parameters for an emulated control unit. This must match a companion definition on a TIU SAP. "
+  },
+  "sdlcCuSap": {
+    "name": "sdlcCuSap",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SapIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Determines the sdlcSapNumber of the SAP (service access point) this row (control unit) is associated with. More than one secondary link station can be associated with a particular sdlcSapNumber. Default Value: none Configuration Changed: administrative "
+  },
+  "sdlcCuId": {
+    "name": "sdlcCuId",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CuAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the address of the control unit associated with this SAP. If this SAP is a TIU, it defines the address of the physical control unit attached to the SAP. If this SAP is an HIU, it defines the address of an emulated control unit. Note that the value of this object is decimal, but control units may specify this value in hexadecimal. Range of Values: 1 - 254 Default Value: none Configuration Changed: administrative"
+  },
+  "sdlcCuRowStatus": {
+    "name": "sdlcCuRowStatus",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "invalid": 1,
+          "valid": 2
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the status of the objects in a table row. Options: invalid (1): Row is flagged, after next reset the values will be disabled and the row will be deleted from the table. valid (2): Values are enabled. Configuration Changed: administrative and operative"
+  },
+  "sdlcCuMaxFrameLength": {
+    "name": "sdlcCuMaxFrameLength",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4096
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 521,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the largest frame that can be sent and received by this control unit. The value of this object must match the setting on the host or control unit the SAP is communicating with. Known as MAXDATA, maximum I- Frame size, or maximum BTU length, depending on the SNA device. Range of Values: 1 - 4096 bytes Default Value: 521 bytes Configuration Changed: administrative and operative"
+  },
+  "sdlcCuTransmitWindow": {
+    "name": "sdlcCuTransmitWindow",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 7
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 7,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the maximum number of information frames that can be outstanding at any given time. A frame is considered to be outstanding until the remote device (control unit or host) acknowledges its receipt. Range of Values: 1 - 7 Default Value: 7 Configuration Changed: administrative and operative"
+  },
+  "sdlcCuPollRetry": {
+    "name": "sdlcCuPollRetry",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 50
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 3,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object applies only if this entry is associated with a TIU service access point. Determines the number of times an unacknowledged poll is retransmitted. A poll is retransmitted if an acknowledgment has not been received from the control unit before the sdlcCuPollAckTimer expires. Range of Values: 1 - 50 Default Value: 3 Related Objects: sdlcCuPollAckTimer Configuration Changed: administrative and operative"
+  },
+  "sdlcCuMaxRetry": {
+    "name": "sdlcCuMaxRetry",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 50
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 3,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object applies only if this entry is associated with a TIU service access point. Determines the number of times an unacknowledged DISC, SNRM, or XID is retransmitted during slow polling. A poll is retransmitted if an acknowledgment has not been received from the control unit before the sdlcCuSlowPollTimer expires. This timer is reset each time a DISC, SNRM, or XID is transmitted. When this counter is exceeded, the link with this control unit is abandoned and a connection cleared message is forwarded to the SNA link conversion layer. Range of Values: 1 - 50 Default Value: 3 Related Objects: sdlcCuPollAckTimer Configuration Changed: administrative and operative"
+  },
+  "sdlcCuWaitForNextSnrmOrXid": {
+    "name": "sdlcCuWaitForNextSnrmOrXid",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "no": 1,
+          "yes": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "no",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object applies only if this entry is associated with an HIU service access point. Determines what the HIU does when it receives a UA or XID response from the control unit (on the TIU side of the link). Options: no (1): The HIU sends the UA or XID response to the host immediately. yes (2): The HIU holds the UA or XID response until the host repeats the original poll. This is used in cases where the delay on the link between the HIU and TIU can cause the host to time out. Default Value: no (1) Configuration Changed: administrative and operative"
+  },
+  "sdlcCuSendDisconnect": {
+    "name": "sdlcCuSendDisconnect",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "no": 1,
+          "yes": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "yes",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Determines the command that is sent to disconnect the control unit. Options: no (1): A SNRM is sent to disconnect the control unit. yes (2): If entry is associated with a TIU SAP, it sends a DISC to the control unit (secondary link station). If entry is associated with an HIU SAP, it sends a DM to the host. Default Value: yes (2) Configuration Changed: administrative and operative"
+  },
+  "sdlcCuPollAckTimer": {
+    "name": "sdlcCuPollAckTimer",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 20,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object applies only if this entry is associated with a TIU service access point. Defines the amount of time the TIU waits for the control unit (secondary link station) to acknowledge a poll. If no response is received before this timer expires, then the poll is retransmitted. The object sdlcCuPollRetry determines how many times the TIU retransmits a poll. If the poll was a SNRM, XID, or DISC, then the first time this timer expires, the sldcCuSlowPollTimer is started, and the TIU slow polls the control unit. Range of Values: 1 - 250 (in tenths of a second), a value of 0 disables the timer Default Value: 20 (2 seconds) Related Objects: sdlcCuPollRetry sldcCuSlowPollTimer Configuration Changed: administrative and operative"
+  },
+  "sdlcCuSlowPollTimer": {
+    "name": "sdlcCuSlowPollTimer",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 10,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "This object applies only if this entry is associated with a TIU service access point. Determines the amount of time the TIU waits for the control unit (secondary link station) to respond to a SNRM poll during slow polling. Each time this timer expires another poll is sent. The object sdlcCuMaxRetry determines how many slow polls are transmitted. The TIU begins slow polling if the sdlcCuPollAckTimer timer expires before the control unit has responded to the initial SNRM, XID, or DISC poll. Range of Values: 1 - 250 tenths of a second (a value of 0 disables the timer) Default Value: 10 (1 second) Related Objects: sdlcCuPollAckTimer sdlcCuMaxRetry Configuration Changed: administrative and operative"
+  },
+  "sdlcCuWaitForUaFromSnalcTimer": {
+    "name": "sdlcCuWaitForUaFromSnalcTimer",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "If this entry is associated with an HIU SAP (service access point), it determines the maximum amount of time that the HIU waits for a response to a SNRM or DISC sent to the TIU. This is used to control link setup across the WAN between the HIU and TIU. When this timer expires, the link is dropped. Set the minimum value of this timer as follows: = p + sdlcCuPollAckTimer + (sdlcCuSlowPollTimer * n) Where: p: is the propagation delay on the WAN link n: is the number of slow polls you want to wait for. If this entry is associated with a TIU SAP, it determines the maximum amount of time that the TIU waits for a response to a DISC sent to the HIU. When this timer expires, the link is dropped. At a minimum this timer should be set greater than the propagation delay on the link. Range of Values: 1 - 250 tenths of a second (a value of 0 disables the timer) Default Value: 0 Configuration Changed: administrative and operative"
+  },
+  "sdlcCuControl": {
+    "name": "sdlcCuControl",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.30",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "clearStats": 1
+        }
+      }
+    },
+    "maxaccess": "write-only",
+    "status": "mandatory",
+    "description": "Clears all statistics for this control unit. Default Value: none Options: clearStats (1): Clear statistics. Configuration Changed: administrative and operative"
+  },
+  "sdlcCuState": {
+    "name": "sdlcCuState",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.40",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "normalDiscMode": 1,
+          "waitForSnrm": 2,
+          "receivedSnrm": 3,
+          "normalResponseMode": 4,
+          "waitForDisc": 5,
+          "receivedDisc": 6,
+          "snrmSent": 7,
+          "discSent": 8,
+          "remoteDiscReceived": 9,
+          "xidExchange": 10
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the current status of the control unit. Options: normalDiscMode (1): This control unit is in Normal Disconnected Mode waitForSnrm (2): This control unit (associated with an HIU SAP) is waiting for a SNRM from the host. receivedSnrm (3): This control unit (associated with an HIU SAP) has received a SNRM from the host. normalResponseMode (4): The control unit is in Normal Response Mode. waitForDisc (5): This control unit (associated with an HIU SAP) is waiting for a DISC from the host. receivedDisc (6): This control unit (associated with an HIU SAP) has received a DISC from the host. snrmSent (7): A SNRM has been sent to this control unit. discSent (8): A DISC has been sent to the companion control unit on the HIU. remoteDiscReceived (9): This control unit has received a (remote) DISC from its companion control unit on the TIU. xidExchange (10): The TIU received an XID poll from the HIU for this control unit."
+  },
+  "sdlcCuOperationalMode": {
+    "name": "sdlcCuOperationalMode",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.41",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "offline": 1,
+          "online": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the state of this control unit. Options: offLine (1): Indicates that this control unit is not operational. onLine (2): Indicates that this control unit is operational."
+  },
+  "sdlcCuDiscReasonCode": {
+    "name": "sdlcCuDiscReasonCode",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.42",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Provides the reason code which indicates why this SLDC control unit was disconnected."
+  },
+  "sdlcCuSnalcDiscReasonCode": {
+    "name": "sdlcCuSnalcDiscReasonCode",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.43",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 20
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Provides the reason code which indicates why the SNA Link Conversion layer disconnected this SLDC control unit."
+  },
+  "sdlcCuConnectionStatus": {
+    "name": "sdlcCuConnectionStatus",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.44",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "down": 1,
+          "up": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the state of the SNA link convergence connection for this control unit. Options: up (1): Indicates that the SNA link convergence connection is operational. down (2): Indicates that SNA link convergence link layer connection is not operational."
+  },
+  "sdlcCuFramesInTransmitQueue": {
+    "name": "sdlcCuFramesInTransmitQueue",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.50",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of frames currently in the transmit queue for this control unit. The number of frames should be less than sdlcCuTransmitWindow. If not, there may be a problem with the link."
+  },
+  "sdlcCuTxFrames": {
+    "name": "sdlcCuTxFrames",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.51",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of information frames transmitted to this control unit. If associated with an HIU service access point, this object indicates the number of information frames transmitted to the host by this emulated control unit. "
+  },
+  "sdlcCuRxFrames": {
+    "name": "sdlcCuRxFrames",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.52",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of information frames received from this control unit. If associated with an HIU service access point, this object indicates the number of information frames received from the host by this emulated control unit. "
+  },
+  "sdlcCuTimeOuts": {
+    "name": "sdlcCuTimeOuts",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.55",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This object applies only if this entry is associated with a TIU service access point. Indicates the number of times the sdlcCuPollAckTimer and the sdlcCuSlowPollTimer have expired."
+  },
+  "sdlcCuSnrmCount": {
+    "name": "sdlcCuSnrmCount",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.56",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of SNRM frames transmitted to this control unit. If associated with an HIU service access point, this object indicates the number of SNRM frames received from the host by this emulated control unit. "
+  },
+  "sdlcCuXidCommand": {
+    "name": "sdlcCuXidCommand",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.57",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of XID frames transmitted to this control unit. If associated with an HIU service access point, this object indicates the number of XID frames received from the host by this emulated control unit."
+  },
+  "sdlcCuXidResponse": {
+    "name": "sdlcCuXidResponse",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.58",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of SNRM frames transmitted to this control unit. If associated with an HIU service access point, this object indicates the number of SNRM frames received from the host by this emulated control unit. "
+  },
+  "sdlcCuUnnumberedAcks": {
+    "name": "sdlcCuUnnumberedAcks",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.59",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of UA responses received from this control unit. If associated with an HIU service access point, this object indicates the number of UA responses transmitted to the host by this emulated control unit. "
+  },
+  "sdlcCuRetransmission": {
+    "name": "sdlcCuRetransmission",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.60",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of information frames retransmitted to this control unit. If associated with an HIU service access point, this object indicates the number of information frames retransmitted to the host by this emulated control unit. "
+  },
+  "sdlcCuDisconnectCount": {
+    "name": "sdlcCuDisconnectCount",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.61",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of DISC commands transmitted to this control unit. If associated with an HIU service access point, this object indicates the number of DISC commands received from the host by this emulated control unit. "
+  },
+  "sdlcCuDisconnectModeCount": {
+    "name": "sdlcCuDisconnectModeCount",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.62",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This object applies only if this entry is associated with a TIU service access point. Indicates the total number of DM (disconnect mode) response frames received from this control unit."
+  },
+  "sdlcCuTransmittedRNR": {
+    "name": "sdlcCuTransmittedRNR",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.63",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of RNR frames transmitted to this control unit. If associated with an HIU service access point, this object indicates the number of RNR frames transmitted to the host by this emulated control unit. "
+  },
+  "sdlcCuReceivedRNR": {
+    "name": "sdlcCuReceivedRNR",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.64",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of RNR frames received from this control unit. If associated with an HIU service access point, this object indicates the number of RNR frames received from the host by this emulated control unit. "
+  },
+  "sdlcCuFrameRejects": {
+    "name": "sdlcCuFrameRejects",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.65",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "If associated with a TIU service access point, this object indicates the number of FRMR response commands received from this control unit. If associated with an HIU service access point, this object indicates the number of FRMR response commands transmitted to the host by this emulated control unit. "
+  },
+  "sdlcCuRemoteDisc": {
+    "name": "sdlcCuRemoteDisc",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.66",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "This object applies only if this entry is associated with an TIU service access point. Indicates the number of DISC frames transmitted by this control unit."
+  },
+  "sdlcCuConnectionRequest": {
+    "name": "sdlcCuConnectionRequest",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.67",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of connections requested by the SNA link conversion layer for this control unit."
+  },
+  "sdlcCuDisconnectionRequest": {
+    "name": "sdlcCuDisconnectionRequest",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.68",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of connection clear requests sent by the SNA link conversion layer for this control unit."
+  },
+  "sdlcCuDisconnectionIndication": {
+    "name": "sdlcCuDisconnectionIndication",
+    "oid": "1.3.6.1.4.1.495.2.1.6.37.2.1.69",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of connection cleared messages sent to the SNA link conversion layer for this control unit."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CXSDLC-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:39:04 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CXSDLC-MIB"
+  }
+}

@@ -1,0 +1,1507 @@
+{
+  "imports": {
+    "class": "imports",
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "NOTIFICATION-TYPE",
+      "OBJECT-TYPE",
+      "Gauge32",
+      "IpAddress",
+      "Counter64",
+      "OBJECT-IDENTITY",
+      "MibIdentifier",
+      "TimeTicks",
+      "Bits",
+      "experimental",
+      "Counter32",
+      "iso",
+      "Integer32",
+      "MODULE-IDENTITY",
+      "Unsigned32"
+    ],
+    "SNMPv2-TC": [
+      "TruthValue",
+      "TEXTUAL-CONVENTION",
+      "RowStatus",
+      "TimeStamp",
+      "DisplayString"
+    ]
+  },
+  "msdpMIB": {
+    "name": "msdpMIB",
+    "oid": "1.3.6.1.3.92",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2006-08-01 00:00",
+        "description": "Initial version, published as RFC 4624."
+      }
+    ],
+    "lastupdated": "200608010000Z",
+    "organization": "IETF MBONED Working Group",
+    "contactinfo": "Bill Fenner 75 Willow Road Menlo Park, CA 94025 Phone: +1 650 867 6073 E-mail: fenner@research.att.com Dave Thaler One Microsoft Way Redmond, WA 98052 Phone: +1 425 703 8835 Email: dthaler@microsoft.com MBONED Working Group: mboned@lists.uoregon.edu",
+    "description": "An experimental MIB module for MSDP Management and Monitoring. Copyright (C) The Internet Society 2006. This version of this MIB module is part of RFC 4624; see the RFC itself for full legal notices."
+  },
+  "msdpMIBobjects": {
+    "name": "msdpMIBobjects",
+    "oid": "1.3.6.1.3.92.1",
+    "class": "objectidentity"
+  },
+  "msdp": {
+    "name": "msdp",
+    "oid": "1.3.6.1.3.92.1.1",
+    "class": "objectidentity"
+  },
+  "msdpEnabled": {
+    "name": "msdpEnabled",
+    "oid": "1.3.6.1.3.92.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The state of MSDP on this MSDP speaker - globally enabled or disabled. Changes to this object should be stored to non-volatile memory."
+  },
+  "msdpCacheLifetime": {
+    "name": "msdpCacheLifetime",
+    "oid": "1.3.6.1.3.92.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "reference": "RFC 3618 section 5.3",
+    "status": "current",
+    "description": "The lifetime given to SA cache entries when created or refreshed. This is the [SG-State-Period] in the MSDP spec. A value of 0 means no SA caching is done by this MSDP speaker. Changes to this object should be stored to non-volatile memory. This object does not measure time per se; instead, it is the delta from the time at which an SA message is received at which it should be expired if not refreshed. (i.e., it is the value of msdpSACacheExpiryTime immediately after receiving an SA message applying to that row.) As such, TimeInterval would be a more appropriate SYNTAX; it remains TimeTicks for backwards compatibility."
+  },
+  "msdpNumSACacheEntries": {
+    "name": "msdpNumSACacheEntries",
+    "oid": "1.3.6.1.3.92.1.1.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of entries in the SA Cache table."
+  },
+  "msdpRPAddress": {
+    "name": "msdpRPAddress",
+    "oid": "1.3.6.1.3.92.1.1.11",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The Rendezvous Point (RP) address used when sourcing MSDP SA messages. May be 0.0.0.0 on non-RPs. Changes to this object should be stored to non-volatile memory."
+  },
+  "msdpRequestsTable": {
+    "name": "msdpRequestsTable",
+    "oid": "1.3.6.1.3.92.1.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "deprecated",
+    "description": "The (conceptual) table listing group ranges and MSDP peers used when deciding where to send an SA Request message, when required. If SA Requests are not enabled, this table may be empty. In order to choose a peer to whom to send an SA Request for a given group, G, the subset of entries in this table whose (msdpRequestsPeerType, msdpRequestsPeer) tuple represents a peer whose msdpPeerState is established are examined. The set is further reduced by examining only those entries for which msdpPeerRequestsGroupAddressType equals the address type of G. The entries with the highest value of msdpRequestsGroupPrefix are considered, where the group G falls within the range described by the combination of msdpRequestsGroup and msdpRequestsGroupPrefix. (This sequence is commonly known as a 'longest-match' lookup.) Finally, if multiple entries remain, the entry with the lowest value of msdpRequestsPriority is chosen. The SA Request message is sent to the peer described by this row."
+  },
+  "msdpRequestsEntry": {
+    "name": "msdpRequestsEntry",
+    "oid": "1.3.6.1.3.92.1.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpRequestsGroupAddress",
+        "implied": 0
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpRequestsGroupMask",
+        "implied": 0
+      }
+    ],
+    "status": "deprecated",
+    "description": "An entry (conceptual row) representing a group range used when deciding where to send an SA Request message."
+  },
+  "msdpRequestsGroupAddress": {
+    "name": "msdpRequestsGroupAddress",
+    "oid": "1.3.6.1.3.92.1.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "deprecated",
+    "description": "The group address that, when combined with the mask in this entry, represents the group range to which this row applies."
+  },
+  "msdpRequestsGroupMask": {
+    "name": "msdpRequestsGroupMask",
+    "oid": "1.3.6.1.3.92.1.1.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "deprecated",
+    "description": "The mask that, when combined with the group address in this entry, represents the group range to which this row applies."
+  },
+  "msdpRequestsPeer": {
+    "name": "msdpRequestsPeer",
+    "oid": "1.3.6.1.3.92.1.1.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "deprecated",
+    "description": "The peer to which MSDP SA Requests for groups matching this entry's group range will be sent. This object, combined with msdpRequestsPeerType, must match the INDEX of a row in the msdpPeerTable, and to be considered, this peer's msdpPeerState must be established."
+  },
+  "msdpRequestsStatus": {
+    "name": "msdpRequestsStatus",
+    "oid": "1.3.6.1.3.92.1.1.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "deprecated",
+    "description": "The status of this row, by which new rows may be added to the table or old rows may be deleted."
+  },
+  "msdpPeerTable": {
+    "name": "msdpPeerTable",
+    "oid": "1.3.6.1.3.92.1.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The (conceptual) table listing the MSDP speaker's peers."
+  },
+  "msdpPeerEntry": {
+    "name": "msdpPeerEntry",
+    "oid": "1.3.6.1.3.92.1.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerRemoteAddress",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) representing an MSDP peer. If row creation is supported, dynamically added rows are added to the system's stable configuration (corresponding to a StorageType value of nonVolatile). "
+  },
+  "msdpPeerRemoteAddress": {
+    "name": "msdpPeerRemoteAddress",
+    "oid": "1.3.6.1.3.92.1.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The address of the remote MSDP peer."
+  },
+  "msdpPeerState": {
+    "name": "msdpPeerState",
+    "oid": "1.3.6.1.3.92.1.1.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inactive": 1,
+          "listen": 2,
+          "connecting": 3,
+          "established": 4,
+          "disabled": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The state of the MSDP TCP connection with this peer."
+  },
+  "msdpPeerRPFFailures": {
+    "name": "msdpPeerRPFFailures",
+    "oid": "1.3.6.1.3.92.1.1.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of SA messages received from this peer that failed the Peer-RPF check. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerInSAs": {
+    "name": "msdpPeerInSAs",
+    "oid": "1.3.6.1.3.92.1.1.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of MSDP SA messages received on this connection. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerOutSAs": {
+    "name": "msdpPeerOutSAs",
+    "oid": "1.3.6.1.3.92.1.1.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of MSDP SA messages transmitted on this connection. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerInSARequests": {
+    "name": "msdpPeerInSARequests",
+    "oid": "1.3.6.1.3.92.1.1.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of MSDP SA-Request messages received on this connection. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerOutSARequests": {
+    "name": "msdpPeerOutSARequests",
+    "oid": "1.3.6.1.3.92.1.1.5.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of MSDP SA-Request messages transmitted on this connection. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerInSAResponses": {
+    "name": "msdpPeerInSAResponses",
+    "oid": "1.3.6.1.3.92.1.1.5.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The number of MSDP SA-Response messages received on this connection. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerOutSAResponses": {
+    "name": "msdpPeerOutSAResponses",
+    "oid": "1.3.6.1.3.92.1.1.5.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The number of MSDP SA Response messages transmitted on this TCP connection. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerInControlMessages": {
+    "name": "msdpPeerInControlMessages",
+    "oid": "1.3.6.1.3.92.1.1.5.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of MSDP messages, excluding encapsulated data packets, received on this TCP connection. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerOutControlMessages": {
+    "name": "msdpPeerOutControlMessages",
+    "oid": "1.3.6.1.3.92.1.1.5.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of MSDP messages, excluding encapsulated data packets, transmitted on this TCP connection. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerInDataPackets": {
+    "name": "msdpPeerInDataPackets",
+    "oid": "1.3.6.1.3.92.1.1.5.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of encapsulated data packets received from this peer. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerOutDataPackets": {
+    "name": "msdpPeerOutDataPackets",
+    "oid": "1.3.6.1.3.92.1.1.5.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The total number of encapsulated data packets sent to this peer. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of msdpPeerDiscontinuityTime."
+  },
+  "msdpPeerFsmEstablishedTransitions": {
+    "name": "msdpPeerFsmEstablishedTransitions",
+    "oid": "1.3.6.1.3.92.1.1.5.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "RFC 3618 section 11",
+    "status": "current",
+    "description": "The total number of times the MSDP FSM transitioned into the ESTABLISHED state."
+  },
+  "msdpPeerFsmEstablishedTime": {
+    "name": "msdpPeerFsmEstablishedTime",
+    "oid": "1.3.6.1.3.92.1.1.5.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "RFC 3618 section 11",
+    "status": "current",
+    "description": "This timestamp is set to the value of sysUpTime when a peer transitions into or out of the ESTABLISHED state. It is set to zero when the MSDP speaker is booted."
+  },
+  "msdpPeerInMessageTime": {
+    "name": "msdpPeerInMessageTime",
+    "oid": "1.3.6.1.3.92.1.1.5.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The sysUpTime value when the last MSDP message was received from the peer. It is set to zero when the MSDP speaker is booted."
+  },
+  "msdpPeerLocalAddress": {
+    "name": "msdpPeerLocalAddress",
+    "oid": "1.3.6.1.3.92.1.1.5.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The local IP address used for this entry's MSDP TCP connection."
+  },
+  "msdpPeerConnectRetryInterval": {
+    "name": "msdpPeerConnectRetryInterval",
+    "oid": "1.3.6.1.3.92.1.1.5.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 30,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "reference": "RFC 3618 section 5.6",
+    "status": "current",
+    "description": "Time interval, in seconds, for the [ConnectRetry-period] for this peer."
+  },
+  "msdpPeerHoldTimeConfigured": {
+    "name": "msdpPeerHoldTimeConfigured",
+    "oid": "1.3.6.1.3.92.1.1.5.1.21",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 3,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 75,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "reference": "RFC 3618 section 5.4",
+    "status": "current",
+    "description": "Time interval, in seconds, for the [HoldTime-Period] configured for this MSDP speaker with this peer. If the value of this object is zero (0), the MSDP connection is never torn down due to the absence of messages from the peer."
+  },
+  "msdpPeerKeepAliveConfigured": {
+    "name": "msdpPeerKeepAliveConfigured",
+    "oid": "1.3.6.1.3.92.1.1.5.1.22",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 1,
+            "max": 21845
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 60,
+        "format": "decimal"
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-create",
+    "reference": "RFC 3618 section 5.5",
+    "status": "current",
+    "description": "Time interval, in seconds, for the [KeepAlive-Period] configured for this MSDP speaker with this peer. If the value of this object is zero (0), no periodic KEEPALIVE messages are sent to the peer after the MSDP connection has been established."
+  },
+  "msdpPeerDataTtl": {
+    "name": "msdpPeerDataTtl",
+    "oid": "1.3.6.1.3.92.1.1.5.1.23",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 1,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The minimum TTL a packet is required to have before it may be forwarded using SA encapsulation to this peer."
+  },
+  "msdpPeerProcessRequestsFrom": {
+    "name": "msdpPeerProcessRequestsFrom",
+    "oid": "1.3.6.1.3.92.1.1.5.1.24",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "deprecated",
+    "description": "This object indicates whether to process MSDP SA Request messages from this peer. If True(1), MSDP SA Request messages from this peer are processed and replied to (if appropriate) with SA Response messages. If False(2), MSDP SA Request messages from this peer are silently ignored. It defaults to False when msdpCacheLifetime is 0 and to True when msdpCacheLifetime is non-0. This object is deprecated because MSDP SA Requests were removed from the MSDP specification."
+  },
+  "msdpPeerStatus": {
+    "name": "msdpPeerStatus",
+    "oid": "1.3.6.1.3.92.1.1.5.1.25",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "reference": "RFC 3618 section 11.1",
+    "status": "current",
+    "description": "The RowStatus object by which peers can be added and deleted. A transition to 'active' will cause the MSDP 'Enable MSDP peering with P' Event to be generated. A transition out of the 'active' state will cause the MSDP 'Disable MSDP peering with P' Event to be generated. Care should be used in providing write access to this object without adequate authentication. msdpPeerRemoteAddress is the only variable that must be set to a valid value before the row can be activated. Since this is the table's INDEX, a row can be activated by simply setting the msdpPeerStatus variable. It is possible to modify other columns in the same conceptual row when the status value is active(1)."
+  },
+  "msdpPeerRemotePort": {
+    "name": "msdpPeerRemotePort",
+    "oid": "1.3.6.1.3.92.1.1.5.1.26",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 639,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The remote port for the TCP connection between the MSDP peers."
+  },
+  "msdpPeerLocalPort": {
+    "name": "msdpPeerLocalPort",
+    "oid": "1.3.6.1.3.92.1.1.5.1.27",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Integer32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 65535
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 639,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The local port for the TCP connection between the MSDP peers."
+  },
+  "msdpPeerEncapsulationType": {
+    "name": "msdpPeerEncapsulationType",
+    "oid": "1.3.6.1.3.92.1.1.5.1.29",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 0,
+          "tcp": 1
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The encapsulation in use when encapsulating data in SA messages to this peer."
+  },
+  "msdpPeerConnectionAttempts": {
+    "name": "msdpPeerConnectionAttempts",
+    "oid": "1.3.6.1.3.92.1.1.5.1.30",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of times the state machine has transitioned from INACTIVE to CONNECTING."
+  },
+  "msdpPeerInNotifications": {
+    "name": "msdpPeerInNotifications",
+    "oid": "1.3.6.1.3.92.1.1.5.1.31",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The number of MSDP Notification messages received from this peer. This object is deprecated because MSDP Notifications have been removed from the spec."
+  },
+  "msdpPeerOutNotifications": {
+    "name": "msdpPeerOutNotifications",
+    "oid": "1.3.6.1.3.92.1.1.5.1.32",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The number of MSDP Notification messages transmitted to this peer. This object is deprecated because MSDP Notifications have been removed from the spec."
+  },
+  "msdpPeerLastError": {
+    "name": "msdpPeerLastError",
+    "oid": "1.3.6.1.3.92.1.1.5.1.33",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 2,
+            "max": 2
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": "0000",
+        "format": "hex"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "deprecated",
+    "description": "The last error code and subcode received via Notification from this peer. If no error has occurred, this field is zero. Otherwise, the first byte of this two-byte OCTET STRING contains the O-bit and error code, and the second byte contains the subcode. This object is deprecated because MSDP Notifications have been removed from the spec."
+  },
+  "msdpPeerDiscontinuityTime": {
+    "name": "msdpPeerDiscontinuityTime",
+    "oid": "1.3.6.1.3.92.1.1.5.1.34",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime on the most recent occasion at which one or more of this entry's counters suffered a discontinuity. See the DESCRIPTION of each object to see if it is expected to have discontinuities. These discontinuities may occur at peer connection establishment. If no such discontinuities have occurred since the last reinitialization of the local management subsystem, then this object contains a zero value."
+  },
+  "msdpSACacheTable": {
+    "name": "msdpSACacheTable",
+    "oid": "1.3.6.1.3.92.1.1.6",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The (conceptual) table listing the MSDP SA advertisements currently in the MSDP speaker's cache."
+  },
+  "msdpSACacheEntry": {
+    "name": "msdpSACacheEntry",
+    "oid": "1.3.6.1.3.92.1.1.6.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheGroupAddr",
+        "implied": 0
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheSourceAddr",
+        "implied": 0
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheOriginRP",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) representing an MSDP SA advertisement. The INDEX to this table includes msdpSACacheOriginRP for diagnosing incorrect MSDP advertisements; normally, a Group and Source pair would be unique. Row creation is not permitted; msdpSACacheStatus may only be used to delete rows from this table."
+  },
+  "msdpSACacheGroupAddr": {
+    "name": "msdpSACacheGroupAddr",
+    "oid": "1.3.6.1.3.92.1.1.6.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The group address of the SA Cache entry."
+  },
+  "msdpSACacheSourceAddr": {
+    "name": "msdpSACacheSourceAddr",
+    "oid": "1.3.6.1.3.92.1.1.6.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The source address of the SA Cache entry."
+  },
+  "msdpSACacheOriginRP": {
+    "name": "msdpSACacheOriginRP",
+    "oid": "1.3.6.1.3.92.1.1.6.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The RP of the SA Cache entry. This field is in the INDEX in order to catch multiple RP's advertising the same source and group."
+  },
+  "msdpSACachePeerLearnedFrom": {
+    "name": "msdpSACachePeerLearnedFrom",
+    "oid": "1.3.6.1.3.92.1.1.6.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The peer from which this SA Cache entry was last accepted. This address must correspond to the msdpPeerRemoteAddress value for a row in the MSDP Peer Table. This should be 0.0.0.0 on the router that originated the entry."
+  },
+  "msdpSACacheRPFPeer": {
+    "name": "msdpSACacheRPFPeer",
+    "oid": "1.3.6.1.3.92.1.1.6.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The peer from which an SA message corresponding to this cache entry would be accepted (i.e., the RPF peer for msdpSACacheOriginRP). This may be different than msdpSACachePeerLearnedFrom if this entry was created by an MSDP SA-Response. This address must correspond to the msdpPeerRemoteAddress value for a row in the MSDP Peer Table, or it may be 0.0.0.0 if no RPF peer exists."
+  },
+  "msdpSACacheInSAs": {
+    "name": "msdpSACacheInSAs",
+    "oid": "1.3.6.1.3.92.1.1.6.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of MSDP SA messages received relevant to this cache entry. This object must be initialized to zero when creating a cache entry."
+  },
+  "msdpSACacheInDataPackets": {
+    "name": "msdpSACacheInDataPackets",
+    "oid": "1.3.6.1.3.92.1.1.6.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of MSDP-encapsulated data packets received relevant to this cache entry. This object must be initialized to zero when creating a cache entry."
+  },
+  "msdpSACacheUpTime": {
+    "name": "msdpSACacheUpTime",
+    "oid": "1.3.6.1.3.92.1.1.6.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time since this entry was first placed in the SA cache. The first epoch is the time that the entry was first placed in the SA cache, and the second epoch is the current time."
+  },
+  "msdpSACacheExpiryTime": {
+    "name": "msdpSACacheExpiryTime",
+    "oid": "1.3.6.1.3.92.1.1.6.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The time remaining before this entry will expire from the SA cache. The first epoch is now, and the second epoch is the time that the entry will expire."
+  },
+  "msdpSACacheStatus": {
+    "name": "msdpSACacheStatus",
+    "oid": "1.3.6.1.3.92.1.1.6.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "active": 1,
+          "destroy": 6
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The status of this row in the table. The only allowable actions are to retrieve the status, which will be 'active', or to set the status to 'destroy' in order to remove this entry from the cache. Row creation is not permitted. No columnar objects are writable, so there are none that may be changed while the status value is active(1)."
+  },
+  "msdpMeshGroupTable": {
+    "name": "msdpMeshGroupTable",
+    "oid": "1.3.6.1.3.92.1.1.12",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The (conceptual) table listing MSDP Mesh Group configuration."
+  },
+  "msdpMeshGroupEntry": {
+    "name": "msdpMeshGroupEntry",
+    "oid": "1.3.6.1.3.92.1.1.12.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpMeshGroupName",
+        "implied": 0
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpMeshGroupPeerAddress",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) representing a peer in an MSDP Mesh Group. If row creation is supported, dynamically added rows are added to the system's stable configuration (corresponding to a StorageType value of nonVolatile)."
+  },
+  "msdpMeshGroupName": {
+    "name": "msdpMeshGroupName",
+    "oid": "1.3.6.1.3.92.1.1.12.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The name of the mesh group."
+  },
+  "msdpMeshGroupPeerAddress": {
+    "name": "msdpMeshGroupPeerAddress",
+    "oid": "1.3.6.1.3.92.1.1.12.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A peer address that is a member of the mesh group with name msdpMeshGroupName. The msdpMeshGroupPeerAddress must match a row in the msdpPeerTable."
+  },
+  "msdpMeshGroupStatus": {
+    "name": "msdpMeshGroupStatus",
+    "oid": "1.3.6.1.3.92.1.1.12.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This entry's status, by which new entries may be added to the table and old entries deleted. msdpMeshGroupName and msdpMeshGroupPeerAddress must be set to valid values before the row can be activated. Since these are the table's INDEX, a row can be activated by simply setting the msdpMeshGroupStatus variable. It is not possible to modify other columns in the same conceptual row when the status value is active(1), because the only other objects in the row are part of the INDEX. Changing one of these changes the row, so an old row must be deleted and a new one created."
+  },
+  "msdpTraps": {
+    "name": "msdpTraps",
+    "oid": "1.3.6.1.3.92.1.1.0",
+    "class": "objectidentity"
+  },
+  "msdpEstablished": {
+    "name": "msdpEstablished",
+    "oid": "1.3.6.1.3.92.1.1.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerFsmEstablishedTransitions"
+      }
+    ],
+    "status": "current",
+    "description": "The MSDP Established event is generated when the MSDP FSM enters the ESTABLISHED state."
+  },
+  "msdpBackwardTransition": {
+    "name": "msdpBackwardTransition",
+    "oid": "1.3.6.1.3.92.1.1.0.2",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerState"
+      }
+    ],
+    "status": "current",
+    "description": "The MSDPBackwardTransition Event is generated when the MSDP FSM moves from a higher-numbered state to a lower-numbered state."
+  },
+  "msdpMIBConformance": {
+    "name": "msdpMIBConformance",
+    "oid": "1.3.6.1.3.92.1.1.8",
+    "class": "objectidentity"
+  },
+  "msdpMIBCompliances": {
+    "name": "msdpMIBCompliances",
+    "oid": "1.3.6.1.3.92.1.1.8.1",
+    "class": "objectidentity"
+  },
+  "msdpMIBGroups": {
+    "name": "msdpMIBGroups",
+    "oid": "1.3.6.1.3.92.1.1.8.2",
+    "class": "objectidentity"
+  },
+  "msdpMIBCompliance": {
+    "name": "msdpMIBCompliance",
+    "oid": "1.3.6.1.3.92.1.1.8.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "msdpMIBGlobalsGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBPeerGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBNotificationGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBEncapsulationGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBSACacheGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBRequestsGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBRPGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBMeshGroupGroup",
+        "module": "MSDP-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities that implement a pre- RFC version of MSDP. This statement is deprecated because it includes objects used for managing/monitoring aspects of MSDP that were removed before it was published as an RFC."
+  },
+  "msdpMIBFullCompliance": {
+    "name": "msdpMIBFullCompliance",
+    "oid": "1.3.6.1.3.92.1.1.8.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "msdpMIBGlobalsGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBPeerGroup2",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBSACacheGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBEncapsulationGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBRPGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBMeshGroupGroup",
+        "module": "MSDP-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities that implement MSDP (RFC3618)."
+  },
+  "msdpMIBReadOnlyCompliance": {
+    "name": "msdpMIBReadOnlyCompliance",
+    "oid": "1.3.6.1.3.92.1.1.8.1.3",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "msdpMIBGlobalsGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBPeerGroup2",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBSACacheGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBEncapsulationGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBRPGroup",
+        "module": "MSDP-MIB"
+      },
+      {
+        "object": "msdpMIBMeshGroupGroup",
+        "module": "MSDP-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities that implement MSDP (RFC3618), but do not permit configuration (or only permit partial configuration) via SNMP."
+  },
+  "msdpMIBGlobalsGroup": {
+    "name": "msdpMIBGlobalsGroup",
+    "oid": "1.3.6.1.3.92.1.1.8.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpEnabled"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects providing information on global MSDP state."
+  },
+  "msdpMIBPeerGroup": {
+    "name": "msdpMIBPeerGroup",
+    "oid": "1.3.6.1.3.92.1.1.8.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerRPFFailures"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerState"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInSAs"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutSAs"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInSARequests"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutSARequests"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInSAResponses"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutSAResponses"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInNotifications"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutNotifications"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInControlMessages"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutControlMessages"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerFsmEstablishedTransitions"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerFsmEstablishedTime"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerLocalAddress"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerRemotePort"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerLocalPort"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerConnectRetryInterval"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerHoldTimeConfigured"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerKeepAliveConfigured"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInMessageTime"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerProcessRequestsFrom"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerConnectionAttempts"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerLastError"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerStatus"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerDiscontinuityTime"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects for managing MSDP peers. This group is deprecated in favor of msdpMIBPeerGroup2 because it contains objects for managing aspects of MSDP that were removed before it was published as an RFC."
+  },
+  "msdpMIBEncapsulationGroup": {
+    "name": "msdpMIBEncapsulationGroup",
+    "oid": "1.3.6.1.3.92.1.1.8.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInDataPackets"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutDataPackets"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerDataTtl"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerEncapsulationType"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for managing encapsulations if the MSDP encapsulation interfaces are not given interface indices."
+  },
+  "msdpMIBSACacheGroup": {
+    "name": "msdpMIBSACacheGroup",
+    "oid": "1.3.6.1.3.92.1.1.8.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpCacheLifetime"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpNumSACacheEntries"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACachePeerLearnedFrom"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheRPFPeer"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheInSAs"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheInDataPackets"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheUpTime"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheExpiryTime"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpSACacheStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for managing MSDP SA cache entries."
+  },
+  "msdpMIBNotificationGroup": {
+    "name": "msdpMIBNotificationGroup",
+    "oid": "1.3.6.1.3.92.1.1.8.2.5",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpEstablished"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpBackwardTransition"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of notifications for signaling changes in MSDP peer relationships."
+  },
+  "msdpMIBRequestsGroup": {
+    "name": "msdpMIBRequestsGroup",
+    "oid": "1.3.6.1.3.92.1.1.8.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpRequestsPeer"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpRequestsStatus"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects for managing MSDP Request transmission. This group is deprecated because Requests were removed from MSDP before its publication as an RFC."
+  },
+  "msdpMIBRPGroup": {
+    "name": "msdpMIBRPGroup",
+    "oid": "1.3.6.1.3.92.1.1.8.2.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpRPAddress"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for MSDP speakers that source MSDP messages."
+  },
+  "msdpMIBMeshGroupGroup": {
+    "name": "msdpMIBMeshGroupGroup",
+    "oid": "1.3.6.1.3.92.1.1.8.2.8",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpMeshGroupStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for MSDP speakers that can participate in MSDP mesh groups."
+  },
+  "msdpMIBPeerGroup2": {
+    "name": "msdpMIBPeerGroup2",
+    "oid": "1.3.6.1.3.92.1.1.8.2.9",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerRPFFailures"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerState"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInSAs"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutSAs"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInSARequests"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutSARequests"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInControlMessages"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerOutControlMessages"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerFsmEstablishedTransitions"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerFsmEstablishedTime"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerLocalAddress"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerRemotePort"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerLocalPort"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerConnectRetryInterval"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerHoldTimeConfigured"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerKeepAliveConfigured"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerInMessageTime"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerConnectionAttempts"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerStatus"
+      },
+      {
+        "module": "MSDP-MIB",
+        "object": "msdpPeerDiscontinuityTime"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for managing MSDP peers."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/MSDP-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:35:21 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "MSDP-MIB"
+  }
+}

@@ -1,0 +1,600 @@
+{
+  "imports": {
+    "class": "imports",
+    "CTRON-MIB-NAMES": [
+      "ctronDLM"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Integer32",
+      "Bits",
+      "iso",
+      "Counter64",
+      "NOTIFICATION-TYPE",
+      "TimeTicks",
+      "Counter32",
+      "Gauge32",
+      "OBJECT-TYPE",
+      "MODULE-IDENTITY",
+      "Unsigned32",
+      "MibIdentifier",
+      "OBJECT-IDENTITY",
+      "IpAddress"
+    ],
+    "SNMPv2-TC": [
+      "DisplayString",
+      "TEXTUAL-CONVENTION"
+    ]
+  },
+  "snmpPollTable": {
+    "name": "snmpPollTable",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "A list of SNMP poll entries which trigger automatic polling of SNMP requests to other SNMP agents. This table is indexed by the destination IP address of the host/device to be polled and the IP address of the requesting host. This indexing pair allows multiple requestors to define a poll request to the same destination, yet maintain separate poll entries. The OIDs to be polled in this request are defined in the snmpOIDTable which is indexed also by the destination/owner IP address pair. If no OIDs are defined for a poll entry, then the the poll will default to polling for sysUpTimei with no threshold comparison. This will act as a simple keep-alive funtion for the destination SNMP agent."
+  },
+  "snmpPollEntry": {
+    "name": "snmpPollEntry",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "DLM-MIB",
+        "object": "snmpPollDestination",
+        "implied": 0
+      },
+      {
+        "module": "DLM-MIB",
+        "object": "snmpPollOwner",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "An SNMP poll entry containing objects for a particular poll request."
+  },
+  "snmpPollDestination": {
+    "name": "snmpPollDestination",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The IP address of the host/device to be polled."
+  },
+  "snmpPollOwner": {
+    "name": "snmpPollOwner",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The IP address of the client which created this poll request entry."
+  },
+  "snmpPollCommunity": {
+    "name": "snmpPollCommunity",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "public",
+        "format": "string"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The value of the community string to be used in the SNMP REQUEST PDU when actively polling. Note that this community name string should be defined for the Cabletron hub device as well as in the destination host/device; otherwise polls can fail due to authenication failures."
+  },
+  "snmpPollInterval": {
+    "name": "snmpPollInterval",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 60,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The value of the interval (in seconds) on which to poll the destination address with the OIDs defined in the OID table assigned to this poll entry. This interval defines how often an SNMP GET REQUEST PDU will be originated from this host device to the polled address."
+  },
+  "snmpPollRetry": {
+    "name": "snmpPollRetry",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 3,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The value of the number of times to retry a failed poll request prior to considering it a failure."
+  },
+  "snmpPollAction": {
+    "name": "snmpPollAction",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "no-action": 1,
+          "send-trap": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "send-trap",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The indication of the action to take when a poll request is considered to have failed. A value of 'no-action' will allow the poll to reset and retry without sending any alarms. A value of 'send-trap' will cause a SNMP TRAP PDU to be generated and sent to the specified trap address for this entry."
+  },
+  "snmpPollTrapAddress": {
+    "name": "snmpPollTrapAddress",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The IP address to which to send the SNMP TRAP if the poll is considered a failure and the action is defined as send-trap. The default trap address is the owner address for this entry."
+  },
+  "snmpPollType": {
+    "name": "snmpPollType",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "invalid": 2,
+          "activate": 3,
+          "suspend": 4
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "activate",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The administrative control of this poll request entry. This leaf is used to trigure an active request (begin polling), suspend polling (stop polling but leave this poll entry intact) on an active request, or to delete an entry (stop polling and remove entry)."
+  },
+  "snmpPollStatus": {
+    "name": "snmpPollStatus",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inactive": 1,
+          "active": 2,
+          "lost-contact": 3,
+          "alarm-condition": 4,
+          "general-failure": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The operational status of this poll request entry. This leaf is used to indicate the state of the last valid poll request."
+  },
+  "snmpPollRequests": {
+    "name": "snmpPollRequests",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the number of poll requests (SNMP GET REQUEST PDUs) have been issued for this poll entry."
+  },
+  "snmpPollLastContact": {
+    "name": "snmpPollLastContact",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the value of the sysUpTime when the last poll response was received from the polled host/device for which this poll entry exists."
+  },
+  "snmpPollLastAlarm": {
+    "name": "snmpPollLastAlarm",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "Indicates the value of the sysUpTime when the last alarm was generated for this poll request entry."
+  },
+  "snmpPollAlarmWait": {
+    "name": "snmpPollAlarmWait",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": 60,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Indicates the number of seconds to wait prior to sending another alarm. This is to ensure that alarms do not flood out upon device contact lost."
+  },
+  "snmpPollTrapCommunity": {
+    "name": "snmpPollTrapCommunity",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OCTET STRING",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "public",
+        "format": "string"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The value of the community string to be used in the SNMP TRAP PDU when a trap is generated."
+  },
+  "snmpPollProtocol": {
+    "name": "snmpPollProtocol",
+    "oid": "1.3.6.1.4.1.52.4.2.1.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "internet-ping": 1,
+          "snmp": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "internet-ping",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Indicates the protocol to use to poll the host/device. If snmp is chosen, there must be at least one corresponding OID Table Entry or a general-failure will result. A corresponding OID Table Entry is an entry with the same Destination and Owner indices."
+  },
+  "snmpOIDTable": {
+    "name": "snmpOIDTable",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "mandatory",
+    "description": "A list of objects used to define the OBJECT IDENTIFIERS and their attributes (type and threashold values) to be used in a particular snmp poll request SNMP GET REQUEST PDU. These OIDs will make up the VarBindList in the PDU. Only OID types which have INTEGER samantics are supported (INTEGER, Counter, Gauge, TimeTicks) since the polled value is compared against a threshold value. This table is addresses by the same keys as the snmpPollTable (destination IP address and owner Ip address) in addition to a unique OID sequence number which is maintained for each OID entry."
+  },
+  "snmpOIDEntry": {
+    "name": "snmpOIDEntry",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "DLM-MIB",
+        "object": "snmpOIDDestination",
+        "implied": 0
+      },
+      {
+        "module": "DLM-MIB",
+        "object": "snmpOIDOwner",
+        "implied": 0
+      },
+      {
+        "module": "DLM-MIB",
+        "object": "snmpOIDSequence",
+        "implied": 0
+      }
+    ],
+    "status": "mandatory",
+    "description": "An SNMP poll OBJECT IDENTIFIER entry containing objects for a particular OID to be polled."
+  },
+  "snmpOIDDestination": {
+    "name": "snmpOIDDestination",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The IP address of the host/device to be polled."
+  },
+  "snmpOIDOwner": {
+    "name": "snmpOIDOwner",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The IP address of the client which created this OID request entry."
+  },
+  "snmpOIDSequence": {
+    "name": "snmpOIDSequence",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The sequence number which uniquely idenifies this OID entry entry within a particular SNMP poll request. This number is incremented each time an OID as added to the poll list for a particular destination/owner pair."
+  },
+  "snmpOIDObject": {
+    "name": "snmpOIDObject",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OBJECT IDENTIFIER",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Identifies the Object Identifier to be polled. This OID value will be placed in a SNMP GET REQUEST PDU on each poll interval."
+  },
+  "snmpOIDComparator": {
+    "name": "snmpOIDComparator",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "equal": 1,
+          "greater": 2,
+          "less": 3,
+          "greater-or-equal": 4,
+          "less-or-equal": 5,
+          "trap-always": 6,
+          "dont-compare": 7,
+          "not-equal": 8
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "dont-compare",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Indicates the type of comparison to be performed on the value portion of the OID being polled. This comparator will be used to compare the OID value with the threshold value defined in this entry. A value of 'dont-compare' causes no comparison to be performed. Comparison failures will trigger an alarm condition."
+  },
+  "snmpOIDEnumType": {
+    "name": "snmpOIDEnumType",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "integer": 1,
+          "counter": 2,
+          "gauge": 3,
+          "ticks": 4
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "ticks",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "Indicates the type of value to expect from the OID being polled such that the correct interpretation of the threshold value can be used to do the comparison."
+  },
+  "snmpOIDThresholdInteger": {
+    "name": "snmpOIDThresholdInteger",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The threshold value to be used when polling an integer-valued Object Identifier."
+  },
+  "snmpOIDThresholdCounter": {
+    "name": "snmpOIDThresholdCounter",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The threshold value to be used when polling a Counter-type Object Identifier."
+  },
+  "snmpOIDThresholdGauge": {
+    "name": "snmpOIDThresholdGauge",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The threshold value to be used when polling a Gauge-type Object Identifier."
+  },
+  "snmpOIDThresholdTicks": {
+    "name": "snmpOIDThresholdTicks",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeTicks",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The threshold value to be used when polling a TimeTicks-type Object Identifier."
+  },
+  "snmpOIDType": {
+    "name": "snmpOIDType",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "inactive": 2,
+          "activate": 3,
+          "suspend": 4
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "activate",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "mandatory",
+    "description": "The administrative control of this Object Identifier entry. This leaf is used to control adding, using, and deleting OIDs from the OID poll list."
+  },
+  "snmpOIDStatus": {
+    "name": "snmpOIDStatus",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inactive": 1,
+          "active": 2,
+          "alarm-condition": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The status of the last poll of this Object ID."
+  },
+  "snmpOIDLastValue": {
+    "name": "snmpOIDLastValue",
+    "oid": "1.3.6.1.4.1.52.4.2.1.2.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "mandatory",
+    "description": "The value of the last poll entry treated as an integer value. This field is used to allow RMON alarms to monitor the polled values."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/DLM-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:48:27 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "DLM-MIB"
+  }
+}

@@ -1,0 +1,951 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "CISCO-VSAN-MIB": [
+      "vsanIndex"
+    ],
+    "DIFFSERV-MIB": [
+      "IndexInteger",
+      "IndexIntegerNextFree",
+      "diffServClfrEntry"
+    ],
+    "IF-MIB": [
+      "InterfaceIndexOrZero"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Counter64",
+      "Bits",
+      "Integer32",
+      "Gauge32",
+      "IpAddress",
+      "TimeTicks",
+      "NOTIFICATION-TYPE",
+      "OBJECT-IDENTITY",
+      "iso",
+      "MODULE-IDENTITY",
+      "Unsigned32",
+      "MibIdentifier",
+      "Counter32",
+      "OBJECT-TYPE"
+    ],
+    "SNMPv2-TC": [
+      "RowStatus",
+      "RowPointer",
+      "TEXTUAL-CONVENTION",
+      "DisplayString",
+      "TruthValue"
+    ]
+  },
+  "ciscoDiffServExtMIB": {
+    "name": "ciscoDiffServExtMIB",
+    "oid": "1.3.6.1.4.1.9.9.381",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2004-11-16 00:00",
+        "description": "Changed max lengths of cdsmClfrName and cdsmFCMultiFieldClfrName to 63 bytes."
+      },
+      {
+        "revision": "2003-12-18 00:00",
+        "description": "Added cdsmClfrNextFreeElement and cdsmFCMultiFieldClfrNextFreeStmt."
+      },
+      {
+        "revision": "2003-12-12 00:00",
+        "description": "Added cdsmChkSumTable. Added cdsmFCMultiFieldMatchWildCard object to cdsmFCMultiFieldMatchStmtTable."
+      },
+      {
+        "revision": "2003-12-05 00:00",
+        "description": "Initial version of this MIB module."
+      }
+    ],
+    "lastupdated": "200411160000Z",
+    "organization": "Cisco Systems Inc.",
+    "contactinfo": " Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 USA Tel: +1 800 553 -NETS E-mail: cs-san@cisco.com",
+    "description": "This MIB is a Cisco extension to the DIFFSERV-MIB, RFC 3289. This MIB defines a Fibre Channel (FC) Multi Field filter to be used in conjunction with the DIFFSERV-MIB. It also helps in associating Differentiated Services Classifiers to interfaces on a VSAN (Virtual Storage Area Network) via the cdsmDataPathTable defined in this MIB."
+  },
+  "ciscoDiffServExtMIBObjects": {
+    "name": "ciscoDiffServExtMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.381.1",
+    "class": "objectidentity"
+  },
+  "ciscoDiffServExtMIBConform": {
+    "name": "ciscoDiffServExtMIBConform",
+    "oid": "1.3.6.1.4.1.9.9.381.2",
+    "class": "objectidentity"
+  },
+  "cdsmConfiguration": {
+    "name": "cdsmConfiguration",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1",
+    "class": "objectidentity"
+  },
+  "CdsmDataDirection": {
+    "name": "CdsmDataDirection",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "inbound": 1,
+          "outbound": 2
+        }
+      }
+    },
+    "status": "current",
+    "description": "Specifies a direction of data travel on a VSAN. 'inbound' traffic is operated on during reception from the VSAN, while 'outbound' traffic is operated on prior to transmission on the VSAN."
+  },
+  "CdsmFcAddrAndMask": {
+    "name": "CdsmFcAddrAndMask",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 0
+          },
+          {
+            "min": 3,
+            "max": 3
+          },
+          {
+            "min": 6,
+            "max": 6
+          },
+          {
+            "min": 8,
+            "max": 8
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "Represents a Fibre Channel Address and, for some formats, an associated mask. If a Fibre Channel World Wide Name (WWN) is represented, the length is 8 octets. If a Fibre Channel ID (FC-ID) is represented, the length is 3 octets. If a Fibre Channel ID is represented with the 3 octet mask, then the length is 6 octets. Objects defined with this syntax must specify the meaning of the zero-length string."
+  },
+  "cdsmDataPathTable": {
+    "name": "cdsmDataPathTable",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table facilitates setting up of data path classifier elements in the DIFFSERV-MIB. This table acts as a trigger for setting up interface based classifier element(s) from a VSAN based classifier element. Creation of an entry in this table on a VSAN and setting of cdsmDataPathClfrStart, results in the classifier elements of the data path elements from the corresponding interface(s) being set. Specifically, the instance(s) of diffServMeterSucceedNext object in the diffServMeterTable, which is pointed to by diffServDataPathStart of the corresponding interface(s) in that VSAN, are set with the value of cdsmDataPathClfrStart object for that VSAN. Deletion of an entry in this table on a VSAN or setting of cdsmDataPathClfrStart to zeroDotZero on a VSAN, results in the corresponding classifier element being removed from the data path elements in the interface(s) belonging to that VSAN."
+  },
+  "cdsmDataPathEntry": {
+    "name": "cdsmDataPathEntry",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VSAN-MIB",
+        "object": "vsanIndex",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmDataPathDirection",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) in this table."
+  },
+  "cdsmDataPathDirection": {
+    "name": "cdsmDataPathDirection",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CdsmDataDirection",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Specifies the direction of traffic flow on this VSAN."
+  },
+  "cdsmDataPathClfrStart": {
+    "name": "cdsmDataPathClfrStart",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowPointer",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object selects the first Differentiated Services Classifier Element to handle traffic on this VSAN. This RowPointer should point to an instance of diffServClfrEntry. The value of this RowPointer will be copied to instance(s) of diffServMeterSucceedNext object in the diffServMeterEntry in the DIFFSERV-MIB, which is (are) pointed to by corresponding diffServDataPathStart object(s) from the diffServDataPathTable. A value of zeroDotZero in this attribute indicates that no Differentiated Services classification is performed on traffic of this data path and on the interface(s) on this VSAN. Setting this to point to a target that does not exist results in an error. If the row pointed to is removed or becomes inactive by other means, the treatment is as if this attribute contains a value of zeroDotZero."
+  },
+  "cdsmDataPathStatus": {
+    "name": "cdsmDataPathStatus",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row."
+  },
+  "cdsmClfrTable": {
+    "name": "cdsmClfrTable",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table is an extension to the diffServClfrTable defined in the DIFFSERV-MIB."
+  },
+  "cdsmClfrEntry": {
+    "name": "cdsmClfrEntry",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "augmention": {
+      "name": "cdsmClfrEntry",
+      "module": "CISCO-DIFFSERV-EXT-MIB",
+      "object": "diffServClfrEntry"
+    },
+    "status": "current",
+    "description": "An entry (conceptual row) in this table."
+  },
+  "cdsmClfrName": {
+    "name": "cdsmClfrName",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 63
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The name of this classifier entry. The name of a classifier entry should be unique. This object is a human readable string. This object cannot be modified while the value of the corresponding instance of diffServClfrStatus in diffServClfrTable is 'active'. This object MUST be set before or concurrently with setting the corresponding instance of diffServClfrStatus object to 'active'."
+  },
+  "cdsmClfrNextFreeElement": {
+    "name": "cdsmClfrNextFreeElement",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IndexIntegerNextFree",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object contains an unused value for diffServClfrElementId for this value of diffServClfrId, or a value of zero if none exist."
+  },
+  "cdsmFCMultiFieldClfrTable": {
+    "name": "cdsmFCMultiFieldClfrTable",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of FC multi-field classifier filter entries. These can be used to identify FC traffic."
+  },
+  "cdsmFCMultiFieldClfrEntry": {
+    "name": "cdsmFCMultiFieldClfrEntry",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) in this table defines a single filter. An instance of diffServClfrElementSpecific object (in the diffServClfrElementTable of DIFFSERV-MIB) which points to an entry in this table, identifies a Fibre Channel filter."
+  },
+  "cdsmFCMultiFieldClfrId": {
+    "name": "cdsmFCMultiFieldClfrId",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IndexInteger",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "An index that enumerates the MultiField Classifier filter entries."
+  },
+  "cdsmFCMultiFieldClfrName": {
+    "name": "cdsmFCMultiFieldClfrName",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 63
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The name of this filter entry. The name should be unique. This object is a human readable string. This object cannot be modified while the value of the corresponding instance of cdsmFCMultiFieldClfrStatus object is 'active'. This object MUST be set before or concurrently with setting the corresponding instance of cdsmFCMultiFieldClfrStatus object to 'active'."
+  },
+  "cdsmFCMultiFieldClfrMatch": {
+    "name": "cdsmFCMultiFieldClfrMatch",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies how this filter should be applied. If this object is set to 'true', then all the match statements associated with this filter must be satisfied in order for this filter match to be considered successful. If this object is set to 'false', then even if any one of the criteria associated with this filter is satisfied, then the filter match is considered successful."
+  },
+  "cdsmFCMultiFieldClfrStatus": {
+    "name": "cdsmFCMultiFieldClfrStatus",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row. All writable objects in this row can be modified at any time, with the exception of cdsmFCMultiFieldClfrName."
+  },
+  "cdsmFCMultiFieldClfrNextFreeStmt": {
+    "name": "cdsmFCMultiFieldClfrNextFreeStmt",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IndexIntegerNextFree",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object contains an unused value for cdsmFCMultiFieldMatchId for this value of cdsmFCMultiFieldClfrId, or a value of zero if none exist."
+  },
+  "cdsmFCMultiFieldMatchStmtTable": {
+    "name": "cdsmFCMultiFieldMatchStmtTable",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table of FC match statements to be used for classifying FC traffic after associating with an FC multi-field classifier."
+  },
+  "cdsmFCMultiFieldMatchStmtEntry": {
+    "name": "cdsmFCMultiFieldMatchStmtEntry",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) in this table. An FC multi-field classifier is represented by cdsmFCMultiFieldClfrId and match statements are represented by cdsmFCMultiFieldMatchId. All match statements which belong to the same classifier have a common cdsmFCMultiFieldClfrId. Note that certain restrictions are applicable in configuring match statements for MultiField classifier entries. 1. Suppose the match statement(s) belong to a classifier filter that has the corresponding instance of cdsmFCMultiFieldClfrMatch object set to 'true'. This essentially means that all match statements belonging to that classifier filter should be matched for the match to be considered successful. In such a case, a maximum of only one instance of each criterion can be set in the corresponding match statement(s). That is, there can be one instance of the source address, one instance of destination address and one of interface. These can be in one or more match statements. Attempt to set more than one instance of a match criterion in this case, results in error. 2. Suppose there is a classifier filter that has the corresponding instance of cdsmFCMultiFieldClfrMatch object set to 'false'. Such a classifier filter can have multiple instances of match criteria associated with it. However, it would be an error to set the cdsmFCMultiFieldClfrMatch object for this classifier filter to 'true', as it does not comply with 1. above."
+  },
+  "cdsmFCMultiFieldMatchId": {
+    "name": "cdsmFCMultiFieldMatchId",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 64
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Uniquely represents a match statement."
+  },
+  "cdsmFCMultiFieldMatchSrcAddr": {
+    "name": "cdsmFCMultiFieldMatchSrcAddr",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CdsmFcAddrAndMask",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "",
+        "format": "hex"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents an FC address that needs to be matched with the source address in a FC frame. This address can be either an 8 octet long FC World Wide Name (WWN) or a 3 octet long FC-ID. If this object is set to an FC-ID, then it can be optionally followed by a 3 octet mask. The mask can have one of the following values: 0xff0000 or 0xffff00 or 0xffffff. The zero-length string means no address is configured for matching with the source address in a FC frame. Setting this object to the zero length string is equivalent to disabling this match criterion."
+  },
+  "cdsmFCMultiFieldMatchDstAddr": {
+    "name": "cdsmFCMultiFieldMatchDstAddr",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CdsmFcAddrAndMask",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "",
+        "format": "hex"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents an FC address that needs to be matched with the destination address in a FC frame. This address can be either an 8 octet long FC World Wide Name (WWN) or a 3 octet long FC-ID. If this object is set to an FC-ID, then it can be optionally followed by a 3 octet mask. The mask can have one of the following values: 0xff0000 or 0xffff00 or 0xffffff. The zero-length string means no address is configured for matching with the destination address in a FC frame. Setting this object to the zero length string is equivalent to disabling this match criterion."
+  },
+  "cdsmFCMultiFieldMatchIntf": {
+    "name": "cdsmFCMultiFieldMatchIntf",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndexOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object represents an FC interface on the local device on which a frame should arrive in order to be classified by this filter. A value of zero indicates that no interface is configured. Setting this object to zero is equivalent to disabling this match criterion."
+  },
+  "cdsmFCMultiFieldMatchStatus": {
+    "name": "cdsmFCMultiFieldMatchStatus",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The status of this conceptual row. All writable objects in this row can be modified at any time."
+  },
+  "cdsmFCMultiFieldMatchWildCard": {
+    "name": "cdsmFCMultiFieldMatchWildCard",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.4.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object specifies whether the wild-card option has been set. If this object is set to 'true', then the wild-card option is set and all the FC traffic will be considered to match the corresponding multi-field classifier. If this object is set to 'false', then the wild-card option is not set. Setting this object to 'true' in a multi-field classifier which has other match criteria set is an error."
+  },
+  "cdsmRateLimitTable": {
+    "name": "cdsmRateLimitTable",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies a set of rate limit parameter(s) for interfaces on the local device."
+  },
+  "cdsmRateLimitEntry": {
+    "name": "cdsmRateLimitEntry",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmRateLimitId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) in this table. An instance of diffServMeterSpecific object (in the diffServMeterTable of DIFFSERV-MIB) which points to an entry in this table, identifies a rate-limit meter."
+  },
+  "cdsmRateLimitId": {
+    "name": "cdsmRateLimitId",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IndexInteger",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Uniquely represents a rate-limit meter."
+  },
+  "cdsmRateLimitPercent": {
+    "name": "cdsmRateLimitPercent",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 100
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 100,
+        "format": "decimal"
+      }
+    },
+    "units": "percent",
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Specifies the rate-limit factor on this interface."
+  },
+  "cdsmSchedulerQTable": {
+    "name": "cdsmSchedulerQTable",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.6",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains configuration information regarding the scheduler queues on the local device."
+  },
+  "cdsmSchedulerQEntry": {
+    "name": "cdsmSchedulerQEntry",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.6.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmSchedulerQNum",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) in this table."
+  },
+  "cdsmSchedulerQNum": {
+    "name": "cdsmSchedulerQNum",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.6.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 3
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "The index of this scheduler queue."
+  },
+  "cdsmSchedulerQWeight": {
+    "name": "cdsmSchedulerQWeight",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.6.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 5,
+            "max": 100
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The weight associated with this queue."
+  },
+  "cdsmChkSumTable": {
+    "name": "cdsmChkSumTable",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.7",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains checksums for the local FC Qos configuration on all configured VSANs."
+  },
+  "cdsmChkSumEntry": {
+    "name": "cdsmChkSumEntry",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.7.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-VSAN-MIB",
+        "object": "vsanIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry (conceptual row) in this table."
+  },
+  "cdsmChkSumValue": {
+    "name": "cdsmChkSumValue",
+    "oid": "1.3.6.1.4.1.9.9.381.1.1.7.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The checksum corresponding to the local FC Qos configuration on this VSAN."
+  },
+  "ciscoDiffServExtMIBCompliances": {
+    "name": "ciscoDiffServExtMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.381.2.1",
+    "class": "objectidentity"
+  },
+  "ciscoDiffServExtMIBGroups": {
+    "name": "ciscoDiffServExtMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.381.2.2",
+    "class": "objectidentity"
+  },
+  "ciscoDiffServExtMIBCompliance": {
+    "name": "ciscoDiffServExtMIBCompliance",
+    "oid": "1.3.6.1.4.1.9.9.381.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoDiffServExtGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      },
+      {
+        "object": "ciscoDiffServVsanGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      },
+      {
+        "object": "ciscoDiffServSchedQGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco Extension to the DIFFSERV-MIB."
+  },
+  "ciscoDiffServExtMIBComplianceR1": {
+    "name": "ciscoDiffServExtMIBComplianceR1",
+    "oid": "1.3.6.1.4.1.9.9.381.2.1.2",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoDiffServExtGroup1",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      },
+      {
+        "object": "ciscoDiffServVsanGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      },
+      {
+        "object": "ciscoDiffServSchedQGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      },
+      {
+        "object": "ciscoDiffServChkSumGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      }
+    ],
+    "status": "deprecated",
+    "description": "The compliance statement for entities which implement the Cisco Extension to the DIFFSERV-MIB."
+  },
+  "ciscoDiffServExtMIBComplianceR2": {
+    "name": "ciscoDiffServExtMIBComplianceR2",
+    "oid": "1.3.6.1.4.1.9.9.381.2.1.3",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "ciscoDiffServExtGroup2",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      },
+      {
+        "object": "ciscoDiffServVsanGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      },
+      {
+        "object": "ciscoDiffServSchedQGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      },
+      {
+        "object": "ciscoDiffServChkSumGroup",
+        "module": "CISCO-DIFFSERV-EXT-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for entities which implement the Cisco Extension to the DIFFSERV-MIB."
+  },
+  "ciscoDiffServVsanGroup": {
+    "name": "ciscoDiffServVsanGroup",
+    "oid": "1.3.6.1.4.1.9.9.381.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmDataPathClfrStart"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmDataPathStatus"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for displaying and configuring VSAN related information."
+  },
+  "ciscoDiffServExtGroup": {
+    "name": "ciscoDiffServExtGroup",
+    "oid": "1.3.6.1.4.1.9.9.381.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmClfrName"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrName"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrMatch"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrStatus"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchSrcAddr"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchDstAddr"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchIntf"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchStatus"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmRateLimitPercent"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects for displaying and configuring FC multi-field filters and other extensions to the DIFFSERV-MIB."
+  },
+  "ciscoDiffServSchedQGroup": {
+    "name": "ciscoDiffServSchedQGroup",
+    "oid": "1.3.6.1.4.1.9.9.381.2.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmSchedulerQWeight"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for displaying and configuring DWRR scheduler Q weights."
+  },
+  "ciscoDiffServExtGroup1": {
+    "name": "ciscoDiffServExtGroup1",
+    "oid": "1.3.6.1.4.1.9.9.381.2.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmClfrName"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrName"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrMatch"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrStatus"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchSrcAddr"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchDstAddr"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchIntf"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchStatus"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchWildCard"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmRateLimitPercent"
+      }
+    ],
+    "status": "deprecated",
+    "description": "A collection of objects for displaying and configuring FC multi-field filters and other extensions to the DIFFSERV-MIB."
+  },
+  "ciscoDiffServChkSumGroup": {
+    "name": "ciscoDiffServChkSumGroup",
+    "oid": "1.3.6.1.4.1.9.9.381.2.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmChkSumValue"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of object(s) for displaying FC Qos configuration checksum."
+  },
+  "ciscoDiffServExtGroup2": {
+    "name": "ciscoDiffServExtGroup2",
+    "oid": "1.3.6.1.4.1.9.9.381.2.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmClfrName"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmClfrNextFreeElement"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrName"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrMatch"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrStatus"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldClfrNextFreeStmt"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchSrcAddr"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchDstAddr"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchIntf"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchStatus"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmFCMultiFieldMatchWildCard"
+      },
+      {
+        "module": "CISCO-DIFFSERV-EXT-MIB",
+        "object": "cdsmRateLimitPercent"
+      }
+    ],
+    "status": "current",
+    "description": "A collection of objects for displaying and configuring FC multi-field filters and other extensions to the DIFFSERV-MIB."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-DIFFSERV-EXT-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 16:58:38 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-DIFFSERV-EXT-MIB"
+  }
+}

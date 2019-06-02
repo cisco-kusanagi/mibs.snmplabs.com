@@ -1,0 +1,651 @@
+{
+  "imports": {
+    "class": "imports",
+    "RIVERSTONE-SMI-MIB": [
+      "riverstoneMibs"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "OBJECT-GROUP",
+      "NOTIFICATION-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "Integer32",
+      "TimeTicks",
+      "OBJECT-TYPE",
+      "MibIdentifier",
+      "Gauge32",
+      "iso",
+      "Bits",
+      "Unsigned32",
+      "Counter64",
+      "Counter32",
+      "OBJECT-IDENTITY",
+      "MODULE-IDENTITY",
+      "NOTIFICATION-TYPE",
+      "IpAddress"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "DisplayString",
+      "TruthValue"
+    ]
+  },
+  "rsImageMib": {
+    "name": "rsImageMib",
+    "oid": "1.3.6.1.4.1.5567.2.13",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2001-03-16 00:00",
+        "description": "First Version, version 1.0, of the Riverstone Image MIB."
+      }
+    ],
+    "lastupdated": "200103160000Z",
+    "organization": "Riverstone Networks, Inc",
+    "contactinfo": "Riverstone Networks, Inc 5200 Great America Parkway Santa Clara CA USA 95054 PHONE:+1 408.878.6500 EMAIL: nms-eng@riverstonenet.com WEB: http://www.riverstonenet.com",
+    "description": "This mib module defines the objects to be used by SNMP to access the 'system image' commands on the Riverstone router, i.e., to add, list, choose and delete system images from PCMCIA flashcards."
+  },
+  "RsImageMibErrorCode": {
+    "name": "RsImageMibErrorCode",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noInfo": 1,
+          "successfullyCompleted": 2,
+          "timeout": 3,
+          "networkError": 4,
+          "noSpace": 5,
+          "invalidImage": 6,
+          "commandCompleted": 7,
+          "internalError": 8,
+          "tftpServerError": 9
+        }
+      }
+    },
+    "status": "current",
+    "description": "A unique value, greater than zero defining the operation completion status."
+  },
+  "RsImageMibControlModuleIndex": {
+    "name": "RsImageMibControlModuleIndex",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "primaryCM": 1,
+          "backupCM": 2
+        }
+      }
+    },
+    "status": "current",
+    "description": "The table in this MIB is indexed by 'rsImageMibControlModuleIndex', 'rsImageMibSlotIndex' and 'rsImageMibImageIndex'- not by 'ifIndex'. Why is there a separate index? Traditionally, ifIndex values are chosen by agents, and are permitted to change across restarts. Using ifIndex to index the tables could complicate row creation and/or cause interoperability problems (if each agent had special restrictions on ifIndex). Having a separate index avoids these problems."
+  },
+  "RsImageMibSlotIndex": {
+    "name": "RsImageMibSlotIndex",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "slot0": 1,
+          "slot1": 2
+        }
+      }
+    },
+    "status": "current",
+    "description": "The table in this MIB is indexed by 'rsImageMibControlModuleIndex', 'rsImageMibSlotIndex' and 'rsImageMibImageIndex'- not by 'ifIndex'."
+  },
+  "RsImageMibImageIndex": {
+    "name": "RsImageMibImageIndex",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "firstImage": 1,
+          "secondImage": 2,
+          "thirdImage": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "The table in this MIB is indexed by 'rsImageMibControlModuleIndex', 'rsImageMibSlotIndex' and 'rsImageMibImageIndex'- not by 'ifIndex'."
+  },
+  "RsImageMibChosen": {
+    "name": "RsImageMibChosen",
+    "class": "textualconvention",
+    "type": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noInfo": 1,
+          "chosen": 2,
+          "notChosen": 3
+        }
+      }
+    },
+    "status": "current",
+    "description": "A unique value, greater than zero, specifying whether the firmware image is the chosen image or not. Default value is noInfo(1)."
+  },
+  "rsImageMibAction": {
+    "name": "rsImageMibAction",
+    "oid": "1.3.6.1.4.1.5567.2.13.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "noop": 1,
+          "addImageToAgent": 2,
+          "deleteImageFromAgent": 3,
+          "chooseImageOnAgent": 4
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The action to be performed. For example, addImageToAgent uses tftp to transfer the image from a tftp server to the agent. Default value is no operation, called noop."
+  },
+  "rsImageMibTftpServerAddress": {
+    "name": "rsImageMibTftpServerAddress",
+    "oid": "1.3.6.1.4.1.5567.2.13.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "IpAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The IPv4 address of the tftp server to be used by the agent when adding an image. Default value is 0.0.0.0. Address must be a unicast address that is reachable from the agent and no firewalls/acls preventing tftp datagrams from being transferred."
+  },
+  "rsImageMibHostName": {
+    "name": "rsImageMibHostName",
+    "oid": "1.3.6.1.4.1.5567.2.13.3",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The name of the host running the tftp server used to add an image to the agent. Default value is a blank string. Length of image name must not exceed 255 alpha-numeric characters, no spaces in imagename."
+  },
+  "rsImageMibTftpUrl": {
+    "name": "rsImageMibTftpUrl",
+    "oid": "1.3.6.1.4.1.5567.2.13.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The URL which gives the tftp server ip address and image name to be added to the agent. Default value is blank. e.g. tftp://10.50.6.4/qa/ssr3000"
+  },
+  "rsImageMibImageName": {
+    "name": "rsImageMibImageName",
+    "oid": "1.3.6.1.4.1.5567.2.13.5",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "The image name that the action task is to involve. For example, for adding an image to the agent, rsImageMibImageName is the image to be added from the tftp server at rsImageMibTftpServerAddres. For example, for deleting an image from the agent, rsImageMibImageName is the image to be deleted from the agent. For example, for choosing an image on the agent as the active image for the next reboot, rsImageMibImageName is the image to be chosen; if the imagename is 'none', this means to choose no image as the active image for the next reboot. 'none' is used to delete a previously chosen image. Default value is blank. Length of image name must not exceed 255 alpha-numeric characters, no spaces in imagename."
+  },
+  "rsImageMibDestination": {
+    "name": "rsImageMibDestination",
+    "oid": "1.3.6.1.4.1.5567.2.13.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "both": 1,
+          "pCM": 2,
+          "bCM": 3,
+          "pCMslot0": 4,
+          "pCMslot1": 5,
+          "bCMslot0": 6,
+          "bCMslot1": 7
+        }
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Which flashcard(s) to perform the add, choose or delete operation on. The choices are: 1. first available flashcard in slot0 or slot1 of both the Primary and Backup Control Modules. For example, you may end up with slot0 of the Primary CM and slot1 of the Backup CM. 2. first available flashcard in slot0 or slot1 of just Primary CM; 3. first available flashcard in slot0 or slot1 of just Backup CM; 4. flashcard in slot0 of Primary CM; 5. flashcard in slot1 of Primary CM; 6. flashcard in slot0 of Backup CM; 7. flashcard in slot1 of Backup CM; Default is both cards."
+  },
+  "rsImageMibActivateTransfer": {
+    "name": "rsImageMibActivateTransfer",
+    "oid": "1.3.6.1.4.1.5567.2.13.7",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "Activate the transfer operation (add, choose or delete) with a value of True(1) or stop it with False(2). Default value is False(2). Poll rsImageMibPrimaryCMOperationStatus for current status of the Primary CM and poll rsImageMibBackupCMOperationStatus for current status of the Backup CM. Default status is False. This object is a trigger that starts the rsImageMibAction, and therefore is equivalent to one of several CLI commands, such as these: to add an image: system image add 10.50.6.4 qa/ssr3000 system image add 10.50.6.4 qa/ssr3000 primary-cm system image add 10.50.6.4 qa/ssr3000 primary-cm slot0 system image add 10.50.6.4 qa/ssr3000 primary-cm slot1 system image add 10.50.6.4 qa/ssr3000 backup-cm system image add 10.50.6.4 qa/ssr3000 backup-cm slot0 system image add 10.50.6.4 qa/ssr3000 backup-cm slot1 system image add tftp://10.50.6.4/qa/ssr3000 system image add tftp://<host_name_of_tftp_server>/qa/ssr3000 system image add <host_name_of_tftp_server> qa/ssr3000 system image add <host_name_of_tftp_server> qa/ssr3000 primary-cm system image add <host_name_of_tftp_server> qa/ssr3000 primary-cm slot0 system image add <host_name_of_tftp_server> qa/ssr3000 primary-cm slot1 system image add <host_name_of_tftp_server> qa/ssr3000 backup-cm system image add <host_name_of_tftp_server> qa/ssr3000 backup-cm slot0 system image add <host_name_of_tftp_server> qa/ssr3000 backup-cm slot1 to choose an image, need: system image choose ssr3000 system image choose ssr3000 primary-cm system image choose ssr3000 primary-cm slot0 system image choose ssr3000 primary-cm slot1 system image choose ssr3000 backup-cm system image choose ssr3000 backup-cm slot0 system image choose ssr3000 backup-cm slot1 system image choose none system image choose none primary-cm system image choose none primary-cm slot0 system image choose none primary-cm slot1 system image choose none backup-cm system image choose none backup-cm slot0 system image choose none backup-cm slot1 to delete an image, need: system image delete ssr3000 system image delete ssr3000 primary-cm system image delete ssr3000 primary-cm slot0 system image delete ssr3000 primary-cm slot1 system image delete ssr3000 backup-cm system image delete ssr3000 backup-cm slot0 system image delete ssr3000 backup-cm slot1 IMPORTANT: ADD OPERATION: For adding an image to a flash card, there are two basic ways to do so: NOTE: both cases use rsImageMibAction set to 2. case 1: use rsImageMibTftpServerAddress (or rsImageMibHostName), rsImageMibImageName and rsImageMibDestination. case 2: use rsImageMibTftpUrl. Please note that the image will automatically be added to both Primary and Backup CMs if they are present, or to only the Primary CM if it alone is present. (NOTE: One cannot specify the destination for the image add operation by using use rsImageMibTftpUrl) In either case, the objects to be used must be set before the final set of rsImageMibActivateTransfer. Please follow these procedures: for case 1: rsImageMibTftpServerAddress (or rsImageMibHostName), rsImageMibImageName and rsImageMibDestination must be set. Do not set rsImageMibTftpUrl after these objects are set. example: //SNMP add to Primary CM: setany -v1 <ip_address> rsImageMibAction.0 2 setany -v1 <ip_address> rsImageMibDestination.0 -i 2 setany -v1 <ip_address> rsImageMibImageName.0 -o qa/ssr3000 setany -v1 <ip_address> rsImageMibTftpServerAddress.0 -a 100.50.6.9 setany -v1 -d <ip_address> rsImageMibActivateTransfer.0 -i 1 for case 2: rsImageMibTftpUrl must be set. Do not set rsImageMibTftpServerAddress, rsImageMibHostName, rsImageMibImageName or rsImageMibDestination after this objects is set. You can check the required scalar objects to make sure they have appropriate values before the final set of rsImageMibActivateTransfer. CHOOSE OPERATION: For choosing an image as the active image for the next reboot, follow this procedure: The objects to be used must be set before the final set of rsImageMibActivateTransfer: rsImageMibAction must be set as in: setany -v1 <ip_address> rsImageMibAction.0 4 rsImageMibImageName must be set as in: setany -v1 <ip_address> rsImageMibImageName.0 -o rs30 rsImageMibDestination can be set as an option as in: setany -v1 <ip_address> rsImageMibDestination.0 -i 2 Finally, rsImageMibActivateTransfer.0 must be set as in: setany -v1 -d <ip_address> rsImageMibActivateTransfer.0 -i 1 Please note: rsImageMibTftpUrl is NOT used in a choose. When the user wants to choose an image, and the user sets rsImageMibDestination to dictate which flash card(s) the image is to be chosen on, the user cannot also use rsImageMibTftpUrl. Setting rsImageMibDestination will set rsImageMibTftpUrl to its default value of a blank string. DELETE OPERATION: For deleting an image from a flashcard, follow this procedure: The objects to be used must be set before the final set of rsImageMibActivateTransfer: rsImageMibAction must be set as in: setany -v1 <ip_address> rsImageMibAction.0 3 rsImageMibImageName must be set as in: setany -v1 <ip_address> rsImageMibImageName.0 -o rs30 rsImageMibDestination can be set as an option as in: setany -v1 <ip_address> rsImageMibDestination.0 -i 2 Finally, rsImageMibActivateTransfer.0 must be set as in: setany -v1 -d <ip_address> rsImageMibActivateTransfer.0 -i 1 Please note: rsImageMibTftpUrl is NOT used in a delete. When the user wants to delete an image, and the user sets rsImageMibDestination to dictate which flash card(s) the image is to be deleted from, the user cannot also use rsImageMibTftpUrl. Setting rsImageMibDestination will set rsImageMibTftpUrl to its default value of a blank string."
+  },
+  "rsImageMibPrimaryCMOperationStatus": {
+    "name": "rsImageMibPrimaryCMOperationStatus",
+    "oid": "1.3.6.1.4.1.5567.2.13.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "idle": 1,
+          "adding": 2,
+          "deleting": 3,
+          "choosing": 4,
+          "actionComplete": 5,
+          "error": 6
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current status of the action task on the Primary Control Module. Default is idle. Adding means an image is being added to a flashcard of the Primary CM. Choosing means an image is being chosen on a flashcard of the Primary CM as the active image for the next reboot. Deleting means an image is being deleted from the flashcards(s) of the Primary CM. Error means the action failed. See rsImageMibPrimaryCMLastError for the reason why it failed."
+  },
+  "rsImageMibBackupCMOperationStatus": {
+    "name": "rsImageMibBackupCMOperationStatus",
+    "oid": "1.3.6.1.4.1.5567.2.13.9",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "idle": 1,
+          "adding": 2,
+          "deleting": 3,
+          "choosing": 4,
+          "actionComplete": 5,
+          "error": 6
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current status of the action task on the Backup Control Module. Default is idle. Adding means an image is being added to a flashcard of the Backup CM. Choosing means an image is being chosen on a flashcard of the Backup CM as the active image for the next reboot. Deleting means an image is being deleted from the flashcards(s) of the Backup CM. Error means the action failed. See rsImageMibBackupCMLastError for the reason why it failed."
+  },
+  "rsImageMibPrimaryCMLastError": {
+    "name": "rsImageMibPrimaryCMLastError",
+    "oid": "1.3.6.1.4.1.5567.2.13.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsImageMibErrorCode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A numeric code for the reason why the last action failed on the Primary CM. Default value is noInfo."
+  },
+  "rsImageMibBackupCMLastError": {
+    "name": "rsImageMibBackupCMLastError",
+    "oid": "1.3.6.1.4.1.5567.2.13.11",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsImageMibErrorCode",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A numeric code for the reason why the last action failed on the Backup CM. Default value is noInfo."
+  },
+  "rsImageMibPrimaryCMLastErrorString": {
+    "name": "rsImageMibPrimaryCMLastErrorString",
+    "oid": "1.3.6.1.4.1.5567.2.13.12",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A string description of rsImageMibPrimaryCMLastError. Default value is blank."
+  },
+  "rsImageMibBackupCMLastErrorString": {
+    "name": "rsImageMibBackupCMLastErrorString",
+    "oid": "1.3.6.1.4.1.5567.2.13.13",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A string description of rsImageMibBackupCMLastError. Default value is blank."
+  },
+  "rsImageMibListTable": {
+    "name": "rsImageMibListTable",
+    "oid": "1.3.6.1.4.1.5567.2.13.14",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "Listing images is performed by snmp get and snmp getNext. This table describes the images listed on the Primary and/or Backup PCMCIA flashcards. Information for each image is contained in a row of the table. Cli commands for listing images on the PCMCIA flashcards are NOT equivalent to how images are listed via snmp. (In other words, one cannot set up a list operation for the imageMib as one can for an add, delete or choose operation. Thus, in order to list the images, one must do a get or getnext or getmany on the object or objects desired) The Cli commands are: system image list system image list all system image list primary-cm system image list backup-cm In this Mib, the images can be listed either by snmp get or snmp getNext. Snmp get gets the image information of the image associated with the index that is passed to snmp get. Snmp getNext gets the information of the next image relative to the index that is passed to snmp getNext. The images are specified in the get or getnext request by 3 (three) indeces which describe the control module, slot and imagename."
+  },
+  "rsImageMibListEntry": {
+    "name": "rsImageMibListEntry",
+    "oid": "1.3.6.1.4.1.5567.2.13.14.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibControlModuleIndex",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibSlotIndex",
+        "implied": 0
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibImageIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "Each table entry contains certain information about a specific image that is present on a flashcard."
+  },
+  "rsImageMibControlModuleIndex": {
+    "name": "rsImageMibControlModuleIndex",
+    "oid": "1.3.6.1.4.1.5567.2.13.14.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsImageMibControlModuleIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A value which together with rsImageMibSlotIndex and rsImageMibImageIndex forms an index which identifies an entry in the table. On the device managed, there are 2 Control Modules possible: Primary and Backup. Each can have its own PCMCIA flashcard(s), which can hold images. Information on these images is kept in the rsImageMibListTable."
+  },
+  "rsImageMibSlotIndex": {
+    "name": "rsImageMibSlotIndex",
+    "oid": "1.3.6.1.4.1.5567.2.13.14.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsImageMibSlotIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A value which together with rsImageMibControlModuleIndex and rsImageMibImageIndex forms an index which identifies an entry in the table. On the device managed, there are 2 slots per Control Module, and each slot may have a PCMCIA flashcard in it."
+  },
+  "rsImageMibImageIndex": {
+    "name": "rsImageMibImageIndex",
+    "oid": "1.3.6.1.4.1.5567.2.13.14.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsImageMibImageIndex",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A value which together with rsImageMibControlModuleIndex and rsImageMibSlotIndex forms an index which identifies an entry in the table. On the device managed, each PCMCIA flashcard can hold currently up to three (3) images."
+  },
+  "rsImageMibListImageName": {
+    "name": "rsImageMibListImageName",
+    "oid": "1.3.6.1.4.1.5567.2.13.14.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The name of the image on the flashcard. Length of image name must not exceed 255 alpha-numeric characters, no spaces in imagename."
+  },
+  "rsImageMibVersion": {
+    "name": "rsImageMibVersion",
+    "oid": "1.3.6.1.4.1.5567.2.13.14.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "DisplayString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The version of the firmware image."
+  },
+  "rsImageMibChosen": {
+    "name": "rsImageMibChosen",
+    "oid": "1.3.6.1.4.1.5567.2.13.14.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RsImageMibChosen",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A unique value, greater than zero, specifying whether the firmware image is the chosen image or not. That is, is the image the chosen image for the next reboot?"
+  },
+  "rsImageMibConformance": {
+    "name": "rsImageMibConformance",
+    "oid": "1.3.6.1.4.1.5567.2.13.15",
+    "class": "objectidentity"
+  },
+  "rsImageMibGroups": {
+    "name": "rsImageMibGroups",
+    "oid": "1.3.6.1.4.1.5567.2.13.15.1",
+    "class": "objectidentity"
+  },
+  "rsImageMibCompliance": {
+    "name": "rsImageMibCompliance",
+    "oid": "1.3.6.1.4.1.5567.2.13.15.2",
+    "class": "objectidentity"
+  },
+  "rsImageMibAddDeleteChooseGroup": {
+    "name": "rsImageMibAddDeleteChooseGroup",
+    "oid": "1.3.6.1.4.1.5567.2.13.15.1.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibAction"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibTftpServerAddress"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibHostName"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibTftpUrl"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibImageName"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibDestination"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibActivateTransfer"
+      }
+    ],
+    "status": "current",
+    "description": "The objects for adding, deleting, and choosing firmware images on the Primary and/or Backup Control Module flashcards. Table columnar objects which are table indexes are not included. "
+  },
+  "rsImageMibListGroup": {
+    "name": "rsImageMibListGroup",
+    "oid": "1.3.6.1.4.1.5567.2.13.15.1.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibListImageName"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibVersion"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibChosen"
+      }
+    ],
+    "status": "current",
+    "description": "The objects for listing firmware images on the Primary and/or Backup Control Module flashcards."
+  },
+  "rsImageMibStatusAndErrorGroup": {
+    "name": "rsImageMibStatusAndErrorGroup",
+    "oid": "1.3.6.1.4.1.5567.2.13.15.1.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibPrimaryCMOperationStatus"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibBackupCMOperationStatus"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibPrimaryCMLastError"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibBackupCMLastError"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibPrimaryCMLastErrorString"
+      },
+      {
+        "module": "RIVERSTONE-IMAGE-MIB",
+        "object": "rsImageMibBackupCMLastErrorString"
+      }
+    ],
+    "status": "current",
+    "description": "The objects for monitoring errors.."
+  },
+  "rsImageMibBasicComplianceV1": {
+    "name": "rsImageMibBasicComplianceV1",
+    "oid": "1.3.6.1.4.1.5567.2.13.15.2.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "rsImageMibAddDeleteChooseGroup",
+        "module": "RIVERSTONE-IMAGE-MIB"
+      },
+      {
+        "object": "rsImageMibListGroup",
+        "module": "RIVERSTONE-IMAGE-MIB"
+      },
+      {
+        "object": "rsImageMibStatusAndErrorGroup",
+        "module": "RIVERSTONE-IMAGE-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The basic implementation requirements for version 1.0 of the RIVERSTONE-IMAGE-MIB. That is, the objects in these groups must be implemented for V1 of this Mib."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/RIVERSTONE-IMAGE-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 21:20:12 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "RIVERSTONE-IMAGE-MIB"
+  }
+}

@@ -1,0 +1,3023 @@
+{
+  "imports": {
+    "class": "imports",
+    "CISCO-FLOW-MONITOR-TC-MIB": [
+      "FlowPointIdentifier",
+      "FlowMetricValue",
+      "FlowMonitorConditionIdentifier",
+      "FlowMonitorConditionsProfileOrZero",
+      "FlowMonitorConditions",
+      "FlowMonitorAlarmGroupIdentifier",
+      "FlowMetricScale",
+      "FlowMetricPrecision",
+      "FlowMonitorConditionsProfile",
+      "FlowMonitorIdentifier",
+      "FlowBitRateUnits",
+      "FlowSetIdentifier",
+      "FlowPointType",
+      "FlowIdentifier",
+      "FlowMetrics"
+    ],
+    "CISCO-REPORT-INTERVAL-TC-MIB": [
+      "ReportIntervalCount"
+    ],
+    "CISCO-SMI": [
+      "ciscoMgmt"
+    ],
+    "CISCO-TC": [
+      "Layer2Cos",
+      "CiscoAlarmSeverity"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddress",
+      "InetPortNumber",
+      "InetAddressType"
+    ],
+    "Q-BRIDGE-MIB": [
+      "VlanId"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "Integer32",
+      "MODULE-IDENTITY",
+      "iso",
+      "TimeTicks",
+      "Counter32",
+      "NOTIFICATION-TYPE",
+      "IpAddress",
+      "Gauge32",
+      "MibIdentifier",
+      "OBJECT-TYPE",
+      "OBJECT-IDENTITY",
+      "Counter64",
+      "Unsigned32",
+      "Bits"
+    ],
+    "SNMPv2-TC": [
+      "TimeStamp",
+      "RowPointer",
+      "TruthValue",
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "AutonomousType"
+    ]
+  },
+  "ciscoFlowMonitorMIB": {
+    "name": "ciscoFlowMonitorMIB",
+    "oid": "1.3.6.1.4.1.9.9.692",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2009-04-08 00:00",
+        "description": "The initial version of the MIB module."
+      }
+    ],
+    "lastupdated": "200904080000Z",
+    "organization": "Cisco Systems, Inc.",
+    "contactinfo": "Cisco Systems Customer Service Postal: 170 W Tasman Drive San Jose, CA 95134 Tel: +1 800 553-NETS E-mail: cs-snmp@cisco.com",
+    "description": "This MIB module defines objects that describe flow monitoring. A typical application of this MIB module will facilitate monitoring media flows, especially flows carrying video streams. However, by no means does the definition of this MIB module prevents other applications from using it. FLOW MONITORS ================= At the top level, this MIB module describes the notion of a flow monitor. A flow monitor is a hardware or software entity that classifies traffic flows, collects data on conforming traffic flows, and periodically computes metrics that reflect the quality of the traffic flows. Because a device can support more than one flow monitor, the MIB module defines the cfmFlowMonitorTable. Consider an edge router that supports a certain line card that has an integrated capability to monitor video flows. In this example, the cfmFlowMonitorTable would contain a row describing each line card installed in the device. TRAFFIC FLOWS ================= At the next level, this MIB module describes the notion of a traffic flow. This MIB module uniquely identifies a traffic flow using an auxiliary variable called cfmFlowId; however, an implementation only has guarantee its uniqueness within the scope of the flow monitor that has the responsibility for monitoring the traffic flow. Thus, we can think of the flow monitor as a container for the traffic flows for which it collects data and periodically computes metrics, as the figure below illustrates. +----------------------------+ | cfmFlowTable | | | +----------------------+ +--------------------------------+ | cfmFlowMonitorId = 3 ----->| +------------------------+ | +----------------------+ | | cfmFlowMonitorId = 3 | | | | cfmFlowId = 101 | | | +------------------------+ | | +------------------------+ | | | cfmFlowMonitorId = 3 | | | | cfmFlowId = 102 | | | +------------------------+ | | : | | : | | +------------------------+ | | | cfmFlowMonitorId = 3 | | | | cfmFlowId = 150 | | | +------------------------+ | +--------------------------------+ | | +----------------------+ +--------------------------------+ | cfmFlowMonitorId = 4 ----->| +------------------------+ | +----------------------+ | | cfmFlowMonitorId = 4 | | | | cfmFlowId = 1 | | | +------------------------+ | | +------------------------+ | | | cfmFlowMonitorId = 4 | | | | cfmFlowId = 2 | | | +------------------------+ | | : | | : | | +------------------------+ | | | cfmFlowMonitorId = 4 | | | | cfmFlowId = 150 | | | +------------------------+ | +--------------------------------+ | | +----------------------------+ While the identifying of a traffic flow using this auxiliary variable is convenient for the MIB module, it is does suffice for an EMS/NMS trying to isolate faults in a network delivering these traffic flows. To aid an EMS/NMS in this task, this MIB module defines a number of tables that provide layers of data relating to a traffic flow, including: o cfmFlowL2VlanTable - describes L2 VLAN data relating to traffic flows. o cfmFlowIpTable - describes IP data relating to traffic flows. o cfmFlowUdpTable - describes UDP data relating to traffic flows. o cfmFlowTcpTable - describes TCP data relating to traffic flows. o cfmFlowRtpTable - describes RTP data relating to traffic flows. Each of these tables have a sparse dependent relationship on the cfmFlowTable, as there exist situations when the data may not be available for a traffic flow, including: 1) The flow monitor simply may not collect the particular data for the traffic flows that it has the responsibility of monitoring. For example, a flow monitor may not have any concern for L2 VLAN data. 2) The data may not apply to a traffic flow. For example, a TCP and RTP data do not apply for a UDP traffic flow. To help an EMS/NMS navigate the data collected for a traffic flow, the corresponding rows are daisy-chained using 'next objects'. An EMS/NMS starts with cfmFlowNext, which indicates a reference to the row in the next table containing data related to the traffic flow. The first object contained by each of these tables is a 'next object'. Consider a RTP traffic flow for which the flow monitor has collected IP, UDP, and RTP data. The figure below illustrates how this MIB module daisy chains this data through the relevant tables. +-------------------------------------------+ | cfmFlowTable | | +---------------------------------------+ | | | cfmFlowMonitorId = 3 | | | | cfmFlowId = 42 | | | | cfmFlowNext = cfmFlowIpNext.3.42 ----------+ | +---------------------------------------+ | | +-------------------------------------------+ | | +-------------------------------------------+ | | cfmFlowIpTable | | | +---------------------------------------+ | | | | cfmFlowMonitorId = 3 |<---+ | | cfmFlowId = 42 | | | | cfmFlowIpNext = cfmFlowUdpNext.3.42 -------+ | +---------------------------------------+ | | +-------------------------------------------+ | | +-------------------------------------------+ | | cfmFlowUdpTable | | | +---------------------------------------+ | | | | cfmFlowMonitorId = 3 |<---+ | | cfmFlowId = 42 | | | | cfmFlowUdpNext = cfmFlowRtpNext.3.42 ------+ | +---------------------------------------+ | | +-------------------------------------------+ | | +-------------------------------------------+ | | cfmFlowRtpTable | | | +---------------------------------------+ | | | | cfmFlowMonitorId = 3 |<---+ | | cfmFlowId = 42 | | | | cfmFlowRtpNext = zeroDotZero | | | +---------------------------------------+ | +-------------------------------------------+ Observe that this structure simplifies the task of extending the MIB module to support additional layers of data. For example, if there is a need for a device to collect data relating to the MPEG-TS layer of a flow carrying a video stream, then it is as simple as defining a table containing this data. However, the definition of such a table must comply with the following requirements: 1) The table must have a sparse dependent relationship on the cfmFlowTable. 2) The first object contained by the table must be a 'next object' to support daisy chaining. REPORTING FLOW METRICS ========================== At the next level, the MIB defines two tables that together form the foundation for reporting metrics. The cfmFlowMetricsTable has a one-to-one dependent relationship on the cfmFlowTable, and it contains data aggregate metrics and data relating to the collection of metrics for the corresponding traffic flow. A row in this table also serves as a container for the historic metrics computed by the corresponding flow monitor, as the figure below illustrates. +----------------------------+ | cfmFlowMetricsIntTable | | | +----------------------+ +----------------------------------+ | cfmFlowMetricsEntry |-->| +------------------------------+ | | | | | cfmFlowMonitorId = 3 | | | cfmFlowMonitorId = 3 | | | cfmFlowId = 101 | | | cfmFlowid = 101 | | | cfmFlowMetricsIntNumber = 1 | | +----------------------+ | +------------------------------+ | | +------------------------------+ | | | cfmFlowMonitorId = 3 | | | | cfmFlowId = 101 | | | | cfmFlowMetricsIntNumber = 2 | | | +------------------------------+ | | : | | : | | +------------------------------+ | | | cfmFlowMonitorId = 3 | | | | cfmFlowId = 101 | | | | cfmFlowMetricsIntNumber = N | | | +------------------------------+ | +----------------------------------+ | | +----------------------------+ The device collects data for a traffic flow over a configured measurement interval, indicated by cfmFlowMetricsIntervalTime. At the end of a measurement interval, the device computes metrics from this data, generating a report. An EMS/NMS can access this report using the cfmFlowMetricsIntTable. cfmFlowMetricsMaxInterval indicates the maximum number of reports a device will save for the corresponding traffic flow, while cfmFlowMetricsIntervals indicates the number of reports currently saved by the device. The cfmFlowMetricsTable and cfmFlowMetricsIntTable have the intent of providing a foundation for reporting metrics for a traffic flow. Furthermore, it is the intent that additional MIB modules define extensions to these tables describing specific sets of metrics. The following list provides some examples: o CISCO-FLOW-MON-MDI-MIB - this MIB module defines extensions that describe MDI metrics defined by RFC-4445. o CISCO-FLOW-MON-RTP-MIB - this MIB module defines extensions that describe RTP metrics defined by RFC-3550. o CISCO-FLOW-MON-IP-CBR-MIB - this MIB module defines extension that describe IP CBR metrics. The tables defined by these MIB modules have a sparse dependent relationhip on the cfmFlowMetricsTable and cfmFlowMetricsIntTable. An EMS/NMS can determine the metrics collected for a traffic flow from the corresponding instance of cfmFlowMetricsCollected, which is nothing more than a bit string-value for which each bit corresponds to a different set of metrics. FAULT MANAGEMENT ==================== At the next level, this MIB module defines tables that describe standing conditions. A standing condition is a lasting error, fault, or warning resulting from the application of a set of criteria to the state of an entity. For example, a flow monitor ceases monitoring a traffic flow when it has not received any packets for that traffic flow in a configured interval of time. If flow monitor expires a significantly large number of traffic flows during a measurement interval, then this might signal a fault. In this example, the 'set of criteria' is a rising threshold and the 'state of an entity' is the number of traffic flows expired by a flow monitor. The cfmConditionTable describes the criteria applied to entities managed by the device, specifically flow monitors and traffic flows. The table groups these criteria into 'conditions profiles'. The device periodically applies these criteria to an entity and saves the results in a bit string-value associated with the entity. An EMS/NMS can monitor the most recent standing conditions for a flow monitor by retrieving the corresponding instance of cfmFlowMonitorConditions. Likewise, an EMS/NMS can monitor the most recent standing conditions for a traffic flow by retrieving the corresponding instance of cfmFlowMetricsConditions. It goes without saying that monitoring the standing conditions for significantly large numbers of traffic flows becomes problematic. To aid an EMS/NMS in this task, this MIB module defines many mechanisms. The most basic of these mechanisms is the notion of an alarm, which is simply a standing condition for which the device signals changes in state. This MIB module provides for three means of signaling when the device raises or clears an alarm condition: 1) Logging - the device creates a record of the event and saves it in a historical account. 2) syslog - the device generates a syslog message containing details of the event and sends it to one or more configured syslog server. 3) SNMP - the device generates a SNMP notification containing details of the event and sends it to one or more configured targets. An EMS/NMS can monitor the most recent alarm conditions for a flow monitor by retrieving the corresponding instance of cfmFlowMonitorAlarms. Likewise, the EMS/NMS can monitor the most recent alarm conditions for a traffic flow by retrieving the corresponding instance of cfmFlowMetricsAlarms. Additionally, the EMS/NMS can poll a summary of alarm conditions maintained for each flow monitor and the traffic flows that it monitors. The following list summarizes the data contained by this summary: o cfmFlowMonitorAlarmSeverity o cfmFlowMonitorAlarmCriticalCount o cfmFlowMonitorAlarmMajorCount o cfmFlowMonitorAlarmMinorCount o cfmFlowMonitorAlarmWarningCount o cfmFlowMonitorAlarmInfoCount An EMS/NMS can also poll cfmAlarmHistoryLastId, which indicates the value of the identifier assigned to the last record saved to the historical account. When it observes a change in the value of this object, then it can retrieve the new records from the cfmAlarmHistoryTable. The burden of monitoring alarm conditions for sufficiently large numbers of traffic flows can itself become a daunting task. Thus, this MIB module defines the notion of an alarm group, which represents a single alarm condition that aggregates a standing condition for a set of traffic flows. The cfmAlarmGroupTable describes the alarm groups configured for a device, and the cfmAlarmGroupFlowTable describes the sets of flows aggregated by these alarm groups. GLOSSARY ============ Alarm Action - a method used by the device to signal changes in an alarm condition. Alarm Aggregation - a technique used to efficiently monitor the same standing condition for a flow set. Alarm Condition - a standing condition for which the device signals changes in state. Alarm Group - a flow set for which the device monitors a configured standing condition, raising an alarm when a configured number of flows in the flow set assert the standing standing. Alarm Severity - the relative disposition of an alarm condition when raised by the device. For example, a provider may regard a flow stop alarm as having a higher severity than a flow's loss fraction exceeding a configured threshold. Flow Monitor - a hardware or software entity that classifies traffic flows, collects flow data, and periodically computes flow metrics. Flow Metric - a measurement that reflects the quality of a traffic flow. Flow Point - represents the ingress or egress of a traffic flow. Flow Set - a group of traffic flows. Measurement Interval - the length of time over which a flow monitor collects data related to a traffic flow, after which the flow monitor computes flow metrics using the collected data. Standing Condition - represents a lasting error, fault, or warning resulting from the application of a set of criteria to the state of an entity, such as a flow monitor or traffic flow. For example, a flow monitor may assert a standing condition if the number of traffic flows that expire in a measurement interval exceeds a configured threshold. Traffic Flow - a unidirectional stream of packets conforming to a classifier. For example, packets having a particular source IP address, destination IP address, protocol type, source port number, and destination port number."
+  },
+  "ciscoFlowMonitorMIBNotifs": {
+    "name": "ciscoFlowMonitorMIBNotifs",
+    "oid": "1.3.6.1.4.1.9.9.692.0",
+    "class": "objectidentity"
+  },
+  "ciscoFlowMonitorMIBObjects": {
+    "name": "ciscoFlowMonitorMIBObjects",
+    "oid": "1.3.6.1.4.1.9.9.692.1",
+    "class": "objectidentity"
+  },
+  "ciscoFlowMonitorMIBConform": {
+    "name": "ciscoFlowMonitorMIBConform",
+    "oid": "1.3.6.1.4.1.9.9.692.2",
+    "class": "objectidentity"
+  },
+  "ciscoFlowMonitorMIBIds": {
+    "name": "ciscoFlowMonitorMIBIds",
+    "oid": "1.3.6.1.4.1.9.9.692.3",
+    "class": "objectidentity"
+  },
+  "cfmFlowMonitors": {
+    "name": "cfmFlowMonitors",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1",
+    "class": "objectidentity"
+  },
+  "cfmFlowMonitorTable": {
+    "name": "cfmFlowMonitorTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the flow monitors contained by the device."
+  },
+  "cfmFlowMonitorEntry": {
+    "name": "cfmFlowMonitorEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes a flow monitor, which represents a hardware or software entity that classifies traffic flows, monitors flow data, and periodically computes flow metrics. A simple device may only support a single flow monitor, where a more sophisticated device may support more than one flow monitor. A device supporting multiple flow monitors creates a row in the cfmFlowMonitorTable when it recognizes the addition of a new flow monitor, such as might occur upon the insertion of a line card that supports flow monitoring. Likewise, such a device destroys a row in the cfmFlowMonitorTable when a flow monitor has been removed."
+  },
+  "cfmFlowMonitorId": {
+    "name": "cfmFlowMonitorId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates an arbitrary integer-value that uniquely identifies the flow monitor. Observe that the value assigned to a flow monitor does not necessarily persist across restarts or the removal-insertion of a physical entity supporting flow monitor(s)."
+  },
+  "cfmFlowMonitorDescr": {
+    "name": "cfmFlowMonitorDescr",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a human-readable description for the flow monitor."
+  },
+  "cfmFlowMonitorCaps": {
+    "name": "cfmFlowMonitorCaps",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetrics",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the capabilities of the flow monitor. Specifically, the value of this column indicates a '1' for each set of flow metrics the flow monitor is capable of measuring."
+  },
+  "cfmFlowMonitorFlowCount": {
+    "name": "cfmFlowMonitorFlowCount",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "traffic flows",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of traffic flows currently monitored by the flow monitor."
+  },
+  "cfmFlowMonitorConditionsProfile": {
+    "name": "cfmFlowMonitorConditionsProfile",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditionsProfileOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the conditions profile that contains the descriptions of the standing conditions monitored for the flow monitor. If the flow monitor does not have an associated conditions profile, then the value of this column must be zero."
+  },
+  "cfmFlowMonitorConditions": {
+    "name": "cfmFlowMonitorConditions",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditions",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current standing conditions for the flow monitor. If the flow monitor does not have an associated conditions profile, then the value of this column must be the null string."
+  },
+  "cfmFlowMonitorAlarms": {
+    "name": "cfmFlowMonitorAlarms",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditions",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current alarm conditions for the flow monitor. If the flow monitor does not have an associated conditions profile, then the value of this column must be the null string."
+  },
+  "cfmFlowMonitorAlarmSeverity": {
+    "name": "cfmFlowMonitorAlarmSeverity",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoAlarmSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the high severity alarm condition currently raised by the flow monitor and the traffic flows monitored by the flow monitor. If no alarm is raised for the flow monitor and the traffic flows monitored for the flow monitor, then the value of this column is 'cleared'."
+  },
+  "cfmFlowMonitorAlarmCriticalCount": {
+    "name": "cfmFlowMonitorAlarmCriticalCount",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "alarms",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of alarm conditions with a critical severity currently raised for traffic flows monitored by the flow monitor."
+  },
+  "cfmFlowMonitorAlarmMajorCount": {
+    "name": "cfmFlowMonitorAlarmMajorCount",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "alarms",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of alarm conditions with a major severity currently raised for traffic flows monitored by the flow monitor."
+  },
+  "cfmFlowMonitorAlarmMinorCount": {
+    "name": "cfmFlowMonitorAlarmMinorCount",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "alarms",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of alarm conditions with a minor severity currently raised for traffic flows monitored by the flow monitor."
+  },
+  "cfmFlowMonitorAlarmWarningCount": {
+    "name": "cfmFlowMonitorAlarmWarningCount",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "alarms",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of alarm conditions with a warning severity currently raised for traffic flows monitored by the flow monitor."
+  },
+  "cfmFlowMonitorAlarmInfoCount": {
+    "name": "cfmFlowMonitorAlarmInfoCount",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "alarms",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of alarm conditions with a informational severity currently raised for traffic flows monitored by the flow monitor."
+  },
+  "cfmFlowMonitorTableChanged": {
+    "name": "cfmFlowMonitorTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device created or destroyed a row in cfmFlowMonitorTable."
+  },
+  "cfmFlows": {
+    "name": "cfmFlows",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2",
+    "class": "objectidentity"
+  },
+  "cfmFlowTable": {
+    "name": "cfmFlowTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the traffic flows monitored by each flow monitor supported by the device. This table has an expansion dependent relationship on the cfmFlowMonitorTable, containing zero or more rows for each flow monitor."
+  },
+  "cfmFlowEntry": {
+    "name": "cfmFlowEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes a traffic flow monitored by a flow monitor. The device creates a row in the cfmFlowTable when a flow monitor starts monitoring a traffic flow. Likewise, the device destroys a row in the cfmFlowTable when a traffic flow monitored by a flow monitor has timed out."
+  },
+  "cfmFlowId": {
+    "name": "cfmFlowId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates an arbitrary integer-value that uniquely identifies a traffic flow in the scope of the flow monitor that learned it. Observe that the value assigned to a flow does not necessarily persist across restarts or the removal-insertion of a physical entity supporting flow monitor(s)."
+  },
+  "cfmFlowDescr": {
+    "name": "cfmFlowDescr",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a human-readable description of the traffic flow."
+  },
+  "cfmFlowNext": {
+    "name": "cfmFlowNext",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowPointer",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a reference to a row in another table containing additional data relating to the traffic flow."
+  },
+  "cfmFlowCreateTime": {
+    "name": "cfmFlowCreateTime",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime when the row was created."
+  },
+  "cfmFlowDiscontinuityTime": {
+    "name": "cfmFlowDiscontinuityTime",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime on the most recent occasion at which any one or more of counters associated with the traffic flow suffered a discontinuity (e.g., process restart or failover event)."
+  },
+  "cfmFlowExpirationTime": {
+    "name": "cfmFlowExpirationTime",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the expiration interval for the traffic flow. If the flow monitor receives no packets for the traffic flow in this interval, then it expires the flow; that is, it stops monitoring the traffic and removes the corresponding row from the cfmFlowTable. If this column is '0', then the traffic flow was statically configured (as opposed to dynamically learned) and it will never expire."
+  },
+  "cfmFlowDirection": {
+    "name": "cfmFlowDirection",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "unknown": 1,
+          "ingress": 2,
+          "egress": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the direction of the traffic flow where the flow monitor collects data: 'unknown' The SNMP entity does not know the direction of the traffic flow at the point the flow monitor collects data. 'ingress' The flow monitor collects data at the point where the traffic flow enters the devices 'egress' The flow monitor collects data at the point where the traffic flow leaves the device."
+  },
+  "cfmFlowAdminStatus": {
+    "name": "cfmFlowAdminStatus",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enabled": 1,
+          "disabled": 2,
+          "expire": 3
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "enabled",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the desired state of the traffic flow: 'enabled' The corresponding flow monitor is collecting data and computing metrics for the traffic flow. 'disabled' The corresponding flow monitor is not collecting data or computing metrics for the traffic flow. As long as a traffic flow remains in this state, the flow monitor will not expire the traffic flow. 'expire' When this column is set to this value, it forces the traffic flow to expire. It is not possible to return this value in a response to a retrieval operation."
+  },
+  "cfmFlowOperStatus": {
+    "name": "cfmFlowOperStatus",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "enabled": 1,
+          "disabled": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the operational state of the traffic flow: 'enabled' The corresponding flow monitor is actively monitoring the traffic flow. 'disabled' The corresponding flow monitor is neither collecting data, nor computing metrics for the traffic flow."
+  },
+  "cfmFlowIngressType": {
+    "name": "cfmFlowIngressType",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowPointType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the type of port that receives the traffic for this traffic flow."
+  },
+  "cfmFlowIngress": {
+    "name": "cfmFlowIngress",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowPointIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object identifies the port that receives the traffic for this traffic flow."
+  },
+  "cfmFlowEgressType": {
+    "name": "cfmFlowEgressType",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowPointType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the type of port that transmits the traffic for this traffic flow."
+  },
+  "cfmFlowEgress": {
+    "name": "cfmFlowEgress",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowPointIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object identifies the port that transmits the traffic for this traffic flow."
+  },
+  "cfmFlowTableChanged": {
+    "name": "cfmFlowTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device created or destroyed a row in cfmFlowTable."
+  },
+  "cfmFlowL2VlanTable": {
+    "name": "cfmFlowL2VlanTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains additional data relating to the L2 VLAN carrying traffic flows monitored by flow monitors. This table has a sparse dependent relationship on the cfmFlowTable."
+  },
+  "cfmFlowL2VlanEntry": {
+    "name": "cfmFlowL2VlanEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes data relating to the L2 VLAN carrying the corresponding traffic flow. A device creates a row in the cfmFlowL2VlanTable when a flow monitor has data relating to the L2 VLAN carrying a corresponding traffic flow. The device destroys a row in the cfmFlowL2VlanTable when the corresponding traffic flow times out."
+  },
+  "cfmFlowL2VlanNext": {
+    "name": "cfmFlowL2VlanNext",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowPointer",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a reference to a row in another table containing additional data relating to the corresponding traffic flow."
+  },
+  "cfmFlowL2VlanId": {
+    "name": "cfmFlowL2VlanId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "VlanId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the tag associated with the VLAN carrying the corresponding traffic flow."
+  },
+  "cfmFlowL2VlanCos": {
+    "name": "cfmFlowL2VlanCos",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Layer2Cos",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the layer 2 COS assigned to the corresponding traffic flow."
+  },
+  "cfmFlowL2VlanTableChanged": {
+    "name": "cfmFlowL2VlanTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device changed the cfmFlowL2VlanTable."
+  },
+  "cfmFlowIpTable": {
+    "name": "cfmFlowIpTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains additional data relating to the IP carrying the corresponding traffic flow. This table has a sparse dependent relationship on the cfmFlowTable."
+  },
+  "cfmFlowIpEntry": {
+    "name": "cfmFlowIpEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes data relating to the IP carrying the corresponding traffic flow. A device creates a row in the cfmFlowIpTable when the flow monitor has data relating to the IP carrying the corresponding traffic flow. The device destroys a row in this table when the corresponding traffic flow times out."
+  },
+  "cfmFlowIpNext": {
+    "name": "cfmFlowIpNext",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowPointer",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a reference to a row in another table containing additional data relating to the corresponding traffic flow."
+  },
+  "cfmFlowIpAddrType": {
+    "name": "cfmFlowIpAddrType",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the type of IP address indicated by the corresponding instances of cfmFlowIpAddrSrc and cfmFlowIpAddrDst."
+  },
+  "cfmFlowIpAddrSrc": {
+    "name": "cfmFlowIpAddrSrc",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the source IP address of the corresponding traffic flow."
+  },
+  "cfmFlowIpAddrDst": {
+    "name": "cfmFlowIpAddrDst",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the destination IP address of the corresponding traffic flow."
+  },
+  "cfmFlowIpValid": {
+    "name": "cfmFlowIpValid",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "trafficClass": 0,
+        "hopLimit": 1
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the corresponding instances of cfmFlowIpTrafficClass and cfmFlowIpHopLimit are valid."
+  },
+  "cfmFlowIpTrafficClass": {
+    "name": "cfmFlowIpTrafficClass",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "J. Postel, 'Internet Protocol', RFC-791, September 1981. J. Deering and R. Hinden, 'Internet Protocol, Version 6 (IPv6) Specification', RFC-2460, December 1998.",
+    "status": "current",
+    "description": "This object indicates the traffic class of the corresponding traffic flow. If version 4 of the IP carries the traffic flow, then the value of this column corresponds to the 'Type of Service' field of the IP header contained by packets in the traffic flow. If version 6 of the IP carries the traffic flow, then the value of this column corresponds to the '' field of the IP header contained by packets in the traffic flow. The value of this column is valid only if the 'trafficClass' bit of the corresponding instance of cfmFlowIpValid is '1'."
+  },
+  "cfmFlowIpHopLimit": {
+    "name": "cfmFlowIpHopLimit",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.5.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 255
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "reference": "J. Postel, 'Internet Protocol', RFC-791, September 1981. J. Deering and R. Hinden, 'Internet Protocol, Version 6 (IPv6) Specification', RFC-2460, December 1998.",
+    "status": "current",
+    "description": "This object indicates the hop limit of the corresponding traffic flow. If version 4 of the IP carries the traffic flow, then the value of this column corresponds to the 'Time to Live' field of the IP header contained by packets in the traffic flow (as observed by the flow monitor). If version 6 of the IP carries the traffic flow, then the value of this column corresponds to the 'Hop Limit' field of the IP header contained by packets in the traffic flow (as observed by the flow monitor). The value of this column is valid only if the 'hopLimit' bit of the corresponding instance of cfmFlowIpValid is '1'."
+  },
+  "cfmFlowIpTableChanged": {
+    "name": "cfmFlowIpTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.6",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device changed the cfmFlowIpTable."
+  },
+  "cfmFlowUdpTable": {
+    "name": "cfmFlowUdpTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.7",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains additional data relating to the UDP carrying the corresponding traffic flow. This table has a sparse dependent relationship on the cfmFlowTable."
+  },
+  "cfmFlowUdpEntry": {
+    "name": "cfmFlowUdpEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.7.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes data relating to the UDP carrying the corresponding traffic flow. A device creates a row in the cfmFlowUdpTable when the flow monitor has data relating to the UDP carrying the corresponding traffic flow. The device destroys a row in this table when the corresponding traffic flow times out."
+  },
+  "cfmFlowUdpNext": {
+    "name": "cfmFlowUdpNext",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.7.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowPointer",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a reference to a row in another table containing additional data relating to the corresponding traffic flow."
+  },
+  "cfmFlowUdpPortSrc": {
+    "name": "cfmFlowUdpPortSrc",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.7.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the source UDP port number of the corresponding traffic flow."
+  },
+  "cfmFlowUdpPortDst": {
+    "name": "cfmFlowUdpPortDst",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.7.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the destination UDP port number of the corresponding traffic flow."
+  },
+  "cfmFlowUdpTableChanged": {
+    "name": "cfmFlowUdpTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.8",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device changed the cfmFlowUdpTable."
+  },
+  "cfmFlowTcpTable": {
+    "name": "cfmFlowTcpTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.9",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains additional data relating to the TCP carrying the corresponding traffic flow. This table has a sparse dependent relationship on the cfmFlowTable."
+  },
+  "cfmFlowTcpEntry": {
+    "name": "cfmFlowTcpEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.9.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes data relating to the TCP carrying the corresponding traffic flow. A device creates a row in the cfmFlowTcpTable when the flow monitor has data relating to the TCP carrying the corresponding traffic flow. The device destroys a row in this table when the corresponding traffic flow times out."
+  },
+  "cfmFlowTcpNext": {
+    "name": "cfmFlowTcpNext",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.9.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowPointer",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a reference to a row in another table containing additional data relating to the corresponding traffic flow."
+  },
+  "cfmFlowTcpPortSrc": {
+    "name": "cfmFlowTcpPortSrc",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.9.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the source TCP port number of the corresponding traffic flow."
+  },
+  "cfmFlowTcpPortDst": {
+    "name": "cfmFlowTcpPortDst",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.9.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetPortNumber",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the destination TCP port number of the corresponding traffic flow."
+  },
+  "cfmFlowTcpTableChanged": {
+    "name": "cfmFlowTcpTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.10",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device changed the cfmFlowTcpTable."
+  },
+  "cfmFlowRtpTable": {
+    "name": "cfmFlowRtpTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.11",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains additional data relating to the RTP carrying the corresponding traffic flow. This table has a sparse dependent relationship on the cfmFlowTable."
+  },
+  "cfmFlowRtpEntry": {
+    "name": "cfmFlowRtpEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.11.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes data relating to the RTP carrying the corresponding traffic flow. A device creates a row in the cfmFlowRtpTable when the flow monitor has data relating to the RTP carrying the corresponding traffic flow. The device destroys a row in this table when the corresponding traffic flow times out."
+  },
+  "cfmFlowRtpNext": {
+    "name": "cfmFlowRtpNext",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.11.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowPointer",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a reference to a row in another table containing additional data relating to the corresponding traffic flow."
+  },
+  "cfmFlowRtpVersion": {
+    "name": "cfmFlowRtpVersion",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.11.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 3
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the RTP version of the corresponding traffic flow."
+  },
+  "cfmFlowRtpSsrc": {
+    "name": "cfmFlowRtpSsrc",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.11.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the RTP synchronized source (SSRC) of the corresponding traffic flow."
+  },
+  "cfmFlowRtpPayloadType": {
+    "name": "cfmFlowRtpPayloadType",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.11.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 127
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the RTP payload type of the corresponding traffic flow."
+  },
+  "cfmFlowRtpTableChanged": {
+    "name": "cfmFlowRtpTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.2.12",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device changed the cfmFlowRtpTable."
+  },
+  "cfmFlowMetrics": {
+    "name": "cfmFlowMetrics",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3",
+    "class": "objectidentity"
+  },
+  "cfmFlowMetricsTable": {
+    "name": "cfmFlowMetricsTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains aggregate metrics and data relating to the collection of metrics for the traffic flows monitored by each of the flow monitors supported by the device. This table has a sparse dependent relationship on the cfmFlowTable, containing a row for each row in the cfmFlowTable for which the device is actively monitoring."
+  },
+  "cfmFlowMetricsEntry": {
+    "name": "cfmFlowMetricsEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry contains aggregate metrics and data relating to the collection of metrics for a corresponding traffic flow. The device creates a row in the cfmFlowMetricsTable when a flow monitor starts monitoring a traffic flow. Likewise, the device destroys a row in the cfmFlowMetricsTable when the corresponding flow monitor has ceased monitoring the traffic flow (e.g., when a traffic flow has timed out). Observe that the device does not destroy the row unless it has not received packets for the corresponding flow for an interval of time equal to the flow's expiration time, thereby giving an EMS/NMS ample time to retrieve any data relating to the flow."
+  },
+  "cfmFlowMetricsCollected": {
+    "name": "cfmFlowMetricsCollected",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetrics",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the metrics collected by the corresponding flow monitor for the corresponding traffic flow."
+  },
+  "cfmFlowMetricsIntervalTime": {
+    "name": "cfmFlowMetricsIntervalTime",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 3600
+          }
+        ]
+      }
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the length of the measurement interval for the corresponding traffic flow. The flow monitor computes the collected metrics for the corresponding traffic flow with a frequency equal to the inverse of the value of this column."
+  },
+  "cfmFlowMetricsMaxIntervals": {
+    "name": "cfmFlowMetricsMaxIntervals",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "units": "intervals",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the maximum number of measurement intervals for which the corresponding flow monitor maintains metrics for the corresponding traffic flow. If the value of this column is '0', then the corresponding flow monitor does not maintain historical metrics for the corresponding traffic flow."
+  },
+  "cfmFlowMetricsElapsedTime": {
+    "name": "cfmFlowMetricsElapsedTime",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "seconds",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the time that has elapsed since the beginning of the current measurement interval."
+  },
+  "cfmFlowMetricsIntervals": {
+    "name": "cfmFlowMetricsIntervals",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "intervals",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of measurement intervals for which data has been collected."
+  },
+  "cfmFlowMetricsInvalidIntervals": {
+    "name": "cfmFlowMetricsInvalidIntervals",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "intervals",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of measurement intervals in the set of collected measurement intervals that contain invalid data."
+  },
+  "cfmFlowMetricsConditionsProfile": {
+    "name": "cfmFlowMetricsConditionsProfile",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditionsProfileOrZero",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the conditions profile that contains the descriptions of the standing conditions monitored for the traffic flow. If the flow does not have an associated conditions profile, then the value of this column must be zero."
+  },
+  "cfmFlowMetricsConditions": {
+    "name": "cfmFlowMetricsConditions",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditions",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current standing conditions for the corresponding traffic flow. If the flow does not have an associated conditions profile, then the value of this column must be the null string."
+  },
+  "cfmFlowMetricsAlarms": {
+    "name": "cfmFlowMetricsAlarms",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditions",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the current alarm conditions for the corresponding traffic flow. If the flow does not have an associated conditions profile, then the value of this column must be the null string."
+  },
+  "cfmFlowMetricsAlarmSeverity": {
+    "name": "cfmFlowMetricsAlarmSeverity",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoAlarmSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the highest severity alarm currently raised for the corresponding traffic flow. If no alarm is raised for the corresponding traffic flow, then the value of this column is 'cleared'."
+  },
+  "cfmFlowMetricsPkts": {
+    "name": "cfmFlowMetricsPkts",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total number of packets processed by the corresponding flow monitor for the corresponding traffic flow."
+  },
+  "cfmFlowMetricsOctets": {
+    "name": "cfmFlowMetricsOctets",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Counter64",
+      "class": "type"
+    },
+    "units": "octets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the total number of octets contained by the packets processed by the corresponding flow monitor for the corresponding traffic flow."
+  },
+  "cfmFlowMetricsBitRateUnits": {
+    "name": "cfmFlowMetricsBitRateUnits",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowBitRateUnits",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the units for the corresponding instance of cfmFlowMetricsBitRate."
+  },
+  "cfmFlowMetricsBitRate": {
+    "name": "cfmFlowMetricsBitRate",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the average bit rate at which the corresponding flow monitor is processing data for the corresponding traffic flow. This value is cumulative over the lifetime of the traffic flow."
+  },
+  "cfmFlowMetricsPktRate": {
+    "name": "cfmFlowMetricsPktRate",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "packets per second",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the average packet rate at which the corresponding flow monitor is processing data for the corresponding traffic flow. This value is cumulative over the lifetime of the traffic flow."
+  },
+  "cfmFlowMetricsTableChanged": {
+    "name": "cfmFlowMetricsTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device created or destroyed a row in cfmFlowMetricsTable."
+  },
+  "cfmFlowMetricsIntTable": {
+    "name": "cfmFlowMetricsIntTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table contains historic metrics for the traffic flows monitored by each of the flow monitors supported by the device. This table has an expansion dependent relationship on the cfmFlowMetricsTable, containing zero or more rows for each traffic flow."
+  },
+  "cfmFlowMetricsIntEntry": {
+    "name": "cfmFlowMetricsIntEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntNumber",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes metrics collected for a previous measurement interval for a corresponding traffic flow."
+  },
+  "cfmFlowMetricsIntNumber": {
+    "name": "cfmFlowMetricsIntNumber",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates the interval number identifying the measurement interval. The measurement interval identified by the value '1' represents the most recent measurement interval, and the interval identified by the value (n) represents the interval immediately preceding the interval identified by the value (n-1)."
+  },
+  "cfmFlowMetricsIntValid": {
+    "name": "cfmFlowMetricsIntValid",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the data for the measurement interval is valid."
+  },
+  "cfmFlowMetricsIntTime": {
+    "name": "cfmFlowMetricsIntTime",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime when the measurement interval was captured."
+  },
+  "cfmFlowMetricsIntConditions": {
+    "name": "cfmFlowMetricsIntConditions",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditions",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates which standing conditions were asserted at least once during the measurement interval for the corresponding traffic flow."
+  },
+  "cfmFlowMetricsIntAlarms": {
+    "name": "cfmFlowMetricsIntAlarms",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditions",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates which alarm conditions were raised at least once during the measurement interval for the corresponding traffic flow."
+  },
+  "cfmFlowMetricsIntAlarmSeverity": {
+    "name": "cfmFlowMetricsIntAlarmSeverity",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoAlarmSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the highest severity alarm raised during the measurement interval for the corresponding traffic flow. If no alarm was raised during the measurement interval for the corresponding traffic flow, then the value of this column is 'cleared'."
+  },
+  "cfmFlowMetricsIntPkts": {
+    "name": "cfmFlowMetricsIntPkts",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "ReportIntervalCount",
+      "class": "type"
+    },
+    "units": "packets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of packets processed by the corresponding flow monitor for the corresponding traffic flow during the measurement interval."
+  },
+  "cfmFlowMetricsIntOctets": {
+    "name": "cfmFlowMetricsIntOctets",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "ReportIntervalCount",
+      "class": "type"
+    },
+    "units": "octets",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of octets contained by the packets processed by the corresponding flow monitor for the corresponding traffic flow during the measurement interval."
+  },
+  "cfmFlowMetricsIntBitRateUnits": {
+    "name": "cfmFlowMetricsIntBitRateUnits",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowBitRateUnits",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the units for the corresponding instance of cfmFlowMetricsIntBitRate."
+  },
+  "cfmFlowMetricsIntBitRate": {
+    "name": "cfmFlowMetricsIntBitRate",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "ReportIntervalCount",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the bit rate at which the corresponding flow monitor processed data for the corresponding traffic flow during the measurement interval."
+  },
+  "cfmFlowMetricsIntPktRate": {
+    "name": "cfmFlowMetricsIntPktRate",
+    "oid": "1.3.6.1.4.1.9.9.692.1.3.3.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "ReportIntervalCount",
+      "class": "type"
+    },
+    "units": "packets per second",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the packet rate at which the corresponding flow monitor processed data for the corresponding traffic flow during the measurement interval."
+  },
+  "cfmConditions": {
+    "name": "cfmConditions",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4",
+    "class": "objectidentity"
+  },
+  "cfmConditionTable": {
+    "name": "cfmConditionTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the standing conditions monitored by the device. The table groups descriptions for standing conditions into condition profiles. The figure below illustrates the relationship between a flow monitor and a conditions profile. Observe that a conditions profile can contain the descriptions for the standing conditions monitored for more than one flow monitor. In this case, the instance of cfmFlowMonitorConditionsProfile for each of these flow monitors would reference the same conditions profile. +------------------------------------------------+ | flow monitor 1 | | | | cfmFlowMonitorConditionsProfile.1 = 42 -----+ | | | | | cfmFlowMonitorConditions.1 | | | N 2 1 0 | | | +-+-...-+-+-+-+ | | | | | | | | | | | | +-+-...-+-+-+-+ | | | ^ ^ ^ ^ | | | | | | | | | +--|-------|-|-|------------------------------|--+ | | | | | | | | | V | | | | +-----------------------------+ | | | | | conditions profile 42 | | | | | | +-------------------------+ | | | | +-----------------| cfmConditionsDescr.42.0 | | | | | | +-------------------------+ | | | | | +-------------------------+ | | | +-------------------| cfmConditionsDescr.42.1 | | | | | +-------------------------+ | | | | +-------------------------+ | | +---------------------| cfmConditionsDescr.42.2 | | | | +-------------------------+ | | | : | | | : | | | +-------------------------+ | +-----------------------------| cfmConditionsDescr.42.N | | | +-------------------------+ | +-----------------------------+ The figure below illustrates the relationship between a traffic flow and a conditions profile. Observe that a conditions profile can contain the descriptions for the standing conditions monitored for more than one traffic flow. In this case, the instance of cfmFlowMetricsConditionsProfile for each of these traffic flows would reference the same conditions profile. +------------------------------------------------+ | traffic flow 201 | | | | cfmFlowMetricsConditionsProfile.1.201 = 54 -+ | | | | | cfmFlowMetricsConditions.1.201 | | | N 2 1 0 | | | +-+-...-+-+-+-+ | | | | | | | | | | | | +-+-...-+-+-+-+ | | | ^ ^ ^ ^ | | | | | | | | | +--|-------|-|-|------------------------------|--+ | | | | | | | | | V | | | | +-----------------------------+ | | | | | conditions profile 54 | | | | | | +-------------------------+ | | | | +-----------------| cfmConditionsDescr.54.0 | | | | | | +-------------------------+ | | | | | +-------------------------+ | | | +-------------------| cfmConditionsDescr.54.1 | | | | | +-------------------------+ | | | | +-------------------------+ | | +---------------------| cfmConditionsDescr.54.2 | | | | +-------------------------+ | | | : | | | : | | | +-------------------------+ | +-----------------------------| cfmConditionsDescr.54.N | | | +-------------------------+ | +-----------------------------+ The figure below illustrates the relationship between the description of a standing condition and an alarm group if the standing condition indicates that the device aggregates the standing condition into an alarm group (i.e., the corresponding instance of cfmConditionAlarm is 'grouped'). +-----------------------------------------+ | conditions profile 42 | | +-------------------------------------+ | | | cfmConditionAlarm.42.9 = 'grouped' |<-------+ | | cfmConditionAlarmGroup.42.9 = 4 -+ | | | | +----------------------------------|--+ |<--+ | | | | | | +------------------------------------|----+ | | V | | +-----------------------------------------+ | | | alarm group 4 | | | | | | | | cfmAlarmGroupConditionsProfile.4 = 42 ------+ | | cfmAlarmGroupConditionId.4 = 9 ----------------+ | | +-----------------------------------------+"
+  },
+  "cfmConditionEntry": {
+    "name": "cfmConditionEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionProfile",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes a standing condition monitored by the device. The cfmConditionTable groups descriptions for standing conditions into condition profiles. A device creates a row in the cfmConditionTable when it has been configured to monitor a standing condition for an entity, such as a flow monitor or traffic flow. Likewise, the device destroys a row when it has been configured to cease monitoring a previously configured standing condition."
+  },
+  "cfmConditionProfile": {
+    "name": "cfmConditionProfile",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditionsProfile",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates an arbitrary integer-value that uniquely identifies the condition profile that contains the standing condition. Observe that the value assigned to a standing condition does not necessarily persist across restars."
+  },
+  "cfmConditionId": {
+    "name": "cfmConditionId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditionIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates an arbitrary integer-value that uniquely identifies the condition within the scope of the profile. The value of this column corresponds to the bit position in a binary string-value representing the standing (or alarm) conditions for an entity, such as a flow monitor or traffic flow. Observe that the value assigned to a standing condition does not necessarily persist across restarts."
+  },
+  "cfmConditionDescr": {
+    "name": "cfmConditionDescr",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a human-readable description of the condition."
+  },
+  "cfmConditionMonitoredElement": {
+    "name": "cfmConditionMonitoredElement",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "AutonomousType",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the monitored element used in determining the state of the standing condition."
+  },
+  "cfmConditionType": {
+    "name": "cfmConditionType",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "boolean": 2,
+          "risingThreshold": 3,
+          "fallingThreshold": 4,
+          "risingAndFallingThreshold": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the type of condition: 'other' The implementation of the MIB does not recognize the condition described by this row. 'boolean' The value monitored only can have one of two values: 'false' or 'true'. In this case, the condition itself evaluates to 'true' if the value itself is 'true'. 'risingThreshold' The condition evaluates to 'true' if the current sample of the monitored value is greater than the rising threshold and the last sample is less than or equal to the rising threshold. 'fallingThreshold' The condition evaluates to 'true' if the current sample of the monitored value is less than the falling threshold and the last sample is greater than or equal to the falling threshold. 'risingAndFallingThreshold' The condition evaluates to 'true' if one of the two criteria is satisfied: 1) The current sample of the monitored value is greater than the rising threshold and the last sample is less than or equal to the rising threhsold. 2) The current sample of the monitored value is less than the falling threshold and the last sample is greater than or equal to the falling threshold."
+  },
+  "cfmConditionThreshRiseScale": {
+    "name": "cfmConditionThreshRiseScale",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetricScale",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the scaling factor for the corresponding instance of cfmConditionThreshRise. This value of this column only has relevance if the corresponding instance of cfmConditionType is 'risingThreshold' or 'risingAndFallingThreshold'."
+  },
+  "cfmConditionThreshRisePrecision": {
+    "name": "cfmConditionThreshRisePrecision",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetricPrecision",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the precision for the corresponding instance of cfmConditionThreshRise. This value of this column only has relevance if the corresponding instance of cfmConditionType is 'risingThreshold' or 'risingAndFallingThreshold'."
+  },
+  "cfmConditionThreshRise": {
+    "name": "cfmConditionThreshRise",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetricValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of the rising threshold. This value of this column only has relevance if the corresponding instance of cfmConditionType is 'risingThreshold' or 'risingAndFallingThreshold'."
+  },
+  "cfmConditionThreshFallScale": {
+    "name": "cfmConditionThreshFallScale",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetricScale",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the scaling factor for the corresponding instance of cfmConditionThreshFall. The value of this column only has relevance if the corresponding instance of cfmConditionType is 'fallingThreshold' or 'risingAndFallingThreshold'."
+  },
+  "cfmConditionThreshFallPrecision": {
+    "name": "cfmConditionThreshFallPrecision",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetricPrecision",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the precision for the corresponding instance of cfmConditionThreshFall. The value of this column only has relevance if the corresponding instance of cfmConditionType is 'fallingThreshold' or 'risingAndFallingThreshold'."
+  },
+  "cfmConditionThreshFall": {
+    "name": "cfmConditionThreshFall",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMetricValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of the falling threshold. The value of this column only has relevance if the corresponding instance of cfmConditionType is 'fallingThreshold' or 'risingAndFallingThreshold'."
+  },
+  "cfmConditionSampleType": {
+    "name": "cfmConditionSampleType",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "raw": 2,
+          "slidingWindowAvg": 3,
+          "expDecayingAvg": 4
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates how the device samples the monitored value before determining whether to assert the condition: 'other' The implementation of the MIB does not recognize the how the device samples the monitored value. 'raw' The device samples the monitored value and uses this value to determine whether to assert the condition. 'slidingWindowAvg' The device samples the monitored value and maintains a average over a sliding window. It uses this value of this average to determine whether to assert the condition. The corresponding instance of cfmCOnditionSampleWindow indicates the length of the sliding window. 'slidingWindowAverage' The device samples the monitored value and maintains a exponentially decaying average over a sliding window. It uses this value of this average to determine whether to assert the condition. The corresponding instance of cfmCOnditionSampleWindow indicates the length of the sliding window."
+  },
+  "cfmConditionSampleWindow": {
+    "name": "cfmConditionSampleWindow",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the sample window used by the device to compute an exponentially decaying average in the case that the corresponding instance of cfmConditionSampleType is 'averaged'. The value of this column only has relevance if the corresponding instance of cfmConditionSampleWindow is 'slidingWindowAvg' or 'expDecayingAvg."
+  },
+  "cfmConditionAlarm": {
+    "name": "cfmConditionAlarm",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "none": 1,
+          "discrete": 2,
+          "grouped": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the device treats the standing condition as an alarm condition: 'none' The device does not treat the standing condition as an alarm condition. 'discrete' The device treats the standing condition as an alarm condition. 'grouped' The device aggregates the standing condition into an alarm group."
+  },
+  "cfmConditionAlarmActions": {
+    "name": "cfmConditionAlarmActions",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Bits",
+      "class": "type",
+      "bits": {
+        "syslog": 0,
+        "snmp": 1
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the actions taken by the device when the alarm condition changes state: 'syslog' The device sends a syslog message. 'snmp' The device sends a cfmNotifyAlarm notification if and only if cfmNotifyEnable is set to 'true'. The value of this column only has relevance if the corresponding instance of cfmConditionAlarm is 'discrete'"
+  },
+  "cfmConditionAlarmSeverity": {
+    "name": "cfmConditionAlarmSeverity",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoAlarmSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the severity of the alarm condition. The value of this column only have relevance if the corresponding instance of cfmConditionAlarm is 'discrete'."
+  },
+  "cfmConditionAlarmGroup": {
+    "name": "cfmConditionAlarmGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.1.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorAlarmGroupIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the alarm group the device aggregates the standing condition into. The value of this column only has relevance if the corresponding instance of cfmConditionAlarm is 'grouped'."
+  },
+  "cfmConditionTableChanged": {
+    "name": "cfmConditionTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.4.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device made a change to the cfmConditionTable."
+  },
+  "cfmAlarmGroups": {
+    "name": "cfmAlarmGroups",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5",
+    "class": "objectidentity"
+  },
+  "cfmAlarmGroupTable": {
+    "name": "cfmAlarmGroupTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists alarm groups maintained by the device."
+  },
+  "cfmAlarmGroupEntry": {
+    "name": "cfmAlarmGroupEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes an alarm group. An alarm group defines an alarm condition that is raised when a configured number of flows in a set of flows asserts a configured standing condition. The figure below illustrates the relationship between an alarm group, a conditions profile, and a flow set. +-----------------------------------------+ | conditions profile 42 | | +-------------------------------------+ | | | cfmConditionAlarm.42.9 = 'grouped' |<-------+ | | cfmConditionAlarmGroup.42.9 = 4 -+ | | | | +----------------------------------|--+ |<--+ | | | | | | +------------------------------------|----+ | | | | | v | | +-----------------------------------------+ | | | alarm group 4 | | | | | | | | cfmAlarmGroupConditionsProfile.4 = 42 ------+ | | cfmAlarmGroupConditionId.4 = 9 ----------------+ | cfmAlarmGroupFlowset.4 = 16 -------+ | | | | +------------------------------------|----+ | v +-----------------------------------------+ | flow set 16 | | | | +------------------------------------+ | | | cfmAlarmGroupFlowId.16.100 | | | +------------------------------------+ | | +------------------------------------+ | | | cfmAlarmGroupFlowId.16.101 | | | +------------------------------------+ | | +------------------------------------+ | | | cfmAlarmGroupFlowId.16.102 | | | +------------------------------------+ | | : | | : | | +------------------------------------+ | | | cfmAlarmGroupFlowId.16.Y | | | +------------------------------------+ | +-----------------------------------------+ A device creates a row in the cfmAlarmGroupTable when it configures a new alarm group. Likewise, the device destroys a row when the alarm group ceases to exist."
+  },
+  "cfmAlarmGroupId": {
+    "name": "cfmAlarmGroupId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorAlarmGroupIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates an arbitrary integer-value that uniquely identifies the alarm group. Observe that the value assigned to an alarm group does not necessarily persist across restarts."
+  },
+  "cfmAlarmGroupDescr": {
+    "name": "cfmAlarmGroupDescr",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a human-readable description of the alarm group."
+  },
+  "cfmAlarmGroupConditionsProfile": {
+    "name": "cfmAlarmGroupConditionsProfile",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditionsProfile",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the conditions profile that contains the description of the standing profile aggregated by the alarm group."
+  },
+  "cfmAlarmGroupConditionId": {
+    "name": "cfmAlarmGroupConditionId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditionIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the standing condition aggregated by the alarm group."
+  },
+  "cfmAlarmGroupFlowSet": {
+    "name": "cfmAlarmGroupFlowSet",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowSetIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the set of traffic flows aggregated by the alarm group."
+  },
+  "cfmAlarmGroupFlowCount": {
+    "name": "cfmAlarmGroupFlowCount",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "traffic flows",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of traffic flows in the set of traffic flows indicated by the corresponding instance of cfmAlarmGroupFlowSet."
+  },
+  "cfmAlarmGroupThresholdUnits": {
+    "name": "cfmAlarmGroupThresholdUnits",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "flows": 2,
+          "percent": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the units for the corresponding instance of cfmAlarmGroupThreshold: 'other' The MIB implementation does not recognize the units in which the value of the corresponding instance of cfmAlarmGroupThreshold has been expressed. 'flows' The value of the corresponding instance of cfmAlarmGroupThreshold indicates a number of traffic flows. 'percent' The value of the corresponding instance of cfmAlarmGroupThreshold indicates a percentage of traffic flows."
+  },
+  "cfmAlarmGroupThreshold": {
+    "name": "cfmAlarmGroupThreshold",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 0,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates a number of flows that must assert the standing condition indicated by the corresponding instance of cfmAlarmGroupCondition before raising an alarm. If the corresponding instance of cfmAlarmGroupThresholdUnits is 'percent', then the value of this column must be greater than or equal to zero and less than or equal to '100'."
+  },
+  "cfmAlarmGroupRaised": {
+    "name": "cfmAlarmGroupRaised",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates whether the alarm group has raised an alarm."
+  },
+  "cfmAlarmGroupCurrentCount": {
+    "name": "cfmAlarmGroupCurrentCount",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.1.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Gauge32",
+      "class": "type"
+    },
+    "units": "traffic flows",
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the number of traffic flows currently asserting the standing condition aggregated by the alarm group."
+  },
+  "cfmAlarmGroupTableChanged": {
+    "name": "cfmAlarmGroupTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device made a change to the cfmAlarmGroupTable."
+  },
+  "cfmAlarmGroupFlowTable": {
+    "name": "cfmAlarmGroupFlowTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists the traffic flows contained by each set of flows configured for the alarm groups contained by the cfmAlarmGroupTable."
+  },
+  "cfmAlarmGroupFlowEntry": {
+    "name": "cfmAlarmGroupFlowEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupFlowSetId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupFlowMonitorId",
+        "implied": 0
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupFlowId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes a traffic flow contained by a set of flows. An alarm group aggregates a standing condition from a set of flows. cfmAlarmFlowSetId uniquely identifies a set of traffic flows. A device creates a row in the cfmAlarmGroupTable under one of the following circumstances: - It has configured a new alarm group, and hence a new set of traffic flows. - It has added a traffic flow to an existing set of flows. Likewise, a device destroys a row under one of the following circumstances: - It has destroyed the set of traffic flows. - It has removed the traffic flow from an existing set of flows."
+  },
+  "cfmAlarmGroupFlowSetId": {
+    "name": "cfmAlarmGroupFlowSetId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowSetIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates an arbitrary integer-value that uniquely identifies the set of traffic flows that contains the traffic flow represented by the row. Observe that the value assigned to a flow set does not necessarily persist across restarts."
+  },
+  "cfmAlarmGroupFlowMonitorId": {
+    "name": "cfmAlarmGroupFlowMonitorId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object identifies the flow monitor responsible for the traffic flow."
+  },
+  "cfmAlarmGroupFlowId": {
+    "name": "cfmAlarmGroupFlowId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object identifies the traffic flow."
+  },
+  "cfmAlarmGroupFlowTableChanged": {
+    "name": "cfmAlarmGroupFlowTableChanged",
+    "oid": "1.3.6.1.4.1.9.9.692.1.5.4",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime the last time the device made a change to the cfmAlarmGroupTable."
+  },
+  "cfmAlarmHistory": {
+    "name": "cfmAlarmHistory",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6",
+    "class": "objectidentity"
+  },
+  "cfmAlarmHistorySize": {
+    "name": "cfmAlarmHistorySize",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "default": {
+      "default": {
+        "value": 500,
+        "format": "decimal"
+      }
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies the maximum number of rows the cfmAlarmHistoryTable can contain at any given time. If the device raises or clears an alarm and the cfmAlarmHistoryTable already contains a number of rows equal to the value of this object, then it destroys the oldest row before creating a new one."
+  },
+  "cfmAlarmHistoryLastId": {
+    "name": "cfmAlarmHistoryLastId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of cfmAlarmHistoryId corresponding to the last row created in the cfmAlarmHistoryTable."
+  },
+  "cfmAlarmHistoryTable": {
+    "name": "cfmAlarmHistoryTable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table lists a history of the changes in the state of alarm conditions monitored by the device."
+  },
+  "cfmAlarmHistoryEntry": {
+    "name": "cfmAlarmHistoryEntry",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryId",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry describes the change in the state of an alarm condition observed by the device. The device creates a row in the cfmAlarmHistoryTable when it observes a change in the state of an alarm condition. The device destroys a row in the cfmAlarmHistoryTable when it needs to create a new row, but the number of rows contained by the cfmAlarmHistoryTable is equal to the value of cfmAlarmHistorySize."
+  },
+  "cfmAlarmHistoryId": {
+    "name": "cfmAlarmHistoryId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This object indicates an arbitrary integer-value that uniquely identifies the event. Observe that the value assigned to a alarm history entry does not necessarily persist across restarts."
+  },
+  "cfmAlarmHistoryType": {
+    "name": "cfmAlarmHistoryType",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "cleared": 1,
+          "raised": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the type of event: 'cleared' The event signaled an alarm condition transitioning to the cleared state. 'raised' The event signalled an alarm condition transitioning to the raised state."
+  },
+  "cfmAlarmHistoryEntity": {
+    "name": "cfmAlarmHistoryEntity",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowPointer",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the entity that caused the event. If the alarm condition has an association with a flow monitor, then the value of this column is a row in the cfmFlowMonitorTable. If the alarm condition has an association with a traffic flow, then the value of this column is a row in the cfmFlowTable. If the alarm condition has an association with a alarm group, then the value of this column is a row in the cfmAlarmGroupTable."
+  },
+  "cfmAlarmHistoryConditionsProfile": {
+    "name": "cfmAlarmHistoryConditionsProfile",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditionsProfile",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the conditions profile containing the description of the alarm condition that changed state."
+  },
+  "cfmAlarmHistoryConditionId": {
+    "name": "cfmAlarmHistoryConditionId",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "FlowMonitorConditionIdentifier",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the alarm condition that changed state."
+  },
+  "cfmAlarmHistorySeverity": {
+    "name": "cfmAlarmHistorySeverity",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "CiscoAlarmSeverity",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the severity of the alarm condition that changed state."
+  },
+  "cfmAlarmHistoryTime": {
+    "name": "cfmAlarmHistoryTime",
+    "oid": "1.3.6.1.4.1.9.9.692.1.6.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "This object indicates the value of sysUpTime when the alarm condition changed state. In the case the device updates standing/alarm conditions at the same time it captures a measurement interval, the value of this column should correlate with the corresponding value of cfmFlowMetricsIntTime. This assures that the EMS/NMS can easily correlate alarms with the metrics captured in the course of a measurement interval."
+  },
+  "cfmNotify": {
+    "name": "cfmNotify",
+    "oid": "1.3.6.1.4.1.9.9.692.1.7",
+    "class": "objectidentity"
+  },
+  "cfmNotifyEnable": {
+    "name": "cfmNotifyEnable",
+    "oid": "1.3.6.1.4.1.9.9.692.1.7.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "This object specifies whether the device generates a cfmNotifyAlarm notification when an alarm condition changes state."
+  },
+  "cfmNotifyAlarm": {
+    "name": "cfmNotifyAlarm",
+    "oid": "1.3.6.1.4.1.9.9.692.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryType"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryEntity"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryConditionsProfile"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryConditionId"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistorySeverity"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryTime"
+      }
+    ],
+    "status": "current",
+    "description": "The device generates this notification when an alarm condition has changed state and the value of cfmNOtifyEnable is 'true'."
+  },
+  "cfmMonitoredElements": {
+    "name": "cfmMonitoredElements",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1",
+    "class": "objectidentity"
+  },
+  "cfmeOther": {
+    "name": "cfmeOther",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1.1",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "This object identifier represents a monitored element not recognized by this implementation of the MIB module."
+  },
+  "cfmeFlowCount": {
+    "name": "cfmeFlowCount",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1.2",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "This object identifier represents the monitored element describing the number of traffic flows currently monitored by a flow monitor (cfmFlowMonitorFlowCount)."
+  },
+  "cfmeFlowTimeouts": {
+    "name": "cfmeFlowTimeouts",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1.3",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "This object identifier represents the monitored element describing the number of traffic flows that expired during the last measurement interval."
+  },
+  "cfmeFlowStop": {
+    "name": "cfmeFlowStop",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1.4",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "This object identifier represents the monitored element describing the condition that arises when a flow monitor does not receive any packets for a traffic flow during the last measurement interval."
+  },
+  "cfmeFlowCumulativeBitRate": {
+    "name": "cfmeFlowCumulativeBitRate",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1.5",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "This object identifier represents the monitored element describing the average rate at which a flow monitor processes bits contained by packets for a traffic flow (cfmFlowMetricsBitRate)."
+  },
+  "cfmeFlowCumulativePktRate": {
+    "name": "cfmeFlowCumulativePktRate",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1.6",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "This object identifier represents the monitored element describing the average rate at which a flow monitor processes packets for a traffic flow (cfmFlowMetricsPktRate)."
+  },
+  "cfmeFlowBitRate": {
+    "name": "cfmeFlowBitRate",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1.7",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "This object identifier represents the monitored element describing the average rate at which a flow monitor processes bits contained by packets for a traffic flow during the last measurement interval (cfmFlowMetricsIntBitRate)."
+  },
+  "cfmeFlowPktRate": {
+    "name": "cfmeFlowPktRate",
+    "oid": "1.3.6.1.4.1.9.9.692.3.1.8",
+    "class": "objectidentity",
+    "status": "current",
+    "description": "This object identifier represents the monitored element describing the average rate at which a flow monitor processes packets for a traffic flow during the last measurement interval (cfmFlowMetricsIntPktRate)."
+  },
+  "ciscoFlowMonitorMIBCompliances": {
+    "name": "ciscoFlowMonitorMIBCompliances",
+    "oid": "1.3.6.1.4.1.9.9.692.2.1",
+    "class": "objectidentity"
+  },
+  "ciscoFlowMonitorMIBGroups": {
+    "name": "ciscoFlowMonitorMIBGroups",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2",
+    "class": "objectidentity"
+  },
+  "ciscoFlowMonitorCompliance01": {
+    "name": "ciscoFlowMonitorCompliance01",
+    "oid": "1.3.6.1.4.1.9.9.692.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "cfmFlowMonitorGroup",
+        "module": "CISCO-FLOW-MONITOR-MIB"
+      },
+      {
+        "object": "cfmFlowGroup",
+        "module": "CISCO-FLOW-MONITOR-MIB"
+      },
+      {
+        "object": "cfmFlowMetricsGroup",
+        "module": "CISCO-FLOW-MONITOR-MIB"
+      },
+      {
+        "object": "cfmFlowConditionsGroup",
+        "module": "CISCO-FLOW-MONITOR-MIB"
+      },
+      {
+        "object": "cfmAlarmAggregationGroup",
+        "module": "CISCO-FLOW-MONITOR-MIB"
+      },
+      {
+        "object": "cfmAlarmHistoryGroup",
+        "module": "CISCO-FLOW-MONITOR-MIB"
+      },
+      {
+        "object": "cfmNotifySupportGroup",
+        "module": "CISCO-FLOW-MONITOR-MIB"
+      },
+      {
+        "object": "cfmNotifyGroup",
+        "module": "CISCO-FLOW-MONITOR-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "This compliance statement specifies the minimal requirements an implementation must meet in order to claim full compliance with the definition of the CISCO-FLOW-MONITOR-MIB."
+  },
+  "cfmFlowMonitorGroup": {
+    "name": "cfmFlowMonitorGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorDescr"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorCaps"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorFlowCount"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorConditionsProfile"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorConditions"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorAlarms"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorAlarmSeverity"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorAlarmCriticalCount"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorAlarmMajorCount"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorAlarmMinorCount"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorAlarmWarningCount"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorAlarmInfoCount"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMonitorTableChanged"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains objects describing flow monitors."
+  },
+  "cfmFlowGroup": {
+    "name": "cfmFlowGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2.2",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowDescr"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowNext"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowCreateTime"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowDiscontinuityTime"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowExpirationTime"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowDirection"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowAdminStatus"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowOperStatus"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIngressType"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIngress"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowEgressType"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowEgress"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowTableChanged"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowL2VlanNext"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowL2VlanId"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowL2VlanCos"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowL2VlanTableChanged"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIpNext"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIpAddrType"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIpAddrSrc"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIpAddrDst"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIpValid"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIpTrafficClass"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIpHopLimit"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowIpTableChanged"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowUdpNext"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowUdpPortSrc"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowUdpPortDst"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowUdpTableChanged"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowTcpNext"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowTcpPortSrc"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowTcpPortDst"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowTcpTableChanged"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowRtpNext"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowRtpVersion"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowRtpSsrc"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowRtpPayloadType"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowRtpTableChanged"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains objects describing traffic flows."
+  },
+  "cfmFlowMetricsGroup": {
+    "name": "cfmFlowMetricsGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2.3",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsCollected"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntervalTime"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsMaxIntervals"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsElapsedTime"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntervals"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsInvalidIntervals"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsConditionsProfile"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsConditions"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsAlarms"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsAlarmSeverity"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsPkts"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsOctets"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsBitRateUnits"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsBitRate"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsPktRate"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsTableChanged"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntValid"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntTime"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntConditions"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntAlarms"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntAlarmSeverity"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntPkts"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntOctets"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntBitRateUnits"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntBitRate"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmFlowMetricsIntPktRate"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains objects describing traffic flow metrics."
+  },
+  "cfmFlowConditionsGroup": {
+    "name": "cfmFlowConditionsGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2.4",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionDescr"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionMonitoredElement"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionType"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionThreshRiseScale"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionThreshRisePrecision"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionThreshRise"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionThreshFallScale"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionThreshFallPrecision"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionThreshFall"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionSampleType"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionSampleWindow"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionAlarm"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionAlarmActions"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionAlarmSeverity"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionAlarmGroup"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmConditionTableChanged"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains objects describing standing/alarm conditions."
+  },
+  "cfmAlarmAggregationGroup": {
+    "name": "cfmAlarmAggregationGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2.5",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupDescr"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupConditionsProfile"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupConditionId"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupFlowSet"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupFlowCount"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupThresholdUnits"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupThreshold"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupRaised"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupCurrentCount"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupTableChanged"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupFlowId"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmGroupFlowTableChanged"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains object describing alarm aggregation."
+  },
+  "cfmAlarmHistoryGroup": {
+    "name": "cfmAlarmHistoryGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2.6",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistorySize"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryLastId"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryType"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryEntity"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryConditionsProfile"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryConditionId"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistorySeverity"
+      },
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmAlarmHistoryTime"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains objects describing alarm history."
+  },
+  "cfmNotifySupportGroup": {
+    "name": "cfmNotifySupportGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2.7",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmNotifyEnable"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains objects supporting notification."
+  },
+  "cfmNotifyGroup": {
+    "name": "cfmNotifyGroup",
+    "oid": "1.3.6.1.4.1.9.9.692.2.2.8",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "CISCO-FLOW-MONITOR-MIB",
+        "object": "cfmNotifyAlarm"
+      }
+    ],
+    "status": "current",
+    "description": "This group contains notifications supporting flow monitoring."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/CISCO-FLOW-MONITOR-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 17:03:19 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "CISCO-FLOW-MONITOR-MIB"
+  }
+}

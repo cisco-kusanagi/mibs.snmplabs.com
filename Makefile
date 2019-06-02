@@ -27,6 +27,18 @@ compile-with-texts:  ## Compile With Texts all MIBs into .py files
 	    $$f; \
 	done
 
+compile-json:  ## Compile With Texts all MIBs into .py files
+	@for f in $$(ls asn1); do \
+	  echo "## Compiling $$f with texts"; \
+	  mibdump.py \
+	    --generate-mib-texts \
+	    --no-python-compile \
+	    --mib-source=file://$$(pwd)/asn1 \
+	    --destination-format=json \
+	    --destination-directory=./json \
+	    $$f; \
+	done
+
 help:  ## Print list of Makefile targets
 	@# Taken from https://github.com/spf13/hugo/blob/master/Makefile
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \

@@ -1,0 +1,822 @@
+{
+  "imports": {
+    "class": "imports",
+    "HUAWEI-3COM-OID-MIB": [
+      "huaweiMgmt",
+      "hwMpls"
+    ],
+    "IF-MIB": [
+      "InterfaceIndex"
+    ],
+    "INET-ADDRESS-MIB": [
+      "InetAddressType",
+      "InetAddress"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "MODULE-COMPLIANCE",
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP"
+    ],
+    "SNMPv2-SMI": [
+      "experimental",
+      "TimeTicks",
+      "iso",
+      "Bits",
+      "Unsigned32",
+      "Counter64",
+      "OBJECT-IDENTITY",
+      "Integer32",
+      "OBJECT-TYPE",
+      "Counter32",
+      "MibIdentifier",
+      "IpAddress",
+      "MODULE-IDENTITY",
+      "Gauge32",
+      "NOTIFICATION-TYPE"
+    ],
+    "SNMPv2-TC": [
+      "RowStatus",
+      "TimeStamp",
+      "TruthValue",
+      "DisplayString",
+      "TEXTUAL-CONVENTION",
+      "StorageType"
+    ]
+  },
+  "hwMplsVpn": {
+    "name": "hwMplsVpn",
+    "oid": "1.3.6.1.4.1.2011.5.12.3",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2001-07-20 12:00",
+        "description": "Re-published as PPVPN working group draft. No changes between this version and last; just name change."
+      },
+      {
+        "revision": "2001-07-17 12:00",
+        "description": "Removed mplsVpnVrfRouteTargetImport/Export from route target table, and modified indexing to better reflect N <> R distribution policy. Also added new object called mplsVpnVrfRouteTargetType which denotes import/export policy for the specified route target. Added mplsVpnInterfaceConfRowStatus which allows for an interface to be associated with a VPN through SNMP configuration. Added VrfName to index of VrfInterfaceConfEntry which allows interfaces to be associated with the appropriate VRF. Modified description of mplsVpnVrfConfMaxPossibleRoutes and mplsVpnVrfConfMaxRoutes to allow for undetermined value. Removed 'both' enumerated value in mplsVpnVrfBgpNbrRole. Updated example to reflect these changes."
+      },
+      {
+        "revision": "2001-07-10 12:00",
+        "description": "Renamed mplsNumVrfSecViolationThreshExceeded to mplsNumVrfSecIllegalLabelThreshExceeded, and removed mplsVpnInterfaceConfIndex from varbind. Changed MplsVpnId TC from SnmpAdminString to OCTET STRING. Added mplsVpnVrfSecIllegalLabelRcvThresh to mplsVpnVrfSecEntry. Changed duplicate mplsVpnVrfRouteTargetImport in mplsVpnVrfRouteTargetEntry INDEX to mplsVpnVrfRouteTargetExport."
+      },
+      {
+        "revision": "2001-06-19 12:00",
+        "description": "Fixed several compile errors."
+      },
+      {
+        "revision": "2001-05-30 12:00",
+        "description": "Updated most of document and MIB to reflect comments from WG."
+      },
+      {
+        "revision": "2000-09-30 12:00",
+        "description": "Initial draft version."
+      }
+    ],
+    "lastupdated": "200107201200Z",
+    "organization": "IETF Layer-3 Virtual Private Networks Working Group.",
+    "contactinfo": " Thomas D. Nadeau tnadeau@cisco.com Luyuan Fang luyuanfang@att.com Stephen Brannon Fabio M. Chiussi fabio@bell-labs.com Joseph Dube jdube@avici.com Martin Tatham martin.tatham@bt.com Harmen Van Der Linde hvdl@att.com Comments and discussion to ppvpn@ietf.org",
+    "description": "This MIB contains managed object definitions for the Multiprotocol Label Switching (MPLS)/Border Gateway Protocol (BGP) Virtual Private Networks (VPNs) as defined in : Rosen, E., Viswanathan, A., and R. Callon, Multiprotocol Label Switching Architecture, Internet Draft <draft-ietf-mpls-arch-06.txt>, August 1999."
+  },
+  "MplsVpnId": {
+    "name": "MplsVpnId",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 31
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "An identifier that is assigned to each MPLS/BGP VPN and is used to uniquely identify it. This is assigned by the system operator or NMS and SHOULD be unique throughout the MPLS domain. If this is the case, then this identifier can then be used at any LSR within a specific MPLS domain to identify this MPLS/BGP VPN. It may also be possible to preserve the uniqueness of this identifier across MPLS domain boundaries, in which case this identifier can then be used to uniquely identify MPLS/BGP VPNs on a more global basis.",
+    "reference": "RFC 2685 [VPN-RFC2685] Fox B., et al, 'Virtual Private Networks Identifier', September 1999."
+  },
+  "MplsVpnRouteDistinguisher": {
+    "name": "MplsVpnRouteDistinguisher",
+    "class": "textualconvention",
+    "type": {
+      "type": "OCTET STRING",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 256
+          }
+        ]
+      }
+    },
+    "status": "current",
+    "description": "Syntax for a route distinguisher and route target."
+  },
+  "mplsVpnObjects": {
+    "name": "mplsVpnObjects",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1",
+    "class": "objectidentity"
+  },
+  "mplsVpnScalars": {
+    "name": "mplsVpnScalars",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.1",
+    "class": "objectidentity"
+  },
+  "mplsVpnConf": {
+    "name": "mplsVpnConf",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2",
+    "class": "objectidentity"
+  },
+  "mplsVpnRoute": {
+    "name": "mplsVpnRoute",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3",
+    "class": "objectidentity"
+  },
+  "mplsVpnConfiguredVrfs": {
+    "name": "mplsVpnConfiguredVrfs",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of VRFs which are configured on this node."
+  },
+  "mplsVpnActiveVrfs": {
+    "name": "mplsVpnActiveVrfs",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The number of VRFs which are active on this node. That is, those whose operStatus = Up (1)."
+  },
+  "mplsVpnInterfaceConfTable": {
+    "name": "mplsVpnInterfaceConfTable",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies per-interface MPLS capability and associated information."
+  },
+  "mplsVpnInterfaceConfEntry": {
+    "name": "mplsVpnInterfaceConfEntry",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfName",
+        "implied": 0
+      },
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnInterfaceConfIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in this table is created by an LSR for every interface capable of supporting MPLS/BGP VPN. Each entry in this table is meant to correspond to an entry in the Interfaces Table."
+  },
+  "mplsVpnInterfaceConfIndex": {
+    "name": "mplsVpnInterfaceConfIndex",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "RFC 2233 - The Interfaces Group MIB using SMIv2, McCloghrie, K., and F. Kastenholtz, Nov. 1997",
+    "status": "current",
+    "description": "This is a unique index for an entry in the MplsVPNInterfaceConfTable."
+  },
+  "mplsVpnInterfaceLabelEdgeType": {
+    "name": "mplsVpnInterfaceLabelEdgeType",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "providerEdge": 1,
+          "customerEdge": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "providerEdge",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Either the providerEdge(1) (PE) or customerEdge(2) (CE) bit MUST be set."
+  },
+  "mplsVpnInterfaceVpnClassification": {
+    "name": "mplsVpnInterfaceVpnClassification",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "carrierOfCarrier": 1,
+          "enterprise": 2,
+          "interProvider": 3
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Denotes whether this link participates in a carrier-of-carrier's, enterprise, or inter-provider scenario."
+  },
+  "mplsVpnInterfaceIpAddress": {
+    "name": "mplsVpnInterfaceIpAddress",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The IP address of this interface."
+  },
+  "mplsVpnInterfaceIpAddressMask": {
+    "name": "mplsVpnInterfaceIpAddressMask",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The IP address mask of this interface."
+  },
+  "mplsVpnInterfaceConfRowStatus": {
+    "name": "mplsVpnInterfaceConfRowStatus",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The row status for this entry. This value is used to create a row in this table, signifying that the specified interface is to be associated with the specified interface. If this operation suceeds, the interface will have been associated, otherwise the agent would not allow the association. If the agent only allows read-only operations on this table, it will create entries in this table as they are created."
+  },
+  "mplsVpnVrfConfTable": {
+    "name": "mplsVpnVrfConfTable",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies per-interface MPLS/BGP VPN VRF Table capability and associated information. Entries in this table define VRF routing instances associated with MPLS/VPN interfaces. Note that multiple interfaces can belong to the same VRF instance. The collection of all VRF instances comprises an actual VPN."
+  },
+  "mplsVpnVrfConfEntry": {
+    "name": "mplsVpnVrfConfEntry",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfName",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in this table is created by an LSR for every VRF capable of supporting MPLS/BGP VPN. The indexing provides an ordering of VRFs per-VPN interface."
+  },
+  "mplsVpnVrfName": {
+    "name": "mplsVpnVrfName",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MplsVpnId",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "reference": "RFC 2685 [VPN-RFC2685] Fox B., et al, `Virtual Private Networks Identifier`, September 1999.",
+    "status": "current",
+    "description": "The human-readable name of this VPN. This MAY be equivalent to the RFC2685 VPN-ID."
+  },
+  "mplsVpnVrfRouteDistinguisher": {
+    "name": "mplsVpnVrfRouteDistinguisher",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MplsVpnRouteDistinguisher",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The route distinguisher for this VRF."
+  },
+  "mplsVpnVrfNetPrefixType": {
+    "name": "mplsVpnVrfNetPrefixType",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "rip": 2,
+          "ospf": 3,
+          "isis": 4,
+          "bgp": 5,
+          "static": 6
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Denotes the type network prefix in use for the PE-CE connections. "
+  },
+  "mplsVpnVrfNetPrefix": {
+    "name": "mplsVpnVrfNetPrefix",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Denotes the network prefix for the PE-CE connections."
+  },
+  "mplsVpnVrfIpRouteRedistributeConn": {
+    "name": "mplsVpnVrfIpRouteRedistributeConn",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Denotes the redistribution of directly connected networks into the VRF BGP table."
+  },
+  "mplsVpnVrfIpRouteRedistributeStatic": {
+    "name": "mplsVpnVrfIpRouteRedistributeStatic",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Denotes the redistribution of static routes into the VRF BGP table."
+  },
+  "mplsVpnVrfIpRouteRedistributeRip": {
+    "name": "mplsVpnVrfIpRouteRedistributeRip",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Denotes the redistribution of rip routes into the VRF BGP table."
+  },
+  "mplsVpnVrfConfHighRouteThreshold": {
+    "name": "mplsVpnVrfConfHighRouteThreshold",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Denotes high-level water marker for the number of routes which this VRF may hold."
+  },
+  "mplsVpnVrfConfIsWarnOnly": {
+    "name": "mplsVpnVrfConfIsWarnOnly",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Denotes the action when the amount of VPN's routes exceed the mplsVpnVrfConfHighRouteThreshold."
+  },
+  "mplsVpnVrfConfMaxRoutes": {
+    "name": "mplsVpnVrfConfMaxRoutes",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Denotes maximum number of routes which this VRF is configured to hold. This value MUST be less than or equal to mplsVrfMaxPossibleRoutes unless it is set to 0."
+  },
+  "mplsVpnVrfConfRowStatus": {
+    "name": "mplsVpnVrfConfRowStatus",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.2.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This variable is used to create, modify, and/or delete a row in this table."
+  },
+  "mplsVpnVrfRouteTargetTable": {
+    "name": "mplsVpnVrfRouteTargetTable",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies per-VRF route target association. Each entry identifies a connectivity policy supported as part of a VPN."
+  },
+  "mplsVpnVrfRouteTargetEntry": {
+    "name": "mplsVpnVrfRouteTargetEntry",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfName",
+        "implied": 0
+      },
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfRouteTarget",
+        "implied": 0
+      },
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfRouteTargetType",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": " An entry in this table is created by an LSR for each route target configured for a VRF supporting a MPLS/BGP VPN instance. The indexing provides an ordering per-VRF instance."
+  },
+  "mplsVpnVrfRouteTarget": {
+    "name": "mplsVpnVrfRouteTarget",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "MplsVpnRouteDistinguisher",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The route target distribution policy."
+  },
+  "mplsVpnVrfRouteTargetType": {
+    "name": "mplsVpnVrfRouteTargetType",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "import": 1,
+          "export": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The route target export distribution type."
+  },
+  "mplsVpnVrfRouteTargetRowStatus": {
+    "name": "mplsVpnVrfRouteTargetRowStatus",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Row status for this entry."
+  },
+  "mplsVpnVrfBgpNbrAddrTable": {
+    "name": "mplsVpnVrfBgpNbrAddrTable",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.4",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "This table specifies per-interface MPLS/BGP neighbor addresses for both PEs and CEs."
+  },
+  "mplsVpnVrfBgpNbrAddrEntry": {
+    "name": "mplsVpnVrfBgpNbrAddrEntry",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.4.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfName",
+        "implied": 0
+      },
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfBgpNbrAddr",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in this table is created by an LSR for every VRF capable of supporting MPLS/BGP VPN. The indexing provides an ordering of VRFs per-VPN interface."
+  },
+  "mplsVpnVrfBgpNbrAddr": {
+    "name": "mplsVpnVrfBgpNbrAddr",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.4.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Denotes the BGP neighbor address."
+  },
+  "mplsVpnVrfBgpNbrRole": {
+    "name": "mplsVpnVrfBgpNbrRole",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.4.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "ce": 1,
+          "pe": 2
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Denotes the role played by this BGP neighbor with respect to this VRF."
+  },
+  "mplsVpnVrfBgpNbrType": {
+    "name": "mplsVpnVrfBgpNbrType",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.4.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Denotes the address family of the PE address."
+  },
+  "mplsVpnVrfBgpNbrAsNumber": {
+    "name": "mplsVpnVrfBgpNbrAsNumber",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.4.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The Automonous System that the BGP's neighbour in."
+  },
+  "mplsVpnVrfBgpNbrAdminStatus": {
+    "name": "mplsVpnVrfBgpNbrAdminStatus",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.4.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "mplsVpnVrfBgpNbrSetUp": 1,
+          "mplsVpnVrfBgpNbrSetDown": 2
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The action set by SNMP client."
+  },
+  "mplsVpnVrfBgpNbrRowStatus": {
+    "name": "mplsVpnVrfBgpNbrRowStatus",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.2.4.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This variable is used to create, modify, and/or delete a row in this table."
+  },
+  "mplsVpnVrfRouteTable": {
+    "name": "mplsVpnVrfRouteTable",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3.1",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "reference": "1. RFC 1213 Section 6.6, The IP Group. 2. RFC 2096 ",
+    "status": "current",
+    "description": "This table specifies per-interface MPLS/BGP VPN VRF Table routing information. Entries in this table define VRF routing entries associated with the specified MPLS/VPN interfaces. Note that this table contains both BGP and IGP routes, as both may appear in the same VRF."
+  },
+  "mplsVpnVrfRouteEntry": {
+    "name": "mplsVpnVrfRouteEntry",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3.1.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfName",
+        "implied": 0
+      },
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfRouteDest",
+        "implied": 0
+      },
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfRouteMask",
+        "implied": 0
+      },
+      {
+        "module": "HUAWEI-MPLS-BGP-VPN-MIB",
+        "object": "mplsVpnVrfRouteNextHop",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry in this table is created by an LSR for every route present configured (either dynamically or statically) within the context of a specific VRF capable of supporting MPLS/BGP VPN. The indexing provides an ordering of VRFs per-VPN interface."
+  },
+  "mplsVpnVrfRouteDest": {
+    "name": "mplsVpnVrfRouteDest",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3.1.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The destination IP address of this route. This object may not take a Multicast (Class D) address value."
+  },
+  "mplsVpnVrfRouteMask": {
+    "name": "mplsVpnVrfRouteMask",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3.1.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Indicate the mask to be logical-ANDed with the destination address before being compared to the value in the mplsVpnVrfRouteDest field. For those systems that do not support arbitrary subnet masks, an agent constructs the value of the mplsVpnVrfRouteMask by reference to the IP Address Class. Any assignment (implicit or otherwise) of an instance of this object to a value x must be rejected if the bit-wise logical-AND of x with the value of the corresponding instance of the mplsVpnVrfRouteDest object is not equal to mplsVpnVrfRouteDest."
+  },
+  "mplsVpnVrfRouteNextHop": {
+    "name": "mplsVpnVrfRouteNextHop",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3.1.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "On remote routes, the address of the next system en route; Otherwise, 0.0.0.0. ."
+  },
+  "mplsVpnVrfRouteIfIndex": {
+    "name": "mplsVpnVrfRouteIfIndex",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3.1.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InterfaceIndex",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The ifIndex value that identifies the local interface through which the next hop of this route should be reached."
+  },
+  "mplsVpnVrfRouteProto": {
+    "name": "mplsVpnVrfRouteProto",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3.1.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "other": 1,
+          "local": 2,
+          "netmgmt": 3,
+          "icmp": 4,
+          "egp": 5,
+          "ggp": 6,
+          "hello": 7,
+          "rip": 8,
+          "isIs": 9,
+          "esIs": 10,
+          "ciscoIgrp": 11,
+          "bbnSpfIgp": 12,
+          "ospf": 13,
+          "bgp": 14,
+          "idpr": 15,
+          "ciscoEigrp": 16
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The routing mechanism via which this route was learned. Inclusion of values for gateway rout- ing protocols is not intended to imply that hosts should support those protocols."
+  },
+  "mplsVpnVrfRouteRowStatus": {
+    "name": "mplsVpnVrfRouteRowStatus",
+    "oid": "1.3.6.1.4.1.2011.5.12.3.1.3.1.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "Row status for this table. It is used according to row installation and removal conventions."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/HUAWEI-MPLS-BGP-VPN-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 19:48:35 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "HUAWEI-MPLS-BGP-VPN-MIB"
+  }
+}

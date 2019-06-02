@@ -1,0 +1,644 @@
+{
+  "imports": {
+    "class": "imports",
+    "INET-ADDRESS-MIB": [
+      "InetAddress",
+      "InetAddressType"
+    ],
+    "RBN-SMI": [
+      "rbnMgmt"
+    ],
+    "RMON-MIB": [
+      "OwnerString"
+    ],
+    "SNMP-FRAMEWORK-MIB": [
+      "SnmpAdminString"
+    ],
+    "SNMPv2-CONF": [
+      "NOTIFICATION-GROUP",
+      "OBJECT-GROUP",
+      "MODULE-COMPLIANCE"
+    ],
+    "SNMPv2-SMI": [
+      "MibIdentifier",
+      "TimeTicks",
+      "OBJECT-IDENTITY",
+      "OBJECT-TYPE",
+      "Counter64",
+      "iso",
+      "Gauge32",
+      "Counter32",
+      "MODULE-IDENTITY",
+      "NOTIFICATION-TYPE",
+      "IpAddress",
+      "Integer32",
+      "Unsigned32",
+      "Bits"
+    ],
+    "SNMPv2-TC": [
+      "TEXTUAL-CONVENTION",
+      "TruthValue",
+      "TestAndIncr",
+      "DisplayString",
+      "RowStatus",
+      "TimeStamp"
+    ]
+  },
+  "rbnConfigFileMib": {
+    "name": "rbnConfigFileMib",
+    "oid": "1.3.6.1.4.1.2352.2.13",
+    "class": "moduleidentity",
+    "revisions": [
+      {
+        "revision": "2002-05-29 00:00",
+        "description": "Add NOTIFICATION-TYPE to imports. Update/correct CONTACT-INFO. Needed to import OwnerString from RMON-MIB because TC is obsoleted in RFC 2863 (IF-MIB)."
+      },
+      {
+        "revision": "2001-10-10 00:00",
+        "description": "Initial version."
+      }
+    ],
+    "lastupdated": "200110100000Z",
+    "organization": "Redback Networks, Inc.",
+    "contactinfo": " RedBack Networks, Inc. Postal: 300 Holger Way San Jose, CA 95134 USA Phone: +1 408 570 5000 Fax: +1 408 570 5599 E-mail: mib-info@redback.com ",
+    "description": "Defines the objects necessary to support loading Redback system configuration files and saving the contents of the current system configuration. For security reasons, all mib objects defined in this module are only accessible via SNMP community strings (v1/v2c) or SNMP contextNames (v3) that map to the system's 'local' context. Note well: due to these security reasons, it is highly encouraged to only allow access to this MIB via the more secure protocols supported by SNMPv3."
+  },
+  "rbnConfigFileMIBNotifications": {
+    "name": "rbnConfigFileMIBNotifications",
+    "oid": "1.3.6.1.4.1.2352.2.13.0",
+    "class": "objectidentity"
+  },
+  "rbnConfigFileMIBObjects": {
+    "name": "rbnConfigFileMIBObjects",
+    "oid": "1.3.6.1.4.1.2352.2.13.1",
+    "class": "objectidentity"
+  },
+  "rbnConfigFileMIBConformance": {
+    "name": "rbnConfigFileMIBConformance",
+    "oid": "1.3.6.1.4.1.2352.2.13.2",
+    "class": "objectidentity"
+  },
+  "rcfJobs": {
+    "name": "rcfJobs",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1",
+    "class": "objectidentity"
+  },
+  "rcfJobSpinLock": {
+    "name": "rcfJobSpinLock",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.1",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TestAndIncr",
+      "class": "type"
+    },
+    "maxaccess": "read-write",
+    "status": "current",
+    "description": "An advisory lock used to allow several cooperating Command Generator Applications to coordinate their use of facilities to create/modify entries in the rcfJobTable."
+  },
+  "rcfJobNextIndex": {
+    "name": "rcfJobNextIndex",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.2",
+    "nodetype": "scalar",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The next available index which can be used to create a rcfJobEntry."
+  },
+  "rcfJobTable": {
+    "name": "rcfJobTable",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3",
+    "nodetype": "table",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A table which is used to start and monitor a process which loads a configuration file, or saves the current configuration out to a file. The suggested method to create a new entry is: 1. GET(rcfJobSpinLock.0, rcfJobNextIndex.0) and save in slValue, niValue respectively 2. SET(rcfJobSpinLock.0 = slValue, rcfJobXxx.niValue = ... rcfJobYyy.niValue = ... ... rcfJobRowStatus.niValue = 'createAndGo') Entries whose state is 'completed' may be automatically deleted by the system after some system dependant time."
+  },
+  "rcfJobEntry": {
+    "name": "rcfJobEntry",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1",
+    "nodetype": "row",
+    "class": "objecttype",
+    "maxaccess": "not-accessible",
+    "indices": [
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobIndex",
+        "implied": 0
+      }
+    ],
+    "status": "current",
+    "description": "An entry created by a Command Generator application which starts and monitors a process which loads a system configuration file or saves the current system configuration out to a file. When rcfJobRowStatus becomes active, rcfJobState is set to 'pending' and is queued for processing. Only one job may be processed at a time. When the job reaches the head of the queue, rcfJobState is set to 'inProgress' and the configuration operation will be performed. When the operation completes, rcfJobState will be set to 'completed'. Also at this time the objects rcfJobResult and rcfJobErrorMsgs will be instantiated and will provide the success/failure status of the operation. A job in the 'pending' state may be aborted by setting rcfJobRowStatus to 'notInService' or 'destroy'. An entry for a job which has completed (rcfJobState is 'completed') may be reset to the 'pending' state by setting rcfRowStatus to 'notInService' and then back to 'active' to initiate another configuration operation. Note: while rcfRowStatus equals 'active', the only object instance that can be modified in the entry is rcfRowStatus. To alter any other object instance, rcfRowStatus must be set to 'notInService'."
+  },
+  "rcfJobIndex": {
+    "name": "rcfJobIndex",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.1",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type",
+      "constraints": {
+        "range": [
+          {
+            "min": 1,
+            "max": 4294967295
+          }
+        ]
+      }
+    },
+    "maxaccess": "not-accessible",
+    "status": "current",
+    "description": "A unique identifier for an entry in this table."
+  },
+  "rcfJobOp": {
+    "name": "rcfJobOp",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.2",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "load": 0,
+          "save": 1
+        }
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The configuration operation to perform. If 'load', the file specified in rcfJobFilename is retrieved, parsed and loaded into the system configuration. If 'save', the current system configuration is written to the file specified in rcfJobFilename."
+  },
+  "rcfJobProtocol": {
+    "name": "rcfJobProtocol",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.3",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "local": 0,
+          "tftp": 1,
+          "ftp": 2
+        }
+      }
+    },
+    "default": {
+      "default": {
+        "value": "local",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "reference": "RFC 1350 (TFTP), RFC 959 (FTP)",
+    "status": "current",
+    "description": "The file transfer protocol to use. If 'local', the filename specified in rcfJobFilename exists locally on the Redback system (eg in /flash). If 'tftp', the filename specified in rcfJobFilename will be read/written from/to the system identified by rcfJobIpAddress via the TFTP file transfer protocol. If 'ftp', the filename specified in rcfJobFilename will be read/written from/to the system identified by rcfJobIpAddress via the FTP file transfer protocol. The values in rcfJobUsername and rcfJobPassword will be used for authentication. rcfJobPassiveMode can be used to enable/disable FTP's passive mode."
+  },
+  "rcfJobFilename": {
+    "name": "rcfJobFilename",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.4",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 128
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The name of the source file (loads) or destination file (saves)."
+  },
+  "rcfJobIpAddressType": {
+    "name": "rcfJobIpAddressType",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.5",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddressType",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The address type for rcfJobIpAddress. This object is only relevant for non-local filenames. If rcfJobProtocol equals 'local', any value for this object will effectively be ignored."
+  },
+  "rcfJobIpAddress": {
+    "name": "rcfJobIpAddress",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.6",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "InetAddress",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The IP address for the file server which contains the source file (loads) or destination file (saves). This object is only relevant for non-local filenames. If rcfJobProtocol equals 'local', any value for this object will effectively be ignored."
+  },
+  "rcfJobUsername": {
+    "name": "rcfJobUsername",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.7",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 1,
+            "max": 32
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The username to use for authentication with the file server. This object is only relevant for the FTP protocol. If rcfJobProtocol does not equal 'ftp', any value for this object will effectively be ignored. For security reasons, all SNMP gets on this object will return a zero-length string."
+  },
+  "rcfJobPassword": {
+    "name": "rcfJobPassword",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.8",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type",
+      "constraints": {
+        "size": [
+          {
+            "min": 0,
+            "max": 128
+          }
+        ]
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The password to use for authentication with the file server. A zero-length string value would be used for usernames that do not require a password. This object is only relevant for the FTP protocol. If rcfJobProtocol does not equal 'ftp', any value for this object will effectively be ignored. For security reasons, all SNMP gets on this object will return a zero-length string."
+  },
+  "rcfJobPassiveMode": {
+    "name": "rcfJobPassiveMode",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.9",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "reference": "RFC 959",
+    "status": "current",
+    "description": "Enables/disables passive mode on FTP connections. This object is only relevant for the FTP protocol. If rcfJobProtocol does not equal 'ftp', any value for this object will effectively be ignored."
+  },
+  "rcfJobStopAtLine": {
+    "name": "rcfJobStopAtLine",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.10",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "Unsigned32",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "If this object instance has a non-zero value, parsing and loading of the configuration file will terminate after the specified line number. This object is only relevant for 'load' operations. If rcfJobOp does not equal 'load', any value for this object will effectively be ignored."
+  },
+  "rcfJobSaveDefaults": {
+    "name": "rcfJobSaveDefaults",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.11",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "If 'true', default values for all configuration values are saved. If 'false', only the values which have been explicitly configured are saved. This object is only relevant for 'save' operations. If rcfJobOp does not equal 'save', any value for this object will effectively be ignored."
+  },
+  "rcfJobState": {
+    "name": "rcfJobState",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.12",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "pending": 0,
+          "inProgress": 1,
+          "completed": 2
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The current state of the configuration job. pending -- The initial state of all jobs. Jobs are queued and processed in order of creation. inProgress -- The job is actively being performed. completed -- The job has completed."
+  },
+  "rcfJobResult": {
+    "name": "rcfJobResult",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.13",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "INTEGER",
+      "class": "type",
+      "constraints": {
+        "enumeration": {
+          "success": 0,
+          "other": 1,
+          "noMemory": 2,
+          "parse": 3,
+          "io": 4,
+          "access": 5
+        }
+      }
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "A generic result code. This object is instantiated only when rcfJobStatus equals 'completed'. success -- The job completed successfully. other -- An error that doesn't fall into one of the categories below. noMemory -- Insufficient system resources to perform the operation. parse -- A parse failure occurred. ie- there was a syntax error in the source configuration file. io -- An i/o error occurred. access -- A file access error occurred. This could be caused by a non-existant source file, or insufficient access/permission to create/modify the destination file. More detailed error descriptions can be found in the rcfJobErrorMsgs object."
+  },
+  "rcfJobErrorMsgs": {
+    "name": "rcfJobErrorMsgs",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.14",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "SnmpAdminString",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "Detailed error messages generated during the configuration operation. This object is instantiated only when rcfJobState equals 'completed'. Note: the amount of error messages produced by a configuration operation may exceed the max size of this object (255 bytes). If this happens, the last character in the rcfJobErrorMsgs value will be '$' to indicate that a truncation occurred. Note: there may be some types of messages that one will see when performing a configuration operation via the CLI. However these messages will not be seen in the values for this object. A specific example on the SMS platform is the messages the CLI will display when there is a parse failure. These messages will not be captured in this object."
+  },
+  "rcfJobCreateTime": {
+    "name": "rcfJobCreateTime",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.15",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when this job entry was created."
+  },
+  "rcfJobStartTime": {
+    "name": "rcfJobStartTime",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.16",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when rcfJobState moved from 'pending' to 'inProgress'. This object will not be instantiated until rcfJobState moves to 'inProgress'. The object will be un-instantiated if rcfJobRowStatus is set to 'notInService'."
+  },
+  "rcfJobStopTime": {
+    "name": "rcfJobStopTime",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.17",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TimeStamp",
+      "class": "type"
+    },
+    "maxaccess": "read-only",
+    "status": "current",
+    "description": "The value of sysUpTime when the job completed. This object will not be instantiated until rcfJobState moves to 'completed'. The object will be un-instantiated if rcfJobRowStatus is set to 'notInService'."
+  },
+  "rcfJobNotifyOnCompletion": {
+    "name": "rcfJobNotifyOnCompletion",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.18",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "TruthValue",
+      "class": "type"
+    },
+    "default": {
+      "default": {
+        "value": "false",
+        "format": "enum"
+      }
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "If 'true', an rcfJobCompleted notification will be generated when the job completes."
+  },
+  "rcfJobOwner": {
+    "name": "rcfJobOwner",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.19",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "OwnerString",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "This object can be used to identify who/what/where created this job entry."
+  },
+  "rcfJobRowStatus": {
+    "name": "rcfJobRowStatus",
+    "oid": "1.3.6.1.4.1.2352.2.13.1.1.3.1.20",
+    "nodetype": "column",
+    "class": "objecttype",
+    "syntax": {
+      "type": "RowStatus",
+      "class": "type"
+    },
+    "maxaccess": "read-create",
+    "status": "current",
+    "description": "The row status for creating, modifying, or deleting an entry in the table. Note that 'active' entries cannot be modified. Any attempt to modify an object in this entry while rcfJobRowStatus equals 'active' will result in an inconsistentValue error. To modify objects in an active entry, rcfJobRowStatus must first be set to 'notInService'. All entries will be automatically deleted by the agent after some system dependent time."
+  },
+  "rcfJobCompleted": {
+    "name": "rcfJobCompleted",
+    "oid": "1.3.6.1.4.1.2352.2.13.0.1",
+    "class": "notificationtype",
+    "objects": [
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobResult"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobErrorMsgs"
+      }
+    ],
+    "status": "current",
+    "description": "A notification indicating that a configuration job has completed."
+  },
+  "rbnConfigFileCompliances": {
+    "name": "rbnConfigFileCompliances",
+    "oid": "1.3.6.1.4.1.2352.2.13.2.1",
+    "class": "objectidentity"
+  },
+  "rbnConfigFileGroups": {
+    "name": "rbnConfigFileGroups",
+    "oid": "1.3.6.1.4.1.2352.2.13.2.2",
+    "class": "objectidentity"
+  },
+  "rcfJobGroup": {
+    "name": "rcfJobGroup",
+    "oid": "1.3.6.1.4.1.2352.2.13.2.2.1",
+    "class": "objectgroup",
+    "objects": [
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobSpinLock"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobNextIndex"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobOp"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobProtocol"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobFilename"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobIpAddressType"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobIpAddress"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobUsername"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobPassword"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobPassiveMode"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobStopAtLine"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobSaveDefaults"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobState"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobResult"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobCreateTime"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobStartTime"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobStopTime"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobErrorMsgs"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobNotifyOnCompletion"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobOwner"
+      },
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobRowStatus"
+      }
+    ],
+    "status": "current",
+    "description": "The collection of objects which represent a configuration job."
+  },
+  "rcfJobNotifyGroup": {
+    "name": "rcfJobNotifyGroup",
+    "oid": "1.3.6.1.4.1.2352.2.13.2.2.2",
+    "class": "notificationgroup",
+    "objects": [
+      {
+        "module": "RBN-CONFIG-FILE-MIB",
+        "object": "rcfJobCompleted"
+      }
+    ],
+    "status": "current",
+    "description": "The collection of notifications related to configuration jobs."
+  },
+  "rbnConfigFileCompliance": {
+    "name": "rbnConfigFileCompliance",
+    "oid": "1.3.6.1.4.1.2352.2.13.2.1.1",
+    "class": "modulecompliance",
+    "modulecompliance": [
+      {
+        "object": "rcfJobGroup",
+        "module": "RBN-CONFIG-FILE-MIB"
+      },
+      {
+        "object": "rcfJobNotifyGroup",
+        "module": "RBN-CONFIG-FILE-MIB"
+      }
+    ],
+    "status": "current",
+    "description": "The compliance statement for SNMP entities which implement the Redback Configuration File MIB."
+  },
+  "meta": {
+    "comments": [
+      "ASN.1 source file:///Users/neermitt/kusanagi/mibs.snmplabs.com/asn1/RBN-CONFIG-FILE-MIB",
+      "Produced by pysmi-0.3.4 at Fri May 24 21:14:29 2019",
+      "On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt",
+      "Using Python version 3.7.3 (default, Mar 27 2019, 09:23:15) "
+    ],
+    "module": "RBN-CONFIG-FILE-MIB"
+  }
+}
