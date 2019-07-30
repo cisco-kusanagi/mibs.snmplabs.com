@@ -16,6 +16,16 @@ compile:  ## Compile all MIBs into .py files
 	    $$f; \
 	done
 
+compile-changed:  ## Compile With Texts all MIBs into .py files
+	@for f in $$(git status --porcelain | grep "^A" | cut -c 4- | grep "asn1/"); do \
+		echo "## Compiling $$f"; \
+		mibdump.py \
+			--no-python-compile \
+			--mib-source=file://$$(pwd)/asn1 \
+			--destination-directory=./pysnmp \
+			$$f; \
+	done
+
 compile-with-texts:  ## Compile With Texts all MIBs into .py files
 	@for f in $$(ls asn1); do \
 	  echo "## Compiling $$f with texts"; \
@@ -27,8 +37,31 @@ compile-with-texts:  ## Compile With Texts all MIBs into .py files
 	    $$f; \
 	done
 
+compile-with-texts-changed:  ## Compile With Texts all MIBs into .py files
+	@for f in $$(git status --porcelain | grep "^A" | cut -c 4- | grep "asn1/"); do \
+	  echo "## Compiling $$f with texts"; \
+	  mibdump.py \
+	    --generate-mib-texts \
+	    --no-python-compile \
+	    --mib-source=file://$$(pwd)/asn1 \
+	    --destination-directory=./pysnmp-with-texts \
+	    $$f; \
+	done
+
 compile-json:  ## Compile With Texts all MIBs into .py files
 	@for f in $$(ls asn1); do \
+	  echo "## Compiling $$f with texts"; \
+	  mibdump.py \
+	    --generate-mib-texts \
+	    --no-python-compile \
+	    --mib-source=file://$$(pwd)/asn1 \
+	    --destination-format=json \
+	    --destination-directory=./json \
+	    $$f; \
+	done
+
+compile-json-changed:  ## Compile With Texts all MIBs into .py files
+	@for f in $$(git status --porcelain | grep "^A" | cut -c 4- | grep "asn1/"); do \
 	  echo "## Compiling $$f with texts"; \
 	  mibdump.py \
 	    --generate-mib-texts \
