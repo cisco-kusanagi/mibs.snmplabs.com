@@ -1,0 +1,332 @@
+--
+--  SYMMNTPCLIENT.my
+-- MIB generated manually. It is Draft version 0.2
+-- Wednesday, March 21, 2018 at 11:07:01
+-- 
+
+	SYMMNTPCLIENT DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			OBJECT-GROUP, MODULE-COMPLIANCE			
+				FROM SNMPv2-CONF			
+			Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY			
+				FROM SNMPv2-SMI			
+			DisplayString, TEXTUAL-CONVENTION, RowStatus			
+				FROM SNMPv2-TC			
+            InetAddressType
+                FROM INET-ADDRESS-MIB
+			symmPacketService, EnableValue			
+				FROM SYMM-COMMON-SMI;
+	
+	
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3
+		symmNTPClient MODULE-IDENTITY 
+			LAST-UPDATED "201806280521Z"		-- June 28, 2018 at 05:21 GMT
+			ORGANIZATION 
+				"Symmetricom"
+			CONTACT-INFO 
+				"Symmetricom Technical Support
+				1-888-367-7966 toll free USA
+				1-408-428-7907 worldwide
+				Support@symmetricom.com
+				"
+			DESCRIPTION 
+				"This is the Symmetricom NTP Client MIB. It has two main nodes: 
+				NTPClient status and NTPClient configuration."
+			REVISION "201803211107Z"		-- March 21, 2018 at 11:07 GMT
+			DESCRIPTION
+                " Symmetricom NTP Client "
+			::= { symmPacketService 3 }
+
+-- 
+-- Textual conventions
+-- 
+		DateAndTime ::= TEXTUAL-CONVENTION
+			DISPLAY-HINT 
+				"2d-1d-1d,1d:1d:1d.1d,1a1d:1d"
+			STATUS current
+			DESCRIPTION 
+				"A date-time specification.
+				
+				field  octets  contents                  range
+				-----  ------  --------                  -----
+				  1      1-2   year*                     0..65536
+				  2       3    month                     1..12
+				  3       4    day                       1..31
+				  4       5    hour                      0..23
+				  5       6    minutes                   0..59
+				  6       7    seconds                   0..60
+				               (use 60 for leap-second)
+				  7       8    deci-seconds              0..9
+				  8       9    direction from UTC        '+' / '-'
+				  9      10    hours from UTC*           0..13
+				 10      11    minutes from UTC          0..59
+				
+				* Notes:
+				- the value of year is in network-byte order
+				- daylight saving time in New Zealand is +13
+				
+				For example, Tuesday May 26, 1992 at 1:30:15 PM EDT would be
+				displayed as:
+				
+				                 1992-5-26,13:30:15.0,-4:0
+				
+				
+				Note that if only local time is known, then timezone
+				information (fields 8-10) is not present."
+			SYNTAX OCTET STRING (SIZE (8 | 11))
+
+
+		TLocalTimeOffset ::= TEXTUAL-CONVENTION
+			DISPLAY-HINT 
+				"1a1d:1d"
+			STATUS current
+			DESCRIPTION 
+				"A local time offset specification.
+				
+				field  octets  contents                  range
+				-----  ------  --------                  -----
+				  1       1    direction from UTC        '+' / '-'
+				  2       2    hours from UTC*           0..13
+				  3       3    minutes from UTC          0..59
+				
+				* Notes:
+				- the value of year is in network-byte order
+				- The hours range is 0..13
+				
+				For example, the -6 local time offset would be
+				displayed as:  -6:0
+				"
+			SYNTAX OCTET STRING (SIZE (3))
+  
+--
+--  Type definitions
+--
+    NTPCLIENTTIME ::= INTEGER
+    {
+        syncNow(1),
+        writeOnlyObject(2)
+    }
+	
+--  Node definitions
+-- 
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.1
+		ntpClientStatusInfo OBJECT IDENTIFIER ::= { symmNTPClient 1 }
+    
+
+    -- 1.3.6.1.4.1.9070.1.2.5.1.3.1.1
+		ntpcTimeOffset OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "seconds"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"NTP client Time Offset"
+			::= { ntpClientStatusInfo 1 }
+            
+
+    -- 1.3.6.1.4.1.9070.1.2.5.1.3.1.2
+		ntpcLastUpdate OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"NTP client Last Update"
+			::= { ntpClientStatusInfo 2 }
+            
+
+    -- 1.3.6.1.4.1.9070.1.2.5.1.3.1.3
+		ntpcStatus OBJECT-TYPE
+			SYNTAX DisplayString 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"NTP client Status"
+			::= { ntpClientStatusInfo 3 }
+            
+
+    -- 1.3.6.1.4.1.9070.1.2.5.1.3.1.4
+		ntpcServerIP OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"NTP client ServerIP"
+			::= { ntpClientStatusInfo 4 }
+
+
+    -- 1.3.6.1.4.1.9070.1.2.5.1.3.1.5
+		ntpcServerLeapIndicator OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"NTP client Server Leap Indicator"
+			::= { ntpClientStatusInfo 5 }
+
+
+    -- 1.3.6.1.4.1.9070.1.2.5.1.3.1.6
+		ntpcServerStratum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"NTP client Server Leap Indicator"
+			::= { ntpClientStatusInfo 6 }
+
+
+        -- 1.3.6.1.4.1.9070.1.2.5.1.3.1.7
+		ntpcServerRefID OBJECT-TYPE
+			SYNTAX DisplayString 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"NTP client Server Reference ID"
+			::= { ntpClientStatusInfo 7}
+
+
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.2
+		ntpClientConfigInfo OBJECT IDENTIFIER ::= { symmNTPClient 2 }
+
+        -- 1.3.6.1.4.1.9070.1.2.5.1.3.2.1
+		ntpcServerIPAddrTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF NtpcServerIPAddrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The NTP-Client Server IP Table. This table's row be added or deleted"
+			::= { ntpClientConfigInfo 1 }
+
+		
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.2.1.1
+		ntpcServerIPAddrEntry OBJECT-TYPE
+			SYNTAX NtpcServerIPAddrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"NTP-Client Server entry"
+			INDEX { ntpcServerIPAddrIndex }
+			::= { ntpcServerIPAddrTable 1 }
+
+		
+		NtpcServerIPAddrEntry ::=
+			SEQUENCE { 
+				ntpcServerIPAddrIndex
+					Integer32,
+				ntpcServerIPAddress
+					DisplayString
+			 }
+
+		-- 1.3.6.1.4.1.9070.1.2.5.1.2.3.1.1.1
+		ntpcServerIPAddrIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..3)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Local index of the NTP Client Server IP table."
+			::= { ntpcServerIPAddrEntry 1 }
+
+
+		-- 1.3.6.1.4.1.9070.1.2.5.1.2.3.1.1.2
+		ntpcServerIPAddress OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"NTP-Client Server IP Address. IPv4 or IPv6 Address"
+			::= { ntpcServerIPAddrEntry 2}
+
+        
+        -- 1.3.6.1.4.1.9070.1.2.5.1.3.2.2
+		ntpClientState OBJECT-TYPE
+			SYNTAX EnableValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The NTP-Client State "
+			::= { ntpClientConfigInfo 2 }
+        
+
+        -- 1.3.6.1.4.1.9070.1.2.5.1.3.2.3
+		ntpClientSyncOnBoot OBJECT-TYPE
+			SYNTAX EnableValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The NTP-Client Sync-On-Boot "
+			::= { ntpClientConfigInfo 3 }
+
+
+        -- 1.3.6.1.4.1.9070.1.2.5.1.3.2.4
+		ntpClientPollInterval OBJECT-TYPE
+			SYNTAX Integer32 (4..17)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The NTP-Client Poll Interval "
+			::= { ntpClientConfigInfo 4 }
+
+        -- 1.3.6.1.4.1.9070.1.2.5.1.3.2.4
+		ntpClientTime OBJECT-TYPE
+			SYNTAX NTPCLIENTTIME
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The NTP-Client Time. This is write-only object. Valid "
+			::= { ntpClientConfigInfo 5 }
+
+
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.3
+		ntpClientConformance OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"This subtree contains conformance statements for the
+				SYMMNTPCLIENT.mib .
+				"
+			::= { symmNTPClient 3 }
+
+		
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.3.1
+		ntpClientCompliances OBJECT IDENTIFIER ::= { ntpClientConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.3.1.1
+		ntpClientBasicCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"The compliance statement for SNMP entities which have
+				NTP packet service."
+			MODULE -- this module
+				MANDATORY-GROUPS { ntpClientStatusInfoGroup, ntpClientConfigInfoGroup}
+			::= { ntpClientCompliances 1 }
+
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.3.2
+		ntpClientUocGroups OBJECT IDENTIFIER ::= { ntpClientConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.3.2.1
+		ntpClientStatusInfoGroup OBJECT-GROUP
+			OBJECTS { ntpcTimeOffset, ntpcLastUpdate, ntpcStatus, ntpcServerIP,ntpcServerLeapIndicator,
+				ntpcServerStratum, ntpcServerRefID }
+			STATUS current
+			DESCRIPTION 
+				"A collection of objects providing information applicable to
+				NTP-Client status group."
+			::= { ntpClientUocGroups 1 }
+
+		
+		-- 1.3.6.1.4.1.9070.1.2.5.1.3.3.2.2
+		ntpClientConfigInfoGroup OBJECT-GROUP
+			OBJECTS { ntpcServerIPAddress, ntpClientState, ntpClientSyncOnBoot,
+		ntpClientPollInterval}
+			STATUS current
+			DESCRIPTION 
+				"A collection of objects providing information applicable to
+				NTP-Client configuration group."
+			::= { ntpClientUocGroups 2 }
+
+	END
+
+--
+-- SYMMNTPCLIENT.my
+--

@@ -1,0 +1,287 @@
+#
+# PySNMP MIB module SYMMCOMMONNETWORK (http://snmplabs.com/pysmi)
+# ASN.1 source file:///Users/neermitt/Dev/kusanagi/mibs.snmplabs.com/asn1/SYMMCOMMONNETWORK
+# Produced by pysmi-0.3.4 at Tue Jul 30 11:34:11 2019
+# On host NEERMITT-M-J0NV platform Darwin version 18.6.0 by user neermitt
+# Using Python version 3.7.4 (default, Jul  9 2019, 18:13:23) 
+#
+OctetString, ObjectIdentifier, Integer = mibBuilder.importSymbols("ASN1", "OctetString", "ObjectIdentifier", "Integer")
+NamedValues, = mibBuilder.importSymbols("ASN1-ENUMERATION", "NamedValues")
+ValueSizeConstraint, ValueRangeConstraint, ConstraintsUnion, SingleValueConstraint, ConstraintsIntersection = mibBuilder.importSymbols("ASN1-REFINEMENT", "ValueSizeConstraint", "ValueRangeConstraint", "ConstraintsUnion", "SingleValueConstraint", "ConstraintsIntersection")
+entPhysicalIndex, = mibBuilder.importSymbols("ENTITY-MIB", "entPhysicalIndex")
+ifNumber, ifIndex = mibBuilder.importSymbols("IF-MIB", "ifNumber", "ifIndex")
+InetAddressIPv6z, InetAddressPrefixLength, InetAddressIPv6, InetAddressIPv4, InetAddressType = mibBuilder.importSymbols("INET-ADDRESS-MIB", "InetAddressIPv6z", "InetAddressPrefixLength", "InetAddressIPv6", "InetAddressIPv4", "InetAddressType")
+ObjectGroup, ModuleCompliance, NotificationGroup = mibBuilder.importSymbols("SNMPv2-CONF", "ObjectGroup", "ModuleCompliance", "NotificationGroup")
+Unsigned32, Gauge32, Counter32, MibScalar, MibTable, MibTableRow, MibTableColumn, NotificationType, Bits, TimeTicks, Counter64, Integer32, MibIdentifier, ObjectIdentity, ModuleIdentity, iso, IpAddress = mibBuilder.importSymbols("SNMPv2-SMI", "Unsigned32", "Gauge32", "Counter32", "MibScalar", "MibTable", "MibTableRow", "MibTableColumn", "NotificationType", "Bits", "TimeTicks", "Counter64", "Integer32", "MibIdentifier", "ObjectIdentity", "ModuleIdentity", "iso", "IpAddress")
+TextualConvention, RowStatus, DisplayString = mibBuilder.importSymbols("SNMPv2-TC", "TextualConvention", "RowStatus", "DisplayString")
+EnableValue, symmNetwork = mibBuilder.importSymbols("SYMM-COMMON-SMI", "EnableValue", "symmNetwork")
+symmCommonNetwork = ModuleIdentity((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1))
+symmCommonNetwork.setRevisions(('2018-04-10 20:53',))
+if mibBuilder.loadTexts: symmCommonNetwork.setLastUpdated('201806280521Z')
+if mibBuilder.loadTexts: symmCommonNetwork.setOrganization('Symmetricom')
+class AutoSpeedValue(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))
+    namedValues = NamedValues(("eth100m", 1), ("eth1000m", 2), ("all", 3), ("unknown", 4))
+
+class IpAddressOriginTC(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 4, 5, 6))
+    namedValues = NamedValues(("other", 1), ("manual", 2), ("dhcp", 4), ("linklayer", 5), ("random", 6))
+
+class IPPortStateValue(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3))
+    namedValues = NamedValues(("enable", 1), ("disable", 2), ("restart", 3))
+
+class FirewallOnOff(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("allow", 1), ("block", 2))
+
+class ETHAUTOSPEEDTYPE(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 4))
+    namedValues = NamedValues(("eth100m", 1), ("eth1000m", 2), ("all", 3), ("unknown", 4))
+
+class ETHLINKSTATUS(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2))
+    namedValues = NamedValues(("ethUp", 1), ("ethDown", 2))
+
+class TPMODULEID(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
+    namedValues = NamedValues(("imc", 1), ("ioc1", 2), ("ioc2", 3), ("exp0", 6), ("exp1", 7), ("exp2", 8), ("exp3", 9), ("exp4", 10), ("exp5", 11), ("exp6", 12), ("exp7", 13), ("exp8", 14), ("exp9", 15))
+
+class IPV6SCOPE(Integer32):
+    subtypeSpec = Integer32.subtypeSpec + ConstraintsUnion(SingleValueConstraint(1, 2, 5, 14))
+    namedValues = NamedValues(("interface-local", 1), ("link-local", 2), ("site-local", 5), ("global", 14))
+
+class DateAndTime(TextualConvention, OctetString):
+    status = 'current'
+    displayHint = '2d-1d-1d,1d:1d:1d.1d,1a1d:1d'
+    subtypeSpec = OctetString.subtypeSpec + ConstraintsUnion(ValueSizeConstraint(8, 8), ValueSizeConstraint(11, 11), )
+class TLatAndLon(TextualConvention, OctetString):
+    status = 'current'
+    displayHint = '1a1d:1d:1d.1d'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(5, 5)
+    fixedLength = 5
+
+class TAntHeight(TextualConvention, OctetString):
+    status = 'current'
+    displayHint = '1a2d.1d'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(4, 4)
+    fixedLength = 4
+
+class TLocalTimeOffset(TextualConvention, OctetString):
+    status = 'current'
+    displayHint = '1a1d:1d'
+    subtypeSpec = OctetString.subtypeSpec + ValueSizeConstraint(3, 3)
+    fixedLength = 3
+
+class TSsm(TextualConvention, Integer32):
+    status = 'current'
+    displayHint = 'x'
+    subtypeSpec = Integer32.subtypeSpec + ValueRangeConstraint(0, 255)
+
+networkEthStatus = MibIdentifier((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 1))
+networkEthLinkTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 1, 1), )
+if mibBuilder.loadTexts: networkEthLinkTable.setStatus('current')
+networkEthLinkEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 1, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkEthLinkIndex"))
+if mibBuilder.loadTexts: networkEthLinkEntry.setStatus('current')
+networkEthLinkIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 1, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000)))
+if mibBuilder.loadTexts: networkEthLinkIndex.setStatus('current')
+networkEthLinkSpeed = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 1, 1, 1, 2), ETHAUTOSPEEDTYPE()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkEthLinkSpeed.setStatus('current')
+networkEthLinkStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 1, 1, 1, 3), ETHLINKSTATUS()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkEthLinkStatus.setStatus('current')
+networkEthConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 2))
+networkEthAutoNegTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 2, 1), )
+if mibBuilder.loadTexts: networkEthAutoNegTable.setStatus('current')
+networkEthAutoNegEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 2, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkEthAutoNegIndex"))
+if mibBuilder.loadTexts: networkEthAutoNegEntry.setStatus('current')
+networkEthAutoNegIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 2, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000)))
+if mibBuilder.loadTexts: networkEthAutoNegIndex.setStatus('current')
+networkEthAutoNegState = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 2, 1, 1, 2), EnableValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkEthAutoNegState.setStatus('current')
+networkEthAutoNegSpeed = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 2, 1, 1, 3), AutoSpeedValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkEthAutoNegSpeed.setStatus('current')
+networkIpConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3))
+networkIPv4ConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 1), )
+if mibBuilder.loadTexts: networkIPv4ConfigTable.setStatus('current')
+networkIPv4ConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkIPv4ConfigIndex"))
+if mibBuilder.loadTexts: networkIPv4ConfigEntry.setStatus('current')
+networkIPv4ConfigIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000)))
+if mibBuilder.loadTexts: networkIPv4ConfigIndex.setStatus('current')
+networkIPv4AddressOrigin = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 1, 1, 2), IpAddressOriginTC()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv4AddressOrigin.setStatus('current')
+networkIPv4Address = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 1, 1, 3), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv4Address.setStatus('current')
+networkIPv4DefaultRouteAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 1, 1, 4), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv4DefaultRouteAddr.setStatus('current')
+networkIPv4SubnetMask = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 1, 1, 5), IpAddress()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv4SubnetMask.setStatus('current')
+networkIPv4PortState = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 1, 1, 6), IPPortStateValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv4PortState.setStatus('current')
+networkIPv4StaticRouteTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2), )
+if mibBuilder.loadTexts: networkIPv4StaticRouteTable.setStatus('current')
+networkIPv4StaticRouteEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkIPv4StaticRouteIndex"))
+if mibBuilder.loadTexts: networkIPv4StaticRouteEntry.setStatus('current')
+networkIPv4StaticRouteIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 500))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv4StaticRouteIndex.setStatus('current')
+networkIPv4StaticRouteIfindex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2, 1, 2), Integer32()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv4StaticRouteIfindex.setStatus('current')
+networkIPv4StaticDestAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2, 1, 3), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv4StaticDestAddr.setStatus('current')
+networkIPv4StaticRouteMask = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2, 1, 4), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv4StaticRouteMask.setStatus('current')
+networkIPv4StaticRouteNextHop = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2, 1, 5), IpAddress()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv4StaticRouteNextHop.setStatus('current')
+networkIPv4StaticRouteMetric1 = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2, 1, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(-1, 65534))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv4StaticRouteMetric1.setStatus('current')
+networkIPv4StaticRouteRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 2, 1, 7), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv4StaticRouteRowStatus.setStatus('current')
+networkFirewallTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3), )
+if mibBuilder.loadTexts: networkFirewallTable.setStatus('current')
+networkFirewallEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkFirewallIndex"))
+if mibBuilder.loadTexts: networkFirewallEntry.setStatus('current')
+networkFirewallIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000)))
+if mibBuilder.loadTexts: networkFirewallIndex.setStatus('current')
+networkFirewallICMP = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1, 2), FirewallOnOff()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkFirewallICMP.setStatus('current')
+networkFirewallTelnet = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1, 3), FirewallOnOff()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkFirewallTelnet.setStatus('current')
+networkFirewallSSH = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1, 4), FirewallOnOff()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkFirewallSSH.setStatus('current')
+networkFirewallSFTP = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1, 5), FirewallOnOff()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkFirewallSFTP.setStatus('current')
+networkFirewallSNMP = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1, 6), FirewallOnOff()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkFirewallSNMP.setStatus('current')
+networkFirewallFTP = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1, 7), FirewallOnOff()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkFirewallFTP.setStatus('current')
+networkFirewallNTP = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 3, 1, 8), FirewallOnOff()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkFirewallNTP.setStatus('current')
+networkIPv6ConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 4), )
+if mibBuilder.loadTexts: networkIPv6ConfigTable.setStatus('current')
+networkIPv6ConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 4, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkIPv6ConfigIndex"))
+if mibBuilder.loadTexts: networkIPv6ConfigEntry.setStatus('current')
+networkIPv6ConfigIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 4, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000)))
+if mibBuilder.loadTexts: networkIPv6ConfigIndex.setStatus('current')
+networkIPv6AddressOrigin = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 4, 1, 2), IpAddressOriginTC()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv6AddressOrigin.setStatus('current')
+networkIPv6Address = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 4, 1, 3), InetAddressIPv6()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv6Address.setStatus('current')
+networkIPv6Prefix = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 4, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 128))).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv6Prefix.setStatus('current')
+networkIPv6DefaultRouteAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 4, 1, 5), InetAddressIPv6()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv6DefaultRouteAddr.setStatus('current')
+networkIPv6PortState = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 4, 1, 6), IPPortStateValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv6PortState.setStatus('current')
+networkIPv6StaticRouteTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5), )
+if mibBuilder.loadTexts: networkIPv6StaticRouteTable.setStatus('current')
+networkIPv6StaticRouteEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkIPv6StaticRouteIndex"))
+if mibBuilder.loadTexts: networkIPv6StaticRouteEntry.setStatus('current')
+networkIPv6StaticRouteIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 500))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv6StaticRouteIndex.setStatus('current')
+networkIPv6StaticRouteIfindex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5, 1, 2), Integer32()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv6StaticRouteIfindex.setStatus('current')
+networkIPv6StaticRouteDestAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5, 1, 3), InetAddressIPv6()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv6StaticRouteDestAddr.setStatus('current')
+networkIPv6StaticRoutePrefix = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5, 1, 4), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 128))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv6StaticRoutePrefix.setStatus('current')
+networkIPv6StaticRouteNextHop = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5, 1, 5), InetAddressIPv6z()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv6StaticRouteNextHop.setStatus('current')
+networkIPv6StaticRouteMetric1 = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5, 1, 6), Integer32().subtype(subtypeSpec=ValueRangeConstraint(-1, 65534))).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv6StaticRouteMetric1.setStatus('current')
+networkIPv6StaticRouteRowStatus = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 5, 1, 7), RowStatus()).setMaxAccess("readcreate")
+if mibBuilder.loadTexts: networkIPv6StaticRouteRowStatus.setStatus('current')
+networkIPVerTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 6), )
+if mibBuilder.loadTexts: networkIPVerTable.setStatus('current')
+networkIPVerEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 6, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkIPVerIndex"))
+if mibBuilder.loadTexts: networkIPVerEntry.setStatus('current')
+networkIPVerIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 6, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000)))
+if mibBuilder.loadTexts: networkIPVerIndex.setStatus('current')
+networkIPVersion = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 6, 1, 2), InetAddressType()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPVersion.setStatus('current')
+networkIPv6AutoConfigTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 7), )
+if mibBuilder.loadTexts: networkIPv6AutoConfigTable.setStatus('current')
+networkIPv6AutoConfigEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 7, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkIPv6AutoConfigIndex"))
+if mibBuilder.loadTexts: networkIPv6AutoConfigEntry.setStatus('current')
+networkIPv6AutoConfigIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 7, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1)))
+if mibBuilder.loadTexts: networkIPv6AutoConfigIndex.setStatus('current')
+networkIPv6AutoConfigMode = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 3, 7, 1, 2), EnableValue()).setMaxAccess("readwrite")
+if mibBuilder.loadTexts: networkIPv6AutoConfigMode.setStatus('current')
+networkVlanConfig = MibIdentifier((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 4))
+networkIPStatus = MibIdentifier((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5))
+networkIPv4StatusTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1), )
+if mibBuilder.loadTexts: networkIPv4StatusTable.setStatus('current')
+networkIPv4StatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkIPv4StatusIndex"))
+if mibBuilder.loadTexts: networkIPv4StatusEntry.setStatus('current')
+networkIPv4StatusIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000)))
+if mibBuilder.loadTexts: networkIPv4StatusIndex.setStatus('current')
+networkIPv4Module = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1, 1, 2), TPMODULEID()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv4Module.setStatus('current')
+networkIPv4VlanID = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(2, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv4VlanID.setStatus('current')
+networkIPv4Addr = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1, 1, 4), InetAddressIPv4()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv4Addr.setStatus('current')
+networkIPv4Netmask = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1, 1, 5), InetAddressIPv4()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv4Netmask.setStatus('current')
+networkIPv4RouteAddr = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1, 1, 6), InetAddressIPv4()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv4RouteAddr.setStatus('current')
+networkIPv4Mode = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 1, 1, 7), IpAddressOriginTC()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv4Mode.setStatus('current')
+networkIPv6StatusTable = MibTable((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2), )
+if mibBuilder.loadTexts: networkIPv6StatusTable.setStatus('current')
+networkIPv6StatusEntry = MibTableRow((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2, 1), ).setIndexNames((0, "IF-MIB", "ifIndex"), (0, "SYMMCOMMONNETWORK", "networkIPv6StatusIndex"))
+if mibBuilder.loadTexts: networkIPv6StatusEntry.setStatus('current')
+networkIPv6StatusIndex = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2, 1, 1), Integer32().subtype(subtypeSpec=ValueRangeConstraint(1, 1000)))
+if mibBuilder.loadTexts: networkIPv6StatusIndex.setStatus('current')
+networkIPv6Module = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2, 1, 2), TPMODULEID()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv6Module.setStatus('current')
+networkIPv6VlanID = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2, 1, 3), Integer32().subtype(subtypeSpec=ValueRangeConstraint(2, 4096))).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv6VlanID.setStatus('current')
+networkIPv6Addr = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2, 1, 4), InetAddressIPv6()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv6Addr.setStatus('current')
+networkIPv6PrefixLength = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2, 1, 5), InetAddressPrefixLength()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv6PrefixLength.setStatus('current')
+networkIPv6AddrScope = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2, 1, 6), IPV6SCOPE()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv6AddrScope.setStatus('current')
+networkIPv6Mode = MibTableColumn((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 5, 2, 1, 7), IpAddressOriginTC()).setMaxAccess("readonly")
+if mibBuilder.loadTexts: networkIPv6Mode.setStatus('current')
+networkConformance = ObjectIdentity((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6))
+if mibBuilder.loadTexts: networkConformance.setStatus('current')
+networkCompliances = MibIdentifier((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 1))
+networkBasicCompliance = ModuleCompliance((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 1, 1)).setObjects(("SYMMCOMMONNETWORK", "networkEthAutoNetGroup"), ("SYMMCOMMONNETWORK", "networkIPv4ConfigGroup"), ("SYMMCOMMONNETWORK", "networkFirewallGroup"), ("SYMMCOMMONNETWORK", "networkIPv4StaticRouteGroup"), ("SYMMCOMMONNETWORK", "networkEthStatusGroup"), ("SYMMCOMMONNETWORK", "networkIPv6ConfigGroup"), ("SYMMCOMMONNETWORK", "networkIPv6StaticRouteGroup"), ("SYMMCOMMONNETWORK", "networkIPVersionGroup"), ("SYMMCOMMONNETWORK", "networkIPv6AutoConfigGroup"), ("SYMMCOMMONNETWORK", "networkIPv4StatusGroup"), ("SYMMCOMMONNETWORK", "networkIPv6StatusGroup"))
+
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkBasicCompliance = networkBasicCompliance.setStatus('current')
+networkUocGroups = MibIdentifier((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2))
+networkEthAutoNetGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 1)).setObjects(("SYMMCOMMONNETWORK", "networkEthAutoNegState"), ("SYMMCOMMONNETWORK", "networkEthAutoNegSpeed"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkEthAutoNetGroup = networkEthAutoNetGroup.setStatus('current')
+networkIPv4ConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 2)).setObjects(("SYMMCOMMONNETWORK", "networkIPv4AddressOrigin"), ("SYMMCOMMONNETWORK", "networkIPv4Address"), ("SYMMCOMMONNETWORK", "networkIPv4DefaultRouteAddr"), ("SYMMCOMMONNETWORK", "networkIPv4SubnetMask"), ("SYMMCOMMONNETWORK", "networkIPv4PortState"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkIPv4ConfigGroup = networkIPv4ConfigGroup.setStatus('current')
+networkFirewallGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 3)).setObjects(("SYMMCOMMONNETWORK", "networkFirewallICMP"), ("SYMMCOMMONNETWORK", "networkFirewallTelnet"), ("SYMMCOMMONNETWORK", "networkFirewallSSH"), ("SYMMCOMMONNETWORK", "networkFirewallSFTP"), ("SYMMCOMMONNETWORK", "networkFirewallSNMP"), ("SYMMCOMMONNETWORK", "networkFirewallFTP"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkFirewallGroup = networkFirewallGroup.setStatus('current')
+networkIPv4StaticRouteGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 4)).setObjects(("SYMMCOMMONNETWORK", "networkIPv4StaticRouteIndex"), ("SYMMCOMMONNETWORK", "networkIPv4StaticDestAddr"), ("SYMMCOMMONNETWORK", "networkIPv4StaticRouteMask"), ("SYMMCOMMONNETWORK", "networkIPv4StaticRouteNextHop"), ("SYMMCOMMONNETWORK", "networkIPv4StaticRouteMetric1"), ("SYMMCOMMONNETWORK", "networkIPv4StaticRouteRowStatus"), ("SYMMCOMMONNETWORK", "networkIPv4StaticRouteIfindex"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkIPv4StaticRouteGroup = networkIPv4StaticRouteGroup.setStatus('current')
+networkEthStatusGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 5)).setObjects(("SYMMCOMMONNETWORK", "networkEthLinkSpeed"), ("SYMMCOMMONNETWORK", "networkEthLinkStatus"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkEthStatusGroup = networkEthStatusGroup.setStatus('current')
+networkIPv6ConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 6)).setObjects(("SYMMCOMMONNETWORK", "networkIPv6AddressOrigin"), ("SYMMCOMMONNETWORK", "networkIPv6Address"), ("SYMMCOMMONNETWORK", "networkIPv6Prefix"), ("SYMMCOMMONNETWORK", "networkIPv6DefaultRouteAddr"), ("SYMMCOMMONNETWORK", "networkIPv6PortState"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkIPv6ConfigGroup = networkIPv6ConfigGroup.setStatus('current')
+networkIPv6StaticRouteGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 7)).setObjects(("SYMMCOMMONNETWORK", "networkIPv6StaticRouteDestAddr"), ("SYMMCOMMONNETWORK", "networkIPv6StaticRoutePrefix"), ("SYMMCOMMONNETWORK", "networkIPv6StaticRouteNextHop"), ("SYMMCOMMONNETWORK", "networkIPv6StaticRouteMetric1"), ("SYMMCOMMONNETWORK", "networkIPv6StaticRouteIndex"), ("SYMMCOMMONNETWORK", "networkIPv6StaticRouteRowStatus"), ("SYMMCOMMONNETWORK", "networkIPv6StaticRouteIfindex"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkIPv6StaticRouteGroup = networkIPv6StaticRouteGroup.setStatus('current')
+networkIPVersionGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 8)).setObjects(("SYMMCOMMONNETWORK", "networkIPVersion"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkIPVersionGroup = networkIPVersionGroup.setStatus('current')
+networkIPv6AutoConfigGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 9)).setObjects(("SYMMCOMMONNETWORK", "networkIPv6AutoConfigMode"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkIPv6AutoConfigGroup = networkIPv6AutoConfigGroup.setStatus('current')
+networkIPv4StatusGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 10)).setObjects(("SYMMCOMMONNETWORK", "networkIPv4Module"), ("SYMMCOMMONNETWORK", "networkIPv4RouteAddr"), ("SYMMCOMMONNETWORK", "networkIPv4Netmask"), ("SYMMCOMMONNETWORK", "networkIPv4Addr"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkIPv4StatusGroup = networkIPv4StatusGroup.setStatus('current')
+networkIPv6StatusGroup = ObjectGroup((1, 3, 6, 1, 4, 1, 9070, 1, 2, 5, 4, 1, 6, 2, 11)).setObjects(("SYMMCOMMONNETWORK", "networkIPv6Module"), ("SYMMCOMMONNETWORK", "networkIPv6Addr"), ("SYMMCOMMONNETWORK", "networkIPv6AddrScope"), ("SYMMCOMMONNETWORK", "networkIPv6Mode"), ("SYMMCOMMONNETWORK", "networkIPv6PrefixLength"))
+if getattr(mibBuilder, 'version', (0, 0, 0)) > (4, 4, 0):
+    networkIPv6StatusGroup = networkIPv6StatusGroup.setStatus('current')
+mibBuilder.exportSymbols("SYMMCOMMONNETWORK", TAntHeight=TAntHeight, networkIPv4StaticRouteMetric1=networkIPv4StaticRouteMetric1, TPMODULEID=TPMODULEID, ETHLINKSTATUS=ETHLINKSTATUS, IPV6SCOPE=IPV6SCOPE, networkIPv6AutoConfigEntry=networkIPv6AutoConfigEntry, networkIPv4VlanID=networkIPv4VlanID, networkIPv6AutoConfigTable=networkIPv6AutoConfigTable, networkIPv6ConfigEntry=networkIPv6ConfigEntry, networkIPv6Mode=networkIPv6Mode, networkFirewallICMP=networkFirewallICMP, networkIPv6AutoConfigGroup=networkIPv6AutoConfigGroup, networkIPVersion=networkIPVersion, FirewallOnOff=FirewallOnOff, networkIPv6ConfigTable=networkIPv6ConfigTable, networkEthAutoNegState=networkEthAutoNegState, networkIPv6AddressOrigin=networkIPv6AddressOrigin, networkEthLinkIndex=networkEthLinkIndex, networkEthAutoNegSpeed=networkEthAutoNegSpeed, networkUocGroups=networkUocGroups, networkFirewallTelnet=networkFirewallTelnet, networkIPv6DefaultRouteAddr=networkIPv6DefaultRouteAddr, networkEthLinkTable=networkEthLinkTable, networkEthLinkStatus=networkEthLinkStatus, networkIPv6StaticRouteIfindex=networkIPv6StaticRouteIfindex, networkIPVerTable=networkIPVerTable, IPPortStateValue=IPPortStateValue, networkBasicCompliance=networkBasicCompliance, networkIPv4StaticDestAddr=networkIPv4StaticDestAddr, networkEthLinkSpeed=networkEthLinkSpeed, networkIPv4StaticRouteIfindex=networkIPv4StaticRouteIfindex, networkIPv4ConfigTable=networkIPv4ConfigTable, networkIPv4Netmask=networkIPv4Netmask, networkIPv4DefaultRouteAddr=networkIPv4DefaultRouteAddr, networkConformance=networkConformance, networkIPv6Module=networkIPv6Module, networkIPv4Module=networkIPv4Module, networkFirewallTable=networkFirewallTable, networkIPv4Mode=networkIPv4Mode, networkIPv6VlanID=networkIPv6VlanID, networkIPv4StaticRouteRowStatus=networkIPv4StaticRouteRowStatus, ETHAUTOSPEEDTYPE=ETHAUTOSPEEDTYPE, networkIPv6PortState=networkIPv6PortState, networkIPv6StaticRouteDestAddr=networkIPv6StaticRouteDestAddr, networkIPv6StatusEntry=networkIPv6StatusEntry, networkIPv4Address=networkIPv4Address, networkIPv4StatusIndex=networkIPv4StatusIndex, networkIPv6StaticRouteRowStatus=networkIPv6StaticRouteRowStatus, networkEthAutoNegIndex=networkEthAutoNegIndex, networkIPStatus=networkIPStatus, networkIPVersionGroup=networkIPVersionGroup, PYSNMP_MODULE_ID=symmCommonNetwork, networkIPv4StatusGroup=networkIPv4StatusGroup, networkFirewallIndex=networkFirewallIndex, networkIPv6StatusIndex=networkIPv6StatusIndex, networkFirewallSSH=networkFirewallSSH, networkFirewallSFTP=networkFirewallSFTP, networkIPv6StaticRouteEntry=networkIPv6StaticRouteEntry, IpAddressOriginTC=IpAddressOriginTC, networkIPVerIndex=networkIPVerIndex, networkIPv6StaticRouteTable=networkIPv6StaticRouteTable, networkEthAutoNegEntry=networkEthAutoNegEntry, networkIPv6StaticRouteGroup=networkIPv6StaticRouteGroup, networkIPv6StatusGroup=networkIPv6StatusGroup, networkIPv4Addr=networkIPv4Addr, networkFirewallEntry=networkFirewallEntry, networkEthStatusGroup=networkEthStatusGroup, DateAndTime=DateAndTime, AutoSpeedValue=AutoSpeedValue, networkIPv4StaticRouteGroup=networkIPv4StaticRouteGroup, networkIPv6StaticRouteNextHop=networkIPv6StaticRouteNextHop, networkIPv4PortState=networkIPv4PortState, networkEthAutoNegTable=networkEthAutoNegTable, networkEthAutoNetGroup=networkEthAutoNetGroup, networkFirewallGroup=networkFirewallGroup, symmCommonNetwork=symmCommonNetwork, networkEthStatus=networkEthStatus, networkIPv6StaticRouteIndex=networkIPv6StaticRouteIndex, networkIPv6AutoConfigIndex=networkIPv6AutoConfigIndex, networkEthConfig=networkEthConfig, networkIPv6AutoConfigMode=networkIPv6AutoConfigMode, TLocalTimeOffset=TLocalTimeOffset, networkIPv6Addr=networkIPv6Addr, networkIPv6StaticRouteMetric1=networkIPv6StaticRouteMetric1, TSsm=TSsm, networkIPv4RouteAddr=networkIPv4RouteAddr, networkEthLinkEntry=networkEthLinkEntry, networkIPv4StaticRouteNextHop=networkIPv4StaticRouteNextHop, networkIPv6Address=networkIPv6Address, networkIPv4StaticRouteEntry=networkIPv4StaticRouteEntry, networkIPv6StaticRoutePrefix=networkIPv6StaticRoutePrefix, networkIPv4StaticRouteMask=networkIPv4StaticRouteMask, networkIPv6ConfigIndex=networkIPv6ConfigIndex, networkIPv6StatusTable=networkIPv6StatusTable, networkIPv4SubnetMask=networkIPv4SubnetMask, networkIPv4ConfigEntry=networkIPv4ConfigEntry, TLatAndLon=TLatAndLon, networkIPv6ConfigGroup=networkIPv6ConfigGroup, networkIpConfig=networkIpConfig, networkIPv4ConfigIndex=networkIPv4ConfigIndex, networkCompliances=networkCompliances, networkIPv4StaticRouteIndex=networkIPv4StaticRouteIndex, networkIPv6Prefix=networkIPv6Prefix, networkIPv4AddressOrigin=networkIPv4AddressOrigin, networkIPv6PrefixLength=networkIPv6PrefixLength, networkFirewallFTP=networkFirewallFTP, networkIPv4StaticRouteTable=networkIPv4StaticRouteTable, networkIPv6AddrScope=networkIPv6AddrScope, networkIPv4StatusEntry=networkIPv4StatusEntry, networkIPv4ConfigGroup=networkIPv4ConfigGroup, networkFirewallNTP=networkFirewallNTP, networkFirewallSNMP=networkFirewallSNMP, networkIPVerEntry=networkIPVerEntry, networkVlanConfig=networkVlanConfig, networkIPv4StatusTable=networkIPv4StatusTable)
