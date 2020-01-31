@@ -18,16 +18,22 @@
 -- --------------------------- Revision ----------------------------------------
 -- Date        Version    Author  Chanage Description
 --             Old/New
+-- 2007/01/07  2.00/2.01  Jason  + Correct spelling error: 
+--                                 'Broadcast Strom Control' to 'Broadcast Storm
+--                                 Control'.
+-- 2007/12/26  1.06/2.00  Jason  + Add objects for QoS, Safeguard,
+--                                 Broadcast Storm Control, Trusted Host.
+-- 2007/12/06  1.05/1.06  Jason  + Disable objects for Asymmetric VLAN.
 -- 2007/11/26  1.04/1.05  Jason  + Add objects for Asymmetric VLAN.
 --                                 Modify maximum of 256 VLANs in comments.
 -- 2007/11/09  1.03/1.04  Jason  + Add IGS value.
 -- 2007/08/02  1.02/1.03  Jason  + Add F/W upgrade objects.
 --                                 Add Management VLAN objects.
--- 2007/08/01  1.02/1.02  Jason  + Initial create.
+-- 2007/08/01  1.01/1.01  Jason  + Initial create.
 -- 
 -- -------------------------- Revision End -------------------------------------
 ------------------------------------------------------------------------------
-        DES-1228p-MIB DEFINITIONS ::= BEGIN
+        DES-1228P-MIB DEFINITIONS ::= BEGIN
 
         IMPORTS                
             OBJECT-TYPE                          FROM RFC-1212
@@ -119,6 +125,9 @@
         companyDot1xGroup       OBJECT IDENTIFIER ::= { des-1228pa1 23 }
         --
         companyLLDPExtnGroup	OBJECT IDENTIFIER ::= { des-1228pa1 24 }
+        companyQoSGroup         OBJECT IDENTIFIER ::= { des-1228pa1 26 }
+        companyTrafficMgmt      OBJECT IDENTIFIER ::= { des-1228pa1 27 }
+        companySecurity         OBJECT IDENTIFIER ::= { des-1228pa1 28 }
 
         --
         -- company Extension MIB, Set Community Information
@@ -527,10 +536,9 @@
         ConfigPortEntry ::= SEQUENCE {
             configPort                 INTEGER,
             configPortSpeed            INTEGER,
-            configPortOperStatus       INTEGER,
+            configPortOperStatus       INTEGER
          -- configPortFlowControl      INTEGER,
          -- configPortFlowControlOper  INTEGER,
-	    configPortPriority         INTEGER
         }
 
         configPort OBJECT-TYPE
@@ -597,23 +605,6 @@
   --              "The port's operating flow control state."
   --          ::= { configPortEntry 5 }
 
-        configPortPriority OBJECT-TYPE
-            SYNTAX INTEGER {
-                   low(1),
-                   middle(2),
-                   high(3),
-                   highest(4)
-            }
-            ACCESS read-write
-            STATUS mandatory
-            DESCRIPTION
-            "For ingress untagged packets, the per port 'Default Priority'
-             setting will be applied to packets of each port to provide 
-             port-based traffic prioritization.
-             For ingress tagged packets, D-Link Smart Switches will refer
-             to their 802.1p information and prioritize them with 4
-             different priority queues."
-            ::= { configPortEntry 6 }
 
         --
         -- VLAN Mode
@@ -858,6 +849,7 @@
   		           and configTftpServerFileName."
               ::= { companyConfigGroup 34 }
 
+
 --        configSysTFTPServer OBJECT-TYPE
 --                  SYNTAX INTEGER  { disable (0), enable(1)}
 --              ACCESS read-write
@@ -867,6 +859,33 @@
 --                      ON = 1
 --                      OFF = 0"
 --            ::= { companyConfigGroup 42 }
+
+--        configJumboEnable OBJECT-TYPE
+--            SYNTAX INTEGER {
+--                   enabled(1),
+--                   disabled(2)
+--            }
+--            ACCESS read-write
+--            STATUS mandatory
+--            DESCRIPTION
+--                "Enable/Disable Jumbo Frame function.   
+--                 Maximum Length of jumbo frame is 10240 bytes."
+--            ::= { companyConfigGroup 43 }
+                                               
+        configSafeguardEnable OBJECT-TYPE
+            SYNTAX INTEGER {
+                   enabled(1),
+                   disabled(2)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "Enable/Disable Safeguard Engine.  
+                 D-Link Safeguard Engine is a robust and innovative technology developed by D-Link,
+                 which will automatically throttle the impact of packet flooding into the switch's CPU.
+                 It will keep D-Link Switches better protected from being too frequently interrupted by 
+                 malicious viruses or worm attacks."
+            ::= { companyConfigGroup 44 }
 
         --
         -- The TVLAN group
@@ -1475,6 +1494,18 @@
             	if igmpInterfaceVersion is 1."
 	        DEFVAL     { 1 }
 	        ::= { igsSystem 17 }
+
+        igsQuerierStateOnOff OBJECT-TYPE
+            SYNTAX INTEGER {
+                   enabled(1),
+                   disabled(2)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "To enable transmitting IGMP Query packets or to disable."
+            ::= { igsSystem 18 }
+
 	--
 	-- The IGS Vlan Group
 	--
@@ -1841,7 +1872,7 @@
                "The User-Name representing the identity of the
                Supplicant PAE."
             REFERENCE
-               "9.4.4, Session User Nam."
+               "9.4.4, Session User Name." 
             ::= { dot1xAuthConfigPortEntry 5 }
 
         -- 
@@ -1983,7 +2014,264 @@
 		    REFERENCE 
 		            "IEEE 802.1AB-2005 9.5.1.3"
 		    ::= { lldpRemOrgDefInfoEntry 3 }
-		    
+
+ 		-- 
+		-- The companyQoSGroup Groups
+		--
+		qosMode  OBJECT-TYPE
+            SYNTAX INTEGER { 
+               dot1p(1), 
+               dscp(2) 
+            } 
+            ACCESS    read-write 
+            STATUS        mandatory
+            DESCRIPTION 
+               "Settings of Qos mode:
+                  IEEE 802.1p QoS or DSCP QoS." 
+            ::= { companyQoSGroup 1 } 
+
+        queuingMechanism       OBJECT-TYPE 
+            SYNTAX INTEGER {
+                strictPriority(1),
+                wrr(2)
+            } 
+            ACCESS    read-write 
+            STATUS        mandatory
+            DESCRIPTION 
+               "Queuing mechanism.
+                     strictPriority(1) : Strict Priority
+                     wrr(2)            : Weighted Round Robin    
+               " 
+            ::= { companyQoSGroup 2 } 
+
+        dot1pPortTable     OBJECT-TYPE
+            SYNTAX SEQUENCE OF Dot1pPortEntry
+            ACCESS not-accessible
+            STATUS mandatory
+            DESCRIPTION
+                "A list of 802.1p port default priority Entries."
+            ::= { companyQoSGroup 3 }
+            
+        dot1pPortEntry OBJECT-TYPE
+            SYNTAX Dot1pPortEntry
+            ACCESS not-accessible
+            STATUS mandatory
+            DESCRIPTION
+                "A list of 802.1p port default priority priorities."
+            INDEX { dot1pPortIndex }
+            ::= { dot1pPortTable 1 }
+            
+        Dot1pPortEntry ::= SEQUENCE {
+            dot1pPortIndex                 INTEGER,
+            dot1pPortPriority              INTEGER
+        }
+        
+        dot1pPortIndex OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                 "A port identifier that is in the range of 1 to ifNumber."
+            ::= { dot1pPortEntry 1 }
+            
+        dot1pPortPriority OBJECT-TYPE
+            SYNTAX INTEGER {
+                   low(1),
+                   middle(2),
+                   high(3),
+                   highest(4)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+            "For ingress untagged packets, the per port 'Default Priority'
+             setting will be applied to packets of each port to provide 
+             port-based traffic prioritization.
+             For ingress tagged packets, D-Link Smart Switches will refer
+             to their 802.1p information and prioritize them with 4
+             different priority queues. "
+            ::= { dot1pPortEntry 2 }
+
+        
+        dscpTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF DscpEntry
+            ACCESS not-accessible
+            STATUS mandatory
+            DESCRIPTION
+                "A list of DSCP Entries."
+            ::= { companyQoSGroup 4 }
+            
+        dscpEntry OBJECT-TYPE
+            SYNTAX DscpEntry
+            ACCESS not-accessible
+            STATUS mandatory
+            DESCRIPTION
+                "A list of DSCP properties."
+            INDEX { dscpIndex }
+            ::= { dscpTable 1 }
+            
+        DscpEntry ::= SEQUENCE {
+            dscpIndex                 INTEGER,
+            dscpPriority              INTEGER
+        }
+        
+        dscpIndex OBJECT-TYPE
+            SYNTAX INTEGER (0..63)
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+            "DSCP value. For ingress IP packets, the DiffServ field of IP packets 
+             provide DSCP-based traffic prioritization information to switches. 
+             D-Link Smart Switches will refer to the value of DiffServ filed 
+             information and prioritize them with 4 different priority queues."
+            ::= { dscpEntry 1 }
+            
+        dscpPriority OBJECT-TYPE
+           SYNTAX INTEGER {
+                   low(1),
+                   middle(2),
+                   high(3),
+                   highest(4)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+            "The queuing priority mapping to DSCP value."
+            ::= { dscpEntry 2 }
+
+
+ 		-- 
+		-- The companyTrafficMgmt Groups
+		--       		
+        -- Broadcast Storm Control
+		broadcastStormCtrlSettings  OBJECT IDENTIFIER ::= { companyTrafficMgmt 3 }
+		
+        broadcastStormCtrlGlobalOnOff       OBJECT-TYPE 
+            SYNTAX INTEGER  {
+        		 enabled(1),
+        		 disabled(2)
+            }
+            ACCESS    read-write 
+            STATUS        mandatory
+            DESCRIPTION 
+           "This object indicates storm control function is enabled or disabled 
+            for device.
+            When you enable broadcast storm control function,  D-Link Smart 
+            Switches will allowed you to limit the number of broadcast packets 
+            per second going through device." 
+            ::= { broadcastStormCtrlSettings 1 } 
+ 
+        broadcastStormGlobalThreshold OBJECT-TYPE
+            SYNTAX INTEGER {  
+                  disabled(1),
+                   kBps-8(2),
+                   kBps-16(3),
+                   kBps-32(4),
+                   kBps-64(5),
+                   kBps-128(6),
+                   kBps-256(7),
+                   kBps-512(8),
+                   kBps-1024(9),
+                   kBps-2048(10),
+                   kBps-4096(11)
+             }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+            "The threshold value in unit of thousand bytes per second for broadcast traffic of the specific port."
+            ::= { broadcastStormCtrlSettings 2 }
+                       
+      --                 
+      -- The companySecurity group
+      --                 
+		trustedHostSettings  OBJECT IDENTIFIER ::= { companySecurity 1 } 
+		
+		    trustedHostOnOff       OBJECT-TYPE 
+            SYNTAX INTEGER  {
+        		 enabled(1),
+        		 disabled(2)
+            }
+            ACCESS    read-write 
+            STATUS        mandatory
+            DESCRIPTION 
+           "This object indicates trusted host function is enabled or disabled. 
+            When trusted host function is enabled, D-Link Smart Switches will 
+            only allow hosts which you trust to access and control the switch.
+            Your local host IP Addresses must be one of the IP Addresses to 
+            avoid disconnection." 
+            ::= { trustedHostSettings 1 } 
+
+        
+        trustedHostTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF TrustedHostEntry
+            ACCESS not-accessible
+            STATUS mandatory
+            DESCRIPTION
+                "A list of Trusted Host Entries."
+            ::= { trustedHostSettings 2 }         
+        
+            
+        trustedHostEntry OBJECT-TYPE
+            SYNTAX TrustedHostEntry
+            ACCESS not-accessible
+            STATUS mandatory
+            DESCRIPTION
+                "A list of Trusted Host properties."
+            INDEX { trustedHostID }
+            ::= { trustedHostTable 1 }
+
+
+        TrustedHostEntry ::= SEQUENCE {
+            trustedHostID                    INTEGER,
+            trustedHostIpAddress             IpAddress,
+            trustedHostIpMask                IpAddress,
+            trustedHostStatus                INTEGER
+        }
+
+        trustedHostID OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "An index that uniquely identifies an entry in the 
+                 Trusted Host Table. Three entries are currently supported."
+            ::= { trustedHostEntry 1 }
+            
+        trustedHostIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "The IP address of host you allow to access to D-Link Smart 
+                 Switch.
+                 Your local host IP Addresses must be one of the IP Addresses 
+                 to avoid disconnection."
+            ::= { trustedHostEntry 2 }
+
+        trustedHostIpMask OBJECT-TYPE
+            SYNTAX IpAddress
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "Used to mask with IP address, it allow you set a subnet as a 
+                 trusted host entry."
+            ::= { trustedHostEntry 3 }
+
+        trustedHostStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+                    active (1),
+                    notready (3),
+                    createAndwait (5),
+                    destroy (6)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "The status of an entry in the Trusted Host Table.  Only a subset
+                 of the rowstatus variables (active, createAndGo, destroy) 
+                 are available."
+            ::= { trustedHostEntry 4 }
+               		    
 		-- *****************************************************************
 		--
 		--  Enterprise Trap group 

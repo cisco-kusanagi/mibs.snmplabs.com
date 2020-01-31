@@ -1,7 +1,7 @@
 -- *********************************************************************
 --   
--- IEEE8021X-PAE-MIB : MIB for IEEE 802.1X (802.1X-2010 + 802.1Xbx)
---   
+-- IEEE8021X-PAE-MIB : IEEE 802.1X (802.1X-2010 + 802.1Xbx + 802.1Xck)
+--
 -- *********************************************************************
 
 IEEE8021X-PAE-MIB DEFINITIONS ::= BEGIN
@@ -34,12 +34,12 @@ IMPORTS
         FROM IEEE8021-SECY-MIB;
 
 ieee8021XPaeMIB MODULE-IDENTITY
-    LAST-UPDATED    "201404101619Z"
+    LAST-UPDATED    "201710281457Z"
     ORGANIZATION    "IEEE 802.1 Working Group"
     CONTACT-INFO
-      " WG-URL: http://grouper.ieee.org/groups/802/1/index.html
-        WG-EMail: stds-802-1@ieee.org
-        Contact: Mick Seaman
+      " WG-URL: http://grouper.ieee802.org/1
+        WG-EMail: stds-802-1-L@ieee.org
+        Contact: IEEE 802.1 Working Group Chair
         Postal: C/O IEEE 802.1 Working Group
                 IEEE Standards Association
                 445 Hoes Lane
@@ -185,8 +185,9 @@ ieee8021XPaeMIB MODULE-IDENTITY
 
         PACP : Port Access Controller Protocol.
 
-        Port Identifier : A 16-bit number that is unique within the
-            scope of the address of the port.
+        Port Identifier : A 16-bit identifier that uniquely identifies each of
+        	a system's transmit SCs that uses the same MAC address as a
+        	component of its SCI.
 
         Real Port : Indicates the PAE is for a real port.  A port that
             is not created on demand by the mechanisms specified in
@@ -208,10 +209,8 @@ ieee8021XPaeMIB MODULE-IDENTITY
 
         SAK : Secure Association key, the secret key used by an SA.
 
-        SCI : Secure Channel Identifier, a globally unique identifier
-            for a secure channel, comprising a globally unique MAC
-            Address and a Port Identifier, unique within the system
-            allocated that address.
+        SCI : Secure Channel Identifier, a unique identifier for a secure 
+        	channel, comprising a MAC Address and a Port Identifier.
 
         secured connectivity : Data transfer between two or 'Controlled
             Ports' that is protected by MACsec.
@@ -235,6 +234,12 @@ ieee8021XPaeMIB MODULE-IDENTITY
             created on demand.  Virtual ports can be used to provide
             separate secure connectivity associations over the same
             LAN."
+    REVISION        "201710281457Z"
+    DESCRIPTION
+        "Published as part of IEEE 802.1Xck.
+         Minor DESCRIPTION clarifications as required by resolution
+         of maintenance items 154, 155, 157 (see 802.1 maintenance
+         process discussion). Added ieee8021XPaeEapolGroupMAC Address."
     REVISION        "201404101619Z"
     DESCRIPTION
         "Update published as part of IEEE 802.1Xbx (Amendment to
@@ -631,7 +636,8 @@ Ieee8021XPaePortEntry ::= SEQUENCE {
         ieee8021XPaePortSupplicantEnable    TruthValue,
         ieee8021XPaePortKayMkaEnable        TruthValue,
         ieee8021XPaePortAnnouncerEnable     TruthValue,
-        ieee8021XPaePortListenerEnable      TruthValue
+        ieee8021XPaePortListenerEnable      TruthValue,
+        ieee8021XPaeEapolGroupMAC			MacAddress
 }
 
 ieee8021XPaePortNumber OBJECT-TYPE
@@ -839,12 +845,13 @@ ieee8021XPaePortAuthenticatorEnable OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "Enable or disable to the Authenticator function in this PAE.
+        "True if the Authenticator is enabled.
 
-        This object will be read only and returns 'false' if the value
+        This object is read only. It returns 'false' if the value
         of the object ieee8021XPaePortCapabilities in the same row has
-        the bit 'authImplemented' Off."
-    REFERENCE       "802.1X Clause 8.4, Figure 12-3" 
+        the bit 'authImplemented' Off, or if the local control variable
+        'enable' has not been set by the Logon Process."
+    REFERENCE       "802.1X Clause 8.4 'enabled', Figure 12-3" 
     ::= { ieee8021XPaePortEntry 14 }
 
 ieee8021XPaePortSupplicantEnable OBJECT-TYPE
@@ -852,12 +859,15 @@ ieee8021XPaePortSupplicantEnable OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "Enable or disable to the Supplicant function in this PAE.
-
-        This object will be read only and returns 'false' if the value
-        of the object ieee8021XPaePortCapabilities in the same row has
-        the bit 'suppImplemented' off."
-    REFERENCE       "802.1X Clause 8.4, Figure 12-3" 
+        "True if the Suppplicant is enabled.
+        
+        This object is read only. It returns 'false' if the PAE lacks 
+        supplicant functionality (ieee8021XPaePortCapabilities in the 
+        same row has the bit 'suppImplemented' off), or if the local 
+        control variable'enable' has not been set by the Logon Process 
+        (perhaps because the supplicant is designed to authenticate a 
+        human user and that user is not present)."
+    REFERENCE       "802.1X Clause 8.4 'enabled', Figure 12-3" 
     ::= { ieee8021XPaePortEntry 15 }
 
 ieee8021XPaePortKayMkaEnable OBJECT-TYPE
@@ -898,6 +908,16 @@ ieee8021XPaePortListenerEnable OBJECT-TYPE
         the bit 'listenerImplemented' off."
     REFERENCE       "802.1X Clause 10.4, Figure 12-3" 
     ::= { ieee8021XPaePortEntry 18 }
+    
+ieee8021XPaeEapolGroupMAC OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The destination Group MAC Address used by this PAE when
+        transmitting EAPOL frames."
+    REFERENCE       "802.1X Clause 12.9, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 19 }
  
 
 -- ------------------------------------------------------------------ --
@@ -1452,8 +1472,7 @@ ieee8021XAuthPaeReAuthEnabled OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object is set 'true' if PACP should initiate
-        reauthentication periodically, 'false' otherwise .  Reading
-        this object always returns 'false'."
+        reauthentication periodically, 'false' otherwise."
     REFERENCE       "IEEE 802.1X Clause 8.9, Figure 12-3" 
     ::= { ieee8021XAuthenticatorEntry 4 }
 
@@ -1853,7 +1872,7 @@ ieee8021XEapolStartFramesTx OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "The number of EAPOL-Start frames that have been received by
+        "The number of EAPOL-Start frames that have been transmitted by
         this PAE."
     REFERENCE       "802.1X Clause 12.8.3, Figure 12-3" 
     ::= { ieee8021XEapolStatsEntry 17 }
@@ -3038,7 +3057,7 @@ ieee8021XPaeCompliance MODULE-COMPLIANCE
 
     GROUP           ieee8021XPacGroup
     DESCRIPTION
-        "This group is mandatory for systems that does not support
+        "This group is mandatory for systems that do not support
         the MACsec functions of the PAE."
 
     GROUP           ieee8021XPaeAuthConfigGroup
@@ -3442,6 +3461,15 @@ ieee8021XPaeKaYIsupgradeGroup OBJECT-GROUP
         "A collection of objects providing monitoring and control
         for MKA support of in-service upgrades."
     ::= { ieee8021XPaeGroups 11 }
+    
+ieee8021XPaeSystemAddGroup OBJECT-GROUP
+	OBJECTS			{
+						ieee8021XPaeEapolGroupMAC
+					}
+	STATUS			current
+	DESCRIPTION
+		"Objects previously overlooked, added by maintenance."
+	::= { ieee8021XPaeGroups 12 }
     
 END
 

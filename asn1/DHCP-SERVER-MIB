@@ -1,784 +1,958 @@
-                                                                                    -- -----------------------------------------------------------------------------
--- MIB NAME : DHCP Server mib
--- FILE NAME: DHCPServer.mib
--- DATE     : 2007/11/12
--- VERSION  : 2.04
--- PURPOSE  : To construct the MIB structure of DHCP Server
---            for proprietary enterprise
--- -----------------------------------------------------------------------------
--- MODIFICTION HISTORY:
--- -----------------------------------------------------------------------------
--- Version, Date, Author
--- Description:
---  [New Object]
---  [Modification]
--- Notes: (Requested by who and which project)
 --
--- Revision 2.02, 2007/06/08, Nic
--- [Modification]
--- [1]Change the access mode of swDHCPServerDefaultRouterIndex from
--- Read-Write to read-only
--- [2]Change the access mode of swDHCPServerManualBindingIpAddress from
--- Read-Write to read-only
--- Notes: Requested by Nic for project DGS3600R2.
-
--- Revision 2.01, 2007/05/30, Nic
--- [Modification]
--- [1]Modify swDHCPServerExcludedAddressTable. Delete node
--- swDHCPServerExcludedAddressIndex, and change the index of table from
--- swDHCPServerExcludedAddressIndex to swDHCPServerExcludedAddressBegin and
--- swDHCPServerExcludedAddressEnd.
--- Notes: Requested by Nic for project DGS3600R2.
+-- Lucent Technologies DHCP MIB extensions.
 --
--- Revision 2.04, 2008/11/12, Lina
--- [Modification]
--- [1]Add swDHCPServerConflictIPTable.
--- Notes: Requested by Lina Liu with DES3528/3552
 --
--- Version 2.00, 2007/05/17, Nic
--- This is the first formal version for universal MIB definition.
--- -----------------------------------------------------------------------------
-
-DHCP-Server-MIB DEFINITIONS ::= BEGIN
-
--- -----------------------------------------------------------------------------
--- DHCP Server MIB
--- -----------------------------------------------------------------------------
-
-
-IMPORTS
-        MODULE-IDENTITY,OBJECT-TYPE,IpAddress     FROM SNMPv2-SMI
-        RowStatus,DisplayString,MacAddress        FROM SNMPv2-TC
-        dlink-common-mgmt               					FROM DLINK-ID-REC-MIB;
-
-     swDHCPServerMIB MODULE-IDENTITY
-          LAST-UPDATED "200706080000Z"
-          ORGANIZATION "D-Link Crop."
-          CONTACT-INFO
-                       "http://support.dlink.com"
-          DESCRIPTION
-           "The structure of DHCP Server management for the
-		    		proprietary enterprise."
-          ::= { dlink-common-mgmt 38 }
-
-   swDHCPServerCtrl            OBJECT IDENTIFIER ::= { swDHCPServerMIB 1 }
-   swDHCPServerInfo            OBJECT IDENTIFIER ::= { swDHCPServerMIB 2}
-   swDHCPServerMgmt            OBJECT IDENTIFIER ::= { swDHCPServerMIB 3}
-
-   swDHCPServerPoolMgmt					OBJECT IDENTIFIER ::= { swDHCPServerMgmt 2}
-   swDHCPServerBindingMgmt	OBJECT IDENTIFIER ::= { swDHCPServerMgmt 4}
-
--- -----------------------------------------------------------------------------
--- swDHCPServerCtrl            OBJECT IDENTIFIER ::= { swDHCPServerMIB 1 }
--- -----------------------------------------------------------------------------
-swDHCPServerState OBJECT-TYPE
-    SYNTAX  INTEGER {
-               enabled(1),
-               disabled(2)
-               }
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-            "This object enables/disables the DHCP server status
-             of the device."
-    ::= { swDHCPServerCtrl 1 }
-
-swDHCPServerPingPktNumber OBJECT-TYPE
-    SYNTAX  INTEGER (0..10)
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-            "This object specifies the number of ping packets
-            the DHCP server sends to an IP address before
-            assigning this address to a requesting client."
-    ::= { swDHCPServerCtrl 2 }
-
-swDHCPServerPingTimeOut OBJECT-TYPE
-    SYNTAX  INTEGER (10..2000)
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-            "This object specifies the amount of time the
-            DHCP server must wait before timing out a ping packet."
-    ::= { swDHCPServerCtrl 3 }
+-- Lucent Technologies
+-- 400 Lapp Road
+-- Malvern, PA.  19355
+--
+-- Version 1.2 May-01-2002
+-- New in this version:
+--  dhcpServFailoverTable
+--  New traps: dhcpServerFailoverActive,dhcpServerFailoverReturnedControl,
+--             dhcpServerSubnetThresholdExceeded
+--
+-- last modified: May-01-2002
+--
+-- iso			1
+-- org			1.3
+-- dod			1.3.6
+-- internet			1.3.6.1
+-- directory		1.3.6.1.1
+-- mgmt			1.3.6.1.2
+-- ?				1.3.6.1.3
+-- private			1.3.6.1.4
+-- enterprises		1.3.6.1.4.1
 
 
--- -----------------------------------------------------------------------------
---  swDHCPServerMgmt            OBJECT IDENTIFIER ::= { swDHCPServerMIB 3}
--- -----------------------------------------------------------------------------
+DHCP-SERVER-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+
+       enterprises, TimeTicks
+				   	FROM RFC1155-SMI
+       DisplayString		FROM RFC1213-MIB
+       NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY,OBJECT-TYPE, IpAddress,Counter64,
+	   Counter32, Gauge32, Integer32
+	   						FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION, RowStatus, TruthValue, DateAndTime
+           FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP
+           FROM SNMPv2-CONF;
+
+lucent		OBJECT IDENTIFIER ::= { enterprises 1751 }	--	1.3.6.1.4.1.1751
+products		OBJECT IDENTIFIER ::= { lucent 1 }			--	1.3.6.1.4.1.1751.1
+mibs			OBJECT IDENTIFIER ::= { lucent 2 }			--	1.3.6.1.4.1.1751.2
+ipspg			OBJECT IDENTIFIER ::= { products 48 }		--	1.3.6.1.4.1.1751.1.48
+ipspgServices	OBJECT IDENTIFIER ::= { ipspg 1 }			--	1.3.6.1.4.1.1751.1.48.1
+ipspgDHCP		OBJECT IDENTIFIER ::= { ipspgServices 1 }		--	1.3.6.1.4.1.1751.1.48.1.1
+ipspgDNS		OBJECT IDENTIFIER ::= { ipspgServices 2 }		--	1.3.6.1.4.1.1751.1.48.1.2
+ipspgTrap		OBJECT IDENTIFIER ::= { ipspg 2 }			--	1.3.6.1.4.1.1751.1.48.2
+
+-- 1.1   Lucent Specific DHCP MIB Extensions
+
+   --       FROM SNMPv2-MIB;
 
 
--- -----------------------------------------------------------------------------
--- swDHCPServerExcludedAddressTable	 { swDHCPServerMgmt 1 }
--- -----------------------------------------------------------------------------
-swDHCPServerExcludedAddressTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDHCPServerExcludedAddressEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains an IP addresses group that
-        the DHCP server should not assign to DHCP client."
-    ::= { swDHCPServerMgmt 1 }
 
-swDHCPServerExcludedAddressEntry OBJECT-TYPE
-    SYNTAX      SwDHCPServerExcludedAddressEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A group of IP addresses that the DHCP server
-        should not assign to DHCP client."
-    INDEX { swDHCPServerExcludedAddressBegin, swDHCPServerExcludedAddressEnd }
-    ::= { swDHCPServerExcludedAddressTable 1 }
+dhcpServMib MODULE-IDENTITY
+       LAST-UPDATED    "0606220830Z"
+       ORGANIZATION    "Lucent Technologies"
+       CONTACT-INFO
+          "        James Offutt
+          Postal:  Lucent Technologies
+                   400 Lapp Road
+                   Malvern, PA 19355
+                   USA
+          Tel:     +1 610-722-7900
+          Fax:     +1 610-725-8559"
+       DESCRIPTION
+          "The Vendor Specific MIB module for entities implementing the server
+          side of the Bootstrap Protocol (BOOTP) and the Dynamic Host
+          Configuration protocol (DHCP) for Internet Protocol version 4
+          (IPv4)."
+       ::= { ipspgDHCP 1 }
 
-SwDHCPServerExcludedAddressEntry ::=
-    SEQUENCE {
-        swDHCPServerExcludedAddressBegin
-            IpAddress,
-        swDHCPServerExcludedAddressEnd
-        		IpAddress,
-        swDHCPServerExcludedAddressStatus
-        		RowStatus
-        }
+   dhcpServMibTraps OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"DHCP Server MIB traps."
+		::= { dhcpServMib 0 }
 
-swDHCPServerExcludedAddressBegin OBJECT-TYPE
-        SYNTAX  IpAddress
-        MAX-ACCESS  read-only
-        STATUS  current
-        DESCRIPTION
-            "The start address of this address range."
-        ::= { swDHCPServerExcludedAddressEntry 1 }
+   dhcpServMibObjects OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "DHCP Server MIB objects are all defined in this branch."
+       ::= { dhcpServMib 1 }
 
-swDHCPServerExcludedAddressEnd OBJECT-TYPE
-        SYNTAX  IpAddress
-        MAX-ACCESS  read-only
-        STATUS  current
-        DESCRIPTION
-            "The end address of this address range."
-        ::= { swDHCPServerExcludedAddressEntry 2 }
+   dhcpServSystem OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "Group of objects that are related to the overall system."
+       ::= { dhcpServMibObjects 1 }
 
-swDHCPServerExcludedAddressStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "This object manages this entry."
-    ::= { swDHCPServerExcludedAddressEntry 3 }
+   dhcpServSubnetCounters OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "Group of objects that count various subnet data values"
+       ::= { dhcpServMibObjects 2 }
+
+   dhcpServBootpCounters OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "Group of objects that count various BOOTP events."
+       ::= { dhcpServMibObjects 3 }
+
+   dhcpServDhcpCounters OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "Group of objects that count various DHCP Statistics."
+       ::= { dhcpServMibObjects 4 }
+
+   dhcpServBootpStatistics OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "Group of objects that measure various BOOTP statistics."
+       ::= { dhcpServMibObjects 5 }
+
+   dhcpServDhcpStatistics OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "Group of objects that measure various DHCP statistics."
+       ::= { dhcpServMibObjects 6 }
+
+   dhcpServConfiguration OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "Objects that contain pre-configured and Dynamic Config. Info."
+       ::= { dhcpServMibObjects 7 }
+
+   dhcpServFailover OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION
+          "Objects that contain partner server info."
+       ::= { dhcpServMibObjects 8 }
+
+   -- Textual conventions defined by this branch
+
+   DhcpServTimeInterval ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+          "The number of milli-seconds that has elapsed since some epoch.
+          Systems that cannot measure events to the milli-second
+          resolution SHOULD round this value to the next available
+          resolution that the system supports."
+       SYNTAX        Gauge32
 
 
--- -----------------------------------------------------------------------------
--- swDHCPServerPoolMgmt	 { swDHCPServerMgmt 2 }
--- -----------------------------------------------------------------------------
--- -----------------------------------------------------------------------------
--- swDHCPServerPoolTable	 { swDHCPServerPoolMgmt 1 }
--- -----------------------------------------------------------------------------
-swDHCPServerPoolTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDHCPServerPoolEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains DHCP server pool information."
-    ::= { swDHCPServerPoolMgmt 1 }
+   -- dhcpServSystem Group
 
-swDHCPServerPoolEntry OBJECT-TYPE
-    SYNTAX      SwDHCPServerPoolEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A list of DHCP server pool information."
-    INDEX { swDHCPServerPoolName }
-    ::= { swDHCPServerPoolTable 1 }
+   dhcpServSystemDescr OBJECT-TYPE
+       SYNTAX        DisplayString (SIZE (0..255))
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "A textual description of the server.  This value should
+          include the full name and version identification of the server.
+          This string MUST contain only printable NVT ASCII characters."
+       ::= { dhcpServSystem 1 }
 
-SwDHCPServerPoolEntry ::=
-    SEQUENCE {
-        swDHCPServerPoolName
-            DisplayString,
-        swDHCPServerPoolNetworkAddress
-            IpAddress,
-        swDHCPServerPoolNetworkAddressMask
-            IpAddress,
-        swDHCPServerPoolDomainName
-        		DisplayString,
-        swDHCPServerPoolNetBIOSNodeType
-        		INTEGER,
-        swDHCPServerPoolLeaseState
-        		INTEGER,
-        swDHCPServerPoolLeaseDay
-        		INTEGER,
-        swDHCPServerPoolLeaseHour
-        		INTEGER,
-        swDHCPServerPoolLeaseMinute
-        		INTEGER,
-        swDHCPServerPoolBootFile
-        		DisplayString,
-        swDHCPServerPoolNextServer
-        		IpAddress,
-        swDHCPServerPoolStatus
-        		RowStatus
-        }
+   dhcpServSystemStatus OBJECT-TYPE
+       SYNTAX        INTEGER {
+                             starting(0),     -- Starting server
+                             running(1),      -- Server is running
+                             stopping(2),     -- Stopping server
+				     stopped(3),      -- Server is stopped
+                             reload(4)        -- Reload server
+                             }
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          " Dhcp System Server Status "
+       ::= { dhcpServSystem 2 }
 
-swDHCPServerPoolName OBJECT-TYPE
-		SYNTAX  DisplayString	(SIZE(1..12))
+   dhcpServSystemUpTime OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "If the server has a persistent state (e.g., a process),
+               this value will be the seconds elapsed since it started.
+               For software without persistant state, this value will
+               be zero."
+       ::= { dhcpServSystem 3 }
+
+   dhcpServSystemResetTime OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "If the server has a persistent state (e.g., a process)
+               and supports a `reset' operation (e.g., can be told to
+               re-read configuration files), this value will be the
+               seconds elapsed since the last time the name server was
+               `reset.'  For software that does not have persistence or
+               does not support a `reset' operation, this value will be
+               zero."
+       ::= { dhcpServSystem 4 }
+
+
+   -- dhcpServSubnetCounters Group
+
+   dhcpServCountUsedSubnets OBJECT-TYPE
+       SYNTAX        Integer32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number subnets managed by the server (i.e. configured), from
+          which the server has issued at least one lease."
+       ::= { dhcpServSubnetCounters 1 }
+
+   dhcpServCountUnusedSubnets OBJECT-TYPE
+       SYNTAX        Integer32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number subnets managed by the server (i.e. configured), from
+          which the server has issued no leases."
+       ::= { dhcpServSubnetCounters 2 }
+
+   dhcpServCountFullSubnets OBJECT-TYPE
+       SYNTAX        Integer32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number subnets managed by the server (i.e. configured), in
+          which the address pools have been exhausted."
+       ::= { dhcpServSubnetCounters 3 }
+
+
+   -- dhcpServBootpCounters Group
+
+   dhcpServBootpCountRequests OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of packets received that contain a Message Type of
+          1 (BOOTREQUEST) in the first octet and do not contain option
+          number 53 (DHCP Message Type) in the options."
+       ::= { dhcpServBootpCounters 1 }
+
+   dhcpServBootpCountInvalids OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of packets received that do not contain a Message
+          Type of 1 (BOOTREQUEST) in the first octet or are not valid
+          BOOTP packets (e.g.: too short, invalid field in packet
+          header)."
+       ::= { dhcpServBootpCounters 2 }
+
+   dhcpServBootpCountReplies OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of packets sent that contain a Message Type of 1
+          (BOOTREQUEST) in the first octet and do not contain option
+          number 53 (DHCP Message Type) in the options."
+       ::= { dhcpServBootpCounters 3 }
+
+   dhcpServBootpCountDroppedUnknownClients OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of BOOTP packets dropped due to the server not
+          recognizing or not providing service to the hardware address
+          received in the incoming packet."
+       ::= { dhcpServBootpCounters 4 }
+
+   dhcpServBootpCountDroppedNotServingSubnet OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of BOOTP packets dropped due to the server not
+          being configured or not otherwise able to serve addresses on
+          the subnet from which this message was received."
+       ::= { dhcpServBootpCounters 5 }
+
+
+   -- dhcpServDhcpCounters Group
+
+   dhcpServDhcpCountDiscovers OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCPDISCOVER (option 53 with value 1) packets
+          received."
+       ::= { dhcpServDhcpCounters 1 }
+
+   dhcpServDhcpCountRequests OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCPREQUEST (option 53 with value 3) packets
+          received."
+       ::= { dhcpServDhcpCounters 2 }
+
+   dhcpServDhcpCountReleases OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCPRELEASE (option 53 with value 7) packets
+          received."
+       ::= { dhcpServDhcpCounters 3 }
+
+   dhcpServDhcpCountDeclines OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCPDECLINE (option 53 with value 4) packets
+          received."
+       ::= { dhcpServDhcpCounters 4 }
+
+   dhcpServDhcpCountInforms OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCPINFORM (option 53 with value 8) packets
+          received."
+       ::= { dhcpServDhcpCounters 5 }
+
+   dhcpServDhcpCountInvalids OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCP packets received whose DHCP message type
+          (i.e.: option number 53) is not understood or handled by the
+          server."
+       ::= { dhcpServDhcpCounters 6 }
+
+   dhcpServDhcpCountOffers OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCPOFFER (option 53 with value 2) packets
+          sent."
+       ::= { dhcpServDhcpCounters 7 }
+
+   dhcpServDhcpCountAcks OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCPACK (option 53 with value 5) packets sent."
+       ::= { dhcpServDhcpCounters 8 }
+
+   dhcpServDhcpCountNacks OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCPNACK (option 53 with value 6) packets sent."
+       ::= { dhcpServDhcpCounters 9 }
+
+   dhcpServDhcpCountDroppedUnknownClient OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCP packets dropped due to the server not
+          recognizing or not providing service to the client-id and/or
+          hardware address received in the incoming packet."
+       ::= { dhcpServDhcpCounters 10 }
+
+   dhcpServDhcpCountDroppedNotServingSubnet OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of DHCP packets dropped due to the server not being
+          configured or not otherwise able to serve addresses on the
+          subnet from which this message was received."
+       ::= { dhcpServDhcpCounters 11 }
+
+
+   -- dhcpServBootpStatistics group
+
+   dhcpServBootpStatMinArrivalInterval OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The minimum amount of time between receiving two BOOTP
+          messages.  A message is received at the server when the server
+          is able to begin processing the message.  This typically occurs
+          immediately after the message is read into server memory.  If
+          no messages have been received, then this object contains a
+          zero value."
+       ::= { dhcpServBootpStatistics 1 }
+
+   dhcpServBootpStatMaxArrivalInterval OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The maximum amount of time between receiving two BOOTP
+          messages.  A message is received at the server when the server
+          is able to begin processing the message.  This typically occurs
+          immediately after the message is read into server memory.  If
+          no messages have been received, then this object contains a
+          zero value."
+       ::= { dhcpServBootpStatistics 2 }
+
+   dhcpServBootpStatLastArrivalTime OBJECT-TYPE
+       SYNTAX        TimeTicks
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of seconds since the last valid BOOTP
+          message was received by the server.  Invalid messages do not
+          cause this value to change.  If valid no messages have been
+          received, then this object contains a zero value."
+       ::= { dhcpServBootpStatistics 3 }
+
+   dhcpServBootpStatMinResponseTime OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The smallest time interval measured as the difference between
+          the arrival of a BOOTP message at the server and the successful
+          transmission of the response to that message.  A message is
+          received at the server when the server is able to begin
+          processing the message.  A message is transmitted after the
+          server has no further use for the message.  Note that the
+          operating system may still have the message queued internally.
+          The operating system queue time is not to be considered as part
+          of the response time.  Invalid messages do not cause this value
+          to change.  If no valid messages have been received, then this
+          object contains a zero value."
+       ::= { dhcpServBootpStatistics 4 }
+
+   dhcpServBootpStatMaxResponseTime OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The largest time interval measured as the difference between
+          the arrival of a BOOTP message at the server and the successful
+          transmission of the response to that message.  A message is
+          received at the server when the server is able to begin
+          processing the message.  A message is transmitted after the
+          server has no further use for the message.  Note that the
+          operating system may still have the message queued internally.
+          The operating system queue time is not to be considered as part
+          of the response time.  Invalid messages do not cause this value
+          to change.  If no valid messages have been received, then this
+          object contains a zero value."
+       ::= { dhcpServBootpStatistics 5 }
+
+   dhcpServBootpStatSumResponseTime OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The sum of the response time intervals in milli-seconds where
+          a response time interval is measured as the difference between
+          the arrival of a BOOTP message at the server and the successful
+          transmission of the response to that message.  A message is
+          received at the server when the server is able to begin
+          processing the message.  A message is transmitted after the
+          server has no further use for the message.  Note that the
+          operating system may still have the message queued internally.
+          The operating system queue time is not to be considered as part
+          of the response time.  Invalid messages do not cause this value
+          to change.  If no valid messages have been received, then this
+          object contains a zero value."
+       ::= { dhcpServBootpStatistics 6 }
+
+
+   -- dhcpServDhcpStatistics group
+
+   dhcpServDhcpStatMinArrivalInterval OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The minimum amount of time between receiving two DHCP
+          messages.  A message is received at the server when the server
+          is able to begin processing the message.  This typically occurs
+          immediately after the message is read into server memory.  If
+          no messages have been received, then this object contains a
+          zero value."
+       ::= { dhcpServDhcpStatistics 1 }
+
+   dhcpServDhcpStatMaxArrivalInterval OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The maximum amount of time between receiving two DHCP
+          messages.  A message is received at the server when the server
+          is able to begin processing the message.  This typically occurs
+          immediately after the message is read into server memory.  If
+          no messages have been received, then this object contains a
+          zero value."
+       ::= { dhcpServDhcpStatistics 2 }
+
+   dhcpServDhcpStatLastArrivalTime OBJECT-TYPE
+       SYNTAX        TimeTicks
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of seconds since the last valid DHCP message
+          was received by the server.  Invalid messages do not cause this
+          value to change.  If no valid messages have been received, then
+          this object contains a zero value."
+       ::= { dhcpServDhcpStatistics 3 }
+
+   dhcpServDhcpStatMinResponseTime OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The smallest time interval measured as the difference between
+          the arrival of a DHCP message at the server and the successful
+          transmission of the response to that message.  A message is
+          received at the server when the server is able to begin
+          processing the message.  A message is transmitted after the
+          server has no further use for the message.  Note that the
+          operating system may still have the message queued internally.
+          The operating system queue time is not to be considered as part
+          of the response time.  Invalid messages do not cause this value
+          to change.  If no valid messages have been received, then this
+          object contains a zero value."
+       ::= { dhcpServDhcpStatistics 4 }
+
+   dhcpServDhcpStatMaxResponseTime OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The largest time interval measured as the difference between
+          the arrival of a DHCP message at the server and the successful
+          transmission of the response to that message.  A message is
+          received at the server when the server is able to begin
+          processing the message.  A message is transmitted after the
+          server has no further use for the message.  Note that the
+          operating system may still have the message queued internally.
+          The operating system queue time is not to be considered as part
+          of the response time.  Invalid messages do not cause this value
+          to change.  If no valid messages have been received, then this
+          object contains a zero value."
+       ::= { dhcpServDhcpStatistics 5 }
+
+   dhcpServDhcpStatSumResponseTime OBJECT-TYPE
+       SYNTAX        DhcpServTimeInterval
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The sum of the response time intervals in milli-seconds where
+          a response time interval is measured as the difference between
+          the arrival of a DHCP message at the server and the successful
+          transmission of the response to that message.  A message is
+          received at the server when the server is able to begin
+          processing the message.  A message is transmitted after the
+          server has no further use for the message.  Note that the
+          operating system may still have the message queued internally.
+          The operating system queue time is not to be considered as part
+          of the response time.  Invalid messages do not cause this value
+          to change.  If no valid messages have been received, then this
+          object contains a zero value."
+       ::= { dhcpServDhcpStatistics 6 }
+
+
+   -- dhcpServConfiguration group
+
+   dhcpServRangeTable OBJECT-TYPE
+       SYNTAX        SEQUENCE OF DhcpServRangeEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+          "A list of ranges that are configured on this server."
+       ::= { dhcpServConfiguration 2 }
+
+   dhcpServRangeEntry OBJECT-TYPE
+       SYNTAX        DhcpServRangeEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+          "A logical row in the serverRangeTable."
+       INDEX            { dhcpServRangeSubnetAddr,dhcpServRangeStart }
+       ::= { dhcpServRangeTable 1 }
+
+   DhcpServRangeEntry ::= SEQUENCE {
+       dhcpServRangeSubnetAddr    IpAddress,
+       dhcpServRangeSubnetMask    IpAddress,
+       dhcpServRangeStart         IpAddress,
+       dhcpServRangeEnd           IpAddress,
+       dhcpServRangeInUse         Gauge32,
+       dhcpServRangeOutstandingOffers Gauge32,
+       dhcpServRangeUnavailable       Gauge32,
+       dhcpServRangeType              INTEGER,
+       dhcpServRangeUnused         Gauge32
+   }
+
+   dhcpServRangeSubnetAddr OBJECT-TYPE
+       SYNTAX        IpAddress
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The IP address defining a subnet"
+       ::= { dhcpServRangeEntry 1 }
+
+   dhcpServRangeSubnetMask OBJECT-TYPE
+       SYNTAX        IpAddress
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The subnet mask (DHCP option 1) provided to any client offered
+          an address from this range."
+       ::= { dhcpServRangeEntry 2 }
+
+   dhcpServRangeStart  OBJECT-TYPE
+       SYNTAX        IpAddress
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "Start of Subnet Address, Index for Conceptual Tabl, Type IP address "
+      ::= { dhcpServRangeEntry 3 }
+
+   dhcpServRangeEnd OBJECT-TYPE
+       SYNTAX        IpAddress
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The IP address of the last address in the range. The value of
+          range end must be greater than or equal to the value of range
+          start."
+       ::= { dhcpServRangeEntry 4 }
+
+   dhcpServRangeInUse OBJECT-TYPE
+       SYNTAX        Gauge32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of addresses in this range that are currently in
+          use.  This number includes those addresses whose lease has not
+          expired and addresses which have been reserved (either by the
+          server or through configuration)."
+       ::= { dhcpServRangeEntry 5 }
+
+   dhcpServRangeOutstandingOffers OBJECT-TYPE
+      SYNTAX        Gauge32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "The number of outstanding DHCPOFFER messages for this range is
+         reported with this value.  An offer is outstanding if the
+         server has sent a DHCPOFFER message to a client, but has not
+         yet received a DHCPREQUEST message from the client nor has the
+         server-specific timeout (limiting the time in which a client
+         can respond to the offer message) for the offer message
+         expired."
+      ::= { dhcpServRangeEntry 6 }
+
+       dhcpServRangeUnavailable OBJECT-TYPE
+       SYNTAX        Gauge32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+        " Dhcp Server IP Addresses unavailable in a Subnet "
+       ::= { dhcpServRangeEntry 7 }
+
+
+       dhcpServRangeType OBJECT-TYPE
+       SYNTAX         INTEGER     { manBootp(1),
+                                    autoBootp(2),
+                                    manDhcp(3),
+                                    autoDhcp(4),
+                                    dynamicDhcp(5)
+                                  }
+       MAX-ACCESS    read-only
+       STATUS        current
+         DESCRIPTION "Dhcp Server Client Lease Type "
+       ::= { dhcpServRangeEntry 8 }
+
+       dhcpServRangeUnused OBJECT-TYPE
+       SYNTAX        Gauge32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The number of addresses in this range that are currently
+          unused.  This number includes those addresses whose lease has not
+          expired and addresses which have been reserved (either by the
+          server or through configuration)."
+       ::= { dhcpServRangeEntry 9 }
+
+
+   -- dhcpServFailover Group
+
+
+   dhcpServFailoverTable OBJECT-TYPE
+       SYNTAX        SEQUENCE OF DhcpServFailoverEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+          "A list of partner server."
+       ::= { dhcpServFailover 1 }
+
+   dhcpServFailoverEntry OBJECT-TYPE
+       SYNTAX        DhcpServFailoverEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+          "A logical row in the serverFailoverTable."
+       INDEX            { dhcpServFailoverPartnerAddr }
+       ::= { dhcpServFailoverTable 1 }
+
+   DhcpServFailoverEntry ::= SEQUENCE {
+        dhcpServFailoverPartnerAddr            IpAddress,
+        dhcpServFailoverPartnerType            INTEGER,
+        dhcpServFailoverPartnerStatus          INTEGER,
+        dhcpServFailoverPartnerPolltime        Counter32
+   }
+
+   dhcpServFailoverPartnerAddr OBJECT-TYPE
+       SYNTAX        IpAddress
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The IP address defining a partner server"
+       ::= { dhcpServFailoverEntry 1 }
+
+
+   dhcpServFailoverPartnerType OBJECT-TYPE
+       SYNTAX         INTEGER     { primary(1),
+                                    failover(2),
+                                    unconfigured(3)
+                                  }
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION "Dhcp Server Failover server type "
+       ::= { dhcpServFailoverEntry 2 }
+
+   dhcpServFailoverPartnerStatus OBJECT-TYPE
+       SYNTAX         INTEGER     { unknown(0),
+                                    syncing(1),
+                                    active(2),
+                                    inactive(3)
+                                  }
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION "Dhcp Server Partner status "
+       ::= { dhcpServFailoverEntry 3 }
+
+   dhcpServFailoverPartnerPolltime OBJECT-TYPE
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The name of this pool entry."
-    ::= { swDHCPServerPoolEntry 1 }
-
-swDHCPServerPoolNetworkAddress OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-        "The network address of this DHCP pool entry."
-    ::= { swDHCPServerPoolEntry 2 }
-
-swDHCPServerPoolNetworkAddressMask OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-        "The network address mask of this DHCP pool entry."
-    ::= { swDHCPServerPoolEntry 3 }
-
-swDHCPServerPoolDomainName OBJECT-TYPE
-    SYNTAX  DisplayString	(SIZE(0..64))
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-        "The domain name for the client if the server allocates
-         the address for the client from this pool."
-    ::= { swDHCPServerPoolEntry 4 }
-
-swDHCPServerPoolNetBIOSNodeType OBJECT-TYPE
-		SYNTAX      INTEGER {
-               broadcast(1),
-               peer-to-peer(2),
-               mixed(3),
-               hybid(4)
-               }
-    MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
-        "The NetBIOS node type for a Microsoft DHCP client."
-    ::= { swDHCPServerPoolEntry 5 }
-
-swDHCPServerPoolLeaseState OBJECT-TYPE
-    SYNTAX      INTEGER	{
-    						predefined(1),
-    						infinite(2)
-    						}
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The pool lease state. When configured to infinity, the following
-        nodes include swDHCPServerPoolLeaseDay, swDHCPServerPoolLeaseHour
-        and swDHCPServerPoolLeaseMinute have no significance any more."
-    ::= { swDHCPServerPoolEntry 6 }
-
-swDHCPServerPoolLeaseDay OBJECT-TYPE
-    SYNTAX      INTEGER	(0..365)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The day of the lease."
-    ::= { swDHCPServerPoolEntry 7 }
-
-swDHCPServerPoolLeaseHour OBJECT-TYPE
-    SYNTAX      INTEGER	(0..23)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The hour of the lease."
-    ::= { swDHCPServerPoolEntry 8 }
-
-swDHCPServerPoolLeaseMinute OBJECT-TYPE
-    SYNTAX      INTEGER	(0..59)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The minute of the lease."
-    ::= { swDHCPServerPoolEntry 9 }
-
-swDHCPServerPoolBootFile OBJECT-TYPE
-		SYNTAX  DisplayString	(SIZE(0..64))
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-        "The name of the file that is used as a boot image."
-    ::= { swDHCPServerPoolEntry 10 }
-
-swDHCPServerPoolNextServer OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-        "The next server to be used in the DHCP client boot process."
-    ::= { swDHCPServerPoolEntry 11 }
-
-swDHCPServerPoolStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "This object manages this entry."
-    ::= { swDHCPServerPoolEntry 12 }
+    DESCRIPTION "The last time there was a successfull communication with the
+partner server. This value is local time in seconds since some epoch."
+    ::= { dhcpServFailoverEntry 4 }
 
 
--- -----------------------------------------------------------------------------
--- swDHCPServerDNSServerAddressTable	 { swDHCPServerPoolMgmt 2 }
--- -----------------------------------------------------------------------------
-swDHCPServerDNSServerAddressTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDHCPServerDNSServerAddressEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains the IP address of a DNS server
-        that is available to a DHCP client."
-    ::= { swDHCPServerPoolMgmt 2 }
+   -- Traps
 
-swDHCPServerDNSServerAddressEntry OBJECT-TYPE
-    SYNTAX      SwDHCPServerDNSServerAddressEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A list of DNS server information."
-    INDEX { swDHCPServerDNSServerPoolName, swDHCPServerDNSServerAddressIndex }
-    ::= { swDHCPServerDNSServerAddressTable 1 }
+   ipspgDhcpTrapTable 	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF IpspgDhcpTrapEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"The agent's table of IPSPG alarm information."
+	::= { ipspgTrap 1 }
 
-SwDHCPServerDNSServerAddressEntry ::=
-    SEQUENCE {
-    		swDHCPServerDNSServerPoolName
-    				DisplayString,
-        swDHCPServerDNSServerAddressIndex
-        		INTEGER,
-        swDHCPServerDNSServerAddress
-        		IpAddress,
-        swDHCPServerDNSServerAddressStatus
-        		RowStatus
-        }
+   ipspgDhcpTrapEntry	OBJECT-TYPE
+	SYNTAX		IpspgDhcpTrapEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Information about the last alarm trap generated by the agent."
+	INDEX { ipspgDhcpTrIndex }
+	::= { ipspgDhcpTrapTable 1 }
 
-swDHCPServerDNSServerPoolName OBJECT-TYPE
-		SYNTAX  DisplayString	(SIZE(1..12))
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The pool name of this entry."
-    ::= { swDHCPServerDNSServerAddressEntry 1 }
-
-swDHCPServerDNSServerAddressIndex OBJECT-TYPE
-    SYNTAX  INTEGER
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The DNS server address number."
-    ::= { swDHCPServerDNSServerAddressEntry 2 }
-
-swDHCPServerDNSServerAddress OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-        "The IP address of a DNS server that is available to a DHCP client."
-    ::= { swDHCPServerDNSServerAddressEntry 3 }
-
-swDHCPServerDNSServerAddressStatus OBJECT-TYPE
-    SYNTAX  RowStatus
-    MAX-ACCESS  read-create
-    STATUS  current
-    DESCRIPTION
-        "This object manages this entry."
-    ::= { swDHCPServerDNSServerAddressEntry 4}
-
--- -----------------------------------------------------------------------------
--- swDHCPServerNetBIOSNameServerTable	 { swDHCPServerPoolMgmt 3 }
--- -----------------------------------------------------------------------------
-swDHCPServerNetBIOSNameServerTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDHCPServerNetBIOSNameServerEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table containing the NetBIOS WINS server address information
-        that is available to a Microsoft DHCP client."
-    ::= { swDHCPServerPoolMgmt 3 }
-
-swDHCPServerNetBIOSNameServerEntry OBJECT-TYPE
-    SYNTAX      SwDHCPServerNetBIOSNameServerEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A list of NetBIOS WINS server infomation."
-    INDEX { swDHCPServerNetBIOSNameServerPoolName, swDHCPServerNetBIOSNameServerIndex}
-    ::= { swDHCPServerNetBIOSNameServerTable 1 }
-
-SwDHCPServerNetBIOSNameServerEntry ::=
-    SEQUENCE {
-    		swDHCPServerNetBIOSNameServerPoolName
-    				DisplayString,
-        swDHCPServerNetBIOSNameServerIndex
-        		INTEGER,
-        swDHCPServerNetBIOSNameServer
-        		IpAddress,
-				swDHCPServerNetBIOSNameServerStatus
-        		RowStatus
-        }
-
-swDHCPServerNetBIOSNameServerPoolName OBJECT-TYPE
-		SYNTAX  DisplayString	(SIZE(1..12))
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The pool name of this entry."
-    ::= { swDHCPServerNetBIOSNameServerEntry 1 }
-
-swDHCPServerNetBIOSNameServerIndex OBJECT-TYPE
-    SYNTAX  INTEGER
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The NetBIOS WINS server number."
-    ::= { swDHCPServerNetBIOSNameServerEntry 2 }
-
-swDHCPServerNetBIOSNameServer OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-        "The NetBIOS WINS server that is available to a DHCP client."
-    ::= { swDHCPServerNetBIOSNameServerEntry 3 }
-
-swDHCPServerNetBIOSNameServerStatus OBJECT-TYPE
-    SYNTAX  RowStatus
-    MAX-ACCESS  read-create
-    STATUS  current
-    DESCRIPTION
-        "This object manages this entry."
-    ::= { swDHCPServerNetBIOSNameServerEntry 4}
-
--- -----------------------------------------------------------------------------
--- swDHCPServerDefaultRouterTable	 { swDHCPServerPoolMgmt 4 }
--- -----------------------------------------------------------------------------
-swDHCPServerDefaultRouterTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDHCPServerDefaultRouterEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains the IP address of the default router for a DHCP client."
-    ::= { swDHCPServerPoolMgmt 4 }
-
-swDHCPServerDefaultRouterEntry OBJECT-TYPE
-    SYNTAX      SwDHCPServerDefaultRouterEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A list of default router information."
-    INDEX { swDHCPServerDefaultRouterPoolName, swDHCPServerDefaultRouterIndex}
-    ::= { swDHCPServerDefaultRouterTable 1 }
-
-SwDHCPServerDefaultRouterEntry ::=
-    SEQUENCE {
-    		swDHCPServerDefaultRouterPoolName
-    				DisplayString,
-        swDHCPServerDefaultRouterIndex
-        		INTEGER,
-        swDHCPServerDefaultRouter
-        		IpAddress,
-				swDHCPServerDefaultRouterStatus
-        		RowStatus
-        }
-
-swDHCPServerDefaultRouterPoolName OBJECT-TYPE
-		SYNTAX  DisplayString	(SIZE(1..12))
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The pool name of this entry."
-    ::= { swDHCPServerDefaultRouterEntry 1 }
-
-swDHCPServerDefaultRouterIndex OBJECT-TYPE
-    SYNTAX  INTEGER
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The default router index."
-    ::= { swDHCPServerDefaultRouterEntry 2 }
-
-swDHCPServerDefaultRouter OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-write
-    STATUS  current
-    DESCRIPTION
-        "The address of the default router for a DHCP client."
-    ::= { swDHCPServerDefaultRouterEntry 3 }
-
-swDHCPServerDefaultRouterStatus OBJECT-TYPE
-    SYNTAX  RowStatus
-    MAX-ACCESS  read-create
-    STATUS  current
-    DESCRIPTION
-        "This object manages this entry."
-    ::= { swDHCPServerDefaultRouterEntry 4}
-
-
--- -----------------------------------------------------------------------------
--- swDHCPServerManualBindingTable	 { swDHCPServerMgmt 3 }
--- -----------------------------------------------------------------------------
-swDHCPServerManualBindingTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDHCPServerManualBindingEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains information regarding the binding
-        of a pool of IP addresses to a DHCP server."
-    ::= { swDHCPServerMgmt 3 }
-
-swDHCPServerManualBindingEntry OBJECT-TYPE
-    SYNTAX      SwDHCPServerManualBindingEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A list of manual pool binding."
-    INDEX { swDHCPServerManualBindingPoolName,swDHCPServerManualBindingIpAddress }
-    ::= { swDHCPServerManualBindingTable 1 }
-
-SwDHCPServerManualBindingEntry ::=
-    SEQUENCE {
-        swDHCPServerManualBindingPoolName
-            DisplayString,
-        swDHCPServerManualBindingIpAddress
-            IpAddress,
-        swDHCPServerManualBindingHardwareAddress
-        		MacAddress,
-       	swDHCPServerManualBindingType
-            INTEGER,
-        swDHCPServerManualBindingStatus
-        		RowStatus
-        }
-
-swDHCPServerManualBindingPoolName OBJECT-TYPE
-		SYNTAX  DisplayString	(SIZE(1..12))
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The pool name of this entry."
-    ::= { swDHCPServerManualBindingEntry 1 }
-
-swDHCPServerManualBindingIpAddress OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "IP address which will be assigned to specified client."
-    ::= { swDHCPServerManualBindingEntry 2 }
-
-swDHCPServerManualBindingHardwareAddress OBJECT-TYPE
-		SYNTAX		MacAddress
-		MAX-ACCESS	read-create
-		STATUS		current
-		DESCRIPTION
-			"The MAC address of a client."
-		::= { swDHCPServerManualBindingEntry 3 }
-
-swDHCPServerManualBindingType OBJECT-TYPE
-		SYNTAX      INTEGER {
-               ethernet(1),
-               ieee802(2),
-               both(3)
-               }
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The type of this manual binding.
-         both(3): The client type has no significance, the entry
-         	  could apply to either one.
-        "
-    ::= { swDHCPServerManualBindingEntry 4 }
-
-swDHCPServerManualBindingStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "This object manages this entry."
-    ::= { swDHCPServerManualBindingEntry 5 }
-
-
--- -----------------------------------------------------------------------------
--- swDHCPServerBindingTable	 { swDHCPServerMgmt 4 }
--- -----------------------------------------------------------------------------
-swDHCPServerBindingTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDHCPServerBindingEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains information regarding dynamic
-        binding information of a pool of IP addresses."
-    ::= { swDHCPServerMgmt 4 }
-
-swDHCPServerBindingEntry OBJECT-TYPE
-    SYNTAX      SwDHCPServerBindingEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A pool of IP addresses that are listed as bound to a DHCP server."
-    INDEX { swDHCPServerBindingPoolName, swDHCPServerBindingIpAddress}
-    ::= { swDHCPServerBindingTable 1 }
-
-SwDHCPServerBindingEntry ::=
-    SEQUENCE {
-        swDHCPServerBindingPoolName
-            DisplayString,
-        swDHCPServerBindingIpAddress
-        		IpAddress,
-        swDHCPServerBindingHardwareAddress
-        		MacAddress,
-        swDHCPServerBindingType
-        		INTEGER,
-        swDHCPServerBindingStatus
-        		INTEGER,
-        swDHCPServerBindingLifeTime
-        		INTEGER,
-        swDHCPServerBindingClearState
-        		INTEGER
-        }
-
-swDHCPServerBindingPoolName OBJECT-TYPE
-		SYNTAX  DisplayString	(SIZE(1..12))
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "The name of this pool entry."
-    ::= { swDHCPServerBindingEntry 1 }
-
-swDHCPServerBindingIpAddress OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "IP addresses which have been assigned to a specified client."
-    ::= { swDHCPServerBindingEntry 2 }
-
-swDHCPServerBindingHardwareAddress OBJECT-TYPE
-		SYNTAX		MacAddress
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION
-			"The MAC address of a client."
-		::= { swDHCPServerBindingEntry 3 }
-
-swDHCPServerBindingType OBJECT-TYPE
-		SYNTAX  INTEGER {
-		ethernet(1),
-		iee802(2)
+   IpspgDhcpTrapEntry ::= SEQUENCE {
+		ipspgDhcpTrIndex		Integer32,
+		ipspgDhcpTrSequence		Counter32,
+		ipspgDhcpTrId			INTEGER,
+		ipspgDhcpTrText			DisplayString(SIZE(0..80)),
+		ipspgDhcpTrPriority		INTEGER,
+		ipspgDhcpTrClass 		Integer32,
+		ipspgDhcpTrType 		Integer32,
+		ipspgDhcpTrTime			Counter32,
+		ipspgDhcpTrSuspect		DisplayString(SIZE(0..32)),
+		ipspgDhcpTrDiagId		Integer32
 	}
-	MAX-ACCESS  read-only
-	STATUS  current
-	DESCRIPTION
-		"The type of this binding."
-	::= { swDHCPServerBindingEntry 4 }
 
-swDHCPServerBindingStatus OBJECT-TYPE
-		SYNTAX  INTEGER {
-		manual(1),
-		automatic(2)
-	}
-	MAX-ACCESS  read-only
-	STATUS  current
-	DESCRIPTION
-		"The status of this binding."
-	::= { swDHCPServerBindingEntry 5 }
+   ipspgDhcpTrIndex	OBJECT-TYPE
+	SYNTAX 		Integer32 (1..31)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Index into the IPSPG Alarm traps"
+	::= {ipspgDhcpTrapEntry 1 }
 
-swDHCPServerBindingLifeTime OBJECT-TYPE
-	SYNTAX  INTEGER
-	MAX-ACCESS  read-only
-	STATUS  current
-	DESCRIPTION
-		"The life time of the binding entry in seconds.
-		 The value '-1' means an infinite life time."
-	::= { swDHCPServerBindingEntry 6 }
+   ipspgDhcpTrSequence OBJECT-TYPE
+	SYNTAX 		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Counter of the number of IPSPG alarm traps since the agent was last initialized"
+	::= {ipspgDhcpTrapEntry 2 }
 
-swDHCPServerBindingClearState OBJECT-TYPE
-		SYNTAX  INTEGER {
-		none(1),
-		start(2)
-	}
-	MAX-ACCESS  read-write
-	STATUS  current
-	DESCRIPTION
-		"This object is used to clear this entry."
-	::= { swDHCPServerBindingEntry 7 }
--- -----------------------------------------------------------------------------
--- swDHCPServerConflictIPTable	 { swDHCPServerMgmt 5 }
--- -----------------------------------------------------------------------------
-swDHCPServerConflictIPTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDHCPServerConflictIPEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains DHCP address conflicts."
-    ::= { swDHCPServerMgmt 5 }
+   ipspgDhcpTrId OBJECT-TYPE
+	SYNTAX 		INTEGER {
+				monitor(1),
+				analyzer(3)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The application which generated this IPSPG alarm."
+	::= {ipspgDhcpTrapEntry 3 }
 
-swDHCPServerConflictIPEntry OBJECT-TYPE
-    SYNTAX      SwDHCPServerConflictIPEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A DHCP address conflict means a duplication of use
-         of the same IP address by two hosts."
-    INDEX { swDHCPServerConflictIPIPAddress }
-    ::= { swDHCPServerConflictIPTable 1 }
+   ipspgDhcpTrText OBJECT-TYPE
+	SYNTAX 		DisplayString (SIZE(0..80))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"An ASCII string describing the IPSPG alarm condition/cause."
+	::= {ipspgDhcpTrapEntry 4 }
 
-SwDHCPServerConflictIPEntry ::=
-    SEQUENCE {
-        swDHCPServerConflictIPIPAddress
-        		IpAddress,
-        swDHCPServerConflictIPDetectionMethod
-        		INTEGER,
-        swDHCPServerConflictIPDetectionTime
-                DisplayString,
-        swDHCPServerConflictIPClearState
-        		INTEGER
-        }
+   ipspgDhcpTrPriority OBJECT-TYPE
+	SYNTAX 		INTEGER {
+				inform(1),
+				warning(2),
+				minor(3),
+				major(4),
+				critical(5)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The priority level as set on the agent for this Calss and Type of trap."
+	::= {ipspgDhcpTrapEntry 5 }
 
+   ipspgDhcpTrClass OBJECT-TYPE
+	SYNTAX 		Integer32 (1..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Class number of the described IPSPG alarm."
+	::= {ipspgDhcpTrapEntry 6 }
 
-swDHCPServerConflictIPIPAddress OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-        "IP address which is duplicated and used by two hosts."
-    ::= { swDHCPServerConflictIPEntry 1 }
+   ipspgDhcpTrType OBJECT-TYPE
+	SYNTAX 		Integer32 (1..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The type number of the described IPSPG alarm."
+	::= {ipspgDhcpTrapEntry 7 }
 
+   ipspgDhcpTrTime OBJECT-TYPE
+	SYNTAX 		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The time that the condition or event occurred which caused generation of this alarm.  This value is given in seconds since 00:00:00 Greenwich mean time (GMT) January 1, 1970."
+	::= {ipspgDhcpTrapEntry 8 }
 
-swDHCPServerConflictIPDetectionMethod OBJECT-TYPE
-		SYNTAX  INTEGER {
-		ping(1),
-		gratuitous-arp(2)
-	}
-	MAX-ACCESS  read-only
-	STATUS  current
-	DESCRIPTION
-		"The server detects conflicts using ping. The client detects
-		 conflicts using gratuitous Address Resolution Protocol (ARP)."
-	::= { swDHCPServerConflictIPEntry 2 }
+   ipspgDhcpTrSuspect OBJECT-TYPE
+	SYNTAX 		DisplayString (SIZE(0..32))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"An ASCII string describing the host which caused the IPSPG alarm."
+	::= {ipspgDhcpTrapEntry 9 }
 
-swDHCPServerConflictIPDetectionTime	OBJECT-TYPE
-		SYNTAX	DisplayString
-		MAX-ACCESS read-only
-		STATUS	current
-		DESCRIPTION
-			"The time at which a DHCP address conflict happens."
-		::= { swDHCPServerConflictIPEntry 3 }
+   ipspgDhcpTrDiagId OBJECT-TYPE
+	SYNTAX 		Integer32 (1..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"An integer describing the diagnosis which triggered this IPSPG alarm."
+	::= {ipspgDhcpTrapEntry 10 }
 
-swDHCPServerConflictIPClearState OBJECT-TYPE
-		SYNTAX  INTEGER {
-		none(1),
-		start(2)
-	}
-	MAX-ACCESS  read-write
-	STATUS  current
-	DESCRIPTION
-		"This object is used to clear this entry."
-	::= { swDHCPServerConflictIPEntry 4 }
+   dhcpServerStarted NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+				ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"The monitor has determined that the DHCP server has been started."
+	::= { dhcpServMibTraps 1 }
 
+   dhcpServerStopped NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+				ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"The monitor has determined that the DHCP server has been stopped."
+	::= { dhcpServMibTraps 2 }
+
+   dhcpServerReload NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"The monitor has determined that the DHCP server has been reloaded."
+	::= { dhcpServMibTraps 3 }
+
+   dhcpServerSubnetDepleted NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"The monitor has determined that the DHCP server has run out of addresses in a subnet."
+	::= { dhcpServMibTraps 4 }
+
+   dhcpServerBadPacket NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"The monitor has determined that the DHCP server has received a bad DHCP or Bootp packet."
+	::= { dhcpServMibTraps 5 }
+
+   dhcpServerFailoverActive NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"This trap is issued by the secondary server. It indicates
+    a primary partner server is down and its scopes are now being served by
+    this failover server."
+	::= { dhcpServMibTraps 6 }
+
+   dhcpServerFailoverReturnedControl NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"This trap is issued by the secondary server. It indicates
+    that the failover server has returned control to its primary partner."
+	::= { dhcpServMibTraps 7 }
+
+   dhcpServerSubnetThresholdExceeded NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"This trap is issued when subnet threshold is exceeded."
+	::= { dhcpServMibTraps 8 }
+
+   dhcpServerSubnetThresholdDescent NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"This trap is issued when subnet unavailable lease percentage falls below the descent threshold value."
+	::= { dhcpServMibTraps 9 }
+
+   dhcpServerDropUnknownClient NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"This trap is issued when the server drops a client message because the client MAC address is either in a MAC exclusion pool or is not in an inclusion pool."
+	::= { dhcpServMibTraps 10 }
+
+   dhcpServerPingResponseReceived NOTIFICATION-TYPE
+	OBJECTS 	{ipspgDhcpTrSequence, ipspgDhcpTrId, ipspgDhcpTrText, ipspgDhcpTrPriority, ipspgDhcpTrClass,
+			ipspgDhcpTrType, ipspgDhcpTrTime, ipspgDhcpTrSuspect, ipspgDhcpTrDiagId }
+	STATUS		current
+	DESCRIPTION	"This trap is issued when the server receives a ping response."
+	::= { dhcpServMibTraps 11 }
 
 END
+
+

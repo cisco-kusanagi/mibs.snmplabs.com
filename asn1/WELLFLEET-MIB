@@ -1,17 +1,18 @@
+               WELLFLEET-MIB DEFINITIONS ::= BEGIN
 
+-- Title:	Wellfleet Concise MIB
+-- Date:	October 3, 1990
+-- By:		Steve Willis/Wellfleet <swillis@welfleet.com>
+-- 		@(#)8100.mib	9.1 10/16/98
 
--- Wellfleet Enterprise MIB (V1.3b) v5.70
--- Wed Dec 11 1991
--- J. Burruss & S. Willis
-
-               Wellfleet-MIB DEFINITIONS ::= BEGIN
 
                IMPORTS
                        enterprises, Counter, NetworkAddress,
-		       IpAddress, Gauge, TimeTicks
+		       IpAddress, Gauge, TimeTicks, OBJECT-TYPE
                            FROM RFC1155-SMI
-                       DisplayString
-                           FROM RFC1213-MIB;
+			DisplayString FROM RFC1213-MIB
+			TRAP-TYPE
+			   FROM RFC-1215;
 
                wellfleet	OBJECT IDENTIFIER ::= { enterprises 18 }
 
@@ -25,17 +26,22 @@
 	       wfTftp		OBJECT IDENTIFIER ::= { wfMib 32 }
 	       wfApple		OBJECT IDENTIFIER ::= { wfMib 34 }
 	       wfConfig		OBJECT IDENTIFIER ::= { wfMib 35 }
-	       wfIpx		OBJECT IDENTIFIER ::= { wfMib 41 }
+
 	
 	-- The XNS Group
 	
-	-- The XNS Group contains information about the XNS
-	-- module of a Wellfleet Communications Server
+	-- The XNS Group contains information about the XNS/IPX
+	-- module of a Wellfleet Commmunications Server.
 	
-	wfxnsMib   OBJECT IDENTIFIER ::= { wfXns 1 }
-
-	wfxnsidp   OBJECT IDENTIFIER ::= { wfxnsMib 1 }
-
+	wfxnsidp OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Internet Datagram Protocol portion of the
+			XNS MIB"
+		::= { wfXns 1}
+	
 	wfxnsidpForwarding OBJECT-TYPE
 		SYNTAX INTEGER {
 			forwarding(1),
@@ -48,7 +54,7 @@
 		::= { wfxnsidp 1 }
 	
 	wfxnsidpInReceives OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
@@ -58,7 +64,7 @@
 		::= { wfxnsidp 2 }
 	
 	wfxnsidpInHdrErrors OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
@@ -69,7 +75,7 @@
 		::= { wfxnsidp 3 }
 	
 	wfxnsidpInAddrErrors OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
@@ -78,17 +84,16 @@
 		::= { wfxnsidp 4 }
 	
 	wfxnsidpForwDatagrams OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The number of received IDP datagrams not addressed
-			to the XNS router. The router attempts to forward
+			to the XNS/IPX router. The router attempts to forward
 			these datagrams to their ultimate destination. "
 		::= { wfxnsidp 5 }
-
 	wfxnsidpInUnknownProtos OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
@@ -97,7 +102,7 @@
 		::= { wfxnsidp 6 }
 	
 	wfxnsidpInDiscards OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
@@ -106,14 +111,13 @@
 		::= { wfxnsidp 7 }
 	
 	wfxnsidpInDelivers OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The number of IDP datagrams delivered to the IDP
 			user protocols. (Error, Echo, RIP). "
 		::= { wfxnsidp 8 }
-
 	wfxnsidpOutRequests OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
@@ -124,7 +128,7 @@
 		::= { wfxnsidp 9 }
 	
 	wfxnsidpOutDiscards OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
@@ -133,7 +137,7 @@
 		::= { wfxnsidp 10 }
 	
 	wfxnsidpOutNoRoutes OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
@@ -141,137 +145,46 @@
 			could be found for their destination. "
 		::= { wfxnsidp 11 }
 	
-	wfxnsidpErrs OBJECT IDENTIFIER ::= { wfxnsidp 12 }
-	-- "A list of error Counters. "
+	wfxnsidpErrs OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"A list of error counters. "
+		::= { wfxnsidp 12}
 	
 	wfxnsidpErrSupressed OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The number of packet dropped because their length
 			is below minimum. "
-		::= { wfxnsidpErrs 1 }
+		::= { wfxnsidpErrs 1}
 	
-	wfxnsidpErrDestUnspec OBJECT-TYPE
-		SYNTAX INTEGER
+	wfxnsidpErrType OBJECT-TYPE
+		SYNTAX Counter
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
-			"The number of destination-host-generated Error packets
-			 with an Error Number of 0 relayed by the router.  This
-			 indicates an IDP packet rejected for unspecified reasons."
+			"/ tbs / "
 		::= { wfxnsidpErrs 2 }
-	
-	wfxnsidpErrDestHdrLen OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by a destination host
-			 because the packet header was of insufficient length."
-		::= { wfxnsidpErrs 3 }
-	
-	wfxnsidpErrDestProto OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by a destination host
-			because the protocol type field contained an invalid or
-			unknown value."
-		::= { wfxnsidpErrs 4 }
-	
-	wfxnsidpErrDestCksum OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by a destination host
-			because of a faulty or corrupted IDP checksum."
-		::= { wfxnsidpErrs 5 }
-	
-	wfxnsidpErrDestBadSock OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by a destination host
-			because the packet was addressed to an unknown socket."
-		::= { wfxnsidpErrs 6 }
-	
-	wfxnsidpErrDestNoResrcs OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by a destination host
-			because of a lack of processing resources."
-		::= { wfxnsidpErrs 7 }
-	
-	wfxnsidpErrDestXitUnspec OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by the router
-			for unspecified reasons."
-		::= { wfxnsidpErrs 8 }
-	
-	wfxnsidpErrXitCksum OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by the router
-			because of a faulty or corrupted checksum."
-		::= { wfxnsidpErrs 9 }
-	
-	wfxnsidpErrXitUnreach OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by the router
-			because the destination is unreachable."
-		::= { wfxnsidpErrs 10 }
-	
-	wfxnsidpErrXitHopCnt OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by the router
-			becuase the packet had passed through more than the
-			maximum number of routers before arriving at its
-			destination."
-		::= { wfxnsidpErrs 11 }
-	
-	wfxnsidpErrXitTooBig OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of packets rejected by the router
-			becuase the packet was too long for the router
-			to relay."
-		::= { wfxnsidpErrs 12 }
 	
 	wfxnsidpAddrTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF WfXnsIdpAddrEntry 
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"The IDP Address table. "
-		::= { wfxnsidp 13 }
+		::= { wfxnsidp 13}
 	
 	wfxnsidpAddrEntry OBJECT-TYPE
 		SYNTAX WfXnsIdpAddrEntry
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"An entry in the IDP address table."
-		INDEX { wfxnsidpAddrAddress }
+		INDEX { idpAddrAddress }
 		::= { wfxnsidpAddrTable 1 }
 	
 	WfXnsIdpAddrEntry ::= SEQUENCE {
@@ -280,14 +193,13 @@
 		wfxnsidpAddrIfIndex
 			INTEGER
 	}
-
 	wfxnsidpAddrAddress OBJECT-TYPE
-		SYNTAX OCTET STRING (SIZE (6))
+		SYNTAX OCTET STRING
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The IDP network number. "
-		::= { wfxnsidpAddrEntry 1 }
+		::= { wfxnsidpAddrEntry 1}
 	
 	wfxnsidpAddrIfIndex OBJECT-TYPE
 		SYNTAX INTEGER
@@ -295,19 +207,19 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The interface index. "
-		::= { wfxnsidpAddrEntry 2 }
+		::= { wfxnsidpAddrEntry 2}
 	
 	wfxnsidpRoutingTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF WfXnsIdpRouteEntry
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"The XNS IDP routing table."
-		::= { wfxnsidp 14 }
+		::= { wfxnsidp 14}
 	
 	wfxnsidpRouteEntry OBJECT-TYPE
 		SYNTAX WfXnsIdpRouteEntry
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"Information about a routing table entry. "
@@ -325,12 +237,9 @@
 			OCTET STRING,
 		wfxnsidpRouteType
 			INTEGER,
-		wfxnsidpRouteProto
-			INTEGER,
-		wfxnsidpRouteAge
+		wfxnsidpRouteProto 
 			INTEGER
 	}
-
 	wfxnsidpRouteDest OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
@@ -357,12 +266,12 @@
 		::= { wfxnsidpRouteEntry 3 }
 	
 	wfxnsidpRouteNextHop OBJECT-TYPE
-		SYNTAX OCTET STRING (SIZE (6))
+		SYNTAX OCTET STRING
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The host address of the next hop gateway. "
-		::= { wfxnsidpRouteEntry 4 }
+		::= { wfxnsidpRouteEntry 4}
 	
 	wfxnsidpRouteType OBJECT-TYPE
 		SYNTAX INTEGER
@@ -371,7 +280,7 @@
 		DESCRIPTION
 			"Indicates whether the route was statically configured,
 			direct or learned via RIP. "
-		::= { wfxnsidpRouteEntry 5 }
+		::= { wfxnsidpRouteEntry 5}
 	
 	wfxnsidpRouteProto OBJECT-TYPE
 		SYNTAX INTEGER
@@ -379,7 +288,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The actual routing protocol used to determine the route."
-		::= { wfxnsidpRouteEntry 6 }
+		::= { wfxnsidpRouteEntry 6}
 	
 	wfxnsidpRouteAge OBJECT-TYPE
 		SYNTAX INTEGER
@@ -387,7 +296,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The age (in seconds) of the route. "
-		::= { wfxnsidpRouteEntry 7 }
+		::= { wfxnsidpRouteEntry 7}
 	
 	
 	-- The DECNET Phase IV Group
@@ -404,7 +313,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"Indicates the state of the router."
-		::= { wfDrs 1 }
+		::= { wfDrs 1}
 	
 	wfdrsArea OBJECT-TYPE
 		SYNTAX INTEGER (1..63)
@@ -412,7 +321,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The number of the local DECNET area."
-		::= { wfDrs 2 }
+		::= { wfDrs 2}
 	
 	wfdrsNode OBJECT-TYPE
 		SYNTAX INTEGER (1..1023)
@@ -420,7 +329,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The DECNET node number."
-		::= { wfDrs 3 }
+		::= { wfDrs 3}
 	
 	wfdrsRouting OBJECT-TYPE
 		SYNTAX INTEGER
@@ -428,7 +337,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			" / tbs /"
-		::= { wfDrs 4 }
+		::= { wfDrs 4}
 	
 	wfdrsMaxArea OBJECT-TYPE
 		SYNTAX INTEGER
@@ -436,7 +345,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The maximum number of areas in the network."
-		::= { wfDrs 5 }
+		::= { wfDrs 5}
 	
 	wfdrsMaxNode OBJECT-TYPE
 		SYNTAX INTEGER
@@ -444,7 +353,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The maximum number of nodes in any area."
-		::= { wfDrs 6 }
+		::= { wfDrs 6}
 	
 	wfdrsAreaMaxHop OBJECT-TYPE
 		SYNTAX INTEGER
@@ -453,14 +362,14 @@
 		DESCRIPTION
 			"Maximum number of areas a packet can transit from source to 
 			destination."
-		::= { wfDrs 7 }
+		::= { wfDrs 7}
 	wfdrsAreaMaxCost OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The maximum area-to-area transit cost."
-		::= { wfDrs 8 }
+		::= { wfDrs 8}
 	
 	wfdrsNodeMaxHop OBJECT-TYPE
 		SYNTAX INTEGER
@@ -469,7 +378,7 @@
 		DESCRIPTION
 			"The maximum number of hops a packet can transit from source
 			to destination."
-		::= { wfDrs 9 }
+		::= { wfDrs 9}
 	
 	wfdrsNodeMaxCost OBJECT-TYPE
 		SYNTAX INTEGER
@@ -477,7 +386,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The maximum node-to-node transit cost."
-		::= { wfDrs 10 }
+		::= { wfDrs 10}
 	
 	wfdrsMaxVisits OBJECT-TYPE
 		SYNTAX INTEGER
@@ -485,23 +394,23 @@
 		STATUS mandatory
 		DESCRIPTION
 			"Maximum number of times packet can transit the same router."
-		::= { wfDrs 11 }
+		::= { wfDrs 11}
 	
 	wfdrsRoutingTimer OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
-			"Time interval between topology packets on non-broadcast media."
-		::= { wfDrs 12 }
+			" /tbs/ "
+		::= { wfDrs 12}
 	
 	wfdrsBcastRoutTimer OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
-			"Time interval between topology packets on bradcast media."
-		::= { wfDrs 13 }
+			"Time interval between topology packets."
+		::= { wfDrs 13}
 	
 	wfdrsBcastEnodeAdj OBJECT-TYPE
 		SYNTAX INTEGER
@@ -509,24 +418,24 @@
 		STATUS mandatory
 		DESCRIPTION
 			"Maximum number of adjacent nodes"
-		::= { wfDrs 14 }
+		::= { wfDrs 14}
 	
 	wfdrsIfTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF WfDrsIfTabEntry
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"The DECNET Interface table. "
-		::= { wfDrs 15 }
+		::= { wfDrs 15}
 	
 	wfdrsIfTabEntry OBJECT-TYPE
 		SYNTAX WfDrsIfTabEntry
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"An entry in the DECNET interface table. "
 		INDEX { wfdrsIfTabEntIfIndex }
-		::= { wfdrsIfTable 1 }
+		::= { wfdrsIfTable 1}
 	
 	WfDrsIfTabEntry ::= SEQUENCE {
 		wfdrsIfTabEntIfIndex
@@ -551,7 +460,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The router assigned interface number. "
-		::= { wfdrsIfTabEntry 1 }
+		::= { wfdrsIfTabEntry 1}
 	
 	wfdrsIfTabEntState OBJECT-TYPE
 		SYNTAX INTEGER
@@ -559,7 +468,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The state of the interface. "
-		::= { wfdrsIfTabEntry 2 }
+		::= { wfdrsIfTabEntry 2}
 	
 	wfdrsIfTabEntName OBJECT-TYPE
 		SYNTAX INTEGER
@@ -583,7 +492,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The time interval between DECNET hello packets."
-		::= { wfdrsIfTabEntry 5 }
+		::= { wfdrsIfTabEntry 5}
 	
 	wfdrsIfTabEntRtrPrior OBJECT-TYPE
 		SYNTAX INTEGER
@@ -591,7 +500,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			" The router priority."
-		::= { wfdrsIfTabEntry 6 }
+		::= { wfdrsIfTabEntry 6}
 	
 	wfdrsIfTabEntNumRtrs OBJECT-TYPE
 		SYNTAX INTEGER
@@ -599,11 +508,11 @@
 		STATUS mandatory
 		DESCRIPTION
 			"Maximum number of adjacent routers on this interface."
-		::= { wfdrsIfTabEntry 7 }
+		::= { wfdrsIfTabEntry 7}
 	
 	wfdrsAreaRoutingTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF WfDrsAreaRoute
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"The level 2 (area) routing table. "
@@ -611,7 +520,7 @@
 	
 	wfdrsAreaRoute OBJECT-TYPE
 		SYNTAX WfDrsAreaRoute
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"Information about a route to an area. "
@@ -638,7 +547,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"Destination area. "
-		::= { wfdrsAreaRoute 1 }
+		::= { wfdrsAreaRoute 1}
 	
 	wfdrsAreaRouteCost OBJECT-TYPE
 		SYNTAX INTEGER
@@ -646,7 +555,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"Aggregate cost to reach destination area."
-		::= { wfdrsAreaRoute 2 }
+		::= { wfdrsAreaRoute 2}
 	
 	wfdrsAreaRouteHopCount OBJECT-TYPE
 		SYNTAX INTEGER
@@ -654,7 +563,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"Number of hops to reach destination area."
-		::= { wfdrsAreaRoute 3 }
+		::= { wfdrsAreaRoute 3}
 	
 	wfdrsAreaRouteNextArea OBJECT-TYPE
 		SYNTAX INTEGER
@@ -662,39 +571,39 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The next area to forward the packet. "
-		::= { wfdrsAreaRoute 4 }
+		::= { wfdrsAreaRoute 4}
 	wfdrsAreaRouteNextNode OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The next node to forward the packet to."
-		::= { wfdrsAreaRoute 5 }
+		::= { wfdrsAreaRoute 5}
 	wfdrsAreaRouteIf OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The interface to forward the packet on."
-		::= { wfdrsAreaRoute 6 }
+		::= { wfdrsAreaRoute 6}
 	
 	wfdrsNodeRoutingTable OBJECT-TYPE	
 		SYNTAX SEQUENCE OF WfDrsNodeRoute
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"The level 1 (node) routing table. "
-		::= { wfDrs 17 }
+		::= { wfDrs 17}
 	
 	wfdrsNodeRoute OBJECT-TYPE
 		SYNTAX WfDrsNodeRoute
-		ACCESS not-accessible
+		ACCESS non-accessible
 		STATUS mandatory
 		DESCRIPTION
 			"Information about how to reach an node
 			within the area. "
 		INDEX { wfdrsNodeRouteDest }
-		::= { wfdrsNodeRoutingTable 1 }
+		::= { wfdrsNodeRoutingTable 1}
 	 
 	WfDrsNodeRoute ::= SEQUENCE {
 		wfdrsNodeRouteDest
@@ -714,7 +623,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The destination node number."
-		::= { wfdrsNodeRoute 1 }
+		::= { wfdrsNodeRoute 1}
 	
 	wfdrsNodeRouteCost OBJECT-TYPE
 		SYNTAX INTEGER
@@ -722,7 +631,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The aggregate cost to the destination node."
-		::= { wfdrsNodeRoute 2 }
+		::= { wfdrsNodeRoute 2}
 	
 	wfdrsNodeRouteHopCount OBJECT-TYPE
 		SYNTAX INTEGER
@@ -730,7 +639,7 @@
 		STATUS mandatory
 		DESCRIPTION
 			"Number of hops to destination node."
-		::= { wfdrsNodeRoute 3 }
+		::= { wfdrsNodeRoute 3}
 	
 	wfdrsNodeRouteNextHop OBJECT-TYPE
 		SYNTAX INTEGER
@@ -738,39 +647,39 @@
 		STATUS mandatory
 		DESCRIPTION
 			"The node number of the next hop."
-		::= { wfdrsNodeRoute 4 }
+		::= { wfdrsNodeRoute 4}
 	wfdrsNodeRouteIf OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
 			"The interface index of the next hop."
-		::= { wfdrsNodeRoute 5 }
+		::= { wfdrsNodeRoute 5}
 		
 	
           -- the Bridge Group
 
           -- The Bridge Group contains information about the Learning Bridge
-	  -- module of a Wellfleet Communications Server
+	  -- module of a Wellfleet Communications Server.
 
           wflbFwdTable OBJECT-TYPE
                   SYNTAX  SEQUENCE OF WfBridgeFwdEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"The bridge modules's table of MAC address-interface
 			mappings."
-                  ::= { wfBridge 1 }
+                  ::= { wfBridge 2 }
 
           wflbFwdEntry OBJECT-TYPE
                   SYNTAX  WfBridgeFwdEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"Each entry describes one MAC address-interface
 			mapping; that is, each entry describes a station
 			which has been or is being learned."
-		  INDEX { wflbFwdEntMacAddr }
+		  INDEX { wflbFwdTabEntMacAddr }
                   ::= { wflbFwdTable 1 }
 
 	  WfBridgeFwdEntry ::= SEQUENCE {
@@ -784,13 +693,13 @@
 			INTEGER,
 		wflbFwdEntIfName
 			DisplayString,
-		wflbFwdEntFloodStat
+		wflbFwdEndFloodStat
 			INTEGER
 	  }
 
   	  wflbFwdEntIf OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"A number identifying the interface on which the station
@@ -800,8 +709,8 @@
                   ::= { wflbFwdEntry 1 }
 
   	  wflbFwdEntMacAddr OBJECT-TYPE
-		  SYNTAX  OCTET STRING (SIZE (6))
-                  ACCESS  read-only
+		  SYNTAX  OCTET STRING
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The MAC-level (physical) address of the station described
@@ -809,28 +718,34 @@
                   ::= { wflbFwdEntry 2 }
 
   	  wflbFwdEntSrcDisp OBJECT-TYPE
-		  SYNTAX  INTEGER
-                  ACCESS  read-only
+		  SYNTAX  INTEGER {
+				drop(0),
+				forward(1)
+			 	}
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"Identifies the disposition of frames containing
 			wflbFwdEntMacAddr as the source address field of the
-			frame.  0 signifies drop; 1 signifies forward."
+			frame."
                   ::= { wflbFwdEntry 3 }
 
   	  wflbFwdEntDstDisp OBJECT-TYPE
-		  SYNTAX  INTEGER
-                  ACCESS  read-only
+		  SYNTAX  INTEGER {
+				drop(0),
+				forward(1)
+			 	}
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"Identifies the disposition of frames containing
 			wflbFwdEntMacAddr as the destination address field of the
-			frame.  0 signifies drop; 1 signifies forward."
+			frame."
                   ::= { wflbFwdEntry 4 }
 
   	  wflbFwdEntIfName OBJECT-TYPE
 		  SYNTAX  DisplayString
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"A text string contining the circuit group name of interface
@@ -838,115 +753,23 @@
                   ::= { wflbFwdEntry 5 }
 
 
-  	  wflbFwdEntFloodStat OBJECT-TYPE
+  	  wflbFwdEndFloodStat OBJECT-TYPE
 		  SYNTAX  INTEGER {
 				forwarding(1),
 				flooding(2),
 				dropping(3)
 			 	}
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"Denotes whether frames destined for wflbFwdEntMacAddr
 			are being flooded or dropped if the MAC Address-interface
 			mapping for wflbFwdEntMacAddr has not yet been learned.
-			If the value of wflbFwdEntFloodStat is forwarding(1), the
+			If the value of wflbFwdEntFloodStat is forwarding, the
 			MAC Address-interface mapping has been learned."
                   ::= { wflbFwdEntry 6 }
 
-          wflbRifTable OBJECT-TYPE
-                  SYNTAX  SEQUENCE OF WfBridgeRifEntry
-                  ACCESS  not-accessible
-                  STATUS  mandatory
-                  DESCRIPTION
-                        "The bridge modules's source routing RIF (Routing 
-                         Information Field) table." 
-                  ::= { wfBridge 2 }
-
-          wflbRifEntry OBJECT-TYPE
-                  SYNTAX  WfBridgeRifEntry
-                  ACCESS  not-accessible
-                  STATUS  mandatory
-                  DESCRIPTION
-                        "Each entry contains a RIF cache for a network node.
-                         The table is indexed by an arbitrary set of 6
-                         integers."
-                  INDEX { INTEGER, INTEGER, INTEGER,
-                          INTEGER, INTEGER, INTEGER }
-                  ::= { wflbRifTable 1 }
-
-          WfBridgeRifEntry ::= SEQUENCE {
-                wflbRifMacSrcAddress
-                        OCTET STRING,
-                wflbRifMacAddress
-                        OCTET STRING,
-                wflbRifCg
-                        DisplayString,
-                wflbRif
-                        OCTET STRING
-          }
-
-          wflbRifMacSrcAddress OBJECT-TYPE
-                  SYNTAX  OCTET STRING (SIZE (6))
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                        "The MAC-level (physical) address of the source
-                         interface."
-                  ::= { wflbRifEntry 1 }
-
-          wflbRifMacAddress OBJECT-TYPE
-                  SYNTAX  OCTET STRING (SIZE (6))
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                        "The MAC-level (physical) address of the destination
-                         interface."
-                  ::= { wflbRifEntry 2 }
-
-          wflbRifCg OBJECT-TYPE
-		  SYNTAX  DisplayString (SIZE (0..32))
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                        "The name of the circuit group that connects the source
-                         interface to token ring."
-                  ::= { wflbRifEntry 3 }
-
-          wflbRif OBJECT-TYPE
-                  SYNTAX  OCTET STRING (SIZE (3..18))
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                        "A description of the path used to source route packets
-                         between the source route and the destination.  The
-                         first two bytes contain the routing control (RC) field
-                         that describes the routing type, field length,
-                         direction bit and largest frame size as follows.
-                              bits 1-2:   RIF type
-                                   00: Specifically Routed Frame (SRF)
-                                   11: Spanning Tree Explorer (STE)
-                                   10: All Routes Explorer (ARE)
-
-                              bit 3:      Reserved
-
-                              bits 4-8:   Length of RIF
-                                   Maximum = 18 bytes 
-
-                              bit 9:      Direction that frames traverses LAN
-                                    0: Forward
-                                    1: Reverse
-                              bits 10-12: Largest Frame size for this route
-                                   Maximum is 4472 bytes
-
-                              bits 13-16: Reserved
-
-                         Next are a series of two-byte route descriptors; each
-                         contains a 12-bit LAN ID followed by a 4-bit bridge ID
-                         number which indicate the next hop in the route."
-                  ::= { wflbRifEntry 4 }
-
-
+	
           -- the TFTP Group
 
           -- The TFTP Group contains information about the Trivial File Transfer
@@ -955,7 +778,7 @@
 	
           wftftpFilesIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of successful transfers of files to this
@@ -965,7 +788,7 @@
 
           wftftpFilesOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of successful transfers of files from this
@@ -975,7 +798,7 @@
 
           wftftpWRQIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of WRQ PDUs received by the TFTP
@@ -987,7 +810,7 @@
 
           wftftpWRQOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of WRQ PDUs sent by the TFTP
@@ -999,7 +822,7 @@
 
           wftftpRRQIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of RRQ PDUs received by the TFTP
@@ -1011,7 +834,7 @@
 
           wftftpRRQOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of RRQ PDUs sent by the TFTP
@@ -1023,7 +846,7 @@
 
           wftftpRxmits OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of TFTP PDUs that have been retransmitted
@@ -1033,7 +856,7 @@
 
           wftftpERRIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ERR PDUs received by the TFTP entity since
@@ -1043,7 +866,7 @@
 
           wftftpERROut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ERR PDUs sent by the TFTP entity since
@@ -1053,36 +876,37 @@
 
           wftftpAborts OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of unsuccessful TFTP file transfer that
 			 have been abnormally terminated."
                   ::= { wfTftp 10 }
 
-	
 
           -- the AppleTalk group
 
           -- The AppleTalk Group contains information about the AppleTalk
-	  -- Router module of a Wellfleet Communications Server
+	  -- Router module of a Wellfleet Communications Server.
 
 
           wfappleStation	OBJECT IDENTIFIER ::= { wfApple 1 }
 
           wfappleStationRouting OBJECT-TYPE
-                  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  SYNTAX  INTEGER {
+				notforwarding(0),
+				forwarding(1)
+			}
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION 
-			"Indicates whether this entity is routing (i.e.,
-			forwarding) AppleTalk datagrams.  1 signifies
-			forwarding; 0 not forwarding."
+			"Indicates that this entity is routing (i.e.,
+			forwarding) AppleTalk datagrams."	
                   ::= { wfappleStation 1 }
 
           wfappleStationVersion OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The version number of the AppleTalk protocol supported
@@ -1092,7 +916,7 @@
 
           wfapplePortTable OBJECT-TYPE
                   SYNTAX  SEQUENCE OF WfApplePortEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"The wfapplePortTable is a table of per-interface
@@ -1103,12 +927,12 @@
 
           wfapplePortEntry OBJECT-TYPE
                   SYNTAX  WfApplePortEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"Each entry describes an interface of the AppleTalk
 			Router."
-		  INDEX { wfapplePortIfIndex }
+		  INDEX { wfappletPortIfIndex }
                   ::= { wfapplePortTable 1 }
 
 	  WfApplePortEntry ::= SEQUENCE {
@@ -1130,7 +954,7 @@
 
   	  wfapplePortIfIndex OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"A number identifying the interface described by this
@@ -1140,17 +964,20 @@
                   ::= { wfapplePortEntry 1 }
 
 	  wfapplePortSeed OBJECT-TYPE
-		  SYNTAX  INTEGER
-                  ACCESS  read-only
+		  SYNTAX  INTEGER {
+				non-seed (0),
+				seed (1)
+				}
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"Describes whether this interface was configured as a 'seed'
-			port.  1 indicates a seed port; 0 a non-seed port."
+			port."
                   ::= { wfapplePortEntry 2 }
 
 	  wfapplePortMinNet OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The minimum network number in the range of network numbers
@@ -1159,7 +986,7 @@
 
 	  wfapplePortMaxNet OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The maximum network number in the range of network numbers
@@ -1168,7 +995,7 @@
 
 	  wfapplePortNetwork OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The  network number within the range wfapplePortMinNet to
@@ -1178,7 +1005,7 @@
 
 	  wfapplePortNodeID OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The node identification which denotes this AppleTalk entity on
@@ -1188,7 +1015,7 @@
 
 	  wfapplePortDefaultZone OBJECT-TYPE
 		  SYNTAX  DisplayString
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The name of the default zone for this interface (a zero-length
@@ -1200,7 +1027,7 @@
 
           wfappleDDPPktsIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The total number of DDP packets received by this entity."
@@ -1208,7 +1035,7 @@
 
           wfappleDDPPktsOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The total number of DDP packets transmitted by this entity."
@@ -1216,7 +1043,7 @@
 
           wfappleDDPPktsFwd OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
        			"The total number of DDP packets forwarded by this entity."
@@ -1224,7 +1051,7 @@
 
           wfappleDDPDelivers OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The total number of DDP packets received by this entity which
@@ -1233,7 +1060,7 @@
 
           wfappleDDPUnknownNet OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
        			"The total number of DDP packets discarded by this entity
@@ -1243,7 +1070,7 @@
 
           wfappleDDPHopsExceeded OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
        			"The total number of DDP packets discarded by this entity
@@ -1252,7 +1079,7 @@
 
           wfappleDDPBadChksum OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
        			"The total number of DDP packets discarded by this entity
@@ -1261,7 +1088,7 @@
 
           wfappleDDPDropped OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
        			"The total number of DDP packets discarded by this entity."
@@ -1271,7 +1098,7 @@
 
           wfappleEchoRequestIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of AEP Echo Request Packets received by this
@@ -1280,7 +1107,7 @@
 
           wfappleEchoResponseOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of AEP Echo Response Packets sent by this
@@ -1291,7 +1118,7 @@
 
           wfappleRTMPRequestIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The total number of RTMP Request packets received by this entity."
@@ -1299,7 +1126,7 @@
 
           wfappleRTMPResponseOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The total number of RTMP Response packets transmitted by this entity."
@@ -1308,7 +1135,7 @@
 
           wfappleRoutingTable OBJECT-TYPE
                   SYNTAX  SEQUENCE OF WfAppleRouteEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"The AppleTalk Routing Table contains an entry for each
@@ -1317,7 +1144,7 @@
 
           wfappleRouteEntry OBJECT-TYPE
                   SYNTAX  WfAppleRouteEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"A route to a particular AppleTalk destination."
@@ -1343,7 +1170,7 @@
 
   	  wfappleRouteMinNet OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The minimum network number in the destination's network
@@ -1352,7 +1179,7 @@
 
   	  wfappleRouteMaxNet OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The maximum network number in the destination's network
@@ -1361,7 +1188,7 @@
 
   	  wfappleRouteIfIndex OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The index value which uniquely identifies the local
@@ -1373,7 +1200,7 @@
 
   	  wfappleRouteDistance OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The AppleTalk routing metric for this route."
@@ -1381,7 +1208,7 @@
 
   	  wfappleRouteNextNet OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The network number of the Next Hop Router for this destination."
@@ -1389,21 +1216,25 @@
 
   	  wfappleRouteNextNode OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The node identification of the Next Hop Router for this destination."
                   ::= { wfappleRouteEntry 6 }
 
   	  wfappleRouteState OBJECT-TYPE
-		  SYNTAX  INTEGER
-                  ACCESS  read-only
+		  SYNTAX  INTEGER {
+				bad(0),
+				suspect(1),
+				good(2)
+				}
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
-			"The status of this route.  Valid routes are marked
-			Good (2); invalidated or timed-out routes (if present)
-			are marked Bad (0); a Suspect route (1) is still valid
-			for routing but has been noted as marginal."
+			"The status of this route.  Valid routes are marked Good;
+			invalidated or timed-out routes (if present) are marked Bad;
+			a Suspect route is still valid for routing but has been noted
+			as marginal."
                   ::= { wfappleRouteEntry 7 }
 
 
@@ -1411,7 +1242,7 @@
 
           wfappleNBPFwdReqOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of NBP Forward Request packets transmitted by
@@ -1420,7 +1251,7 @@
 
           wfappleNBPLookupOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of NBP Lookup packets transmitted by this entity."
@@ -1428,7 +1259,7 @@
 
           wfappleNBPBcastReqIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of NBP Broadcast Request packets received by
@@ -1437,7 +1268,7 @@
 
           wfappleNBPFwdReqIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of NBP Forward Request packets received by
@@ -1449,7 +1280,7 @@
 
           wfappleZIPRequestOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of Zone Information Protocol (ZIP) Request
@@ -1458,7 +1289,7 @@
 
           wfappleZIPReplyOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of Zone Information Protocol (ZIP) Reply
@@ -1467,7 +1298,7 @@
 
           wfappleZIPNetInfoRepOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetNetInfo Reply packets
@@ -1476,7 +1307,7 @@
 
           wfappleZIPGetLclZoneOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetLocalZones packets
@@ -1485,7 +1316,7 @@
 
           wfappleZIPGetLclZoneRepOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetLocalZones Reply packets
@@ -1494,7 +1325,7 @@
 
           wfappleZIPGetZoneListOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetZoneList packets
@@ -1503,7 +1334,7 @@
 
           wfappleZIPGetNetInfoOut OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetNetInfo packets
@@ -1512,7 +1343,7 @@
 
           wfappleZIPGetNetInfoIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetNetInfo packets
@@ -1521,7 +1352,7 @@
 
           wfappleZIPNetInfoRepIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetNetInfo Reply packets
@@ -1530,7 +1361,7 @@
 
           wfappleZIPRequestIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP Request packets received by this entity."
@@ -1538,7 +1369,7 @@
 
           wfappleZIPReplyIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP Reply packets received by this entity."
@@ -1546,7 +1377,7 @@
 
           wfappleZIPGetZoneListIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetZoneList packets
@@ -1555,7 +1386,7 @@
 
           wfappleZIPGetLclZoneIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetLocalZones packets
@@ -1564,7 +1395,7 @@
 
           wfappleZIPGetLclZoneRepIn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The number of ZIP GetLocalZones Reply packets
@@ -1574,7 +1405,7 @@
 	
           wfappleLocalZoneTable OBJECT-TYPE
                   SYNTAX  SEQUENCE OF WfAppleLZTEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"A list of all the zone names for the network to which
@@ -1583,11 +1414,11 @@
 
           wfappleLZTEntry OBJECT-TYPE
                   SYNTAX  WfAppleLZTEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"Each entry associates a zone name with an interface."
-		  INDEX { wfappleLZTIfIndex } 
+		  INDEX { wfappleLZTIfIndex, INTEGER } --OPTIONAL }
                   ::= { wfappleLocalZoneTable 1 }
 
 	  WfAppleLZTEntry ::= SEQUENCE {
@@ -1599,7 +1430,7 @@
 
   	  wfappleLZTZoneName OBJECT-TYPE
 		  SYNTAX  DisplayString
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The name of an AppleTalk zone associated with a particular
@@ -1608,7 +1439,7 @@
 
   	  wfappleLZTIfIndex OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The interface to the network with which the named zone
@@ -1620,7 +1451,7 @@
 
           wfappleAARPTable OBJECT-TYPE
                   SYNTAX  SEQUENCE OF WfAppleAARPEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
 			"The AppleTalk Address Resolution Protocol Table used
@@ -1630,7 +1461,7 @@
 	
           wfappleAARPEntry OBJECT-TYPE
                   SYNTAX  WfAppleAARPEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION 
 			"Each entry contains one AppleTalk Net/Node address to
@@ -1643,15 +1474,15 @@
 			INTEGER,
 		wfappleAARPNode
 			INTEGER,
-  	  	wfappleAARPMacAddress
+		wfappleRouteMacAddr
 			OCTET STRING,
-  	  	wfappleAARPIfIndex
+		wfappleRouteIfIndex
 			INTEGER
 	  }
 
   	  wfappleAARPNet OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The network number of the AppleTalk entity described by this
@@ -1660,7 +1491,7 @@
 
   	  wfappleAARPNode OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The node identification of the AppleTalk entity described by this
@@ -1668,8 +1499,8 @@
                   ::= { wfappleAARPEntry 2 }
 
   	  wfappleAARPMacAddress OBJECT-TYPE
-		  SYNTAX  OCTET STRING (SIZE (6))
-                  ACCESS  read-only
+		  SYNTAX  OCTET STRING
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The media-dependent 'physical' address of this AppleTalk entity."
@@ -1677,7 +1508,7 @@
 
   	  wfappleAARPIfIndex OBJECT-TYPE
 		  SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
 			"The interface on which this entry's equivalence is
@@ -1691,12 +1522,12 @@
           -- the Configuration Group
 
           -- The Configuration Group contains information about various
-	  -- aspects of a Wellfleet Communication Server's configuration:
+	  -- aspects of a Wellfleet Communications Server's configuration:
 	  -- Notably, software release number and hardware config.
 
           wfconfigVersionMajor OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The Major Version Number of the Software Release
@@ -1706,7 +1537,7 @@
 
           wfconfigVersionMinor OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The Minor Version Number of the Software Release
@@ -1715,8 +1546,8 @@
                   ::= { wfConfig 2 }
 
           wfconfigImageFileName OBJECT-TYPE
-                  SYNTAX  OCTET STRING (SIZE (0..12))
-                  ACCESS  read-only
+                  SYNTAX  OCTET STRING
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The name of the binary load image file from which
@@ -1724,85 +1555,36 @@
                   ::= { wfConfig 3 }
 
           wfconfigConfigFileName OBJECT-TYPE
-                  SYNTAX  OCTET STRING (SIZE (0..12))
-                  ACCESS  read-only
+                  SYNTAX  OCTET STRING
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The name of the text file from which the current
 			   configuration of the Communications Server was read."
                   ::= { wfConfig 4 }
 
-	wfconfigKeys       OBJECT IDENTIFIER ::= { wfConfig 5 }
-
-          wfconfigKeysBridge OBJECT-TYPE
-                  SYNTAX  INTEGER
-                  ACCESS  read-only
+          wfconfigKeys OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF INTEGER
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
-                          "Indicates whether the Bridge software option is
-                           active in the Communications Server's software
-                           configuration.  0 indicates that the option is
-			   absent; 1 that it is present."
-                  ::= { wfconfigKeys 1 }
-
-          wfconfigKeysDrs OBJECT-TYPE
-                  SYNTAX  INTEGER
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                          "Indicates whether the DecNet routing software
-                           option is active in the Communications Server's 
-                           software configuration.  0 indicates that the
-			   option is absent; 1 that it is present."
-                  ::= { wfconfigKeys 2 }
-
-          wfconfigKeysIp OBJECT-TYPE
-                  SYNTAX  INTEGER
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                          "Indicates whether the Ip routing software option
-                           is active in the Communications Server's software
-                           configuration.  0 indicates that the option is
-			   absent; 1 that it is present."
-                  ::= { wfconfigKeys 3 }
-
-          wfconfigKeysX25 OBJECT-TYPE
-                  SYNTAX  INTEGER
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                          "Indicates whether the X.25 software option is 
-                           active in the Communications Server's software
-                           configuration.  0 indicates that the option is
-			   absent; 1 that it is present."
-                  ::= { wfconfigKeys 4 }
-
-          wfconfigKeysXns OBJECT-TYPE
-                  SYNTAX  INTEGER
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                          "Indicates whether the XNS/IPX routing software
-                           option is active in the Communications Server's
-                           software configuration.  0 indicates that the
-			   option is absent; 1 that it is present."
-                  ::= { wfconfigKeys 5 }
-
-          wfconfigKeysApple OBJECT-TYPE
-                  SYNTAX  INTEGER
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                          "Indicates whether the AppleTalk routing software
-                           option is active in the Communications Server's
-                           software configuration.  0 indicates that the
-			   option is absent; 1 that it is present."
-                  ::= { wfconfigKeys 6 }
+                          "An array describing the software options active
+			   in the Communications Server's software configuration.
+			   The value of the index denominates a software option;
+			   the value wfconfigKeys.x is 1 if option x is present,
+			   1 if option x is absent.  The legal index values are:
+				1 -- Bridge
+				2 -- Decnet Routing
+				3 -- Ip Routing
+				4 -- X.25
+				5 -- XNS/IPX Routing
+				6 -- AppleTalk Routing "
+--		  INDEX	  { INTEGER OPTIONAL }	
+                  ::= { wfConfig 5 }
 
           wfconfigHwTable OBJECT-TYPE
                   SYNTAX  SEQUENCE OF CardEntry
-                  ACCESS  not-accessible
+                  ACCESS non-accessible
                   STATUS  mandatory
                   DESCRIPTION
                           "The Hw Table records the Hardware present in the 
@@ -1812,7 +1594,7 @@
 
           wfconfigHwEntry OBJECT-TYPE
                   SYNTAX  CardEntry
-                  ACCESS  not-accessible
+                  ACCESS  non-accessible
                   STATUS  mandatory
                   DESCRIPTION
  			   "Describes the Processor and ILI Cards present in
@@ -1840,7 +1622,7 @@
 
           wfconfigHwAceSn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The serial number of the processor board in this slot.
@@ -1850,7 +1632,7 @@
 
           wfconfigHwAceRev OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The revision level of the processor board in this slot.
@@ -1860,7 +1642,7 @@
 
           wfconfigHwModSn OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The serial number of the ILI board (Link Module)
@@ -1869,7 +1651,7 @@
 
           wfconfigHwModRev OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The revision level of the ILI board (Link Module)
@@ -1878,7 +1660,7 @@
 
           wfconfigHwModID OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The ID number of the ILI board (Link Module)
@@ -1888,7 +1670,7 @@
 
           wfconfigHwSlot OBJECT-TYPE
                   SYNTAX  INTEGER
-                  ACCESS  read-only
+                  ACCESS  read
                   STATUS  mandatory
                   DESCRIPTION
                           "The slot in which the boards described in this
@@ -1897,394 +1679,6 @@
 			   slot.  wfconfigHwEntrys will be defined only for
 			   populated slots."
                   ::= { wfconfigHwEntry 6 }
-
-	   wfconfigBootpRqSrvr OBJECT-TYPE
-                  SYNTAX  IpAddress
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                          "The IP Address of the BOOTP Server which initialized the
-			   entity's Load Image and Configuration name."
-                  ::= { wfConfig 7 }
-
-	   wfconfigBootpFileSrvr OBJECT-TYPE
-                  SYNTAX  IpAddress
-                  ACCESS  read-only
-                  STATUS  mandatory
-                  DESCRIPTION
-                          "The IP Address of the TFTP Server from which the
-			   entity's Load Image and Configuration file were downloaded."
-                  ::= { wfConfig 8 }
-
-	-- The IPX Group
-	
-	-- The IPX Group contains information about the IPX
-	-- module of a Wellfleet Communications Server
-	
-	wfipxMib   OBJECT IDENTIFIER ::= { wfIpx 1 }
-
-	wfipxidp   OBJECT IDENTIFIER ::= { wfipxMib 1 }
-
-	wfipxidpForwarding OBJECT-TYPE
-		SYNTAX INTEGER {
-			forwarding(1),
-			host(2)
-		}
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"Indicates whether the node is a router."
-		::= { wfipxidp 1 }
-	
-	wfipxidpInReceives OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			" Contains the total number of all IDP datagrams 
-			(including those received in error) received from
-			all interfaces."
-		::= { wfipxidp 2 }
-	
-	wfipxidpInHdrErrors OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"Contains the number of IDP datagrams discarded
-			because of errors in their IDP headers. Such errors
-			include bad checksums, format errors and bad hop 
-			counts. "
-		::= { wfipxidp 3 }
-	
-	wfipxidpInAddrErrors OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of IDP datagrams discarded because of
-			invalid destination fields. "
-		::= { wfipxidp 4 }
-	
-	wfipxidpForwDatagrams OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of received IDP datagrams not addressed
-			to the IPX router. The router attempts to forward
-			these datagrams to their ultimate destination. "
-		::= { wfipxidp 5 }
-
-	wfipxidpInUnknownProtos OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of IDP datagrams discarded because of
-			an invalid protocol field."
-		::= { wfipxidp 6 }
-	
-	wfipxidpInDiscards OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of input IDP datagrams discarded because of
-			of insufficient Server resources. "
-		::= { wfipxidp 7 }
-	
-	wfipxidpInDelivers OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of IDP datagrams delivered to the IDP
-			user protocols. (Error, Echo, RIP). "
-		::= { wfipxidp 8 }
-
-	wfipxidpOutRequests OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of IDP datagrams generated by the local
-			IDP user protocols. "
-		::= { wfipxidp 9 }
-	
-	wfipxidpOutDiscards OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of output IDP datagrams discarded because of
-			of insufficient Server resources. "
-		::= { wfipxidp 10 }
-	
-	wfipxidpOutNoRoutes OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of IDP datagrams discarded because no route
-			could be found for their destination. "
-		::= { wfipxidp 11 }
-	
-	wfipxidpAddrTable OBJECT-TYPE
-		SYNTAX SEQUENCE OF WfIpxIdpAddrEntry 
-		ACCESS not-accessible
-		STATUS mandatory
-		DESCRIPTION
-			"The IDP Address table. "
-		::= { wfipxidp 13 }
-	
-	wfipxidpAddrEntry OBJECT-TYPE
-		SYNTAX WfIpxIdpAddrEntry
-		ACCESS not-accessible
-		STATUS mandatory
-		DESCRIPTION
-			"An entry in the IDP address table."
-		INDEX { wfipxidpAddrAddress }
-		::= { wfipxidpAddrTable 1 }
-	
-	WfIpxIdpAddrEntry ::= SEQUENCE {
-		wfipxidpAddrAddress
-			OCTET STRING,
-		wfipxidpAddrIfIndex
-			INTEGER
-	}
-
-	wfipxidpAddrAddress OBJECT-TYPE
-		SYNTAX OCTET STRING (SIZE (6))
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The IDP network number. "
-		::= { wfipxidpAddrEntry 1 }
-	
-	wfipxidpAddrIfIndex OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The interface index. "
-		::= { wfipxidpAddrEntry 2 }
-	
-	wfipxidpRoutingTable OBJECT-TYPE
-		SYNTAX SEQUENCE OF WfIpxIdpRouteEntry
-		ACCESS not-accessible
-		STATUS mandatory
-		DESCRIPTION
-			"The IPX IDP routing table."
-		::= { wfipxidp 14 }
-	
-	wfipxidpRouteEntry OBJECT-TYPE
-		SYNTAX WfIpxIdpRouteEntry
-		ACCESS not-accessible
-		STATUS mandatory
-		DESCRIPTION
-			"Information about a routing table entry. "
-		INDEX { wfipxidpRouteDest }
-		::= { wfipxidpRoutingTable 1 }
-	
-	WfIpxIdpRouteEntry ::= SEQUENCE {
-		wfipxidpRouteDest
-			INTEGER,
-		wfipxidpRouteIfIndex
-			INTEGER,
-		wfipxidpRouteMetric
-			INTEGER,
-		wfipxidpRouteNextHop
-			OCTET STRING,
-		wfipxidpRouteType
-			INTEGER,
-		wfipxidpRouteProto
-			INTEGER,
-		wfipxidpRouteAge
-			INTEGER
-	}
-
-	wfipxidpRouteDest OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The destination network. "
-		::= { wfipxidpRouteEntry 1 }
-	
-	wfipxidpRouteIfIndex OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"An index to the next hop interface. "
-		::= { wfipxidpRouteEntry 2 }
-	
-	wfipxidpRouteMetric OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The RIP hop count to the destination. 0 means the
-			host is locally attached. "
-		::= { wfipxidpRouteEntry 3 }
-	
-	wfipxidpRouteNextHop OBJECT-TYPE
-		SYNTAX OCTET STRING (SIZE (6))
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The host address of the next hop gateway. "
-		::= { wfipxidpRouteEntry 4 }
-	
-	wfipxidpRouteType OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"Indicates whether the route was statically configured,
-			direct or learned via RIP. "
-		::= { wfipxidpRouteEntry 5 }
-	
-	wfipxidpRouteProto OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The actual routing protocol used to determine the route."
-		::= { wfipxidpRouteEntry 6 }
-	
-	wfipxidpRouteAge OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The age (in seconds) of the route. "
-		::= { wfipxidpRouteEntry 7 }
-	
-
-	wfipxidpSAPTable OBJECT-TYPE
-		SYNTAX SEQUENCE OF WfIpxIdpSAPEntry
-		ACCESS not-accessible
-		STATUS mandatory
-		DESCRIPTION
-			"The IPX SAP Servers table."
-		::= { wfipxidp 15 }
-	
-	wfipxidpSAPEntry OBJECT-TYPE
-		SYNTAX WfIpxIdpSAPEntry
-		ACCESS not-accessible
-		STATUS mandatory
-		DESCRIPTION
-			"Information about a SAP table entry. "
-		INDEX { wfipxidpSAPType, wfipxidpSAPNet, wfipxidpSAPHost, 
-		        wfipxidpSAPSocket, wfipxidpSAPIndex }
-		::= { wfipxidpSAPTable 1 }
-	
-	WfIpxIdpSAPEntry ::= SEQUENCE {
-		wfipxidpSAPType
-			INTEGER,
-		wfipxidpSAPNet
-			INTEGER,
-		wfipxidpSAPHost
-			OCTET STRING,
-		wfipxidpSAPSocket
-			INTEGER,
-		wfipxidpSAPName
-			OCTET STRING,
-		wfipxidpSAPAge
-			INTEGER,
-		wfipxidpSAPHops
-			INTEGER,
-		wfipxidpSAPIfIndex
-			INTEGER,
-		wfipxidpSAPIndex
-			INTEGER
-	}
-
-
-	wfipxidpSAPType OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The IPX numerical type of server described by this
-			 server entry. "
-		::= { wfipxidpSAPEntry 1 }
-	
-	wfipxidpSAPNet OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The IPX network number of the server described by this
-			 server entry. "
-		::= { wfipxidpSAPEntry 2 }
-	
-	wfipxidpSAPHost OBJECT-TYPE
-		SYNTAX OCTET STRING (SIZE (6))
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The IPX host address of the server described by this
-			 server entry. "
-		::= { wfipxidpSAPEntry 3 }
-	
-	wfipxidpSAPSocket OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The IPX socket number at which the server is advertising
-			 service."
-		::= { wfipxidpSAPEntry 4 }
-	
-	wfipxidpSAPName OBJECT-TYPE
-		SYNTAX OCTET STRING (SIZE (48))
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The name of the server described by this
-			 server entry. "
-		::= { wfipxidpSAPEntry 5 }
-	
-	wfipxidpSAPAge OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The age (in seconds) of the server entry.  That is, the
-			 number of seconds since the entry was updated by the SAP
-			 protocol. "
-		::= { wfipxidpSAPEntry 6 }
-	
-	wfipxidpSAPHops OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The number of network hops needed to reach the server
-			 described by this server entry. "
-		::= { wfipxidpSAPEntry 7 }
-	
-	wfipxidpSAPIfIndex OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"The index, corresponding of a value of ifIndex, identifying
-			 the interface through which the server is reachable."
-		::= { wfipxidpSAPEntry 8 }
-	
-	wfipxidpSAPIndex OBJECT-TYPE
-		SYNTAX INTEGER
-		ACCESS read-only
-		STATUS mandatory
-		DESCRIPTION
-			"A unique number identifying servers advertised at the same IPX
-			 network and host address."
-		::= { wfipxidpSAPEntry 9 }
-	
 
                END
 

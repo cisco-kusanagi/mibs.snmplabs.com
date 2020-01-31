@@ -1,0 +1,673 @@
+--
+-- Title:         Fibronics' MIB  
+-- MIB Module :   Private MIB for  NM129
+-- Version    :   V1.0
+-- Date       :   Jan 1, 1995
+-- By         :   Gadi K.
+-- Contact    :   Edna Ganon
+-- Email:     :   edna@fibronics.co.il 
+-- 
+-- Description:   Definitions of Managed Objects
+--                for the Ethernet-like Interface Types
+-- Copyright (c) 1991 Fibronics International
+
+
+          hub-rptr-prvt DEFINITIONS ::= BEGIN
+
+          private    OBJECT IDENTIFIER ::= { internet 4 }
+          enterprises OBJECT IDENTIFIER ::= { private 1 }
+
+
+                  fibronics  OBJECT IDENTIFIER ::= { enterprises 22 }
+                  trap            OBJECT IDENTIFIER ::= { fibronics 3 }
+                  traprun         OBJECT IDENTIFIER ::= { trap 1 }
+                  traperm         OBJECT IDENTIFIER ::= { trap 2 }
+                  trapvar         OBJECT IDENTIFIER ::= { trap 3 }
+                  fm800           OBJECT IDENTIFIER ::= { fibronics 51 }
+                  fmsystem        OBJECT IDENTIFIER ::= { fm800 1 }
+                  fmslot          OBJECT IDENTIFIER ::= { fm800 2 }
+                  fmlu            OBJECT IDENTIFIER ::= { fm800 3 }
+                  fmdiag          OBJECT IDENTIFIER ::= { fm800 5 }
+                  fmdebug         OBJECT IDENTIFIER ::= { fm800 6 }
+
+                  fmsystemrun     OBJECT IDENTIFIER ::= { fmsystem 1 }
+                  fmsystemperm    OBJECT IDENTIFIER ::= { fmsystem 2 }
+
+
+       fmethrptr                OBJECT IDENTIFIER ::= { fm800 11 }
+       rptrinfo                 OBJECT IDENTIFIER ::= { fmethrptr 1 }
+       rptrgroup                OBJECT IDENTIFIER ::= { fmethrptr 2 }
+       rptrgroupport            OBJECT IDENTIFIER ::= { fmethrptr 3 }
+       rptrgroupmodule          OBJECT IDENTIFIER ::= { fmethrptr 4 }
+
+
+
+
+--                  FIBRONICS ETHERNET REPEATER MIB
+--                  ===============================
+
+--------------------------------------------------
+--         Repeater Level
+--------------------------------------------------
+
+rptrRxDscrptrOverFlow        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This counter reflects the number of the
+                     missed received packets due to lack of resourcees
+                     such as descriptors or memory buffers"
+        ::= { rptrinfo 1 }
+
+rptrTxDscrptrOverFlow        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This counter is incremented evry time
+                     there is a transmit over flow"
+        ::= { rptrinfo 2 }
+
+
+rptrMemoryErrors        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This counter is incremented evry time
+                     there is a memory error"
+        ::= { rptrinfo 3 }
+
+rptrJabberCounter        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This counter is incremented evry time
+                     there is a jubber in one of the ports."
+        ::= { rptrinfo 4 }
+
+
+rptrNMSConnectionPort      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Returns the port number which the
+                     NMS is connected."
+        ::= { rptrinfo 5 }
+
+rptrEDBPort      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Returns the port number which the
+                     MultiHub (EDB) is connected to. if the
+                     MultiHub is not connected to the card
+                     the value returned will be 99, if the
+                     card is installed in a stand alone chassis
+                     then reading this object will return 99"
+        ::= { rptrinfo 6 }
+
+--------------------------------------------------
+--         Group Level
+--------------------------------------------------
+
+rptrfmGroupTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RptrfmGroupEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        ::= { rptrgroup 1 }
+
+
+rptrfmGroupEntry     OBJECT-TYPE
+        SYNTAX  RptrfmGroupEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        INDEX   { rptrGroupIndex }
+        ::= { rptrfmGroupTable 1 }
+
+RptrfmGroupEntry ::= SEQUENCE {
+        rptrGroupIndex
+                INTEGER,
+        rptrGroupGlobalStatus
+                OCTET STRING,
+        rptrGroupPrevStatus
+                OCTET STRING,
+        rptrGroupGlobalError
+                INTEGER,
+        rptrGroupJabberError
+                INTEGER,
+        rptrGroupCpuError
+                INTEGER,
+        rptrGroupSQE
+                INTEGER,
+        rptrGroupRepeaterBlockError
+                INTEGER,
+        rptrGroupAutoPartition
+                INTEGER,
+        rptrGroupDetachStatus
+                INTEGER,
+        rptrGroupGlobalCommandCode
+                INTEGER,
+        rptrGroupTrapMask
+                INTEGER,
+        rptrGroupLinkSelectHead1
+                INTEGER,
+        rptrGroupBackupHead1State
+                INTEGER,
+        rptrGroupTailState
+                INTEGER,
+        rptrGroupMaxModuleNumber
+                INTEGER
+}
+
+
+rptrGroupIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Group Number"
+        ::= { rptrfmGroupEntry 1 }
+
+rptrGroupGlobalStatus      OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "8 bytes. 60 status bits of
+                the card. For more information about
+                the meaning of the status, read the
+                specific user manual of each card.
+                The channel leds are encoded into
+                2 bytes."
+        ::= { rptrfmGroupEntry 2 }
+
+rptrGroupPrevStatus      OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "8 bytes. Previous 60 status
+                   bits of the card. This
+                   object id is used mainly
+                   for traps (see Card Trap)"
+        ::= { rptrfmGroupEntry 3 }
+
+
+rptrGroupGlobalError      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fault-exist(1),
+                no-fault-exist(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Group Global Fault status. If
+                     the value is one - there is a
+                     fault in the card."
+        ::= { rptrfmGroupEntry 4 }
+
+rptrGroupJabberError      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fault-exist(1),
+                no-fault-exist(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Jabber Fault status. If
+                     the value is one - there is a
+                     jabber event."
+        ::= { rptrfmGroupEntry 5 }
+
+
+rptrGroupCpuError      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fault-exist(1),
+                no-fault-exist(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "CPU Fault status. If
+                     the value is one - there is a
+                     CPU fault in the card."
+        ::= { rptrfmGroupEntry 6 }
+
+rptrGroupSQE      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fault-exist(1),
+                no-fault-exist(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Group SQE Fault status (for AUI module (339)). If
+                     the value is one - there is an
+                     SQE indication to the card."
+        ::= { rptrfmGroupEntry 7 }
+
+
+rptrGroupRepeaterBlockError      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fault-exist(1),
+                no-fault-exist(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Repeater Block Fault status. If
+                     the value is one - there is a
+                     fault in the repeater block."
+        ::= { rptrfmGroupEntry 8 }
+
+
+rptrGroupAutoPartition      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fault-exist(1),
+                no-fault-exist(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Group Auto partition Fault status. If
+                     the value is one - at least one of
+                     the ports is in auto-partition."
+        ::= { rptrfmGroupEntry 9 }
+
+
+rptrGroupDetachStatus      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                detach-exist(1),
+                no-detach-exist(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Global Detach status. If
+                     the value is one - at least one of
+                     the ports is detached."
+        ::= { rptrfmGroupEntry 10 }
+
+
+rptrGroupGlobalCommandCode   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                attach-all-ports(1),
+                detach-all-ports(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Enable the user to attach/detach all repeater
+                     ports. Note: in case off detach command - all port
+                     will detach except the port on which the
+                     last NMS message was received.
+                     when reading this object the value returned is always
+                     attach-all-ports(1)"
+        ::= { rptrfmGroupEntry 11 }
+
+
+rptrGroupTrapMask  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                mask-all(1),
+                mask-fatal(2),
+                mask-warn(3),
+                mask-info(4)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "When setting this variable to mask-info(4)
+                     then only all traps will be sent.
+                     When setting this variable to mask-warn(3)
+                     then only traps with severity of warn or fatal
+                     will be sent.When setting this variable to mask-fatal(2)
+                     then only traps with severity of fatal
+                     will be sent.
+                     When setting this variable to mask-all(1)
+                     then no traps will be sent."
+        ::= { rptrfmGroupEntry 12 }
+
+rptrGroupLinkSelectHead1   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                toggle-link-select(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Enable the user to switch between MAIN
+                     and SECOND link only in Head module in
+                     the 303 type cards."
+        ::= { rptrfmGroupEntry 13 }
+
+rptrGroupBackupHead1State   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable(1),
+                disable(2),
+                normal(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Enable the user to enable or disable
+                     the backup port for Head module only
+                     in 303 cards. when set to enabled(1)
+                     the active port will be the primary port,
+                     when set to disabled(2) the active port
+                     will be the secondary port and when set
+                     to normal(3) the active port will be set
+                     by the backup algorithm"
+        ::= { rptrfmGroupEntry 14 }
+
+
+rptrGroupTailState   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+                }
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION "Enable the user to enable or disable
+                     Tail in 303 card"
+        ::= { rptrfmGroupEntry 15 }
+
+
+rptrGroupMaxModuleNumber     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Maximum Number of modules in a group."
+        ::= { rptrfmGroupEntry 16 }
+
+----------------------------------------------------
+-- group port table
+----------------------------------------------------
+
+
+
+rptrGroupPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RptrGroupPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        ::= { rptrgroupport 1 }
+
+
+rptrGroupPortEntry     OBJECT-TYPE
+        SYNTAX  RptrGroupPortEntry
+        ACCESS  read-write
+        STATUS  mandatory
+        INDEX   { rptrGroupPIndex , rptrGroupPortIndex }
+        ::= { rptrGroupPortTable 1 }
+
+RptrGroupPortEntry ::= SEQUENCE {
+        rptrGroupPIndex
+                INTEGER,
+        rptrGroupPortIndex
+                INTEGER,
+        rptrGroupPortLinkStatus
+                INTEGER,
+        rptrGroupPortRcvStatus
+                INTEGER,
+        rptrGroupPortLinkFaultCounter
+                Counter,
+        rptrGroupPortAutoPartitionCount
+                Counter,
+        rptrGroupPortAutoPartitionType
+                INTEGER
+}
+
+
+rptrGroupPIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Group Number"
+        ::= { rptrGroupPortEntry 1 }
+
+rptrGroupPortIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Port Number"
+        ::= { rptrGroupPortEntry 2 }
+
+rptrGroupPortLinkStatus      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                link-ok(1),
+                link-not-ok(2),
+                link-not-applicable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "When the value is 1, link status is O.K."
+        ::= { rptrGroupPortEntry 3 }
+
+rptrGroupPortRcvStatus      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                receive(1),
+                no-receive(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This object describes the receive status of the port,
+                     When a port is receiveing data the object gets
+                     the value receive(1), when the port does not
+                     receive any data the object gets the value no-receive(2)"
+        ::= { rptrGroupPortEntry 4 }
+
+
+rptrGroupPortLinkFaultCounter      OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This counter is incremented evry time
+                     a link change is detected in the port.
+                     A link change is encountered on the port
+                     whenever the link is disappearing or
+                     apearing on the port"
+        ::= { rptrGroupPortEntry 5 }
+
+
+rptrGroupPortAutoPartitionCount      OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "This counter is incremented evry time
+                     there is a Auto Partition state in the port."
+        ::= { rptrGroupPortEntry 6 }
+
+
+rptrGroupPortAutoPartitionType      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                collision-limit(1),
+                collision-length-limit(2),
+                loopback-failure(3),
+                cpu-forced-reconnection(4),
+                none(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Auto Partition type."
+        ::= { rptrGroupPortEntry 7 }
+
+
+----------------------------------------------------
+-- module table
+----------------------------------------------------
+
+
+rptrGroupModuleTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RptrGroupModuleEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        ::= { rptrgroupmodule 1 }
+
+
+rptrGroupModuleEntry     OBJECT-TYPE
+        SYNTAX  RptrGroupModuleEntry
+        ACCESS  read-write
+        STATUS  mandatory
+        INDEX   { rptrGroupMIndex , rptrGroupModuleIndex }
+        ::= { rptrGroupModuleTable 1 }
+
+RptrGroupModuleEntry ::= SEQUENCE {
+        rptrGroupMIndex
+                INTEGER,
+        rptrGroupModuleIndex
+                INTEGER,
+        rptrGroupModuleStructInfo
+                INTEGER,
+        rptrGroupModuleBackupState
+                INTEGER
+}
+
+
+rptrGroupMIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Group Number"
+        ::= { rptrGroupModuleEntry 1 }
+
+rptrGroupModuleIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Module Number"
+        ::= { rptrGroupModuleEntry 2 }
+
+rptrGroupModuleStructInfo    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                EM892-330-Blank(1),
+                EM892-331-FO1(2),
+                EM892-332-FO2(3),
+                EM892-333-CX1(4),
+                EM892-334-CX2(5),
+                EM892-332B-FO2B(6),
+                EM892-335-TP1(7),
+                EM892-337-DTE(8),
+                EM892-336-TP2(9),
+                EM892-339-AUI(10)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "
+                List of modules numnbers:
+                eM892.330    /* BLANK */
+                EM892.331    /* FO single port  */
+                EM892.332    /* FO dual port */
+                EM892.333    /* COAX single port  */
+                EM892.334    /* COAX dual port */
+                EM892.332B   /* FO dual port for Dual Homing */
+                EM892.335    /* 10BASET single port */
+                EM892.337    /* DTE */
+                EM892.336    /* 10BASET dual port */
+                EM892.339    /* AUI */"
+        ::= { rptrGroupModuleEntry 3 }
+
+rptrGroupModuleBackupState   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable(1),
+                disable(2),
+                hardware(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Enable the user to overide the
+                     backup switch (enable/disable). or
+                     let the state be as the switch is (hardware)
+                     This object applies only to the 308 card.
+                     setting this object will take effect only after
+                     the next reset or power up of the card."
+        ::= { rptrGroupModuleEntry 4 }
+
+
+----------------------------------------------------
+--                TRAPS
+----------------------------------------------------
+
+rptrGroupPortStatus        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrPortGroupIndex,
+                    rptrPortIndex,
+                    rptrPortAdminStatus
+                  }
+        DESCRIPTION "Issued when the port changed its status"
+        ::= 1
+
+rptrGroupJabberFaultStatus        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrGroupIndex,
+                    rptrGroupPortIndex,
+                    rptrGroupJabberError
+                  }
+        DESCRIPTION "Issued when the port enters the jabber lock state"
+        ::= 2
+
+rptrGroupCPUFaultStatus        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrGroupIndex,
+                    rptrGroupCpuError }
+        DESCRIPTION "Issued when a CPU fault is detected"
+        ::= 3
+
+rptrGroupSQEStatus        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrGroupIndex,
+                    rptrGroupPortIndex,
+                    rptrGroupSQE
+                  }
+        DESCRIPTION "Issued when a SQE error is detected"
+        ::= 4
+
+rptrGroupRepeaterBlockFaultStatus        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrGroupIndex,
+                    rptrGroupRepeaterBlockError }
+        DESCRIPTION "Issued when a repeater block error is detected"
+        ::= 5
+
+rptrGroupPortAutoPartitionStatus        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrGroupPIndex,
+                    rptrGroupPortIndex,
+                    rptrGroupPortAutoPartitionType
+                  }
+        DESCRIPTION "Issued when the port is auto partitioned"
+        ::= 6
+
+rptrGroupTrap              TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrGroupIndex,
+                    rptrGroupGlobalStatus ,
+                    rptrGroupPrevStatus }
+        DESCRIPTION "Generated when a significant status has
+                changed in a group. By xoring the 2 statuses,
+                the NMS can identify the cause of the trap."
+        ::= 7
+
+rptrGroupPortLinkStatus        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrPortGroupIndex,
+                    rptrPortIndex,
+                    rptrGroupPortLinkStatus
+                  }
+        DESCRIPTION "Issued when the link status of the port
+                     changed its status"
+        ::= 8
+
+
+rptrGroupDetachNmsPort        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrNMSConnectionPort }
+        DESCRIPTION "Issued when the port connected to the NMS
+                     Is not dettached by a detach command received
+                     from the NMS"
+        ::= 9
+
+rptrGroupHead1BackupMainActive        TRAP-TYPE
+        ENTERPRISE fm800
+        VARIABLES { rptrGroupIndex }
+        DESCRIPTION "Indicates that the MAIN link is active"
+        ::= 10
+
+rptrGroupHead1BackupSecondActive        TRAP-TYPE
+        ENTERPRISE fm800
+        VARIABLES { rptrGroupIndex }
+        DESCRIPTION "Indicates that the SECOND link is active"
+        ::= 11
+
+rptrGroupDetachEdbPort        TRAP-TYPE
+        ENTERPRISE fmethrptr
+        VARIABLES { rptrEDBPort }
+        DESCRIPTION "Issued when the port connected to the EDB
+                     Is not dettached by a detach command received
+                     from the NMS"
+        ::= 12
+
+
+        END

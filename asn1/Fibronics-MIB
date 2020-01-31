@@ -1,0 +1,592 @@
+
+   
+  
+Fibronics-MIB DEFINITIONS ::= BEGIN 
+ 
+-- Title:       Fibronics' MIB
+-- Description: Private SNMP MIB for :  FER2500, FR9500    
+-- Version:     1.0  
+-- Date:        January 3, 1993  
+-- By:          David Bruce
+-- Contact      Edna Ganon
+-- Email:       edna@fibronics.co.il 
+--  
+-- Comments:    the agents also support the following Non-Private MIBs:  
+--              - RFC 1213 : MIB-II  
+--              - RFC 1286 : BRIDGE - MIB  
+--              - RFC 1231 : Token Ring MIB   
+--/*  sccsid @(#)fxr_mib.txt   4.3 Fibronics(C) 2/4/93 /arc1/SCCS/nms/fxr/snmp/mib/s.fxr_mib.txt */   
+
+IMPORTS  
+		DisplayString FROM SNMPv2-TC
+    NetworkAddress, IpAddress,  
+    Counter, Gauge, TimeTicks,  enterprises  , internet
+  FROM RFC1155-SMI  
+    OBJECT-TYPE  
+  FROM RFC-1212;  
+  
+  
+    MACAddress ::= OCTET STRING (SIZE(6))  
+    FddiTime ::= INTEGER (0..2147483647)  
+    PhivAddr ::= OCTET STRING (SIZE (2))  
+  
+-- Some MIB compilers require that the following 6 lines which define the path  
+-- to Fibronics MIB are commented out:  
+  
+ mgmt           OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1)  mgmt(2) }  
+ mib            OBJECT IDENTIFIER ::= { mgmt 1  }  
+ directory      OBJECT IDENTIFIER ::= { internet 1  }  
+ experimental   OBJECT IDENTIFIER ::= { internet 3  }  
+ private        OBJECT IDENTIFIER ::= { internet 4  }  
+ enterprises    OBJECT IDENTIFIER ::= { private 1  }  
+ fibronics      OBJECT IDENTIFIER ::= { enterprises 22  }  
+  
+ fxrBridge      OBJECT IDENTIFIER ::= { fibronics 61  }  
+-- Objects in this MIB are arranged into groups:  
+--   fxrMng          - Management/Action  
+--   fxrDeviceParams - General parameters  
+--   fxrMaskTable  -  Fibronics Masking tables   
+--   fxrTR - Parameters for additional Token Ring support  
+  
+-- fxrMng group contains Management Variables for Fibronic devices   
+  
+fxrMng   OBJECT IDENTIFIER ::= { fxrBridge 1  }  
+  
+fxrSysId OBJECT-TYPE  
+    SYNTAX  INTEGER {  
+       fr9500(8),  
+       fer2500(12)  
+    }  
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Identification of an Fibronics device. The device type for each   
+	integer clarifies the sysObjectID in MIB - II."  
+    ::= { fxrMng 1  }  
+  
+fxrAction OBJECT-TYPE  
+    SYNTAX  INTEGER {  
+       reset(1),  
+       sendNetworkTab(2),  
+       deleteNetworkTab(3),  
+       sendRoutingTab(4),    -- Level II  
+       deleteRoutinTab(5),  
+       sendLanTab(6),  
+       deleteLanTab(7),  
+       deleteArpTab(8),  
+       sendArpTab(9),  
+       deleteRouteTab(10),   -- Level III  
+       sendRouteTab(11)  
+     }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"This variable enables the operator to perform one of the  
+	specified actions on the tables maintained by the network device.  
+	Send actions require support of proprietery File exchange  
+	protocol."  
+   ::= { fxrMng 2  }  
+  
+  
+fxrFileName OBJECT-TYPE  
+    SYNTAX OCTET STRING -- SIZE 256  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"The name of the file used internally by Fibronics for transferring   
+	tables maintained by network devices, using a prorietary File  
+	exchange protocol."  
+    ::=  { fxrMng 3  }  
+  
+  
+-- fxrDeviceParams group contains a number of general variables   
+  
+fxrDeviceParams       OBJECT IDENTIFIER ::= { fxrBridge 2  }  
+  
+fxrBridgeType  OBJECT-TYPE   
+    SYNTAX  INTEGER {   
+       fr9500(8),  
+       fer2500(31)  
+     }  
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Identification of the Fibronics bridge type."  
+    ::= { fxrDeviceParams 1  }  
+  
+    
+fxrInactiveArpTimeOut OBJECT-TYPE  
+    SYNTAX INTEGER  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"This variable defines the maximum time period that can pass  
+	between ARP requests concerning an entry in the ARP table.  
+	After this time period, the entry is deleted from the table."  
+    ::= { fxrDeviceParams 2  }  
+     
+-- The following two variables define the format of Fibronics specific  
+-- error messages issued by the Fibronics devices  
+     
+fxrBridgeAlarm  OBJECT IDENTIFIER ::= { fxrDeviceParams 3  }  
+    
+fxrErrorDesc OBJECT-TYPE  
+    SYNTAX DisplayString   
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"A textual description of the enterprise-specific trap sent   
+	to the Network Management Station by the Fibronics managed device."  
+    ::= { fxrBridgeAlarm 1  }  
+     
+fxrErrorSeverity OBJECT-TYPE  
+    SYNTAX INTEGER  
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"The severity type of the enterprise-specific trap sent to the   
+	Network Management Station by the Fibronics managed device."  
+    ::= { fxrBridgeAlarm 2  }  
+  
+fxrBrgVersion OBJECT-TYPE  
+    SYNTAX  DisplayString  
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"The bridge version."  
+   ::= { fxrDeviceParams 4  }  
+  
+fxrBrgFeatures OBJECT-TYPE  
+    SYNTAX   OCTET STRING  -- SIZE 20  
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"A bit mask that defines the features supported by a particular configuration  
+	 of this network element:  
+       __________________________________________  
+       |  Byte 1|Byte 2 |Byte 3 | ....|Byte 20  |  
+       |87654321|                     | 87654321|  
+       |________|_______________________________|  
+  
+	 Byte1 :  
+	      bit1: TX Block mask  
+	      bit2: Source Routing Encapulation  
+	      bit3: SNA/SDLC  
+	      bit4: Frame Relay  
+	      bit5: SNMP  
+	      bit6: LAN Manager  
+	      bit7: High Performance  
+	 Byte2 :  
+	      bit1: DEC Router  
+	      bit2: IPX Router "  
+   ::= { fxrDeviceParams 5  }  
+  
+-- fxrMaskTab group defines the format of Fibronics masking tables  
+  
+fxrMaskTab    OBJECT-TYPE  
+    SYNTAX  SEQUENCE  OF FxrMaskEntry  
+    ACCESS  not-accessible  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Mask tables enable definition of routing restrictions and   
+	control of messages flow in the internetwork. Each entry  
+	in this table defines a mask statement consisting of up to   
+	three mask definitions and an action defined by   
+	fxrMaskOper. Different types of mask entries are supported,   
+	as defined by fxrMaskType."  
+    ::=  { fxrBridge 8 }  
+  
+fxrMaskEntry OBJECT-TYPE  
+    SYNTAX  FxrMaskEntry  
+    ACCESS  not-accessible  
+    STATUS  mandatory  
+--  INDEX   { fxrMaskType,  
+--            fxrIfPortNum,  
+--            fxrMaskNum  }  
+    DESCRIPTION  
+	"Defines the contents of each line in the mask table.  
+	Each line is composed of three mask definitions and the  
+	action to be taken. Each mask definition is composed of a  
+	Pattern, Active bit, Base, Offset and Condition."  
+    ::=  { fxrMaskTab 1  }  
+  
+FxrMaskEntry ::= SEQUENCE {  
+    fxrMaskType  
+     INTEGER,  
+    fxrIfPortNum  
+     INTEGER,  
+    fxrMaskNum  
+     INTEGER,  
+    fxrMaskDest  
+     INTEGER,  
+    fxrMaskPat1  
+     OCTET STRING,  
+    fxrMaskActiveBit1  
+     OCTET STRING,  
+    fxrMaskFrom1  
+     INTEGER,  
+    fxrMaskOffset1  
+     INTEGER,  
+    fxrMaskCond1  
+     INTEGER,  
+    fxrMaskPat2  
+     OCTET STRING,  
+    fxrMaskActiveBit2  
+     OCTET STRING,  
+    fxrMaskFrom2  
+     INTEGER,  
+    fxrMaskOffset2  
+     INTEGER,  
+    fxrMaskCond2  
+     INTEGER,  
+    fxrMaskPat3  
+     OCTET STRING,  
+    fxrMaskActiveBit3  
+     OCTET STRING,  
+    fxrMaskFrom3  
+     INTEGER,  
+    fxrMaskOffset3  
+     INTEGER,  
+    fxrMaskCond3  
+     INTEGER,  
+    fxrMaskCompFrom  
+     INTEGER,  
+    fxrMaskCompOffset  
+     INTEGER,  
+    fxrMaskOper  
+     INTEGER  
+    }  
+  
+fxrMaskType  OBJECT-TYPE  
+    SYNTAX INTEGER {  
+       tx(1),  
+       rx(2),  
+       compress(3),  
+       priority(4),  
+       loadSharing(5)  
+    }  
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Defines the type of mask entry."  
+    ::= { fxrMaskEntry 1  }  
+  
+fxrIfPortNum  OBJECT-TYPE  
+    SYNTAX INTEGER  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION   
+	"Specifies the port number to which the mask is applied."  
+   ::= { fxrMaskEntry 2  }  
+  
+fxrMaskNum  OBJECT-TYPE  
+    SYNTAX INTEGER  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"The Mask entry number, defined by its line number in the mask  
+	table."  
+   ::= {  fxrMaskEntry 3  }  
+  
+fxrMaskDest  OBJECT-TYPE  
+    SYNTAX INTEGER {  
+       unassigned-cond (1),  
+       broadcast-msge (2),  
+       multicast-msge (3),  
+       all-msge(4)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION   
+	"Specifies the type of destination address carried by the frame  
+	to which the mask will be applied. Unassigned-condition   
+	deactivates the mask entry."  
+    ::= {  fxrMaskEntry 4   }  
+  
+  
+fxrMaskPat1 OBJECT-TYPE  
+    SYNTAX OCTET STRING  -- (SIZE (2))  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Describes the mask field which is either a 16 bit binary pattern,  
+	or four digit hexadecimal pattern."  
+    ::= { fxrMaskEntry 5  }  
+  
+fxrMaskActiveBit1  OBJECT-TYPE  
+    SYNTAX OCTET STRING  -- (SIZE (2))  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the positions of the wild card characters (*)   
+	in the fxrMaskPat1 field."  
+    ::= { fxrMaskEntry 6  }  
+  
+fxrMaskFrom1  OBJECT-TYPE  
+    SYNTAX INTEGER {  
+       mac(1),  
+       llc(2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Offset base of fxrMaskPat1 within the frame."  
+    ::= { fxrMaskEntry 7  }  
+  
+fxrMaskOffset1  OBJECT-TYPE  
+    SYNTAX INTEGER  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the fxrMaskPat1 offset within the frame (in bytes) from   
+	the base defined in by fxrMaskForm1.The mask offset is an even  
+	decimal number in the range of 0 to 1518."   
+    ::= { fxrMaskEntry 8  }  
+  
+fxrMaskCond1 OBJECT-TYPE  
+    SYNTAX INTEGER {  
+       false (1),  
+       true (2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the logical condition of the mask pattern:  
+  
+	true  - Condition is valid if at the position specified by   
+		fxrMaskOffset1 the packet contains data that matches  
+		the content of fxrMaskPat1.  
+  
+	false - Condition is valid if at the position specified by   
+		fxrMaskOffset1 the packet contains data that does not  
+		match the content of fxrMaskPat1."  
+    ::= {  fxrMaskEntry 9  }  
+  
+fxrMaskPat2  OBJECT-TYPE  
+    SYNTAX OCTET STRING  --   (SIZE (2))  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Describes the mask field which is either a 16 bit binary pattern,  
+	 or four digit hexadecimal pattern."  
+    ::= {  fxrMaskEntry 10  }  
+  
+fxrMaskActiveBit2  OBJECT-TYPE  
+    SYNTAX OCTET STRING  --   (SIZE (2))  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the positions of the wild card characters (*)   
+	in the fxrMaskPat2 field."  
+    ::= {  fxrMaskEntry 11  }  
+  
+fxrMaskFrom2  OBJECT-TYPE  
+    SYNTAX INTEGER {   
+       mac (1),  
+       llc (2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Offset base of fxrMaskPat2 within the frame."  
+    ::= {  fxrMaskEntry 12  }  
+  
+fxrMaskOffset2  OBJECT-TYPE  
+    SYNTAX INTEGER  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the fxrMaskPat2 offset within the frame (in bytes) from   
+	the base defined in by fxrMaskForm2.The mask offset is an even  
+	decimal number in the range of 0 to 1518."   
+    ::= {  fxrMaskEntry 13  }  
+  
+fxrMaskCond2 OBJECT-TYPE  
+    SYNTAX INTEGER {   
+       false (1),  
+       true (2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the logical condition of the mask pattern:  
+  
+	true  - Condition is valid if at the position specified by   
+		fxrMaskOffset2 the packet contains data that matches  
+		the content of fxrMaskPat2.  
+  
+	false - Condition is valid if at the position specified by   
+		fxrMaskOffset2 the packet contains data that does not  
+		match the content of fxrMaskPat2."  
+    ::= {  fxrMaskEntry 14  }  
+  
+fxrMaskPat3 OBJECT-TYPE  
+    SYNTAX OCTET STRING  --   (SIZE (2))  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Describes the mask field which is either a 16 bit binary pattern,  
+	or four digit hexadecimal pattern."  
+    ::= {  fxrMaskEntry 15  }  
+  
+fxrMaskActiveBit3 OBJECT-TYPE  
+    SYNTAX OCTET STRING  --   (SIZE (2))  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the positions of the wild card characters (*)   
+	in the fxrMaskPat3 field."  
+    ::= {  fxrMaskEntry 16  }  
+  
+fxrMaskFrom3 OBJECT-TYPE  
+    SYNTAX INTEGER {   
+       mac (1),  
+       llc (2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Offset base of fxrMaskPat3 within the frame."  
+    ::= {  fxrMaskEntry 17  }  
+  
+fxrMaskOffset3 OBJECT-TYPE  
+    SYNTAX INTEGER  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the fxrMaskPat3 offset within the frame (in bytes) from   
+	the base defined in by fxrMaskForm3. The mask offset is an even  
+	decimal number in the range of 0 to 1518."   
+    ::= {  fxrMaskEntry 18  }  
+  
+fxrMaskCond3 OBJECT-TYPE  
+    SYNTAX INTEGER {   
+       false (1),  
+       true (2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Specifies the logical condition of the mask pattern:  
+  
+	true  - Condition is valid if at the position specified by   
+		fxrMaskOffset3 the packet contains data that matches  
+		the content of fxrMaskPat3  
+  
+	false - Condition is valid if at the position specified by   
+		fxrMaskOffset3 the packet contains data that does not  
+		match the content of fxrMaskPat3."  
+    ::= {  fxrMaskEntry 19  }  
+  
+  
+fxrMaskCompFrom  OBJECT-TYPE  
+    SYNTAX INTEGER {   
+       mac (1),  
+       llc (2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"This field is used only when the mask type is 'compress'.  
+	It specifies the offset base from which the offset specified by  
+	fxrMaskCompOffset is calculated"  
+    ::= {  fxrMaskEntry 20  }  
+      
+fxrMaskCompOffset  OBJECT-TYPE  
+    SYNTAX INTEGER  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"This field is used for compression mask type only. It defines   
+	the truncation offset in bytes. The rage is 12 to 254 and it can   
+	assume only even values."  
+    ::= {  fxrMaskEntry 21  }  
+      
+fxrMaskOper OBJECT-TYPE  
+    SYNTAX INTEGER {   
+       block (1),  
+       forward (2),  
+       route (3),  
+       forward-route (4),  
+       high-priority (5)  
+    }  
+    ACCESS read-write  
+    STATUS mandatory  
+    DESCRIPTION  
+	"The type of action to be taken if the frame meets the   
+	conditions of the mask."  
+    ::= {  fxrMaskEntry 22  }  
+  
+-- fxrTR group defines the parameters for the Token Ring elemet   
+fxrTR    OBJECT IDENTIFIER ::= { fxrBridge 13 }  
+  
+fxrTRIfTab  OBJECT-TYPE  
+    SYNTAX  SEQUENCE  OF FxrTRIfEntry  
+    ACCESS  not-accessible  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"This table defines the configuration parameters for Token Ring support which are unique to Fibronics   
+	 Token Ring bridges."  
+    ::=  { fxrTR 1  }  
+  
+fxrTRIfEntry    OBJECT-TYPE  
+    SYNTAX  FxrTRIfEntry  
+    ACCESS  not-accessible  
+    STATUS  mandatory  
+    INDEX  { fxrTRIfIndex }  
+    ::=  { fxrTRIfTab 1  }  
+  
+FxrTRIfEntry ::= SEQUENCE {  
+    fxrTRIfIndex  
+     INTEGER,  
+    fxrTREarlyTokenRelease  
+     INTEGER,  
+    fxrTRLocalAdminAddr  
+     MACAddress,  
+    fxrTRLocalAdminAddressStatus  
+      INTEGER  
+	  }  
+  
+fxrTRIfIndex OBJECT-TYPE  
+    SYNTAX   INTEGER  
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"Index to the Token Ring  Interface Table. The interface defined by a  
+	particular value of this index is the same interface as  
+	identified by the same value of ifIndex (MIBII)."  
+    ::= {  fxrTRIfEntry 1  }  
+  
+fxrTREarlyTokenRelease OBJECT-TYPE  
+    SYNTAX  INTEGER {  
+       enable(1),  
+       disable(2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	 "This parameter controls the early token release. This paramenter  
+	  is applicable only to 16 Mbps ring."  
+    ::= {  fxrTRIfEntry 2  }  
+  
+fxrTRLocalAdminAddress  OBJECT-TYPE  
+    SYNTAX MACAddress  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	"A locally administered MAC Address of this interface."  
+    ::= {  fxrTRIfEntry 3  }  
+  
+fxrTRLocalAdminAddressStatus OBJECT-TYPE  
+    SYNTAX  INTEGER {  
+       enable(1),  
+       disable(2)  
+    }  
+    ACCESS  read-write  
+    STATUS  mandatory  
+    DESCRIPTION  
+	 "This parameter controls whether the bridge uses the locally administered MAC   
+	 Address defined for this interface, when enable(1),  or not ,  when disable(2)."  
+    ::= {  fxrTRIfEntry 4  }  
+  
+END           
