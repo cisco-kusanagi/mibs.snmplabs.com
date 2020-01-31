@@ -17,7 +17,7 @@ compile:  ## Compile all MIBs into .py files
 	done
 
 compile-changed:  ## Compile With Texts all MIBs into .py files
-	@for f in $$(git status --porcelain | grep "^A" | cut -c 4- | grep "asn1/"); do \
+	@for f in $$(git diff --name-only --diff-filter=AM HEAD asn1/); do \
 		echo "## Compiling $$f"; \
 		mibdump.py \
 			--no-python-compile \
@@ -38,7 +38,7 @@ compile-with-texts:  ## Compile With Texts all MIBs into .py files
 	done
 
 compile-with-texts-changed:  ## Compile With Texts all MIBs into .py files
-	@for f in $$(git status --porcelain | grep "^A" | cut -c 4- | grep "asn1/"); do \
+	@for f in $$(git diff --name-only --diff-filter=AM HEAD asn1/); do \
 	  echo "## Compiling $$f with texts"; \
 	  mibdump.py \
 	    --generate-mib-texts \
@@ -61,7 +61,7 @@ compile-json:  ## Compile With Texts all MIBs into .py files
 	done
 
 compile-json-changed:  ## Compile With Texts all MIBs into .py files
-	@for f in $$(git status --porcelain | grep "^A" | cut -c 4- | grep "asn1/"); do \
+	@for f in $$(git diff --name-only --diff-filter=AM HEAD asn1/); do \
 	  echo "## Compiling $$f with texts"; \
 	  mibdump.py \
 	    --generate-mib-texts \
