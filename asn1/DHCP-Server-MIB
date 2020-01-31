@@ -1,0 +1,784 @@
+                                                                                    -- -----------------------------------------------------------------------------
+-- MIB NAME : DHCP Server mib
+-- FILE NAME: DHCPServer.mib
+-- DATE     : 2007/11/12
+-- VERSION  : 2.04
+-- PURPOSE  : To construct the MIB structure of DHCP Server
+--            for proprietary enterprise
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:
+--  [New Object]
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Revision 2.02, 2007/06/08, Nic
+-- [Modification]
+-- [1]Change the access mode of swDHCPServerDefaultRouterIndex from
+-- Read-Write to read-only
+-- [2]Change the access mode of swDHCPServerManualBindingIpAddress from
+-- Read-Write to read-only
+-- Notes: Requested by Nic for project DGS3600R2.
+
+-- Revision 2.01, 2007/05/30, Nic
+-- [Modification]
+-- [1]Modify swDHCPServerExcludedAddressTable. Delete node
+-- swDHCPServerExcludedAddressIndex, and change the index of table from
+-- swDHCPServerExcludedAddressIndex to swDHCPServerExcludedAddressBegin and
+-- swDHCPServerExcludedAddressEnd.
+-- Notes: Requested by Nic for project DGS3600R2.
+--
+-- Revision 2.04, 2008/11/12, Lina
+-- [Modification]
+-- [1]Add swDHCPServerConflictIPTable.
+-- Notes: Requested by Lina Liu with DES3528/3552
+--
+-- Version 2.00, 2007/05/17, Nic
+-- This is the first formal version for universal MIB definition.
+-- -----------------------------------------------------------------------------
+
+DHCP-Server-MIB DEFINITIONS ::= BEGIN
+
+-- -----------------------------------------------------------------------------
+-- DHCP Server MIB
+-- -----------------------------------------------------------------------------
+
+
+IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,IpAddress     FROM SNMPv2-SMI
+        RowStatus,DisplayString,MacAddress        FROM SNMPv2-TC
+        dlink-common-mgmt               					FROM DLINK-ID-REC-MIB;
+
+     swDHCPServerMIB MODULE-IDENTITY
+          LAST-UPDATED "200706080000Z"
+          ORGANIZATION "D-Link Crop."
+          CONTACT-INFO
+                       "http://support.dlink.com"
+          DESCRIPTION
+           "The structure of DHCP Server management for the
+		    		proprietary enterprise."
+          ::= { dlink-common-mgmt 38 }
+
+   swDHCPServerCtrl            OBJECT IDENTIFIER ::= { swDHCPServerMIB 1 }
+   swDHCPServerInfo            OBJECT IDENTIFIER ::= { swDHCPServerMIB 2}
+   swDHCPServerMgmt            OBJECT IDENTIFIER ::= { swDHCPServerMIB 3}
+
+   swDHCPServerPoolMgmt					OBJECT IDENTIFIER ::= { swDHCPServerMgmt 2}
+   swDHCPServerBindingMgmt	OBJECT IDENTIFIER ::= { swDHCPServerMgmt 4}
+
+-- -----------------------------------------------------------------------------
+-- swDHCPServerCtrl            OBJECT IDENTIFIER ::= { swDHCPServerMIB 1 }
+-- -----------------------------------------------------------------------------
+swDHCPServerState OBJECT-TYPE
+    SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2)
+               }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object enables/disables the DHCP server status
+             of the device."
+    ::= { swDHCPServerCtrl 1 }
+
+swDHCPServerPingPktNumber OBJECT-TYPE
+    SYNTAX  INTEGER (0..10)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object specifies the number of ping packets
+            the DHCP server sends to an IP address before
+            assigning this address to a requesting client."
+    ::= { swDHCPServerCtrl 2 }
+
+swDHCPServerPingTimeOut OBJECT-TYPE
+    SYNTAX  INTEGER (10..2000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object specifies the amount of time the
+            DHCP server must wait before timing out a ping packet."
+    ::= { swDHCPServerCtrl 3 }
+
+
+-- -----------------------------------------------------------------------------
+--  swDHCPServerMgmt            OBJECT IDENTIFIER ::= { swDHCPServerMIB 3}
+-- -----------------------------------------------------------------------------
+
+
+-- -----------------------------------------------------------------------------
+-- swDHCPServerExcludedAddressTable	 { swDHCPServerMgmt 1 }
+-- -----------------------------------------------------------------------------
+swDHCPServerExcludedAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwDHCPServerExcludedAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains an IP addresses group that
+        the DHCP server should not assign to DHCP client."
+    ::= { swDHCPServerMgmt 1 }
+
+swDHCPServerExcludedAddressEntry OBJECT-TYPE
+    SYNTAX      SwDHCPServerExcludedAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A group of IP addresses that the DHCP server
+        should not assign to DHCP client."
+    INDEX { swDHCPServerExcludedAddressBegin, swDHCPServerExcludedAddressEnd }
+    ::= { swDHCPServerExcludedAddressTable 1 }
+
+SwDHCPServerExcludedAddressEntry ::=
+    SEQUENCE {
+        swDHCPServerExcludedAddressBegin
+            IpAddress,
+        swDHCPServerExcludedAddressEnd
+        		IpAddress,
+        swDHCPServerExcludedAddressStatus
+        		RowStatus
+        }
+
+swDHCPServerExcludedAddressBegin OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The start address of this address range."
+        ::= { swDHCPServerExcludedAddressEntry 1 }
+
+swDHCPServerExcludedAddressEnd OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The end address of this address range."
+        ::= { swDHCPServerExcludedAddressEntry 2 }
+
+swDHCPServerExcludedAddressStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object manages this entry."
+    ::= { swDHCPServerExcludedAddressEntry 3 }
+
+
+-- -----------------------------------------------------------------------------
+-- swDHCPServerPoolMgmt	 { swDHCPServerMgmt 2 }
+-- -----------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
+-- swDHCPServerPoolTable	 { swDHCPServerPoolMgmt 1 }
+-- -----------------------------------------------------------------------------
+swDHCPServerPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwDHCPServerPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains DHCP server pool information."
+    ::= { swDHCPServerPoolMgmt 1 }
+
+swDHCPServerPoolEntry OBJECT-TYPE
+    SYNTAX      SwDHCPServerPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of DHCP server pool information."
+    INDEX { swDHCPServerPoolName }
+    ::= { swDHCPServerPoolTable 1 }
+
+SwDHCPServerPoolEntry ::=
+    SEQUENCE {
+        swDHCPServerPoolName
+            DisplayString,
+        swDHCPServerPoolNetworkAddress
+            IpAddress,
+        swDHCPServerPoolNetworkAddressMask
+            IpAddress,
+        swDHCPServerPoolDomainName
+        		DisplayString,
+        swDHCPServerPoolNetBIOSNodeType
+        		INTEGER,
+        swDHCPServerPoolLeaseState
+        		INTEGER,
+        swDHCPServerPoolLeaseDay
+        		INTEGER,
+        swDHCPServerPoolLeaseHour
+        		INTEGER,
+        swDHCPServerPoolLeaseMinute
+        		INTEGER,
+        swDHCPServerPoolBootFile
+        		DisplayString,
+        swDHCPServerPoolNextServer
+        		IpAddress,
+        swDHCPServerPoolStatus
+        		RowStatus
+        }
+
+swDHCPServerPoolName OBJECT-TYPE
+		SYNTAX  DisplayString	(SIZE(1..12))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The name of this pool entry."
+    ::= { swDHCPServerPoolEntry 1 }
+
+swDHCPServerPoolNetworkAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The network address of this DHCP pool entry."
+    ::= { swDHCPServerPoolEntry 2 }
+
+swDHCPServerPoolNetworkAddressMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The network address mask of this DHCP pool entry."
+    ::= { swDHCPServerPoolEntry 3 }
+
+swDHCPServerPoolDomainName OBJECT-TYPE
+    SYNTAX  DisplayString	(SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The domain name for the client if the server allocates
+         the address for the client from this pool."
+    ::= { swDHCPServerPoolEntry 4 }
+
+swDHCPServerPoolNetBIOSNodeType OBJECT-TYPE
+		SYNTAX      INTEGER {
+               broadcast(1),
+               peer-to-peer(2),
+               mixed(3),
+               hybid(4)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The NetBIOS node type for a Microsoft DHCP client."
+    ::= { swDHCPServerPoolEntry 5 }
+
+swDHCPServerPoolLeaseState OBJECT-TYPE
+    SYNTAX      INTEGER	{
+    						predefined(1),
+    						infinite(2)
+    						}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The pool lease state. When configured to infinity, the following
+        nodes include swDHCPServerPoolLeaseDay, swDHCPServerPoolLeaseHour
+        and swDHCPServerPoolLeaseMinute have no significance any more."
+    ::= { swDHCPServerPoolEntry 6 }
+
+swDHCPServerPoolLeaseDay OBJECT-TYPE
+    SYNTAX      INTEGER	(0..365)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The day of the lease."
+    ::= { swDHCPServerPoolEntry 7 }
+
+swDHCPServerPoolLeaseHour OBJECT-TYPE
+    SYNTAX      INTEGER	(0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The hour of the lease."
+    ::= { swDHCPServerPoolEntry 8 }
+
+swDHCPServerPoolLeaseMinute OBJECT-TYPE
+    SYNTAX      INTEGER	(0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minute of the lease."
+    ::= { swDHCPServerPoolEntry 9 }
+
+swDHCPServerPoolBootFile OBJECT-TYPE
+		SYNTAX  DisplayString	(SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The name of the file that is used as a boot image."
+    ::= { swDHCPServerPoolEntry 10 }
+
+swDHCPServerPoolNextServer OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The next server to be used in the DHCP client boot process."
+    ::= { swDHCPServerPoolEntry 11 }
+
+swDHCPServerPoolStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object manages this entry."
+    ::= { swDHCPServerPoolEntry 12 }
+
+
+-- -----------------------------------------------------------------------------
+-- swDHCPServerDNSServerAddressTable	 { swDHCPServerPoolMgmt 2 }
+-- -----------------------------------------------------------------------------
+swDHCPServerDNSServerAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwDHCPServerDNSServerAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the IP address of a DNS server
+        that is available to a DHCP client."
+    ::= { swDHCPServerPoolMgmt 2 }
+
+swDHCPServerDNSServerAddressEntry OBJECT-TYPE
+    SYNTAX      SwDHCPServerDNSServerAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of DNS server information."
+    INDEX { swDHCPServerDNSServerPoolName, swDHCPServerDNSServerAddressIndex }
+    ::= { swDHCPServerDNSServerAddressTable 1 }
+
+SwDHCPServerDNSServerAddressEntry ::=
+    SEQUENCE {
+    		swDHCPServerDNSServerPoolName
+    				DisplayString,
+        swDHCPServerDNSServerAddressIndex
+        		INTEGER,
+        swDHCPServerDNSServerAddress
+        		IpAddress,
+        swDHCPServerDNSServerAddressStatus
+        		RowStatus
+        }
+
+swDHCPServerDNSServerPoolName OBJECT-TYPE
+		SYNTAX  DisplayString	(SIZE(1..12))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The pool name of this entry."
+    ::= { swDHCPServerDNSServerAddressEntry 1 }
+
+swDHCPServerDNSServerAddressIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The DNS server address number."
+    ::= { swDHCPServerDNSServerAddressEntry 2 }
+
+swDHCPServerDNSServerAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The IP address of a DNS server that is available to a DHCP client."
+    ::= { swDHCPServerDNSServerAddressEntry 3 }
+
+swDHCPServerDNSServerAddressStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "This object manages this entry."
+    ::= { swDHCPServerDNSServerAddressEntry 4}
+
+-- -----------------------------------------------------------------------------
+-- swDHCPServerNetBIOSNameServerTable	 { swDHCPServerPoolMgmt 3 }
+-- -----------------------------------------------------------------------------
+swDHCPServerNetBIOSNameServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwDHCPServerNetBIOSNameServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the NetBIOS WINS server address information
+        that is available to a Microsoft DHCP client."
+    ::= { swDHCPServerPoolMgmt 3 }
+
+swDHCPServerNetBIOSNameServerEntry OBJECT-TYPE
+    SYNTAX      SwDHCPServerNetBIOSNameServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of NetBIOS WINS server infomation."
+    INDEX { swDHCPServerNetBIOSNameServerPoolName, swDHCPServerNetBIOSNameServerIndex}
+    ::= { swDHCPServerNetBIOSNameServerTable 1 }
+
+SwDHCPServerNetBIOSNameServerEntry ::=
+    SEQUENCE {
+    		swDHCPServerNetBIOSNameServerPoolName
+    				DisplayString,
+        swDHCPServerNetBIOSNameServerIndex
+        		INTEGER,
+        swDHCPServerNetBIOSNameServer
+        		IpAddress,
+				swDHCPServerNetBIOSNameServerStatus
+        		RowStatus
+        }
+
+swDHCPServerNetBIOSNameServerPoolName OBJECT-TYPE
+		SYNTAX  DisplayString	(SIZE(1..12))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The pool name of this entry."
+    ::= { swDHCPServerNetBIOSNameServerEntry 1 }
+
+swDHCPServerNetBIOSNameServerIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The NetBIOS WINS server number."
+    ::= { swDHCPServerNetBIOSNameServerEntry 2 }
+
+swDHCPServerNetBIOSNameServer OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The NetBIOS WINS server that is available to a DHCP client."
+    ::= { swDHCPServerNetBIOSNameServerEntry 3 }
+
+swDHCPServerNetBIOSNameServerStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "This object manages this entry."
+    ::= { swDHCPServerNetBIOSNameServerEntry 4}
+
+-- -----------------------------------------------------------------------------
+-- swDHCPServerDefaultRouterTable	 { swDHCPServerPoolMgmt 4 }
+-- -----------------------------------------------------------------------------
+swDHCPServerDefaultRouterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwDHCPServerDefaultRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the IP address of the default router for a DHCP client."
+    ::= { swDHCPServerPoolMgmt 4 }
+
+swDHCPServerDefaultRouterEntry OBJECT-TYPE
+    SYNTAX      SwDHCPServerDefaultRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of default router information."
+    INDEX { swDHCPServerDefaultRouterPoolName, swDHCPServerDefaultRouterIndex}
+    ::= { swDHCPServerDefaultRouterTable 1 }
+
+SwDHCPServerDefaultRouterEntry ::=
+    SEQUENCE {
+    		swDHCPServerDefaultRouterPoolName
+    				DisplayString,
+        swDHCPServerDefaultRouterIndex
+        		INTEGER,
+        swDHCPServerDefaultRouter
+        		IpAddress,
+				swDHCPServerDefaultRouterStatus
+        		RowStatus
+        }
+
+swDHCPServerDefaultRouterPoolName OBJECT-TYPE
+		SYNTAX  DisplayString	(SIZE(1..12))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The pool name of this entry."
+    ::= { swDHCPServerDefaultRouterEntry 1 }
+
+swDHCPServerDefaultRouterIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The default router index."
+    ::= { swDHCPServerDefaultRouterEntry 2 }
+
+swDHCPServerDefaultRouter OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The address of the default router for a DHCP client."
+    ::= { swDHCPServerDefaultRouterEntry 3 }
+
+swDHCPServerDefaultRouterStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "This object manages this entry."
+    ::= { swDHCPServerDefaultRouterEntry 4}
+
+
+-- -----------------------------------------------------------------------------
+-- swDHCPServerManualBindingTable	 { swDHCPServerMgmt 3 }
+-- -----------------------------------------------------------------------------
+swDHCPServerManualBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwDHCPServerManualBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information regarding the binding
+        of a pool of IP addresses to a DHCP server."
+    ::= { swDHCPServerMgmt 3 }
+
+swDHCPServerManualBindingEntry OBJECT-TYPE
+    SYNTAX      SwDHCPServerManualBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of manual pool binding."
+    INDEX { swDHCPServerManualBindingPoolName,swDHCPServerManualBindingIpAddress }
+    ::= { swDHCPServerManualBindingTable 1 }
+
+SwDHCPServerManualBindingEntry ::=
+    SEQUENCE {
+        swDHCPServerManualBindingPoolName
+            DisplayString,
+        swDHCPServerManualBindingIpAddress
+            IpAddress,
+        swDHCPServerManualBindingHardwareAddress
+        		MacAddress,
+       	swDHCPServerManualBindingType
+            INTEGER,
+        swDHCPServerManualBindingStatus
+        		RowStatus
+        }
+
+swDHCPServerManualBindingPoolName OBJECT-TYPE
+		SYNTAX  DisplayString	(SIZE(1..12))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The pool name of this entry."
+    ::= { swDHCPServerManualBindingEntry 1 }
+
+swDHCPServerManualBindingIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "IP address which will be assigned to specified client."
+    ::= { swDHCPServerManualBindingEntry 2 }
+
+swDHCPServerManualBindingHardwareAddress OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"The MAC address of a client."
+		::= { swDHCPServerManualBindingEntry 3 }
+
+swDHCPServerManualBindingType OBJECT-TYPE
+		SYNTAX      INTEGER {
+               ethernet(1),
+               ieee802(2),
+               both(3)
+               }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of this manual binding.
+         both(3): The client type has no significance, the entry
+         	  could apply to either one.
+        "
+    ::= { swDHCPServerManualBindingEntry 4 }
+
+swDHCPServerManualBindingStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object manages this entry."
+    ::= { swDHCPServerManualBindingEntry 5 }
+
+
+-- -----------------------------------------------------------------------------
+-- swDHCPServerBindingTable	 { swDHCPServerMgmt 4 }
+-- -----------------------------------------------------------------------------
+swDHCPServerBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwDHCPServerBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information regarding dynamic
+        binding information of a pool of IP addresses."
+    ::= { swDHCPServerMgmt 4 }
+
+swDHCPServerBindingEntry OBJECT-TYPE
+    SYNTAX      SwDHCPServerBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A pool of IP addresses that are listed as bound to a DHCP server."
+    INDEX { swDHCPServerBindingPoolName, swDHCPServerBindingIpAddress}
+    ::= { swDHCPServerBindingTable 1 }
+
+SwDHCPServerBindingEntry ::=
+    SEQUENCE {
+        swDHCPServerBindingPoolName
+            DisplayString,
+        swDHCPServerBindingIpAddress
+        		IpAddress,
+        swDHCPServerBindingHardwareAddress
+        		MacAddress,
+        swDHCPServerBindingType
+        		INTEGER,
+        swDHCPServerBindingStatus
+        		INTEGER,
+        swDHCPServerBindingLifeTime
+        		INTEGER,
+        swDHCPServerBindingClearState
+        		INTEGER
+        }
+
+swDHCPServerBindingPoolName OBJECT-TYPE
+		SYNTAX  DisplayString	(SIZE(1..12))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The name of this pool entry."
+    ::= { swDHCPServerBindingEntry 1 }
+
+swDHCPServerBindingIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "IP addresses which have been assigned to a specified client."
+    ::= { swDHCPServerBindingEntry 2 }
+
+swDHCPServerBindingHardwareAddress OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The MAC address of a client."
+		::= { swDHCPServerBindingEntry 3 }
+
+swDHCPServerBindingType OBJECT-TYPE
+		SYNTAX  INTEGER {
+		ethernet(1),
+		iee802(2)
+	}
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The type of this binding."
+	::= { swDHCPServerBindingEntry 4 }
+
+swDHCPServerBindingStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+		manual(1),
+		automatic(2)
+	}
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The status of this binding."
+	::= { swDHCPServerBindingEntry 5 }
+
+swDHCPServerBindingLifeTime OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The life time of the binding entry in seconds.
+		 The value '-1' means an infinite life time."
+	::= { swDHCPServerBindingEntry 6 }
+
+swDHCPServerBindingClearState OBJECT-TYPE
+		SYNTAX  INTEGER {
+		none(1),
+		start(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"This object is used to clear this entry."
+	::= { swDHCPServerBindingEntry 7 }
+-- -----------------------------------------------------------------------------
+-- swDHCPServerConflictIPTable	 { swDHCPServerMgmt 5 }
+-- -----------------------------------------------------------------------------
+swDHCPServerConflictIPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwDHCPServerConflictIPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains DHCP address conflicts."
+    ::= { swDHCPServerMgmt 5 }
+
+swDHCPServerConflictIPEntry OBJECT-TYPE
+    SYNTAX      SwDHCPServerConflictIPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCP address conflict means a duplication of use
+         of the same IP address by two hosts."
+    INDEX { swDHCPServerConflictIPIPAddress }
+    ::= { swDHCPServerConflictIPTable 1 }
+
+SwDHCPServerConflictIPEntry ::=
+    SEQUENCE {
+        swDHCPServerConflictIPIPAddress
+        		IpAddress,
+        swDHCPServerConflictIPDetectionMethod
+        		INTEGER,
+        swDHCPServerConflictIPDetectionTime
+                DisplayString,
+        swDHCPServerConflictIPClearState
+        		INTEGER
+        }
+
+
+swDHCPServerConflictIPIPAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "IP address which is duplicated and used by two hosts."
+    ::= { swDHCPServerConflictIPEntry 1 }
+
+
+swDHCPServerConflictIPDetectionMethod OBJECT-TYPE
+		SYNTAX  INTEGER {
+		ping(1),
+		gratuitous-arp(2)
+	}
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The server detects conflicts using ping. The client detects
+		 conflicts using gratuitous Address Resolution Protocol (ARP)."
+	::= { swDHCPServerConflictIPEntry 2 }
+
+swDHCPServerConflictIPDetectionTime	OBJECT-TYPE
+		SYNTAX	DisplayString
+		MAX-ACCESS read-only
+		STATUS	current
+		DESCRIPTION
+			"The time at which a DHCP address conflict happens."
+		::= { swDHCPServerConflictIPEntry 3 }
+
+swDHCPServerConflictIPClearState OBJECT-TYPE
+		SYNTAX  INTEGER {
+		none(1),
+		start(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"This object is used to clear this entry."
+	::= { swDHCPServerConflictIPEntry 4 }
+
+
+END

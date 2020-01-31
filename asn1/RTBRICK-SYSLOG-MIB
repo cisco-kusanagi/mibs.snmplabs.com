@@ -1,0 +1,99 @@
+-- ****************************************************************************
+--  RTBRICK-SYSLOG-MIB definitions
+--
+--
+--  RTBRICK Syslog MIB file.
+--
+-- ****************************************************************************
+
+
+RTBRICK-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32                              FROM    SNMPv2-SMI
+    TEXTUAL-CONVENTION,DisplayString        FROM    SNMPv2-TC
+    rtbrickTraps, rtbrickSyslogNotifications    FROM    RTBRICK-MIB
+    rtbrickModules FROM    RTBRICK-MIB
+;
+
+rtBrickSyslogMIB MODULE-IDENTITY
+    LAST-UPDATED "201804140000Z"
+    ORGANIZATION "RtBrick"
+    CONTACT-INFO "E-mail: Stefan Lieberth <stefan@rtbrick.com>"
+    DESCRIPTION  "system_software_info"
+    REVISION     "201901040000Z"
+    DESCRIPTION  "Initial revision"
+    ::= { rtbrickModules 2 }
+
+syslogMessage   OBJECT IDENTIFIER ::= { rtBrickSyslogMIB 1 }
+
+-- system log severity textual convention
+--      This values is the actual value the syslog daemon uses,
+--      plus 1. For example: the value for debug severity will
+--      be 8 instead of 7.
+SyslogSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Indicates the severity of a syslog message.
+                 NOTE: This values is the actual value the syslog daemon uses,
+                       plus 1. For example: the value for debug severity will
+                       be 8 instead of 7."
+    SYNTAX      INTEGER
+                {
+                    emergency(1),
+                    alert(2),
+                    critical(3),
+                    error(4),
+                    warning(5),
+                    notice(6),
+                    info(7),
+                    debug(8)
+                }
+
+-- system log message
+syslogMsgNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "A unique ID representing a message in the system log."
+    ::= { syslogMessage 1 }
+
+syslogMsgFacility OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "A string representing the facility that sent the message."
+    ::= { syslogMessage 2  }
+
+syslogMsgSeverity OBJECT-TYPE
+    SYNTAX      SyslogSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The severity level of the message in the system log."
+    ::= { syslogMessage 3  }
+
+syslogMsgText OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The message itself as logged in the system log."
+    ::= { syslogMessage 4 }
+
+
+--
+-- Syslog Notification definitions
+--
+    rtbrickSyslogNotificationPrefix OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "All Syslog notifications are registered under
+             this branch."
+        ::= { rtbrickSyslogNotifications 0 }
+
+    rtbrickSyslogTrap NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "Notification of a generated syslog message"
+        ::= { rtbrickSyslogNotificationPrefix 1 }
+
+END

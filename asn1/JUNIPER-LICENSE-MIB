@@ -1,104 +1,260 @@
-
--- *****************************************************************************
--- Juniper-LICENSE-MIB
 --
--- Juniper Networks Enterprise MIB
---   License Manager MIB
+-- Juniper Enterprise Specific MIB: License MIB
 --
--- Copyright (c) 2004 Juniper Networks, Inc.
---   All Rights Reserved.
--- *****************************************************************************
+-- Copyright (c) 2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
 
-Juniper-LICENSE-MIB  DEFINITIONS ::= BEGIN
+JUNIPER-LICENSE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, TimeTicks, IpAddress,
+    NOTIFICATION-TYPE
         FROM SNMPv2-SMI
+    jnxLicenseMibRoot
+        FROM JUNIPER-SMI
     DisplayString
-        FROM SNMPv2-TC
-    MODULE-COMPLIANCE, OBJECT-GROUP
-        FROM SNMPv2-CONF
-    juniMibs
-        FROM Juniper-MIBs;
+        FROM SNMPv2-TC;
 
-juniLicenseMIB  MODULE-IDENTITY
-    LAST-UPDATED "200409141924Z"  -- 14-Sep-04 03:24 PM EDT
-    ORGANIZATION "Juniper Networks, Inc."
+jnxLicenseMIB       MODULE-IDENTITY
+    LAST-UPDATED    "201007090000Z"
+    ORGANIZATION    "Juniper Networks, Inc."
     CONTACT-INFO
-        "       Juniper Networks, Inc.
-        Postal: 10 Technology Park Drive
-                Westford MA  01886-3146
-                USA
-        Tel:    +1 978 589 5800
-        Email:  mib@Juniper.net"
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
     DESCRIPTION
-        "The License Manager MIB for the Juniper Networks enterprise."
-    -- Revision History
-    REVISION    "200409141924Z"  -- 14-Sep-04 03:24 PM EDT  - JUNOSe 6.0
+        "Implementation of enterprise specific MIB
+         for license commands and configuration."
+    REVISION    "201007090000Z"    -- Jul 09, 2010
     DESCRIPTION
-        "Initial version of this MIB module."
-    ::= { juniMibs 76 }
+             "Initial version."
+    ::=  {  jnxLicenseMibRoot  1  }
+
+jnxLicenseNotifications     OBJECT IDENTIFIER ::=  {  jnxLicenseMIB  0  }
+jnxLicenseObjects           OBJECT IDENTIFIER ::=  {  jnxLicenseMIB  1  }
+
+jnxLicenseInstallObjects      OBJECT IDENTIFIER ::=  { jnxLicenseObjects 1 }
+jnxLicenseSettings            OBJECT IDENTIFIER ::=  { jnxLicenseObjects 2 }
+
+-- ****************************************************************
+-- License table for installed licenses
+-- ****************************************************************
+
+jnxLicenseInstallTable   OBJECT-TYPE
+    SYNTAX            SEQUENCE  OF  JnxLicenseInstallEntry
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION       "This table contains installed feature license information."
+    ::=  { jnxLicenseInstallObjects 1 }
+
+jnxLicenseInstallEntry   OBJECT-TYPE
+    SYNTAX            JnxLicenseInstallEntry 
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION       "A row of giving installed feature license information."
+    INDEX             {  IMPLIED jnxLicenseId  }
+    ::=  { jnxLicenseInstallTable 1 }
+
+JnxLicenseInstallEntry  ::=  SEQUENCE {
+    jnxLicenseId              DisplayString,
+    jnxLicenseVersion         INTEGER,
+    jnxLicenseDeviceId        DisplayString,
+    jnxLicenseType            INTEGER,
+    jnxLicenseKeys            OCTET STRING
+    }
+
+jnxLicenseId OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Installed feature licenses Id."
+    ::=  {  jnxLicenseInstallEntry 1  }
+
+jnxLicenseVersion OBJECT-TYPE
+    SYNTAX          INTEGER 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License Version information"
+    ::=  {  jnxLicenseInstallEntry 2  }
+
+jnxLicenseDeviceId OBJECT-TYPE
+    SYNTAX          DisplayString 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License Device Id "
+    ::=  {  jnxLicenseInstallEntry 3  }
+
+jnxLicenseType OBJECT-TYPE
+    SYNTAX          INTEGER { invalid(0), count-down(1), date-based(2),permanent(3) } 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License type information"
+    ::=  {  jnxLicenseInstallEntry 4  }
+
+jnxLicenseKeys      OBJECT-TYPE
+    SYNTAX          OCTET STRING 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License Keys"
+    ::=  {  jnxLicenseInstallEntry 5  }
+
+-- Feature Listing Table 
+
+jnxLicenseFeatureListTable OBJECT-TYPE
+    SYNTAX          SEQUENCE  OF  JnxLicenseFeatureListEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "list of features supporting Licensing."
+    ::=  { jnxLicenseInstallObjects  2 }
+
+jnxLicenseFeatureListEntry OBJECT-TYPE
+    SYNTAX          JnxLicenseFeatureListEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row of licensed features."
+    INDEX           {  jnxLicenseFeatureId  }
+    ::=  { jnxLicenseFeatureListTable 1 }
+
+JnxLicenseFeatureListEntry ::=  SEQUENCE {
+    jnxLicenseFeatureId              INTEGER,
+    jnxLicenseFeatureName            DisplayString,
+    jnxLicenseFeatureDescr           DisplayString,
+    jnxLicenseFeatureLicenseId       DisplayString,
+    jnxLicenseFeatureLicenseUsed            INTEGER,
+    jnxLicenseFeatureLicenseInstalled       INTEGER,
+    jnxLicenseFeatureLicenseNeeded          INTEGER
+    }
+
+jnxLicenseFeatureId OBJECT-TYPE
+    SYNTAX              INTEGER 
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "Feature Id to point an entry in this table"
+    ::=  { jnxLicenseFeatureListEntry 1 }
+
+jnxLicenseFeatureName OBJECT-TYPE
+    SYNTAX                 DisplayString 
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION            "Feature Name"
+    ::=  {  jnxLicenseFeatureListEntry 2  } 
+
+jnxLicenseFeatureDescr OBJECT-TYPE
+    SYNTAX                 DisplayString
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION            "Feature Name"
+    ::=  {  jnxLicenseFeatureListEntry 3  }
+
+jnxLicenseFeatureLicenseId OBJECT-TYPE
+    SYNTAX                 DisplayString 
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION            "Feature License Id"
+    ::=  {  jnxLicenseFeatureListEntry 4  } 
+
+jnxLicenseFeatureLicenseUsed      OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Licenses Used"
+    ::=  {  jnxLicenseFeatureListEntry 5  }
+
+jnxLicenseFeatureLicenseInstalled OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Licenses Installed"
+    ::=  {  jnxLicenseFeatureListEntry 6  }
+
+jnxLicenseFeatureLicenseNeeded    OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Licenses Needed"
+    ::=  {  jnxLicenseFeatureListEntry 7  }
 
 
--- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- Managed objects for Assignment functions
--- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-juniLicenseObjects          OBJECT IDENTIFIER ::= { juniLicenseMIB 1 }
+-- ****************************************************************
+-- License configuration parameters
+-- ****************************************************************
 
-juniLicenseLineModuleIfLimitKey OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE(0..16))
-    MAX-ACCESS  read-write
-    STATUS      current
+jnxLicenseRenewBeforExpiration  OBJECT-TYPE
+    SYNTAX                      INTEGER
+    MAX-ACCESS                  read-only
+    STATUS                      current
     DESCRIPTION
-        "The license string that determines the maximum number of interfaces
-        that can be configured on an ATM line module.  A zero-length string
-        (no license) restores the original interface limit."
-    ::= { juniLicenseObjects 1 }
+        "License renew lead time before expiration in days."
+    ::= { jnxLicenseSettings  1 }
 
-juniLicenseLineModuleIfLimitValue OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  read-only
-    STATUS      current
+jnxLicenseRenewInterval  OBJECT-TYPE
+    SYNTAX               INTEGER
+    MAX-ACCESS           read-only
+    STATUS               current
     DESCRIPTION
-        "The maximum number of interfaces allowed on the ATM line module 
-        on the currently configured license string."
-    ::= { juniLicenseObjects 2 }
+        "License checking interval in hours."
+    ::= { jnxLicenseSettings  2 }
 
-
--- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- Conformance information
--- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-juniLicenseMIBConformance
-             OBJECT IDENTIFIER ::= { juniLicenseMIB 2 }
-juniLicenseMIBCompliances
-             OBJECT IDENTIFIER ::= { juniLicenseMIBConformance 1 }
-juniLicenseMIBGroups
-             OBJECT IDENTIFIER ::= { juniLicenseMIBConformance 2 }
-
---
--- compliance statements
---
-juniLicenseCompliance MODULE-COMPLIANCE
-    STATUS      current
+jnxLicenseAutoUpdate    OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
     DESCRIPTION
-        "The compliance statement for systems supporting licensing
-        of features."
-    MODULE  -- this module
-        MANDATORY-GROUPS {
-            juniLicenseGroup }
-    ::= { juniLicenseMIBCompliances 1 }
+        "License auto update URL of a license server."
+    ::= { jnxLicenseSettings  3 }
 
---
--- units of conformance
---
-juniLicenseGroup OBJECT-GROUP
-    OBJECTS {
-        juniLicenseLineModuleIfLimitKey,
-        juniLicenseLineModuleIfLimitValue }
-    STATUS      current
+
+
+-- ********************************************************************
+-- define branches for jnx license traps
+-- ********************************************************************
+
+jnxLicenseGraceExpired NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
     DESCRIPTION
-        "The basic collection of objects providing management of
-        feature licenses in a Juniper product."
-    ::= { juniLicenseMIBGroups 1 }
+        "The SNMP trap that is generated when the license grace period for
+         feature identified by jnxLicenseFeatureName is expired"
+    ::= { jnxLicenseNotifications 1 }
+
+jnxLicenseGraceAboutToExpire NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the license grace period for
+         feature identified by jnxLicenseFeatureName is about to expire"
+    ::= { jnxLicenseNotifications 2 }
+
+jnxLicenseAboutToExpire NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the license period for
+         feature identified by jnxLicenseFeatureName is about to expire"
+    ::= { jnxLicenseNotifications 3 }
+
+jnxLicenseInfringeCumulative NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the feature is used more
+         times than as specified in number of licenses allowed for feature
+         as identified by jnxLicenseFeatureName"
+    ::= { jnxLicenseNotifications 4 }
+
+jnxLicenseInfringeSingle NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the license for feature
+         identified by jnxLicenseFeatureName is not valid i.e. either expired or
+         not available."
+    ::= { jnxLicenseNotifications 5 }
+
 
 END
