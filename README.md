@@ -1,6 +1,6 @@
 # mibs.snmplabs.com
 
-Scrape of all MIBs taken from http://mibs.snmplabs.com/asn1/, as of 04/29/2019.
+Scrape of all MIBs taken from http://mibs.snmplabs.com/asn1/, as of 01/31/2020.
 
 Created with a recursive wget command.
 
@@ -22,4 +22,11 @@ make fetch
 
 # Comiling all mibs
 make compile
+make compile-json
+make compile-with-texts
+
+# Compiling mibs only updated and just added
+make complie-changed
+make compile-json-changed
+make compile-with-texts-changed
 ```
